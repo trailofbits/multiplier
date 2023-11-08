@@ -17,14 +17,17 @@ class TemplateTypeParmDecl;
 class TemplateTypeParmType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateTypeParmType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<TemplateTypeParmType> in(const Fragment &frag);
-  static gap::generator<TemplateTypeParmType> in(const File &file);
   static gap::generator<TemplateTypeParmType> in(const Index &index);
   static gap::generator<TemplateTypeParmType> containing(const Token &tok);
   bool contains(const Token &tok) const;

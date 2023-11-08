@@ -14,7 +14,7 @@ namespace mx {
 enum class AArch64SVEPcsAttrSpelling : unsigned char {
   GNU_AARCH64_SVE_PCS,
   CXX11_CLANG_AARCH64_SVE_PCS,
-  C2X_CLANG_AARCH64_SVE_PCS,
+  C23_CLANG_AARCH64_SVE_PCS,
   SPELLING_NOT_CALCULATED,
 };
 

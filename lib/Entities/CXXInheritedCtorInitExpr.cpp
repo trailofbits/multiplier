@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::containing(co
 
 bool CXXInheritedCtorInitExpr::contains(const Decl &decl) {
   for (auto &parent : CXXInheritedCtorInitExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXInheritedCtorInitExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXInheritedCtorInitExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -111,7 +111,7 @@ std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const Stm
 }
 
 gap::generator<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXInheritedCtorInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXInheritedCtorInitExpr> e = CXXInheritedCtorInitExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::in(const Inde
 }
 
 gap::generator<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXInheritedCtorInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::in(const Frag
 }
 
 gap::generator<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXInheritedCtorInitExprDerivedKinds) {
@@ -160,16 +160,16 @@ bool CXXInheritedCtorInitExpr::constructs_virtual_base(void) const {
 }
 
 CXXConstructExprConstructionKind CXXInheritedCtorInitExpr::construction_kind(void) const {
-  return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal94());
+  return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal95());
 }
 
 CXXConstructorDecl CXXInheritedCtorInitExpr::constructor(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token CXXInheritedCtorInitExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 bool CXXInheritedCtorInitExpr::inherited_from_virtual_base(void) const {

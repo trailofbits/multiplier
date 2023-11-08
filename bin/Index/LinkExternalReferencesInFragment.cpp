@@ -21,92 +21,116 @@
 
 namespace indexer {
 
+// Identify the reference kind and update the records. The function
+// goes through the AST node of referrer and assigned the reference
+// kind for the decl. The functions are defined in `References.cpp`
+extern void DeclReferenceKind(
+    const pasta::AST &ast, const EntityMapper &em,
+    const pasta::Stmt &stmt, const pasta::Decl &ref,
+     mx::ReferenceRecord &record);
+
+extern void DeclReferenceKind(
+    const pasta::AST &ast, const EntityMapper &em,
+    const pasta::Decl &decl, const pasta::Decl &ref,
+    mx::ReferenceRecord &record);
+
+extern void DeclReferenceKind(
+    const pasta::AST &ast, const EntityMapper &em,
+    const pasta::Designator &designator, const pasta::Decl &ref,
+    mx::ReferenceRecord &record);
+
+namespace {
+
+template <typename Entity>
+static void AddDeclReferenceFrom(
+    const pasta::AST &ast, mx::DatabaseWriter &database, const EntityMapper &em,
+    const Entity &from_entity, mx::RawEntityId from_id,
+    const pasta::Decl &to_entity) {
+
+  auto to_id = em.EntityId(to_entity);
+  if (!mx::EntityId(to_id).Extract<mx::DeclId>()) {
+    assert(false);
+    return;
+  }
+
+  // The referer context id will be same as `from_id` by default. The
+  // DeclReferenceKind function updates it based on the AST analysis
+  // of the context in which declaration is referred.
+  mx::ReferenceRecord record{
+      from_id, to_id, from_id, mx::BuiltinReferenceKind::USE};
+  DeclReferenceKind(ast, em, from_entity, to_entity, record);
+  database.AddAsync(record);
+}
+
+template <typename EntityId, typename EntityKindListMap>
+static void AddDeclReferencesFrom(
+    const pasta::AST &ast, mx::DatabaseWriter &database,
+    const PendingFragment &pf,
+    const EntityKindListMap &entities) {
+
+  for (auto from_entity : Entities(entities)) {
+    mx::RawEntityId from_id = pf.em.EntityId(from_entity);
+    auto from_eid = mx::EntityId(from_id).Extract<EntityId>();
+
+    if (!from_eid) {
+      assert(false);
+      continue;
+    }
+
+    if (from_eid->fragment_id != pf.fragment_index) {
+      assert(false);
+      continue;  // This is weird?
+    }
+
+    for (pasta::Decl to_entity : DeclReferencesFrom(from_entity)) {
+      AddDeclReferenceFrom(ast, database, pf.em, from_entity, from_id, to_entity);
+    }
+  }
+}
+
+}  // namespace
+
 // Identify all unique entity IDs referenced by this fragment,
 // and map them to the fragment ID in the data store.
 void LinkExternalReferencesInFragment(
-    mx::DatabaseWriter &database, const PendingFragment &pf,
-    EntityMapper &em) {
+    const pasta::AST &ast, mx::DatabaseWriter &database,
+    const PendingFragment &pf) {
 
+  const EntityMapper &em = pf.em;
+  
   // XREF(pag): Issue #214. We want to record references to other decls that are
   //            expressed in types. In PASTA, we don't present Clang's
   //            `TypeLoc`s, so we need to instead go through the types to find
   //            which ones are explicitly referenced.
-  for (const pasta::Decl &decl : pf.decls_to_serialize) {
-    mx::RawEntityId from_id = em.EntityId(decl);
-    mx::VariantId vid = mx::EntityId(from_id).Unpack();
-    if (!std::holds_alternative<mx::DeclId>(vid)) {
-      assert(false);
-      continue;
-    }
-
-    mx::DeclId did = std::get<mx::DeclId>(vid);
-    if (did.fragment_id != pf.fragment_index) {
-      assert(false);
-      continue;  // This is weird?
-    }
-
-    for (pasta::Decl ref_decl : DeclReferencesFrom(decl)) {
-      mx::RawEntityId to_id = em.EntityId(ref_decl);
-      vid = mx::EntityId(to_id).Unpack();
-      if (!std::holds_alternative<mx::DeclId>(vid)) {
-        assert(false);
-        continue;
-      }
-
-      database.AddAsync(mx::ReferenceRecord{from_id, to_id});
-    }
-  }
-
-  for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
-    mx::RawEntityId from_id = em.EntityId(stmt);
-    mx::VariantId vid = mx::EntityId(from_id).Unpack();
-    if (!std::holds_alternative<mx::StmtId>(vid)) {
-      assert(false);
-      continue;
-    }
-
-    mx::StmtId sid = std::get<mx::StmtId>(vid);
-    if (sid.fragment_id != pf.fragment_index) {
-      assert(false);
-      continue;  // This is weird?
-    }
-
-    for (pasta::Decl ref_decl : DeclReferencesFrom(stmt)) {
-      mx::RawEntityId to_id = em.EntityId(ref_decl);
-      vid = mx::EntityId(to_id).Unpack();
-      if (!std::holds_alternative<mx::DeclId>(vid)) {
-        assert(false);
-        continue;
-      }
-
-      database.AddAsync(mx::ReferenceRecord{from_id, to_id});
-    }
-  }
+  AddDeclReferencesFrom<mx::DeclId>(ast, database, pf, pf.decls_to_serialize);
+  AddDeclReferencesFrom<mx::StmtId>(ast, database, pf, pf.stmts_to_serialize);
 
   // XREF(pag): Issue #192. Make sure we record references from designators
   //            to fields.
-  for (const pasta::Designator &d: pf.designators_to_serialize) {
-    mx::RawEntityId from_id = em.EntityId(d);
-    mx::VariantId vid = mx::EntityId(from_id).Unpack();
-    if (!std::holds_alternative<mx::DesignatorId>(vid)) {
+  for (pasta::Designator from_entity : Entities(pf.designators_to_serialize)) {
+    mx::RawEntityId from_id = em.EntityId(from_entity);
+    auto from_eid = mx::EntityId(from_id).Extract<mx::DesignatorId>();
+    if (!from_eid) {
       assert(false);
       continue;
     }
 
-    if (auto to_field = d.Field()) {
-      mx::RawEntityId to_id = em.EntityId(to_field.value());
-      vid = mx::EntityId(to_id).Unpack();
-      if (!std::holds_alternative<mx::DeclId>(vid)) {
-        assert(false);
-        continue;
-      }
-
-      database.AddAsync(mx::ReferenceRecord{from_id, to_id});
+    if (from_eid->fragment_id != pf.fragment_index) {
+      assert(false);
+      continue;
     }
+
+    auto to_field = from_entity.Field();
+    if (!to_field) {
+      continue;
+    }
+
+    AddDeclReferenceFrom(ast, database, pf.em,
+                         from_entity, from_id, to_field.value());
   }
 
-  for (const std::optional<TokenTree> &tt : pf.macros_to_serialize) {
-    if (!tt) {
+  for (auto maybe_tt : Entities(pf.macros_to_serialize)) {
+    if (!maybe_tt) {
 
       // TODO(pag): Remove this assertion later; really it's a failure to
       //            construct a token tree, and we do have a backup path
@@ -115,43 +139,39 @@ void LinkExternalReferencesInFragment(
       continue;
     }
 
-    std::optional<pasta::Macro> m = tt->Macro();
-    if (!m) {
+    const TokenTree &tt = maybe_tt.value();
+    std::optional<pasta::Macro> maybe_macro = tt.Macro();
+    if (!maybe_macro) {
       continue;
     }
 
-    mx::RawEntityId macro_id = em.EntityId(tt->RawNode());
-    if (macro_id == mx::kInvalidEntityId) {
-      macro_id = em.EntityId(m.value());
-    }
-
-    mx::VariantId vid = mx::EntityId(macro_id).Unpack();
-    if (!std::holds_alternative<mx::MacroId>(vid)) {
+    const pasta::Macro &m = maybe_macro.value();
+    mx::RawEntityId macro_id = em.EntityId(tt);
+    auto from_eid = mx::EntityId(macro_id).Extract<mx::MacroId>();
+    if (!from_eid) {
       assert(false);
       continue;
     }
 
-    mx::MacroId mid = std::get<mx::MacroId>(vid);
-    if (mid.fragment_id != pf.fragment_index) {
+    if (from_eid->fragment_id != pf.fragment_index) {
       assert(false);
       continue;  // This is weird?
     }
 
-    switch (tt->Kind()) {
+    switch (tt.Kind()) {
       default:
         break;
 
       // Have the expansion marked as a reference of the definition.
       case mx::MacroKind::EXPANSION:
-        if (auto exp = pasta::MacroExpansion::From(m.value())) {
+        if (auto exp = pasta::MacroExpansion::From(m)) {
           std::optional<pasta::DefineMacroDirective> def = exp->Definition();
           if (!def) {
             continue;
           }
 
           mx::RawEntityId def_id = em.EntityId(def.value());
-          vid = mx::EntityId(def_id).Unpack();
-          if (!std::holds_alternative<mx::MacroId>(vid)) {
+          if (!mx::EntityId(def_id).Extract<mx::MacroId>()) {
             auto macro_name = def->Name();
             if (!macro_name) {
               continue;  // Probably in a conditionally disabled region.
@@ -174,7 +194,10 @@ void LinkExternalReferencesInFragment(
             continue;
           }
 
-          database.AddAsync(mx::ReferenceRecord{macro_id, def_id});
+          // The referrer context id will be same as `macro_id` by default
+          // and assigned the same.
+          database.AddAsync(mx::ReferenceRecord{
+              macro_id, def_id, macro_id, mx::BuiltinReferenceKind::EXPANSION_OF});
         }
         break;
 
@@ -183,20 +206,22 @@ void LinkExternalReferencesInFragment(
       case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
       case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
       case mx::MacroKind::IMPORT_DIRECTIVE:
-        if (auto inc = pasta::IncludeLikeMacroDirective::From(m.value())) {
+        if (auto inc = pasta::IncludeLikeMacroDirective::From(m)) {
           std::optional<pasta::File> f = inc->IncludedFile();
           if (!f) {
             continue;
           }
 
           mx::RawEntityId file_id = em.EntityId(f.value());
-          vid = mx::EntityId(file_id).Unpack();
-          if (!std::holds_alternative<mx::FileId>(vid)) {
+          if (!mx::EntityId(file_id).Extract<mx::FileId>()) {
             assert(false);
             continue;
           }
 
-          database.AddAsync(mx::ReferenceRecord{macro_id, file_id});
+          // The referrer context id will be same as `macro_id` by default
+          // and assigned the same.
+          database.AddAsync(mx::ReferenceRecord{
+              macro_id, file_id, macro_id, mx::BuiltinReferenceKind::INCLUSION});
         }
         break;
     }

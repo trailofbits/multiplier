@@ -12,7 +12,6 @@
 
 namespace mx {
 enum class RISCVInterruptAttrInterruptType : unsigned char {
-  USER,
   SUPERVISOR,
   MACHINE,
 };
@@ -22,7 +21,7 @@ inline static const char *EnumerationName(RISCVInterruptAttrInterruptType) {
 }
 
 inline static constexpr unsigned NumEnumerators(RISCVInterruptAttrInterruptType) {
-  return 3;
+  return 2;
 }
 
 const char *EnumeratorName(RISCVInterruptAttrInterruptType);

@@ -21,6 +21,11 @@ class Stmt;
 class Token;
 class ValueDecl;
 class VarDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPCapturedExprDecl : public VarDecl {
  private:
@@ -31,12 +36,12 @@ class OMPCapturedExprDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<OMPCapturedExprDecl> in(const Fragment &frag);
-  static gap::generator<OMPCapturedExprDecl> in(const File &file);
   static gap::generator<OMPCapturedExprDecl> in(const Index &index);
   static gap::generator<OMPCapturedExprDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPCapturedExprDecl> by_id(const Index &, EntityId);
+  static gap::generator<OMPCapturedExprDecl> in(const Fragment &frag);
+  static gap::generator<OMPCapturedExprDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_CAPTURED_EXPR;

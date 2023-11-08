@@ -19,6 +19,11 @@ class ObjCIsaExpr;
 class Stmt;
 class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCIsaExpr : public Expr {
  private:
@@ -27,12 +32,12 @@ class ObjCIsaExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<ObjCIsaExpr> in(const Fragment &frag);
-  static gap::generator<ObjCIsaExpr> in(const File &file);
   static gap::generator<ObjCIsaExpr> in(const Index &index);
   static gap::generator<ObjCIsaExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCIsaExpr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCIsaExpr> in(const Fragment &frag);
+  static gap::generator<ObjCIsaExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_ISA_EXPR;

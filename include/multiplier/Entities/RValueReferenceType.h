@@ -17,6 +17,11 @@ class RValueReferenceType;
 class ReferenceType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class RValueReferenceType : public ReferenceType {
  private:
@@ -24,8 +29,6 @@ class RValueReferenceType : public ReferenceType {
   friend class ReferenceType;
   friend class Type;
  public:
-  static gap::generator<RValueReferenceType> in(const Fragment &frag);
-  static gap::generator<RValueReferenceType> in(const File &file);
   static gap::generator<RValueReferenceType> in(const Index &index);
   static gap::generator<RValueReferenceType> containing(const Token &tok);
   bool contains(const Token &tok) const;

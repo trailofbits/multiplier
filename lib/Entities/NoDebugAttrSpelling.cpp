@@ -17,7 +17,7 @@ const char *EnumeratorName(NoDebugAttrSpelling e) {
   switch (e) {
     case NoDebugAttrSpelling::GNU_NODEBUG: return "GNU_NODEBUG";
     case NoDebugAttrSpelling::CXX11_GNU_NODEBUG: return "CXX11_GNU_NODEBUG";
-    case NoDebugAttrSpelling::C2X_GNU_NODEBUG: return "C2X_GNU_NODEBUG";
+    case NoDebugAttrSpelling::C23_GNU_NODEBUG: return "C23_GNU_NODEBUG";
     case NoDebugAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

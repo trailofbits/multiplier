@@ -14,7 +14,7 @@ namespace mx {
 enum class RegCallAttrSpelling : unsigned char {
   GNU_REGCALL,
   CXX11_GNU_REGCALL,
-  C2X_GNU_REGCALL,
+  C23_GNU_REGCALL,
   KEYWORD_REGCALL,
   SPELLING_NOT_CALCULATED,
 };

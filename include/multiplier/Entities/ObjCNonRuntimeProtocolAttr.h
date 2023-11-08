@@ -16,18 +16,23 @@ class Index;
 class Attr;
 class ObjCNonRuntimeProtocolAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCNonRuntimeProtocolAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<ObjCNonRuntimeProtocolAttr> in(const Fragment &frag);
-  static gap::generator<ObjCNonRuntimeProtocolAttr> in(const File &file);
   static gap::generator<ObjCNonRuntimeProtocolAttr> in(const Index &index);
   static gap::generator<ObjCNonRuntimeProtocolAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCNonRuntimeProtocolAttr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCNonRuntimeProtocolAttr> in(const Fragment &frag);
+  static gap::generator<ObjCNonRuntimeProtocolAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_NON_RUNTIME_PROTOCOL;

@@ -31,11 +31,18 @@ class FieldDecl;
 class File;
 class Fragment;
 class Reference;
-class SourceIR;
 class Token;
 class TokenRange;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Designator {
+ public:
+  std::optional<Decl> parent_declaration(void) const;
+  std::optional<Stmt> parent_statement(void) const;
  protected:
   friend class Attr;
   friend class Decl;
@@ -45,11 +52,13 @@ class Designator {
   friend class Index;
   friend class Macro;
   friend class Reference;
-  friend class SourceIR;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
   friend class DesignatorImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const DesignatorImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
   static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
@@ -60,12 +69,9 @@ class Designator {
   Designator &operator=(Designator &&) noexcept = default;
   Designator &operator=(const Designator &) = default;
 
-  friend inline std::strong_ordering operator<=>(const Designator &lhs, const Designator &rhs) noexcept {
-    return lhs.id().Pack() <=> rhs.id().Pack();
+  inline bool operator==(const Designator &rhs) const noexcept {
+    return id().Pack() == rhs.id().Pack();
   }
-
-  bool operator==(const Designator &) const noexcept = default;
-  bool operator!=(const Designator &) const noexcept = default;
 
   /* implicit */ inline Designator(std::shared_ptr<const DesignatorImpl> impl_)
       : impl(std::move(impl_)) {}
@@ -99,7 +105,6 @@ class Designator {
   Token left_bracket_token(void) const;
   Token right_bracket_token(void) const;
   Token ellipsis_token(void) const;
-  std::optional<unsigned> first_expression_index(void) const;
 };
 
 #endif

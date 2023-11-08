@@ -18,14 +18,17 @@ class DeducedTemplateSpecializationType;
 class DeducedType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DeducedType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<DeducedType> in(const Fragment &frag);
-  static gap::generator<DeducedType> in(const File &file);
   static gap::generator<DeducedType> in(const Index &index);
   static gap::generator<DeducedType> containing(const Token &tok);
   bool contains(const Token &tok) const;

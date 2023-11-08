@@ -15,7 +15,7 @@
 #include <multiplier/Entities/ValueDecl.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<MemberExpr> MemberExpr::containing(const std::optional<Stmt> &stm
 
 bool MemberExpr::contains(const Decl &decl) {
   for (auto &parent : MemberExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool MemberExpr::contains(const Stmt &stmt) {
   for (auto &parent : MemberExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -111,7 +111,7 @@ std::optional<MemberExpr> MemberExpr::from(const Stmt &parent) {
 }
 
 gap::generator<MemberExpr> MemberExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kMemberExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<MemberExpr> e = MemberExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<MemberExpr> MemberExpr::in(const Index &index) {
 }
 
 gap::generator<MemberExpr> MemberExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kMemberExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<MemberExpr> MemberExpr::in(const Fragment &frag) {
 }
 
 gap::generator<MemberExpr> MemberExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kMemberExprDerivedKinds) {
@@ -156,33 +156,33 @@ std::optional<MemberExpr> MemberExpr::from(const TokenContext &t) {
 }
 
 Expr MemberExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token MemberExpr::l_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 ValueDecl MemberExpr::member_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token MemberExpr::member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token MemberExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Token MemberExpr::r_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 Token MemberExpr::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 bool MemberExpr::had_multiple_candidates(void) const {
@@ -206,11 +206,11 @@ bool MemberExpr::is_arrow(void) const {
 }
 
 bool MemberExpr::is_implicit_access(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal94();
 }
 
 NonOdrUseReason MemberExpr::is_non_odr_use(void) const {
-  return static_cast<NonOdrUseReason>(impl->reader.getVal94());
+  return static_cast<NonOdrUseReason>(impl->reader.getVal95());
 }
 
 #pragma GCC diagnostic pop

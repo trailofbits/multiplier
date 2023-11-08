@@ -17,7 +17,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/TypeDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Decl.h"
 
@@ -78,14 +78,14 @@ gap::generator<EnumDecl> EnumDecl::containing(const std::optional<Stmt> &stmt) {
 
 bool EnumDecl::contains(const Decl &decl) {
   for (auto &parent : EnumDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool EnumDecl::contains(const Stmt &stmt) {
   for (auto &parent : EnumDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -140,7 +140,7 @@ std::optional<EnumDecl> EnumDecl::from(const Decl &parent) {
 }
 
 gap::generator<EnumDecl> EnumDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kEnumDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<EnumDecl> e = EnumDecl::from(Decl(std::move(eptr)))) {
@@ -151,7 +151,7 @@ gap::generator<EnumDecl> EnumDecl::in(const Index &index) {
 }
 
 gap::generator<EnumDecl> EnumDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kEnumDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -163,7 +163,7 @@ gap::generator<EnumDecl> EnumDecl::in(const Fragment &frag) {
 }
 
 gap::generator<EnumDecl> EnumDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kEnumDeclDerivedKinds) {
@@ -185,15 +185,15 @@ std::optional<EnumDecl> EnumDecl::from(const TokenContext &t) {
 }
 
 unsigned EnumDecl::num_enumerators(void) const {
-  return impl->reader.getVal60().size();
+  return impl->reader.getVal62().size();
 }
 
 std::optional<EnumConstantDecl> EnumDecl::nth_enumerator(unsigned n) const {
-  auto list = impl->reader.getVal60();
+  auto list = impl->reader.getVal62();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -203,12 +203,12 @@ std::optional<EnumConstantDecl> EnumDecl::nth_enumerator(unsigned n) const {
 }
 
 gap::generator<EnumConstantDecl> EnumDecl::enumerators(void) const & {
-  auto list = impl->reader.getVal60();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal62();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d60 = ep->DeclFor(ep, v)) {
-      if (auto e = EnumConstantDecl::from(Decl(std::move(d60)))) {
+    if (auto d62 = ep->DeclFor(ep, v)) {
+      if (auto e = EnumConstantDecl::from(Decl(std::move(d62)))) {
         co_yield std::move(*e);
       }
     }
@@ -218,7 +218,7 @@ gap::generator<EnumConstantDecl> EnumDecl::enumerators(void) const & {
 
 std::optional<EnumDecl> EnumDecl::instantiated_from_member_enum(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal76();
+    RawEntityId eid = impl->reader.getVal78();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -231,7 +231,7 @@ std::optional<EnumDecl> EnumDecl::instantiated_from_member_enum(void) const {
 
 std::optional<Type> EnumDecl::integer_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal77();
+    RawEntityId eid = impl->reader.getVal79();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -243,23 +243,21 @@ std::optional<Type> EnumDecl::integer_type(void) const {
 }
 
 TokenRange EnumDecl::integer_type_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal79(), impl->reader.getVal80());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal81(), impl->reader.getVal82());
 }
 
-std::optional<unsigned> EnumDecl::odr_hash(void) const {
-  if (!impl->reader.getVal103()) {
+std::optional<uint32_t> EnumDecl::odr_hash(void) const {
+  if (!impl->reader.getVal104()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal140());
+    return static_cast<uint32_t>(impl->reader.getVal142());
   }
   return std::nullopt;
 }
 
 std::optional<Type> EnumDecl::promotion_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal81();
+    RawEntityId eid = impl->reader.getVal83();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -272,7 +270,7 @@ std::optional<Type> EnumDecl::promotion_type(void) const {
 
 std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal82();
+    RawEntityId eid = impl->reader.getVal84();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -284,35 +282,35 @@ std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
 }
 
 TemplateSpecializationKind EnumDecl::template_specialization_kind(void) const {
-  return static_cast<TemplateSpecializationKind>(impl->reader.getVal83());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal85());
 }
 
 bool EnumDecl::is_closed(void) const {
-  return impl->reader.getVal104();
-}
-
-bool EnumDecl::is_closed_flag(void) const {
   return impl->reader.getVal105();
 }
 
-bool EnumDecl::is_closed_non_flag(void) const {
+bool EnumDecl::is_closed_flag(void) const {
   return impl->reader.getVal106();
 }
 
-bool EnumDecl::is_complete(void) const {
+bool EnumDecl::is_closed_non_flag(void) const {
   return impl->reader.getVal107();
 }
 
-bool EnumDecl::is_fixed(void) const {
+bool EnumDecl::is_complete(void) const {
   return impl->reader.getVal108();
 }
 
-bool EnumDecl::is_scoped(void) const {
+bool EnumDecl::is_fixed(void) const {
   return impl->reader.getVal109();
 }
 
-bool EnumDecl::is_scoped_using_class_tag(void) const {
+bool EnumDecl::is_scoped(void) const {
   return impl->reader.getVal110();
+}
+
+bool EnumDecl::is_scoped_using_class_tag(void) const {
+  return impl->reader.getVal111();
 }
 
 #pragma GCC diagnostic pop

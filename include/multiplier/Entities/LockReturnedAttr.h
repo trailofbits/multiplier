@@ -18,6 +18,11 @@ class Expr;
 class InheritableAttr;
 class LockReturnedAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class LockReturnedAttr : public InheritableAttr {
  private:
@@ -25,12 +30,12 @@ class LockReturnedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<LockReturnedAttr> in(const Fragment &frag);
-  static gap::generator<LockReturnedAttr> in(const File &file);
   static gap::generator<LockReturnedAttr> in(const Index &index);
   static gap::generator<LockReturnedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<LockReturnedAttr> by_id(const Index &, EntityId);
+  static gap::generator<LockReturnedAttr> in(const Fragment &frag);
+  static gap::generator<LockReturnedAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LOCK_RETURNED;

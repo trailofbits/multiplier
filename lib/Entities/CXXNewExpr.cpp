@@ -17,7 +17,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Stmt.h"
 
@@ -78,14 +78,14 @@ gap::generator<CXXNewExpr> CXXNewExpr::containing(const std::optional<Stmt> &stm
 
 bool CXXNewExpr::contains(const Decl &decl) {
   for (auto &parent : CXXNewExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXNewExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXNewExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -114,7 +114,7 @@ std::optional<CXXNewExpr> CXXNewExpr::from(const Stmt &parent) {
 }
 
 gap::generator<CXXNewExpr> CXXNewExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXNewExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXNewExpr> e = CXXNewExpr::from(Stmt(std::move(eptr)))) {
@@ -125,7 +125,7 @@ gap::generator<CXXNewExpr> CXXNewExpr::in(const Index &index) {
 }
 
 gap::generator<CXXNewExpr> CXXNewExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXNewExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -137,7 +137,7 @@ gap::generator<CXXNewExpr> CXXNewExpr::in(const Fragment &frag) {
 }
 
 gap::generator<CXXNewExpr> CXXNewExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXNewExprDerivedKinds) {
@@ -163,13 +163,13 @@ bool CXXNewExpr::does_usual_array_delete_want_size(void) const {
 }
 
 Type CXXNewExpr::allocated_type(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> CXXNewExpr::array_size(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -182,7 +182,7 @@ std::optional<Expr> CXXNewExpr::array_size(void) const {
 
 std::optional<CXXConstructExpr> CXXNewExpr::construct_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal40();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -194,18 +194,16 @@ std::optional<CXXConstructExpr> CXXNewExpr::construct_expression(void) const {
 }
 
 TokenRange CXXNewExpr::direct_initializer_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal41(), impl->reader.getVal42());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal40(), impl->reader.getVal41());
 }
 
 CXXNewExprInitializationStyle CXXNewExpr::initialization_style(void) const {
-  return static_cast<CXXNewExprInitializationStyle>(impl->reader.getVal94());
+  return static_cast<CXXNewExprInitializationStyle>(impl->reader.getVal95());
 }
 
 std::optional<Expr> CXXNewExpr::initializer(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal43();
+    RawEntityId eid = impl->reader.getVal42();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -217,19 +215,17 @@ std::optional<Expr> CXXNewExpr::initializer(void) const {
 }
 
 FunctionDecl CXXNewExpr::operator_delete(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal43();
   return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 FunctionDecl CXXNewExpr::operator_new(void) const {
-  RawEntityId eid = impl->reader.getVal45();
+  RawEntityId eid = impl->reader.getVal44();
   return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TokenRange CXXNewExpr::type_id_parentheses(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal46(), impl->reader.getVal47());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal45(), impl->reader.getVal46());
 }
 
 bool CXXNewExpr::has_initializer(void) const {
@@ -249,7 +245,7 @@ bool CXXNewExpr::is_parenthesis_type_id(void) const {
 }
 
 bool CXXNewExpr::pass_alignment(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal94();
 }
 
 unsigned CXXNewExpr::num_placement_arguments(void) const {
@@ -261,7 +257,7 @@ std::optional<Expr> CXXNewExpr::nth_placement_argument(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -272,7 +268,7 @@ std::optional<Expr> CXXNewExpr::nth_placement_argument(unsigned n) const {
 
 gap::generator<Expr> CXXNewExpr::placement_arguments(void) const & {
   auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
@@ -285,7 +281,7 @@ gap::generator<Expr> CXXNewExpr::placement_arguments(void) const & {
 }
 
 bool CXXNewExpr::should_null_check_allocation(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal96();
 }
 
 #pragma GCC diagnostic pop

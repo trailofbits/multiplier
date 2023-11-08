@@ -20,7 +20,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Stmt.h"
 
@@ -81,14 +81,14 @@ gap::generator<LambdaExpr> LambdaExpr::containing(const std::optional<Stmt> &stm
 
 bool LambdaExpr::contains(const Decl &decl) {
   for (auto &parent : LambdaExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool LambdaExpr::contains(const Stmt &stmt) {
   for (auto &parent : LambdaExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -117,7 +117,7 @@ std::optional<LambdaExpr> LambdaExpr::from(const Stmt &parent) {
 }
 
 gap::generator<LambdaExpr> LambdaExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kLambdaExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<LambdaExpr> e = LambdaExpr::from(Stmt(std::move(eptr)))) {
@@ -128,7 +128,7 @@ gap::generator<LambdaExpr> LambdaExpr::in(const Index &index) {
 }
 
 gap::generator<LambdaExpr> LambdaExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kLambdaExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -140,7 +140,7 @@ gap::generator<LambdaExpr> LambdaExpr::in(const Fragment &frag) {
 }
 
 gap::generator<LambdaExpr> LambdaExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kLambdaExprDerivedKinds) {
@@ -162,31 +162,31 @@ std::optional<LambdaExpr> LambdaExpr::from(const TokenContext &t) {
 }
 
 Stmt LambdaExpr::body(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 CXXMethodDecl LambdaExpr::call_operator(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 LambdaCaptureDefault LambdaExpr::capture_default(void) const {
-  return static_cast<LambdaCaptureDefault>(impl->reader.getVal94());
+  return static_cast<LambdaCaptureDefault>(impl->reader.getVal95());
 }
 
 Token LambdaExpr::capture_default_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 CompoundStmt LambdaExpr::compound_statement_body(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<FunctionTemplateDecl> LambdaExpr::dependent_call_operator(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal42();
+    RawEntityId eid = impl->reader.getVal41();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -206,7 +206,7 @@ std::optional<NamedDecl> LambdaExpr::nth_explicit_template_parameter(unsigned n)
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -217,7 +217,7 @@ std::optional<NamedDecl> LambdaExpr::nth_explicit_template_parameter(unsigned n)
 
 gap::generator<NamedDecl> LambdaExpr::explicit_template_parameters(void) const & {
   auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->DeclFor(ep, v)) {
@@ -230,19 +230,17 @@ gap::generator<NamedDecl> LambdaExpr::explicit_template_parameters(void) const &
 }
 
 TokenRange LambdaExpr::introducer_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal43(), impl->reader.getVal44());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal42(), impl->reader.getVal43());
 }
 
 CXXRecordDecl LambdaExpr::lambda_class(void) const {
-  RawEntityId eid = impl->reader.getVal45();
+  RawEntityId eid = impl->reader.getVal44();
   return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<TemplateParameterList> LambdaExpr::template_parameter_list(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal46();
+    RawEntityId eid = impl->reader.getVal45();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -255,7 +253,7 @@ std::optional<TemplateParameterList> LambdaExpr::template_parameter_list(void) c
 
 std::optional<Expr> LambdaExpr::trailing_requires_clause(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal47();
+    RawEntityId eid = impl->reader.getVal46();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

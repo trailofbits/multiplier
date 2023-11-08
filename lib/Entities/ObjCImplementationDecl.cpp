@@ -17,7 +17,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -77,14 +77,14 @@ gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::containing(const 
 
 bool ObjCImplementationDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCImplementationDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCImplementationDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCImplementationDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -139,7 +139,7 @@ std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const Decl &p
 }
 
 gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCImplementationDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ObjCImplementationDecl> e = ObjCImplementationDecl::from(Decl(std::move(eptr)))) {
@@ -150,7 +150,7 @@ gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::in(const Index &i
 }
 
 gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCImplementationDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -162,7 +162,7 @@ gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::in(const Fragment
 }
 
 gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCImplementationDeclDerivedKinds) {
@@ -184,45 +184,45 @@ std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const TokenCo
 }
 
 Token ObjCImplementationDecl::instance_variable_l_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal65());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal67());
 }
 
 Token ObjCImplementationDecl::instance_variable_r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal68());
 }
 
 std::string_view ObjCImplementationDecl::obj_c_runtime_name_as_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal71();
+  capnp::Text::Reader data = impl->reader.getVal73();
   return std::string_view(data.cStr(), data.size());
 }
 
 ObjCInterfaceDecl ObjCImplementationDecl::super_class(void) const {
-  RawEntityId eid = impl->reader.getVal76();
+  RawEntityId eid = impl->reader.getVal78();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCImplementationDecl::super_class_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal77());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal79());
 }
 
 bool ObjCImplementationDecl::has_destructors(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal74();
 }
 
 bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
-  return impl->reader.getVal73();
+  return impl->reader.getVal75();
 }
 
 unsigned ObjCImplementationDecl::num_instance_variables(void) const {
-  return impl->reader.getVal339().size();
+  return impl->reader.getVal341().size();
 }
 
 std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsigned n) const {
-  auto list = impl->reader.getVal339();
+  auto list = impl->reader.getVal341();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -232,12 +232,12 @@ std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsign
 }
 
 gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const & {
-  auto list = impl->reader.getVal339();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal341();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d339 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCIvarDecl::from(Decl(std::move(d339)))) {
+    if (auto d341 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCIvarDecl::from(Decl(std::move(d341)))) {
         co_yield std::move(*e);
       }
     }

@@ -15,7 +15,7 @@
 #include <multiplier/Entities/UnresolvedLookupExpr.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<CXXFoldExpr> CXXFoldExpr::containing(const std::optional<Stmt> &s
 
 bool CXXFoldExpr::contains(const Decl &decl) {
   for (auto &parent : CXXFoldExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXFoldExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXFoldExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -111,7 +111,7 @@ std::optional<CXXFoldExpr> CXXFoldExpr::from(const Stmt &parent) {
 }
 
 gap::generator<CXXFoldExpr> CXXFoldExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXFoldExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXFoldExpr> e = CXXFoldExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<CXXFoldExpr> CXXFoldExpr::in(const Index &index) {
 }
 
 gap::generator<CXXFoldExpr> CXXFoldExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXFoldExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<CXXFoldExpr> CXXFoldExpr::in(const Fragment &frag) {
 }
 
 gap::generator<CXXFoldExpr> CXXFoldExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXFoldExprDerivedKinds) {
@@ -156,44 +156,44 @@ std::optional<CXXFoldExpr> CXXFoldExpr::from(const TokenContext &t) {
 }
 
 UnresolvedLookupExpr CXXFoldExpr::callee(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return UnresolvedLookupExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXFoldExpr::ellipsis_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Expr CXXFoldExpr::initializer(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CXXFoldExpr::lhs(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXFoldExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 BinaryOperatorKind CXXFoldExpr::operator_(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal94());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal95());
 }
 
 Expr CXXFoldExpr::pattern(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal42();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CXXFoldExpr::rhs(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal43();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXFoldExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 bool CXXFoldExpr::is_left_fold(void) const {

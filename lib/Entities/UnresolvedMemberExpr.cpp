@@ -16,7 +16,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::containing(const std:
 
 bool UnresolvedMemberExpr::contains(const Decl &decl) {
   for (auto &parent : UnresolvedMemberExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UnresolvedMemberExpr::contains(const Stmt &stmt) {
   for (auto &parent : UnresolvedMemberExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -112,7 +112,7 @@ std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const Stmt &paren
 }
 
 gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kUnresolvedMemberExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<UnresolvedMemberExpr> e = UnresolvedMemberExpr::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::in(const Index &index
 }
 
 gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kUnresolvedMemberExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::in(const Fragment &fr
 }
 
 gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kUnresolvedMemberExprDerivedKinds) {
@@ -157,21 +157,21 @@ std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const TokenContex
 }
 
 Expr UnresolvedMemberExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal42();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type UnresolvedMemberExpr::base_type(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal43();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token UnresolvedMemberExpr::member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 Token UnresolvedMemberExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 bool UnresolvedMemberExpr::has_unresolved_using(void) const {

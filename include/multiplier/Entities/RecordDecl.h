@@ -25,6 +25,11 @@ class Stmt;
 class TagDecl;
 class Token;
 class TypeDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class RecordDecl : public TagDecl {
  private:
@@ -34,12 +39,12 @@ class RecordDecl : public TagDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<RecordDecl> in(const Fragment &frag);
-  static gap::generator<RecordDecl> in(const File &file);
   static gap::generator<RecordDecl> in(const Index &index);
   static gap::generator<RecordDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<RecordDecl> by_id(const Index &, EntityId);
+  static gap::generator<RecordDecl> in(const Fragment &frag);
+  static gap::generator<RecordDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::RECORD;
@@ -94,6 +99,9 @@ class RecordDecl : public TagDecl {
   bool is_parameter_destroyed_in_callee(void) const;
   bool is_randomized(void) const;
   bool may_insert_extra_padding(void) const;
+  std::optional<uint64_t> size(void) const;
+  std::optional<uint64_t> alignment(void) const;
+  std::optional<uint64_t> size_without_trailing_padding(void) const;
 };
 
 static_assert(sizeof(RecordDecl) == sizeof(TagDecl));

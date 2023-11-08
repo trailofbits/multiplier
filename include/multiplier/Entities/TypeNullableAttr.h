@@ -17,6 +17,11 @@ class Attr;
 class Token;
 class TypeAttr;
 class TypeNullableAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypeNullableAttr : public TypeAttr {
  private:
@@ -24,12 +29,12 @@ class TypeNullableAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  static gap::generator<TypeNullableAttr> in(const Fragment &frag);
-  static gap::generator<TypeNullableAttr> in(const File &file);
   static gap::generator<TypeNullableAttr> in(const Index &index);
   static gap::generator<TypeNullableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TypeNullableAttr> by_id(const Index &, EntityId);
+  static gap::generator<TypeNullableAttr> in(const Fragment &frag);
+  static gap::generator<TypeNullableAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TYPE_NULLABLE;

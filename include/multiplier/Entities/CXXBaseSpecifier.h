@@ -32,12 +32,18 @@ class CXXBaseSpecifierImpl;
 class File;
 class Fragment;
 class Reference;
-class SourceIR;
 class Token;
 class TokenRange;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXBaseSpecifier {
+ public:
+  std::optional<Decl> parent_declaration(void) const;
  protected:
   friend class Attr;
   friend class Decl;
@@ -47,11 +53,13 @@ class CXXBaseSpecifier {
   friend class Index;
   friend class Macro;
   friend class Reference;
-  friend class SourceIR;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
   friend class CXXBaseSpecifierImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const CXXBaseSpecifierImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
   static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
@@ -62,12 +70,9 @@ class CXXBaseSpecifier {
   CXXBaseSpecifier &operator=(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier &operator=(const CXXBaseSpecifier &) = default;
 
-  friend inline std::strong_ordering operator<=>(const CXXBaseSpecifier &lhs, const CXXBaseSpecifier &rhs) noexcept {
-    return lhs.id().Pack() <=> rhs.id().Pack();
+  inline bool operator==(const CXXBaseSpecifier &rhs) const noexcept {
+    return id().Pack() == rhs.id().Pack();
   }
-
-  bool operator==(const CXXBaseSpecifier &) const noexcept = default;
-  bool operator!=(const CXXBaseSpecifier &) const noexcept = default;
 
   /* implicit */ inline CXXBaseSpecifier(std::shared_ptr<const CXXBaseSpecifierImpl> impl_)
       : impl(std::move(impl_)) {}

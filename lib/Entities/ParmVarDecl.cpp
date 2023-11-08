@@ -18,7 +18,7 @@
 #include <multiplier/Entities/ValueDecl.h>
 #include <multiplier/Entities/VarDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Decl.h"
 
@@ -79,14 +79,14 @@ gap::generator<ParmVarDecl> ParmVarDecl::containing(const std::optional<Stmt> &s
 
 bool ParmVarDecl::contains(const Decl &decl) {
   for (auto &parent : ParmVarDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ParmVarDecl::contains(const Stmt &stmt) {
   for (auto &parent : ParmVarDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -141,7 +141,7 @@ std::optional<ParmVarDecl> ParmVarDecl::from(const Decl &parent) {
 }
 
 gap::generator<ParmVarDecl> ParmVarDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kParmVarDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ParmVarDecl> e = ParmVarDecl::from(Decl(std::move(eptr)))) {
@@ -152,7 +152,7 @@ gap::generator<ParmVarDecl> ParmVarDecl::in(const Index &index) {
 }
 
 gap::generator<ParmVarDecl> ParmVarDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kParmVarDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -164,7 +164,7 @@ gap::generator<ParmVarDecl> ParmVarDecl::in(const Fragment &frag) {
 }
 
 gap::generator<ParmVarDecl> ParmVarDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kParmVarDeclDerivedKinds) {
@@ -187,7 +187,7 @@ std::optional<ParmVarDecl> ParmVarDecl::from(const TokenContext &t) {
 
 std::optional<Expr> ParmVarDecl::default_argument(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal126();
+    RawEntityId eid = impl->reader.getVal128();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -199,23 +199,21 @@ std::optional<Expr> ParmVarDecl::default_argument(void) const {
 }
 
 TokenRange ParmVarDecl::default_argument_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal127(), impl->reader.getVal128());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal129(), impl->reader.getVal130());
 }
 
 DeclObjCDeclQualifier ParmVarDecl::obj_c_decl_qualifier(void) const {
-  return static_cast<DeclObjCDeclQualifier>(impl->reader.getVal129());
+  return static_cast<DeclObjCDeclQualifier>(impl->reader.getVal131());
 }
 
 Type ParmVarDecl::original_type(void) const {
-  RawEntityId eid = impl->reader.getVal130();
+  RawEntityId eid = impl->reader.getVal132();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> ParmVarDecl::uninstantiated_default_argument(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal131();
+    RawEntityId eid = impl->reader.getVal133();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -227,31 +225,31 @@ std::optional<Expr> ParmVarDecl::uninstantiated_default_argument(void) const {
 }
 
 bool ParmVarDecl::has_default_argument(void) const {
-  return impl->reader.getVal132();
-}
-
-bool ParmVarDecl::has_inherited_default_argument(void) const {
-  return impl->reader.getVal133();
-}
-
-bool ParmVarDecl::has_uninstantiated_default_argument(void) const {
   return impl->reader.getVal134();
 }
 
-bool ParmVarDecl::has_unparsed_default_argument(void) const {
+bool ParmVarDecl::has_inherited_default_argument(void) const {
   return impl->reader.getVal135();
 }
 
-bool ParmVarDecl::is_destroyed_in_callee(void) const {
+bool ParmVarDecl::has_uninstantiated_default_argument(void) const {
   return impl->reader.getVal136();
 }
 
-bool ParmVarDecl::is_knr_promoted(void) const {
+bool ParmVarDecl::has_unparsed_default_argument(void) const {
   return impl->reader.getVal137();
 }
 
-bool ParmVarDecl::is_obj_c_method_parameter(void) const {
+bool ParmVarDecl::is_destroyed_in_callee(void) const {
   return impl->reader.getVal138();
+}
+
+bool ParmVarDecl::is_knr_promoted(void) const {
+  return impl->reader.getVal139();
+}
+
+bool ParmVarDecl::is_obj_c_method_parameter(void) const {
+  return impl->reader.getVal140();
 }
 
 #pragma GCC diagnostic pop

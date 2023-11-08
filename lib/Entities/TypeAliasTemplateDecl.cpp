@@ -15,7 +15,7 @@
 #include <multiplier/Entities/TemplateDecl.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::containing(const st
 
 bool TypeAliasTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : TypeAliasTemplateDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool TypeAliasTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : TypeAliasTemplateDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -137,7 +137,7 @@ std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const Decl &par
 }
 
 gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kTypeAliasTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<TypeAliasTemplateDecl> e = TypeAliasTemplateDecl::from(Decl(std::move(eptr)))) {
@@ -148,7 +148,7 @@ gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::in(const Index &ind
 }
 
 gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kTypeAliasTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -160,7 +160,7 @@ gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::in(const Fragment &
 }
 
 gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kTypeAliasTemplateDeclDerivedKinds) {

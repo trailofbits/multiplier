@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class LeafAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class LeafAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class LeafAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<LeafAttr> in(const Fragment &frag);
-  static gap::generator<LeafAttr> in(const File &file);
   static gap::generator<LeafAttr> in(const Index &index);
   static gap::generator<LeafAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<LeafAttr> by_id(const Index &, EntityId);
+  static gap::generator<LeafAttr> in(const Fragment &frag);
+  static gap::generator<LeafAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LEAF;

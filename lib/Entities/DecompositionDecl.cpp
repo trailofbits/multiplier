@@ -17,7 +17,7 @@
 #include <multiplier/Entities/ValueDecl.h>
 #include <multiplier/Entities/VarDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -77,14 +77,14 @@ gap::generator<DecompositionDecl> DecompositionDecl::containing(const std::optio
 
 bool DecompositionDecl::contains(const Decl &decl) {
   for (auto &parent : DecompositionDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool DecompositionDecl::contains(const Stmt &stmt) {
   for (auto &parent : DecompositionDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -139,7 +139,7 @@ std::optional<DecompositionDecl> DecompositionDecl::from(const Decl &parent) {
 }
 
 gap::generator<DecompositionDecl> DecompositionDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kDecompositionDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<DecompositionDecl> e = DecompositionDecl::from(Decl(std::move(eptr)))) {
@@ -150,7 +150,7 @@ gap::generator<DecompositionDecl> DecompositionDecl::in(const Index &index) {
 }
 
 gap::generator<DecompositionDecl> DecompositionDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kDecompositionDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -162,7 +162,7 @@ gap::generator<DecompositionDecl> DecompositionDecl::in(const Fragment &frag) {
 }
 
 gap::generator<DecompositionDecl> DecompositionDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kDecompositionDeclDerivedKinds) {
@@ -184,15 +184,15 @@ std::optional<DecompositionDecl> DecompositionDecl::from(const TokenContext &t) 
 }
 
 unsigned DecompositionDecl::num_bindings(void) const {
-  return impl->reader.getVal50().size();
+  return impl->reader.getVal52().size();
 }
 
 std::optional<BindingDecl> DecompositionDecl::nth_binding(unsigned n) const {
-  auto list = impl->reader.getVal50();
+  auto list = impl->reader.getVal52();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -202,12 +202,12 @@ std::optional<BindingDecl> DecompositionDecl::nth_binding(unsigned n) const {
 }
 
 gap::generator<BindingDecl> DecompositionDecl::bindings(void) const & {
-  auto list = impl->reader.getVal50();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal52();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d50 = ep->DeclFor(ep, v)) {
-      if (auto e = BindingDecl::from(Decl(std::move(d50)))) {
+    if (auto d52 = ep->DeclFor(ep, v)) {
+      if (auto e = BindingDecl::from(Decl(std::move(d52)))) {
         co_yield std::move(*e);
       }
     }

@@ -19,6 +19,11 @@ class Expr;
 class Stmt;
 class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXBoolLiteralExpr : public Expr {
  private:
@@ -27,12 +32,12 @@ class CXXBoolLiteralExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXBoolLiteralExpr> in(const Fragment &frag);
-  static gap::generator<CXXBoolLiteralExpr> in(const File &file);
   static gap::generator<CXXBoolLiteralExpr> in(const Index &index);
   static gap::generator<CXXBoolLiteralExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXBoolLiteralExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXBoolLiteralExpr> in(const Fragment &frag);
+  static gap::generator<CXXBoolLiteralExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_BOOL_LITERAL_EXPR;

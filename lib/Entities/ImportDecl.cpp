@@ -12,7 +12,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Decl.h"
 
@@ -73,14 +73,14 @@ gap::generator<ImportDecl> ImportDecl::containing(const std::optional<Stmt> &stm
 
 bool ImportDecl::contains(const Decl &decl) {
   for (auto &parent : ImportDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ImportDecl::contains(const Stmt &stmt) {
   for (auto &parent : ImportDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -135,7 +135,7 @@ std::optional<ImportDecl> ImportDecl::from(const Decl &parent) {
 }
 
 gap::generator<ImportDecl> ImportDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kImportDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ImportDecl> e = ImportDecl::from(Decl(std::move(eptr)))) {
@@ -146,7 +146,7 @@ gap::generator<ImportDecl> ImportDecl::in(const Index &index) {
 }
 
 gap::generator<ImportDecl> ImportDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kImportDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -158,7 +158,7 @@ gap::generator<ImportDecl> ImportDecl::in(const Fragment &frag) {
 }
 
 gap::generator<ImportDecl> ImportDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kImportDeclDerivedKinds) {
@@ -180,15 +180,15 @@ std::optional<ImportDecl> ImportDecl::from(const TokenContext &t) {
 }
 
 unsigned ImportDecl::num_identifier_tokens(void) const {
-  return impl->reader.getVal49().size();
+  return impl->reader.getVal51().size();
 }
 
 std::optional<Token> ImportDecl::nth_identifier_token(unsigned n) const {
-  auto list = impl->reader.getVal49();
+  auto list = impl->reader.getVal51();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TokenFor(ep, v);
   if (!e) {
@@ -198,8 +198,8 @@ std::optional<Token> ImportDecl::nth_identifier_token(unsigned n) const {
 }
 
 gap::generator<Token> ImportDecl::identifier_tokens(void) const & {
-  auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal51();
+  EntityProviderPtr ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
   if (!fragment) {
     assert(false);
@@ -208,8 +208,8 @@ gap::generator<Token> ImportDecl::identifier_tokens(void) const & {
   auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
-    if (auto t49 = ep->TokenFor(ep, tok_reader, v)) {
-      co_yield t49;
+    if (auto t51 = ep->TokenFor(ep, tok_reader, v)) {
+      co_yield t51;
     }
   }
   co_return;

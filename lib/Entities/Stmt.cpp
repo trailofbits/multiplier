@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Reference.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../File.h"
 #include "../Fragment.h"
 #include "../Stmt.h"
@@ -44,6 +44,7 @@ std::optional<Stmt> Stmt::parent_statement(void) const {
   }
   return std::nullopt;
 }
+
 std::shared_ptr<EntityProvider> Stmt::entity_provider_of(const Index &index_) {
   return index_.impl;
 }
@@ -131,14 +132,14 @@ gap::generator<Stmt> Stmt::containing(const std::optional<Stmt> &stmt) {
 
 bool Stmt::contains(const Decl &decl) {
   for (auto &parent : Stmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool Stmt::contains(const Stmt &stmt) {
   for (auto &parent : Stmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -154,7 +155,7 @@ std::optional<Stmt> Stmt::by_id(const Index &index, EntityId eid) {
 }
 
 gap::generator<Stmt> Stmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtImplPtr eptr : ep->StmtsFor(ep)) {
     if (std::optional<Stmt> e = Stmt::from(Stmt(std::move(eptr)))) {
       co_yield std::move(e.value());
@@ -162,18 +163,17 @@ gap::generator<Stmt> Stmt::in(const Index &index) {
   }
 }
 
-gap::generator<Stmt> Stmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (StmtImplPtr eptr : ep->StmtsFor(ep, frag_id)) {
-    if (std::optional<Stmt> e = Stmt::from(Stmt(std::move(eptr)))) {
-      co_yield std::move(e.value());
+gap::generator<Stmt> Stmt::in(const Index &index, std::span<StmtKind> kinds) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (StmtKind k : kinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
+      co_yield Stmt(std::move(eptr));
     }
   }
 }
 
 gap::generator<Stmt> Stmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, frag_id)) {
@@ -184,17 +184,18 @@ gap::generator<Stmt> Stmt::in(const File &file) {
   }
 }
 
-gap::generator<Stmt> Stmt::in(const Index &index, std::span<StmtKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
-  for (StmtKind k : kinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      co_yield Stmt(std::move(eptr));
+gap::generator<Stmt> Stmt::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (StmtImplPtr eptr : ep->StmtsFor(ep, frag_id)) {
+    if (std::optional<Stmt> e = Stmt::from(Stmt(std::move(eptr)))) {
+      co_yield std::move(e.value());
     }
   }
 }
 
 gap::generator<Stmt> Stmt::in(const Fragment &frag, std::span<StmtKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -204,7 +205,7 @@ gap::generator<Stmt> Stmt::in(const Fragment &frag, std::span<StmtKind> kinds) {
 }
 
 gap::generator<Stmt> Stmt::in(const File &file, std::span<StmtKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kinds) {
@@ -230,7 +231,7 @@ Stmt Stmt::ignore_containers(void) const {
 
 gap::generator<Stmt> Stmt::children(void) const & {
   auto list = impl->reader.getVal4();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d4 = ep->StmtFor(ep, v)) {
@@ -241,9 +242,7 @@ gap::generator<Stmt> Stmt::children(void) const & {
 }
 
 TokenRange Stmt::tokens(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal5(), impl->reader.getVal6());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal5(), impl->reader.getVal6());
 }
 
 StmtKind Stmt::kind(void) const {

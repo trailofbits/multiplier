@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {
@@ -66,37 +66,11 @@ std::optional<TypeWithKeyword> TypeWithKeyword::from(const Type &parent) {
 }
 
 gap::generator<TypeWithKeyword> TypeWithKeyword::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kTypeWithKeywordDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<TypeWithKeyword> e = TypeWithKeyword::from(Type(std::move(eptr)))) {
         co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<TypeWithKeyword> TypeWithKeyword::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kTypeWithKeywordDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<TypeWithKeyword> e = TypeWithKeyword::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<TypeWithKeyword> TypeWithKeyword::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kTypeWithKeywordDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<TypeWithKeyword> e = TypeWithKeyword::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
       }
     }
   }
@@ -111,7 +85,7 @@ std::optional<TypeWithKeyword> TypeWithKeyword::from(const TokenContext &t) {
 }
 
 ElaboratedTypeKeyword TypeWithKeyword::keyword(void) const {
-  return static_cast<ElaboratedTypeKeyword>(impl->reader.getVal238());
+  return static_cast<ElaboratedTypeKeyword>(impl->reader.getVal26());
 }
 
 #pragma GCC diagnostic pop

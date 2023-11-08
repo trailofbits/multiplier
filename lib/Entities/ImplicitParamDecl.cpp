@@ -16,7 +16,7 @@
 #include <multiplier/Entities/ValueDecl.h>
 #include <multiplier/Entities/VarDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<ImplicitParamDecl> ImplicitParamDecl::containing(const std::optio
 
 bool ImplicitParamDecl::contains(const Decl &decl) {
   for (auto &parent : ImplicitParamDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ImplicitParamDecl::contains(const Stmt &stmt) {
   for (auto &parent : ImplicitParamDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -138,7 +138,7 @@ std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const Decl &parent) {
 }
 
 gap::generator<ImplicitParamDecl> ImplicitParamDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kImplicitParamDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ImplicitParamDecl> e = ImplicitParamDecl::from(Decl(std::move(eptr)))) {
@@ -149,7 +149,7 @@ gap::generator<ImplicitParamDecl> ImplicitParamDecl::in(const Index &index) {
 }
 
 gap::generator<ImplicitParamDecl> ImplicitParamDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kImplicitParamDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -161,7 +161,7 @@ gap::generator<ImplicitParamDecl> ImplicitParamDecl::in(const Fragment &frag) {
 }
 
 gap::generator<ImplicitParamDecl> ImplicitParamDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kImplicitParamDeclDerivedKinds) {
@@ -183,7 +183,7 @@ std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const TokenContext &t) 
 }
 
 ImplicitParamDeclImplicitParamKind ImplicitParamDecl::parameter_kind(void) const {
-  return static_cast<ImplicitParamDeclImplicitParamKind>(impl->reader.getVal129());
+  return static_cast<ImplicitParamDeclImplicitParamKind>(impl->reader.getVal131());
 }
 
 #pragma GCC diagnostic pop

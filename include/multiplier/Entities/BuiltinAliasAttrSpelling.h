@@ -13,7 +13,7 @@
 namespace mx {
 enum class BuiltinAliasAttrSpelling : unsigned char {
   CXX11_CLANG_BUILTIN_ALIAS,
-  C2X_CLANG_BUILTIN_ALIAS,
+  C23_CLANG_BUILTIN_ALIAS,
   GNU_CLANG_BUILTIN_ALIAS,
   SPELLING_NOT_CALCULATED,
 };

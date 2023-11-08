@@ -30,6 +30,11 @@ class Stmt;
 class Token;
 class Type;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ExplicitCastExpr : public CastExpr {
  private:
@@ -39,12 +44,12 @@ class ExplicitCastExpr : public CastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<ExplicitCastExpr> in(const Fragment &frag);
-  static gap::generator<ExplicitCastExpr> in(const File &file);
   static gap::generator<ExplicitCastExpr> in(const Index &index);
   static gap::generator<ExplicitCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ExplicitCastExpr> by_id(const Index &, EntityId);
+  static gap::generator<ExplicitCastExpr> in(const Fragment &frag);
+  static gap::generator<ExplicitCastExpr> in(const File &file);
 
   static gap::generator<ExplicitCastExpr> containing(const Decl &decl);
   static gap::generator<ExplicitCastExpr> containing(const std::optional<Decl> &decl);

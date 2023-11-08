@@ -6,8 +6,7 @@
 
 #include "Codegen.h"
 
-#ifdef MX_ENABLE_SOURCEIR
-
+#define VAST_ENABLE_EXCEPTIONS
 #include <vast/Util/Warnings.hpp>
 
 VAST_RELAX_WARNINGS
@@ -23,57 +22,99 @@ VAST_UNRELAX_WARNINGS
 
 #include <glog/logging.h>
 
-#include <vast/Util/Common.hpp>
-#include <vast/Translation/CodeGenContext.hpp>
-#include <vast/Translation/CodeGenVisitor.hpp>
-#include <vast/Dialect/Dialects.hpp>
-#include <vast/Translation/CodeGen.hpp>
-
-#include "CodegenMetaGenerator.h"
-#include "CodegenVisitor.hpp"
-
-#endif  // MX_ENABLE_SOURCEIR
-
+#include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
 
+#include <vast/Util/Common.hpp>
+#include <vast/CodeGen/CodeGenContext.hpp>
+#include <vast/CodeGen/CodeGenVisitor.hpp>
+#include <vast/CodeGen/CodeGen.hpp>
+#include <vast/Dialect/Dialects.hpp>
+
+#include "CodegenMetaGenerator.h"
 #include "Context.h"
 #include "EntityMapper.h"
+#include "PendingFragment.h"
+#include "TypeMapper.h"
+#include "Util.h"
 
 namespace indexer {
+namespace {
 
-#ifdef MX_ENABLE_SOURCEIR
-class CodeGeneratorVisitor {
+using MXCodeGenContext = vast::cg::CodeGenContext;
+
+template <typename Derived>
+struct TypeCompressingGenVisitor
+    : vast::cg::CodeGenTypeVisitorWithDataLayout< Derived > {
  public:
 
-  template<typename Derived>
-  using VisitorConfig =  vast::cg::CodeGenFallBackVisitorMixin<
-      Derived, vast::cg::DefaultCodeGenVisitorMixin, FallBackVisitor >;
+  // The base class is logically our "next" class in the proxy pattern.
+  using Base = vast::cg::CodeGenTypeVisitorWithDataLayout< Derived >;
 
-  using Visitor = vast::cg::CodeGenVisitor<VisitorConfig, MetaGenerator>;
-
-  CodeGeneratorVisitor(const pasta::AST &ast, mlir::MLIRContext *mctx, const EntityMapper &em)
-    : meta(ast, mctx, em), codegen(mctx, meta) {}
-
-  void append_to_module(clang::Decl *decl) {
-    codegen.append_to_module(decl);
+  // Apply the `TypeMapper`s type compression, which eagerly desugars things
+  // like `AutoType`, `ElaboratedType`, etc. (but isn't as aggressive when
+  // the types are incomplete / dependent on template parameters), then ask
+  // VAST's default type code generator to handle things.
+  //
+  // E.g. if there was an `AutoType` that wrapped a `PointerType`, then here
+  // we'd forward the pointer type to `Base`, then when `Base` gets around to
+  // lifting the pointer element type into an MLIR type, it will call
+  // `Derived::visit`, the most derived type, and represents the "top" code
+  // generator visitor, which will lead us back into here to apply compression
+  // on the pointer element type.
+  vast::cg::mlir_type Visit(clang::QualType type) {
+    return Base::Visit(TypeMapper::Compress(Base::acontext(), type));
   }
 
-  vast::owning_module_ref freeze() {
-    return codegen.freeze();
-  }
+  vast::cg::mlir_type Visit(const clang::Type *type) {
+    auto new_qtype = TypeMapper::Compress(Base::acontext(), type);
+    auto new_type = new_qtype.getTypePtrOrNull();
+    if (new_type != type) {
+      if (new_qtype.hasQualifiers()) {
+        return Base::Visit(new_qtype);
+      }
+    } else {
+      assert(!new_qtype.hasQualifiers());
+    }
 
-  MetaGenerator meta;
-  vast::cg::CodeGenBase<Visitor> codegen;
+    return Base::Visit(new_type);
+  }
 };
 
-#endif
+template< typename Derived >
+struct MXDefaultCodeGenVisitor
+    : vast::cg::CodeGenDeclVisitor< Derived >
+    , vast::cg::CodeGenStmtVisitor< Derived >
+    , TypeCompressingGenVisitor< Derived >
+{
+    using DeclVisitor = vast::cg::CodeGenDeclVisitor< Derived >;
+    using StmtVisitor = vast::cg::CodeGenStmtVisitor< Derived >;
+    using TypeVisitor = TypeCompressingGenVisitor< Derived >;
 
+    using DeclVisitor::Visit;
+    using StmtVisitor::Visit;
+    using TypeVisitor::Visit;
+};
+
+template< typename Derived >
+using MXVisitorConfig = vast::cg::FallBackVisitor< Derived,
+    MXDefaultCodeGenVisitor,
+    vast::cg::UnsupportedVisitor,
+    vast::cg::UnreachableVisitor
+>;
+
+using MXCodeGenVisitor = vast::cg::CodeGenVisitor<
+    vast::cg::CodeGenContext, MXVisitorConfig, MetaGenerator
+    >;
+
+using MXCodeGenerator = vast::cg::CodeGenBase<MXCodeGenVisitor, MXCodeGenContext>;
+
+}  // namespace
 
 class CodeGeneratorImpl {
  public:
   bool disabled{false};
 
-#ifdef MX_ENABLE_SOURCEIR
   mlir::DialectRegistry registry;
 
   CodeGeneratorImpl(void) {
@@ -81,7 +122,6 @@ class CodeGeneratorImpl {
                     vast::meta::MetaDialect,
                     vast::core::CoreDialect>();
   }
-#endif  // MX_ENABLE_SOURCEIR
 };
 
 CodeGenerator::CodeGenerator(void)
@@ -93,22 +133,11 @@ void CodeGenerator::Disable(void) {
 
 CodeGenerator::~CodeGenerator(void) {}
 
-std::string CodeGenerator::GenerateSourceIRFromTLDs(
-    const pasta::AST &ast,
-    mx::RawEntityId fragment_id,
-    const EntityMapper &em,
-    const std::vector<pasta::Decl> &decls,
-    unsigned num_decls) {
-
-  (void) ast;
-  (void) fragment_id;
-  (void) em;
-  (void) decls;
-  (void) num_decls;
+std::string CodeGenerator::GenerateSourceIR(
+    const pasta::AST &ast, const EntityMapper &em) {
 
   std::string ret;
-#ifdef MX_ENABLE_SOURCEIR
-  if (impl->disabled || decls.empty()) {
+  if (impl->disabled) {
     return ret;
   }
 
@@ -118,24 +147,24 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
   // flag passed to the function is set to false to avoid printing them in
   // `pretty` form. This is because the IR generated in pretty form is not
   // parsable.
-  flags.enableDebugInfo(false);
+  flags.enableDebugInfo(true, false);
 
   mlir::MLIRContext context(impl->registry);
-  CodeGeneratorVisitor codegen(ast, &context, em);
+
+  MetaGenerator meta(ast, context, em);
+  MXCodeGenContext cgctx(context, ast.UnderlyingAST());
+  MXCodeGenerator codegen(cgctx, meta);
+  llvm::raw_string_ostream os(ret);
 
   try {
-    for (const pasta::Decl &decl : decls) {
-      codegen.append_to_module(const_cast<clang::Decl *>(decl.RawDecl()));
-    }
+    auto mod = codegen.emit_module(
+        const_cast<clang::TranslationUnitDecl *>(
+            ast.TranslationUnit().RawDecl()));
+    mod->print(os, flags);
+
   } catch (std::exception &e) {
     LOG(ERROR) << e.what();
-    return ret;
   }
-
-  auto mod = codegen.freeze();
-  llvm::raw_string_ostream os(ret);
-  mod->print(os, flags);
-#endif
 
   return ret;
 }

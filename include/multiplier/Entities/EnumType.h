@@ -17,6 +17,11 @@ class EnumType;
 class TagType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class EnumType : public TagType {
  private:
@@ -24,8 +29,6 @@ class EnumType : public TagType {
   friend class TagType;
   friend class Type;
  public:
-  static gap::generator<EnumType> in(const Fragment &frag);
-  static gap::generator<EnumType> in(const File &file);
   static gap::generator<EnumType> in(const Index &index);
   static gap::generator<EnumType> containing(const Token &tok);
   bool contains(const Token &tok) const;

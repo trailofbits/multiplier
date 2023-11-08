@@ -18,6 +18,11 @@ class InheritableAttr;
 class Token;
 class Type;
 class TypeTagForDatatypeAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypeTagForDatatypeAttr : public InheritableAttr {
  private:
@@ -25,12 +30,12 @@ class TypeTagForDatatypeAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<TypeTagForDatatypeAttr> in(const Fragment &frag);
-  static gap::generator<TypeTagForDatatypeAttr> in(const File &file);
   static gap::generator<TypeTagForDatatypeAttr> in(const Index &index);
   static gap::generator<TypeTagForDatatypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TypeTagForDatatypeAttr> by_id(const Index &, EntityId);
+  static gap::generator<TypeTagForDatatypeAttr> in(const Fragment &frag);
+  static gap::generator<TypeTagForDatatypeAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TYPE_TAG_FOR_DATATYPE;

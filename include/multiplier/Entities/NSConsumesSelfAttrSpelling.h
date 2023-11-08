@@ -14,7 +14,7 @@ namespace mx {
 enum class NSConsumesSelfAttrSpelling : unsigned char {
   GNU_NS_CONSUMES_SELF,
   CXX11_CLANG_NS_CONSUMES_SELF,
-  C2X_CLANG_NS_CONSUMES_SELF,
+  C23_CLANG_NS_CONSUMES_SELF,
   SPELLING_NOT_CALCULATED,
 };
 

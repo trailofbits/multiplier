@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<MSAsmStmt> MSAsmStmt::containing(const std::optional<Stmt> &stmt)
 
 bool MSAsmStmt::contains(const Decl &decl) {
   for (auto &parent : MSAsmStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool MSAsmStmt::contains(const Stmt &stmt) {
   for (auto &parent : MSAsmStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<MSAsmStmt> MSAsmStmt::from(const Stmt &parent) {
 }
 
 gap::generator<MSAsmStmt> MSAsmStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kMSAsmStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<MSAsmStmt> e = MSAsmStmt::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<MSAsmStmt> MSAsmStmt::in(const Index &index) {
 }
 
 gap::generator<MSAsmStmt> MSAsmStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kMSAsmStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<MSAsmStmt> MSAsmStmt::in(const Fragment &frag) {
 }
 
 gap::generator<MSAsmStmt> MSAsmStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kMSAsmStmtDerivedKinds) {
@@ -156,7 +156,7 @@ std::optional<MSAsmStmt> MSAsmStmt::from(const TokenContext &t) {
 
 gap::generator<std::string_view> MSAsmStmt::all_constraints(void) const & {
   auto list = impl->reader.getVal64();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }
@@ -172,7 +172,7 @@ std::optional<Expr> MSAsmStmt::nth_all_expression(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -183,7 +183,7 @@ std::optional<Expr> MSAsmStmt::nth_all_expression(unsigned n) const {
 
 gap::generator<Expr> MSAsmStmt::all_expressions(void) const & {
   auto list = impl->reader.getVal29();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d29 = ep->StmtFor(ep, v)) {

@@ -20,6 +20,11 @@ class Expr;
 class Stmt;
 class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXTemporaryObjectExpr : public CXXConstructExpr {
  private:
@@ -29,12 +34,12 @@ class CXXTemporaryObjectExpr : public CXXConstructExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXTemporaryObjectExpr> in(const Fragment &frag);
-  static gap::generator<CXXTemporaryObjectExpr> in(const File &file);
   static gap::generator<CXXTemporaryObjectExpr> in(const Index &index);
   static gap::generator<CXXTemporaryObjectExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXTemporaryObjectExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXTemporaryObjectExpr> in(const Fragment &frag);
+  static gap::generator<CXXTemporaryObjectExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_TEMPORARY_OBJECT_EXPR;

@@ -12,7 +12,7 @@
 #include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/MacroDirective.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Macro.h"
 
 namespace mx {
@@ -76,7 +76,7 @@ std::optional<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::from(const
 }
 
 gap::generator<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroKind k : kIfNotDefinedMacroDirectiveDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
       if (std::optional<IfNotDefinedMacroDirective> e = IfNotDefinedMacroDirective::from(Macro(std::move(eptr)))) {
@@ -87,7 +87,7 @@ gap::generator<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::in(const 
 }
 
 gap::generator<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (MacroKind k : kIfNotDefinedMacroDirectiveDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
@@ -99,7 +99,7 @@ gap::generator<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::in(const 
 }
 
 gap::generator<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (MacroKind k : kIfNotDefinedMacroDirectiveDerivedKinds) {

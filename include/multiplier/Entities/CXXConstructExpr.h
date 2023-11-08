@@ -23,6 +23,11 @@ class Stmt;
 class Token;
 class TokenRange;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXConstructExpr : public Expr {
  private:
@@ -31,12 +36,12 @@ class CXXConstructExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXConstructExpr> in(const Fragment &frag);
-  static gap::generator<CXXConstructExpr> in(const File &file);
   static gap::generator<CXXConstructExpr> in(const Index &index);
   static gap::generator<CXXConstructExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXConstructExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXConstructExpr> in(const Fragment &frag);
+  static gap::generator<CXXConstructExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_CONSTRUCT_EXPR;
@@ -73,6 +78,7 @@ class CXXConstructExpr : public Expr {
   TokenRange parenthesis_or_brace_range(void) const;
   bool had_multiple_candidates(void) const;
   bool is_elidable(void) const;
+  bool is_immediate_escalating(void) const;
   bool is_list_initialization(void) const;
   bool is_std_initializer_list_initialization(void) const;
   bool requires_zero_initialization(void) const;

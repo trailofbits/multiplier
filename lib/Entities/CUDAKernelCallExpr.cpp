@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<CUDAKernelCallExpr> CUDAKernelCallExpr::containing(const std::opt
 
 bool CUDAKernelCallExpr::contains(const Decl &decl) {
   for (auto &parent : CUDAKernelCallExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CUDAKernelCallExpr::contains(const Stmt &stmt) {
   for (auto &parent : CUDAKernelCallExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -111,7 +111,7 @@ std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const Stmt &parent) {
 }
 
 gap::generator<CUDAKernelCallExpr> CUDAKernelCallExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCUDAKernelCallExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CUDAKernelCallExpr> e = CUDAKernelCallExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<CUDAKernelCallExpr> CUDAKernelCallExpr::in(const Index &index) {
 }
 
 gap::generator<CUDAKernelCallExpr> CUDAKernelCallExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCUDAKernelCallExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<CUDAKernelCallExpr> CUDAKernelCallExpr::in(const Fragment &frag) 
 }
 
 gap::generator<CUDAKernelCallExpr> CUDAKernelCallExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCUDAKernelCallExprDerivedKinds) {
@@ -156,7 +156,7 @@ std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const TokenContext &t
 }
 
 CallExpr CUDAKernelCallExpr::config(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal42();
   return CallExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

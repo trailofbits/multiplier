@@ -18,6 +18,11 @@ class InheritableAttr;
 class NSErrorDomainAttr;
 class Token;
 class VarDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class NSErrorDomainAttr : public InheritableAttr {
  private:
@@ -25,12 +30,12 @@ class NSErrorDomainAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<NSErrorDomainAttr> in(const Fragment &frag);
-  static gap::generator<NSErrorDomainAttr> in(const File &file);
   static gap::generator<NSErrorDomainAttr> in(const Index &index);
   static gap::generator<NSErrorDomainAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NSErrorDomainAttr> by_id(const Index &, EntityId);
+  static gap::generator<NSErrorDomainAttr> in(const Fragment &frag);
+  static gap::generator<NSErrorDomainAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_ERROR_DOMAIN;

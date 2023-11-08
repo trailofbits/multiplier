@@ -13,7 +13,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/TypeWithKeyword.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {
@@ -61,37 +61,11 @@ std::optional<ElaboratedType> ElaboratedType::from(const Type &parent) {
 }
 
 gap::generator<ElaboratedType> ElaboratedType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kElaboratedTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<ElaboratedType> e = ElaboratedType::from(Type(std::move(eptr)))) {
         co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<ElaboratedType> ElaboratedType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kElaboratedTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<ElaboratedType> e = ElaboratedType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<ElaboratedType> ElaboratedType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kElaboratedTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<ElaboratedType> e = ElaboratedType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
       }
     }
   }
@@ -106,18 +80,18 @@ std::optional<ElaboratedType> ElaboratedType::from(const TokenContext &t) {
 }
 
 Type ElaboratedType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal17();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type ElaboratedType::named_type(void) const {
-  RawEntityId eid = impl->reader.getVal230();
+  RawEntityId eid = impl->reader.getVal18();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<TagDecl> ElaboratedType::owned_tag_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal236();
+    RawEntityId eid = impl->reader.getVal24();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -129,7 +103,7 @@ std::optional<TagDecl> ElaboratedType::owned_tag_declaration(void) const {
 }
 
 bool ElaboratedType::is_sugared(void) const {
-  return impl->reader.getVal231();
+  return impl->reader.getVal19();
 }
 
 #pragma GCC diagnostic pop

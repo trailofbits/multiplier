@@ -19,7 +19,7 @@
 #include <multiplier/Entities/TemplateParameterList.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../File.h"
 #include "../Fragment.h"
 #include "../Decl.h"
@@ -28,10 +28,6 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
-
-bool Decl::is_definition(void) const {
-  return impl->reader.getVal2();
-}
 
 std::optional<Decl> Decl::parent_declaration(void) const {
   if (auto id = impl->reader.getVal0(); id != kInvalidEntityId) {
@@ -52,6 +48,11 @@ std::optional<Stmt> Decl::parent_statement(void) const {
   }
   return std::nullopt;
 }
+
+bool Decl::is_definition(void) const {
+  return impl->reader.getVal2();
+}
+
 std::shared_ptr<EntityProvider> Decl::entity_provider_of(const Index &index_) {
   return index_.impl;
 }
@@ -116,14 +117,14 @@ gap::generator<Decl> Decl::containing(const std::optional<Stmt> &stmt) {
 
 bool Decl::contains(const Decl &decl) {
   for (auto &parent : Decl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool Decl::contains(const Stmt &stmt) {
   for (auto &parent : Decl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -139,7 +140,7 @@ std::optional<Decl> Decl::by_id(const Index &index, EntityId eid) {
 }
 
 gap::generator<Decl> Decl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclImplPtr eptr : ep->DeclsFor(ep)) {
     if (std::optional<Decl> e = Decl::from(Decl(std::move(eptr)))) {
       co_yield std::move(e.value());
@@ -147,18 +148,17 @@ gap::generator<Decl> Decl::in(const Index &index) {
   }
 }
 
-gap::generator<Decl> Decl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (DeclImplPtr eptr : ep->DeclsFor(ep, frag_id)) {
-    if (std::optional<Decl> e = Decl::from(Decl(std::move(eptr)))) {
-      co_yield std::move(e.value());
+gap::generator<Decl> Decl::in(const Index &index, std::span<DeclKind> kinds) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (DeclKind k : kinds) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
+      co_yield Decl(std::move(eptr));
     }
   }
 }
 
 gap::generator<Decl> Decl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, frag_id)) {
@@ -169,17 +169,18 @@ gap::generator<Decl> Decl::in(const File &file) {
   }
 }
 
-gap::generator<Decl> Decl::in(const Index &index, std::span<DeclKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
-  for (DeclKind k : kinds) {
-    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      co_yield Decl(std::move(eptr));
+gap::generator<Decl> Decl::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (DeclImplPtr eptr : ep->DeclsFor(ep, frag_id)) {
+    if (std::optional<Decl> e = Decl::from(Decl(std::move(eptr)))) {
+      co_yield std::move(e.value());
     }
   }
 }
 
 gap::generator<Decl> Decl::in(const Fragment &frag, std::span<DeclKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -189,7 +190,7 @@ gap::generator<Decl> Decl::in(const Fragment &frag, std::span<DeclKind> kinds) {
 }
 
 gap::generator<Decl> Decl::in(const File &file, std::span<DeclKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kinds) {
@@ -217,7 +218,7 @@ std::optional<Attr> Decl::nth_attribute(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->AttrFor(ep, v);
   if (!e) {
@@ -228,7 +229,7 @@ std::optional<Attr> Decl::nth_attribute(unsigned n) const {
 
 gap::generator<Attr> Decl::attributes(void) const & {
   auto list = impl->reader.getVal3();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d3 = ep->AttrFor(ep, v)) {
@@ -302,13 +303,22 @@ DeclFriendObjectKind Decl::friend_object_kind(void) const {
   return static_cast<DeclFriendObjectKind>(impl->reader.getVal10());
 }
 
+std::optional<uint32_t> Decl::max_alignment(void) const {
+  if (!impl->reader.getVal12()) {
+    return std::nullopt;
+  } else {
+    return static_cast<uint32_t>(impl->reader.getVal11());
+  }
+  return std::nullopt;
+}
+
 DeclModuleOwnershipKind Decl::module_ownership_kind(void) const {
-  return static_cast<DeclModuleOwnershipKind>(impl->reader.getVal11());
+  return static_cast<DeclModuleOwnershipKind>(impl->reader.getVal13());
 }
 
 std::optional<Decl> Decl::non_closure_context(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal12();
+    RawEntityId eid = impl->reader.getVal14();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -320,137 +330,136 @@ std::optional<Decl> Decl::non_closure_context(void) const {
 }
 
 bool Decl::has_attributes(void) const {
-  return impl->reader.getVal13();
-}
-
-bool Decl::has_owning_module(void) const {
-  return impl->reader.getVal14();
-}
-
-bool Decl::has_tag_identifier_namespace(void) const {
   return impl->reader.getVal15();
 }
 
-bool Decl::is_defined_outside_function_or_method(void) const {
+bool Decl::has_owning_module(void) const {
   return impl->reader.getVal16();
 }
 
-bool Decl::is_deprecated(void) const {
+bool Decl::has_tag_identifier_namespace(void) const {
   return impl->reader.getVal17();
 }
 
-bool Decl::is_discarded_in_global_module_fragment(void) const {
+bool Decl::is_defined_outside_function_or_method(void) const {
   return impl->reader.getVal18();
 }
 
-bool Decl::is_file_context_declaration(void) const {
+bool Decl::is_deprecated(void) const {
   return impl->reader.getVal19();
 }
 
-bool Decl::is_function_or_function_template(void) const {
+bool Decl::is_discarded_in_global_module_fragment(void) const {
   return impl->reader.getVal20();
 }
 
-bool Decl::is_implicit(void) const {
+bool Decl::is_file_context_declaration(void) const {
   return impl->reader.getVal21();
 }
 
-bool Decl::is_in_anonymous_namespace(void) const {
+bool Decl::is_function_or_function_template(void) const {
   return impl->reader.getVal22();
 }
 
-bool Decl::is_in_export_declaration_context(void) const {
+bool Decl::is_function_pointer_type(void) const {
   return impl->reader.getVal23();
 }
 
-bool Decl::is_in_local_scope_for_instantiation(void) const {
+bool Decl::is_implicit(void) const {
   return impl->reader.getVal24();
 }
 
-bool Decl::is_in_std_namespace(void) const {
+bool Decl::is_in_anonymous_namespace(void) const {
   return impl->reader.getVal25();
 }
 
-bool Decl::is_invalid_declaration(void) const {
+bool Decl::is_in_another_module_unit(void) const {
   return impl->reader.getVal26();
 }
 
-bool Decl::is_invisible_outside_the_owning_module(void) const {
+bool Decl::is_in_export_declaration_context(void) const {
   return impl->reader.getVal27();
 }
 
-bool Decl::is_local_extern_declaration(void) const {
-  return impl->reader.getVal28();
+std::optional<bool> Decl::is_in_local_scope_for_instantiation(void) const {
+  if (!impl->reader.getVal29()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal28());
+  }
+  return std::nullopt;
 }
 
-bool Decl::is_module_private(void) const {
-  return impl->reader.getVal29();
-}
-
-bool Decl::is_out_of_line(void) const {
+bool Decl::is_in_std_namespace(void) const {
   return impl->reader.getVal30();
 }
 
-bool Decl::is_parameter_pack(void) const {
+bool Decl::is_invisible_outside_the_owning_module(void) const {
   return impl->reader.getVal31();
 }
 
-bool Decl::is_reachable(void) const {
+bool Decl::is_local_extern_declaration(void) const {
   return impl->reader.getVal32();
 }
 
-bool Decl::is_template_declaration(void) const {
+bool Decl::is_module_private(void) const {
   return impl->reader.getVal33();
 }
 
-bool Decl::is_template_parameter(void) const {
+bool Decl::is_out_of_line(void) const {
   return impl->reader.getVal34();
 }
 
-bool Decl::is_template_parameter_pack(void) const {
+bool Decl::is_parameter_pack(void) const {
   return impl->reader.getVal35();
 }
 
-bool Decl::is_templated(void) const {
+bool Decl::is_template_declaration(void) const {
   return impl->reader.getVal36();
 }
 
-bool Decl::is_this_declaration_referenced(void) const {
+bool Decl::is_template_parameter(void) const {
   return impl->reader.getVal37();
 }
 
-bool Decl::is_top_level_declaration_in_obj_c_container(void) const {
+bool Decl::is_template_parameter_pack(void) const {
   return impl->reader.getVal38();
 }
 
-bool Decl::is_unavailable(void) const {
+bool Decl::is_templated(void) const {
   return impl->reader.getVal39();
 }
 
-bool Decl::is_unconditionally_visible(void) const {
+bool Decl::is_top_level_declaration_in_obj_c_container(void) const {
   return impl->reader.getVal40();
 }
 
-bool Decl::is_weak_imported(void) const {
+bool Decl::is_unavailable(void) const {
   return impl->reader.getVal41();
 }
 
+bool Decl::is_unconditionally_visible(void) const {
+  return impl->reader.getVal42();
+}
+
+bool Decl::is_weak_imported(void) const {
+  return impl->reader.getVal43();
+}
+
 DeclKind Decl::kind(void) const {
-  return static_cast<DeclKind>(impl->reader.getVal42());
+  return static_cast<DeclKind>(impl->reader.getVal44());
 }
 
 DeclCategory Decl::category(void) const {
-  return static_cast<DeclCategory>(impl->reader.getVal43());
+  return static_cast<DeclCategory>(impl->reader.getVal45());
 }
 
 Token Decl::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
 }
 
 TokenRange Decl::tokens(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal45(), impl->reader.getVal46());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal47(), impl->reader.getVal48());
 }
 
 #pragma GCC diagnostic pop

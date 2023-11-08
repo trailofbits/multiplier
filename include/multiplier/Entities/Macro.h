@@ -31,12 +31,17 @@ class Index;
 class Macro;
 class MacroImpl;
 class Reference;
-class SourceIR;
 class Token;
 class TokenRange;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using MacroOrToken = std::variant<Macro, Token>;
 class Macro {
+ public:
  protected:
   friend class Attr;
   friend class Decl;
@@ -45,11 +50,13 @@ class Macro {
   friend class FragmentImpl;
   friend class Index;
   friend class Reference;
-  friend class SourceIR;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
   friend class MacroImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const MacroImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
   static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
@@ -60,12 +67,9 @@ class Macro {
   Macro &operator=(Macro &&) noexcept = default;
   Macro &operator=(const Macro &) = default;
 
-  friend inline std::strong_ordering operator<=>(const Macro &lhs, const Macro &rhs) noexcept {
-    return lhs.id().Pack() <=> rhs.id().Pack();
+  inline bool operator==(const Macro &rhs) const noexcept {
+    return id().Pack() == rhs.id().Pack();
   }
-
-  bool operator==(const Macro &) const noexcept = default;
-  bool operator!=(const Macro &) const noexcept = default;
 
   /* implicit */ inline Macro(std::shared_ptr<const MacroImpl> impl_)
       : impl(std::move(impl_)) {}
@@ -87,9 +91,9 @@ class Macro {
   TokenRange expansion_tokens(void) const &;
   gap::generator<Token> generate_expansion_tokens(void) const &;
 
+  static gap::generator<Macro> in(const Index &index, std::span<MacroKind> kinds);
   static gap::generator<Macro> in(const Fragment &frag, std::span<MacroKind> kinds);
   static gap::generator<Macro> in(const File &file, std::span<MacroKind> kinds);
-  static gap::generator<Macro> in(const Index &index, std::span<MacroKind> kinds);
   static gap::generator<Macro> in(const Fragment &frag);
   static gap::generator<Macro> in(const File &file);
 

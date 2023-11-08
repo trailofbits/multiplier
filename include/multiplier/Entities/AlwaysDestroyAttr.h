@@ -17,6 +17,11 @@ class AlwaysDestroyAttr;
 class Attr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AlwaysDestroyAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class AlwaysDestroyAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<AlwaysDestroyAttr> in(const Fragment &frag);
-  static gap::generator<AlwaysDestroyAttr> in(const File &file);
   static gap::generator<AlwaysDestroyAttr> in(const Index &index);
   static gap::generator<AlwaysDestroyAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AlwaysDestroyAttr> by_id(const Index &, EntityId);
+  static gap::generator<AlwaysDestroyAttr> in(const Fragment &frag);
+  static gap::generator<AlwaysDestroyAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALWAYS_DESTROY;

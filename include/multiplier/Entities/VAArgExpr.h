@@ -17,9 +17,13 @@ class Decl;
 class Expr;
 class Stmt;
 class Token;
-class Type;
 class VAArgExpr;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VAArgExpr : public Expr {
  private:
@@ -28,12 +32,12 @@ class VAArgExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<VAArgExpr> in(const Fragment &frag);
-  static gap::generator<VAArgExpr> in(const File &file);
   static gap::generator<VAArgExpr> in(const Index &index);
   static gap::generator<VAArgExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<VAArgExpr> by_id(const Index &, EntityId);
+  static gap::generator<VAArgExpr> in(const Fragment &frag);
+  static gap::generator<VAArgExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::VA_ARG_EXPR;
@@ -64,7 +68,6 @@ class VAArgExpr : public Expr {
   Token builtin_token(void) const;
   Token r_paren_token(void) const;
   Expr sub_expression(void) const;
-  Type written_type(void) const;
   bool is_microsoft_abi(void) const;
 };
 

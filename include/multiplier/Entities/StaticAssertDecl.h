@@ -17,20 +17,24 @@ class Decl;
 class Expr;
 class StaticAssertDecl;
 class Stmt;
-class StringLiteral;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class StaticAssertDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<StaticAssertDecl> in(const Fragment &frag);
-  static gap::generator<StaticAssertDecl> in(const File &file);
   static gap::generator<StaticAssertDecl> in(const Index &index);
   static gap::generator<StaticAssertDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<StaticAssertDecl> by_id(const Index &, EntityId);
+  static gap::generator<StaticAssertDecl> in(const Fragment &frag);
+  static gap::generator<StaticAssertDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::STATIC_ASSERT;
@@ -62,7 +66,7 @@ class StaticAssertDecl : public Decl {
   static std::optional<StaticAssertDecl> from(const TokenContext &t);
 
   Expr assert_expression(void) const;
-  StringLiteral message(void) const;
+  Expr message(void) const;
   Token r_paren_token(void) const;
   bool is_failed(void) const;
 };

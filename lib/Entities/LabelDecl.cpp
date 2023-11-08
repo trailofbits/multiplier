@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<LabelDecl> LabelDecl::containing(const std::optional<Stmt> &stmt)
 
 bool LabelDecl::contains(const Decl &decl) {
   for (auto &parent : LabelDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool LabelDecl::contains(const Stmt &stmt) {
   for (auto &parent : LabelDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -136,7 +136,7 @@ std::optional<LabelDecl> LabelDecl::from(const Decl &parent) {
 }
 
 gap::generator<LabelDecl> LabelDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kLabelDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<LabelDecl> e = LabelDecl::from(Decl(std::move(eptr)))) {
@@ -147,7 +147,7 @@ gap::generator<LabelDecl> LabelDecl::in(const Index &index) {
 }
 
 gap::generator<LabelDecl> LabelDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kLabelDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -159,7 +159,7 @@ gap::generator<LabelDecl> LabelDecl::in(const Fragment &frag) {
 }
 
 gap::generator<LabelDecl> LabelDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kLabelDeclDerivedKinds) {
@@ -181,25 +181,25 @@ std::optional<LabelDecl> LabelDecl::from(const TokenContext &t) {
 }
 
 std::string_view LabelDecl::ms_assembly_label(void) const {
-  capnp::Text::Reader data = impl->reader.getVal71();
+  capnp::Text::Reader data = impl->reader.getVal73();
   return std::string_view(data.cStr(), data.size());
 }
 
 LabelStmt LabelDecl::statement(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal56();
   return LabelStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool LabelDecl::is_gnu_local(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal74();
 }
 
 bool LabelDecl::is_ms_assembly_label(void) const {
-  return impl->reader.getVal73();
+  return impl->reader.getVal75();
 }
 
 bool LabelDecl::is_resolved_ms_assembly_label(void) const {
-  return impl->reader.getVal74();
+  return impl->reader.getVal76();
 }
 
 #pragma GCC diagnostic pop

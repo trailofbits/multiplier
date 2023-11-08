@@ -18,14 +18,17 @@ class DependentSizedMatrixType;
 class MatrixType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MatrixType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<MatrixType> in(const Fragment &frag);
-  static gap::generator<MatrixType> in(const File &file);
   static gap::generator<MatrixType> in(const Index &index);
   static gap::generator<MatrixType> containing(const Token &tok);
   bool contains(const Token &tok) const;

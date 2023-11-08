@@ -13,7 +13,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {
@@ -61,37 +61,11 @@ std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const Typ
 }
 
 gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kDependentSizedMatrixTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<DependentSizedMatrixType> e = DependentSizedMatrixType::from(Type(std::move(eptr)))) {
         co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kDependentSizedMatrixTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<DependentSizedMatrixType> e = DependentSizedMatrixType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kDependentSizedMatrixTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<DependentSizedMatrixType> e = DependentSizedMatrixType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
       }
     }
   }
@@ -106,16 +80,16 @@ std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const Tok
 }
 
 Token DependentSizedMatrixType::attribute_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal236());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal24());
 }
 
 Expr DependentSizedMatrixType::column_expression(void) const {
-  RawEntityId eid = impl->reader.getVal237();
+  RawEntityId eid = impl->reader.getVal25();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr DependentSizedMatrixType::row_expression(void) const {
-  RawEntityId eid = impl->reader.getVal267();
+  RawEntityId eid = impl->reader.getVal58();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

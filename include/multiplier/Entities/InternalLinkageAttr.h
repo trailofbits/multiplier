@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class InternalLinkageAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class InternalLinkageAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class InternalLinkageAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<InternalLinkageAttr> in(const Fragment &frag);
-  static gap::generator<InternalLinkageAttr> in(const File &file);
   static gap::generator<InternalLinkageAttr> in(const Index &index);
   static gap::generator<InternalLinkageAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<InternalLinkageAttr> by_id(const Index &, EntityId);
+  static gap::generator<InternalLinkageAttr> in(const Fragment &frag);
+  static gap::generator<InternalLinkageAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INTERNAL_LINKAGE;

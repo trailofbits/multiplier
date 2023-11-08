@@ -16,18 +16,23 @@ class Index;
 class Attr;
 class SwiftObjCMembersAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class SwiftObjCMembersAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<SwiftObjCMembersAttr> in(const Fragment &frag);
-  static gap::generator<SwiftObjCMembersAttr> in(const File &file);
   static gap::generator<SwiftObjCMembersAttr> in(const Index &index);
   static gap::generator<SwiftObjCMembersAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SwiftObjCMembersAttr> by_id(const Index &, EntityId);
+  static gap::generator<SwiftObjCMembersAttr> in(const Fragment &frag);
+  static gap::generator<SwiftObjCMembersAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_OBJ_C_MEMBERS;

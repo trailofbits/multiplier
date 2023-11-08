@@ -12,7 +12,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -72,14 +72,14 @@ gap::generator<ExportDecl> ExportDecl::containing(const std::optional<Stmt> &stm
 
 bool ExportDecl::contains(const Decl &decl) {
   for (auto &parent : ExportDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ExportDecl::contains(const Stmt &stmt) {
   for (auto &parent : ExportDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -134,7 +134,7 @@ std::optional<ExportDecl> ExportDecl::from(const Decl &parent) {
 }
 
 gap::generator<ExportDecl> ExportDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kExportDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ExportDecl> e = ExportDecl::from(Decl(std::move(eptr)))) {
@@ -145,7 +145,7 @@ gap::generator<ExportDecl> ExportDecl::in(const Index &index) {
 }
 
 gap::generator<ExportDecl> ExportDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kExportDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -157,7 +157,7 @@ gap::generator<ExportDecl> ExportDecl::in(const Fragment &frag) {
 }
 
 gap::generator<ExportDecl> ExportDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kExportDeclDerivedKinds) {
@@ -179,20 +179,20 @@ std::optional<ExportDecl> ExportDecl::from(const TokenContext &t) {
 }
 
 Token ExportDecl::export_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
 }
 
 Token ExportDecl::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal54());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
 bool ExportDecl::has_braces(void) const {
-  return impl->reader.getVal48();
+  return impl->reader.getVal50();
 }
 
 gap::generator<Decl> ExportDecl::declarations_in_context(void) const & {
-  EntityProvider::Ptr ep = impl->ep;
-  auto list = impl->reader.getVal49();
+  EntityProviderPtr ep = impl->ep;
+  auto list = impl->reader.getVal51();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

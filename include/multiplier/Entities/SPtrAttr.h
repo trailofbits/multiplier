@@ -17,6 +17,11 @@ class Attr;
 class SPtrAttr;
 class Token;
 class TypeAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class SPtrAttr : public TypeAttr {
  private:
@@ -24,12 +29,12 @@ class SPtrAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  static gap::generator<SPtrAttr> in(const Fragment &frag);
-  static gap::generator<SPtrAttr> in(const File &file);
   static gap::generator<SPtrAttr> in(const Index &index);
   static gap::generator<SPtrAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SPtrAttr> by_id(const Index &, EntityId);
+  static gap::generator<SPtrAttr> in(const Fragment &frag);
+  static gap::generator<SPtrAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::S_PTR;

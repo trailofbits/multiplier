@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {
@@ -62,37 +62,11 @@ std::optional<AutoType> AutoType::from(const Type &parent) {
 }
 
 gap::generator<AutoType> AutoType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kAutoTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<AutoType> e = AutoType::from(Type(std::move(eptr)))) {
         co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<AutoType> AutoType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kAutoTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<AutoType> e = AutoType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<AutoType> AutoType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kAutoTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<AutoType> e = AutoType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
       }
     }
   }
@@ -107,19 +81,19 @@ std::optional<AutoType> AutoType::from(const TokenContext &t) {
 }
 
 AutoTypeKeyword AutoType::keyword(void) const {
-  return static_cast<AutoTypeKeyword>(impl->reader.getVal238());
+  return static_cast<AutoTypeKeyword>(impl->reader.getVal26());
 }
 
 unsigned AutoType::num_type_constraint_arguments(void) const {
-  return impl->reader.getVal234().size();
+  return impl->reader.getVal22().size();
 }
 
 std::optional<TemplateArgument> AutoType::nth_type_constraint_argument(unsigned n) const {
-  auto list = impl->reader.getVal234();
+  auto list = impl->reader.getVal22();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TemplateArgumentFor(ep, v);
   if (!e) {
@@ -129,12 +103,12 @@ std::optional<TemplateArgument> AutoType::nth_type_constraint_argument(unsigned 
 }
 
 gap::generator<TemplateArgument> AutoType::type_constraint_arguments(void) const & {
-  auto list = impl->reader.getVal234();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal22();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d234 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d234));
+    if (auto d22 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d22));
     }
   }
   co_return;
@@ -142,7 +116,7 @@ gap::generator<TemplateArgument> AutoType::type_constraint_arguments(void) const
 
 std::optional<ConceptDecl> AutoType::type_constraint_concept(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal236();
+    RawEntityId eid = impl->reader.getVal24();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -154,15 +128,15 @@ std::optional<ConceptDecl> AutoType::type_constraint_concept(void) const {
 }
 
 bool AutoType::is_constrained(void) const {
-  return impl->reader.getVal233();
+  return impl->reader.getVal21();
 }
 
 bool AutoType::is_decltype_auto(void) const {
-  return impl->reader.getVal239();
+  return impl->reader.getVal27();
 }
 
 bool AutoType::is_gnu_auto_type(void) const {
-  return impl->reader.getVal240();
+  return impl->reader.getVal28();
 }
 
 #pragma GCC diagnostic pop

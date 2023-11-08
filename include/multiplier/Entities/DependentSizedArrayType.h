@@ -19,6 +19,11 @@ class Expr;
 class Token;
 class TokenRange;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DependentSizedArrayType : public ArrayType {
  private:
@@ -26,8 +31,6 @@ class DependentSizedArrayType : public ArrayType {
   friend class ArrayType;
   friend class Type;
  public:
-  static gap::generator<DependentSizedArrayType> in(const Fragment &frag);
-  static gap::generator<DependentSizedArrayType> in(const File &file);
   static gap::generator<DependentSizedArrayType> in(const Index &index);
   static gap::generator<DependentSizedArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;

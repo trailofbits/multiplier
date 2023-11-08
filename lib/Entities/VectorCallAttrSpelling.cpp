@@ -17,7 +17,7 @@ const char *EnumeratorName(VectorCallAttrSpelling e) {
   switch (e) {
     case VectorCallAttrSpelling::GNU_VECTORCALL: return "GNU_VECTORCALL";
     case VectorCallAttrSpelling::CXX11_CLANG_VECTORCALL: return "CXX11_CLANG_VECTORCALL";
-    case VectorCallAttrSpelling::C2X_CLANG_VECTORCALL: return "C2X_CLANG_VECTORCALL";
+    case VectorCallAttrSpelling::C23_CLANG_VECTORCALL: return "C23_CLANG_VECTORCALL";
     case VectorCallAttrSpelling::KEYWORD_VECTORCALL: return "KEYWORD_VECTORCALL";
     case VectorCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

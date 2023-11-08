@@ -20,6 +20,11 @@ class NamedDecl;
 class Stmt;
 class Token;
 class UsingShadowDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UsingShadowDecl : public NamedDecl {
  private:
@@ -27,12 +32,12 @@ class UsingShadowDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<UsingShadowDecl> in(const Fragment &frag);
-  static gap::generator<UsingShadowDecl> in(const File &file);
   static gap::generator<UsingShadowDecl> in(const Index &index);
   static gap::generator<UsingShadowDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UsingShadowDecl> by_id(const Index &, EntityId);
+  static gap::generator<UsingShadowDecl> in(const Fragment &frag);
+  static gap::generator<UsingShadowDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_SHADOW;

@@ -24,6 +24,11 @@ class TypeAliasDecl;
 class TypeDecl;
 class TypedefDecl;
 class TypedefNameDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypedefNameDecl : public TypeDecl {
  private:
@@ -32,12 +37,12 @@ class TypedefNameDecl : public TypeDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<TypedefNameDecl> in(const Fragment &frag);
-  static gap::generator<TypedefNameDecl> in(const File &file);
   static gap::generator<TypedefNameDecl> in(const Index &index);
   static gap::generator<TypedefNameDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TypedefNameDecl> by_id(const Index &, EntityId);
+  static gap::generator<TypedefNameDecl> in(const Fragment &frag);
+  static gap::generator<TypedefNameDecl> in(const File &file);
 
   static gap::generator<TypedefNameDecl> containing(const Decl &decl);
   static gap::generator<TypedefNameDecl> containing(const std::optional<Decl> &decl);

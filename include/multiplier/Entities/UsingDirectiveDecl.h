@@ -18,6 +18,11 @@ class NamedDecl;
 class Stmt;
 class Token;
 class UsingDirectiveDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UsingDirectiveDecl : public NamedDecl {
  private:
@@ -25,12 +30,12 @@ class UsingDirectiveDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<UsingDirectiveDecl> in(const Fragment &frag);
-  static gap::generator<UsingDirectiveDecl> in(const File &file);
   static gap::generator<UsingDirectiveDecl> in(const Index &index);
   static gap::generator<UsingDirectiveDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UsingDirectiveDecl> by_id(const Index &, EntityId);
+  static gap::generator<UsingDirectiveDecl> in(const Fragment &frag);
+  static gap::generator<UsingDirectiveDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_DIRECTIVE;

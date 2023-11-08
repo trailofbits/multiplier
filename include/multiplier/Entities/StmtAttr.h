@@ -22,18 +22,23 @@ class StmtAttr;
 class SuppressAttr;
 class Token;
 class UnlikelyAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class StmtAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<StmtAttr> in(const Fragment &frag);
-  static gap::generator<StmtAttr> in(const File &file);
   static gap::generator<StmtAttr> in(const Index &index);
   static gap::generator<StmtAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<StmtAttr> by_id(const Index &, EntityId);
+  static gap::generator<StmtAttr> in(const Fragment &frag);
+  static gap::generator<StmtAttr> in(const File &file);
 
   static std::optional<StmtAttr> from(const Attr &parent);
 

@@ -37,6 +37,8 @@
 #include <multiplier/Entities/ArcWeakrefUnavailableAttr.h>
 #include <multiplier/Entities/ArgumentWithTypeTagAttr.h>
 #include <multiplier/Entities/ArmBuiltinAliasAttr.h>
+#include <multiplier/Entities/ArmLocallyStreamingAttr.h>
+#include <multiplier/Entities/ArmNewZAAttr.h>
 #include <multiplier/Entities/ArtificialAttr.h>
 #include <multiplier/Entities/AsmLabelAttr.h>
 #include <multiplier/Entities/AssertCapabilityAttr.h>
@@ -46,6 +48,7 @@
 #include <multiplier/Entities/AssumptionAttr.h>
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/AvailabilityAttr.h>
+#include <multiplier/Entities/AvailableOnlyInDefaultEvalMethodAttr.h>
 #include <multiplier/Entities/BPFPreserveAccessIndexAttr.h>
 #include <multiplier/Entities/BTFDeclTagAttr.h>
 #include <multiplier/Entities/BlocksAttr.h>
@@ -162,6 +165,7 @@
 #include <multiplier/Entities/NSReturnsAutoreleasedAttr.h>
 #include <multiplier/Entities/NSReturnsNotRetainedAttr.h>
 #include <multiplier/Entities/NSReturnsRetainedAttr.h>
+#include <multiplier/Entities/NVPTXKernelAttr.h>
 #include <multiplier/Entities/NakedAttr.h>
 #include <multiplier/Entities/NoAliasAttr.h>
 #include <multiplier/Entities/NoCommonAttr.h>
@@ -295,6 +299,7 @@
 #include <multiplier/Entities/TypeVisibilityAttr.h>
 #include <multiplier/Entities/UnavailableAttr.h>
 #include <multiplier/Entities/UninitializedAttr.h>
+#include <multiplier/Entities/UnsafeBufferUsageAttr.h>
 #include <multiplier/Entities/UnusedAttr.h>
 #include <multiplier/Entities/UseHandleAttr.h>
 #include <multiplier/Entities/UsedAttr.h>
@@ -318,7 +323,7 @@
 #include <multiplier/Entities/XRayLogArgsAttr.h>
 #include <multiplier/Entities/ZeroCallUsedRegsAttr.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Attr.h"
 
 namespace mx {
@@ -386,6 +391,7 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     NSReturnsAutoreleasedAttr::static_kind(),
     NSReturnsNotRetainedAttr::static_kind(),
     NSReturnsRetainedAttr::static_kind(),
+    NVPTXKernelAttr::static_kind(),
     NakedAttr::static_kind(),
     NoAliasAttr::static_kind(),
     NoCommonAttr::static_kind(),
@@ -508,6 +514,7 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     TypeVisibilityAttr::static_kind(),
     UnavailableAttr::static_kind(),
     UninitializedAttr::static_kind(),
+    UnsafeBufferUsageAttr::static_kind(),
     UnusedAttr::static_kind(),
     UsedAttr::static_kind(),
     UsingIfExistsAttr::static_kind(),
@@ -556,6 +563,8 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     ArcWeakrefUnavailableAttr::static_kind(),
     ArgumentWithTypeTagAttr::static_kind(),
     ArmBuiltinAliasAttr::static_kind(),
+    ArmLocallyStreamingAttr::static_kind(),
+    ArmNewZAAttr::static_kind(),
     ArtificialAttr::static_kind(),
     AsmLabelAttr::static_kind(),
     AssertCapabilityAttr::static_kind(),
@@ -564,6 +573,7 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     AssumeAlignedAttr::static_kind(),
     AssumptionAttr::static_kind(),
     AvailabilityAttr::static_kind(),
+    AvailableOnlyInDefaultEvalMethodAttr::static_kind(),
     BPFPreserveAccessIndexAttr::static_kind(),
     BTFDeclTagAttr::static_kind(),
     BlocksAttr::static_kind(),
@@ -697,6 +707,7 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
     case NSReturnsAutoreleasedAttr::static_kind():
     case NSReturnsNotRetainedAttr::static_kind():
     case NSReturnsRetainedAttr::static_kind():
+    case NVPTXKernelAttr::static_kind():
     case NakedAttr::static_kind():
     case NoAliasAttr::static_kind():
     case NoCommonAttr::static_kind():
@@ -819,6 +830,7 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
     case TypeVisibilityAttr::static_kind():
     case UnavailableAttr::static_kind():
     case UninitializedAttr::static_kind():
+    case UnsafeBufferUsageAttr::static_kind():
     case UnusedAttr::static_kind():
     case UsedAttr::static_kind():
     case UsingIfExistsAttr::static_kind():
@@ -867,6 +879,8 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
     case ArcWeakrefUnavailableAttr::static_kind():
     case ArgumentWithTypeTagAttr::static_kind():
     case ArmBuiltinAliasAttr::static_kind():
+    case ArmLocallyStreamingAttr::static_kind():
+    case ArmNewZAAttr::static_kind():
     case ArtificialAttr::static_kind():
     case AsmLabelAttr::static_kind():
     case AssertCapabilityAttr::static_kind():
@@ -875,6 +889,7 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
     case AssumeAlignedAttr::static_kind():
     case AssumptionAttr::static_kind():
     case AvailabilityAttr::static_kind():
+    case AvailableOnlyInDefaultEvalMethodAttr::static_kind():
     case BPFPreserveAccessIndexAttr::static_kind():
     case BTFDeclTagAttr::static_kind():
     case BlocksAttr::static_kind():
@@ -978,7 +993,7 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
 }
 
 gap::generator<InheritableAttr> InheritableAttr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kInheritableAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
       if (std::optional<InheritableAttr> e = InheritableAttr::from(Attr(std::move(eptr)))) {
@@ -989,7 +1004,7 @@ gap::generator<InheritableAttr> InheritableAttr::in(const Index &index) {
 }
 
 gap::generator<InheritableAttr> InheritableAttr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kInheritableAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
@@ -1001,7 +1016,7 @@ gap::generator<InheritableAttr> InheritableAttr::in(const Fragment &frag) {
 }
 
 gap::generator<InheritableAttr> InheritableAttr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kInheritableAttrDerivedKinds) {

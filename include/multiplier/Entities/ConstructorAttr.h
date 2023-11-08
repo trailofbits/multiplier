@@ -17,6 +17,11 @@ class Attr;
 class ConstructorAttr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ConstructorAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class ConstructorAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ConstructorAttr> in(const Fragment &frag);
-  static gap::generator<ConstructorAttr> in(const File &file);
   static gap::generator<ConstructorAttr> in(const Index &index);
   static gap::generator<ConstructorAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ConstructorAttr> by_id(const Index &, EntityId);
+  static gap::generator<ConstructorAttr> in(const Fragment &frag);
+  static gap::generator<ConstructorAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CONSTRUCTOR;

@@ -20,18 +20,23 @@ class ForStmt;
 class Stmt;
 class Token;
 class VarDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ForStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<ForStmt> in(const Fragment &frag);
-  static gap::generator<ForStmt> in(const File &file);
   static gap::generator<ForStmt> in(const Index &index);
   static gap::generator<ForStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ForStmt> by_id(const Index &, EntityId);
+  static gap::generator<ForStmt> in(const Fragment &frag);
+  static gap::generator<ForStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FOR_STMT;

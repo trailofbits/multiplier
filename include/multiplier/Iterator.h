@@ -23,6 +23,7 @@ class Stmt;
 class TemplateArgument;
 class TemplateParameterList;
 class Token;
+class TokenContextReader;
 class Type;
 
 #define MX_FORWARD_DECLARE_ENTITY(type_name, lower_name, enum_name, category) \
@@ -30,6 +31,8 @@ class Type;
     class type_name ## Impl;
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE_ENTITY,
+                            MX_FORWARD_DECLARE_ENTITY,
+                            MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
@@ -238,7 +241,7 @@ class TokenContext {
  private:
   friend class Token;
 
-  std::shared_ptr<const FragmentImpl> impl;
+  std::shared_ptr<const TokenContextReader> reader;
 
   // Offset of this token context inside of the fragment.
   unsigned offset{0};
@@ -253,8 +256,8 @@ class TokenContext {
   // the current fragment, but in rare instances it may not.
   RawEntityId entity_id{kInvalidEntityId};
 
-  inline TokenContext(std::shared_ptr<const FragmentImpl> impl_)
-      : impl(std::move(impl_)) {}
+  inline TokenContext(std::shared_ptr<const TokenContextReader> reader_)
+      : reader(std::move(reader_)) {}
 
  public:
   inline bool has_parent(void) const noexcept {
@@ -283,9 +286,11 @@ class TokenContext {
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_FORWARD_DECLARE_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_FORWARD_DECLARE_GETTER,
-                            MX_FORWARD_DECLARE_GETTER)
+                            MX_FORWARD_DECLARE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_FORWARD_DECLARE_GETTER
 
   // Return the aliased context, if any.

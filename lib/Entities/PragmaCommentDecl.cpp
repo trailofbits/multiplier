@@ -12,7 +12,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -72,14 +72,14 @@ gap::generator<PragmaCommentDecl> PragmaCommentDecl::containing(const std::optio
 
 bool PragmaCommentDecl::contains(const Decl &decl) {
   for (auto &parent : PragmaCommentDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool PragmaCommentDecl::contains(const Stmt &stmt) {
   for (auto &parent : PragmaCommentDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -134,7 +134,7 @@ std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const Decl &parent) {
 }
 
 gap::generator<PragmaCommentDecl> PragmaCommentDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kPragmaCommentDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<PragmaCommentDecl> e = PragmaCommentDecl::from(Decl(std::move(eptr)))) {
@@ -145,7 +145,7 @@ gap::generator<PragmaCommentDecl> PragmaCommentDecl::in(const Index &index) {
 }
 
 gap::generator<PragmaCommentDecl> PragmaCommentDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kPragmaCommentDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -157,7 +157,7 @@ gap::generator<PragmaCommentDecl> PragmaCommentDecl::in(const Fragment &frag) {
 }
 
 gap::generator<PragmaCommentDecl> PragmaCommentDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kPragmaCommentDeclDerivedKinds) {
@@ -179,12 +179,12 @@ std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const TokenContext &t) 
 }
 
 std::string_view PragmaCommentDecl::argument(void) const {
-  capnp::Text::Reader data = impl->reader.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal63();
   return std::string_view(data.cStr(), data.size());
 }
 
 PragmaMSCommentKind PragmaCommentDecl::comment_kind(void) const {
-  return static_cast<PragmaMSCommentKind>(impl->reader.getVal63());
+  return static_cast<PragmaMSCommentKind>(impl->reader.getVal65());
 }
 
 #pragma GCC diagnostic pop

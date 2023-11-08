@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class InitPriorityAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class InitPriorityAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class InitPriorityAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<InitPriorityAttr> in(const Fragment &frag);
-  static gap::generator<InitPriorityAttr> in(const File &file);
   static gap::generator<InitPriorityAttr> in(const Index &index);
   static gap::generator<InitPriorityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<InitPriorityAttr> by_id(const Index &, EntityId);
+  static gap::generator<InitPriorityAttr> in(const Fragment &frag);
+  static gap::generator<InitPriorityAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INIT_PRIORITY;

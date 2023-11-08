@@ -20,6 +20,7 @@ enum class VectorTypeVectorKind : unsigned char {
   NEON_POLY_VECTOR,
   SVE_FIXED_LENGTH_DATA_VECTOR,
   SVE_FIXED_LENGTH_PREDICATE_VECTOR,
+  RVV_FIXED_LENGTH_DATA_VECTOR,
 };
 
 inline static const char *EnumerationName(VectorTypeVectorKind) {
@@ -27,7 +28,7 @@ inline static const char *EnumerationName(VectorTypeVectorKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(VectorTypeVectorKind) {
-  return 8;
+  return 9;
 }
 
 const char *EnumeratorName(VectorTypeVectorKind);

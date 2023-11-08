@@ -18,6 +18,11 @@ class TagDecl;
 class Token;
 class Type;
 class TypeWithKeyword;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ElaboratedType : public TypeWithKeyword {
  private:
@@ -25,8 +30,6 @@ class ElaboratedType : public TypeWithKeyword {
   friend class TypeWithKeyword;
   friend class Type;
  public:
-  static gap::generator<ElaboratedType> in(const Fragment &frag);
-  static gap::generator<ElaboratedType> in(const File &file);
   static gap::generator<ElaboratedType> in(const Index &index);
   static gap::generator<ElaboratedType> containing(const Token &tok);
   bool contains(const Token &tok) const;

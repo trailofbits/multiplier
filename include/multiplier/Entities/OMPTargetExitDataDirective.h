@@ -18,6 +18,11 @@ class OMPExecutableDirective;
 class OMPTargetExitDataDirective;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPTargetExitDataDirective : public OMPExecutableDirective {
  private:
@@ -25,12 +30,12 @@ class OMPTargetExitDataDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPTargetExitDataDirective> in(const Fragment &frag);
-  static gap::generator<OMPTargetExitDataDirective> in(const File &file);
   static gap::generator<OMPTargetExitDataDirective> in(const Index &index);
   static gap::generator<OMPTargetExitDataDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPTargetExitDataDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPTargetExitDataDirective> in(const Fragment &frag);
+  static gap::generator<OMPTargetExitDataDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_EXIT_DATA_DIRECTIVE;

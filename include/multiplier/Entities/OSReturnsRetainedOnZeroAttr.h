@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class OSReturnsRetainedOnZeroAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OSReturnsRetainedOnZeroAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class OSReturnsRetainedOnZeroAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<OSReturnsRetainedOnZeroAttr> in(const Fragment &frag);
-  static gap::generator<OSReturnsRetainedOnZeroAttr> in(const File &file);
   static gap::generator<OSReturnsRetainedOnZeroAttr> in(const Index &index);
   static gap::generator<OSReturnsRetainedOnZeroAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OSReturnsRetainedOnZeroAttr> by_id(const Index &, EntityId);
+  static gap::generator<OSReturnsRetainedOnZeroAttr> in(const Fragment &frag);
+  static gap::generator<OSReturnsRetainedOnZeroAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OS_RETURNS_RETAINED_ON_ZERO;

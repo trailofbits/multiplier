@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<ChooseExpr> ChooseExpr::containing(const std::optional<Stmt> &stm
 
 bool ChooseExpr::contains(const Decl &decl) {
   for (auto &parent : ChooseExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ChooseExpr::contains(const Stmt &stmt) {
   for (auto &parent : ChooseExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<ChooseExpr> ChooseExpr::from(const Stmt &parent) {
 }
 
 gap::generator<ChooseExpr> ChooseExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kChooseExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ChooseExpr> e = ChooseExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<ChooseExpr> ChooseExpr::in(const Index &index) {
 }
 
 gap::generator<ChooseExpr> ChooseExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kChooseExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<ChooseExpr> ChooseExpr::in(const Fragment &frag) {
 }
 
 gap::generator<ChooseExpr> ChooseExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kChooseExprDerivedKinds) {
@@ -155,31 +155,31 @@ std::optional<ChooseExpr> ChooseExpr::from(const TokenContext &t) {
 }
 
 Token ChooseExpr::builtin_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 Expr ChooseExpr::chosen_sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ChooseExpr::condition(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ChooseExpr::lhs(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ChooseExpr::rhs(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token ChooseExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 bool ChooseExpr::is_condition_dependent(void) const {

@@ -13,7 +13,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -73,14 +73,14 @@ gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::containing(const std:
 
 bool OMPTaskwaitDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTaskwaitDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPTaskwaitDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTaskwaitDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -109,7 +109,7 @@ std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from(const Stmt &paren
 }
 
 gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPTaskwaitDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPTaskwaitDirective> e = OMPTaskwaitDirective::from(Stmt(std::move(eptr)))) {
@@ -120,7 +120,7 @@ gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::in(const Index &index
 }
 
 gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPTaskwaitDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -132,7 +132,7 @@ gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::in(const Fragment &fr
 }
 
 gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPTaskwaitDirectiveDerivedKinds) {

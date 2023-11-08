@@ -19,18 +19,23 @@ class DefaultStmt;
 class Stmt;
 class SwitchCase;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class SwitchCase : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<SwitchCase> in(const Fragment &frag);
-  static gap::generator<SwitchCase> in(const File &file);
   static gap::generator<SwitchCase> in(const Index &index);
   static gap::generator<SwitchCase> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SwitchCase> by_id(const Index &, EntityId);
+  static gap::generator<SwitchCase> in(const Fragment &frag);
+  static gap::generator<SwitchCase> in(const File &file);
 
   static gap::generator<SwitchCase> containing(const Decl &decl);
   static gap::generator<SwitchCase> containing(const std::optional<Decl> &decl);

@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class NoDestroyAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class NoDestroyAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class NoDestroyAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<NoDestroyAttr> in(const Fragment &frag);
-  static gap::generator<NoDestroyAttr> in(const File &file);
   static gap::generator<NoDestroyAttr> in(const Index &index);
   static gap::generator<NoDestroyAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NoDestroyAttr> by_id(const Index &, EntityId);
+  static gap::generator<NoDestroyAttr> in(const Fragment &frag);
+  static gap::generator<NoDestroyAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_DESTROY;

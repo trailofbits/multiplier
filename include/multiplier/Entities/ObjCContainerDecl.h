@@ -26,6 +26,11 @@ class ObjCProtocolDecl;
 class Stmt;
 class Token;
 class TokenRange;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCContainerDecl : public NamedDecl {
  private:
@@ -33,12 +38,12 @@ class ObjCContainerDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ObjCContainerDecl> in(const Fragment &frag);
-  static gap::generator<ObjCContainerDecl> in(const File &file);
   static gap::generator<ObjCContainerDecl> in(const Index &index);
   static gap::generator<ObjCContainerDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCContainerDecl> by_id(const Index &, EntityId);
+  static gap::generator<ObjCContainerDecl> in(const Fragment &frag);
+  static gap::generator<ObjCContainerDecl> in(const File &file);
 
   static gap::generator<ObjCContainerDecl> containing(const Decl &decl);
   static gap::generator<ObjCContainerDecl> containing(const std::optional<Decl> &decl);

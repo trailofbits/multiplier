@@ -55,6 +55,11 @@ class OMPTeamsDistributeSimdDirective;
 class OMPTeamsGenericLoopDirective;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPLoopDirective : public OMPLoopBasedDirective {
  private:
@@ -63,12 +68,12 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPLoopDirective> in(const Fragment &frag);
-  static gap::generator<OMPLoopDirective> in(const File &file);
   static gap::generator<OMPLoopDirective> in(const Index &index);
   static gap::generator<OMPLoopDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPLoopDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPLoopDirective> in(const Fragment &frag);
+  static gap::generator<OMPLoopDirective> in(const File &file);
 
   static gap::generator<OMPLoopDirective> containing(const Decl &decl);
   static gap::generator<OMPLoopDirective> containing(const std::optional<Decl> &decl);

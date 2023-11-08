@@ -20,7 +20,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/ValueDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -80,14 +80,14 @@ gap::generator<CXXMethodDecl> CXXMethodDecl::containing(const std::optional<Stmt
 
 bool CXXMethodDecl::contains(const Decl &decl) {
   for (auto &parent : CXXMethodDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXMethodDecl::contains(const Stmt &stmt) {
   for (auto &parent : CXXMethodDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -148,7 +148,7 @@ std::optional<CXXMethodDecl> CXXMethodDecl::from(const Decl &parent) {
 }
 
 gap::generator<CXXMethodDecl> CXXMethodDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kCXXMethodDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<CXXMethodDecl> e = CXXMethodDecl::from(Decl(std::move(eptr)))) {
@@ -159,7 +159,7 @@ gap::generator<CXXMethodDecl> CXXMethodDecl::in(const Index &index) {
 }
 
 gap::generator<CXXMethodDecl> CXXMethodDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kCXXMethodDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -171,7 +171,7 @@ gap::generator<CXXMethodDecl> CXXMethodDecl::in(const Fragment &frag) {
 }
 
 gap::generator<CXXMethodDecl> CXXMethodDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kCXXMethodDeclDerivedKinds) {
@@ -193,12 +193,12 @@ std::optional<CXXMethodDecl> CXXMethodDecl::from(const TokenContext &t) {
 }
 
 RefQualifierKind CXXMethodDecl::reference_qualifier(void) const {
-  return static_cast<RefQualifierKind>(impl->reader.getVal164());
+  return static_cast<RefQualifierKind>(impl->reader.getVal168());
 }
 
 std::optional<Type> CXXMethodDecl::this_object_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal165();
+    RawEntityId eid = impl->reader.getVal169();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -211,7 +211,7 @@ std::optional<Type> CXXMethodDecl::this_object_type(void) const {
 
 std::optional<Type> CXXMethodDecl::this_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal166();
+    RawEntityId eid = impl->reader.getVal170();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -223,47 +223,47 @@ std::optional<Type> CXXMethodDecl::this_type(void) const {
 }
 
 bool CXXMethodDecl::has_inline_body(void) const {
-  return impl->reader.getVal167();
-}
-
-bool CXXMethodDecl::is_const(void) const {
-  return impl->reader.getVal168();
-}
-
-bool CXXMethodDecl::is_copy_assignment_operator(void) const {
-  return impl->reader.getVal169();
-}
-
-bool CXXMethodDecl::is_instance(void) const {
-  return impl->reader.getVal170();
-}
-
-bool CXXMethodDecl::is_lambda_static_invoker(void) const {
   return impl->reader.getVal171();
 }
 
-bool CXXMethodDecl::is_move_assignment_operator(void) const {
+bool CXXMethodDecl::is_const(void) const {
   return impl->reader.getVal172();
 }
 
-bool CXXMethodDecl::is_virtual(void) const {
+bool CXXMethodDecl::is_copy_assignment_operator(void) const {
   return impl->reader.getVal173();
 }
 
-bool CXXMethodDecl::is_volatile(void) const {
+bool CXXMethodDecl::is_instance(void) const {
   return impl->reader.getVal174();
 }
 
+bool CXXMethodDecl::is_lambda_static_invoker(void) const {
+  return impl->reader.getVal175();
+}
+
+bool CXXMethodDecl::is_move_assignment_operator(void) const {
+  return impl->reader.getVal176();
+}
+
+bool CXXMethodDecl::is_virtual(void) const {
+  return impl->reader.getVal177();
+}
+
+bool CXXMethodDecl::is_volatile(void) const {
+  return impl->reader.getVal178();
+}
+
 unsigned CXXMethodDecl::num_overridden_methods(void) const {
-  return impl->reader.getVal175().size();
+  return impl->reader.getVal179().size();
 }
 
 std::optional<CXXMethodDecl> CXXMethodDecl::nth_overridden_method(unsigned n) const {
-  auto list = impl->reader.getVal175();
+  auto list = impl->reader.getVal179();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -273,12 +273,12 @@ std::optional<CXXMethodDecl> CXXMethodDecl::nth_overridden_method(unsigned n) co
 }
 
 gap::generator<CXXMethodDecl> CXXMethodDecl::overridden_methods(void) const & {
-  auto list = impl->reader.getVal175();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal179();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d175 = ep->DeclFor(ep, v)) {
-      if (auto e = CXXMethodDecl::from(Decl(std::move(d175)))) {
+    if (auto d179 = ep->DeclFor(ep, v)) {
+      if (auto e = CXXMethodDecl::from(Decl(std::move(d179)))) {
         co_yield std::move(*e);
       }
     }

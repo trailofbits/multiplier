@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<OMPParallelSectionsDirective> OMPParallelSectionsDirective::conta
 
 bool OMPParallelSectionsDirective::contains(const Decl &decl) {
   for (auto &parent : OMPParallelSectionsDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPParallelSectionsDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPParallelSectionsDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(c
 }
 
 gap::generator<OMPParallelSectionsDirective> OMPParallelSectionsDirective::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPParallelSectionsDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPParallelSectionsDirective> e = OMPParallelSectionsDirective::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<OMPParallelSectionsDirective> OMPParallelSectionsDirective::in(co
 }
 
 gap::generator<OMPParallelSectionsDirective> OMPParallelSectionsDirective::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPParallelSectionsDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<OMPParallelSectionsDirective> OMPParallelSectionsDirective::in(co
 }
 
 gap::generator<OMPParallelSectionsDirective> OMPParallelSectionsDirective::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPParallelSectionsDirectiveDerivedKinds) {

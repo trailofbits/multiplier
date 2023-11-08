@@ -18,6 +18,11 @@ class OMPExecutableDirective;
 class OMPScanDirective;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPScanDirective : public OMPExecutableDirective {
  private:
@@ -25,12 +30,12 @@ class OMPScanDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPScanDirective> in(const Fragment &frag);
-  static gap::generator<OMPScanDirective> in(const File &file);
   static gap::generator<OMPScanDirective> in(const Index &index);
   static gap::generator<OMPScanDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPScanDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPScanDirective> in(const Fragment &frag);
+  static gap::generator<OMPScanDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_SCAN_DIRECTIVE;

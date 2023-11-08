@@ -19,6 +19,11 @@ class MatrixSubscriptExpr;
 class Stmt;
 class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MatrixSubscriptExpr : public Expr {
  private:
@@ -27,12 +32,12 @@ class MatrixSubscriptExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<MatrixSubscriptExpr> in(const Fragment &frag);
-  static gap::generator<MatrixSubscriptExpr> in(const File &file);
   static gap::generator<MatrixSubscriptExpr> in(const Index &index);
   static gap::generator<MatrixSubscriptExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MatrixSubscriptExpr> by_id(const Index &, EntityId);
+  static gap::generator<MatrixSubscriptExpr> in(const Fragment &frag);
+  static gap::generator<MatrixSubscriptExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MATRIX_SUBSCRIPT_EXPR;

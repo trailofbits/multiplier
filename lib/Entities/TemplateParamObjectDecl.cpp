@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::containing(cons
 
 bool TemplateParamObjectDecl::contains(const Decl &decl) {
   for (auto &parent : TemplateParamObjectDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool TemplateParamObjectDecl::contains(const Stmt &stmt) {
   for (auto &parent : TemplateParamObjectDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -136,7 +136,7 @@ std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::from(const Decl 
 }
 
 gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kTemplateParamObjectDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<TemplateParamObjectDecl> e = TemplateParamObjectDecl::from(Decl(std::move(eptr)))) {
@@ -147,7 +147,7 @@ gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::in(const Index 
 }
 
 gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kTemplateParamObjectDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -159,7 +159,7 @@ gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::in(const Fragme
 }
 
 gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kTemplateParamObjectDeclDerivedKinds) {

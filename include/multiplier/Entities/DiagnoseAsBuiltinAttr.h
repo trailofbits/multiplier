@@ -18,6 +18,11 @@ class DiagnoseAsBuiltinAttr;
 class FunctionDecl;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DiagnoseAsBuiltinAttr : public InheritableAttr {
  private:
@@ -25,12 +30,12 @@ class DiagnoseAsBuiltinAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<DiagnoseAsBuiltinAttr> in(const Fragment &frag);
-  static gap::generator<DiagnoseAsBuiltinAttr> in(const File &file);
   static gap::generator<DiagnoseAsBuiltinAttr> in(const Index &index);
   static gap::generator<DiagnoseAsBuiltinAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<DiagnoseAsBuiltinAttr> by_id(const Index &, EntityId);
+  static gap::generator<DiagnoseAsBuiltinAttr> in(const Fragment &frag);
+  static gap::generator<DiagnoseAsBuiltinAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DIAGNOSE_AS_BUILTIN;

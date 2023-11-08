@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<PseudoObjectExpr> PseudoObjectExpr::containing(const std::optiona
 
 bool PseudoObjectExpr::contains(const Decl &decl) {
   for (auto &parent : PseudoObjectExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool PseudoObjectExpr::contains(const Stmt &stmt) {
   for (auto &parent : PseudoObjectExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<PseudoObjectExpr> PseudoObjectExpr::from(const Stmt &parent) {
 }
 
 gap::generator<PseudoObjectExpr> PseudoObjectExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kPseudoObjectExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<PseudoObjectExpr> e = PseudoObjectExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<PseudoObjectExpr> PseudoObjectExpr::in(const Index &index) {
 }
 
 gap::generator<PseudoObjectExpr> PseudoObjectExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kPseudoObjectExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<PseudoObjectExpr> PseudoObjectExpr::in(const Fragment &frag) {
 }
 
 gap::generator<PseudoObjectExpr> PseudoObjectExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kPseudoObjectExprDerivedKinds) {
@@ -155,12 +155,12 @@ std::optional<PseudoObjectExpr> PseudoObjectExpr::from(const TokenContext &t) {
 }
 
 Expr PseudoObjectExpr::result_expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr PseudoObjectExpr::syntactic_form(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
@@ -173,7 +173,7 @@ std::optional<Expr> PseudoObjectExpr::nth_semantic(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -184,7 +184,7 @@ std::optional<Expr> PseudoObjectExpr::nth_semantic(unsigned n) const {
 
 gap::generator<Expr> PseudoObjectExpr::semantics(void) const & {
   auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
@@ -205,7 +205,7 @@ std::optional<Expr> PseudoObjectExpr::nth_semantic_expression(unsigned n) const 
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -216,7 +216,7 @@ std::optional<Expr> PseudoObjectExpr::nth_semantic_expression(unsigned n) const 
 
 gap::generator<Expr> PseudoObjectExpr::semantic_expressions(void) const & {
   auto list = impl->reader.getVal26();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d26 = ep->StmtFor(ep, v)) {

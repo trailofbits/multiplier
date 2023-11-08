@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class NoUwtableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class NoUwtableAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class NoUwtableAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<NoUwtableAttr> in(const Fragment &frag);
-  static gap::generator<NoUwtableAttr> in(const File &file);
   static gap::generator<NoUwtableAttr> in(const Index &index);
   static gap::generator<NoUwtableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NoUwtableAttr> by_id(const Index &, EntityId);
+  static gap::generator<NoUwtableAttr> in(const Fragment &frag);
+  static gap::generator<NoUwtableAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_UWTABLE;

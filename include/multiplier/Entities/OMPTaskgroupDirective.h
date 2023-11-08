@@ -19,6 +19,11 @@ class OMPExecutableDirective;
 class OMPTaskgroupDirective;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPTaskgroupDirective : public OMPExecutableDirective {
  private:
@@ -26,12 +31,12 @@ class OMPTaskgroupDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPTaskgroupDirective> in(const Fragment &frag);
-  static gap::generator<OMPTaskgroupDirective> in(const File &file);
   static gap::generator<OMPTaskgroupDirective> in(const Index &index);
   static gap::generator<OMPTaskgroupDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPTaskgroupDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPTaskgroupDirective> in(const Fragment &frag);
+  static gap::generator<OMPTaskgroupDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TASKGROUP_DIRECTIVE;

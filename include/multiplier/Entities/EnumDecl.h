@@ -24,6 +24,11 @@ class Token;
 class TokenRange;
 class Type;
 class TypeDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class EnumDecl : public TagDecl {
  private:
@@ -33,12 +38,12 @@ class EnumDecl : public TagDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<EnumDecl> in(const Fragment &frag);
-  static gap::generator<EnumDecl> in(const File &file);
   static gap::generator<EnumDecl> in(const Index &index);
   static gap::generator<EnumDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<EnumDecl> by_id(const Index &, EntityId);
+  static gap::generator<EnumDecl> in(const Fragment &frag);
+  static gap::generator<EnumDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::ENUM;
@@ -75,7 +80,7 @@ class EnumDecl : public TagDecl {
   std::optional<EnumDecl> instantiated_from_member_enum(void) const;
   std::optional<Type> integer_type(void) const;
   TokenRange integer_type_range(void) const;
-  std::optional<unsigned> odr_hash(void) const;
+  std::optional<uint32_t> odr_hash(void) const;
   std::optional<Type> promotion_type(void) const;
   std::optional<EnumDecl> template_instantiation_pattern(void) const;
   TemplateSpecializationKind template_specialization_kind(void) const;

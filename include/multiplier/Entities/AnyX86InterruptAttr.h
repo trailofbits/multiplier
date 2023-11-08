@@ -17,6 +17,11 @@ class AnyX86InterruptAttr;
 class Attr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AnyX86InterruptAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class AnyX86InterruptAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<AnyX86InterruptAttr> in(const Fragment &frag);
-  static gap::generator<AnyX86InterruptAttr> in(const File &file);
   static gap::generator<AnyX86InterruptAttr> in(const Index &index);
   static gap::generator<AnyX86InterruptAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AnyX86InterruptAttr> by_id(const Index &, EntityId);
+  static gap::generator<AnyX86InterruptAttr> in(const Fragment &frag);
+  static gap::generator<AnyX86InterruptAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANY_X86_INTERRUPT;

@@ -9,18 +9,18 @@
 #include <multiplier/AST.capnp.h>
 #include <multiplier/Entities/Attr.h>
 
-#include "Entity.h"
+#include "FragmentEntity.h"
 
 namespace mx {
 
 // Interface for accessing an attribute.
-class AttrImpl final : public EntityImpl<ast::Attr> {
+class AttrImpl final : public FragmentEntityImpl<ast::Attr> {
  public:
   const PackedFragmentId fragment_id;
   const EntityOffset offset;
 
-  explicit AttrImpl(std::shared_ptr<EntityProvider> ep_,
-                    kj::Array<capnp::word> data_,
+  explicit AttrImpl(FragmentImplPtr frag_,
+                    ast::Attr::Reader reader_,
                     RawEntityId id_);
 };
 

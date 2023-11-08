@@ -11,7 +11,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {
@@ -59,37 +59,11 @@ std::optional<BuiltinType> BuiltinType::from(const Type &parent) {
 }
 
 gap::generator<BuiltinType> BuiltinType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kBuiltinTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<BuiltinType> e = BuiltinType::from(Type(std::move(eptr)))) {
         co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<BuiltinType> BuiltinType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kBuiltinTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<BuiltinType> e = BuiltinType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<BuiltinType> BuiltinType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kBuiltinTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<BuiltinType> e = BuiltinType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
       }
     }
   }
@@ -104,36 +78,40 @@ std::optional<BuiltinType> BuiltinType::from(const TokenContext &t) {
 }
 
 Type BuiltinType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal17();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 BuiltinTypeKind BuiltinType::builtin_kind(void) const {
-  return static_cast<BuiltinTypeKind>(impl->reader.getVal238());
+  return static_cast<BuiltinTypeKind>(impl->reader.getVal66());
 }
 
 bool BuiltinType::is_floating_point(void) const {
-  return impl->reader.getVal231();
+  return impl->reader.getVal19();
 }
 
 bool BuiltinType::is_integer(void) const {
-  return impl->reader.getVal232();
+  return impl->reader.getVal20();
 }
 
 bool BuiltinType::is_sve_bool(void) const {
-  return impl->reader.getVal233();
+  return impl->reader.getVal21();
+}
+
+bool BuiltinType::is_sve_count(void) const {
+  return impl->reader.getVal27();
 }
 
 bool BuiltinType::is_signed_integer(void) const {
-  return impl->reader.getVal239();
+  return impl->reader.getVal28();
 }
 
 bool BuiltinType::is_sugared(void) const {
-  return impl->reader.getVal240();
+  return impl->reader.getVal29();
 }
 
 bool BuiltinType::is_unsigned_integer(void) const {
-  return impl->reader.getVal241();
+  return impl->reader.getVal30();
 }
 
 #pragma GCC diagnostic pop

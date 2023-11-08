@@ -17,7 +17,7 @@ const char *EnumeratorName(ConstructorAttrSpelling e) {
   switch (e) {
     case ConstructorAttrSpelling::GNU_CONSTRUCTOR: return "GNU_CONSTRUCTOR";
     case ConstructorAttrSpelling::CXX11_GNU_CONSTRUCTOR: return "CXX11_GNU_CONSTRUCTOR";
-    case ConstructorAttrSpelling::C2X_GNU_CONSTRUCTOR: return "C2X_GNU_CONSTRUCTOR";
+    case ConstructorAttrSpelling::C23_GNU_CONSTRUCTOR: return "C23_GNU_CONSTRUCTOR";
     case ConstructorAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

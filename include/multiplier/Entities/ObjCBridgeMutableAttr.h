@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class ObjCBridgeMutableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCBridgeMutableAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class ObjCBridgeMutableAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ObjCBridgeMutableAttr> in(const Fragment &frag);
-  static gap::generator<ObjCBridgeMutableAttr> in(const File &file);
   static gap::generator<ObjCBridgeMutableAttr> in(const Index &index);
   static gap::generator<ObjCBridgeMutableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCBridgeMutableAttr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCBridgeMutableAttr> in(const Fragment &frag);
+  static gap::generator<ObjCBridgeMutableAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_BRIDGE_MUTABLE;

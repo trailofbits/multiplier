@@ -16,7 +16,7 @@
 #include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/MacroDirective.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Macro.h"
 
 namespace mx {
@@ -86,7 +86,7 @@ std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from(const M
 }
 
 gap::generator<IncludeLikeMacroDirective> IncludeLikeMacroDirective::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroKind k : kIncludeLikeMacroDirectiveDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
       if (std::optional<IncludeLikeMacroDirective> e = IncludeLikeMacroDirective::from(Macro(std::move(eptr)))) {
@@ -97,7 +97,7 @@ gap::generator<IncludeLikeMacroDirective> IncludeLikeMacroDirective::in(const In
 }
 
 gap::generator<IncludeLikeMacroDirective> IncludeLikeMacroDirective::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (MacroKind k : kIncludeLikeMacroDirectiveDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
@@ -109,7 +109,7 @@ gap::generator<IncludeLikeMacroDirective> IncludeLikeMacroDirective::in(const Fr
 }
 
 gap::generator<IncludeLikeMacroDirective> IncludeLikeMacroDirective::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (MacroKind k : kIncludeLikeMacroDirectiveDerivedKinds) {
@@ -132,7 +132,7 @@ std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from(const T
 
 std::optional<File> IncludeLikeMacroDirective::included_file(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal10();
+    RawEntityId eid = impl->reader.getVal7();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

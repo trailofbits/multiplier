@@ -22,6 +22,11 @@ class Stmt;
 class Token;
 class ValueDecl;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DeclRefExpr : public Expr {
  private:
@@ -30,12 +35,12 @@ class DeclRefExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<DeclRefExpr> in(const Fragment &frag);
-  static gap::generator<DeclRefExpr> in(const File &file);
   static gap::generator<DeclRefExpr> in(const Index &index);
   static gap::generator<DeclRefExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<DeclRefExpr> by_id(const Index &, EntityId);
+  static gap::generator<DeclRefExpr> in(const Fragment &frag);
+  static gap::generator<DeclRefExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DECL_REF_EXPR;
@@ -73,6 +78,7 @@ class DeclRefExpr : public Expr {
   bool has_qualifier(void) const;
   bool has_template_keyword_and_arguments_info(void) const;
   bool has_template_keyword(void) const;
+  bool is_immediate_escalating(void) const;
   NonOdrUseReason is_non_odr_use(void) const;
   bool refers_to_enclosing_variable_or_capture(void) const;
 };

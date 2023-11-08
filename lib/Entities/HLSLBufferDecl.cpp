@@ -13,7 +13,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -73,14 +73,14 @@ gap::generator<HLSLBufferDecl> HLSLBufferDecl::containing(const std::optional<St
 
 bool HLSLBufferDecl::contains(const Decl &decl) {
   for (auto &parent : HLSLBufferDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool HLSLBufferDecl::contains(const Stmt &stmt) {
   for (auto &parent : HLSLBufferDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -135,7 +135,7 @@ std::optional<HLSLBufferDecl> HLSLBufferDecl::from(const Decl &parent) {
 }
 
 gap::generator<HLSLBufferDecl> HLSLBufferDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kHLSLBufferDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<HLSLBufferDecl> e = HLSLBufferDecl::from(Decl(std::move(eptr)))) {
@@ -146,7 +146,7 @@ gap::generator<HLSLBufferDecl> HLSLBufferDecl::in(const Index &index) {
 }
 
 gap::generator<HLSLBufferDecl> HLSLBufferDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kHLSLBufferDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -158,7 +158,7 @@ gap::generator<HLSLBufferDecl> HLSLBufferDecl::in(const Fragment &frag) {
 }
 
 gap::generator<HLSLBufferDecl> HLSLBufferDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kHLSLBufferDeclDerivedKinds) {
@@ -180,19 +180,19 @@ std::optional<HLSLBufferDecl> HLSLBufferDecl::from(const TokenContext &t) {
 }
 
 Token HLSLBufferDecl::l_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal54());
-}
-
-Token HLSLBufferDecl::token_start(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
-}
-
-Token HLSLBufferDecl::r_brace_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
+Token HLSLBufferDecl::token_start(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
+}
+
+Token HLSLBufferDecl::r_brace_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
+}
+
 bool HLSLBufferDecl::is_c_buffer(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal74();
 }
 
 #pragma GCC diagnostic pop

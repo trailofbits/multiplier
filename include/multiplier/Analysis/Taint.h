@@ -7,6 +7,7 @@
 #include <gap/core/generator.hpp>
 #include <optional>
 #include <memory>
+#include <multiplier/Compilation.h>
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/CallExpr.h>
 #include <multiplier/Entities/CXXBaseSpecifier.h>
@@ -70,13 +71,9 @@ class TraintTrackingEdge {
   std::optional<Decl> as_declaration(void) const noexcept;
   std::optional<Stmt> as_statement(void) const noexcept;
 
-  friend inline std::strong_ordering operator<=>(
-      const TraintTrackingEdge &self, const TraintTrackingEdge &that) noexcept {
-    return self.entity_id <=> that.entity_id;
+  inline bool operator==(const TraintTrackingEdge &that) const noexcept {
+    return entity_id == that.entity_id;
   }
-
-  bool operator==(const TraintTrackingEdge &) const noexcept = default;
-  bool operator!=(const TraintTrackingEdge &) const noexcept = default;
 };
 
 // The driver for a taint tracking analysis. Executes a single step of taint

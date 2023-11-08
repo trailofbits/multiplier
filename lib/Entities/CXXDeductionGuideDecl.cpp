@@ -18,7 +18,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -78,14 +78,14 @@ gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::containing(const st
 
 bool CXXDeductionGuideDecl::contains(const Decl &decl) {
   for (auto &parent : CXXDeductionGuideDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXDeductionGuideDecl::contains(const Stmt &stmt) {
   for (auto &parent : CXXDeductionGuideDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -140,7 +140,7 @@ std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const Decl &par
 }
 
 gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kCXXDeductionGuideDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<CXXDeductionGuideDecl> e = CXXDeductionGuideDecl::from(Decl(std::move(eptr)))) {
@@ -151,7 +151,7 @@ gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::in(const Index &ind
 }
 
 gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kCXXDeductionGuideDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -163,7 +163,7 @@ gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::in(const Fragment &
 }
 
 gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kCXXDeductionGuideDeclDerivedKinds) {
@@ -185,21 +185,21 @@ std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const TokenCont
 }
 
 CXXConstructorDecl CXXDeductionGuideDecl::corresponding_constructor(void) const {
-  RawEntityId eid = impl->reader.getVal165();
+  RawEntityId eid = impl->reader.getVal169();
   return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TemplateDecl CXXDeductionGuideDecl::deduced_template(void) const {
-  RawEntityId eid = impl->reader.getVal166();
+  RawEntityId eid = impl->reader.getVal170();
   return TemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
-bool CXXDeductionGuideDecl::is_copy_deduction_candidate(void) const {
-  return impl->reader.getVal167();
+DeductionCandidate CXXDeductionGuideDecl::deduction_candidate_kind(void) const {
+  return static_cast<DeductionCandidate>(impl->reader.getVal168());
 }
 
 bool CXXDeductionGuideDecl::is_explicit(void) const {
-  return impl->reader.getVal168();
+  return impl->reader.getVal171();
 }
 
 #pragma GCC diagnostic pop

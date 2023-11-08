@@ -14,7 +14,7 @@ namespace mx {
 enum class VectorCallAttrSpelling : unsigned char {
   GNU_VECTORCALL,
   CXX11_CLANG_VECTORCALL,
-  C2X_CLANG_VECTORCALL,
+  C23_CLANG_VECTORCALL,
   KEYWORD_VECTORCALL,
   SPELLING_NOT_CALCULATED,
 };

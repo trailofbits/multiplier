@@ -17,6 +17,11 @@ class AnyX86NoCfCheckAttr;
 class Attr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AnyX86NoCfCheckAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class AnyX86NoCfCheckAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<AnyX86NoCfCheckAttr> in(const Fragment &frag);
-  static gap::generator<AnyX86NoCfCheckAttr> in(const File &file);
   static gap::generator<AnyX86NoCfCheckAttr> in(const Index &index);
   static gap::generator<AnyX86NoCfCheckAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AnyX86NoCfCheckAttr> by_id(const Index &, EntityId);
+  static gap::generator<AnyX86NoCfCheckAttr> in(const Fragment &frag);
+  static gap::generator<AnyX86NoCfCheckAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANY_X86_NO_CF_CHECK;

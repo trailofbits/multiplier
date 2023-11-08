@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<CXXOperatorCallExpr> CXXOperatorCallExpr::containing(const std::o
 
 bool CXXOperatorCallExpr::contains(const Decl &decl) {
   for (auto &parent : CXXOperatorCallExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXOperatorCallExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXOperatorCallExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -111,7 +111,7 @@ std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const Stmt &parent)
 }
 
 gap::generator<CXXOperatorCallExpr> CXXOperatorCallExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXOperatorCallExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXOperatorCallExpr> e = CXXOperatorCallExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<CXXOperatorCallExpr> CXXOperatorCallExpr::in(const Index &index) 
 }
 
 gap::generator<CXXOperatorCallExpr> CXXOperatorCallExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXOperatorCallExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<CXXOperatorCallExpr> CXXOperatorCallExpr::in(const Fragment &frag
 }
 
 gap::generator<CXXOperatorCallExpr> CXXOperatorCallExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXOperatorCallExprDerivedKinds) {
@@ -156,15 +156,15 @@ std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const TokenContext 
 }
 
 OverloadedOperatorKind CXXOperatorCallExpr::operator_(void) const {
-  return static_cast<OverloadedOperatorKind>(impl->reader.getVal96());
+  return static_cast<OverloadedOperatorKind>(impl->reader.getVal97());
 }
 
 Token CXXOperatorCallExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 bool CXXOperatorCallExpr::is_assignment_operation(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal96();
 }
 
 bool CXXOperatorCallExpr::is_comparison_operation(void) const {

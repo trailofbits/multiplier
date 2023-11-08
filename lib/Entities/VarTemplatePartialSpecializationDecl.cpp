@@ -18,7 +18,7 @@
 #include <multiplier/Entities/VarDecl.h>
 #include <multiplier/Entities/VarTemplateSpecializationDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -78,14 +78,14 @@ gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializ
 
 bool VarTemplatePartialSpecializationDecl::contains(const Decl &decl) {
   for (auto &parent : VarTemplatePartialSpecializationDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool VarTemplatePartialSpecializationDecl::contains(const Stmt &stmt) {
   for (auto &parent : VarTemplatePartialSpecializationDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -140,7 +140,7 @@ std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializa
 }
 
 gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kVarTemplatePartialSpecializationDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<VarTemplatePartialSpecializationDecl> e = VarTemplatePartialSpecializationDecl::from(Decl(std::move(eptr)))) {
@@ -151,7 +151,7 @@ gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializ
 }
 
 gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kVarTemplatePartialSpecializationDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -163,7 +163,7 @@ gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializ
 }
 
 gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kVarTemplatePartialSpecializationDeclDerivedKinds) {
@@ -185,17 +185,17 @@ std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializa
 }
 
 VarTemplatePartialSpecializationDecl VarTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
-  RawEntityId eid = impl->reader.getVal131();
+  RawEntityId eid = impl->reader.getVal133();
   return VarTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TemplateParameterList VarTemplatePartialSpecializationDecl::template_parameters(void) const {
-  RawEntityId eid = impl->reader.getVal139();
+  RawEntityId eid = impl->reader.getVal141();
   return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
 bool VarTemplatePartialSpecializationDecl::has_associated_constraints(void) const {
-  return impl->reader.getVal135();
+  return impl->reader.getVal137();
 }
 
 #pragma GCC diagnostic pop

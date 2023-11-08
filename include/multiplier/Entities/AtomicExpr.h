@@ -21,6 +21,11 @@ class Stmt;
 class Token;
 class Type;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AtomicExpr : public Expr {
  private:
@@ -29,12 +34,12 @@ class AtomicExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<AtomicExpr> in(const Fragment &frag);
-  static gap::generator<AtomicExpr> in(const File &file);
   static gap::generator<AtomicExpr> in(const Index &index);
   static gap::generator<AtomicExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AtomicExpr> by_id(const Index &, EntityId);
+  static gap::generator<AtomicExpr> in(const Fragment &frag);
+  static gap::generator<AtomicExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ATOMIC_EXPR;
@@ -64,6 +69,7 @@ class AtomicExpr : public Expr {
 
   Token builtin_token(void) const;
   AtomicExprAtomicOp operation(void) const;
+  std::string_view operation_as_string(void) const;
   Expr order(void) const;
   std::optional<Expr> order_fail(void) const;
   Expr pointer(void) const;

@@ -16,18 +16,23 @@ class Index;
 class AbiTagAttr;
 class Attr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AbiTagAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<AbiTagAttr> in(const Fragment &frag);
-  static gap::generator<AbiTagAttr> in(const File &file);
   static gap::generator<AbiTagAttr> in(const Index &index);
   static gap::generator<AbiTagAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AbiTagAttr> by_id(const Index &, EntityId);
+  static gap::generator<AbiTagAttr> in(const Fragment &frag);
+  static gap::generator<AbiTagAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ABI_TAG;

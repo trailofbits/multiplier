@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCOwnershipAttrSpelling e) {
   switch (e) {
     case ObjCOwnershipAttrSpelling::GNU_OBJC_OWNERSHIP: return "GNU_OBJC_OWNERSHIP";
     case ObjCOwnershipAttrSpelling::CXX11_CLANG_OBJC_OWNERSHIP: return "CXX11_CLANG_OBJC_OWNERSHIP";
-    case ObjCOwnershipAttrSpelling::C2X_CLANG_OBJC_OWNERSHIP: return "C2X_CLANG_OBJC_OWNERSHIP";
+    case ObjCOwnershipAttrSpelling::C23_CLANG_OBJC_OWNERSHIP: return "C23_CLANG_OBJC_OWNERSHIP";
     case ObjCOwnershipAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<FriendTemplateDecl> FriendTemplateDecl::containing(const std::opt
 
 bool FriendTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : FriendTemplateDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool FriendTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : FriendTemplateDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -137,7 +137,7 @@ std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const Decl &parent) {
 }
 
 gap::generator<FriendTemplateDecl> FriendTemplateDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kFriendTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<FriendTemplateDecl> e = FriendTemplateDecl::from(Decl(std::move(eptr)))) {
@@ -148,7 +148,7 @@ gap::generator<FriendTemplateDecl> FriendTemplateDecl::in(const Index &index) {
 }
 
 gap::generator<FriendTemplateDecl> FriendTemplateDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kFriendTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -160,7 +160,7 @@ gap::generator<FriendTemplateDecl> FriendTemplateDecl::in(const Fragment &frag) 
 }
 
 gap::generator<FriendTemplateDecl> FriendTemplateDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kFriendTemplateDeclDerivedKinds) {
@@ -182,29 +182,29 @@ std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const TokenContext &t
 }
 
 NamedDecl FriendTemplateDecl::friend_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal49();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token FriendTemplateDecl::friend_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal54());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
 Type FriendTemplateDecl::friend_type(void) const {
-  RawEntityId eid = impl->reader.getVal55();
+  RawEntityId eid = impl->reader.getVal57();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 unsigned FriendTemplateDecl::num_template_parameter_lists(void) const {
-  return impl->reader.getVal49().size();
+  return impl->reader.getVal51().size();
 }
 
 std::optional<TemplateParameterList> FriendTemplateDecl::nth_template_parameter_list(unsigned n) const {
-  auto list = impl->reader.getVal49();
+  auto list = impl->reader.getVal51();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TemplateParameterListFor(ep, v);
   if (!e) {
@@ -214,12 +214,12 @@ std::optional<TemplateParameterList> FriendTemplateDecl::nth_template_parameter_
 }
 
 gap::generator<TemplateParameterList> FriendTemplateDecl::template_parameter_lists(void) const & {
-  auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal51();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d49 = ep->TemplateParameterListFor(ep, v)) {
-      co_yield TemplateParameterList(std::move(d49));
+    if (auto d51 = ep->TemplateParameterListFor(ep, v)) {
+      co_yield TemplateParameterList(std::move(d51));
     }
   }
   co_return;

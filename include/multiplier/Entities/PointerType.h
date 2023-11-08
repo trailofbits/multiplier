@@ -16,14 +16,17 @@ class Index;
 class PointerType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class PointerType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<PointerType> in(const Fragment &frag);
-  static gap::generator<PointerType> in(const File &file);
   static gap::generator<PointerType> in(const Index &index);
   static gap::generator<PointerType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -47,6 +50,7 @@ class PointerType : public Type {
   static std::optional<PointerType> from(const TokenContext &t);
 
   Type desugar(void) const;
+  Type pointee_type(void) const;
   bool is_sugared(void) const;
 };
 

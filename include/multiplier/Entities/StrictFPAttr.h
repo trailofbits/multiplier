@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class StrictFPAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class StrictFPAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class StrictFPAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<StrictFPAttr> in(const Fragment &frag);
-  static gap::generator<StrictFPAttr> in(const File &file);
   static gap::generator<StrictFPAttr> in(const Index &index);
   static gap::generator<StrictFPAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<StrictFPAttr> by_id(const Index &, EntityId);
+  static gap::generator<StrictFPAttr> in(const Fragment &frag);
+  static gap::generator<StrictFPAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::STRICT_FP;

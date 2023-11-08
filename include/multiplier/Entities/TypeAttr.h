@@ -16,6 +16,10 @@ class Index;
 class AddressSpaceAttr;
 class AnnotateTypeAttr;
 class ArmMveStrictPolymorphismAttr;
+class ArmPreservesZAAttr;
+class ArmSharedZAAttr;
+class ArmStreamingAttr;
+class ArmStreamingCompatibleAttr;
 class Attr;
 class BTFTypeTagAttr;
 class CmseNSCallAttr;
@@ -41,18 +45,24 @@ class TypeNullUnspecifiedAttr;
 class TypeNullableAttr;
 class TypeNullableResultAttr;
 class UPtrAttr;
+class WebAssemblyFuncrefAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypeAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<TypeAttr> in(const Fragment &frag);
-  static gap::generator<TypeAttr> in(const File &file);
   static gap::generator<TypeAttr> in(const Index &index);
   static gap::generator<TypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TypeAttr> by_id(const Index &, EntityId);
+  static gap::generator<TypeAttr> in(const Fragment &frag);
+  static gap::generator<TypeAttr> in(const File &file);
 
   static std::optional<TypeAttr> from(const Attr &parent);
 

@@ -13,7 +13,7 @@
 #include <multiplier/Entities/StringLiteral.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -73,14 +73,14 @@ gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::containing(const std::optiona
 
 bool FileScopeAsmDecl::contains(const Decl &decl) {
   for (auto &parent : FileScopeAsmDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool FileScopeAsmDecl::contains(const Stmt &stmt) {
   for (auto &parent : FileScopeAsmDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -135,7 +135,7 @@ std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const Decl &parent) {
 }
 
 gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kFileScopeAsmDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<FileScopeAsmDecl> e = FileScopeAsmDecl::from(Decl(std::move(eptr)))) {
@@ -146,7 +146,7 @@ gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::in(const Index &index) {
 }
 
 gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kFileScopeAsmDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -158,7 +158,7 @@ gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::in(const Fragment &frag) {
 }
 
 gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kFileScopeAsmDeclDerivedKinds) {
@@ -180,16 +180,16 @@ std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const TokenContext &t) {
 }
 
 Token FileScopeAsmDecl::assembly_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
 }
 
 StringLiteral FileScopeAsmDecl::assembly_string(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal56();
   return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token FileScopeAsmDecl::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
 }
 
 #pragma GCC diagnostic pop

@@ -19,6 +19,11 @@ class Expr;
 class Stmt;
 class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXStdInitializerListExpr : public Expr {
  private:
@@ -27,12 +32,12 @@ class CXXStdInitializerListExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXStdInitializerListExpr> in(const Fragment &frag);
-  static gap::generator<CXXStdInitializerListExpr> in(const File &file);
   static gap::generator<CXXStdInitializerListExpr> in(const Index &index);
   static gap::generator<CXXStdInitializerListExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXStdInitializerListExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXStdInitializerListExpr> in(const Fragment &frag);
+  static gap::generator<CXXStdInitializerListExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_STD_INITIALIZER_LIST_EXPR;

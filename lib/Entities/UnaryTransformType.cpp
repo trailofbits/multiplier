@@ -11,7 +11,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {
@@ -59,37 +59,11 @@ std::optional<UnaryTransformType> UnaryTransformType::from(const Type &parent) {
 }
 
 gap::generator<UnaryTransformType> UnaryTransformType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kUnaryTransformTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<UnaryTransformType> e = UnaryTransformType::from(Type(std::move(eptr)))) {
         co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<UnaryTransformType> UnaryTransformType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kUnaryTransformTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<UnaryTransformType> e = UnaryTransformType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<UnaryTransformType> UnaryTransformType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kUnaryTransformTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<UnaryTransformType> e = UnaryTransformType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
       }
     }
   }
@@ -104,26 +78,26 @@ std::optional<UnaryTransformType> UnaryTransformType::from(const TokenContext &t
 }
 
 Type UnaryTransformType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal17();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type UnaryTransformType::base_type(void) const {
-  RawEntityId eid = impl->reader.getVal230();
+  RawEntityId eid = impl->reader.getVal18();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 UnaryTransformTypeUTTKind UnaryTransformType::utt_kind(void) const {
-  return static_cast<UnaryTransformTypeUTTKind>(impl->reader.getVal238());
+  return static_cast<UnaryTransformTypeUTTKind>(impl->reader.getVal26());
 }
 
 Type UnaryTransformType::underlying_type(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal24();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool UnaryTransformType::is_sugared(void) const {
-  return impl->reader.getVal231();
+  return impl->reader.getVal19();
 }
 
 #pragma GCC diagnostic pop

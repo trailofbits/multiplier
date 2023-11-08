@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<ParenExpr> ParenExpr::containing(const std::optional<Stmt> &stmt)
 
 bool ParenExpr::contains(const Decl &decl) {
   for (auto &parent : ParenExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ParenExpr::contains(const Stmt &stmt) {
   for (auto &parent : ParenExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<ParenExpr> ParenExpr::from(const Stmt &parent) {
 }
 
 gap::generator<ParenExpr> ParenExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kParenExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ParenExpr> e = ParenExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<ParenExpr> ParenExpr::in(const Index &index) {
 }
 
 gap::generator<ParenExpr> ParenExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kParenExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<ParenExpr> ParenExpr::in(const Fragment &frag) {
 }
 
 gap::generator<ParenExpr> ParenExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kParenExprDerivedKinds) {
@@ -155,15 +155,15 @@ std::optional<ParenExpr> ParenExpr::from(const TokenContext &t) {
 }
 
 Token ParenExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 Token ParenExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Expr ParenExpr::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

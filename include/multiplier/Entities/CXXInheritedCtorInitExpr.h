@@ -21,6 +21,11 @@ class Expr;
 class Stmt;
 class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXInheritedCtorInitExpr : public Expr {
  private:
@@ -29,12 +34,12 @@ class CXXInheritedCtorInitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXInheritedCtorInitExpr> in(const Fragment &frag);
-  static gap::generator<CXXInheritedCtorInitExpr> in(const File &file);
   static gap::generator<CXXInheritedCtorInitExpr> in(const Index &index);
   static gap::generator<CXXInheritedCtorInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXInheritedCtorInitExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXInheritedCtorInitExpr> in(const Fragment &frag);
+  static gap::generator<CXXInheritedCtorInitExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_INHERITED_CTOR_INIT_EXPR;

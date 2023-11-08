@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::containin
 
 bool CXXUnresolvedConstructExpr::contains(const Decl &decl) {
   for (auto &parent : CXXUnresolvedConstructExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXUnresolvedConstructExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXUnresolvedConstructExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -111,7 +111,7 @@ std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const
 }
 
 gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXUnresolvedConstructExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXUnresolvedConstructExpr> e = CXXUnresolvedConstructExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::in(const 
 }
 
 gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXUnresolvedConstructExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::in(const 
 }
 
 gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXUnresolvedConstructExprDerivedKinds) {
@@ -164,7 +164,7 @@ std::optional<Expr> CXXUnresolvedConstructExpr::nth_argument(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -175,7 +175,7 @@ std::optional<Expr> CXXUnresolvedConstructExpr::nth_argument(unsigned n) const {
 
 gap::generator<Expr> CXXUnresolvedConstructExpr::arguments(void) const & {
   auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
@@ -188,15 +188,15 @@ gap::generator<Expr> CXXUnresolvedConstructExpr::arguments(void) const & {
 }
 
 Token CXXUnresolvedConstructExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 Token CXXUnresolvedConstructExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Type CXXUnresolvedConstructExpr::type_as_written(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

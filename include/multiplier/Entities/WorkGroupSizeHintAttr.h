@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class Token;
 class WorkGroupSizeHintAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class WorkGroupSizeHintAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class WorkGroupSizeHintAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<WorkGroupSizeHintAttr> in(const Fragment &frag);
-  static gap::generator<WorkGroupSizeHintAttr> in(const File &file);
   static gap::generator<WorkGroupSizeHintAttr> in(const Index &index);
   static gap::generator<WorkGroupSizeHintAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<WorkGroupSizeHintAttr> by_id(const Index &, EntityId);
+  static gap::generator<WorkGroupSizeHintAttr> in(const Fragment &frag);
+  static gap::generator<WorkGroupSizeHintAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::WORK_GROUP_SIZE_HINT;

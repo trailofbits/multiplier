@@ -17,7 +17,7 @@ const char *EnumeratorName(HotAttrSpelling e) {
   switch (e) {
     case HotAttrSpelling::GNU_HOT: return "GNU_HOT";
     case HotAttrSpelling::CXX11_GNU_HOT: return "CXX11_GNU_HOT";
-    case HotAttrSpelling::C2X_GNU_HOT: return "C2X_GNU_HOT";
+    case HotAttrSpelling::C23_GNU_HOT: return "C23_GNU_HOT";
     case HotAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

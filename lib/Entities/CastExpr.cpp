@@ -26,7 +26,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -86,14 +86,14 @@ gap::generator<CastExpr> CastExpr::containing(const std::optional<Stmt> &stmt) {
 
 bool CastExpr::contains(const Decl &decl) {
   for (auto &parent : CastExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CastExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -140,7 +140,7 @@ std::optional<CastExpr> CastExpr::from(const Stmt &parent) {
 }
 
 gap::generator<CastExpr> CastExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCastExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CastExpr> e = CastExpr::from(Stmt(std::move(eptr)))) {
@@ -151,7 +151,7 @@ gap::generator<CastExpr> CastExpr::in(const Index &index) {
 }
 
 gap::generator<CastExpr> CastExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCastExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -163,7 +163,7 @@ gap::generator<CastExpr> CastExpr::in(const Fragment &frag) {
 }
 
 gap::generator<CastExpr> CastExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCastExprDerivedKinds) {
@@ -185,7 +185,7 @@ std::optional<CastExpr> CastExpr::from(const TokenContext &t) {
 }
 
 CastKind CastExpr::cast_kind(void) const {
-  return static_cast<CastKind>(impl->reader.getVal94());
+  return static_cast<CastKind>(impl->reader.getVal95());
 }
 
 std::string_view CastExpr::cast_kind_name(void) const {
@@ -195,7 +195,7 @@ std::string_view CastExpr::cast_kind_name(void) const {
 
 std::optional<NamedDecl> CastExpr::conversion_function(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal37();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -207,18 +207,18 @@ std::optional<NamedDecl> CastExpr::conversion_function(void) const {
 }
 
 Expr CastExpr::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CastExpr::sub_expression_as_written(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<FieldDecl> CastExpr::target_union_field(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal41();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

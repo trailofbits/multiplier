@@ -20,6 +20,7 @@ enum class SubStmt : unsigned char {
   ON_FALLTHROUGH,
   ALLOCATE,
   DEALLOCATE,
+  RESULT_DECLARATION,
   RETURN_VALUE,
   RETURN_STATEMENT,
   RETURN_STATEMENT_ON_ALLOC_FAILURE,
@@ -30,7 +31,7 @@ inline static const char *EnumerationName(SubStmt) {
 }
 
 inline static constexpr unsigned NumEnumerators(SubStmt) {
-  return 11;
+  return 12;
 }
 
 const char *EnumeratorName(SubStmt);

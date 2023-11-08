@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<FriendDecl> FriendDecl::containing(const std::optional<Stmt> &stm
 
 bool FriendDecl::contains(const Decl &decl) {
   for (auto &parent : FriendDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool FriendDecl::contains(const Stmt &stmt) {
   for (auto &parent : FriendDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -137,7 +137,7 @@ std::optional<FriendDecl> FriendDecl::from(const Decl &parent) {
 }
 
 gap::generator<FriendDecl> FriendDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kFriendDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<FriendDecl> e = FriendDecl::from(Decl(std::move(eptr)))) {
@@ -148,7 +148,7 @@ gap::generator<FriendDecl> FriendDecl::in(const Index &index) {
 }
 
 gap::generator<FriendDecl> FriendDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kFriendDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -160,7 +160,7 @@ gap::generator<FriendDecl> FriendDecl::in(const Fragment &frag) {
 }
 
 gap::generator<FriendDecl> FriendDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kFriendDeclDerivedKinds) {
@@ -183,7 +183,7 @@ std::optional<FriendDecl> FriendDecl::from(const TokenContext &t) {
 
 std::optional<NamedDecl> FriendDecl::friend_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal47();
+    RawEntityId eid = impl->reader.getVal49();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -195,12 +195,12 @@ std::optional<NamedDecl> FriendDecl::friend_declaration(void) const {
 }
 
 Token FriendDecl::friend_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal54());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
 std::optional<Type> FriendDecl::friend_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal55();
+    RawEntityId eid = impl->reader.getVal57();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -212,19 +212,19 @@ std::optional<Type> FriendDecl::friend_type(void) const {
 }
 
 bool FriendDecl::is_unsupported_friend(void) const {
-  return impl->reader.getVal48();
+  return impl->reader.getVal50();
 }
 
 unsigned FriendDecl::num_friend_type_template_parameter_lists(void) const {
-  return impl->reader.getVal49().size();
+  return impl->reader.getVal51().size();
 }
 
 std::optional<TemplateParameterList> FriendDecl::nth_friend_type_template_parameter_list(unsigned n) const {
-  auto list = impl->reader.getVal49();
+  auto list = impl->reader.getVal51();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TemplateParameterListFor(ep, v);
   if (!e) {
@@ -234,12 +234,12 @@ std::optional<TemplateParameterList> FriendDecl::nth_friend_type_template_parame
 }
 
 gap::generator<TemplateParameterList> FriendDecl::friend_type_template_parameter_lists(void) const & {
-  auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal51();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d49 = ep->TemplateParameterListFor(ep, v)) {
-      co_yield TemplateParameterList(std::move(d49));
+    if (auto d51 = ep->TemplateParameterListFor(ep, v)) {
+      co_yield TemplateParameterList(std::move(d51));
     }
   }
   co_return;

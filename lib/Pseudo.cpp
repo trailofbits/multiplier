@@ -6,17 +6,17 @@
 
 #include "Pseudo.h"
 
-#include <multiplier/Index.h>
-
+#include "EntityProvider.h"
 #include "Reference.h"
 #include "Types.h"
 
 namespace mx {
 
 #define MX_DEFINE_PSEUDO(name) \
-    name ## Impl::name ## Impl(std::shared_ptr<EntityProvider> ep_, \
-                               kj::Array<capnp::word> data_, RawEntityId id_) \
-        : EntityImpl<ast::name>(std::move(ep_), kj::mv(data_)), \
+    name ## Impl::name ## Impl(FragmentImplPtr frag_, \
+                               ast::name::Reader reader_, \
+                               RawEntityId id_) \
+        : FragmentEntityImpl<ast::name>(std::move(frag_), kj::mv(reader_)), \
           fragment_id(FragmentIdFromEntityId(id_).value()), \
           offset(FragmentOffsetFromEntityId(id_).value()) {} \
     \
@@ -28,12 +28,7 @@ namespace mx {
     } \
     \
     gap::generator<Reference> name::references(void) const & { \
-      const EntityProvider::Ptr &ep = impl->ep; \
-      for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) { \
-        if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) { \
-          co_yield Reference(std::move(eptr), ref_id, category, ref_kind); \
-        } \
-      } \
+      return References(impl->ep, id().Pack()); \
     }
 
 MX_FOR_EACH_PSEUDO(MX_DEFINE_PSEUDO)

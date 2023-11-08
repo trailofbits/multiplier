@@ -16,7 +16,7 @@
 #include <multiplier/Entities/ValueDecl.h>
 #include <multiplier/Entities/VarDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<BindingDecl> BindingDecl::containing(const std::optional<Stmt> &s
 
 bool BindingDecl::contains(const Decl &decl) {
   for (auto &parent : BindingDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool BindingDecl::contains(const Stmt &stmt) {
   for (auto &parent : BindingDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -138,7 +138,7 @@ std::optional<BindingDecl> BindingDecl::from(const Decl &parent) {
 }
 
 gap::generator<BindingDecl> BindingDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kBindingDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<BindingDecl> e = BindingDecl::from(Decl(std::move(eptr)))) {
@@ -149,7 +149,7 @@ gap::generator<BindingDecl> BindingDecl::in(const Index &index) {
 }
 
 gap::generator<BindingDecl> BindingDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kBindingDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -161,7 +161,7 @@ gap::generator<BindingDecl> BindingDecl::in(const Fragment &frag) {
 }
 
 gap::generator<BindingDecl> BindingDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kBindingDeclDerivedKinds) {
@@ -183,17 +183,17 @@ std::optional<BindingDecl> BindingDecl::from(const TokenContext &t) {
 }
 
 Expr BindingDecl::binding(void) const {
-  RawEntityId eid = impl->reader.getVal56();
+  RawEntityId eid = impl->reader.getVal58();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ValueDecl BindingDecl::decomposed_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal64();
+  RawEntityId eid = impl->reader.getVal66();
   return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 VarDecl BindingDecl::holding_variable(void) const {
-  RawEntityId eid = impl->reader.getVal65();
+  RawEntityId eid = impl->reader.getVal67();
   return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

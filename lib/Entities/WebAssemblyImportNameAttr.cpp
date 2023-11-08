@@ -12,7 +12,7 @@
 #include <multiplier/Entities/InheritableAttr.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Attr.h"
 
 namespace mx {
@@ -60,7 +60,7 @@ std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::from(const A
 }
 
 gap::generator<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kWebAssemblyImportNameAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
       if (std::optional<WebAssemblyImportNameAttr> e = WebAssemblyImportNameAttr::from(Attr(std::move(eptr)))) {
@@ -71,7 +71,7 @@ gap::generator<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::in(const In
 }
 
 gap::generator<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kWebAssemblyImportNameAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
@@ -83,7 +83,7 @@ gap::generator<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::in(const Fr
 }
 
 gap::generator<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kWebAssemblyImportNameAttrDerivedKinds) {

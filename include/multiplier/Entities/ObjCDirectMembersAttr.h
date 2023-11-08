@@ -16,18 +16,23 @@ class Index;
 class Attr;
 class ObjCDirectMembersAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCDirectMembersAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<ObjCDirectMembersAttr> in(const Fragment &frag);
-  static gap::generator<ObjCDirectMembersAttr> in(const File &file);
   static gap::generator<ObjCDirectMembersAttr> in(const Index &index);
   static gap::generator<ObjCDirectMembersAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCDirectMembersAttr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCDirectMembersAttr> in(const Fragment &frag);
+  static gap::generator<ObjCDirectMembersAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_DIRECT_MEMBERS;

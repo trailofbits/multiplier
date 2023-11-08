@@ -21,6 +21,11 @@ class Token;
 class Type;
 class UnaryExprOrTypeTraitExpr;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UnaryExprOrTypeTraitExpr : public Expr {
  private:
@@ -29,12 +34,12 @@ class UnaryExprOrTypeTraitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<UnaryExprOrTypeTraitExpr> in(const Fragment &frag);
-  static gap::generator<UnaryExprOrTypeTraitExpr> in(const File &file);
   static gap::generator<UnaryExprOrTypeTraitExpr> in(const Index &index);
   static gap::generator<UnaryExprOrTypeTraitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UnaryExprOrTypeTraitExpr> by_id(const Index &, EntityId);
+  static gap::generator<UnaryExprOrTypeTraitExpr> in(const Fragment &frag);
+  static gap::generator<UnaryExprOrTypeTraitExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR;
@@ -64,7 +69,7 @@ class UnaryExprOrTypeTraitExpr : public Expr {
 
   std::optional<Expr> argument_expression(void) const;
   std::optional<Type> argument_type(void) const;
-  UnaryExprOrTypeTrait expression_or_trait_kind(void) const;
+  UnaryExprOrTypeTrait keyword_kind(void) const;
   Token operator_token(void) const;
   Token r_paren_token(void) const;
   Type type_of_argument(void) const;

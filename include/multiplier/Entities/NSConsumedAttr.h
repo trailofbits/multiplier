@@ -18,6 +18,11 @@ class InheritableAttr;
 class InheritableParamAttr;
 class NSConsumedAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class NSConsumedAttr : public InheritableParamAttr {
  private:
@@ -26,12 +31,12 @@ class NSConsumedAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<NSConsumedAttr> in(const Fragment &frag);
-  static gap::generator<NSConsumedAttr> in(const File &file);
   static gap::generator<NSConsumedAttr> in(const Index &index);
   static gap::generator<NSConsumedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NSConsumedAttr> by_id(const Index &, EntityId);
+  static gap::generator<NSConsumedAttr> in(const Fragment &frag);
+  static gap::generator<NSConsumedAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_CONSUMED;

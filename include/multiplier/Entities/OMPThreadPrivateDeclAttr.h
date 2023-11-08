@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class OMPThreadPrivateDeclAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPThreadPrivateDeclAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class OMPThreadPrivateDeclAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<OMPThreadPrivateDeclAttr> in(const Fragment &frag);
-  static gap::generator<OMPThreadPrivateDeclAttr> in(const File &file);
   static gap::generator<OMPThreadPrivateDeclAttr> in(const Index &index);
   static gap::generator<OMPThreadPrivateDeclAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPThreadPrivateDeclAttr> by_id(const Index &, EntityId);
+  static gap::generator<OMPThreadPrivateDeclAttr> in(const Fragment &frag);
+  static gap::generator<OMPThreadPrivateDeclAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_THREAD_PRIVATE_DECL;

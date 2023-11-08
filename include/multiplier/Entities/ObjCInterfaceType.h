@@ -18,6 +18,11 @@ class ObjCInterfaceType;
 class ObjCObjectType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCInterfaceType : public ObjCObjectType {
  private:
@@ -25,8 +30,6 @@ class ObjCInterfaceType : public ObjCObjectType {
   friend class ObjCObjectType;
   friend class Type;
  public:
-  static gap::generator<ObjCInterfaceType> in(const Fragment &frag);
-  static gap::generator<ObjCInterfaceType> in(const File &file);
   static gap::generator<ObjCInterfaceType> in(const Index &index);
   static gap::generator<ObjCInterfaceType> containing(const Token &tok);
   bool contains(const Token &tok) const;

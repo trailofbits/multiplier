@@ -20,6 +20,11 @@ class Stmt;
 class Token;
 class Type;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCEncodeExpr : public Expr {
  private:
@@ -28,12 +33,12 @@ class ObjCEncodeExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<ObjCEncodeExpr> in(const Fragment &frag);
-  static gap::generator<ObjCEncodeExpr> in(const File &file);
   static gap::generator<ObjCEncodeExpr> in(const Index &index);
   static gap::generator<ObjCEncodeExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCEncodeExpr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCEncodeExpr> in(const Fragment &frag);
+  static gap::generator<ObjCEncodeExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_ENCODE_EXPR;

@@ -17,6 +17,11 @@ class ConditionalMacroDirective;
 class ElseIfMacroDirective;
 class Macro;
 class MacroDirective;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ElseIfMacroDirective : public ConditionalMacroDirective {
  private:

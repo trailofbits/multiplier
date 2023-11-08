@@ -18,6 +18,11 @@ class OMPExecutableDirective;
 class OMPTaskyieldDirective;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPTaskyieldDirective : public OMPExecutableDirective {
  private:
@@ -25,12 +30,12 @@ class OMPTaskyieldDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPTaskyieldDirective> in(const Fragment &frag);
-  static gap::generator<OMPTaskyieldDirective> in(const File &file);
   static gap::generator<OMPTaskyieldDirective> in(const Index &index);
   static gap::generator<OMPTaskyieldDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPTaskyieldDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPTaskyieldDirective> in(const Fragment &frag);
+  static gap::generator<OMPTaskyieldDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TASKYIELD_DIRECTIVE;

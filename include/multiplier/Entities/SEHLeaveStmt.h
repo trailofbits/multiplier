@@ -17,18 +17,23 @@ class Decl;
 class SEHLeaveStmt;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class SEHLeaveStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<SEHLeaveStmt> in(const Fragment &frag);
-  static gap::generator<SEHLeaveStmt> in(const File &file);
   static gap::generator<SEHLeaveStmt> in(const Index &index);
   static gap::generator<SEHLeaveStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SEHLeaveStmt> by_id(const Index &, EntityId);
+  static gap::generator<SEHLeaveStmt> in(const Fragment &frag);
+  static gap::generator<SEHLeaveStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_LEAVE_STMT;

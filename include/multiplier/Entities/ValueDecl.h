@@ -46,6 +46,11 @@ class ValueDecl;
 class VarDecl;
 class VarTemplatePartialSpecializationDecl;
 class VarTemplateSpecializationDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ValueDecl : public NamedDecl {
  private:
@@ -53,12 +58,12 @@ class ValueDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ValueDecl> in(const Fragment &frag);
-  static gap::generator<ValueDecl> in(const File &file);
   static gap::generator<ValueDecl> in(const Index &index);
   static gap::generator<ValueDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ValueDecl> by_id(const Index &, EntityId);
+  static gap::generator<ValueDecl> in(const Fragment &frag);
+  static gap::generator<ValueDecl> in(const File &file);
 
   static gap::generator<ValueDecl> containing(const Decl &decl);
   static gap::generator<ValueDecl> containing(const std::optional<Decl> &decl);

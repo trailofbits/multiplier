@@ -18,6 +18,11 @@ class Attr;
 class OpenCLGenericAddressSpaceAttr;
 class Token;
 class TypeAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OpenCLGenericAddressSpaceAttr : public TypeAttr {
  private:
@@ -25,12 +30,12 @@ class OpenCLGenericAddressSpaceAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  static gap::generator<OpenCLGenericAddressSpaceAttr> in(const Fragment &frag);
-  static gap::generator<OpenCLGenericAddressSpaceAttr> in(const File &file);
   static gap::generator<OpenCLGenericAddressSpaceAttr> in(const Index &index);
   static gap::generator<OpenCLGenericAddressSpaceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OpenCLGenericAddressSpaceAttr> by_id(const Index &, EntityId);
+  static gap::generator<OpenCLGenericAddressSpaceAttr> in(const Fragment &frag);
+  static gap::generator<OpenCLGenericAddressSpaceAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_GENERIC_ADDRESS_SPACE;

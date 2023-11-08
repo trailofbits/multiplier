@@ -12,7 +12,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {
@@ -60,37 +60,11 @@ std::optional<FunctionNoProtoType> FunctionNoProtoType::from(const Type &parent)
 }
 
 gap::generator<FunctionNoProtoType> FunctionNoProtoType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kFunctionNoProtoTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<FunctionNoProtoType> e = FunctionNoProtoType::from(Type(std::move(eptr)))) {
         co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<FunctionNoProtoType> FunctionNoProtoType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kFunctionNoProtoTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<FunctionNoProtoType> e = FunctionNoProtoType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<FunctionNoProtoType> FunctionNoProtoType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kFunctionNoProtoTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<FunctionNoProtoType> e = FunctionNoProtoType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
       }
     }
   }
@@ -105,12 +79,12 @@ std::optional<FunctionNoProtoType> FunctionNoProtoType::from(const TokenContext 
 }
 
 Type FunctionNoProtoType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal24();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool FunctionNoProtoType::is_sugared(void) const {
-  return impl->reader.getVal242();
+  return impl->reader.getVal30();
 }
 
 #pragma GCC diagnostic pop

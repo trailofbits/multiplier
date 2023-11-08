@@ -53,6 +53,7 @@ class OMPParallelMasterTaskLoopDirective;
 class OMPParallelMasterTaskLoopSimdDirective;
 class OMPParallelSectionsDirective;
 class OMPScanDirective;
+class OMPScopeDirective;
 class OMPSectionDirective;
 class OMPSectionsDirective;
 class OMPSimdDirective;
@@ -89,18 +90,23 @@ class OMPTileDirective;
 class OMPUnrollDirective;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPExecutableDirective : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<OMPExecutableDirective> in(const Fragment &frag);
-  static gap::generator<OMPExecutableDirective> in(const File &file);
   static gap::generator<OMPExecutableDirective> in(const Index &index);
   static gap::generator<OMPExecutableDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPExecutableDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPExecutableDirective> in(const Fragment &frag);
+  static gap::generator<OMPExecutableDirective> in(const File &file);
 
   static gap::generator<OMPExecutableDirective> containing(const Decl &decl);
   static gap::generator<OMPExecutableDirective> containing(const std::optional<Decl> &decl);

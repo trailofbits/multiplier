@@ -16,7 +16,7 @@
 #include <multiplier/Entities/ValueDecl.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::containing(co
 
 bool MaterializeTemporaryExpr::contains(const Decl &decl) {
   for (auto &parent : MaterializeTemporaryExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool MaterializeTemporaryExpr::contains(const Stmt &stmt) {
   for (auto &parent : MaterializeTemporaryExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -112,7 +112,7 @@ std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const Stm
 }
 
 gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kMaterializeTemporaryExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<MaterializeTemporaryExpr> e = MaterializeTemporaryExpr::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::in(const Inde
 }
 
 gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kMaterializeTemporaryExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::in(const Frag
 }
 
 gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kMaterializeTemporaryExprDerivedKinds) {
@@ -158,7 +158,7 @@ std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const Tok
 
 std::optional<ValueDecl> MaterializeTemporaryExpr::extending_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal37();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -171,7 +171,7 @@ std::optional<ValueDecl> MaterializeTemporaryExpr::extending_declaration(void) c
 
 std::optional<LifetimeExtendedTemporaryDecl> MaterializeTemporaryExpr::lifetime_extended_temporary_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -183,11 +183,11 @@ std::optional<LifetimeExtendedTemporaryDecl> MaterializeTemporaryExpr::lifetime_
 }
 
 StorageDuration MaterializeTemporaryExpr::storage_duration(void) const {
-  return static_cast<StorageDuration>(impl->reader.getVal94());
+  return static_cast<StorageDuration>(impl->reader.getVal95());
 }
 
 Expr MaterializeTemporaryExpr::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

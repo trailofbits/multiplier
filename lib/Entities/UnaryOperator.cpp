@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<UnaryOperator> UnaryOperator::containing(const std::optional<Stmt
 
 bool UnaryOperator::contains(const Decl &decl) {
   for (auto &parent : UnaryOperator::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UnaryOperator::contains(const Stmt &stmt) {
   for (auto &parent : UnaryOperator::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<UnaryOperator> UnaryOperator::from(const Stmt &parent) {
 }
 
 gap::generator<UnaryOperator> UnaryOperator::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kUnaryOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<UnaryOperator> e = UnaryOperator::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<UnaryOperator> UnaryOperator::in(const Index &index) {
 }
 
 gap::generator<UnaryOperator> UnaryOperator::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kUnaryOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<UnaryOperator> UnaryOperator::in(const Fragment &frag) {
 }
 
 gap::generator<UnaryOperator> UnaryOperator::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kUnaryOperatorDerivedKinds) {
@@ -159,15 +159,15 @@ bool UnaryOperator::can_overflow(void) const {
 }
 
 UnaryOperatorKind UnaryOperator::opcode(void) const {
-  return static_cast<UnaryOperatorKind>(impl->reader.getVal94());
+  return static_cast<UnaryOperatorKind>(impl->reader.getVal95());
 }
 
 Token UnaryOperator::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 Expr UnaryOperator::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
@@ -188,11 +188,11 @@ bool UnaryOperator::is_increment_decrement_operation(void) const {
 }
 
 bool UnaryOperator::is_increment_operation(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal94();
 }
 
 bool UnaryOperator::is_postfix(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal96();
 }
 
 bool UnaryOperator::is_prefix(void) const {

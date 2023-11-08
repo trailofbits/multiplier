@@ -17,6 +17,11 @@ class Attr;
 class OpenCLUnrollHintAttr;
 class StmtAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OpenCLUnrollHintAttr : public StmtAttr {
  private:
@@ -24,12 +29,12 @@ class OpenCLUnrollHintAttr : public StmtAttr {
   friend class StmtAttr;
   friend class Attr;
  public:
-  static gap::generator<OpenCLUnrollHintAttr> in(const Fragment &frag);
-  static gap::generator<OpenCLUnrollHintAttr> in(const File &file);
   static gap::generator<OpenCLUnrollHintAttr> in(const Index &index);
   static gap::generator<OpenCLUnrollHintAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OpenCLUnrollHintAttr> by_id(const Index &, EntityId);
+  static gap::generator<OpenCLUnrollHintAttr> in(const Fragment &frag);
+  static gap::generator<OpenCLUnrollHintAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_UNROLL_HINT;

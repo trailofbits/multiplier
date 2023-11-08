@@ -20,10 +20,10 @@ static thread_local RawEntityIdList tIgnoredRedecls;
 
 }  // namespace
 
-MacroImpl::MacroImpl(std::shared_ptr<EntityProvider> ep_,
-                     kj::Array<capnp::word> data_,
+MacroImpl::MacroImpl(FragmentImplPtr frag_,
+                     ast::Macro::Reader reader_,
                      RawEntityId id_)
-    : EntityImpl<ast::Macro>(std::move(ep_), kj::mv(data_)),
+    : FragmentEntityImpl<ast::Macro>(std::move(frag_), kj::mv(reader_)),
       fragment_id(FragmentIdFromEntityId(id_).value()),
       offset(FragmentOffsetFromEntityId(id_).value()) {}
 
@@ -36,8 +36,8 @@ SpecificEntityId<MacroId> Macro::id(void) const {
 }
 
 gap::generator<Macro> Macro::containing_internal(const Token &token) {
-  auto frag = token.impl->OwningFragment();
-  if (!frag) {
+  EntityProviderPtr ep = TokenReader::EntityProviderFor(token);
+  if (!ep) {
     co_return;
   }
 
@@ -53,8 +53,8 @@ gap::generator<Macro> Macro::containing_internal(const Token &token) {
   }
 
   MacroId mid = std::get<MacroId>(vid);
-  MacroImplPtr eptr = frag->ep->MacroFor(frag->ep, mid);
-  if (!eptr || mid.fragment_id != frag->fragment_id) {
+  MacroImplPtr eptr = ep->MacroFor(ep, mid);
+  if (!eptr) {
     assert(false);
     co_return;
   }
@@ -67,12 +67,7 @@ gap::generator<Macro> Macro::containing_internal(const Token &token) {
 
 // References to this macro definition.
 gap::generator<Reference> Macro::references(void) const & {
-  const EntityProvider::Ptr &ep = impl->ep;
-  for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
-    if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
-      co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
-    }
-  }
+  return References(impl->ep, id().Pack());
 }
 
 namespace {
@@ -94,9 +89,7 @@ static gap::generator<Token> GenerateExpansionTokensFromMacro(Macro macro);
 static gap::generator<Token> GenerateExpansionTokensFromUse(
     MacroOrToken use) {
   if (std::holds_alternative<mx::Token>(use)) {
-    if (auto pt = std::get<Token>(use).parsed_token()) {
-      co_yield pt;
-    }
+    co_yield std::get<Token>(use);
   } else if (std::holds_alternative<Macro>(use)) {
     for (Token pt : GenerateExpansionTokensFromMacro(
                         std::move(std::get<Macro>(use)))) {

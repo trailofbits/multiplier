@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class TargetVersionAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TargetVersionAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class TargetVersionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<TargetVersionAttr> in(const Fragment &frag);
-  static gap::generator<TargetVersionAttr> in(const File &file);
   static gap::generator<TargetVersionAttr> in(const Index &index);
   static gap::generator<TargetVersionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TargetVersionAttr> by_id(const Index &, EntityId);
+  static gap::generator<TargetVersionAttr> in(const Fragment &frag);
+  static gap::generator<TargetVersionAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TARGET_VERSION;

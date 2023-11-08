@@ -13,7 +13,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -73,14 +73,14 @@ gap::generator<OMPRequiresDecl> OMPRequiresDecl::containing(const std::optional<
 
 bool OMPRequiresDecl::contains(const Decl &decl) {
   for (auto &parent : OMPRequiresDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPRequiresDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPRequiresDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -135,7 +135,7 @@ std::optional<OMPRequiresDecl> OMPRequiresDecl::from(const Decl &parent) {
 }
 
 gap::generator<OMPRequiresDecl> OMPRequiresDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kOMPRequiresDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<OMPRequiresDecl> e = OMPRequiresDecl::from(Decl(std::move(eptr)))) {
@@ -146,7 +146,7 @@ gap::generator<OMPRequiresDecl> OMPRequiresDecl::in(const Index &index) {
 }
 
 gap::generator<OMPRequiresDecl> OMPRequiresDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kOMPRequiresDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -158,7 +158,7 @@ gap::generator<OMPRequiresDecl> OMPRequiresDecl::in(const Fragment &frag) {
 }
 
 gap::generator<OMPRequiresDecl> OMPRequiresDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kOMPRequiresDeclDerivedKinds) {

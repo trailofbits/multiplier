@@ -12,7 +12,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {
@@ -60,37 +60,11 @@ std::optional<MemberPointerType> MemberPointerType::from(const Type &parent) {
 }
 
 gap::generator<MemberPointerType> MemberPointerType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kMemberPointerTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<MemberPointerType> e = MemberPointerType::from(Type(std::move(eptr)))) {
         co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<MemberPointerType> MemberPointerType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kMemberPointerTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<MemberPointerType> e = MemberPointerType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<MemberPointerType> MemberPointerType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kMemberPointerTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<MemberPointerType> e = MemberPointerType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
       }
     }
   }
@@ -105,30 +79,35 @@ std::optional<MemberPointerType> MemberPointerType::from(const TokenContext &t) 
 }
 
 Type MemberPointerType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal17();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type MemberPointerType::class_(void) const {
-  RawEntityId eid = impl->reader.getVal230();
+  RawEntityId eid = impl->reader.getVal18();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 CXXRecordDecl MemberPointerType::most_recent_cxx_record_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal24();
   return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
+Type MemberPointerType::pointee_type(void) const {
+  RawEntityId eid = impl->reader.getVal25();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
+}
+
 bool MemberPointerType::is_member_data_pointer(void) const {
-  return impl->reader.getVal231();
+  return impl->reader.getVal19();
 }
 
 bool MemberPointerType::is_member_function_pointer(void) const {
-  return impl->reader.getVal232();
+  return impl->reader.getVal20();
 }
 
 bool MemberPointerType::is_sugared(void) const {
-  return impl->reader.getVal233();
+  return impl->reader.getVal21();
 }
 
 #pragma GCC diagnostic pop

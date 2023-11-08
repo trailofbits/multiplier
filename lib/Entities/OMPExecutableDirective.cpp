@@ -47,6 +47,7 @@
 #include <multiplier/Entities/OMPParallelMasterTaskLoopSimdDirective.h>
 #include <multiplier/Entities/OMPParallelSectionsDirective.h>
 #include <multiplier/Entities/OMPScanDirective.h>
+#include <multiplier/Entities/OMPScopeDirective.h>
 #include <multiplier/Entities/OMPSectionDirective.h>
 #include <multiplier/Entities/OMPSectionsDirective.h>
 #include <multiplier/Entities/OMPSimdDirective.h>
@@ -84,7 +85,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -144,14 +145,14 @@ gap::generator<OMPExecutableDirective> OMPExecutableDirective::containing(const 
 
 bool OMPExecutableDirective::contains(const Decl &decl) {
   for (auto &parent : OMPExecutableDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPExecutableDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPExecutableDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -178,6 +179,7 @@ static const StmtKind kOMPExecutableDirectiveDerivedKinds[] = {
     OMPParallelMasterDirective::static_kind(),
     OMPParallelSectionsDirective::static_kind(),
     OMPScanDirective::static_kind(),
+    OMPScopeDirective::static_kind(),
     OMPSectionDirective::static_kind(),
     OMPSectionsDirective::static_kind(),
     OMPSingleDirective::static_kind(),
@@ -253,6 +255,7 @@ std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const Stmt &p
     case OMPParallelMasterDirective::static_kind():
     case OMPParallelSectionsDirective::static_kind():
     case OMPScanDirective::static_kind():
+    case OMPScopeDirective::static_kind():
     case OMPSectionDirective::static_kind():
     case OMPSectionsDirective::static_kind():
     case OMPSingleDirective::static_kind():
@@ -320,7 +323,7 @@ std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const Stmt &p
 }
 
 gap::generator<OMPExecutableDirective> OMPExecutableDirective::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPExecutableDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPExecutableDirective> e = OMPExecutableDirective::from(Stmt(std::move(eptr)))) {
@@ -331,7 +334,7 @@ gap::generator<OMPExecutableDirective> OMPExecutableDirective::in(const Index &i
 }
 
 gap::generator<OMPExecutableDirective> OMPExecutableDirective::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPExecutableDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -343,7 +346,7 @@ gap::generator<OMPExecutableDirective> OMPExecutableDirective::in(const Fragment
 }
 
 gap::generator<OMPExecutableDirective> OMPExecutableDirective::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPExecutableDirectiveDerivedKinds) {

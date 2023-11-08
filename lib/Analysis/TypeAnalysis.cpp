@@ -10,4 +10,5 @@ namespace mx {
 class TypecastAnalysisImpl final {
 public:
     
+};
 }

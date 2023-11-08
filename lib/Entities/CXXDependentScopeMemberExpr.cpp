@@ -16,7 +16,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::contain
 
 bool CXXDependentScopeMemberExpr::contains(const Decl &decl) {
   for (auto &parent : CXXDependentScopeMemberExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXDependentScopeMemberExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXDependentScopeMemberExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -112,7 +112,7 @@ std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(con
 }
 
 gap::generator<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXDependentScopeMemberExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXDependentScopeMemberExpr> e = CXXDependentScopeMemberExpr::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::in(cons
 }
 
 gap::generator<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXDependentScopeMemberExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::in(cons
 }
 
 gap::generator<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXDependentScopeMemberExprDerivedKinds) {
@@ -158,7 +158,7 @@ std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(con
 
 std::optional<Expr> CXXDependentScopeMemberExpr::base(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal37();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -170,13 +170,13 @@ std::optional<Expr> CXXDependentScopeMemberExpr::base(void) const {
 }
 
 Type CXXDependentScopeMemberExpr::base_type(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<NamedDecl> CXXDependentScopeMemberExpr::first_qualifier_found_in_scope(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal40();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -188,23 +188,23 @@ std::optional<NamedDecl> CXXDependentScopeMemberExpr::first_qualifier_found_in_s
 }
 
 Token CXXDependentScopeMemberExpr::l_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token CXXDependentScopeMemberExpr::member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Token CXXDependentScopeMemberExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 Token CXXDependentScopeMemberExpr::r_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 Token CXXDependentScopeMemberExpr::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 bool CXXDependentScopeMemberExpr::has_explicit_template_arguments(void) const {

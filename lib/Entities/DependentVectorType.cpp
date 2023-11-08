@@ -12,7 +12,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {
@@ -60,37 +60,11 @@ std::optional<DependentVectorType> DependentVectorType::from(const Type &parent)
 }
 
 gap::generator<DependentVectorType> DependentVectorType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kDependentVectorTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<DependentVectorType> e = DependentVectorType::from(Type(std::move(eptr)))) {
         co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<DependentVectorType> DependentVectorType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kDependentVectorTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<DependentVectorType> e = DependentVectorType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<DependentVectorType> DependentVectorType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kDependentVectorTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<DependentVectorType> e = DependentVectorType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
       }
     }
   }
@@ -105,30 +79,30 @@ std::optional<DependentVectorType> DependentVectorType::from(const TokenContext 
 }
 
 Type DependentVectorType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal17();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token DependentVectorType::attribute_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal230());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal18());
 }
 
 Type DependentVectorType::element_type(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal24();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr DependentVectorType::size_expression(void) const {
-  RawEntityId eid = impl->reader.getVal237();
+  RawEntityId eid = impl->reader.getVal25();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 VectorTypeVectorKind DependentVectorType::vector_kind(void) const {
-  return static_cast<VectorTypeVectorKind>(impl->reader.getVal238());
+  return static_cast<VectorTypeVectorKind>(impl->reader.getVal26());
 }
 
 bool DependentVectorType::is_sugared(void) const {
-  return impl->reader.getVal231();
+  return impl->reader.getVal19();
 }
 
 #pragma GCC diagnostic pop

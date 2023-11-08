@@ -16,7 +16,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<FullExpr> FullExpr::containing(const std::optional<Stmt> &stmt) {
 
 bool FullExpr::contains(const Decl &decl) {
   for (auto &parent : FullExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool FullExpr::contains(const Stmt &stmt) {
   for (auto &parent : FullExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -114,7 +114,7 @@ std::optional<FullExpr> FullExpr::from(const Stmt &parent) {
 }
 
 gap::generator<FullExpr> FullExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kFullExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<FullExpr> e = FullExpr::from(Stmt(std::move(eptr)))) {
@@ -125,7 +125,7 @@ gap::generator<FullExpr> FullExpr::in(const Index &index) {
 }
 
 gap::generator<FullExpr> FullExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kFullExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -137,7 +137,7 @@ gap::generator<FullExpr> FullExpr::in(const Fragment &frag) {
 }
 
 gap::generator<FullExpr> FullExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kFullExprDerivedKinds) {
@@ -159,7 +159,7 @@ std::optional<FullExpr> FullExpr::from(const TokenContext &t) {
 }
 
 Expr FullExpr::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

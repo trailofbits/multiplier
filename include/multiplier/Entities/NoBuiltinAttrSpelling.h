@@ -14,7 +14,7 @@ namespace mx {
 enum class NoBuiltinAttrSpelling : unsigned char {
   GNU_NO_BUILTIN,
   CXX11_CLANG_NO_BUILTIN,
-  C2X_CLANG_NO_BUILTIN,
+  C23_CLANG_NO_BUILTIN,
   SPELLING_NOT_CALCULATED,
 };
 

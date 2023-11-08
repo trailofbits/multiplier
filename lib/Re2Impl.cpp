@@ -9,11 +9,11 @@
 #include <algorithm>
 #include <cassert>
 #include <multiplier/Index.h>
-#include <multiplier/Types.h>
 
 #include "File.h"
 #include "Fragment.h"
 #include "Token.h"
+#include "Types.h"
 #include "Util.h"
 
 #ifndef MX_DISABLE_RE2
@@ -23,7 +23,7 @@ namespace mx {
 RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
-    const RegexQuery &query_, EntityProvider::Ptr ep_,
+    const RegexQuery &query_, EntityProviderPtr ep_,
     FragmentIdList fragment_ids_)
     : query(query_),
       ep(std::move(ep_)),
@@ -345,7 +345,7 @@ gap::generator<RegexQueryMatch> RegexQuery::match_fragments(
     }
   }
 
-  const EntityProvider::Ptr &ep = file.impl->ep;
+  const EntityProviderPtr &ep = file.impl->ep;
   RegexQueryResultImpl result_impl(
       *this, ep,
       ep->FragmentsCoveringTokens(ep, file.id(), std::move(matched_offsets)));
@@ -371,7 +371,7 @@ namespace mx {
 RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
-    const RegexQuery &query_, EntityProvider::Ptr ep_, FragmentIdList)
+    const RegexQuery &query_, EntityProviderPtr ep_, FragmentIdList)
     : query(query_),
       ep(std::move(ep_)) {}
 
@@ -380,11 +380,11 @@ RegexQueryResultImpl::RegexQueryResultImpl(
     : query(query_),
       ep(frag_->ep) {}
 
-bool RegexQueryResultImpl::InitForFragment(FragmentImplPtr frag_) {
+bool RegexQueryResultImpl::InitForFragment(FragmentImplPtr) {
   return false;
 }
 
-bool RegexQueryResultImpl::InitForFragment(RawEntityId frag_id) {
+bool RegexQueryResultImpl::InitForFragment(PackedFragmentId) {
   return false;
 }
 
@@ -400,7 +400,7 @@ gap::generator<RegexQueryMatch> RegexQueryResultImpl::Enumerate(void) & {
 RegexQueryMatch::~RegexQueryMatch(void) {}
 
 RegexQueryMatch::RegexQueryMatch(TokenRange range_ /* file token range */,
-                                 std::string_view data_range /* file data */,
+                                 std::string_view /* file data */,
                                  std::shared_ptr<const FragmentImpl> frag_,
                                  const RegexQuery &query_)
     : TokenRange(std::move(range_)),
@@ -409,37 +409,35 @@ RegexQueryMatch::RegexQueryMatch(TokenRange range_ /* file token range */,
 
 // Translate a data capture into a token range capture.
 std::optional<TokenRange> RegexQueryMatch::TranslateCapture(
-    std::string_view capture) const {
+    std::string_view) const {
   return std::nullopt;
 }
 
 // Return the index of a capture variable.
 std::optional<size_t> RegexQueryMatch::index_of_captured_variable(
-    const std::string &var) const {
+    const std::string &) const {
   return std::nullopt;
 }
 
 // Return the captured tokens for a given named capture group.
 std::optional<TokenRange> RegexQueryMatch::captured_tokens(
-    const std::string &var) const {
+    const std::string &) const {
   return std::nullopt;
 }
 
 // Return the captured data for a given named capture group.
 std::optional<std::string_view> RegexQueryMatch::captured_data(
-    const std::string &var) const {
+    const std::string &) const {
   return std::nullopt;
 }
 
 // Return the captured tokens for a given indexed capture group.
-std::optional<TokenRange> RegexQueryMatch::captured_tokens(
-    size_t index) const {
+std::optional<TokenRange> RegexQueryMatch::captured_tokens(size_t) const {
   return std::nullopt;
 }
 
 // Return the captured data for a given indexed capture group.
-std::optional<std::string_view> RegexQueryMatch::captured_data(
-    size_t capture_index) const {
+std::optional<std::string_view> RegexQueryMatch::captured_data(size_t) const {
   return std::nullopt;
 }
 

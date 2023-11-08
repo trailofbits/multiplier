@@ -20,6 +20,11 @@ class OMPDeclareMapperDecl;
 class Stmt;
 class Token;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
  private:
@@ -28,12 +33,12 @@ class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<OMPDeclarativeDirectiveValueDecl> in(const Fragment &frag);
-  static gap::generator<OMPDeclarativeDirectiveValueDecl> in(const File &file);
   static gap::generator<OMPDeclarativeDirectiveValueDecl> in(const Index &index);
   static gap::generator<OMPDeclarativeDirectiveValueDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPDeclarativeDirectiveValueDecl> by_id(const Index &, EntityId);
+  static gap::generator<OMPDeclarativeDirectiveValueDecl> in(const Fragment &frag);
+  static gap::generator<OMPDeclarativeDirectiveValueDecl> in(const File &file);
 
   static gap::generator<OMPDeclarativeDirectiveValueDecl> containing(const Decl &decl);
   static gap::generator<OMPDeclarativeDirectiveValueDecl> containing(const std::optional<Decl> &decl);

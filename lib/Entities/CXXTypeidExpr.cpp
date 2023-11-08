@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<CXXTypeidExpr> CXXTypeidExpr::containing(const std::optional<Stmt
 
 bool CXXTypeidExpr::contains(const Decl &decl) {
   for (auto &parent : CXXTypeidExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXTypeidExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXTypeidExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -111,7 +111,7 @@ std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const Stmt &parent) {
 }
 
 gap::generator<CXXTypeidExpr> CXXTypeidExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXTypeidExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXTypeidExpr> e = CXXTypeidExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<CXXTypeidExpr> CXXTypeidExpr::in(const Index &index) {
 }
 
 gap::generator<CXXTypeidExpr> CXXTypeidExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXTypeidExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<CXXTypeidExpr> CXXTypeidExpr::in(const Fragment &frag) {
 }
 
 gap::generator<CXXTypeidExpr> CXXTypeidExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXTypeidExprDerivedKinds) {
@@ -157,7 +157,7 @@ std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const TokenContext &t) {
 
 std::optional<Expr> CXXTypeidExpr::expression_operand(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal37();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -169,12 +169,12 @@ std::optional<Expr> CXXTypeidExpr::expression_operand(void) const {
 }
 
 Type CXXTypeidExpr::type_operand(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type CXXTypeidExpr::type_operand_source_info(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

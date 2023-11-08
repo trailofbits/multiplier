@@ -18,6 +18,11 @@ class NamedDecl;
 class Stmt;
 class Token;
 class UsingPackDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UsingPackDecl : public NamedDecl {
  private:
@@ -25,12 +30,12 @@ class UsingPackDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<UsingPackDecl> in(const Fragment &frag);
-  static gap::generator<UsingPackDecl> in(const File &file);
   static gap::generator<UsingPackDecl> in(const Index &index);
   static gap::generator<UsingPackDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UsingPackDecl> by_id(const Index &, EntityId);
+  static gap::generator<UsingPackDecl> in(const Fragment &frag);
+  static gap::generator<UsingPackDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_PACK;

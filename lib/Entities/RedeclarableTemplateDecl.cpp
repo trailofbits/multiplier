@@ -18,7 +18,7 @@
 #include <multiplier/Entities/TypeAliasTemplateDecl.h>
 #include <multiplier/Entities/VarTemplateDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -78,14 +78,14 @@ gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::containing(co
 
 bool RedeclarableTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : RedeclarableTemplateDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool RedeclarableTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : RedeclarableTemplateDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -146,7 +146,7 @@ std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Dec
 }
 
 gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kRedeclarableTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<RedeclarableTemplateDecl> e = RedeclarableTemplateDecl::from(Decl(std::move(eptr)))) {
@@ -157,7 +157,7 @@ gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::in(const Inde
 }
 
 gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kRedeclarableTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -169,7 +169,7 @@ gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::in(const Frag
 }
 
 gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kRedeclarableTemplateDeclDerivedKinds) {
@@ -191,12 +191,12 @@ std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Tok
 }
 
 RedeclarableTemplateDecl RedeclarableTemplateDecl::instantiated_from_member_template(void) const {
-  RawEntityId eid = impl->reader.getVal56();
+  RawEntityId eid = impl->reader.getVal58();
   return RedeclarableTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool RedeclarableTemplateDecl::is_member_specialization(void) const {
-  return impl->reader.getVal74();
+  return impl->reader.getVal76();
 }
 
 #pragma GCC diagnostic pop

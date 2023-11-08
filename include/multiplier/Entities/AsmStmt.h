@@ -20,18 +20,23 @@ class GCCAsmStmt;
 class MSAsmStmt;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AsmStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<AsmStmt> in(const Fragment &frag);
-  static gap::generator<AsmStmt> in(const File &file);
   static gap::generator<AsmStmt> in(const Index &index);
   static gap::generator<AsmStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AsmStmt> by_id(const Index &, EntityId);
+  static gap::generator<AsmStmt> in(const Fragment &frag);
+  static gap::generator<AsmStmt> in(const File &file);
 
   static gap::generator<AsmStmt> containing(const Decl &decl);
   static gap::generator<AsmStmt> containing(const std::optional<Decl> &decl);

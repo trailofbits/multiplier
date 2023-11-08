@@ -16,7 +16,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/VarDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<SwitchStmt> SwitchStmt::containing(const std::optional<Stmt> &stm
 
 bool SwitchStmt::contains(const Decl &decl) {
   for (auto &parent : SwitchStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool SwitchStmt::contains(const Stmt &stmt) {
   for (auto &parent : SwitchStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -112,7 +112,7 @@ std::optional<SwitchStmt> SwitchStmt::from(const Stmt &parent) {
 }
 
 gap::generator<SwitchStmt> SwitchStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kSwitchStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<SwitchStmt> e = SwitchStmt::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<SwitchStmt> SwitchStmt::in(const Index &index) {
 }
 
 gap::generator<SwitchStmt> SwitchStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kSwitchStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<SwitchStmt> SwitchStmt::in(const Fragment &frag) {
 }
 
 gap::generator<SwitchStmt> SwitchStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kSwitchStmtDerivedKinds) {

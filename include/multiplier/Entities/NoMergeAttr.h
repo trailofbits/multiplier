@@ -18,6 +18,11 @@ class DeclOrStmtAttr;
 class InheritableAttr;
 class NoMergeAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class NoMergeAttr : public DeclOrStmtAttr {
  private:
@@ -26,12 +31,12 @@ class NoMergeAttr : public DeclOrStmtAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<NoMergeAttr> in(const Fragment &frag);
-  static gap::generator<NoMergeAttr> in(const File &file);
   static gap::generator<NoMergeAttr> in(const Index &index);
   static gap::generator<NoMergeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NoMergeAttr> by_id(const Index &, EntityId);
+  static gap::generator<NoMergeAttr> in(const Fragment &frag);
+  static gap::generator<NoMergeAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_MERGE;

@@ -19,6 +19,11 @@ class FloatingLiteral;
 class Stmt;
 class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class FloatingLiteral : public Expr {
  private:
@@ -27,12 +32,12 @@ class FloatingLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<FloatingLiteral> in(const Fragment &frag);
-  static gap::generator<FloatingLiteral> in(const File &file);
   static gap::generator<FloatingLiteral> in(const Index &index);
   static gap::generator<FloatingLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<FloatingLiteral> by_id(const Index &, EntityId);
+  static gap::generator<FloatingLiteral> in(const Fragment &frag);
+  static gap::generator<FloatingLiteral> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FLOATING_LITERAL;

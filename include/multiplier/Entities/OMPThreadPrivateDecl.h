@@ -19,6 +19,11 @@ class OMPDeclarativeDirectiveDecl;
 class OMPThreadPrivateDecl;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
  private:
@@ -26,12 +31,12 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
   friend class OMPDeclarativeDirectiveDecl;
   friend class Decl;
  public:
-  static gap::generator<OMPThreadPrivateDecl> in(const Fragment &frag);
-  static gap::generator<OMPThreadPrivateDecl> in(const File &file);
   static gap::generator<OMPThreadPrivateDecl> in(const Index &index);
   static gap::generator<OMPThreadPrivateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPThreadPrivateDecl> by_id(const Index &, EntityId);
+  static gap::generator<OMPThreadPrivateDecl> in(const Fragment &frag);
+  static gap::generator<OMPThreadPrivateDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_THREAD_PRIVATE;

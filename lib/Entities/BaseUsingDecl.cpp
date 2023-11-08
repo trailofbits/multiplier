@@ -16,7 +16,7 @@
 #include <multiplier/Entities/UsingEnumDecl.h>
 #include <multiplier/Entities/UsingShadowDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<BaseUsingDecl> BaseUsingDecl::containing(const std::optional<Stmt
 
 bool BaseUsingDecl::contains(const Decl &decl) {
   for (auto &parent : BaseUsingDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool BaseUsingDecl::contains(const Stmt &stmt) {
   for (auto &parent : BaseUsingDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -140,7 +140,7 @@ std::optional<BaseUsingDecl> BaseUsingDecl::from(const Decl &parent) {
 }
 
 gap::generator<BaseUsingDecl> BaseUsingDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kBaseUsingDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<BaseUsingDecl> e = BaseUsingDecl::from(Decl(std::move(eptr)))) {
@@ -151,7 +151,7 @@ gap::generator<BaseUsingDecl> BaseUsingDecl::in(const Index &index) {
 }
 
 gap::generator<BaseUsingDecl> BaseUsingDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kBaseUsingDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -163,7 +163,7 @@ gap::generator<BaseUsingDecl> BaseUsingDecl::in(const Fragment &frag) {
 }
 
 gap::generator<BaseUsingDecl> BaseUsingDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kBaseUsingDeclDerivedKinds) {
@@ -185,15 +185,15 @@ std::optional<BaseUsingDecl> BaseUsingDecl::from(const TokenContext &t) {
 }
 
 unsigned BaseUsingDecl::num_shadows(void) const {
-  return impl->reader.getVal49().size();
+  return impl->reader.getVal51().size();
 }
 
 std::optional<UsingShadowDecl> BaseUsingDecl::nth_shadow(unsigned n) const {
-  auto list = impl->reader.getVal49();
+  auto list = impl->reader.getVal51();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -203,12 +203,12 @@ std::optional<UsingShadowDecl> BaseUsingDecl::nth_shadow(unsigned n) const {
 }
 
 gap::generator<UsingShadowDecl> BaseUsingDecl::shadows(void) const & {
-  auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal51();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d49 = ep->DeclFor(ep, v)) {
-      if (auto e = UsingShadowDecl::from(Decl(std::move(d49)))) {
+    if (auto d51 = ep->DeclFor(ep, v)) {
+      if (auto e = UsingShadowDecl::from(Decl(std::move(d51)))) {
         co_yield std::move(*e);
       }
     }

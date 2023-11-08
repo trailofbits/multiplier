@@ -13,7 +13,7 @@
 #include <multiplier/Entities/TemplateArgument.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -73,14 +73,14 @@ gap::generator<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationD
 
 bool ImplicitConceptSpecializationDecl::contains(const Decl &decl) {
   for (auto &parent : ImplicitConceptSpecializationDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ImplicitConceptSpecializationDecl::contains(const Stmt &stmt) {
   for (auto &parent : ImplicitConceptSpecializationDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -135,7 +135,7 @@ std::optional<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationDe
 }
 
 gap::generator<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kImplicitConceptSpecializationDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ImplicitConceptSpecializationDecl> e = ImplicitConceptSpecializationDecl::from(Decl(std::move(eptr)))) {
@@ -146,7 +146,7 @@ gap::generator<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationD
 }
 
 gap::generator<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kImplicitConceptSpecializationDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -158,7 +158,7 @@ gap::generator<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationD
 }
 
 gap::generator<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kImplicitConceptSpecializationDeclDerivedKinds) {
@@ -180,15 +180,15 @@ std::optional<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationDe
 }
 
 unsigned ImplicitConceptSpecializationDecl::num_template_arguments(void) const {
-  return impl->reader.getVal49().size();
+  return impl->reader.getVal51().size();
 }
 
 std::optional<TemplateArgument> ImplicitConceptSpecializationDecl::nth_template_argument(unsigned n) const {
-  auto list = impl->reader.getVal49();
+  auto list = impl->reader.getVal51();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TemplateArgumentFor(ep, v);
   if (!e) {
@@ -198,12 +198,12 @@ std::optional<TemplateArgument> ImplicitConceptSpecializationDecl::nth_template_
 }
 
 gap::generator<TemplateArgument> ImplicitConceptSpecializationDecl::template_arguments(void) const & {
-  auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal51();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d49 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d49));
+    if (auto d51 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d51));
     }
   }
   co_return;

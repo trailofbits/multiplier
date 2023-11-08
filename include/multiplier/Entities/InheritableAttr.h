@@ -42,6 +42,8 @@ class AnyX86NoCfCheckAttr;
 class ArcWeakrefUnavailableAttr;
 class ArgumentWithTypeTagAttr;
 class ArmBuiltinAliasAttr;
+class ArmLocallyStreamingAttr;
+class ArmNewZAAttr;
 class ArtificialAttr;
 class AsmLabelAttr;
 class AssertCapabilityAttr;
@@ -51,6 +53,7 @@ class AssumeAlignedAttr;
 class AssumptionAttr;
 class Attr;
 class AvailabilityAttr;
+class AvailableOnlyInDefaultEvalMethodAttr;
 class BPFPreserveAccessIndexAttr;
 class BTFDeclTagAttr;
 class BlocksAttr;
@@ -168,6 +171,7 @@ class NSErrorDomainAttr;
 class NSReturnsAutoreleasedAttr;
 class NSReturnsNotRetainedAttr;
 class NSReturnsRetainedAttr;
+class NVPTXKernelAttr;
 class NakedAttr;
 class NoAliasAttr;
 class NoCommonAttr;
@@ -301,6 +305,7 @@ class TypeTagForDatatypeAttr;
 class TypeVisibilityAttr;
 class UnavailableAttr;
 class UninitializedAttr;
+class UnsafeBufferUsageAttr;
 class UnusedAttr;
 class UseHandleAttr;
 class UsedAttr;
@@ -323,18 +328,23 @@ class X86ForceAlignArgPointerAttr;
 class XRayInstrumentAttr;
 class XRayLogArgsAttr;
 class ZeroCallUsedRegsAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class InheritableAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<InheritableAttr> in(const Fragment &frag);
-  static gap::generator<InheritableAttr> in(const File &file);
   static gap::generator<InheritableAttr> in(const Index &index);
   static gap::generator<InheritableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<InheritableAttr> by_id(const Index &, EntityId);
+  static gap::generator<InheritableAttr> in(const Fragment &frag);
+  static gap::generator<InheritableAttr> in(const File &file);
 
   static std::optional<InheritableAttr> from(const Attr &parent);
 

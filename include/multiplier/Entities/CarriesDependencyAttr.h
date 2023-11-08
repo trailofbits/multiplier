@@ -18,6 +18,11 @@ class CarriesDependencyAttr;
 class InheritableAttr;
 class InheritableParamAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CarriesDependencyAttr : public InheritableParamAttr {
  private:
@@ -26,12 +31,12 @@ class CarriesDependencyAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<CarriesDependencyAttr> in(const Fragment &frag);
-  static gap::generator<CarriesDependencyAttr> in(const File &file);
   static gap::generator<CarriesDependencyAttr> in(const Index &index);
   static gap::generator<CarriesDependencyAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CarriesDependencyAttr> by_id(const Index &, EntityId);
+  static gap::generator<CarriesDependencyAttr> in(const Fragment &frag);
+  static gap::generator<CarriesDependencyAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CARRIES_DEPENDENCY;

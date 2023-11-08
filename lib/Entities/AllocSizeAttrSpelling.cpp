@@ -17,7 +17,7 @@ const char *EnumeratorName(AllocSizeAttrSpelling e) {
   switch (e) {
     case AllocSizeAttrSpelling::GNU_ALLOC_SIZE: return "GNU_ALLOC_SIZE";
     case AllocSizeAttrSpelling::CXX11_GNU_ALLOC_SIZE: return "CXX11_GNU_ALLOC_SIZE";
-    case AllocSizeAttrSpelling::C2X_GNU_ALLOC_SIZE: return "C2X_GNU_ALLOC_SIZE";
+    case AllocSizeAttrSpelling::C23_GNU_ALLOC_SIZE: return "C23_GNU_ALLOC_SIZE";
     case AllocSizeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

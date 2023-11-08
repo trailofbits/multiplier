@@ -59,6 +59,15 @@ IndexStatus Index::status(bool block) const {
   }
 }
 
+// Create an in-memory caching index provider.
+Index Index::in_memory_cache(Index next, unsigned timeout_s) {
+  return EntityProvider::CreateInMemoryCache(std::move(next.impl), timeout_s);
+}
+
+Index Index::from_database(std::filesystem::path path) {
+  return EntityProvider::CreateFromDatabase(std::move(path));
+}
+
 Index Index::containing(const Fragment &fragment) {
   return Index(fragment.impl->ep);
 }
@@ -92,12 +101,8 @@ Index Index::containing(const Designator &entity) {
 }
 
 std::optional<Index> Index::containing(const Token &entity) {
-  if (auto frag = entity.impl->OwningFragment()) {
-    return Index(frag->ep);
-
-  } else if (auto file = entity.impl->OwningFile()) {
-    return Index(file->ep);
-
+  if (EntityProviderPtr ep = TokenReader::EntityProviderFor(entity)) {
+    return Index(std::move(ep));
   } else {
     return std::nullopt;
   }
@@ -131,8 +136,13 @@ FilePathMap Index::file_paths(void) const {
   return impl->ListFiles(impl);
 }
 
+// Generate all compilation units in the index.
+gap::generator<Compilation> Index::compilations(void) const & {
+  co_return;  // TODO(pag): Implement me!
+}
+
 gap::generator<File> Index::files(void) const & {
-  std::vector<SpecificEntityId<FileId>> file_ids;
+  std::vector<PackedFileId> file_ids;
   auto file_paths = impl->ListFiles(impl);
   file_ids.reserve(file_paths.size());
   for (const auto &[path, file_id] : file_paths) {
@@ -153,14 +163,16 @@ gap::generator<File> Index::files(void) const & {
 
 #define MX_DEFINE_GETTER(type_name, lower_name, enum_name, category) \
   std::optional<type_name> Index::lower_name(RawEntityId id) const { \
-    if (type_name ## ImplPtr ptr = impl->type_name ## For(impl, id)) { \
-      return type_name(std::move(ptr)); \
-    } else { \
-      return std::nullopt; \
+    if (CategoryFromEntityId(id) == EntityCategory::enum_name) { \
+      if (type_name ## ImplPtr ptr = impl->type_name ## For(impl, id)) { \
+        return type_name(std::move(ptr)); \
+      } \
     } \
+    return std::nullopt; \
   }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DEFINE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DEFINE_GETTER, MX_DEFINE_GETTER,
                             MX_DEFINE_GETTER, MX_DEFINE_GETTER,
                             MX_DEFINE_GETTER)
 #undef MX_DEFINE_GETTER
@@ -241,6 +253,7 @@ VariantEntity Index::entity(EntityId eid) const {
       assert(false);
 
     MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY,
+                                MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
                                 MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
                                 MX_DISPATCH_GETTER)
 #undef MX_DISPATCH_GETTER

@@ -21,6 +21,11 @@ class Stmt;
 class TemplateArgument;
 class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class SizeOfPackExpr : public Expr {
  private:
@@ -29,12 +34,12 @@ class SizeOfPackExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<SizeOfPackExpr> in(const Fragment &frag);
-  static gap::generator<SizeOfPackExpr> in(const File &file);
   static gap::generator<SizeOfPackExpr> in(const Index &index);
   static gap::generator<SizeOfPackExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SizeOfPackExpr> by_id(const Index &, EntityId);
+  static gap::generator<SizeOfPackExpr> in(const Fragment &frag);
+  static gap::generator<SizeOfPackExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SIZE_OF_PACK_EXPR;
@@ -64,7 +69,7 @@ class SizeOfPackExpr : public Expr {
 
   Token operator_token(void) const;
   NamedDecl pack(void) const;
-  std::optional<unsigned> pack_length(void) const;
+  std::optional<uint32_t> pack_length(void) const;
   Token pack_token(void) const;
   std::optional<std::vector<TemplateArgument>> partial_arguments(void) const;
   Token r_paren_token(void) const;

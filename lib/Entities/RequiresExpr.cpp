@@ -16,7 +16,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<RequiresExpr> RequiresExpr::containing(const std::optional<Stmt> 
 
 bool RequiresExpr::contains(const Decl &decl) {
   for (auto &parent : RequiresExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool RequiresExpr::contains(const Stmt &stmt) {
   for (auto &parent : RequiresExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -112,7 +112,7 @@ std::optional<RequiresExpr> RequiresExpr::from(const Stmt &parent) {
 }
 
 gap::generator<RequiresExpr> RequiresExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kRequiresExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<RequiresExpr> e = RequiresExpr::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<RequiresExpr> RequiresExpr::in(const Index &index) {
 }
 
 gap::generator<RequiresExpr> RequiresExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kRequiresExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<RequiresExpr> RequiresExpr::in(const Fragment &frag) {
 }
 
 gap::generator<RequiresExpr> RequiresExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kRequiresExprDerivedKinds) {
@@ -157,7 +157,7 @@ std::optional<RequiresExpr> RequiresExpr::from(const TokenContext &t) {
 }
 
 RequiresExprBodyDecl RequiresExpr::body(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return RequiresExprBodyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
@@ -170,7 +170,7 @@ std::optional<ParmVarDecl> RequiresExpr::nth_local_parameter(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -181,7 +181,7 @@ std::optional<ParmVarDecl> RequiresExpr::nth_local_parameter(unsigned n) const {
 
 gap::generator<ParmVarDecl> RequiresExpr::local_parameters(void) const & {
   auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->DeclFor(ep, v)) {
@@ -194,11 +194,11 @@ gap::generator<ParmVarDecl> RequiresExpr::local_parameters(void) const & {
 }
 
 Token RequiresExpr::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token RequiresExpr::requires_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 bool RequiresExpr::is_satisfied(void) const {

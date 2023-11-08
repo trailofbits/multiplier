@@ -20,6 +20,11 @@ class Expr;
 class InheritableAttr;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AlignedAttr : public InheritableAttr {
  private:
@@ -27,12 +32,12 @@ class AlignedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<AlignedAttr> in(const Fragment &frag);
-  static gap::generator<AlignedAttr> in(const File &file);
   static gap::generator<AlignedAttr> in(const Index &index);
   static gap::generator<AlignedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AlignedAttr> by_id(const Index &, EntityId);
+  static gap::generator<AlignedAttr> in(const Fragment &frag);
+  static gap::generator<AlignedAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALIGNED;
@@ -53,6 +58,7 @@ class AlignedAttr : public InheritableAttr {
 
   std::optional<Expr> alignment_expression(void) const;
   std::optional<Type> alignment_type(void) const;
+  std::optional<uint32_t> cached_alignment_value(void) const;
   AlignedAttrSpelling semantic_spelling(void) const;
   bool is_alignas(void) const;
   bool is_alignment_dependent(void) const;

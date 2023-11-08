@@ -16,7 +16,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<UsingEnumDecl> UsingEnumDecl::containing(const std::optional<Stmt
 
 bool UsingEnumDecl::contains(const Decl &decl) {
   for (auto &parent : UsingEnumDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UsingEnumDecl::contains(const Stmt &stmt) {
   for (auto &parent : UsingEnumDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -138,7 +138,7 @@ std::optional<UsingEnumDecl> UsingEnumDecl::from(const Decl &parent) {
 }
 
 gap::generator<UsingEnumDecl> UsingEnumDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kUsingEnumDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<UsingEnumDecl> e = UsingEnumDecl::from(Decl(std::move(eptr)))) {
@@ -149,7 +149,7 @@ gap::generator<UsingEnumDecl> UsingEnumDecl::in(const Index &index) {
 }
 
 gap::generator<UsingEnumDecl> UsingEnumDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kUsingEnumDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -161,7 +161,7 @@ gap::generator<UsingEnumDecl> UsingEnumDecl::in(const Fragment &frag) {
 }
 
 gap::generator<UsingEnumDecl> UsingEnumDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kUsingEnumDeclDerivedKinds) {
@@ -183,21 +183,21 @@ std::optional<UsingEnumDecl> UsingEnumDecl::from(const TokenContext &t) {
 }
 
 EnumDecl UsingEnumDecl::enum_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal56();
   return EnumDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token UsingEnumDecl::enum_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
 }
 
 Type UsingEnumDecl::enum_type(void) const {
-  RawEntityId eid = impl->reader.getVal56();
+  RawEntityId eid = impl->reader.getVal58();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token UsingEnumDecl::using_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 #pragma GCC diagnostic pop

@@ -20,6 +20,11 @@ class OMPLoopDirective;
 class OMPTargetTeamsDistributeDirective;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPTargetTeamsDistributeDirective : public OMPLoopDirective {
  private:
@@ -29,12 +34,12 @@ class OMPTargetTeamsDistributeDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPTargetTeamsDistributeDirective> in(const Fragment &frag);
-  static gap::generator<OMPTargetTeamsDistributeDirective> in(const File &file);
   static gap::generator<OMPTargetTeamsDistributeDirective> in(const Index &index);
   static gap::generator<OMPTargetTeamsDistributeDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPTargetTeamsDistributeDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPTargetTeamsDistributeDirective> in(const Fragment &frag);
+  static gap::generator<OMPTargetTeamsDistributeDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_DIRECTIVE;

@@ -18,6 +18,11 @@ class Attr;
 class InheritableAttr;
 class Token;
 class UnusedAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UnusedAttr : public InheritableAttr {
  private:
@@ -25,12 +30,12 @@ class UnusedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<UnusedAttr> in(const Fragment &frag);
-  static gap::generator<UnusedAttr> in(const File &file);
   static gap::generator<UnusedAttr> in(const Index &index);
   static gap::generator<UnusedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UnusedAttr> by_id(const Index &, EntityId);
+  static gap::generator<UnusedAttr> in(const Fragment &frag);
+  static gap::generator<UnusedAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::UNUSED;

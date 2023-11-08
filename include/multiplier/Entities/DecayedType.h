@@ -17,6 +17,11 @@ class AdjustedType;
 class DecayedType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DecayedType : public AdjustedType {
  private:
@@ -24,8 +29,6 @@ class DecayedType : public AdjustedType {
   friend class AdjustedType;
   friend class Type;
  public:
-  static gap::generator<DecayedType> in(const Fragment &frag);
-  static gap::generator<DecayedType> in(const File &file);
   static gap::generator<DecayedType> in(const Index &index);
   static gap::generator<DecayedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -48,6 +51,7 @@ class DecayedType : public AdjustedType {
   static std::optional<DecayedType> from(const Reference &r);
   static std::optional<DecayedType> from(const TokenContext &t);
 
+  Type pointee_type(void) const;
 };
 
 static_assert(sizeof(DecayedType) == sizeof(AdjustedType));

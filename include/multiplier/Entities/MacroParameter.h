@@ -16,6 +16,11 @@ class Index;
 class Macro;
 class MacroParameter;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MacroParameter : public Macro {
  private:
@@ -53,7 +58,7 @@ class MacroParameter : public Macro {
 
   Token variadic_dots(void) const;
   Token name(void) const;
-  unsigned index(void) const;
+  uint32_t index(void) const;
 };
 
 static_assert(sizeof(MacroParameter) == sizeof(Macro));

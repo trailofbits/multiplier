@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<UsingShadowDecl> UsingShadowDecl::containing(const std::optional<
 
 bool UsingShadowDecl::contains(const Decl &decl) {
   for (auto &parent : UsingShadowDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UsingShadowDecl::contains(const Stmt &stmt) {
   for (auto &parent : UsingShadowDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -139,7 +139,7 @@ std::optional<UsingShadowDecl> UsingShadowDecl::from(const Decl &parent) {
 }
 
 gap::generator<UsingShadowDecl> UsingShadowDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kUsingShadowDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<UsingShadowDecl> e = UsingShadowDecl::from(Decl(std::move(eptr)))) {
@@ -150,7 +150,7 @@ gap::generator<UsingShadowDecl> UsingShadowDecl::in(const Index &index) {
 }
 
 gap::generator<UsingShadowDecl> UsingShadowDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kUsingShadowDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -162,7 +162,7 @@ gap::generator<UsingShadowDecl> UsingShadowDecl::in(const Fragment &frag) {
 }
 
 gap::generator<UsingShadowDecl> UsingShadowDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kUsingShadowDeclDerivedKinds) {
@@ -184,13 +184,13 @@ std::optional<UsingShadowDecl> UsingShadowDecl::from(const TokenContext &t) {
 }
 
 BaseUsingDecl UsingShadowDecl::introducer(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal56();
   return BaseUsingDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<UsingShadowDecl> UsingShadowDecl::next_using_shadow_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal55();
+    RawEntityId eid = impl->reader.getVal57();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -202,7 +202,7 @@ std::optional<UsingShadowDecl> UsingShadowDecl::next_using_shadow_declaration(vo
 }
 
 NamedDecl UsingShadowDecl::target_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal56();
+  RawEntityId eid = impl->reader.getVal58();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

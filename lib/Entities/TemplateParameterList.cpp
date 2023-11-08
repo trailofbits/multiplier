@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Reference.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../File.h"
 #include "../Fragment.h"
 #include "../TemplateParameterList.h"
@@ -45,7 +45,7 @@ std::optional<TemplateParameterList> TemplateParameterList::from(const TokenCont
   return t.as_template_parameter_list();
 }
 
-unsigned TemplateParameterList::depth(void) const {
+uint32_t TemplateParameterList::depth(void) const {
   return impl->reader.getVal0();
 }
 
@@ -83,9 +83,7 @@ Token TemplateParameterList::right_angle_token(void) const {
 }
 
 TokenRange TemplateParameterList::tokens(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal7(), impl->reader.getVal8());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal7(), impl->reader.getVal8());
 }
 
 unsigned TemplateParameterList::num_parameters(void) const {
@@ -97,7 +95,7 @@ std::optional<NamedDecl> TemplateParameterList::nth_parameter(unsigned n) const 
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -108,7 +106,7 @@ std::optional<NamedDecl> TemplateParameterList::nth_parameter(unsigned n) const 
 
 gap::generator<NamedDecl> TemplateParameterList::parameters(void) const & {
   auto list = impl->reader.getVal9();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d9 = ep->DeclFor(ep, v)) {

@@ -17,14 +17,17 @@ class CXXRecordDecl;
 class MemberPointerType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MemberPointerType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<MemberPointerType> in(const Fragment &frag);
-  static gap::generator<MemberPointerType> in(const File &file);
   static gap::generator<MemberPointerType> in(const Index &index);
   static gap::generator<MemberPointerType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -50,6 +53,7 @@ class MemberPointerType : public Type {
   Type desugar(void) const;
   Type class_(void) const;
   CXXRecordDecl most_recent_cxx_record_declaration(void) const;
+  Type pointee_type(void) const;
   bool is_member_data_pointer(void) const;
   bool is_member_function_pointer(void) const;
   bool is_sugared(void) const;

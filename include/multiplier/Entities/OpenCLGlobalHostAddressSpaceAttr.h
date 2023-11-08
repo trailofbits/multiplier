@@ -17,6 +17,11 @@ class Attr;
 class OpenCLGlobalHostAddressSpaceAttr;
 class Token;
 class TypeAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OpenCLGlobalHostAddressSpaceAttr : public TypeAttr {
  private:
@@ -24,12 +29,12 @@ class OpenCLGlobalHostAddressSpaceAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  static gap::generator<OpenCLGlobalHostAddressSpaceAttr> in(const Fragment &frag);
-  static gap::generator<OpenCLGlobalHostAddressSpaceAttr> in(const File &file);
   static gap::generator<OpenCLGlobalHostAddressSpaceAttr> in(const Index &index);
   static gap::generator<OpenCLGlobalHostAddressSpaceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OpenCLGlobalHostAddressSpaceAttr> by_id(const Index &, EntityId);
+  static gap::generator<OpenCLGlobalHostAddressSpaceAttr> in(const Fragment &frag);
+  static gap::generator<OpenCLGlobalHostAddressSpaceAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE;

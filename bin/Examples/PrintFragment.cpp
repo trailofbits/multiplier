@@ -10,11 +10,11 @@
 
 #include "Index.h"
 #include <multiplier/AST.h>
+#include <multiplier/TokenTree.h>
 
 DEFINE_uint64(fragment_id, 0, "ID of the fragment to print");
-DEFINE_bool(unparsed, false, "Show original source code?");
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
@@ -32,42 +32,51 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  // Print our the tokens of this fragment as they appear in the file.
-  if (FLAGS_unparsed) {
-    RenderFragment(std::cout, *fragment, mx::TokenRange(), "", true);
+  std::cout << "Parsed data from tokens:";
 
-  // Print out the tokens of this fragment that were actually parsed. These
-  // are post-macro expansion tokens, and generally don't include whitespace
-  // or comments. There can be empty tokens, however.
-  } else {
-
-    std::cout << "Parsed data from tokens:";
-
-    for (mx::Token token : fragment->parsed_tokens()) {
-      std::cout
-          << '\n' << token.id()
-          << '\t' << token.related_entity_id()
-          << '\t' << mx::EnumeratorName(token.kind())
-          << '\t' << mx::EnumeratorName(token.category())
-          << '\t' << token.data();
-    }
-
-    std::cout << "\n\n\nParsed data from token range:\n";
-    std::cout << fragment->parsed_tokens().data();
-
-    std::cout << "\n\n\nFile data from parsed token range:\n";
-    std::cout << fragment->parsed_tokens().file_tokens().data();
-
-    std::cout << "\n\nFile data from tokens:\n";
-    for (mx::Token token : fragment->file_tokens()) {
-      std::cout << token.data();
-    }
-
-    std::cout << "\n\nFile data from file token range:\n";
-    std::cout << fragment->file_tokens().data();
-
-    std::cout << '\n';
+  for (mx::Token token : fragment->parsed_tokens()) {
+    std::cout
+        << '\n' << token.id()
+        << '\t' << token.related_entity_id()
+        << '\t' << mx::EnumeratorName(token.kind())
+        << '\t' << mx::EnumeratorName(token.category())
+        << '\t' << token.data();
   }
+
+  std::cout << "\n\n\nParsed data from token range:\n";
+  std::cout << fragment->parsed_tokens().data();
+
+  std::cout << "\n\n\nFile data from parsed token range:\n";
+  std::cout << fragment->parsed_tokens().file_tokens().data();
+
+  std::cout << "\n\nFile data from tokens:\n";
+  for (mx::Token token : fragment->file_tokens()) {
+    std::cout
+        << '\n' << token.id()
+        << '\t' << mx::kInvalidEntityId
+        << '\t' << mx::EnumeratorName(token.kind())
+        << '\t' << mx::EnumeratorName(token.category())
+        << '\t' << token.data();
+  }
+
+  std::cout << "\n\nFile data from file token range:\n";
+  std::cout << fragment->file_tokens().data();
+
+  std::cout << "\n\nFused data from file and fragment token ranges:\n";
+  mx::TokenTree tt = mx::TokenTree::from(fragment.value());
+  mx::TokenRange fused_tokens = tt.serialize();
+  std::cout << fused_tokens.data();
+
+  std::cout << "\n\nFused data from file and fragment token ranges:\n";
+  for (mx::Token token : fused_tokens) {
+    std::cout
+        << '\n' << token.id()
+        << '\t' << token.related_entity_id()
+        << '\t' << mx::EnumeratorName(token.kind())
+        << '\t' << mx::EnumeratorName(token.category())
+        << '\t' << token.data();
+  }
+  std::cout << '\n';
 
   return EXIT_SUCCESS;
 }

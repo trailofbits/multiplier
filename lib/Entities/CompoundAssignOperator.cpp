@@ -16,7 +16,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<CompoundAssignOperator> CompoundAssignOperator::containing(const 
 
 bool CompoundAssignOperator::contains(const Decl &decl) {
   for (auto &parent : CompoundAssignOperator::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CompoundAssignOperator::contains(const Stmt &stmt) {
   for (auto &parent : CompoundAssignOperator::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -112,7 +112,7 @@ std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const Stmt &p
 }
 
 gap::generator<CompoundAssignOperator> CompoundAssignOperator::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCompoundAssignOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CompoundAssignOperator> e = CompoundAssignOperator::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<CompoundAssignOperator> CompoundAssignOperator::in(const Index &i
 }
 
 gap::generator<CompoundAssignOperator> CompoundAssignOperator::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCompoundAssignOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<CompoundAssignOperator> CompoundAssignOperator::in(const Fragment
 }
 
 gap::generator<CompoundAssignOperator> CompoundAssignOperator::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCompoundAssignOperatorDerivedKinds) {
@@ -157,12 +157,12 @@ std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const TokenCo
 }
 
 Type CompoundAssignOperator::computation_lhs_type(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type CompoundAssignOperator::computation_result_type(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal41();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

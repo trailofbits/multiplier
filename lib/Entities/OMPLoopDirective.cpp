@@ -50,7 +50,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -110,14 +110,14 @@ gap::generator<OMPLoopDirective> OMPLoopDirective::containing(const std::optiona
 
 bool OMPLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPLoopDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPLoopDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -214,7 +214,7 @@ std::optional<OMPLoopDirective> OMPLoopDirective::from(const Stmt &parent) {
 }
 
 gap::generator<OMPLoopDirective> OMPLoopDirective::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPLoopDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPLoopDirective> e = OMPLoopDirective::from(Stmt(std::move(eptr)))) {
@@ -225,7 +225,7 @@ gap::generator<OMPLoopDirective> OMPLoopDirective::in(const Index &index) {
 }
 
 gap::generator<OMPLoopDirective> OMPLoopDirective::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPLoopDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -237,7 +237,7 @@ gap::generator<OMPLoopDirective> OMPLoopDirective::in(const Fragment &frag) {
 }
 
 gap::generator<OMPLoopDirective> OMPLoopDirective::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPLoopDirectiveDerivedKinds) {
@@ -267,7 +267,7 @@ std::optional<Expr> OMPLoopDirective::nth_counter(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -278,7 +278,7 @@ std::optional<Expr> OMPLoopDirective::nth_counter(unsigned n) const {
 
 gap::generator<Expr> OMPLoopDirective::counters(void) const & {
   auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
@@ -299,7 +299,7 @@ std::optional<Expr> OMPLoopDirective::nth_dependent_counter(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -310,7 +310,7 @@ std::optional<Expr> OMPLoopDirective::nth_dependent_counter(unsigned n) const {
 
 gap::generator<Expr> OMPLoopDirective::dependent_counters(void) const & {
   auto list = impl->reader.getVal26();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d26 = ep->StmtFor(ep, v)) {
@@ -331,7 +331,7 @@ std::optional<Expr> OMPLoopDirective::nth_dependent_initializer(unsigned n) cons
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -342,7 +342,7 @@ std::optional<Expr> OMPLoopDirective::nth_dependent_initializer(unsigned n) cons
 
 gap::generator<Expr> OMPLoopDirective::dependent_initializers(void) const & {
   auto list = impl->reader.getVal27();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d27 = ep->StmtFor(ep, v)) {
@@ -363,7 +363,7 @@ std::optional<Expr> OMPLoopDirective::nth_final(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -374,7 +374,7 @@ std::optional<Expr> OMPLoopDirective::nth_final(unsigned n) const {
 
 gap::generator<Expr> OMPLoopDirective::finals(void) const & {
   auto list = impl->reader.getVal28();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d28 = ep->StmtFor(ep, v)) {
@@ -395,7 +395,7 @@ std::optional<Expr> OMPLoopDirective::nth_finals_condition(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -406,7 +406,7 @@ std::optional<Expr> OMPLoopDirective::nth_finals_condition(unsigned n) const {
 
 gap::generator<Expr> OMPLoopDirective::finals_conditions(void) const & {
   auto list = impl->reader.getVal29();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d29 = ep->StmtFor(ep, v)) {
@@ -572,7 +572,7 @@ std::optional<Expr> OMPLoopDirective::nth_initializer(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -583,7 +583,7 @@ std::optional<Expr> OMPLoopDirective::nth_initializer(unsigned n) const {
 
 gap::generator<Expr> OMPLoopDirective::initializers(void) const & {
   auto list = impl->reader.getVal52();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d52 = ep->StmtFor(ep, v)) {
@@ -604,7 +604,7 @@ std::optional<Expr> OMPLoopDirective::nth_private_counter(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -615,7 +615,7 @@ std::optional<Expr> OMPLoopDirective::nth_private_counter(unsigned n) const {
 
 gap::generator<Expr> OMPLoopDirective::private_counters(void) const & {
   auto list = impl->reader.getVal53();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d53 = ep->StmtFor(ep, v)) {
@@ -636,7 +636,7 @@ std::optional<Expr> OMPLoopDirective::nth_update(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -647,7 +647,7 @@ std::optional<Expr> OMPLoopDirective::nth_update(unsigned n) const {
 
 gap::generator<Expr> OMPLoopDirective::updates(void) const & {
   auto list = impl->reader.getVal54();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d54 = ep->StmtFor(ep, v)) {

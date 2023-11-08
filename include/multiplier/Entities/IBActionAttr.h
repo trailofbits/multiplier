@@ -17,6 +17,11 @@ class Attr;
 class IBActionAttr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class IBActionAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class IBActionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<IBActionAttr> in(const Fragment &frag);
-  static gap::generator<IBActionAttr> in(const File &file);
   static gap::generator<IBActionAttr> in(const Index &index);
   static gap::generator<IBActionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<IBActionAttr> by_id(const Index &, EntityId);
+  static gap::generator<IBActionAttr> in(const Fragment &frag);
+  static gap::generator<IBActionAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::IB_ACTION;

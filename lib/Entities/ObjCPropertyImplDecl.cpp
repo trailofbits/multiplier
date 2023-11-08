@@ -16,7 +16,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::containing(const std:
 
 bool ObjCPropertyImplDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCPropertyImplDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCPropertyImplDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCPropertyImplDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -138,7 +138,7 @@ std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::from(const Decl &paren
 }
 
 gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCPropertyImplDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ObjCPropertyImplDecl> e = ObjCPropertyImplDecl::from(Decl(std::move(eptr)))) {
@@ -149,7 +149,7 @@ gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::in(const Index &index
 }
 
 gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCPropertyImplDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -161,7 +161,7 @@ gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::in(const Fragment &fr
 }
 
 gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCPropertyImplDeclDerivedKinds) {
@@ -183,45 +183,45 @@ std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::from(const TokenContex
 }
 
 Expr ObjCPropertyImplDecl::getter_cxx_constructor(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal49();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ObjCMethodDecl ObjCPropertyImplDecl::getter_method_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal56();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCPropertyDecl ObjCPropertyImplDecl::property_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal55();
+  RawEntityId eid = impl->reader.getVal57();
   return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCPropertyImplDeclKind ObjCPropertyImplDecl::property_implementation(void) const {
-  return static_cast<ObjCPropertyImplDeclKind>(impl->reader.getVal63());
+  return static_cast<ObjCPropertyImplDeclKind>(impl->reader.getVal65());
 }
 
 ObjCIvarDecl ObjCPropertyImplDecl::property_instance_variable_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal56();
+  RawEntityId eid = impl->reader.getVal58();
   return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCPropertyImplDecl::property_instance_variable_declaration_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 Expr ObjCPropertyImplDecl::setter_cxx_assignment(void) const {
-  RawEntityId eid = impl->reader.getVal65();
+  RawEntityId eid = impl->reader.getVal67();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ObjCMethodDecl ObjCPropertyImplDecl::setter_method_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal66();
+  RawEntityId eid = impl->reader.getVal68();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool ObjCPropertyImplDecl::is_instance_variable_name_specified(void) const {
-  return impl->reader.getVal48();
+  return impl->reader.getVal50();
 }
 
 #pragma GCC diagnostic pop

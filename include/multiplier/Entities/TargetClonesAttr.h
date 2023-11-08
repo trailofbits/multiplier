@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class TargetClonesAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TargetClonesAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class TargetClonesAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<TargetClonesAttr> in(const Fragment &frag);
-  static gap::generator<TargetClonesAttr> in(const File &file);
   static gap::generator<TargetClonesAttr> in(const Index &index);
   static gap::generator<TargetClonesAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TargetClonesAttr> by_id(const Index &, EntityId);
+  static gap::generator<TargetClonesAttr> in(const Fragment &frag);
+  static gap::generator<TargetClonesAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TARGET_CLONES;

@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/VarDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<ReturnStmt> ReturnStmt::containing(const std::optional<Stmt> &stm
 
 bool ReturnStmt::contains(const Decl &decl) {
   for (auto &parent : ReturnStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ReturnStmt::contains(const Stmt &stmt) {
   for (auto &parent : ReturnStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<ReturnStmt> ReturnStmt::from(const Stmt &parent) {
 }
 
 gap::generator<ReturnStmt> ReturnStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kReturnStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ReturnStmt> e = ReturnStmt::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<ReturnStmt> ReturnStmt::in(const Index &index) {
 }
 
 gap::generator<ReturnStmt> ReturnStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kReturnStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<ReturnStmt> ReturnStmt::in(const Fragment &frag) {
 }
 
 gap::generator<ReturnStmt> ReturnStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kReturnStmtDerivedKinds) {

@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<OMPDeclareReductionDecl> OMPDeclareReductionDecl::containing(cons
 
 bool OMPDeclareReductionDecl::contains(const Decl &decl) {
   for (auto &parent : OMPDeclareReductionDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPDeclareReductionDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPDeclareReductionDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -137,7 +137,7 @@ std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const Decl 
 }
 
 gap::generator<OMPDeclareReductionDecl> OMPDeclareReductionDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kOMPDeclareReductionDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<OMPDeclareReductionDecl> e = OMPDeclareReductionDecl::from(Decl(std::move(eptr)))) {
@@ -148,7 +148,7 @@ gap::generator<OMPDeclareReductionDecl> OMPDeclareReductionDecl::in(const Index 
 }
 
 gap::generator<OMPDeclareReductionDecl> OMPDeclareReductionDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kOMPDeclareReductionDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -160,7 +160,7 @@ gap::generator<OMPDeclareReductionDecl> OMPDeclareReductionDecl::in(const Fragme
 }
 
 gap::generator<OMPDeclareReductionDecl> OMPDeclareReductionDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kOMPDeclareReductionDeclDerivedKinds) {
@@ -182,42 +182,42 @@ std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const Token
 }
 
 Expr OMPDeclareReductionDecl::combiner(void) const {
-  RawEntityId eid = impl->reader.getVal56();
+  RawEntityId eid = impl->reader.getVal58();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPDeclareReductionDecl::combiner_in(void) const {
-  RawEntityId eid = impl->reader.getVal64();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-Expr OMPDeclareReductionDecl::combiner_out(void) const {
-  RawEntityId eid = impl->reader.getVal65();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-Expr OMPDeclareReductionDecl::initializer_original(void) const {
   RawEntityId eid = impl->reader.getVal66();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
+Expr OMPDeclareReductionDecl::combiner_out(void) const {
+  RawEntityId eid = impl->reader.getVal67();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
+Expr OMPDeclareReductionDecl::initializer_original(void) const {
+  RawEntityId eid = impl->reader.getVal68();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
 Expr OMPDeclareReductionDecl::initializer_private(void) const {
-  RawEntityId eid = impl->reader.getVal76();
+  RawEntityId eid = impl->reader.getVal78();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPDeclareReductionDecl::initializer(void) const {
-  RawEntityId eid = impl->reader.getVal77();
+  RawEntityId eid = impl->reader.getVal79();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 OMPDeclareReductionDeclInitKind OMPDeclareReductionDecl::initializer_kind(void) const {
-  return static_cast<OMPDeclareReductionDeclInitKind>(impl->reader.getVal78());
+  return static_cast<OMPDeclareReductionDeclInitKind>(impl->reader.getVal80());
 }
 
 gap::generator<Decl> OMPDeclareReductionDecl::declarations_in_context(void) const & {
-  EntityProvider::Ptr ep = impl->ep;
-  auto list = impl->reader.getVal49();
+  EntityProviderPtr ep = impl->ep;
+  auto list = impl->reader.getVal51();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

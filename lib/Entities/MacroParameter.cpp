@@ -11,7 +11,7 @@
 #include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Macro.h"
 
 namespace mx {
@@ -75,7 +75,7 @@ std::optional<MacroParameter> MacroParameter::from(const Macro &parent) {
 }
 
 gap::generator<MacroParameter> MacroParameter::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroKind k : kMacroParameterDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
       if (std::optional<MacroParameter> e = MacroParameter::from(Macro(std::move(eptr)))) {
@@ -86,7 +86,7 @@ gap::generator<MacroParameter> MacroParameter::in(const Index &index) {
 }
 
 gap::generator<MacroParameter> MacroParameter::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (MacroKind k : kMacroParameterDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
@@ -98,7 +98,7 @@ gap::generator<MacroParameter> MacroParameter::in(const Fragment &frag) {
 }
 
 gap::generator<MacroParameter> MacroParameter::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (MacroKind k : kMacroParameterDerivedKinds) {
@@ -132,7 +132,7 @@ Token MacroParameter::variadic_dots(void) const {
 
 Token MacroParameter::name(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal8();
+    RawEntityId eid = impl->reader.getVal6();
     if (eid == kInvalidEntityId) {
       return Token();
     }
@@ -141,8 +141,8 @@ Token MacroParameter::name(void) const {
   return Token();
 }
 
-unsigned MacroParameter::index(void) const {
-  return impl->reader.getVal9();
+uint32_t MacroParameter::index(void) const {
+  return impl->reader.getVal12();
 }
 
 #pragma GCC diagnostic pop

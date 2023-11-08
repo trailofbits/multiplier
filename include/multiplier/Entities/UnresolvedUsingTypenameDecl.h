@@ -19,6 +19,11 @@ class Stmt;
 class Token;
 class TypeDecl;
 class UnresolvedUsingTypenameDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UnresolvedUsingTypenameDecl : public TypeDecl {
  private:
@@ -27,12 +32,12 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<UnresolvedUsingTypenameDecl> in(const Fragment &frag);
-  static gap::generator<UnresolvedUsingTypenameDecl> in(const File &file);
   static gap::generator<UnresolvedUsingTypenameDecl> in(const Index &index);
   static gap::generator<UnresolvedUsingTypenameDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UnresolvedUsingTypenameDecl> by_id(const Index &, EntityId);
+  static gap::generator<UnresolvedUsingTypenameDecl> in(const Fragment &frag);
+  static gap::generator<UnresolvedUsingTypenameDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_TYPENAME;

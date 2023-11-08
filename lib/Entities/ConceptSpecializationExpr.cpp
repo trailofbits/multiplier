@@ -8,15 +8,17 @@
 
 #include <multiplier/Entities/ConceptSpecializationExpr.h>
 
+#include <multiplier/Entities/ConceptDecl.h>
 #include <multiplier/Entities/Decl.h>
 #include <multiplier/Entities/Expr.h>
 #include <multiplier/Entities/ImplicitConceptSpecializationDecl.h>
+#include <multiplier/Entities/NamedDecl.h>
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/TemplateArgument.h>
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -76,14 +78,14 @@ gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::containing(
 
 bool ConceptSpecializationExpr::contains(const Decl &decl) {
   for (auto &parent : ConceptSpecializationExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ConceptSpecializationExpr::contains(const Stmt &stmt) {
   for (auto &parent : ConceptSpecializationExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -112,7 +114,7 @@ std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const S
 }
 
 gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kConceptSpecializationExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ConceptSpecializationExpr> e = ConceptSpecializationExpr::from(Stmt(std::move(eptr)))) {
@@ -123,7 +125,7 @@ gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::in(const In
 }
 
 gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kConceptSpecializationExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +137,7 @@ gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::in(const Fr
 }
 
 gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kConceptSpecializationExprDerivedKinds) {
@@ -156,8 +158,22 @@ std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const T
   return ConceptSpecializationExpr::from(t.as_statement());
 }
 
-ImplicitConceptSpecializationDecl ConceptSpecializationExpr::specialization_declaration(void) const {
+Token ConceptSpecializationExpr::concept_name_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
+}
+
+NamedDecl ConceptSpecializationExpr::found_declaration(void) const {
   RawEntityId eid = impl->reader.getVal38();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+}
+
+ConceptDecl ConceptSpecializationExpr::named_concept(void) const {
+  RawEntityId eid = impl->reader.getVal39();
+  return ConceptDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+}
+
+ImplicitConceptSpecializationDecl ConceptSpecializationExpr::specialization_declaration(void) const {
+  RawEntityId eid = impl->reader.getVal40();
   return ImplicitConceptSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
@@ -170,7 +186,7 @@ std::optional<TemplateArgument> ConceptSpecializationExpr::nth_template_argument
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TemplateArgumentFor(ep, v);
   if (!e) {
@@ -181,7 +197,7 @@ std::optional<TemplateArgument> ConceptSpecializationExpr::nth_template_argument
 
 gap::generator<TemplateArgument> ConceptSpecializationExpr::template_arguments(void) const & {
   auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->TemplateArgumentFor(ep, v)) {
@@ -191,8 +207,16 @@ gap::generator<TemplateArgument> ConceptSpecializationExpr::template_arguments(v
   co_return;
 }
 
-bool ConceptSpecializationExpr::is_satisfied(void) const {
+Token ConceptSpecializationExpr::template_keyword_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+}
+
+bool ConceptSpecializationExpr::has_explicit_template_arguments(void) const {
   return impl->reader.getVal89();
+}
+
+bool ConceptSpecializationExpr::is_satisfied(void) const {
+  return impl->reader.getVal90();
 }
 
 #pragma GCC diagnostic pop

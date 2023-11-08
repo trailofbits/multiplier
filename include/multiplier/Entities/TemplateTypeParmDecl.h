@@ -20,6 +20,11 @@ class TemplateTypeParmDecl;
 class Token;
 class Type;
 class TypeDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateTypeParmDecl : public TypeDecl {
  private:
@@ -28,12 +33,12 @@ class TemplateTypeParmDecl : public TypeDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<TemplateTypeParmDecl> in(const Fragment &frag);
-  static gap::generator<TemplateTypeParmDecl> in(const File &file);
   static gap::generator<TemplateTypeParmDecl> in(const Index &index);
   static gap::generator<TemplateTypeParmDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TemplateTypeParmDecl> by_id(const Index &, EntityId);
+  static gap::generator<TemplateTypeParmDecl> in(const Fragment &frag);
+  static gap::generator<TemplateTypeParmDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TEMPLATE_TYPE_PARM;

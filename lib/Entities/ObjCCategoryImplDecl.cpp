@@ -16,7 +16,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::containing(const std:
 
 bool ObjCCategoryImplDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCCategoryImplDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCCategoryImplDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCCategoryImplDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -138,7 +138,7 @@ std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const Decl &paren
 }
 
 gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCCategoryImplDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ObjCCategoryImplDecl> e = ObjCCategoryImplDecl::from(Decl(std::move(eptr)))) {
@@ -149,7 +149,7 @@ gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::in(const Index &index
 }
 
 gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCCategoryImplDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -161,7 +161,7 @@ gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::in(const Fragment &fr
 }
 
 gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCCategoryImplDeclDerivedKinds) {
@@ -183,12 +183,12 @@ std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const TokenContex
 }
 
 ObjCCategoryDecl ObjCCategoryImplDecl::category_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal65();
+  RawEntityId eid = impl->reader.getVal67();
   return ObjCCategoryDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCCategoryImplDecl::category_name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal68());
 }
 
 #pragma GCC diagnostic pop

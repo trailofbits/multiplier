@@ -17,18 +17,23 @@ class Decl;
 class RequiresExprBodyDecl;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class RequiresExprBodyDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<RequiresExprBodyDecl> in(const Fragment &frag);
-  static gap::generator<RequiresExprBodyDecl> in(const File &file);
   static gap::generator<RequiresExprBodyDecl> in(const Index &index);
   static gap::generator<RequiresExprBodyDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<RequiresExprBodyDecl> by_id(const Index &, EntityId);
+  static gap::generator<RequiresExprBodyDecl> in(const Fragment &frag);
+  static gap::generator<RequiresExprBodyDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::REQUIRES_EXPR_BODY;

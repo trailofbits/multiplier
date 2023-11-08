@@ -20,6 +20,11 @@ class InitListExpr;
 class Stmt;
 class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class InitListExpr : public Expr {
  private:
@@ -28,12 +33,12 @@ class InitListExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<InitListExpr> in(const Fragment &frag);
-  static gap::generator<InitListExpr> in(const File &file);
   static gap::generator<InitListExpr> in(const Index &index);
   static gap::generator<InitListExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<InitListExpr> by_id(const Index &, EntityId);
+  static gap::generator<InitListExpr> in(const Fragment &frag);
+  static gap::generator<InitListExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::INIT_LIST_EXPR;
@@ -69,6 +74,7 @@ class InitListExpr : public Expr {
   std::optional<InitListExpr> syntactic_form(void) const;
   bool had_array_range_designator(void) const;
   bool has_array_filler(void) const;
+  bool has_designated_initializer(void) const;
   std::optional<Expr> nth_initializer(unsigned n) const;
   unsigned num_initializers(void) const;
   gap::generator<Expr> initializers(void) const &;

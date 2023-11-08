@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Stmt.h"
 
@@ -76,14 +76,14 @@ gap::generator<DesignatedInitExpr> DesignatedInitExpr::containing(const std::opt
 
 bool DesignatedInitExpr::contains(const Decl &decl) {
   for (auto &parent : DesignatedInitExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool DesignatedInitExpr::contains(const Stmt &stmt) {
   for (auto &parent : DesignatedInitExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -112,7 +112,7 @@ std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const Stmt &parent) {
 }
 
 gap::generator<DesignatedInitExpr> DesignatedInitExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kDesignatedInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<DesignatedInitExpr> e = DesignatedInitExpr::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<DesignatedInitExpr> DesignatedInitExpr::in(const Index &index) {
 }
 
 gap::generator<DesignatedInitExpr> DesignatedInitExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kDesignatedInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<DesignatedInitExpr> DesignatedInitExpr::in(const Fragment &frag) 
 }
 
 gap::generator<DesignatedInitExpr> DesignatedInitExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kDesignatedInitExprDerivedKinds) {
@@ -165,7 +165,7 @@ std::optional<Designator> DesignatedInitExpr::nth_designator(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DesignatorFor(ep, v);
   if (!e) {
@@ -176,7 +176,7 @@ std::optional<Designator> DesignatedInitExpr::nth_designator(unsigned n) const {
 
 gap::generator<Designator> DesignatedInitExpr::designators(void) const & {
   auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->DesignatorFor(ep, v)) {
@@ -186,18 +186,16 @@ gap::generator<Designator> DesignatedInitExpr::designators(void) const & {
   co_return;
 }
 
-TokenRange DesignatedInitExpr::designators_source_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal38(), impl->reader.getVal39());
+TokenRange DesignatedInitExpr::designators_tokens(void) const {
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal37(), impl->reader.getVal38());
 }
 
 Token DesignatedInitExpr::equal_or_colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Expr DesignatedInitExpr::initializer(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
@@ -218,7 +216,7 @@ std::optional<Expr> DesignatedInitExpr::nth_sub_expression(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -229,7 +227,7 @@ std::optional<Expr> DesignatedInitExpr::nth_sub_expression(unsigned n) const {
 
 gap::generator<Expr> DesignatedInitExpr::sub_expressions(void) const & {
   auto list = impl->reader.getVal26();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d26 = ep->StmtFor(ep, v)) {

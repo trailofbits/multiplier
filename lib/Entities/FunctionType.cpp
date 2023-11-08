@@ -13,7 +13,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {
@@ -63,37 +63,11 @@ std::optional<FunctionType> FunctionType::from(const Type &parent) {
 }
 
 gap::generator<FunctionType> FunctionType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kFunctionTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<FunctionType> e = FunctionType::from(Type(std::move(eptr)))) {
         co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<FunctionType> FunctionType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kFunctionTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<FunctionType> e = FunctionType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<FunctionType> FunctionType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kFunctionTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<FunctionType> e = FunctionType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
       }
     }
   }
@@ -108,41 +82,41 @@ std::optional<FunctionType> FunctionType::from(const TokenContext &t) {
 }
 
 CallingConv FunctionType::call_conv(void) const {
-  return static_cast<CallingConv>(impl->reader.getVal238());
+  return static_cast<CallingConv>(impl->reader.getVal26());
 }
 
 Type FunctionType::call_result_type(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal17();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool FunctionType::cmse_ns_call_attribute(void) const {
-  return impl->reader.getVal231();
+  return impl->reader.getVal19();
 }
 
 bool FunctionType::has_reg_parm(void) const {
-  return impl->reader.getVal232();
+  return impl->reader.getVal20();
 }
 
 bool FunctionType::no_return_attribute(void) const {
-  return impl->reader.getVal233();
+  return impl->reader.getVal21();
 }
 
 Type FunctionType::return_type(void) const {
-  RawEntityId eid = impl->reader.getVal230();
+  RawEntityId eid = impl->reader.getVal18();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool FunctionType::is_const(void) const {
-  return impl->reader.getVal239();
+  return impl->reader.getVal27();
 }
 
 bool FunctionType::is_restrict(void) const {
-  return impl->reader.getVal240();
+  return impl->reader.getVal28();
 }
 
 bool FunctionType::is_volatile(void) const {
-  return impl->reader.getVal241();
+  return impl->reader.getVal29();
 }
 
 #pragma GCC diagnostic pop

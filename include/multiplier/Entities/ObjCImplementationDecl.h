@@ -22,6 +22,11 @@ class ObjCInterfaceDecl;
 class ObjCIvarDecl;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCImplementationDecl : public ObjCImplDecl {
  private:
@@ -31,12 +36,12 @@ class ObjCImplementationDecl : public ObjCImplDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ObjCImplementationDecl> in(const Fragment &frag);
-  static gap::generator<ObjCImplementationDecl> in(const File &file);
   static gap::generator<ObjCImplementationDecl> in(const Index &index);
   static gap::generator<ObjCImplementationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCImplementationDecl> by_id(const Index &, EntityId);
+  static gap::generator<ObjCImplementationDecl> in(const Fragment &frag);
+  static gap::generator<ObjCImplementationDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_IMPLEMENTATION;

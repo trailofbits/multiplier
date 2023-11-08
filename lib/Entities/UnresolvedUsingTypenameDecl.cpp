@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/TypeDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::contain
 
 bool UnresolvedUsingTypenameDecl::contains(const Decl &decl) {
   for (auto &parent : UnresolvedUsingTypenameDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UnresolvedUsingTypenameDecl::contains(const Stmt &stmt) {
   for (auto &parent : UnresolvedUsingTypenameDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -136,7 +136,7 @@ std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::from(con
 }
 
 gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kUnresolvedUsingTypenameDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<UnresolvedUsingTypenameDecl> e = UnresolvedUsingTypenameDecl::from(Decl(std::move(eptr)))) {
@@ -147,7 +147,7 @@ gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::in(cons
 }
 
 gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kUnresolvedUsingTypenameDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -159,7 +159,7 @@ gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::in(cons
 }
 
 gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kUnresolvedUsingTypenameDeclDerivedKinds) {
@@ -181,19 +181,19 @@ std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::from(con
 }
 
 Token UnresolvedUsingTypenameDecl::ellipsis_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
 }
 
 Token UnresolvedUsingTypenameDecl::typename_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
 }
 
 Token UnresolvedUsingTypenameDecl::using_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 bool UnresolvedUsingTypenameDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal74();
 }
 
 #pragma GCC diagnostic pop

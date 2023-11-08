@@ -17,6 +17,11 @@ class Attr;
 class ConsumableAutoCastAttr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ConsumableAutoCastAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class ConsumableAutoCastAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ConsumableAutoCastAttr> in(const Fragment &frag);
-  static gap::generator<ConsumableAutoCastAttr> in(const File &file);
   static gap::generator<ConsumableAutoCastAttr> in(const Index &index);
   static gap::generator<ConsumableAutoCastAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ConsumableAutoCastAttr> by_id(const Index &, EntityId);
+  static gap::generator<ConsumableAutoCastAttr> in(const Fragment &frag);
+  static gap::generator<ConsumableAutoCastAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CONSUMABLE_AUTO_CAST;

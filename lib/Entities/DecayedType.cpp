@@ -12,7 +12,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {
@@ -60,37 +60,11 @@ std::optional<DecayedType> DecayedType::from(const Type &parent) {
 }
 
 gap::generator<DecayedType> DecayedType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kDecayedTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<DecayedType> e = DecayedType::from(Type(std::move(eptr)))) {
         co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<DecayedType> DecayedType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kDecayedTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<DecayedType> e = DecayedType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<DecayedType> DecayedType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kDecayedTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<DecayedType> e = DecayedType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
       }
     }
   }
@@ -102,6 +76,11 @@ std::optional<DecayedType> DecayedType::from(const Reference &r) {
 
 std::optional<DecayedType> DecayedType::from(const TokenContext &t) {
   return DecayedType::from(t.as_type());
+}
+
+Type DecayedType::pointee_type(void) const {
+  RawEntityId eid = impl->reader.getVal25();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 #pragma GCC diagnostic pop

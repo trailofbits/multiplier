@@ -20,6 +20,11 @@ class RedeclarableTemplateDecl;
 class Stmt;
 class TemplateDecl;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class FunctionTemplateDecl : public RedeclarableTemplateDecl {
  private:
@@ -29,12 +34,12 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<FunctionTemplateDecl> in(const Fragment &frag);
-  static gap::generator<FunctionTemplateDecl> in(const File &file);
   static gap::generator<FunctionTemplateDecl> in(const Index &index);
   static gap::generator<FunctionTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<FunctionTemplateDecl> by_id(const Index &, EntityId);
+  static gap::generator<FunctionTemplateDecl> in(const Fragment &frag);
+  static gap::generator<FunctionTemplateDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FUNCTION_TEMPLATE;

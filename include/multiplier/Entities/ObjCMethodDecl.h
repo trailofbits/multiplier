@@ -27,6 +27,11 @@ class Stmt;
 class Token;
 class TokenRange;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCMethodDecl : public NamedDecl {
  private:
@@ -34,12 +39,12 @@ class ObjCMethodDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ObjCMethodDecl> in(const Fragment &frag);
-  static gap::generator<ObjCMethodDecl> in(const File &file);
   static gap::generator<ObjCMethodDecl> in(const Index &index);
   static gap::generator<ObjCMethodDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCMethodDecl> by_id(const Index &, EntityId);
+  static gap::generator<ObjCMethodDecl> in(const Fragment &frag);
+  static gap::generator<ObjCMethodDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_METHOD;
@@ -79,7 +84,7 @@ class ObjCMethodDecl : public NamedDecl {
   ObjCMethodFamily method_family(void) const;
   DeclObjCDeclQualifier obj_c_decl_qualifier(void) const;
   Type return_type(void) const;
-  TokenRange return_type_source_range(void) const;
+  TokenRange return_type_tokens(void) const;
   Token selector_start_token(void) const;
   ImplicitParamDecl self_declaration(void) const;
   bool has_parameter_destroyed_in_callee(void) const;

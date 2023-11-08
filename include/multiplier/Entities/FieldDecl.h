@@ -25,6 +25,11 @@ class Stmt;
 class Token;
 class ValueDecl;
 class VariableArrayType;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class FieldDecl : public DeclaratorDecl {
  private:
@@ -34,12 +39,12 @@ class FieldDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<FieldDecl> in(const Fragment &frag);
-  static gap::generator<FieldDecl> in(const File &file);
   static gap::generator<FieldDecl> in(const Index &index);
   static gap::generator<FieldDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<FieldDecl> by_id(const Index &, EntityId);
+  static gap::generator<FieldDecl> in(const Fragment &frag);
+  static gap::generator<FieldDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FIELD;
@@ -76,12 +81,15 @@ class FieldDecl : public DeclaratorDecl {
   std::optional<Expr> in_class_initializer(void) const;
   bool has_captured_vla_type(void) const;
   bool has_in_class_initializer(void) const;
+  bool has_non_null_in_class_initializer(void) const;
   bool is_anonymous_struct_or_union(void) const;
   bool is_bit_field(void) const;
   bool is_mutable(void) const;
+  bool is_potentially_overlapping(void) const;
   bool is_unnamed_bitfield(void) const;
   bool is_zero_length_bit_field(void) const;
   bool is_zero_size(void) const;
+  std::optional<uint64_t> offset_in_bits(void) const;
 };
 
 static_assert(sizeof(FieldDecl) == sizeof(DeclaratorDecl));

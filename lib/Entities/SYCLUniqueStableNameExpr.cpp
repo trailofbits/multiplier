@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::containing(co
 
 bool SYCLUniqueStableNameExpr::contains(const Decl &decl) {
   for (auto &parent : SYCLUniqueStableNameExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool SYCLUniqueStableNameExpr::contains(const Stmt &stmt) {
   for (auto &parent : SYCLUniqueStableNameExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::from(const Stm
 }
 
 gap::generator<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kSYCLUniqueStableNameExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<SYCLUniqueStableNameExpr> e = SYCLUniqueStableNameExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::in(const Inde
 }
 
 gap::generator<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kSYCLUniqueStableNameExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::in(const Frag
 }
 
 gap::generator<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kSYCLUniqueStableNameExprDerivedKinds) {
@@ -160,15 +160,15 @@ std::string_view SYCLUniqueStableNameExpr::compute_name(void) const {
 }
 
 Token SYCLUniqueStableNameExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 Token SYCLUniqueStableNameExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token SYCLUniqueStableNameExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 #pragma GCC diagnostic pop

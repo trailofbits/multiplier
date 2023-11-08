@@ -10,7 +10,10 @@
 #include <capnp/serialize.h>
 #include <memory>
 #include <string>
-#include <multiplier/Types.h>
+
+#include <multiplier/RPC.capnp.h>
+
+#include "Types.h"
 
 namespace mx {
 namespace {

@@ -17,14 +17,17 @@ class Index;
 class QualifiedType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class QualifiedType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<QualifiedType> in(const Fragment &frag);
-  static gap::generator<QualifiedType> in(const File &file);
   static gap::generator<QualifiedType> in(const Index &index);
   static gap::generator<QualifiedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -75,8 +78,11 @@ class QualifiedType : public Type {
   bool is_restrict_qualified(void) const;
   bool is_trivial_type(void) const;
   bool is_trivially_copyable_type(void) const;
+  bool is_trivially_equality_comparable_type(void) const;
   bool is_trivially_relocatable_type(void) const;
   bool is_volatile_qualified(void) const;
+  bool is_web_assembly_funcref_type(void) const;
+  bool is_web_assembly_reference_type(void) const;
   bool may_be_dynamic_class(void) const;
   bool may_be_not_dynamic_class(void) const;
 };

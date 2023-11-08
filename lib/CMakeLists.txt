@@ -18,51 +18,9 @@ capnp_generate_cpp(MX_AST_SOURCES MX_AST_HEADERS AST.capnp)  # Bootstrapped file
 file(GLOB entity_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_ENTITIES_DIR}/*.h")
 file(GLOB entity_sources CONFIGURE_DEPENDS "${MX_BOOTSTRAP_LIB_ENTITIES_DIR}/*.cpp")
 
-add_library("mx-mlir" INTERFACE)
-set_target_properties("mx-mlir"
-  PROPERTIES
-    LINKER_LANGUAGE
-      CXX
-    VISIBILITY_INLINES_HIDDEN
-      YES
-    CXX_VISIBILITY_PRESET
-      hidden
-    POSITION_INDEPENDENT_CODE
-      YES
-)
-
 if(MX_ENABLE_VAST)
-  target_link_libraries("mx-mlir"
-    INTERFACE
-      vast::vast
-      vast::MLIRCore
-      vast::MLIRMeta
-      vast::MLIRLowLevel
-      vast::MLIRHighLevel
-      MLIRDialect
-      MLIRMLProgramDialect
-      MLIROpenMPDialect
-      MLIRTosaDialect
-  
-      MLIRBufferizationTransformOps
-      MLIRSparseTensorTransforms
-      MLIROpenACCDialect
-      MLIRLLVMIRTransforms
-      MLIRROCDLDialect
-      MLIRAsyncDialect
-      MLIRSCFTransformOps
-      MLIREmitCDialect
-      MLIRNVGPUDialect
-      MLIRShapeDialect
-      MLIRAMDGPUDialect
-      MLIRShapeOpsTransforms
-      MLIRLinalgTransformOps
-      MLIRSPIRVDialect
-      MLIRTensorInferTypeOpInterfaceImpl
-  )
-else(MX_ENABLE_VAST)
-  target_link_libraries("mx-mlir" INTERFACE)
-endif(MX_ENABLE_VAST)
+  add_subdirectory("IR")
+endif()
 
 add_library("mx-entities" INTERFACE)
 set_target_properties("mx-entities"
@@ -121,6 +79,7 @@ add_custom_target("copy_headers"
 
 set(api_headers
   "${source_include_dir}/AST.h"
+  "${source_include_dir}/Compilation.h"
   $<BUILD_INTERFACE:${source_include_dir}/Database.h>
   "${source_include_dir}/Entity.h"
   "${source_include_dir}/File.h"
@@ -131,9 +90,8 @@ set(api_headers
   "${source_include_dir}/Re2.h"
   "${source_include_dir}/Reference.h"
   "${source_include_dir}/Token.h"
+  "${source_include_dir}/TokenTree.h"
   "${source_include_dir}/Types.h"
-  "${source_include_dir}/SourceIR.h"
-  "${source_include_dir}/Weggli.h"
   "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"
 )
 
@@ -142,22 +100,25 @@ add_library("mx-api" STATIC
   ${entity_headers}  # Auto-generated
   ${entity_sources}  # Auto-generated
   
-  "API.cpp"
-  "API.h"
   "Attr.h"
   "Attr.cpp"
   "CachingEntityProvider.cpp"
   "CachingEntityProvider.h"
+  "Compilation.h"
+  "Compilation.cpp"
   "CXXBaseSpecifier.h"
   "Database.cpp"
   "Decl.h"
   "Decl.cpp"
   "Designator.h"
   "Entity.h"
+  "EntityProvider.cpp"
+  "EntityProvider.h"
   "File.cpp"
   "FileImpl.cpp"
   "File.h"
   "Fragment.cpp"
+  "FragmentEntity.h"
   "FragmentImpl.cpp"
   "Fragment.h"
   "Index.cpp"
@@ -179,23 +140,21 @@ add_library("mx-api" STATIC
   "SQLiteStore.h"
   "Stmt.h"
   "Stmt.cpp"
-  "SourceIR.cpp"
-  "SourceIR.h"
   "TemplateArgument.h"
   "TemplateParameterList.h"
   "ThreadLocal.cpp"
   "ThreadLocal.h"
   "TokenContext.cpp"
+  "TokenContext.h"
   "Token.cpp"
   "Token.h"
+  "TokenTree.cpp"
+  "TokenTree.h"
   "Type.h"
   "Type.cpp"
   "Types.h"
   "Types.cpp"
   "Util.h"
-  "Weggli.cpp"
-  "WeggliImpl.cpp"
-  "WeggliImpl.h"
 
   # Auto-generated.
   ${copied_headers}
@@ -214,46 +173,31 @@ target_link_libraries("mx-api"
     "gap::gap-core"
     "std::coroutines"
     "gap::gap-settings"
-    $<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>
   PRIVATE
-    "CapnProto::capnp-rpc"
+    "zstd::zstd"
+    "CapnProto::capnp"
     $<BUILD_INTERFACE:concurrentqueue>
 )
 
 if(MX_ENABLE_VAST)
   target_link_libraries("mx-api"
     PUBLIC
-      "mx-mlir"
-  )
-  
+      "mx-mlir")
+else()
   target_compile_definitions("mx-api"
-    PRIVATE
-      "MX_ENABLE_SOURCEIR"
-  )
-endif(MX_ENABLE_VAST)
+    PUBLIC
+      "MX_DISABLE_VAST")
+endif()
 
 if(MX_ENABLE_RE2)
   target_link_libraries("mx-api"
     PRIVATE
-      "re2::re2"
-  )
-else(MX_ENABLE_RE2)
+      re2::re2)
+else()
   target_compile_definitions("mx-api"
     PUBLIC
       "MX_DISABLE_RE2")
-endif(MX_ENABLE_RE2)
-
-
-if(MX_ENABLE_WEGGLI)
-  target_link_libraries("mx-api"
-    PRIVATE
-      "weggli_native::static"
-  )
-else(MX_ENABLE_WEGGLI)
-  target_compile_definitions("mx-api"
-    PUBLIC
-      "MX_DISABLE_WEGGLI")
-endif(MX_ENABLE_WEGGLI)
+endif()
 
 target_compile_options("mx-api"
   PRIVATE
@@ -302,7 +246,6 @@ if(MX_ENABLE_INSTALL)
   install(
     TARGETS
       "mx-api"
-      "mx-mlir"
     EXPORT
       "${PROJECT_NAME}Targets"
     RUNTIME

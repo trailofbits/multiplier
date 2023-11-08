@@ -19,7 +19,7 @@
 #include <multiplier/Entities/TypeDecl.h>
 #include <multiplier/Entities/TypedefDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -79,14 +79,14 @@ gap::generator<TypedefNameDecl> TypedefNameDecl::containing(const std::optional<
 
 bool TypedefNameDecl::contains(const Decl &decl) {
   for (auto &parent : TypedefNameDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool TypedefNameDecl::contains(const Stmt &stmt) {
   for (auto &parent : TypedefNameDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -145,7 +145,7 @@ std::optional<TypedefNameDecl> TypedefNameDecl::from(const Decl &parent) {
 }
 
 gap::generator<TypedefNameDecl> TypedefNameDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kTypedefNameDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<TypedefNameDecl> e = TypedefNameDecl::from(Decl(std::move(eptr)))) {
@@ -156,7 +156,7 @@ gap::generator<TypedefNameDecl> TypedefNameDecl::in(const Index &index) {
 }
 
 gap::generator<TypedefNameDecl> TypedefNameDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kTypedefNameDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -168,7 +168,7 @@ gap::generator<TypedefNameDecl> TypedefNameDecl::in(const Fragment &frag) {
 }
 
 gap::generator<TypedefNameDecl> TypedefNameDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kTypedefNameDeclDerivedKinds) {
@@ -191,7 +191,7 @@ std::optional<TypedefNameDecl> TypedefNameDecl::from(const TokenContext &t) {
 
 std::optional<TagDecl> TypedefNameDecl::anonymous_declaration_with_typedef_name(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal55();
+    RawEntityId eid = impl->reader.getVal57();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -203,16 +203,16 @@ std::optional<TagDecl> TypedefNameDecl::anonymous_declaration_with_typedef_name(
 }
 
 Type TypedefNameDecl::underlying_type(void) const {
-  RawEntityId eid = impl->reader.getVal56();
+  RawEntityId eid = impl->reader.getVal58();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool TypedefNameDecl::is_moded(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal74();
 }
 
 bool TypedefNameDecl::is_transparent_tag(void) const {
-  return impl->reader.getVal73();
+  return impl->reader.getVal75();
 }
 
 #pragma GCC diagnostic pop

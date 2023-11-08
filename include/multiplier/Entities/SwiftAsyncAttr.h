@@ -9,6 +9,7 @@
 #pragma once
 
 #include "InheritableAttr.h"
+#include "SwiftAsyncAttrKind.h"
 
 namespace mx {
 class EntityProvider;
@@ -17,6 +18,11 @@ class Attr;
 class InheritableAttr;
 class SwiftAsyncAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class SwiftAsyncAttr : public InheritableAttr {
  private:
@@ -24,12 +30,12 @@ class SwiftAsyncAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<SwiftAsyncAttr> in(const Fragment &frag);
-  static gap::generator<SwiftAsyncAttr> in(const File &file);
   static gap::generator<SwiftAsyncAttr> in(const Index &index);
   static gap::generator<SwiftAsyncAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SwiftAsyncAttr> by_id(const Index &, EntityId);
+  static gap::generator<SwiftAsyncAttr> in(const Fragment &frag);
+  static gap::generator<SwiftAsyncAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_ASYNC;
@@ -48,6 +54,7 @@ class SwiftAsyncAttr : public InheritableAttr {
   static std::optional<SwiftAsyncAttr> from(const Reference &r);
   static std::optional<SwiftAsyncAttr> from(const TokenContext &t);
 
+  SwiftAsyncAttrKind attribute_kind(void) const;
 };
 
 static_assert(sizeof(SwiftAsyncAttr) == sizeof(InheritableAttr));

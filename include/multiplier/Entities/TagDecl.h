@@ -28,6 +28,11 @@ class Token;
 class TokenRange;
 class TypeDecl;
 class TypedefNameDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TagDecl : public TypeDecl {
  private:
@@ -36,12 +41,12 @@ class TagDecl : public TypeDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<TagDecl> in(const Fragment &frag);
-  static gap::generator<TagDecl> in(const File &file);
   static gap::generator<TagDecl> in(const Index &index);
   static gap::generator<TagDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TagDecl> by_id(const Index &, EntityId);
+  static gap::generator<TagDecl> in(const Fragment &frag);
+  static gap::generator<TagDecl> in(const File &file);
 
   static gap::generator<TagDecl> containing(const Decl &decl);
   static gap::generator<TagDecl> containing(const std::optional<Decl> &decl);
@@ -79,7 +84,6 @@ class TagDecl : public TypeDecl {
   bool is_complete_definition(void) const;
   bool is_complete_definition_required(void) const;
   bool is_dependent_type(void) const;
-  bool is_embedded_in_declarator(void) const;
   bool is_enum(void) const;
   bool is_free_standing(void) const;
   bool is_interface(void) const;

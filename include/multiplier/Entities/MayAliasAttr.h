@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class MayAliasAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MayAliasAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class MayAliasAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<MayAliasAttr> in(const Fragment &frag);
-  static gap::generator<MayAliasAttr> in(const File &file);
   static gap::generator<MayAliasAttr> in(const Index &index);
   static gap::generator<MayAliasAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MayAliasAttr> by_id(const Index &, EntityId);
+  static gap::generator<MayAliasAttr> in(const Fragment &frag);
+  static gap::generator<MayAliasAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MAY_ALIAS;

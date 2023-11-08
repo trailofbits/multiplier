@@ -47,7 +47,7 @@ enum class TokenCategory : unsigned char {
   WHITESPACE,
   FILE_NAME,
   LINE_NUMBER,
-  COLUMN_NUMBER
+  COLUMN_NUMBER,
 };
 
 inline static const char *EnumerationName(TokenCategory) {

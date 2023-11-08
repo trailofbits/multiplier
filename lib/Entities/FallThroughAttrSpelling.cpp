@@ -16,11 +16,11 @@ namespace mx {
 const char *EnumeratorName(FallThroughAttrSpelling e) {
   switch (e) {
     case FallThroughAttrSpelling::CXX11_FALLTHROUGH: return "CXX11_FALLTHROUGH";
-    case FallThroughAttrSpelling::C2X_FALLTHROUGH: return "C2X_FALLTHROUGH";
+    case FallThroughAttrSpelling::C23_FALLTHROUGH: return "C23_FALLTHROUGH";
     case FallThroughAttrSpelling::CXX11_CLANG_FALLTHROUGH: return "CXX11_CLANG_FALLTHROUGH";
     case FallThroughAttrSpelling::GNU_FALLTHROUGH: return "GNU_FALLTHROUGH";
     case FallThroughAttrSpelling::CXX11_GNU_FALLTHROUGH: return "CXX11_GNU_FALLTHROUGH";
-    case FallThroughAttrSpelling::C2X_GNU_FALLTHROUGH: return "C2X_GNU_FALLTHROUGH";
+    case FallThroughAttrSpelling::C23_GNU_FALLTHROUGH: return "C23_GNU_FALLTHROUGH";
     case FallThroughAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

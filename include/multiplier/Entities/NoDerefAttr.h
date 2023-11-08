@@ -17,6 +17,11 @@ class Attr;
 class NoDerefAttr;
 class Token;
 class TypeAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class NoDerefAttr : public TypeAttr {
  private:
@@ -24,12 +29,12 @@ class NoDerefAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  static gap::generator<NoDerefAttr> in(const Fragment &frag);
-  static gap::generator<NoDerefAttr> in(const File &file);
   static gap::generator<NoDerefAttr> in(const Index &index);
   static gap::generator<NoDerefAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NoDerefAttr> by_id(const Index &, EntityId);
+  static gap::generator<NoDerefAttr> in(const Fragment &frag);
+  static gap::generator<NoDerefAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_DEREF;

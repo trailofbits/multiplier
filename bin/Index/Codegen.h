@@ -21,6 +21,7 @@ namespace indexer {
 
 class EntityMapper;
 class GlobalIndexingState;
+class PendingFragment;
 
 class CodeGeneratorImpl;
 class CodeGenerator {
@@ -42,10 +43,7 @@ class CodeGenerator {
   // IR gets emitted to same module and saved with the same code ids. If
   // the top-level declaration is not `FunctionDecl`, it will visit
   // AST node and generate source ir for function decl found.
-  std::string GenerateSourceIRFromTLDs(
-      const pasta::AST &ast, mx::RawEntityId frag_id,
-      const EntityMapper &em, const std::vector<pasta::Decl> &tlds,
-      unsigned num_decls);
+  std::string GenerateSourceIR(const pasta::AST &ast, const EntityMapper &em);
 };
 
 }  // namespace indexer

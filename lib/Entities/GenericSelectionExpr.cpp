@@ -12,9 +12,10 @@
 #include <multiplier/Entities/Expr.h>
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
+#include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +75,14 @@ gap::generator<GenericSelectionExpr> GenericSelectionExpr::containing(const std:
 
 bool GenericSelectionExpr::contains(const Decl &decl) {
   for (auto &parent : GenericSelectionExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool GenericSelectionExpr::contains(const Stmt &stmt) {
   for (auto &parent : GenericSelectionExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +111,7 @@ std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const Stmt &paren
 }
 
 gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kGenericSelectionExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<GenericSelectionExpr> e = GenericSelectionExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +122,7 @@ gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const Index &index
 }
 
 gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kGenericSelectionExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +134,7 @@ gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const Fragment &fr
 }
 
 gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kGenericSelectionExprDerivedKinds) {
@@ -163,7 +164,7 @@ std::optional<Expr> GenericSelectionExpr::nth_association_expression(unsigned n)
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -174,7 +175,7 @@ std::optional<Expr> GenericSelectionExpr::nth_association_expression(unsigned n)
 
 gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const & {
   auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
@@ -187,8 +188,13 @@ gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const &
 }
 
 Expr GenericSelectionExpr::controlling_expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
+Type GenericSelectionExpr::controlling_type(void) const {
+  RawEntityId eid = impl->reader.getVal38();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token GenericSelectionExpr::default_token(void) const {
@@ -208,8 +214,16 @@ Expr GenericSelectionExpr::result_expression(void) const {
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-bool GenericSelectionExpr::is_result_dependent(void) const {
+bool GenericSelectionExpr::is_expression_predicate(void) const {
   return impl->reader.getVal89();
+}
+
+bool GenericSelectionExpr::is_result_dependent(void) const {
+  return impl->reader.getVal90();
+}
+
+bool GenericSelectionExpr::is_type_predicate(void) const {
+  return impl->reader.getVal91();
 }
 
 #pragma GCC diagnostic pop

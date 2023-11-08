@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<GNUNullExpr> GNUNullExpr::containing(const std::optional<Stmt> &s
 
 bool GNUNullExpr::contains(const Decl &decl) {
   for (auto &parent : GNUNullExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool GNUNullExpr::contains(const Stmt &stmt) {
   for (auto &parent : GNUNullExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<GNUNullExpr> GNUNullExpr::from(const Stmt &parent) {
 }
 
 gap::generator<GNUNullExpr> GNUNullExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kGNUNullExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<GNUNullExpr> e = GNUNullExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<GNUNullExpr> GNUNullExpr::in(const Index &index) {
 }
 
 gap::generator<GNUNullExpr> GNUNullExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kGNUNullExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<GNUNullExpr> GNUNullExpr::in(const Fragment &frag) {
 }
 
 gap::generator<GNUNullExpr> GNUNullExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kGNUNullExprDerivedKinds) {
@@ -155,7 +155,7 @@ std::optional<GNUNullExpr> GNUNullExpr::from(const TokenContext &t) {
 }
 
 Token GNUNullExpr::token_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 #pragma GCC diagnostic pop

@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/VariableArrayType.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {
@@ -69,37 +69,11 @@ std::optional<ArrayType> ArrayType::from(const Type &parent) {
 }
 
 gap::generator<ArrayType> ArrayType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kArrayTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<ArrayType> e = ArrayType::from(Type(std::move(eptr)))) {
         co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<ArrayType> ArrayType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kArrayTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<ArrayType> e = ArrayType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<ArrayType> ArrayType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kArrayTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<ArrayType> e = ArrayType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
       }
     }
   }
@@ -114,12 +88,12 @@ std::optional<ArrayType> ArrayType::from(const TokenContext &t) {
 }
 
 Type ArrayType::element_type(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal17();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ArrayTypeArraySizeModifier ArrayType::size_modifier(void) const {
-  return static_cast<ArrayTypeArraySizeModifier>(impl->reader.getVal238());
+  return static_cast<ArrayTypeArraySizeModifier>(impl->reader.getVal26());
 }
 
 #pragma GCC diagnostic pop

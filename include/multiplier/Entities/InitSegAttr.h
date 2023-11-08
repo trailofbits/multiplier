@@ -16,18 +16,23 @@ class Index;
 class Attr;
 class InitSegAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class InitSegAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<InitSegAttr> in(const Fragment &frag);
-  static gap::generator<InitSegAttr> in(const File &file);
   static gap::generator<InitSegAttr> in(const Index &index);
   static gap::generator<InitSegAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<InitSegAttr> by_id(const Index &, EntityId);
+  static gap::generator<InitSegAttr> in(const Fragment &frag);
+  static gap::generator<InitSegAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INIT_SEG;

@@ -10,6 +10,7 @@
 #include <memory>
 #include <string>
 
+#include "Reference.h"
 #include "Types.h"
 
 #define MX_DATABASE_HAS_FTS5 1
@@ -20,15 +21,25 @@
 namespace mx {
 class DatabaseWriterImpl;
 
+// NOTE(pag): `FragmentIndexRecord` is logically an async record, but it has a
+//            one-to-many relationship with SQL statements, so it's not modelled
+//            here, and we deal with it manually on the backend.
 #define MX_FOR_EACH_ASYNC_RECORD_TYPE(m) \
     m(FilePathRecord) \
     m(FragmentFileRecord) \
+    m(NestedFragmentRecord) \
     m(FragmentFileRangeRecord) \
     m(RedeclarationRecord) \
     m(MangledNameRecord) \
     m(ReferenceRecord) \
     m(NamedEntityRecord) \
     m(DictionaryRecord)
+
+#define MX_FOR_EACH_ENTITY_RECORD_TYPE(m) \
+    m(FileRecord) \
+    m(FragmentRecord) \
+    m(TypeRecord) \
+    m(CompilationRecord)
 
 
 // Tells us one of the valid file paths associated with a file id.
@@ -72,6 +83,26 @@ struct FragmentFileRecord {
 
   PackedFragmentId fragment_id;
   PackedFileId file_id;
+};
+
+struct NestedFragmentRecord {
+  static constexpr const char *kTableName = "nested_fragment";
+
+  static constexpr const char *kInitStatements[] =
+      {R"(CREATE TABLE IF NOT EXISTS nested_fragment (
+            parent_id INTEGER NOT NULL,
+            child_id INTEGER NOT NULL,
+            PRIMARY KEY(parent_id, child_id)
+          ) WITHOUT ROWID)",};
+
+  static constexpr const char *kExitStatements[] = {nullptr};
+
+  static constexpr const char *kInsertStatement =
+      R"(INSERT OR IGNORE INTO nested_fragment (parent_id, child_id)
+         VALUES (?1, ?2))";
+
+  PackedFragmentId parent_id;
+  PackedFragmentId child_id;
 };
 
 // Tells us a the inclusive range of file tokens of a file covered by a
@@ -212,26 +243,59 @@ struct ReferenceRecord {
       {R"(CREATE TABLE IF NOT EXISTS reference (
             from_entity_id INTEGER NOT NULL,
             to_entity_id INTEGER NOT NULL,
+            context_id INTEGER NOT NULL,
             kind_id INTEGER NOT NULL,
-            PRIMARY KEY(to_entity_id ASC, from_entity_id ASC, kind_id)
+            PRIMARY KEY(to_entity_id ASC,
+                        from_entity_id ASC,
+                        context_id ASC,
+                        kind_id)
           ) WITHOUT ROWID)",
 
        R"(CREATE TABLE IF NOT EXISTS reference_kind (
             kind BLOB NOT NULL PRIMARY KEY
           ))",
 
+       // The reference kind values should be in sync with the enum
+       // `BuildinReferenceKind` (include/multiplier/Reference.h:29).
+       // The reference_kind table is used to convert the reference kind
+       // into string that appears in the info browser.
        R"(INSERT OR IGNORE INTO reference_kind (rowid, kind)
-          VALUES (0, "Explicit code reference"))"};
+          VALUES (0, "Use"),
+                 (1, "Address of"),
+                 (2, "Assigned To"),
+                 (3, "Assignment"),
+                 (4, "Called By"),
+                 (5, "Call Argument"),
+                 (6, "Used By"),
+                 (7, "Dereference"),
+                 (8, "Enumeration"),
+                 (9, "Expansion"),
+                 (10, "Included By"),
+                 (11, "Initialization"),
+                 (12, "Influencing Condition"),
+                 (13, "Type Cast"),
+                 (14, "Statement Use"),
+                 (15, "Type Trait Use")
+          )"};
 
   static constexpr const char *kExitStatements[] = {nullptr};
 
   // NOTE(pag): Reference id `0` is the id of an "explicit code reference."
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO reference (from_entity_id, to_entity_id, kind_id)
-         VALUES (?1, ?2, 0))";
+      R"(INSERT OR IGNORE INTO reference (from_entity_id,
+         to_entity_id, context_id, kind_id)
+         VALUES (?1, ?2, ?3, ?4))";
 
+  // Entity id of the referer
   RawEntityId from_entity_id;
+
+  // Entity id of the reference
   RawEntityId to_entity_id;
+
+  // Entity id of the context in which reference has happened. It will
+  // be either same as `from_entity_id` or ancestor of `from_entity_id`.
+  RawEntityId context_id;
+  mx::BuiltinReferenceKind kind;
 };
 
 // Records a ZSTD dictionary for a category of entities into the database.
@@ -253,45 +317,102 @@ struct DictionaryRecord {
   std::string data;
 };
 
-// Records an entity into the database
-struct EntityRecord {
-  static constexpr const char *kTableName = "entity";
+// Records a file into the database.
+struct FileRecord {
+  static constexpr EntityCategory kCategory = EntityCategory::FILE;
+
+  static constexpr const char *kTableName = "file";
 
   static constexpr const char *kInitStatements[] =
-      {R"(CREATE TABLE IF NOT EXISTS entity (
-            entity_id INTEGER PRIMARY KEY,
+      {R"(CREATE TABLE IF NOT EXISTS file (
+            file_id INTEGER PRIMARY KEY,
             data BLOB NOT NULL
           ) WITHOUT ROWID)",
-       R"(CREATE INDEX IF NOT EXISTS entities_by_category
-          ON entity(entity_id_to_category(entity_id) ASC))",
 
-       R"(CREATE INDEX IF NOT EXISTS entities_by_fragment
-          ON entity(entity_id_to_category(entity_id) ASC,
-                    entity_id_to_fragment_id(entity_id) ASC))",
-
-       R"(CREATE INDEX IF NOT EXISTS entities_by_kind
-          ON entity(entity_id_to_category(entity_id) ASC,
-                    entity_id_to_kind(entity_id) ASC,
-                    entity_id_to_fragment_id(entity_id) ASC))",
-
-#define MX_CREATE_ENTITY_VIEW(type, name, enum_, id) \
-     "CREATE VIEW IF NOT EXISTS " #name " AS " \
-     "SELECT entity_id AS " #name "_id, data " \
-     "FROM entity " \
-     "WHERE entity_id_to_category(entity_id) = " #id,
-
-      MX_FOR_EACH_ENTITY_CATEGORY(MX_CREATE_ENTITY_VIEW,
-                                  MX_IGNORE_ENTITY_CATEGORY,
-                                  MX_CREATE_ENTITY_VIEW,
-                                  MX_CREATE_ENTITY_VIEW,
-                                  MX_CREATE_ENTITY_VIEW)
-      #undef MX_CREATE_ENTITY_VIEW
-  };
+       nullptr};
 
   static constexpr const char *kExitStatements[] = {nullptr};
 
   static constexpr const char *kInsertStatement =
-      "INSERT OR IGNORE INTO entity (entity_id, data) VALUES (?1, ?2)";
+      "INSERT OR IGNORE INTO file (file_id, data) VALUES (?1, ?2)";
+
+  RawEntityId id;
+  std::string data;
+};
+
+// Records a fragment into the database. A fragment is a syntactically
+// freestanding unit of code, e.g. a function. A fragment includes most entities
+// embedded within it.
+struct FragmentRecord {
+  static constexpr EntityCategory kCategory = EntityCategory::FRAGMENT;
+
+  static constexpr const char *kTableName = "fragment";
+
+  static constexpr const char *kInitStatements[] =
+      {R"(CREATE TABLE IF NOT EXISTS fragment (
+            fragment_id INTEGER PRIMARY KEY,
+            data BLOB NOT NULL
+          ) WITHOUT ROWID)",
+
+       nullptr};
+
+  static constexpr const char *kExitStatements[] = {nullptr};
+
+  static constexpr const char *kInsertStatement =
+      "INSERT OR IGNORE INTO fragment (fragment_id, data) VALUES (?1, ?2)";
+
+  RawEntityId id;
+  std::string data;
+};
+
+// Records a type into the database. A type is similar to a fragment, in that
+// it has tokens and token contexts (for visualization purposes), but instead
+// of embedded many entities, it just embeds a single type entity.
+struct TypeRecord {
+  static constexpr EntityCategory kCategory = EntityCategory::TYPE;
+
+  static constexpr const char *kTableName = "type";
+
+  static constexpr const char *kInitStatements[] =
+      {R"(CREATE TABLE IF NOT EXISTS type (
+            type_id INTEGER PRIMARY KEY,
+            data BLOB NOT NULL
+          ) WITHOUT ROWID)",
+
+       R"(CREATE INDEX IF NOT EXISTS type_by_kind
+          ON type(entity_id_to_kind(type_id) ASC))",
+
+       nullptr};
+
+  static constexpr const char *kExitStatements[] = {nullptr};
+
+  static constexpr const char *kInsertStatement =
+      "INSERT OR IGNORE INTO type (type_id, data) VALUES (?1, ?2)";
+
+  RawEntityId id;
+  std::string data;
+};
+
+// Records a compilation / translation unit into the database. A compilation
+// includes the MLIR generated by VAST for the translation unit. A compilation
+// also includes information about the compile command itself.
+struct CompilationRecord {
+  static constexpr EntityCategory kCategory = EntityCategory::COMPILATION;
+
+  static constexpr const char *kTableName = "compilation";
+
+  static constexpr const char *kInitStatements[] =
+      {R"(CREATE TABLE IF NOT EXISTS compilation (
+            compilation_id INTEGER PRIMARY KEY,
+            data BLOB NOT NULL
+          ) WITHOUT ROWID)",
+
+       nullptr};
+
+  static constexpr const char *kExitStatements[] = {nullptr};
+
+  static constexpr const char *kInsertStatement =
+      "INSERT OR IGNORE INTO compilation (compilation_id, data) VALUES (?1, ?2)";
 
   RawEntityId id;
   std::string data;
@@ -303,6 +424,24 @@ class DatabaseWriter final {
   std::shared_ptr<DatabaseWriterImpl> impl;
 
   DatabaseWriter(void) = delete;
+
+  // Get, or create and return, a fragment ID for the specific fragment hash.
+  PackedFragmentId GetOrCreateSmallFragmentIdForHash(
+      RawEntityId tok_id, std::string hash, bool &is_new);
+
+  // Get, or create and return, a fragment ID for the specific fragment hash.
+  PackedFragmentId GetOrCreateBigFragmentIdForHash(
+      RawEntityId tok_id, std::string hash, bool &is_new);
+
+  // Get, or create and return, a type ID for the specific type.
+  PackedTypeId GetOrCreateSmallTypeIdForHash(
+      mx::TypeKind type_kind, uint32_t type_qualifiers,
+      std::string hash, bool &is_new);
+
+  // Get, or create and return, a type ID for the specific type.
+  PackedTypeId GetOrCreateBigTypeIdForHash(
+      mx::TypeKind type_kind, uint32_t type_qualifiers,
+      std::string hash, bool &is_new);
 
  public:
   static constexpr const char *kInitStatements[] = {
@@ -317,7 +456,10 @@ class DatabaseWriter final {
       R"(CREATE TABLE IF NOT EXISTS metadata (
            next_file_index INTEGER NOT NULL,
            next_small_fragment_index INTEGER NOT NULL,
-           next_big_fragment_index INTEGER NOT NULL
+           next_big_fragment_index INTEGER NOT NULL,
+           next_small_type_index INTEGER NOT NULL,
+           next_big_type_index INTEGER NOT NULL,
+           next_compilation_index INTEGER NOT NULL
          ))",
 
       R"(CREATE TABLE IF NOT EXISTS version (
@@ -334,47 +476,20 @@ class DatabaseWriter final {
   explicit DatabaseWriter(std::filesystem::path db_path,
                           size_t max_queue_size_in_bytes);
 
+  // Add an index record saying that the fragment containing the entity with ID
+  // `entity_id` contains the specific type and kind of entity.
+  void AsyncIndexFragmentSpecificEntity(mx::RawEntityId entity_id);
+
   // Schedule all outstanding asynchronous writes to be flushed. This operation
   // is itself asynchronous, and when it returns, there are no guarantees that
   // the database writes have actually happened.
   void AsyncFlush(void);
 
-  // Get, or create and return, a file ID for the specific file contents hash.
-  PackedFileId GetOrCreateFileIdForHash(
-      std::string hash, bool &is_new);
-
-  // Get, or create and return, a fragment ID for the specific fragment hash.
-  PackedFragmentId GetOrCreateSmallFragmentIdForHash(
-      RawEntityId tok_id, std::string hash, bool &is_new);
-
-  // Get, or create and return, a fragment ID for the specific fragment hash.
-  PackedFragmentId GetOrCreateLargeFragmentIdForHash(
-      RawEntityId tok_id, std::string hash, bool &is_new);
-
-  PackedFragmentId GetOrCreateFragmentIdForHash(
-      RawEntityId tok_id, std::string hash, size_t num_tokens, bool &is_new) {
-
-    // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
-    //
-    // NOTE(pag): We have a fudge factor here of `3x` to account for macro
-    //            expansions.
-    if ((num_tokens * 3u) >= mx::kNumTokensInBigFragment) {
-      return GetOrCreateLargeFragmentIdForHash(
-          tok_id, std::move(hash), is_new);
-    } else {
-      return GetOrCreateSmallFragmentIdForHash(
-          tok_id, std::move(hash), is_new);
-    }
-  }
-
-//  // Flush all outstanding writes to the database.
-//  void Flush(void);
-
 #define MX_DECLARE_ADD_RECORD(name) \
     void AddAsync(name);
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DECLARE_ADD_RECORD)
-  MX_DECLARE_ADD_RECORD(EntityRecord)
+  MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DECLARE_ADD_RECORD)
 #undef MX_DECLARE_ADD_RECORD
 
   template <typename T1, typename T2, typename... Ts>

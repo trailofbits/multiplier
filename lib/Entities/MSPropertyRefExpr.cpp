@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<MSPropertyRefExpr> MSPropertyRefExpr::containing(const std::optio
 
 bool MSPropertyRefExpr::contains(const Decl &decl) {
   for (auto &parent : MSPropertyRefExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool MSPropertyRefExpr::contains(const Stmt &stmt) {
   for (auto &parent : MSPropertyRefExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -111,7 +111,7 @@ std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const Stmt &parent) {
 }
 
 gap::generator<MSPropertyRefExpr> MSPropertyRefExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kMSPropertyRefExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<MSPropertyRefExpr> e = MSPropertyRefExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<MSPropertyRefExpr> MSPropertyRefExpr::in(const Index &index) {
 }
 
 gap::generator<MSPropertyRefExpr> MSPropertyRefExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kMSPropertyRefExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<MSPropertyRefExpr> MSPropertyRefExpr::in(const Fragment &frag) {
 }
 
 gap::generator<MSPropertyRefExpr> MSPropertyRefExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kMSPropertyRefExprDerivedKinds) {
@@ -156,16 +156,16 @@ std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const TokenContext &t) 
 }
 
 Expr MSPropertyRefExpr::base_expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token MSPropertyRefExpr::member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 MSPropertyDecl MSPropertyRefExpr::property_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return MSPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

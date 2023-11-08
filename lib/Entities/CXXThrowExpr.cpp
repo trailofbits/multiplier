@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<CXXThrowExpr> CXXThrowExpr::containing(const std::optional<Stmt> 
 
 bool CXXThrowExpr::contains(const Decl &decl) {
   for (auto &parent : CXXThrowExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXThrowExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXThrowExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<CXXThrowExpr> CXXThrowExpr::from(const Stmt &parent) {
 }
 
 gap::generator<CXXThrowExpr> CXXThrowExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXThrowExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXThrowExpr> e = CXXThrowExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<CXXThrowExpr> CXXThrowExpr::in(const Index &index) {
 }
 
 gap::generator<CXXThrowExpr> CXXThrowExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXThrowExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<CXXThrowExpr> CXXThrowExpr::in(const Fragment &frag) {
 }
 
 gap::generator<CXXThrowExpr> CXXThrowExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXThrowExprDerivedKinds) {
@@ -156,7 +156,7 @@ std::optional<CXXThrowExpr> CXXThrowExpr::from(const TokenContext &t) {
 
 std::optional<Expr> CXXThrowExpr::sub_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal37();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -168,7 +168,7 @@ std::optional<Expr> CXXThrowExpr::sub_expression(void) const {
 }
 
 Token CXXThrowExpr::throw_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 bool CXXThrowExpr::is_thrown_variable_in_scope(void) const {

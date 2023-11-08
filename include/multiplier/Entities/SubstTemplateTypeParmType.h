@@ -18,14 +18,17 @@ class SubstTemplateTypeParmType;
 class TemplateTypeParmDecl;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class SubstTemplateTypeParmType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<SubstTemplateTypeParmType> in(const Fragment &frag);
-  static gap::generator<SubstTemplateTypeParmType> in(const File &file);
   static gap::generator<SubstTemplateTypeParmType> in(const Index &index);
   static gap::generator<SubstTemplateTypeParmType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -50,7 +53,7 @@ class SubstTemplateTypeParmType : public Type {
 
   Type desugar(void) const;
   Decl associated_declaration(void) const;
-  std::optional<unsigned> pack_index(void) const;
+  std::optional<uint32_t> pack_index(void) const;
   TemplateTypeParmDecl replaced_parameter(void) const;
   Type replacement_type(void) const;
   bool is_sugared(void) const;

@@ -18,6 +18,11 @@ class InheritableAttr;
 class MSGuidDecl;
 class Token;
 class UuidAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UuidAttr : public InheritableAttr {
  private:
@@ -25,12 +30,12 @@ class UuidAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<UuidAttr> in(const Fragment &frag);
-  static gap::generator<UuidAttr> in(const File &file);
   static gap::generator<UuidAttr> in(const Index &index);
   static gap::generator<UuidAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UuidAttr> by_id(const Index &, EntityId);
+  static gap::generator<UuidAttr> in(const Fragment &frag);
+  static gap::generator<UuidAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::UUID;

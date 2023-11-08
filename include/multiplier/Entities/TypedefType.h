@@ -17,14 +17,17 @@ class Token;
 class Type;
 class TypedefNameDecl;
 class TypedefType;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypedefType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<TypedefType> in(const Fragment &frag);
-  static gap::generator<TypedefType> in(const File &file);
   static gap::generator<TypedefType> in(const Index &index);
   static gap::generator<TypedefType> containing(const Token &tok);
   bool contains(const Token &tok) const;

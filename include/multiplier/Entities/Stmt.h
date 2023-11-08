@@ -30,13 +30,20 @@ class File;
 class Fragment;
 class Index;
 class Reference;
-class SourceIR;
 class Stmt;
 class StmtImpl;
 class Token;
 class TokenRange;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Stmt {
+ public:
+  std::optional<Decl> parent_declaration(void) const;
+  std::optional<Stmt> parent_statement(void) const;
  protected:
   friend class Attr;
   friend class Decl;
@@ -46,10 +53,12 @@ class Stmt {
   friend class Index;
   friend class Macro;
   friend class Reference;
-  friend class SourceIR;
   friend class TokenContext;
   friend class Type;
   friend class StmtImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const StmtImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
   static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
@@ -60,12 +69,9 @@ class Stmt {
   Stmt &operator=(Stmt &&) noexcept = default;
   Stmt &operator=(const Stmt &) = default;
 
-  friend inline std::strong_ordering operator<=>(const Stmt &lhs, const Stmt &rhs) noexcept {
-    return lhs.id().Pack() <=> rhs.id().Pack();
+  inline bool operator==(const Stmt &rhs) const noexcept {
+    return id().Pack() == rhs.id().Pack();
   }
-
-  bool operator==(const Stmt &) const noexcept = default;
-  bool operator!=(const Stmt &) const noexcept = default;
 
   /* implicit */ inline Stmt(std::shared_ptr<const StmtImpl> impl_)
       : impl(std::move(impl_)) {}
@@ -77,20 +83,18 @@ class Stmt {
   PackedStmtId id(void) const;
   gap::generator<Reference> references(void) const &;
 
-  std::optional<Decl> parent_declaration(void) const;
-  std::optional<Stmt> parent_statement(void) const;
   std::optional<PackedDeclId> referenced_declaration_id(void) const;
   std::optional<Decl> referenced_declaration(void) const;
  public:
+  static gap::generator<Stmt> in(const Index &index, std::span<StmtKind> kinds);
   static gap::generator<Stmt> in(const Fragment &frag, std::span<StmtKind> kinds);
   static gap::generator<Stmt> in(const File &file, std::span<StmtKind> kinds);
-  static gap::generator<Stmt> in(const Index &index, std::span<StmtKind> kinds);
-  static gap::generator<Stmt> in(const Fragment &frag);
-  static gap::generator<Stmt> in(const File &file);
   static gap::generator<Stmt> in(const Index &index);
   static gap::generator<Stmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<Stmt> by_id(const Index &, EntityId);
+  static gap::generator<Stmt> in(const Fragment &frag);
+  static gap::generator<Stmt> in(const File &file);
 
   static gap::generator<Stmt> containing(const Decl &decl);
   static gap::generator<Stmt> containing(const std::optional<Decl> &decl);

@@ -72,6 +72,7 @@ const char *EnumeratorName(AtomicExprAtomicOp e) {
     case AtomicExprAtomicOp::HIP_ATOMIC_COMPARE_EXCHANGE_STRONG: return "HIP_ATOMIC_COMPARE_EXCHANGE_STRONG";
     case AtomicExprAtomicOp::HIP_ATOMIC_EXCHANGE: return "HIP_ATOMIC_EXCHANGE";
     case AtomicExprAtomicOp::HIP_ATOMIC_FETCH_ADD: return "HIP_ATOMIC_FETCH_ADD";
+    case AtomicExprAtomicOp::HIP_ATOMIC_FETCH_SUB: return "HIP_ATOMIC_FETCH_SUB";
     case AtomicExprAtomicOp::HIP_ATOMIC_FETCH_AND: return "HIP_ATOMIC_FETCH_AND";
     case AtomicExprAtomicOp::HIP_ATOMIC_FETCH_OR: return "HIP_ATOMIC_FETCH_OR";
     case AtomicExprAtomicOp::HIP_ATOMIC_FETCH_XOR: return "HIP_ATOMIC_FETCH_XOR";

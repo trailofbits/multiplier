@@ -17,6 +17,11 @@ class AsmLabelAttr;
 class Attr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AsmLabelAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class AsmLabelAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<AsmLabelAttr> in(const Fragment &frag);
-  static gap::generator<AsmLabelAttr> in(const File &file);
   static gap::generator<AsmLabelAttr> in(const Index &index);
   static gap::generator<AsmLabelAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AsmLabelAttr> by_id(const Index &, EntityId);
+  static gap::generator<AsmLabelAttr> in(const Fragment &frag);
+  static gap::generator<AsmLabelAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ASM_LABEL;

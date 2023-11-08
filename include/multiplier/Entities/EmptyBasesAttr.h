@@ -17,6 +17,11 @@ class Attr;
 class EmptyBasesAttr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class EmptyBasesAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class EmptyBasesAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<EmptyBasesAttr> in(const Fragment &frag);
-  static gap::generator<EmptyBasesAttr> in(const File &file);
   static gap::generator<EmptyBasesAttr> in(const Index &index);
   static gap::generator<EmptyBasesAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<EmptyBasesAttr> by_id(const Index &, EntityId);
+  static gap::generator<EmptyBasesAttr> in(const Fragment &frag);
+  static gap::generator<EmptyBasesAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::EMPTY_BASES;

@@ -20,6 +20,11 @@ class OMPLoopDirective;
 class OMPParallelMaskedTaskLoopSimdDirective;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPParallelMaskedTaskLoopSimdDirective : public OMPLoopDirective {
  private:
@@ -29,12 +34,12 @@ class OMPParallelMaskedTaskLoopSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPParallelMaskedTaskLoopSimdDirective> in(const Fragment &frag);
-  static gap::generator<OMPParallelMaskedTaskLoopSimdDirective> in(const File &file);
   static gap::generator<OMPParallelMaskedTaskLoopSimdDirective> in(const Index &index);
   static gap::generator<OMPParallelMaskedTaskLoopSimdDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPParallelMaskedTaskLoopSimdDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPParallelMaskedTaskLoopSimdDirective> in(const Fragment &frag);
+  static gap::generator<OMPParallelMaskedTaskLoopSimdDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_MASKED_TASK_LOOP_SIMD_DIRECTIVE;

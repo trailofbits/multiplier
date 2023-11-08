@@ -13,7 +13,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -73,14 +73,14 @@ gap::generator<UsingPackDecl> UsingPackDecl::containing(const std::optional<Stmt
 
 bool UsingPackDecl::contains(const Decl &decl) {
   for (auto &parent : UsingPackDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UsingPackDecl::contains(const Stmt &stmt) {
   for (auto &parent : UsingPackDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -135,7 +135,7 @@ std::optional<UsingPackDecl> UsingPackDecl::from(const Decl &parent) {
 }
 
 gap::generator<UsingPackDecl> UsingPackDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kUsingPackDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<UsingPackDecl> e = UsingPackDecl::from(Decl(std::move(eptr)))) {
@@ -146,7 +146,7 @@ gap::generator<UsingPackDecl> UsingPackDecl::in(const Index &index) {
 }
 
 gap::generator<UsingPackDecl> UsingPackDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kUsingPackDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -158,7 +158,7 @@ gap::generator<UsingPackDecl> UsingPackDecl::in(const Fragment &frag) {
 }
 
 gap::generator<UsingPackDecl> UsingPackDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kUsingPackDeclDerivedKinds) {
@@ -180,15 +180,15 @@ std::optional<UsingPackDecl> UsingPackDecl::from(const TokenContext &t) {
 }
 
 unsigned UsingPackDecl::num_expansions(void) const {
-  return impl->reader.getVal49().size();
+  return impl->reader.getVal51().size();
 }
 
 std::optional<NamedDecl> UsingPackDecl::nth_expansion(unsigned n) const {
-  auto list = impl->reader.getVal49();
+  auto list = impl->reader.getVal51();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -198,12 +198,12 @@ std::optional<NamedDecl> UsingPackDecl::nth_expansion(unsigned n) const {
 }
 
 gap::generator<NamedDecl> UsingPackDecl::expansions(void) const & {
-  auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal51();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d49 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from(Decl(std::move(d49)))) {
+    if (auto d51 = ep->DeclFor(ep, v)) {
+      if (auto e = NamedDecl::from(Decl(std::move(d51)))) {
         co_yield std::move(*e);
       }
     }
@@ -212,7 +212,7 @@ gap::generator<NamedDecl> UsingPackDecl::expansions(void) const & {
 }
 
 NamedDecl UsingPackDecl::instantiated_from_using_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal56();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

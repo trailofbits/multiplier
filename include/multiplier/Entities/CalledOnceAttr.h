@@ -16,18 +16,23 @@ class Index;
 class Attr;
 class CalledOnceAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CalledOnceAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<CalledOnceAttr> in(const Fragment &frag);
-  static gap::generator<CalledOnceAttr> in(const File &file);
   static gap::generator<CalledOnceAttr> in(const Index &index);
   static gap::generator<CalledOnceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CalledOnceAttr> by_id(const Index &, EntityId);
+  static gap::generator<CalledOnceAttr> in(const Fragment &frag);
+  static gap::generator<CalledOnceAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CALLED_ONCE;

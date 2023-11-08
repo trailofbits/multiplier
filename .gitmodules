@@ -1,6 +1,53 @@
 [submodule "vendor/concurrentqueue/src"]
 	path = vendor/concurrentqueue/src
 	url = https://github.com/cameron314/concurrentqueue.git
+	shallow = true
 [submodule "vendor/reproc/src"]
 	path = vendor/reproc/src
 	url = https://github.com/DaanDeMeyer/reproc.git
+	shallow = true
+[submodule "vendor/capnproto/src"]
+	path = vendor/capnproto/src
+	url = https://github.com/capnproto/capnproto.git
+	shallow = true
+[submodule "vendor/glog/src"]
+	path = vendor/glog/src
+	url = https://github.com/google/glog.git
+	shallow = true
+[submodule "vendor/gflags/src"]
+	path = vendor/gflags/src
+	url = https://github.com/gflags/gflags.git
+	shallow = true
+[submodule "vendor/zstd/src"]
+	path = vendor/zstd/src
+	url = https://github.com/facebook/zstd.git
+	shallow = true
+[submodule "vendor/gap/src"]
+	path = vendor/gap/src
+	url = https://github.com/lifting-bits/gap.git
+	shallow = true
+[submodule "vendor/pasta/src"]
+	path = vendor/pasta/src
+	url = https://github.com/trailofbits/pasta.git
+	branch = master
+[submodule "vendor/llvm-project/src"]
+	path = vendor/llvm-project/src
+	url = https://github.com/trail-of-forks/llvm-project.git
+	branch = pasta
+[submodule "vendor/abseil/src"]
+	path = vendor/abseil/src
+	url = https://github.com/abseil/abseil-cpp.git
+	shallow = true
+[submodule "vendor/re2/src"]
+	path = vendor/re2/src
+	url = https://github.com/google/re2.git
+	shallow = true
+[submodule "vendor/rocksdb/src"]
+	path = vendor/rocksdb/src
+	url = https://github.com/facebook/rocksdb.git
+[submodule "vendor/xxhash/src"]
+	path = vendor/xxhash/src
+	url = https://github.com/Cyan4973/xxHash.git
+[submodule "vendor/nanobind/src"]
+	path = vendor/nanobind/src
+	url = https://github.com/wjakob/nanobind.git

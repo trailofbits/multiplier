@@ -18,6 +18,11 @@ class InheritableAttr;
 class InheritableParamAttr;
 class ReleaseHandleAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ReleaseHandleAttr : public InheritableParamAttr {
  private:
@@ -26,12 +31,12 @@ class ReleaseHandleAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ReleaseHandleAttr> in(const Fragment &frag);
-  static gap::generator<ReleaseHandleAttr> in(const File &file);
   static gap::generator<ReleaseHandleAttr> in(const Index &index);
   static gap::generator<ReleaseHandleAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ReleaseHandleAttr> by_id(const Index &, EntityId);
+  static gap::generator<ReleaseHandleAttr> in(const Fragment &frag);
+  static gap::generator<ReleaseHandleAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RELEASE_HANDLE;

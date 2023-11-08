@@ -14,7 +14,7 @@ namespace mx {
 enum class NoDebugAttrSpelling : unsigned char {
   GNU_NODEBUG,
   CXX11_GNU_NODEBUG,
-  C2X_GNU_NODEBUG,
+  C23_GNU_NODEBUG,
   SPELLING_NOT_CALCULATED,
 };
 

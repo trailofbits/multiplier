@@ -17,7 +17,7 @@ const char *EnumeratorName(TypeTagForDatatypeAttrSpelling e) {
   switch (e) {
     case TypeTagForDatatypeAttrSpelling::GNU_TYPE_TAG_FOR_DATATYPE: return "GNU_TYPE_TAG_FOR_DATATYPE";
     case TypeTagForDatatypeAttrSpelling::CXX11_CLANG_TYPE_TAG_FOR_DATATYPE: return "CXX11_CLANG_TYPE_TAG_FOR_DATATYPE";
-    case TypeTagForDatatypeAttrSpelling::C2X_CLANG_TYPE_TAG_FOR_DATATYPE: return "C2X_CLANG_TYPE_TAG_FOR_DATATYPE";
+    case TypeTagForDatatypeAttrSpelling::C23_CLANG_TYPE_TAG_FOR_DATATYPE: return "C23_CLANG_TYPE_TAG_FOR_DATATYPE";
     case TypeTagForDatatypeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

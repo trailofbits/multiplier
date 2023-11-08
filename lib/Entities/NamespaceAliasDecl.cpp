@@ -13,7 +13,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -73,14 +73,14 @@ gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::containing(const std::opt
 
 bool NamespaceAliasDecl::contains(const Decl &decl) {
   for (auto &parent : NamespaceAliasDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool NamespaceAliasDecl::contains(const Stmt &stmt) {
   for (auto &parent : NamespaceAliasDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -135,7 +135,7 @@ std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const Decl &parent) {
 }
 
 gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kNamespaceAliasDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<NamespaceAliasDecl> e = NamespaceAliasDecl::from(Decl(std::move(eptr)))) {
@@ -146,7 +146,7 @@ gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::in(const Index &index) {
 }
 
 gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kNamespaceAliasDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -158,7 +158,7 @@ gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::in(const Fragment &frag) 
 }
 
 gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kNamespaceAliasDeclDerivedKinds) {
@@ -180,20 +180,20 @@ std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const TokenContext &t
 }
 
 Token NamespaceAliasDecl::alias_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal54());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
 NamedDecl NamespaceAliasDecl::aliased_namespace(void) const {
-  RawEntityId eid = impl->reader.getVal55();
+  RawEntityId eid = impl->reader.getVal57();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token NamespaceAliasDecl::namespace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
 }
 
 Token NamespaceAliasDecl::target_name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 #pragma GCC diagnostic pop

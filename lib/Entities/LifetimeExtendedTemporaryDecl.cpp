@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::con
 
 bool LifetimeExtendedTemporaryDecl::contains(const Decl &decl) {
   for (auto &parent : LifetimeExtendedTemporaryDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool LifetimeExtendedTemporaryDecl::contains(const Stmt &stmt) {
   for (auto &parent : LifetimeExtendedTemporaryDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -136,7 +136,7 @@ std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from
 }
 
 gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kLifetimeExtendedTemporaryDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<LifetimeExtendedTemporaryDecl> e = LifetimeExtendedTemporaryDecl::from(Decl(std::move(eptr)))) {
@@ -147,7 +147,7 @@ gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(
 }
 
 gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kLifetimeExtendedTemporaryDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -159,7 +159,7 @@ gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(
 }
 
 gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kLifetimeExtendedTemporaryDeclDerivedKinds) {
@@ -181,28 +181,28 @@ std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from
 }
 
 gap::generator<Stmt> LifetimeExtendedTemporaryDecl::children(void) const & {
-  auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal51();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d49 = ep->StmtFor(ep, v)) {
-      co_yield Stmt(std::move(d49));
+    if (auto d51 = ep->StmtFor(ep, v)) {
+      co_yield Stmt(std::move(d51));
     }
   }
   co_return;
 }
 
 ValueDecl LifetimeExtendedTemporaryDecl::extending_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal49();
   return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 StorageDuration LifetimeExtendedTemporaryDecl::storage_duration(void) const {
-  return static_cast<StorageDuration>(impl->reader.getVal63());
+  return static_cast<StorageDuration>(impl->reader.getVal65());
 }
 
 Expr LifetimeExtendedTemporaryDecl::temporary_expression(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal56();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

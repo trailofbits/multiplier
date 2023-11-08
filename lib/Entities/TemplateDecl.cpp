@@ -21,7 +21,7 @@
 #include <multiplier/Entities/TypeAliasTemplateDecl.h>
 #include <multiplier/Entities/VarTemplateDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -81,14 +81,14 @@ gap::generator<TemplateDecl> TemplateDecl::containing(const std::optional<Stmt> 
 
 bool TemplateDecl::contains(const Decl &decl) {
   for (auto &parent : TemplateDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool TemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : TemplateDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -155,7 +155,7 @@ std::optional<TemplateDecl> TemplateDecl::from(const Decl &parent) {
 }
 
 gap::generator<TemplateDecl> TemplateDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<TemplateDecl> e = TemplateDecl::from(Decl(std::move(eptr)))) {
@@ -166,7 +166,7 @@ gap::generator<TemplateDecl> TemplateDecl::in(const Index &index) {
 }
 
 gap::generator<TemplateDecl> TemplateDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -178,7 +178,7 @@ gap::generator<TemplateDecl> TemplateDecl::in(const Fragment &frag) {
 }
 
 gap::generator<TemplateDecl> TemplateDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kTemplateDeclDerivedKinds) {
@@ -200,21 +200,21 @@ std::optional<TemplateDecl> TemplateDecl::from(const TokenContext &t) {
 }
 
 TemplateParameterList TemplateDecl::template_parameters(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal56();
   return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
 NamedDecl TemplateDecl::templated_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal55();
+  RawEntityId eid = impl->reader.getVal57();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool TemplateDecl::has_associated_constraints(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal74();
 }
 
 bool TemplateDecl::is_type_alias(void) const {
-  return impl->reader.getVal73();
+  return impl->reader.getVal75();
 }
 
 #pragma GCC diagnostic pop

@@ -30,13 +30,18 @@ class File;
 class Fragment;
 class NamedDecl;
 class Reference;
-class SourceIR;
 class TemplateParameterList;
 class TemplateParameterListImpl;
 class Token;
 class TokenRange;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParameterList {
+ public:
  protected:
   friend class Attr;
   friend class Decl;
@@ -46,11 +51,13 @@ class TemplateParameterList {
   friend class Index;
   friend class Macro;
   friend class Reference;
-  friend class SourceIR;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
   friend class TemplateParameterListImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const TemplateParameterListImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
   static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
@@ -61,12 +68,9 @@ class TemplateParameterList {
   TemplateParameterList &operator=(TemplateParameterList &&) noexcept = default;
   TemplateParameterList &operator=(const TemplateParameterList &) = default;
 
-  friend inline std::strong_ordering operator<=>(const TemplateParameterList &lhs, const TemplateParameterList &rhs) noexcept {
-    return lhs.id().Pack() <=> rhs.id().Pack();
+  inline bool operator==(const TemplateParameterList &rhs) const noexcept {
+    return id().Pack() == rhs.id().Pack();
   }
-
-  bool operator==(const TemplateParameterList &) const noexcept = default;
-  bool operator!=(const TemplateParameterList &) const noexcept = default;
 
   /* implicit */ inline TemplateParameterList(std::shared_ptr<const TemplateParameterListImpl> impl_)
       : impl(std::move(impl_)) {}
@@ -90,7 +94,7 @@ class TemplateParameterList {
 
   static std::optional<TemplateParameterList> from(const TokenContext &t);
 
-  unsigned depth(void) const;
+  uint32_t depth(void) const;
   bool has_unexpanded_parameter_pack(void) const;
   bool has_parameter_pack(void) const;
   std::optional<Expr> requires_clause(void) const;

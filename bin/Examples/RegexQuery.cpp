@@ -42,7 +42,7 @@ static void DumpMatch(const mx::RegexQueryMatch &match) {
   std::cout << "\n\n";
 }
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
@@ -65,8 +65,8 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::in_memory_cache(
-      mx::EntityProvider::from_database(FLAGS_db)));
+  mx::Index index(mx::Index::in_memory_cache(
+      mx::Index::from_database(FLAGS_db)));
 
   for (auto [path, id] : index.file_paths()) {
     file_id_to_paths.emplace(id, path);

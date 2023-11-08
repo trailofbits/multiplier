@@ -19,6 +19,11 @@ class Token;
 class TokenRange;
 class Type;
 class VariableArrayType;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VariableArrayType : public ArrayType {
  private:
@@ -26,8 +31,6 @@ class VariableArrayType : public ArrayType {
   friend class ArrayType;
   friend class Type;
  public:
-  static gap::generator<VariableArrayType> in(const Fragment &frag);
-  static gap::generator<VariableArrayType> in(const File &file);
   static gap::generator<VariableArrayType> in(const Index &index);
   static gap::generator<VariableArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;

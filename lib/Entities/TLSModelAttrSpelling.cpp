@@ -17,7 +17,7 @@ const char *EnumeratorName(TLSModelAttrSpelling e) {
   switch (e) {
     case TLSModelAttrSpelling::GNU_TLS_MODEL: return "GNU_TLS_MODEL";
     case TLSModelAttrSpelling::CXX11_GNU_TLS_MODEL: return "CXX11_GNU_TLS_MODEL";
-    case TLSModelAttrSpelling::C2X_GNU_TLS_MODEL: return "C2X_GNU_TLS_MODEL";
+    case TLSModelAttrSpelling::C23_GNU_TLS_MODEL: return "C23_GNU_TLS_MODEL";
     case TLSModelAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

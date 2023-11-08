@@ -17,6 +17,11 @@ class Attr;
 class IBOutletAttr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class IBOutletAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class IBOutletAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<IBOutletAttr> in(const Fragment &frag);
-  static gap::generator<IBOutletAttr> in(const File &file);
   static gap::generator<IBOutletAttr> in(const Index &index);
   static gap::generator<IBOutletAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<IBOutletAttr> by_id(const Index &, EntityId);
+  static gap::generator<IBOutletAttr> in(const Fragment &frag);
+  static gap::generator<IBOutletAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::IB_OUTLET;

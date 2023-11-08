@@ -17,6 +17,11 @@ class Attr;
 class DLLImportStaticLocalAttr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DLLImportStaticLocalAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class DLLImportStaticLocalAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<DLLImportStaticLocalAttr> in(const Fragment &frag);
-  static gap::generator<DLLImportStaticLocalAttr> in(const File &file);
   static gap::generator<DLLImportStaticLocalAttr> in(const Index &index);
   static gap::generator<DLLImportStaticLocalAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<DLLImportStaticLocalAttr> by_id(const Index &, EntityId);
+  static gap::generator<DLLImportStaticLocalAttr> in(const Fragment &frag);
+  static gap::generator<DLLImportStaticLocalAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DLL_IMPORT_STATIC_LOCAL;

@@ -14,7 +14,7 @@
 #include <multiplier/Entities/InheritableAttr.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Attr.h"
 
 namespace mx {
@@ -64,7 +64,7 @@ std::optional<HLSLAnnotationAttr> HLSLAnnotationAttr::from(const Attr &parent) {
 }
 
 gap::generator<HLSLAnnotationAttr> HLSLAnnotationAttr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kHLSLAnnotationAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
       if (std::optional<HLSLAnnotationAttr> e = HLSLAnnotationAttr::from(Attr(std::move(eptr)))) {
@@ -75,7 +75,7 @@ gap::generator<HLSLAnnotationAttr> HLSLAnnotationAttr::in(const Index &index) {
 }
 
 gap::generator<HLSLAnnotationAttr> HLSLAnnotationAttr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kHLSLAnnotationAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
@@ -87,7 +87,7 @@ gap::generator<HLSLAnnotationAttr> HLSLAnnotationAttr::in(const Fragment &frag) 
 }
 
 gap::generator<HLSLAnnotationAttr> HLSLAnnotationAttr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kHLSLAnnotationAttrDerivedKinds) {

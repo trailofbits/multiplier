@@ -139,7 +139,7 @@
 #include <multiplier/Entities/VAArgExpr.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -199,14 +199,14 @@ gap::generator<Expr> Expr::containing(const std::optional<Stmt> &stmt) {
 
 bool Expr::contains(const Decl &decl) {
   for (auto &parent : Expr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool Expr::contains(const Stmt &stmt) {
   for (auto &parent : Expr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -481,7 +481,7 @@ std::optional<Expr> Expr::from(const Stmt &parent) {
 }
 
 gap::generator<Expr> Expr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<Expr> e = Expr::from(Stmt(std::move(eptr)))) {
@@ -492,7 +492,7 @@ gap::generator<Expr> Expr::in(const Index &index) {
 }
 
 gap::generator<Expr> Expr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -504,7 +504,7 @@ gap::generator<Expr> Expr::in(const Fragment &frag) {
 }
 
 gap::generator<Expr> Expr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kExprDerivedKinds) {
@@ -597,22 +597,17 @@ bool Expr::contains_unexpanded_parameter_pack(void) const {
   return impl->reader.getVal23();
 }
 
-Expr Expr::best_dynamic_class_type_expression(void) const {
-  RawEntityId eid = impl->reader.getVal32();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
 ExprDependence Expr::dependence(void) const {
   return static_cast<ExprDependence>(impl->reader.getVal56());
 }
 
 Token Expr::expression_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal33());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal32());
 }
 
 std::optional<ObjCPropertyRefExpr> Expr::obj_c_property(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal34();
+    RawEntityId eid = impl->reader.getVal33();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -629,7 +624,7 @@ ExprObjectKind Expr::object_kind(void) const {
 
 std::optional<Decl> Expr::referenced_declaration_of_callee(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal35();
+    RawEntityId eid = impl->reader.getVal34();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -642,7 +637,7 @@ std::optional<Decl> Expr::referenced_declaration_of_callee(void) const {
 
 std::optional<FieldDecl> Expr::source_bit_field(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal36();
+    RawEntityId eid = impl->reader.getVal35();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -655,7 +650,7 @@ std::optional<FieldDecl> Expr::source_bit_field(void) const {
 
 std::optional<Type> Expr::type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal37();
+    RawEntityId eid = impl->reader.getVal36();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -674,32 +669,32 @@ bool Expr::has_non_trivial_call(void) const {
   return impl->reader.getVal24();
 }
 
-std::optional<bool> Expr::is_cxx98_integral_constant_expression(void) const {
-  if (!impl->reader.getVal57()) {
+bool Expr::is_default_argument(void) const {
+  return impl->reader.getVal25();
+}
+
+bool Expr::is_gl_value(void) const {
+  return impl->reader.getVal57();
+}
+
+bool Expr::is_implicit_cxx_this(void) const {
+  return impl->reader.getVal58();
+}
+
+bool Expr::is_instantiation_dependent(void) const {
+  return impl->reader.getVal59();
+}
+
+std::optional<bool> Expr::is_integer_constant_expression(void) const {
+  if (!impl->reader.getVal72()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal25());
+    return static_cast<bool>(impl->reader.getVal71());
   }
   return std::nullopt;
 }
 
-bool Expr::is_default_argument(void) const {
-  return impl->reader.getVal58();
-}
-
-bool Expr::is_gl_value(void) const {
-  return impl->reader.getVal59();
-}
-
-bool Expr::is_implicit_cxx_this(void) const {
-  return impl->reader.getVal71();
-}
-
-bool Expr::is_instantiation_dependent(void) const {
-  return impl->reader.getVal72();
-}
-
-std::optional<bool> Expr::is_integer_constant_expression(void) const {
+std::optional<bool> Expr::is_known_to_have_boolean_value(void) const {
   if (!impl->reader.getVal74()) {
     return std::nullopt;
   } else {
@@ -708,32 +703,33 @@ std::optional<bool> Expr::is_integer_constant_expression(void) const {
   return std::nullopt;
 }
 
-bool Expr::is_known_to_have_boolean_value(void) const {
+bool Expr::is_l_value(void) const {
   return impl->reader.getVal75();
 }
 
-bool Expr::is_l_value(void) const {
+bool Expr::is_objcgc_candidate(void) const {
   return impl->reader.getVal76();
 }
 
-bool Expr::is_objcgc_candidate(void) const {
+bool Expr::is_obj_c_self_expression(void) const {
   return impl->reader.getVal77();
 }
 
-bool Expr::is_obj_c_self_expression(void) const {
+bool Expr::is_ordinary_or_bit_field_object(void) const {
   return impl->reader.getVal78();
 }
 
-bool Expr::is_ordinary_or_bit_field_object(void) const {
+bool Expr::is_pr_value(void) const {
   return impl->reader.getVal79();
 }
 
-bool Expr::is_pr_value(void) const {
-  return impl->reader.getVal80();
-}
-
-bool Expr::is_read_if_discarded_in_c_plus_plus11(void) const {
-  return impl->reader.getVal81();
+std::optional<bool> Expr::is_read_if_discarded_in_c_plus_plus11(void) const {
+  if (!impl->reader.getVal81()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal80());
+  }
+  return std::nullopt;
 }
 
 bool Expr::is_type_dependent(void) const {

@@ -17,6 +17,11 @@ class Attr;
 class CFReturnsNotRetainedAttr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CFReturnsNotRetainedAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class CFReturnsNotRetainedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<CFReturnsNotRetainedAttr> in(const Fragment &frag);
-  static gap::generator<CFReturnsNotRetainedAttr> in(const File &file);
   static gap::generator<CFReturnsNotRetainedAttr> in(const Index &index);
   static gap::generator<CFReturnsNotRetainedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CFReturnsNotRetainedAttr> by_id(const Index &, EntityId);
+  static gap::generator<CFReturnsNotRetainedAttr> in(const Fragment &frag);
+  static gap::generator<CFReturnsNotRetainedAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_RETURNS_NOT_RETAINED;

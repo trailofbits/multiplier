@@ -17,18 +17,23 @@ class Decl;
 class DeclStmt;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DeclStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<DeclStmt> in(const Fragment &frag);
-  static gap::generator<DeclStmt> in(const File &file);
   static gap::generator<DeclStmt> in(const Index &index);
   static gap::generator<DeclStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<DeclStmt> by_id(const Index &, EntityId);
+  static gap::generator<DeclStmt> in(const Fragment &frag);
+  static gap::generator<DeclStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DECL_STMT;

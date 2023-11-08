@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<CXXStdInitializerListExpr> CXXStdInitializerListExpr::containing(
 
 bool CXXStdInitializerListExpr::contains(const Decl &decl) {
   for (auto &parent : CXXStdInitializerListExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXStdInitializerListExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXStdInitializerListExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<CXXStdInitializerListExpr> CXXStdInitializerListExpr::from(const S
 }
 
 gap::generator<CXXStdInitializerListExpr> CXXStdInitializerListExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXStdInitializerListExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXStdInitializerListExpr> e = CXXStdInitializerListExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<CXXStdInitializerListExpr> CXXStdInitializerListExpr::in(const In
 }
 
 gap::generator<CXXStdInitializerListExpr> CXXStdInitializerListExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXStdInitializerListExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<CXXStdInitializerListExpr> CXXStdInitializerListExpr::in(const Fr
 }
 
 gap::generator<CXXStdInitializerListExpr> CXXStdInitializerListExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXStdInitializerListExprDerivedKinds) {
@@ -155,7 +155,7 @@ std::optional<CXXStdInitializerListExpr> CXXStdInitializerListExpr::from(const T
 }
 
 Expr CXXStdInitializerListExpr::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

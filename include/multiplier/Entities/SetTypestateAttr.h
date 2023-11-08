@@ -18,6 +18,11 @@ class Attr;
 class InheritableAttr;
 class SetTypestateAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class SetTypestateAttr : public InheritableAttr {
  private:
@@ -25,12 +30,12 @@ class SetTypestateAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<SetTypestateAttr> in(const Fragment &frag);
-  static gap::generator<SetTypestateAttr> in(const File &file);
   static gap::generator<SetTypestateAttr> in(const Index &index);
   static gap::generator<SetTypestateAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SetTypestateAttr> by_id(const Index &, EntityId);
+  static gap::generator<SetTypestateAttr> in(const Fragment &frag);
+  static gap::generator<SetTypestateAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SET_TYPESTATE;

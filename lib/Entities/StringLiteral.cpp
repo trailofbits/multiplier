@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<StringLiteral> StringLiteral::containing(const std::optional<Stmt
 
 bool StringLiteral::contains(const Decl &decl) {
   for (auto &parent : StringLiteral::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool StringLiteral::contains(const Stmt &stmt) {
   for (auto &parent : StringLiteral::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<StringLiteral> StringLiteral::from(const Stmt &parent) {
 }
 
 gap::generator<StringLiteral> StringLiteral::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kStringLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<StringLiteral> e = StringLiteral::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<StringLiteral> StringLiteral::in(const Index &index) {
 }
 
 gap::generator<StringLiteral> StringLiteral::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kStringLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<StringLiteral> StringLiteral::in(const Fragment &frag) {
 }
 
 gap::generator<StringLiteral> StringLiteral::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kStringLiteralDerivedKinds) {
@@ -177,8 +177,8 @@ std::string_view StringLiteral::bytes(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-StringLiteralStringKind StringLiteral::string_kind(void) const {
-  return static_cast<StringLiteralStringKind>(impl->reader.getVal94());
+StringLiteralStringKind StringLiteral::literal_kind(void) const {
+  return static_cast<StringLiteralStringKind>(impl->reader.getVal95());
 }
 
 std::optional<std::string_view> StringLiteral::string(void) const {
@@ -192,11 +192,11 @@ std::optional<std::string_view> StringLiteral::string(void) const {
 }
 
 bool StringLiteral::is_ordinary(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal94();
 }
 
 bool StringLiteral::is_pascal(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal96();
 }
 
 bool StringLiteral::is_utf16(void) const {
@@ -211,8 +211,12 @@ bool StringLiteral::is_utf8(void) const {
   return impl->reader.getVal100();
 }
 
-bool StringLiteral::is_wide(void) const {
+bool StringLiteral::is_unevaluated(void) const {
   return impl->reader.getVal101();
+}
+
+bool StringLiteral::is_wide(void) const {
+  return impl->reader.getVal102();
 }
 
 #pragma GCC diagnostic pop

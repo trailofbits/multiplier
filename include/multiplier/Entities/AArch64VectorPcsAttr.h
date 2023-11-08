@@ -17,6 +17,11 @@ class AArch64VectorPcsAttr;
 class Attr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AArch64VectorPcsAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class AArch64VectorPcsAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<AArch64VectorPcsAttr> in(const Fragment &frag);
-  static gap::generator<AArch64VectorPcsAttr> in(const File &file);
   static gap::generator<AArch64VectorPcsAttr> in(const Index &index);
   static gap::generator<AArch64VectorPcsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AArch64VectorPcsAttr> by_id(const Index &, EntityId);
+  static gap::generator<AArch64VectorPcsAttr> in(const Fragment &frag);
+  static gap::generator<AArch64VectorPcsAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::A_ARCH64_VECTOR_PCS;

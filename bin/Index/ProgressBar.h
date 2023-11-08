@@ -18,10 +18,9 @@ class ProgressBar {
 
   ~ProgressBar(void);
 
-  void Advance(std::chrono::duration<double> elapsed_time) const;
+  void Advance(void) const;
   void AddWork(uint64_t num_steps) const;
 
-  void SetNumWorkers(unsigned num_workers) const;
  private:
   ProgressBar(void) = delete;
   ProgressBar(const ProgressBar &) = delete;
@@ -41,13 +40,11 @@ class ProgressBarStep {
       : ProgressBarStep(bar_.get()) {}
 
   inline explicit ProgressBarStep(const ProgressBar *bar_)
-      : bar(bar_),
-        start_time(std::chrono::system_clock::now()) {}
+      : bar(bar_) {}
 
   inline ~ProgressBarStep(void) {
-    auto finish_time = std::chrono::system_clock::now();
     if (bar) {
-      bar->Advance(finish_time - start_time);
+      bar->Advance();
     }
   }
 
@@ -58,14 +55,10 @@ class ProgressBarStep {
 
  protected:
   const ProgressBar * const bar;
-  std::chrono::system_clock::time_point start_time;
 };
 
 // Like a `ProgressBarStep`, but also adds work to the bar.
 class ProgressBarWork : public ProgressBarStep {
- private:
-  using ProgressBarStep::ProgressBarStep;
-
  public:
   template <typename T>
   inline explicit ProgressBarWork(const std::unique_ptr<T> &bar_)

@@ -27,6 +27,11 @@ class TemplateArgument;
 class Token;
 class Type;
 class TypeDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ClassTemplateSpecializationDecl : public CXXRecordDecl {
  private:
@@ -38,12 +43,12 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ClassTemplateSpecializationDecl> in(const Fragment &frag);
-  static gap::generator<ClassTemplateSpecializationDecl> in(const File &file);
   static gap::generator<ClassTemplateSpecializationDecl> in(const Index &index);
   static gap::generator<ClassTemplateSpecializationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ClassTemplateSpecializationDecl> by_id(const Index &, EntityId);
+  static gap::generator<ClassTemplateSpecializationDecl> in(const Fragment &frag);
+  static gap::generator<ClassTemplateSpecializationDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_TEMPLATE_SPECIALIZATION;

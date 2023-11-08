@@ -20,6 +20,11 @@ class Stmt;
 class StringLiteral;
 class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class StringLiteral : public Expr {
  private:
@@ -28,12 +33,12 @@ class StringLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<StringLiteral> in(const Fragment &frag);
-  static gap::generator<StringLiteral> in(const File &file);
   static gap::generator<StringLiteral> in(const Index &index);
   static gap::generator<StringLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<StringLiteral> by_id(const Index &, EntityId);
+  static gap::generator<StringLiteral> in(const Fragment &frag);
+  static gap::generator<StringLiteral> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::STRING_LITERAL;
@@ -64,13 +69,14 @@ class StringLiteral : public Expr {
   std::optional<bool> contains_non_ascii(void) const;
   std::optional<bool> contains_non_ascii_or_null(void) const;
   std::string_view bytes(void) const;
-  StringLiteralStringKind string_kind(void) const;
+  StringLiteralStringKind literal_kind(void) const;
   std::optional<std::string_view> string(void) const;
   bool is_ordinary(void) const;
   bool is_pascal(void) const;
   bool is_utf16(void) const;
   bool is_utf32(void) const;
   bool is_utf8(void) const;
+  bool is_unevaluated(void) const;
   bool is_wide(void) const;
 };
 

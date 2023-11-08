@@ -17,6 +17,11 @@ class ArrayType;
 class IncompleteArrayType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class IncompleteArrayType : public ArrayType {
  private:
@@ -24,8 +29,6 @@ class IncompleteArrayType : public ArrayType {
   friend class ArrayType;
   friend class Type;
  public:
-  static gap::generator<IncompleteArrayType> in(const Fragment &frag);
-  static gap::generator<IncompleteArrayType> in(const File &file);
   static gap::generator<IncompleteArrayType> in(const Index &index);
   static gap::generator<IncompleteArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;

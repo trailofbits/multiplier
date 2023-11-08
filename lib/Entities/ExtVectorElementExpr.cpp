@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::containing(const std:
 
 bool ExtVectorElementExpr::contains(const Decl &decl) {
   for (auto &parent : ExtVectorElementExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ExtVectorElementExpr::contains(const Stmt &stmt) {
   for (auto &parent : ExtVectorElementExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const Stmt &paren
 }
 
 gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kExtVectorElementExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ExtVectorElementExpr> e = ExtVectorElementExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const Index &index
 }
 
 gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kExtVectorElementExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const Fragment &fr
 }
 
 gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kExtVectorElementExprDerivedKinds) {
@@ -159,11 +159,11 @@ bool ExtVectorElementExpr::contains_duplicate_elements(void) const {
 }
 
 Token ExtVectorElementExpr::accessor_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 Expr ExtVectorElementExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

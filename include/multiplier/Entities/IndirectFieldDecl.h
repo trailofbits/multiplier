@@ -21,6 +21,11 @@ class Stmt;
 class Token;
 class ValueDecl;
 class VarDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class IndirectFieldDecl : public ValueDecl {
  private:
@@ -29,12 +34,12 @@ class IndirectFieldDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<IndirectFieldDecl> in(const Fragment &frag);
-  static gap::generator<IndirectFieldDecl> in(const File &file);
   static gap::generator<IndirectFieldDecl> in(const Index &index);
   static gap::generator<IndirectFieldDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<IndirectFieldDecl> by_id(const Index &, EntityId);
+  static gap::generator<IndirectFieldDecl> in(const Fragment &frag);
+  static gap::generator<IndirectFieldDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::INDIRECT_FIELD;

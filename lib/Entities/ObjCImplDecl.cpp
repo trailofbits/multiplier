@@ -18,7 +18,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -78,14 +78,14 @@ gap::generator<ObjCImplDecl> ObjCImplDecl::containing(const std::optional<Stmt> 
 
 bool ObjCImplDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCImplDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCImplDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCImplDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -142,7 +142,7 @@ std::optional<ObjCImplDecl> ObjCImplDecl::from(const Decl &parent) {
 }
 
 gap::generator<ObjCImplDecl> ObjCImplDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCImplDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ObjCImplDecl> e = ObjCImplDecl::from(Decl(std::move(eptr)))) {
@@ -153,7 +153,7 @@ gap::generator<ObjCImplDecl> ObjCImplDecl::in(const Index &index) {
 }
 
 gap::generator<ObjCImplDecl> ObjCImplDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCImplDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -165,7 +165,7 @@ gap::generator<ObjCImplDecl> ObjCImplDecl::in(const Fragment &frag) {
 }
 
 gap::generator<ObjCImplDecl> ObjCImplDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCImplDeclDerivedKinds) {
@@ -187,20 +187,20 @@ std::optional<ObjCImplDecl> ObjCImplDecl::from(const TokenContext &t) {
 }
 
 ObjCInterfaceDecl ObjCImplDecl::class_interface(void) const {
-  RawEntityId eid = impl->reader.getVal64();
+  RawEntityId eid = impl->reader.getVal66();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 unsigned ObjCImplDecl::num_property_implementations(void) const {
-  return impl->reader.getVal313().size();
+  return impl->reader.getVal315().size();
 }
 
 std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(unsigned n) const {
-  auto list = impl->reader.getVal313();
+  auto list = impl->reader.getVal315();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -210,12 +210,12 @@ std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(un
 }
 
 gap::generator<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void) const & {
-  auto list = impl->reader.getVal313();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal315();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d313 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCPropertyImplDecl::from(Decl(std::move(d313)))) {
+    if (auto d315 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCPropertyImplDecl::from(Decl(std::move(d315)))) {
         co_yield std::move(*e);
       }
     }

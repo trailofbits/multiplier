@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class MaxFieldAlignmentAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MaxFieldAlignmentAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class MaxFieldAlignmentAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<MaxFieldAlignmentAttr> in(const Fragment &frag);
-  static gap::generator<MaxFieldAlignmentAttr> in(const File &file);
   static gap::generator<MaxFieldAlignmentAttr> in(const Index &index);
   static gap::generator<MaxFieldAlignmentAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MaxFieldAlignmentAttr> by_id(const Index &, EntityId);
+  static gap::generator<MaxFieldAlignmentAttr> in(const Fragment &frag);
+  static gap::generator<MaxFieldAlignmentAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MAX_FIELD_ALIGNMENT;

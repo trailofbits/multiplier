@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class PtGuardedVarAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class PtGuardedVarAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class PtGuardedVarAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<PtGuardedVarAttr> in(const Fragment &frag);
-  static gap::generator<PtGuardedVarAttr> in(const File &file);
   static gap::generator<PtGuardedVarAttr> in(const Index &index);
   static gap::generator<PtGuardedVarAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<PtGuardedVarAttr> by_id(const Index &, EntityId);
+  static gap::generator<PtGuardedVarAttr> in(const Fragment &frag);
+  static gap::generator<PtGuardedVarAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PT_GUARDED_VAR;

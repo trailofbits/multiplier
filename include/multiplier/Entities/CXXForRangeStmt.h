@@ -20,18 +20,23 @@ class Expr;
 class Stmt;
 class Token;
 class VarDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXForRangeStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<CXXForRangeStmt> in(const Fragment &frag);
-  static gap::generator<CXXForRangeStmt> in(const File &file);
   static gap::generator<CXXForRangeStmt> in(const Index &index);
   static gap::generator<CXXForRangeStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXForRangeStmt> by_id(const Index &, EntityId);
+  static gap::generator<CXXForRangeStmt> in(const Fragment &frag);
+  static gap::generator<CXXForRangeStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_FOR_RANGE_STMT;

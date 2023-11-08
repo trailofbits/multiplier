@@ -23,6 +23,11 @@ class SwiftContextAttr;
 class SwiftErrorResultAttr;
 class SwiftIndirectResultAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ParameterABIAttr : public InheritableParamAttr {
  private:
@@ -31,12 +36,12 @@ class ParameterABIAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ParameterABIAttr> in(const Fragment &frag);
-  static gap::generator<ParameterABIAttr> in(const File &file);
   static gap::generator<ParameterABIAttr> in(const Index &index);
   static gap::generator<ParameterABIAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ParameterABIAttr> by_id(const Index &, EntityId);
+  static gap::generator<ParameterABIAttr> in(const Fragment &frag);
+  static gap::generator<ParameterABIAttr> in(const File &file);
 
   static std::optional<ParameterABIAttr> from(const Attr &parent);
 

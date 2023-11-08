@@ -17,18 +17,23 @@ class AlignValueAttr;
 class Attr;
 class Expr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AlignValueAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<AlignValueAttr> in(const Fragment &frag);
-  static gap::generator<AlignValueAttr> in(const File &file);
   static gap::generator<AlignValueAttr> in(const Index &index);
   static gap::generator<AlignValueAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AlignValueAttr> by_id(const Index &, EntityId);
+  static gap::generator<AlignValueAttr> in(const Fragment &frag);
+  static gap::generator<AlignValueAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALIGN_VALUE;

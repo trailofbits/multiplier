@@ -19,6 +19,11 @@ class Stmt;
 class TemplateParamObjectDecl;
 class Token;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParamObjectDecl : public ValueDecl {
  private:
@@ -27,12 +32,12 @@ class TemplateParamObjectDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<TemplateParamObjectDecl> in(const Fragment &frag);
-  static gap::generator<TemplateParamObjectDecl> in(const File &file);
   static gap::generator<TemplateParamObjectDecl> in(const Index &index);
   static gap::generator<TemplateParamObjectDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TemplateParamObjectDecl> by_id(const Index &, EntityId);
+  static gap::generator<TemplateParamObjectDecl> in(const Fragment &frag);
+  static gap::generator<TemplateParamObjectDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TEMPLATE_PARAM_OBJECT;

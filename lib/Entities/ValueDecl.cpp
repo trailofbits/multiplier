@@ -41,7 +41,7 @@
 #include <multiplier/Entities/VarTemplatePartialSpecializationDecl.h>
 #include <multiplier/Entities/VarTemplateSpecializationDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -101,14 +101,14 @@ gap::generator<ValueDecl> ValueDecl::containing(const std::optional<Stmt> &stmt)
 
 bool ValueDecl::contains(const Decl &decl) {
   for (auto &parent : ValueDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ValueDecl::contains(const Stmt &stmt) {
   for (auto &parent : ValueDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -215,7 +215,7 @@ std::optional<ValueDecl> ValueDecl::from(const Decl &parent) {
 }
 
 gap::generator<ValueDecl> ValueDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kValueDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ValueDecl> e = ValueDecl::from(Decl(std::move(eptr)))) {
@@ -226,7 +226,7 @@ gap::generator<ValueDecl> ValueDecl::in(const Index &index) {
 }
 
 gap::generator<ValueDecl> ValueDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kValueDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -238,7 +238,7 @@ gap::generator<ValueDecl> ValueDecl::in(const Fragment &frag) {
 }
 
 gap::generator<ValueDecl> ValueDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kValueDeclDerivedKinds) {
@@ -261,7 +261,7 @@ std::optional<ValueDecl> ValueDecl::from(const TokenContext &t) {
 
 std::optional<VarDecl> ValueDecl::potentially_decomposed_variable_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal54();
+    RawEntityId eid = impl->reader.getVal56();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -273,16 +273,16 @@ std::optional<VarDecl> ValueDecl::potentially_decomposed_variable_declaration(vo
 }
 
 Type ValueDecl::type(void) const {
-  RawEntityId eid = impl->reader.getVal55();
+  RawEntityId eid = impl->reader.getVal57();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool ValueDecl::is_initializer_capture(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal74();
 }
 
 bool ValueDecl::is_weak(void) const {
-  return impl->reader.getVal73();
+  return impl->reader.getVal75();
 }
 
 #pragma GCC diagnostic pop

@@ -25,10 +25,9 @@
 #include <multiplier/Entities/TagDecl.h>
 #include <multiplier/Entities/TemplateParameterList.h>
 #include <multiplier/Entities/Token.h>
-#include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/TypeDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -88,14 +87,14 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::containing(const std::optional<Stmt
 
 bool CXXRecordDecl::contains(const Decl &decl) {
   for (auto &parent : CXXRecordDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXRecordDecl::contains(const Stmt &stmt) {
   for (auto &parent : CXXRecordDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -154,7 +153,7 @@ std::optional<CXXRecordDecl> CXXRecordDecl::from(const Decl &parent) {
 }
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kCXXRecordDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<CXXRecordDecl> e = CXXRecordDecl::from(Decl(std::move(eptr)))) {
@@ -165,7 +164,7 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::in(const Index &index) {
 }
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kCXXRecordDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -177,7 +176,7 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::in(const Fragment &frag) {
 }
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kCXXRecordDeclDerivedKinds) {
@@ -199,50 +198,50 @@ std::optional<CXXRecordDecl> CXXRecordDecl::from(const TokenContext &t) {
 }
 
 std::optional<bool> CXXRecordDecl::allow_const_default_initializer(void) const {
-  if (!impl->reader.getVal124()) {
+  if (!impl->reader.getVal134()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal123());
+    return static_cast<bool>(impl->reader.getVal127());
   }
   return std::nullopt;
 }
 
 std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::bases(void) const {
-  if (!impl->reader.getVal125()) {
+  if (!impl->reader.getVal135()) {
     return std::nullopt;
   }
-  auto list = impl->reader.getVal175();
+  auto list = impl->reader.getVal179();
   std::vector<CXXBaseSpecifier> vec;
   vec.reserve(list.size());
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d175 = ep->CXXBaseSpecifierFor(ep, v)) {
-      vec.emplace_back(std::move(d175));
+    if (auto d179 = ep->CXXBaseSpecifierFor(ep, v)) {
+      vec.emplace_back(std::move(d179));
     }
   }
   return vec;
 }
 
 std::optional<MSInheritanceModel> CXXRecordDecl::calculate_inheritance_model(void) const {
-  if (!impl->reader.getVal132()) {
+  if (!impl->reader.getVal136()) {
     return std::nullopt;
   } else {
-    return static_cast<MSInheritanceModel>(impl->reader.getVal85());
+    return static_cast<MSInheritanceModel>(impl->reader.getVal87());
   }
   return std::nullopt;
 }
 
 unsigned CXXRecordDecl::num_constructors(void) const {
-  return impl->reader.getVal183().size();
+  return impl->reader.getVal187().size();
 }
 
 std::optional<CXXConstructorDecl> CXXRecordDecl::nth_constructor(unsigned n) const {
-  auto list = impl->reader.getVal183();
+  auto list = impl->reader.getVal187();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -252,12 +251,12 @@ std::optional<CXXConstructorDecl> CXXRecordDecl::nth_constructor(unsigned n) con
 }
 
 gap::generator<CXXConstructorDecl> CXXRecordDecl::constructors(void) const & {
-  auto list = impl->reader.getVal183();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal187();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d183 = ep->DeclFor(ep, v)) {
-      if (auto e = CXXConstructorDecl::from(Decl(std::move(d183)))) {
+    if (auto d187 = ep->DeclFor(ep, v)) {
+      if (auto e = CXXConstructorDecl::from(Decl(std::move(d187)))) {
         co_yield std::move(*e);
       }
     }
@@ -266,17 +265,17 @@ gap::generator<CXXConstructorDecl> CXXRecordDecl::constructors(void) const & {
 }
 
 std::optional<std::vector<FriendDecl>> CXXRecordDecl::friends(void) const {
-  if (!impl->reader.getVal133()) {
+  if (!impl->reader.getVal137()) {
     return std::nullopt;
   }
-  auto list = impl->reader.getVal184();
+  auto list = impl->reader.getVal188();
   std::vector<FriendDecl> vec;
   vec.reserve(list.size());
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d184 = ep->DeclFor(ep, v)) {
-      if (auto e = FriendDecl::from(Decl(std::move(d184)))) {
+    if (auto d188 = ep->DeclFor(ep, v)) {
+      if (auto e = FriendDecl::from(Decl(std::move(d188)))) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -286,7 +285,7 @@ std::optional<std::vector<FriendDecl>> CXXRecordDecl::friends(void) const {
 
 std::optional<FunctionTemplateDecl> CXXRecordDecl::dependent_lambda_call_operator(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal76();
+    RawEntityId eid = impl->reader.getVal82();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -299,7 +298,7 @@ std::optional<FunctionTemplateDecl> CXXRecordDecl::dependent_lambda_call_operato
 
 std::optional<ClassTemplateDecl> CXXRecordDecl::described_class_template(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal77();
+    RawEntityId eid = impl->reader.getVal83();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -312,7 +311,7 @@ std::optional<ClassTemplateDecl> CXXRecordDecl::described_class_template(void) c
 
 std::optional<CXXDestructorDecl> CXXRecordDecl::destructor(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal79();
+    RawEntityId eid = impl->reader.getVal84();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -325,7 +324,7 @@ std::optional<CXXDestructorDecl> CXXRecordDecl::destructor(void) const {
 
 std::optional<TemplateParameterList> CXXRecordDecl::generic_lambda_template_parameter_list(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal80();
+    RawEntityId eid = impl->reader.getVal86();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -338,7 +337,7 @@ std::optional<TemplateParameterList> CXXRecordDecl::generic_lambda_template_para
 
 std::optional<CXXRecordDecl> CXXRecordDecl::instantiated_from_member_class(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal81();
+    RawEntityId eid = impl->reader.getVal91();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -351,7 +350,7 @@ std::optional<CXXRecordDecl> CXXRecordDecl::instantiated_from_member_class(void)
 
 std::optional<CXXMethodDecl> CXXRecordDecl::lambda_call_operator(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal82();
+    RawEntityId eid = impl->reader.getVal128();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -363,17 +362,17 @@ std::optional<CXXMethodDecl> CXXRecordDecl::lambda_call_operator(void) const {
 }
 
 std::optional<LambdaCaptureDefault> CXXRecordDecl::lambda_capture_default(void) const {
-  if (!impl->reader.getVal134()) {
+  if (!impl->reader.getVal138()) {
     return std::nullopt;
   } else {
-    return static_cast<LambdaCaptureDefault>(impl->reader.getVal86());
+    return static_cast<LambdaCaptureDefault>(impl->reader.getVal88());
   }
   return std::nullopt;
 }
 
 std::optional<Decl> CXXRecordDecl::lambda_context_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal84();
+    RawEntityId eid = impl->reader.getVal129();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -385,17 +384,17 @@ std::optional<Decl> CXXRecordDecl::lambda_context_declaration(void) const {
 }
 
 std::optional<std::vector<NamedDecl>> CXXRecordDecl::lambda_explicit_template_parameters(void) const {
-  if (!impl->reader.getVal135()) {
+  if (!impl->reader.getVal139()) {
     return std::nullopt;
   }
-  auto list = impl->reader.getVal185();
+  auto list = impl->reader.getVal189();
   std::vector<NamedDecl> vec;
   vec.reserve(list.size());
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d185 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from(Decl(std::move(d185)))) {
+    if (auto d189 = ep->DeclFor(ep, v)) {
+      if (auto e = NamedDecl::from(Decl(std::move(d189)))) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -403,53 +402,40 @@ std::optional<std::vector<NamedDecl>> CXXRecordDecl::lambda_explicit_template_pa
   return vec;
 }
 
-std::optional<unsigned> CXXRecordDecl::lambda_mangling_number(void) const {
-  if (!impl->reader.getVal136()) {
+std::optional<uint32_t> CXXRecordDecl::lambda_mangling_number(void) const {
+  if (!impl->reader.getVal140()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal140());
-  }
-  return std::nullopt;
-}
-
-std::optional<Type> CXXRecordDecl::lambda_type(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal89();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr));
-    }
+    return static_cast<uint32_t>(impl->reader.getVal142());
   }
   return std::nullopt;
 }
 
 std::optional<MSInheritanceModel> CXXRecordDecl::ms_inheritance_model(void) const {
-  if (!impl->reader.getVal137()) {
+  if (!impl->reader.getVal145()) {
     return std::nullopt;
   } else {
-    return static_cast<MSInheritanceModel>(impl->reader.getVal87());
+    return static_cast<MSInheritanceModel>(impl->reader.getVal89());
   }
   return std::nullopt;
 }
 
 MSVtorDispMode CXXRecordDecl::ms_vtor_disp_mode(void) const {
-  return static_cast<MSVtorDispMode>(impl->reader.getVal88());
+  return static_cast<MSVtorDispMode>(impl->reader.getVal90());
 }
 
-std::optional<unsigned> CXXRecordDecl::odr_hash(void) const {
-  if (!impl->reader.getVal138()) {
+std::optional<uint32_t> CXXRecordDecl::odr_hash(void) const {
+  if (!impl->reader.getVal146()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal186());
+    return static_cast<uint32_t>(impl->reader.getVal190());
   }
   return std::nullopt;
 }
 
 std::optional<CXXRecordDecl> CXXRecordDecl::template_instantiation_pattern(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal126();
+    RawEntityId eid = impl->reader.getVal130();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -461,19 +447,10 @@ std::optional<CXXRecordDecl> CXXRecordDecl::template_instantiation_pattern(void)
 }
 
 TemplateSpecializationKind CXXRecordDecl::template_specialization_kind(void) const {
-  return static_cast<TemplateSpecializationKind>(impl->reader.getVal90());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal92());
 }
 
 std::optional<bool> CXXRecordDecl::has_any_dependent_bases(void) const {
-  if (!impl->reader.getVal146()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal145());
-  }
-  return std::nullopt;
-}
-
-std::optional<bool> CXXRecordDecl::has_constexpr_default_constructor(void) const {
   if (!impl->reader.getVal148()) {
     return std::nullopt;
   } else {
@@ -482,7 +459,7 @@ std::optional<bool> CXXRecordDecl::has_constexpr_default_constructor(void) const
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_constexpr_destructor(void) const {
+std::optional<bool> CXXRecordDecl::has_constexpr_default_constructor(void) const {
   if (!impl->reader.getVal150()) {
     return std::nullopt;
   } else {
@@ -491,7 +468,7 @@ std::optional<bool> CXXRecordDecl::has_constexpr_destructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_constexpr_non_copy_move_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_constexpr_destructor(void) const {
   if (!impl->reader.getVal152()) {
     return std::nullopt;
   } else {
@@ -500,7 +477,7 @@ std::optional<bool> CXXRecordDecl::has_constexpr_non_copy_move_constructor(void)
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_copy_assignment_with_const_parameter(void) const {
+std::optional<bool> CXXRecordDecl::has_constexpr_non_copy_move_constructor(void) const {
   if (!impl->reader.getVal154()) {
     return std::nullopt;
   } else {
@@ -509,7 +486,7 @@ std::optional<bool> CXXRecordDecl::has_copy_assignment_with_const_parameter(void
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_copy_constructor_with_const_parameter(void) const {
+std::optional<bool> CXXRecordDecl::has_copy_assignment_with_const_parameter(void) const {
   if (!impl->reader.getVal156()) {
     return std::nullopt;
   } else {
@@ -518,7 +495,7 @@ std::optional<bool> CXXRecordDecl::has_copy_constructor_with_const_parameter(voi
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_default_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_copy_constructor_with_const_parameter(void) const {
   if (!impl->reader.getVal158()) {
     return std::nullopt;
   } else {
@@ -527,7 +504,7 @@ std::optional<bool> CXXRecordDecl::has_default_constructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_definition(void) const {
+std::optional<bool> CXXRecordDecl::has_default_constructor(void) const {
   if (!impl->reader.getVal160()) {
     return std::nullopt;
   } else {
@@ -536,7 +513,7 @@ std::optional<bool> CXXRecordDecl::has_definition(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_direct_fields(void) const {
+std::optional<bool> CXXRecordDecl::has_definition(void) const {
   if (!impl->reader.getVal162()) {
     return std::nullopt;
   } else {
@@ -545,25 +522,25 @@ std::optional<bool> CXXRecordDecl::has_direct_fields(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_friends(void) const {
-  if (!impl->reader.getVal168()) {
+std::optional<bool> CXXRecordDecl::has_direct_fields(void) const {
+  if (!impl->reader.getVal164()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal167());
+    return static_cast<bool>(impl->reader.getVal163());
+  }
+  return std::nullopt;
+}
+
+std::optional<bool> CXXRecordDecl::has_friends(void) const {
+  if (!impl->reader.getVal166()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal165());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_in_class_initializer(void) const {
-  if (!impl->reader.getVal170()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal169());
-  }
-  return std::nullopt;
-}
-
-std::optional<bool> CXXRecordDecl::has_inherited_assignment(void) const {
   if (!impl->reader.getVal172()) {
     return std::nullopt;
   } else {
@@ -572,7 +549,7 @@ std::optional<bool> CXXRecordDecl::has_inherited_assignment(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_inherited_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_inherited_assignment(void) const {
   if (!impl->reader.getVal174()) {
     return std::nullopt;
   } else {
@@ -581,26 +558,26 @@ std::optional<bool> CXXRecordDecl::has_inherited_constructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_initializer_method(void) const {
-  if (!impl->reader.getVal179()) {
+std::optional<bool> CXXRecordDecl::has_inherited_constructor(void) const {
+  if (!impl->reader.getVal176()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal178());
+    return static_cast<bool>(impl->reader.getVal175());
+  }
+  return std::nullopt;
+}
+
+std::optional<bool> CXXRecordDecl::has_initializer_method(void) const {
+  if (!impl->reader.getVal178()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal177());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_irrelevant_destructor(void) const {
-  if (!impl->reader.getVal181()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal180());
-  }
-  return std::nullopt;
-}
-
-std::optional<bool> CXXRecordDecl::has_known_lambda_internal_linkage(void) const {
-  if (!impl->reader.getVal187()) {
+  if (!impl->reader.getVal183()) {
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal182());
@@ -608,25 +585,25 @@ std::optional<bool> CXXRecordDecl::has_known_lambda_internal_linkage(void) const
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_move_assignment(void) const {
-  if (!impl->reader.getVal189()) {
+std::optional<bool> CXXRecordDecl::has_known_lambda_internal_linkage(void) const {
+  if (!impl->reader.getVal185()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal188());
+    return static_cast<bool>(impl->reader.getVal184());
+  }
+  return std::nullopt;
+}
+
+std::optional<bool> CXXRecordDecl::has_move_assignment(void) const {
+  if (!impl->reader.getVal191()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal186());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_move_constructor(void) const {
-  if (!impl->reader.getVal191()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal190());
-  }
-  return std::nullopt;
-}
-
-std::optional<bool> CXXRecordDecl::has_mutable_fields(void) const {
   if (!impl->reader.getVal193()) {
     return std::nullopt;
   } else {
@@ -635,7 +612,7 @@ std::optional<bool> CXXRecordDecl::has_mutable_fields(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_non_literal_type_fields_or_bases(void) const {
+std::optional<bool> CXXRecordDecl::has_mutable_fields(void) const {
   if (!impl->reader.getVal195()) {
     return std::nullopt;
   } else {
@@ -644,7 +621,7 @@ std::optional<bool> CXXRecordDecl::has_non_literal_type_fields_or_bases(void) co
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_non_trivial_copy_assignment(void) const {
+std::optional<bool> CXXRecordDecl::has_non_literal_type_fields_or_bases(void) const {
   if (!impl->reader.getVal197()) {
     return std::nullopt;
   } else {
@@ -653,7 +630,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_copy_assignment(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_non_trivial_copy_assignment(void) const {
   if (!impl->reader.getVal199()) {
     return std::nullopt;
   } else {
@@ -662,7 +639,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor(void) const 
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor_for_call(void) const {
+std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor(void) const {
   if (!impl->reader.getVal201()) {
     return std::nullopt;
   } else {
@@ -671,7 +648,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor_for_call(voi
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_non_trivial_default_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor_for_call(void) const {
   if (!impl->reader.getVal203()) {
     return std::nullopt;
   } else {
@@ -680,7 +657,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_default_constructor(void) con
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_non_trivial_destructor(void) const {
+std::optional<bool> CXXRecordDecl::has_non_trivial_default_constructor(void) const {
   if (!impl->reader.getVal205()) {
     return std::nullopt;
   } else {
@@ -689,7 +666,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_destructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_non_trivial_destructor_for_call(void) const {
+std::optional<bool> CXXRecordDecl::has_non_trivial_destructor(void) const {
   if (!impl->reader.getVal207()) {
     return std::nullopt;
   } else {
@@ -698,7 +675,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_destructor_for_call(void) con
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_non_trivial_move_assignment(void) const {
+std::optional<bool> CXXRecordDecl::has_non_trivial_destructor_for_call(void) const {
   if (!impl->reader.getVal209()) {
     return std::nullopt;
   } else {
@@ -707,7 +684,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_move_assignment(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_non_trivial_move_assignment(void) const {
   if (!impl->reader.getVal211()) {
     return std::nullopt;
   } else {
@@ -716,7 +693,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor(void) const 
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor_for_call(void) const {
+std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor(void) const {
   if (!impl->reader.getVal213()) {
     return std::nullopt;
   } else {
@@ -725,7 +702,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor_for_call(voi
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_private_fields(void) const {
+std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor_for_call(void) const {
   if (!impl->reader.getVal215()) {
     return std::nullopt;
   } else {
@@ -734,7 +711,7 @@ std::optional<bool> CXXRecordDecl::has_private_fields(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_protected_fields(void) const {
+std::optional<bool> CXXRecordDecl::has_private_fields(void) const {
   if (!impl->reader.getVal217()) {
     return std::nullopt;
   } else {
@@ -743,7 +720,7 @@ std::optional<bool> CXXRecordDecl::has_protected_fields(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_simple_copy_assignment(void) const {
+std::optional<bool> CXXRecordDecl::has_protected_fields(void) const {
   if (!impl->reader.getVal219()) {
     return std::nullopt;
   } else {
@@ -752,7 +729,7 @@ std::optional<bool> CXXRecordDecl::has_simple_copy_assignment(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_simple_copy_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_simple_copy_assignment(void) const {
   if (!impl->reader.getVal221()) {
     return std::nullopt;
   } else {
@@ -761,7 +738,7 @@ std::optional<bool> CXXRecordDecl::has_simple_copy_constructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_simple_destructor(void) const {
+std::optional<bool> CXXRecordDecl::has_simple_copy_constructor(void) const {
   if (!impl->reader.getVal223()) {
     return std::nullopt;
   } else {
@@ -770,7 +747,7 @@ std::optional<bool> CXXRecordDecl::has_simple_destructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_simple_move_assignment(void) const {
+std::optional<bool> CXXRecordDecl::has_simple_destructor(void) const {
   if (!impl->reader.getVal225()) {
     return std::nullopt;
   } else {
@@ -779,7 +756,7 @@ std::optional<bool> CXXRecordDecl::has_simple_move_assignment(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_simple_move_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_simple_move_assignment(void) const {
   if (!impl->reader.getVal227()) {
     return std::nullopt;
   } else {
@@ -788,7 +765,7 @@ std::optional<bool> CXXRecordDecl::has_simple_move_constructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_trivial_copy_assignment(void) const {
+std::optional<bool> CXXRecordDecl::has_simple_move_constructor(void) const {
   if (!impl->reader.getVal229()) {
     return std::nullopt;
   } else {
@@ -797,7 +774,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_copy_assignment(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_trivial_copy_assignment(void) const {
   if (!impl->reader.getVal231()) {
     return std::nullopt;
   } else {
@@ -806,7 +783,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor_for_call(void) const {
+std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor(void) const {
   if (!impl->reader.getVal233()) {
     return std::nullopt;
   } else {
@@ -815,7 +792,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor_for_call(void) c
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_trivial_default_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor_for_call(void) const {
   if (!impl->reader.getVal235()) {
     return std::nullopt;
   } else {
@@ -824,7 +801,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_default_constructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_trivial_destructor(void) const {
+std::optional<bool> CXXRecordDecl::has_trivial_default_constructor(void) const {
   if (!impl->reader.getVal237()) {
     return std::nullopt;
   } else {
@@ -833,7 +810,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_destructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_trivial_destructor_for_call(void) const {
+std::optional<bool> CXXRecordDecl::has_trivial_destructor(void) const {
   if (!impl->reader.getVal239()) {
     return std::nullopt;
   } else {
@@ -842,7 +819,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_destructor_for_call(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_trivial_move_assignment(void) const {
+std::optional<bool> CXXRecordDecl::has_trivial_destructor_for_call(void) const {
   if (!impl->reader.getVal241()) {
     return std::nullopt;
   } else {
@@ -851,7 +828,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_move_assignment(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_trivial_move_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_trivial_move_assignment(void) const {
   if (!impl->reader.getVal243()) {
     return std::nullopt;
   } else {
@@ -860,7 +837,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_move_constructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_trivial_move_constructor_for_call(void) const {
+std::optional<bool> CXXRecordDecl::has_trivial_move_constructor(void) const {
   if (!impl->reader.getVal245()) {
     return std::nullopt;
   } else {
@@ -869,7 +846,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_move_constructor_for_call(void) c
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_uninitialized_reference_member(void) const {
+std::optional<bool> CXXRecordDecl::has_trivial_move_constructor_for_call(void) const {
   if (!impl->reader.getVal247()) {
     return std::nullopt;
   } else {
@@ -878,7 +855,7 @@ std::optional<bool> CXXRecordDecl::has_uninitialized_reference_member(void) cons
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_user_declared_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_uninitialized_reference_member(void) const {
   if (!impl->reader.getVal249()) {
     return std::nullopt;
   } else {
@@ -887,7 +864,7 @@ std::optional<bool> CXXRecordDecl::has_user_declared_constructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_user_declared_copy_assignment(void) const {
+std::optional<bool> CXXRecordDecl::has_user_declared_constructor(void) const {
   if (!impl->reader.getVal251()) {
     return std::nullopt;
   } else {
@@ -896,7 +873,7 @@ std::optional<bool> CXXRecordDecl::has_user_declared_copy_assignment(void) const
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_user_declared_copy_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_user_declared_copy_assignment(void) const {
   if (!impl->reader.getVal253()) {
     return std::nullopt;
   } else {
@@ -905,7 +882,7 @@ std::optional<bool> CXXRecordDecl::has_user_declared_copy_constructor(void) cons
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_user_declared_destructor(void) const {
+std::optional<bool> CXXRecordDecl::has_user_declared_copy_constructor(void) const {
   if (!impl->reader.getVal255()) {
     return std::nullopt;
   } else {
@@ -914,7 +891,7 @@ std::optional<bool> CXXRecordDecl::has_user_declared_destructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_user_declared_move_assignment(void) const {
+std::optional<bool> CXXRecordDecl::has_user_declared_destructor(void) const {
   if (!impl->reader.getVal257()) {
     return std::nullopt;
   } else {
@@ -923,7 +900,7 @@ std::optional<bool> CXXRecordDecl::has_user_declared_move_assignment(void) const
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_user_declared_move_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_user_declared_move_assignment(void) const {
   if (!impl->reader.getVal259()) {
     return std::nullopt;
   } else {
@@ -932,7 +909,7 @@ std::optional<bool> CXXRecordDecl::has_user_declared_move_constructor(void) cons
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_user_declared_move_operation(void) const {
+std::optional<bool> CXXRecordDecl::has_user_declared_move_constructor(void) const {
   if (!impl->reader.getVal261()) {
     return std::nullopt;
   } else {
@@ -941,7 +918,7 @@ std::optional<bool> CXXRecordDecl::has_user_declared_move_operation(void) const 
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_user_provided_default_constructor(void) const {
+std::optional<bool> CXXRecordDecl::has_user_declared_move_operation(void) const {
   if (!impl->reader.getVal263()) {
     return std::nullopt;
   } else {
@@ -950,7 +927,7 @@ std::optional<bool> CXXRecordDecl::has_user_provided_default_constructor(void) c
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::has_variant_members(void) const {
+std::optional<bool> CXXRecordDecl::has_user_provided_default_constructor(void) const {
   if (!impl->reader.getVal265()) {
     return std::nullopt;
   } else {
@@ -959,7 +936,7 @@ std::optional<bool> CXXRecordDecl::has_variant_members(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::implicit_copy_assignment_has_const_parameter(void) const {
+std::optional<bool> CXXRecordDecl::has_variant_members(void) const {
   if (!impl->reader.getVal267()) {
     return std::nullopt;
   } else {
@@ -968,7 +945,7 @@ std::optional<bool> CXXRecordDecl::implicit_copy_assignment_has_const_parameter(
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::implicit_copy_constructor_has_const_parameter(void) const {
+std::optional<bool> CXXRecordDecl::implicit_copy_assignment_has_const_parameter(void) const {
   if (!impl->reader.getVal269()) {
     return std::nullopt;
   } else {
@@ -977,7 +954,7 @@ std::optional<bool> CXXRecordDecl::implicit_copy_constructor_has_const_parameter
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::is_abstract(void) const {
+std::optional<bool> CXXRecordDecl::implicit_copy_constructor_has_const_parameter(void) const {
   if (!impl->reader.getVal271()) {
     return std::nullopt;
   } else {
@@ -986,7 +963,7 @@ std::optional<bool> CXXRecordDecl::is_abstract(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::is_aggregate(void) const {
+std::optional<bool> CXXRecordDecl::is_abstract(void) const {
   if (!impl->reader.getVal273()) {
     return std::nullopt;
   } else {
@@ -995,7 +972,7 @@ std::optional<bool> CXXRecordDecl::is_aggregate(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::is_any_destructor_no_return(void) const {
+std::optional<bool> CXXRecordDecl::is_aggregate(void) const {
   if (!impl->reader.getVal275()) {
     return std::nullopt;
   } else {
@@ -1004,7 +981,7 @@ std::optional<bool> CXXRecordDecl::is_any_destructor_no_return(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::is_c_like(void) const {
+std::optional<bool> CXXRecordDecl::is_any_destructor_no_return(void) const {
   if (!impl->reader.getVal277()) {
     return std::nullopt;
   } else {
@@ -1013,7 +990,7 @@ std::optional<bool> CXXRecordDecl::is_c_like(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::is_cxx11_standard_layout(void) const {
+std::optional<bool> CXXRecordDecl::is_c_like(void) const {
   if (!impl->reader.getVal279()) {
     return std::nullopt;
   } else {
@@ -1022,20 +999,20 @@ std::optional<bool> CXXRecordDecl::is_cxx11_standard_layout(void) const {
   return std::nullopt;
 }
 
-bool CXXRecordDecl::is_dependent_lambda(void) const {
-  return impl->reader.getVal280();
-}
-
-std::optional<bool> CXXRecordDecl::is_dynamic_class(void) const {
-  if (!impl->reader.getVal282()) {
+std::optional<bool> CXXRecordDecl::is_cxx11_standard_layout(void) const {
+  if (!impl->reader.getVal281()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal281());
+    return static_cast<bool>(impl->reader.getVal280());
   }
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::is_effectively_final(void) const {
+bool CXXRecordDecl::is_dependent_lambda(void) const {
+  return impl->reader.getVal282();
+}
+
+std::optional<bool> CXXRecordDecl::is_dynamic_class(void) const {
   if (!impl->reader.getVal284()) {
     return std::nullopt;
   } else {
@@ -1044,7 +1021,7 @@ std::optional<bool> CXXRecordDecl::is_effectively_final(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::is_empty(void) const {
+std::optional<bool> CXXRecordDecl::is_effectively_final(void) const {
   if (!impl->reader.getVal286()) {
     return std::nullopt;
   } else {
@@ -1053,20 +1030,20 @@ std::optional<bool> CXXRecordDecl::is_empty(void) const {
   return std::nullopt;
 }
 
-bool CXXRecordDecl::is_generic_lambda(void) const {
-  return impl->reader.getVal287();
-}
-
-std::optional<bool> CXXRecordDecl::is_interface_like(void) const {
-  if (!impl->reader.getVal289()) {
+std::optional<bool> CXXRecordDecl::is_empty(void) const {
+  if (!impl->reader.getVal288()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal288());
+    return static_cast<bool>(impl->reader.getVal287());
   }
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::is_literal(void) const {
+bool CXXRecordDecl::is_generic_lambda(void) const {
+  return impl->reader.getVal289();
+}
+
+std::optional<bool> CXXRecordDecl::is_interface_like(void) const {
   if (!impl->reader.getVal291()) {
     return std::nullopt;
   } else {
@@ -1075,9 +1052,18 @@ std::optional<bool> CXXRecordDecl::is_literal(void) const {
   return std::nullopt;
 }
 
+std::optional<bool> CXXRecordDecl::is_literal(void) const {
+  if (!impl->reader.getVal293()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal292());
+  }
+  return std::nullopt;
+}
+
 std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal127();
+    RawEntityId eid = impl->reader.getVal132();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -1089,19 +1075,10 @@ std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const {
 }
 
 bool CXXRecordDecl::is_never_dependent_lambda(void) const {
-  return impl->reader.getVal292();
+  return impl->reader.getVal294();
 }
 
 std::optional<bool> CXXRecordDecl::is_pod(void) const {
-  if (!impl->reader.getVal294()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal293());
-  }
-  return std::nullopt;
-}
-
-std::optional<bool> CXXRecordDecl::is_polymorphic(void) const {
   if (!impl->reader.getVal296()) {
     return std::nullopt;
   } else {
@@ -1110,7 +1087,7 @@ std::optional<bool> CXXRecordDecl::is_polymorphic(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::is_standard_layout(void) const {
+std::optional<bool> CXXRecordDecl::is_polymorphic(void) const {
   if (!impl->reader.getVal298()) {
     return std::nullopt;
   } else {
@@ -1119,7 +1096,7 @@ std::optional<bool> CXXRecordDecl::is_standard_layout(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::is_structural(void) const {
+std::optional<bool> CXXRecordDecl::is_standard_layout(void) const {
   if (!impl->reader.getVal300()) {
     return std::nullopt;
   } else {
@@ -1128,7 +1105,7 @@ std::optional<bool> CXXRecordDecl::is_structural(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::is_trivial(void) const {
+std::optional<bool> CXXRecordDecl::is_structural(void) const {
   if (!impl->reader.getVal302()) {
     return std::nullopt;
   } else {
@@ -1137,7 +1114,7 @@ std::optional<bool> CXXRecordDecl::is_trivial(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::is_trivially_copyable(void) const {
+std::optional<bool> CXXRecordDecl::is_trivial(void) const {
   if (!impl->reader.getVal304()) {
     return std::nullopt;
   } else {
@@ -1146,7 +1123,7 @@ std::optional<bool> CXXRecordDecl::is_trivially_copyable(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::lambda_is_default_constructible_and_assignable(void) const {
+std::optional<bool> CXXRecordDecl::is_trivially_copyable(void) const {
   if (!impl->reader.getVal306()) {
     return std::nullopt;
   } else {
@@ -1155,7 +1132,7 @@ std::optional<bool> CXXRecordDecl::lambda_is_default_constructible_and_assignabl
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::may_be_abstract(void) const {
+std::optional<bool> CXXRecordDecl::lambda_is_default_constructible_and_assignable(void) const {
   if (!impl->reader.getVal308()) {
     return std::nullopt;
   } else {
@@ -1164,7 +1141,7 @@ std::optional<bool> CXXRecordDecl::may_be_abstract(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::may_be_dynamic_class(void) const {
+std::optional<bool> CXXRecordDecl::may_be_abstract(void) const {
   if (!impl->reader.getVal310()) {
     return std::nullopt;
   } else {
@@ -1173,7 +1150,7 @@ std::optional<bool> CXXRecordDecl::may_be_dynamic_class(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::may_be_non_dynamic_class(void) const {
+std::optional<bool> CXXRecordDecl::may_be_dynamic_class(void) const {
   if (!impl->reader.getVal312()) {
     return std::nullopt;
   } else {
@@ -1182,18 +1159,27 @@ std::optional<bool> CXXRecordDecl::may_be_non_dynamic_class(void) const {
   return std::nullopt;
 }
 
-std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
+std::optional<bool> CXXRecordDecl::may_be_non_dynamic_class(void) const {
   if (!impl->reader.getVal314()) {
     return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal313());
   }
-  auto list = impl->reader.getVal313();
+  return std::nullopt;
+}
+
+std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
+  if (!impl->reader.getVal316()) {
+    return std::nullopt;
+  }
+  auto list = impl->reader.getVal315();
   std::vector<CXXMethodDecl> vec;
   vec.reserve(list.size());
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d313 = ep->DeclFor(ep, v)) {
-      if (auto e = CXXMethodDecl::from(Decl(std::move(d313)))) {
+    if (auto d315 = ep->DeclFor(ep, v)) {
+      if (auto e = CXXMethodDecl::from(Decl(std::move(d315)))) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -1202,15 +1188,6 @@ std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_copy_assignment(void) const {
-  if (!impl->reader.getVal316()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal315());
-  }
-  return std::nullopt;
-}
-
-std::optional<bool> CXXRecordDecl::needs_implicit_copy_constructor(void) const {
   if (!impl->reader.getVal318()) {
     return std::nullopt;
   } else {
@@ -1219,7 +1196,7 @@ std::optional<bool> CXXRecordDecl::needs_implicit_copy_constructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::needs_implicit_default_constructor(void) const {
+std::optional<bool> CXXRecordDecl::needs_implicit_copy_constructor(void) const {
   if (!impl->reader.getVal320()) {
     return std::nullopt;
   } else {
@@ -1228,7 +1205,7 @@ std::optional<bool> CXXRecordDecl::needs_implicit_default_constructor(void) cons
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::needs_implicit_destructor(void) const {
+std::optional<bool> CXXRecordDecl::needs_implicit_default_constructor(void) const {
   if (!impl->reader.getVal322()) {
     return std::nullopt;
   } else {
@@ -1237,7 +1214,7 @@ std::optional<bool> CXXRecordDecl::needs_implicit_destructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::needs_implicit_move_assignment(void) const {
+std::optional<bool> CXXRecordDecl::needs_implicit_destructor(void) const {
   if (!impl->reader.getVal324()) {
     return std::nullopt;
   } else {
@@ -1246,7 +1223,7 @@ std::optional<bool> CXXRecordDecl::needs_implicit_move_assignment(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::needs_implicit_move_constructor(void) const {
+std::optional<bool> CXXRecordDecl::needs_implicit_move_assignment(void) const {
   if (!impl->reader.getVal326()) {
     return std::nullopt;
   } else {
@@ -1255,7 +1232,7 @@ std::optional<bool> CXXRecordDecl::needs_implicit_move_constructor(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_assignment(void) const {
+std::optional<bool> CXXRecordDecl::needs_implicit_move_constructor(void) const {
   if (!impl->reader.getVal328()) {
     return std::nullopt;
   } else {
@@ -1264,7 +1241,7 @@ std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_assignment
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_constructor(void) const {
+std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_assignment(void) const {
   if (!impl->reader.getVal330()) {
     return std::nullopt;
   } else {
@@ -1273,7 +1250,7 @@ std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_constructo
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_destructor(void) const {
+std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_constructor(void) const {
   if (!impl->reader.getVal332()) {
     return std::nullopt;
   } else {
@@ -1282,7 +1259,7 @@ std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_destructor(void
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_assignment(void) const {
+std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_destructor(void) const {
   if (!impl->reader.getVal334()) {
     return std::nullopt;
   } else {
@@ -1291,7 +1268,7 @@ std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_assignment
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_constructor(void) const {
+std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_assignment(void) const {
   if (!impl->reader.getVal336()) {
     return std::nullopt;
   } else {
@@ -1300,7 +1277,7 @@ std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_constructo
   return std::nullopt;
 }
 
-std::optional<bool> CXXRecordDecl::null_field_offset_is_zero(void) const {
+std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_constructor(void) const {
   if (!impl->reader.getVal338()) {
     return std::nullopt;
   } else {
@@ -1309,21 +1286,88 @@ std::optional<bool> CXXRecordDecl::null_field_offset_is_zero(void) const {
   return std::nullopt;
 }
 
-std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::virtual_bases(void) const {
+std::optional<bool> CXXRecordDecl::null_field_offset_is_zero(void) const {
   if (!impl->reader.getVal340()) {
     return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal339());
   }
-  auto list = impl->reader.getVal339();
+  return std::nullopt;
+}
+
+std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::virtual_bases(void) const {
+  if (!impl->reader.getVal342()) {
+    return std::nullopt;
+  }
+  auto list = impl->reader.getVal341();
   std::vector<CXXBaseSpecifier> vec;
   vec.reserve(list.size());
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d339 = ep->CXXBaseSpecifierFor(ep, v)) {
-      vec.emplace_back(std::move(d339));
+    if (auto d341 = ep->CXXBaseSpecifierFor(ep, v)) {
+      vec.emplace_back(std::move(d341));
     }
   }
   return vec;
+}
+
+std::optional<uint64_t> CXXRecordDecl::size_without_virtual_bases(void) const {
+  if (!impl->reader.getVal343()) {
+    return std::nullopt;
+  } else {
+    return static_cast<uint64_t>(impl->reader.getVal133());
+  }
+  return std::nullopt;
+}
+
+std::optional<CXXRecordDecl> CXXRecordDecl::primary_base(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal141();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return CXXRecordDecl::from(Decl(std::move(eptr)));
+    }
+  }
+  return std::nullopt;
+}
+
+std::optional<bool> CXXRecordDecl::has_own_virtual_function_table_pointer(void) const {
+  if (!impl->reader.getVal345()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal344());
+  }
+  return std::nullopt;
+}
+
+std::optional<bool> CXXRecordDecl::has_extendable_virtual_function_table_pointer(void) const {
+  if (!impl->reader.getVal347()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal346());
+  }
+  return std::nullopt;
+}
+
+std::optional<bool> CXXRecordDecl::has_virtual_base_table_pointer(void) const {
+  if (!impl->reader.getVal349()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal348());
+  }
+  return std::nullopt;
+}
+
+std::optional<bool> CXXRecordDecl::has_own_virtual_base_table_pointer(void) const {
+  if (!impl->reader.getVal351()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal350());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

@@ -23,6 +23,11 @@ class NamedDecl;
 class Stmt;
 class Token;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXDestructorDecl : public CXXMethodDecl {
  private:
@@ -34,12 +39,12 @@ class CXXDestructorDecl : public CXXMethodDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<CXXDestructorDecl> in(const Fragment &frag);
-  static gap::generator<CXXDestructorDecl> in(const File &file);
   static gap::generator<CXXDestructorDecl> in(const Index &index);
   static gap::generator<CXXDestructorDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXDestructorDecl> by_id(const Index &, EntityId);
+  static gap::generator<CXXDestructorDecl> in(const Fragment &frag);
+  static gap::generator<CXXDestructorDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_DESTRUCTOR;

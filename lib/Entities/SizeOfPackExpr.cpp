@@ -16,7 +16,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<SizeOfPackExpr> SizeOfPackExpr::containing(const std::optional<St
 
 bool SizeOfPackExpr::contains(const Decl &decl) {
   for (auto &parent : SizeOfPackExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool SizeOfPackExpr::contains(const Stmt &stmt) {
   for (auto &parent : SizeOfPackExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -112,7 +112,7 @@ std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const Stmt &parent) {
 }
 
 gap::generator<SizeOfPackExpr> SizeOfPackExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kSizeOfPackExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<SizeOfPackExpr> e = SizeOfPackExpr::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<SizeOfPackExpr> SizeOfPackExpr::in(const Index &index) {
 }
 
 gap::generator<SizeOfPackExpr> SizeOfPackExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kSizeOfPackExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<SizeOfPackExpr> SizeOfPackExpr::in(const Fragment &frag) {
 }
 
 gap::generator<SizeOfPackExpr> SizeOfPackExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kSizeOfPackExprDerivedKinds) {
@@ -157,25 +157,25 @@ std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const TokenContext &t) {
 }
 
 Token SizeOfPackExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 NamedDecl SizeOfPackExpr::pack(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
-std::optional<unsigned> SizeOfPackExpr::pack_length(void) const {
+std::optional<uint32_t> SizeOfPackExpr::pack_length(void) const {
   if (!impl->reader.getVal89()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal105());
+    return static_cast<uint32_t>(impl->reader.getVal105());
   }
   return std::nullopt;
 }
 
 Token SizeOfPackExpr::pack_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 std::optional<std::vector<TemplateArgument>> SizeOfPackExpr::partial_arguments(void) const {
@@ -185,7 +185,7 @@ std::optional<std::vector<TemplateArgument>> SizeOfPackExpr::partial_arguments(v
   auto list = impl->reader.getVal15();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->TemplateArgumentFor(ep, v)) {
@@ -196,7 +196,7 @@ std::optional<std::vector<TemplateArgument>> SizeOfPackExpr::partial_arguments(v
 }
 
 Token SizeOfPackExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 bool SizeOfPackExpr::is_partially_substituted(void) const {

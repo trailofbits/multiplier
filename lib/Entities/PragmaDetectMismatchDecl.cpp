@@ -12,7 +12,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -72,14 +72,14 @@ gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::containing(co
 
 bool PragmaDetectMismatchDecl::contains(const Decl &decl) {
   for (auto &parent : PragmaDetectMismatchDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool PragmaDetectMismatchDecl::contains(const Stmt &stmt) {
   for (auto &parent : PragmaDetectMismatchDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -134,7 +134,7 @@ std::optional<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::from(const Dec
 }
 
 gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kPragmaDetectMismatchDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<PragmaDetectMismatchDecl> e = PragmaDetectMismatchDecl::from(Decl(std::move(eptr)))) {
@@ -145,7 +145,7 @@ gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::in(const Inde
 }
 
 gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kPragmaDetectMismatchDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -157,7 +157,7 @@ gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::in(const Frag
 }
 
 gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kPragmaDetectMismatchDeclDerivedKinds) {
@@ -179,12 +179,12 @@ std::optional<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::from(const Tok
 }
 
 std::string_view PragmaDetectMismatchDecl::name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal63();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::string_view PragmaDetectMismatchDecl::value(void) const {
-  capnp::Text::Reader data = impl->reader.getVal62();
+  capnp::Text::Reader data = impl->reader.getVal64();
   return std::string_view(data.cStr(), data.size());
 }
 

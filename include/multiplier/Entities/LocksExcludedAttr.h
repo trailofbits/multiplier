@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class LocksExcludedAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class LocksExcludedAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class LocksExcludedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<LocksExcludedAttr> in(const Fragment &frag);
-  static gap::generator<LocksExcludedAttr> in(const File &file);
   static gap::generator<LocksExcludedAttr> in(const Index &index);
   static gap::generator<LocksExcludedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<LocksExcludedAttr> by_id(const Index &, EntityId);
+  static gap::generator<LocksExcludedAttr> in(const Fragment &frag);
+  static gap::generator<LocksExcludedAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LOCKS_EXCLUDED;

@@ -21,6 +21,11 @@ class Stmt;
 class Token;
 class Type;
 class UsingEnumDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UsingEnumDecl : public BaseUsingDecl {
  private:
@@ -29,12 +34,12 @@ class UsingEnumDecl : public BaseUsingDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<UsingEnumDecl> in(const Fragment &frag);
-  static gap::generator<UsingEnumDecl> in(const File &file);
   static gap::generator<UsingEnumDecl> in(const Index &index);
   static gap::generator<UsingEnumDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UsingEnumDecl> by_id(const Index &, EntityId);
+  static gap::generator<UsingEnumDecl> in(const Fragment &frag);
+  static gap::generator<UsingEnumDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_ENUM;

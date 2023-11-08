@@ -75,7 +75,7 @@
 #include <multiplier/Entities/VarTemplatePartialSpecializationDecl.h>
 #include <multiplier/Entities/VarTemplateSpecializationDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -135,14 +135,14 @@ gap::generator<NamedDecl> NamedDecl::containing(const std::optional<Stmt> &stmt)
 
 bool NamedDecl::contains(const Decl &decl) {
   for (auto &parent : NamedDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool NamedDecl::contains(const Stmt &stmt) {
   for (auto &parent : NamedDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -321,7 +321,7 @@ std::optional<NamedDecl> NamedDecl::from(const Decl &parent) {
 }
 
 gap::generator<NamedDecl> NamedDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kNamedDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<NamedDecl> e = NamedDecl::from(Decl(std::move(eptr)))) {
@@ -332,7 +332,7 @@ gap::generator<NamedDecl> NamedDecl::in(const Index &index) {
 }
 
 gap::generator<NamedDecl> NamedDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kNamedDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -344,7 +344,7 @@ gap::generator<NamedDecl> NamedDecl::in(const Fragment &frag) {
 }
 
 gap::generator<NamedDecl> NamedDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kNamedDeclDerivedKinds) {
@@ -366,67 +366,67 @@ std::optional<NamedDecl> NamedDecl::from(const TokenContext &t) {
 }
 
 Linkage NamedDecl::formal_linkage(void) const {
-  return static_cast<Linkage>(impl->reader.getVal63());
+  return static_cast<Linkage>(impl->reader.getVal65());
 }
 
 std::string_view NamedDecl::name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal63();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCStringFormatFamily> NamedDecl::obj_cf_string_formatting_family(void) const {
-  if (!impl->reader.getVal48()) {
+  if (!impl->reader.getVal50()) {
     return std::nullopt;
   } else {
-    return static_cast<ObjCStringFormatFamily>(impl->reader.getVal67());
+    return static_cast<ObjCStringFormatFamily>(impl->reader.getVal69());
   }
   return std::nullopt;
 }
 
 std::string_view NamedDecl::qualified_name_as_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal62();
+  capnp::Text::Reader data = impl->reader.getVal64();
   return std::string_view(data.cStr(), data.size());
 }
 
 NamedDecl NamedDecl::underlying_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal49();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Visibility NamedDecl::visibility(void) const {
-  return static_cast<Visibility>(impl->reader.getVal68());
+  return static_cast<Visibility>(impl->reader.getVal70());
 }
 
 bool NamedDecl::has_external_formal_linkage(void) const {
-  return impl->reader.getVal51();
-}
-
-bool NamedDecl::has_linkage(void) const {
-  return impl->reader.getVal52();
-}
-
-bool NamedDecl::has_linkage_been_computed(void) const {
   return impl->reader.getVal53();
 }
 
+bool NamedDecl::has_linkage(void) const {
+  return impl->reader.getVal54();
+}
+
+bool NamedDecl::has_linkage_been_computed(void) const {
+  return impl->reader.getVal55();
+}
+
 bool NamedDecl::is_cxx_class_member(void) const {
-  return impl->reader.getVal57();
-}
-
-bool NamedDecl::is_cxx_instance_member(void) const {
-  return impl->reader.getVal58();
-}
-
-bool NamedDecl::is_externally_declarable(void) const {
   return impl->reader.getVal59();
 }
 
+bool NamedDecl::is_cxx_instance_member(void) const {
+  return impl->reader.getVal60();
+}
+
+bool NamedDecl::is_externally_declarable(void) const {
+  return impl->reader.getVal61();
+}
+
 bool NamedDecl::is_externally_visible(void) const {
-  return impl->reader.getVal69();
+  return impl->reader.getVal71();
 }
 
 bool NamedDecl::is_linkage_valid(void) const {
-  return impl->reader.getVal70();
+  return impl->reader.getVal72();
 }
 
 #pragma GCC diagnostic pop

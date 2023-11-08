@@ -17,18 +17,23 @@ class Decl;
 class ObjCAutoreleasePoolStmt;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCAutoreleasePoolStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<ObjCAutoreleasePoolStmt> in(const Fragment &frag);
-  static gap::generator<ObjCAutoreleasePoolStmt> in(const File &file);
   static gap::generator<ObjCAutoreleasePoolStmt> in(const Index &index);
   static gap::generator<ObjCAutoreleasePoolStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCAutoreleasePoolStmt> by_id(const Index &, EntityId);
+  static gap::generator<ObjCAutoreleasePoolStmt> in(const Fragment &frag);
+  static gap::generator<ObjCAutoreleasePoolStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AUTORELEASE_POOL_STMT;

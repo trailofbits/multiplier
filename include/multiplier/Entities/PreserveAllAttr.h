@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class PreserveAllAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class PreserveAllAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class PreserveAllAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<PreserveAllAttr> in(const Fragment &frag);
-  static gap::generator<PreserveAllAttr> in(const File &file);
   static gap::generator<PreserveAllAttr> in(const Index &index);
   static gap::generator<PreserveAllAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<PreserveAllAttr> by_id(const Index &, EntityId);
+  static gap::generator<PreserveAllAttr> in(const Fragment &frag);
+  static gap::generator<PreserveAllAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PRESERVE_ALL;

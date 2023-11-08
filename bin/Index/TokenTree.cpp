@@ -17,6 +17,7 @@
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Macro.h>
+#include <pasta/AST/Printer.h>
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
 #include <sstream>
@@ -26,6 +27,7 @@
 #include <iostream>
 
 #include "PASTA.h"
+#include "Util.h"
 
 //#define D(...) __VA_ARGS__
 #ifndef D
@@ -80,19 +82,13 @@ struct TokenInfo {
   TokenInfo *next{nullptr};
 
   std::optional<pasta::Token> parsed_tok;
+  std::optional<pasta::PrintedToken> printed_tok;
   std::optional<pasta::FileToken> file_tok;
   std::optional<pasta::MacroToken> macro_tok;
   Category category{kFileToken};
 
   // `, ## __VA_ARGS__`.
   bool is_va_args_concat{false};
-
-  // This is a metric of whether or not we can trust that some token is actually
-  // part of its substitution. In a macro expansion, this tells us whether or
-  // not the token is part of the macro definition itself. In a macro use, this
-  // tells us if it's part of the use, rather than a substituted macro
-  // parameter.
-  bool is_part_of_sub{false};
 };
 
 using SubstitutionNode = std::variant<TokenInfo *, Substitution *>;
@@ -138,11 +134,6 @@ class Substitution {
 
   bool is_va_args_concat{false};
 
-  // Sometimes we have a substitution where the bounds on `before` and
-  // `after` should be treated as the same. This happens when merging
-  // argument pre-expansion stuff.
-  bool before_after_bounds_are_same{false};
-
   // Is this node dead?
   bool is_dead{false};
 
@@ -187,10 +178,19 @@ class TokenTreeImpl {
   // parsed, plus the file tokens that were macro uses. This does not contain
   // file tokens that were elided due to things like conditional macros, e.g.
   // `#if 0`.
-  TokenInfo *BuildInitialTokenList(pasta::TokenRange range,
-                                   uint64_t begin_index,
-                                   uint64_t end_index,
-                                   std::ostream &err);
+  TokenInfo *BuildInitialTokenList(
+      const std::optional<pasta::TokenRange> &range,
+      const pasta::PrintedTokenRange &printed_range,
+      std::ostream &err);
+
+  TokenInfo *BuildParsedTokenList(
+      const pasta::TokenRange &range,
+      const pasta::PrintedTokenRange &printed_range,
+      std::ostream &err);
+
+  TokenInfo *BuildPrintedTokenList(
+      const pasta::PrintedTokenRange &printed_range,
+      std::ostream &err);
 
   Substitution *GetMacroBody(pasta::DefineMacroDirective def,
                              std::ostream &err);
@@ -203,13 +203,6 @@ class TokenTreeImpl {
 
   // Fill in the missing tokens from the token tree.
   void StripWhitespace(Substitution::NodeList &nodes);
-
-  bool FindSubstitutionBoundsRec(Substitution::NodeList &nodes,
-                                 TokenInfo *lower_bound,
-                                 TokenInfo *upper_bound);
-
-  bool FindSubstitutionBoundsRec(Substitution *sub, TokenInfo *lower_bound,
-                                 TokenInfo *upper_bound);
 
   Substitution *MergeArguments(Substitution *orig, Substitution *pre_arg,
                                std::ostream &err);
@@ -279,12 +272,6 @@ class TokenTreeImpl {
   Substitution *BuildSubstitutions(std::ostream &err);
 
   Substitution *CreateSubstitution(mx::MacroKind kind);
-
-  static bool BoundsAreSane(const Substitution::NodeList &nodes);
-  static bool BoundsAreSane(const Substitution *sub);
-  static bool BoundsAreSane(const TokenInfo *lb, const TokenInfo *ub);
-  void AddOrClearInsaneBounds(Substitution::NodeList &nodes);
-  void AddOrClearInsaneBounds(Substitution *sub);
 };
 
 [[gnu::noinline]]
@@ -314,68 +301,6 @@ static void Die(const TokenTreeImpl *impl) {
   TT_ASSERT(false);
 }
 
-bool TokenTreeImpl::BoundsAreSane(const TokenInfo *lb, const TokenInfo *ub) {
-  if (!lb != !ub) {
-    return false;
-  }
-
-  if (!lb || !ub) {
-    return true;
-  }
-
-  if (!lb->file_tok != !ub->file_tok) {
-    return false;
-  }
-
-  if (!lb->file_tok || !ub->file_tok) {
-    return true;
-  }
-
-  // Make sure they're in the same file.
-  if (lb->file_tok->RawFile() != ub->file_tok->RawFile()) {
-    return false;
-  }
-
-  auto bi = lb->file_tok->Index();
-  auto ai = ub->file_tok->Index();
-  if (bi < ai) {
-    return true;
-
-  } else {
-    return false;
-  }
-}
-
-bool TokenTreeImpl::BoundsAreSane(const Substitution::NodeList &nodes) {
-  return BoundsAreSane(nodes.prev, nodes.next);
-}
-
-bool TokenTreeImpl::BoundsAreSane(const Substitution *sub) {
-  return BoundsAreSane(sub->before);
-}
-
-void TokenTreeImpl::AddOrClearInsaneBounds(Substitution::NodeList &nodes) {
-  if (!nodes.prev && !nodes.empty() &&
-      std::holds_alternative<TokenInfo *>(nodes.front())) {
-    TokenInfo *first = std::get<TokenInfo *>(nodes.front());
-    if (first->is_part_of_sub) {
-      nodes.prev = TryGetBeforeToken(first);
-    }
-  }
-
-  if (!nodes.next && !nodes.empty() &&
-      std::holds_alternative<TokenInfo *>(nodes.back())) {
-    TokenInfo *last = std::get<TokenInfo *>(nodes.back());
-    if (last->is_part_of_sub) {
-      nodes.next = TryGetAfterToken(last);
-    }
-  }
-}
-void TokenTreeImpl::AddOrClearInsaneBounds(Substitution *sub) {
-  AddOrClearInsaneBounds(sub->before);
-  AddOrClearInsaneBounds(sub->after);
-}
-
 static bool InNodeList(const Substitution::NodeList &nodes, const void *elem) {
   for (const Substitution::Node &node : nodes) {
     if (std::holds_alternative<Substitution *>(node)) {
@@ -389,57 +314,6 @@ static bool InNodeList(const Substitution::NodeList &nodes, const void *elem) {
     }
   }
   return false;
-}
-
-static bool InFileBody(const Substitution *sub) {
-  if (!sub) {
-    return false;
-  }
-
-  switch (sub->kind) {
-    // These are all in the body of a macro.
-    case mx::MacroKind::PARAMETER:
-    case mx::MacroKind::PARAMETER_SUBSTITUTION:
-    case mx::MacroKind::STRINGIFY:
-    case mx::MacroKind::CONCATENATE:
-    case mx::MacroKind::VA_OPT:
-    case mx::MacroKind::VA_OPT_ARGUMENT:
-      return true;
-
-    case mx::MacroKind::OTHER_DIRECTIVE:
-    case mx::MacroKind::IF_DIRECTIVE:
-    case mx::MacroKind::IF_DEFINED_DIRECTIVE:
-    case mx::MacroKind::IF_NOT_DEFINED_DIRECTIVE:
-    case mx::MacroKind::ELSE_IF_DIRECTIVE:
-    case mx::MacroKind::ELSE_IF_DEFINED_DIRECTIVE:
-    case mx::MacroKind::ELSE_IF_NOT_DEFINED_DIRECTIVE:
-    case mx::MacroKind::ELSE_DIRECTIVE:
-    case mx::MacroKind::END_IF_DIRECTIVE:
-    case mx::MacroKind::DEFINE_DIRECTIVE:
-    case mx::MacroKind::UNDEFINE_DIRECTIVE:
-    case mx::MacroKind::INCLUDE_DIRECTIVE:
-    case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
-    case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
-    case mx::MacroKind::IMPORT_DIRECTIVE:
-      return true;
-
-    // Watch out for `_Pragma` -> `#pragma`. But distinguish from:
-    // `MACRO(... #pragma ... )`.
-    case mx::MacroKind::PRAGMA_DIRECTIVE:
-      [[clang::fallthrough]];
-
-    case mx::MacroKind::EXPANSION:
-    case mx::MacroKind::SUBSTITUTION:
-    case mx::MacroKind::ARGUMENT:
-      if (!InFileBody(sub->parent)) {
-        return false;
-      } else {
-        return InNodeList(sub->parent->before, sub);
-      }
-//
-//    default:
-//      return false;
-  }
 }
 
 template <typename T>
@@ -490,6 +364,14 @@ static void FixupNodeParents(Substitution *sub) {
     }
   }
 
+  for (Substitution::Node &node : sub->body) {
+    if (std::holds_alternative<Substitution *>(node)) {
+      Substitution *child_sub = std::get<Substitution *>(node);
+      assert(child_sub != sub);
+      child_sub->parent = sub;
+    }
+  }
+
   for (Substitution::Node &node : sub->after) {
     if (std::holds_alternative<Substitution *>(node)) {
       Substitution *child_sub = std::get<Substitution *>(node);
@@ -497,6 +379,53 @@ static void FixupNodeParents(Substitution *sub) {
       child_sub->parent = sub;
     }
   }
+}
+
+static TokenInfo *LeftCornerOfExp(const Substitution::NodeList &nodes);
+static TokenInfo *LeftCornerOfExp(const Substitution::Node &node) {
+  if (std::holds_alternative<TokenInfo *>(node)) {
+    auto tok = std::get<TokenInfo *>(node);
+    if (tok->category != TokenInfo::kMarkerToken) {
+      return tok;
+    }
+  } else if (auto sub = std::get<Substitution *>(node)) {
+    return LeftCornerOfExp(sub->after);
+  }
+  return nullptr;
+}
+
+TokenInfo *LeftCornerOfExp(const Substitution::NodeList &nodes) {
+  for (const Substitution::Node &node : nodes) {
+    if (auto tok = LeftCornerOfExp(node)) {
+      return tok;
+    }
+  }
+  return nullptr;
+}
+
+static TokenInfo *RightCornerOfExp(const Substitution::NodeList &nodes);
+static TokenInfo *RightCornerOfExp(const Substitution::Node &node) {
+  if (std::holds_alternative<TokenInfo *>(node)) {
+    auto tok = std::get<TokenInfo *>(node);
+    if (tok->category != TokenInfo::kMarkerToken) {
+      return tok;
+    }
+  } else if (auto sub = std::get<Substitution *>(node)) {
+    return RightCornerOfExp(sub->after);
+  }
+  return nullptr;
+}
+
+TokenInfo *RightCornerOfExp(const Substitution::NodeList &nodes) {
+  auto it = nodes.rbegin();
+  auto end = nodes.rend();
+  for (; it != end; ++it) {
+    const Substitution::Node &node = *it;
+    if (auto rc = RightCornerOfExp(node)) {
+      return rc;
+    }
+  }
+  return nullptr;
 }
 
 static TokenInfo *LeftCornerOfUse(const Substitution::NodeList &nodes);
@@ -718,9 +647,6 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
   auto has_any = false;
   auto dump_tok = [&](TokenInfo *info) {
     os << "<TD><TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"0\"";
-    if (info->is_part_of_sub) {
-      os << " bgcolor=\"antiquewhite\"";
-    }
     os << ">";
     if (info->file_tok) {
       os << "<TR><TD>FK=" << info->file_tok->KindName() << "</TD></TR>";
@@ -792,10 +718,6 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
     os << "s" << reinterpret_cast<const void *>(this)
        << " [label=<<TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"1\""
        << "><TR><TD colspan=\"2\">" << mx::EnumeratorName(kind);
-
-    if (before_after_bounds_are_same) {
-      os << " same_bounds";
-    }
 
     if (is_va_args_concat) {
       os << " va_args";
@@ -906,16 +828,68 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
 // parsed, plus the file tokens that were macro uses. This does not contain
 // file tokens that were elided due to things like conditional macros, e.g.
 // `#if 0`.
-TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
-                                                uint64_t begin_index,
-                                                uint64_t end_index,
-                                                std::ostream &err) {
-  int macro_depth = 0;
+TokenInfo *TokenTreeImpl::BuildInitialTokenList(
+    const std::optional<pasta::TokenRange> &range,
+    const pasta::PrintedTokenRange &printed_range,
+    std::ostream &err) {
+
+  if (range.has_value()) {
+    return BuildParsedTokenList(range.value(), printed_range, err);
+
+  } else if (printed_range) {
+    return BuildPrintedTokenList(printed_range, err);
+
+  } else {
+    err << "Empty parsed and printed token ranges.";
+    return nullptr;
+  }
+}
+
+TokenInfo *TokenTreeImpl::BuildPrintedTokenList(
+    const pasta::PrintedTokenRange &range, std::ostream &err) {
+
+  for (pasta::PrintedToken tok : range) {
+    
+    TokenInfo &info = tokens_alloc.emplace_back();
+    info.printed_tok = tok;
+    info.category = TokenInfo::kFileToken;
+    info.parsed_tok = tok.DerivedLocation();
+
+    if (info.parsed_tok) {
+      info.file_tok = info.parsed_tok->FileLocation();
+
+      if (info.file_tok) {
+        nth_file_token.emplace(
+            std::make_pair(info.file_tok->RawFile(), info.file_tok->Index()),
+            &info);
+      }
+    }
+  }
+
+  // Link all of the tokens together.
+  if (auto num_toks = tokens_alloc.size()) {
+    for (auto i = 1ull, j = 0ull; i < num_toks; ++i, ++j) {
+      tokens_alloc[j].next = &(tokens_alloc[i]);
+    }
+
+    return &(tokens_alloc.front());
+  }
+
+  err << "Cannot create token tree from empty token range";
+  return nullptr;
+}
+
+TokenInfo *TokenTreeImpl::BuildParsedTokenList(
+    const pasta::TokenRange &range,
+    const pasta::PrintedTokenRange &printed_range,
+    std::ostream &err) {
+
   TokenInfo *last_macro_use_token = nullptr;
 
-  for (auto i = begin_index; i <= end_index; ++i) {
-    pasta::Token tok = range[i];
+  size_t next_printed_tok = 1u;
+  std::optional<pasta::PrintedToken> npt = printed_range.At(0);
 
+  for (pasta::Token tok : range) {
     TokenInfo &info = tokens_alloc.emplace_back();
     info.file_tok = tok.FileLocation();
     info.macro_tok = tok.MacroLocation();
@@ -927,6 +901,25 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
           &info);
     }
 
+    // Match up the parsed token with a printed token.
+    const auto pti = tok.Index();
+    const bool is_parsed_tok = IsParsedToken(tok);
+    while (is_parsed_tok && !info.printed_tok.has_value() && npt.has_value()) {
+
+      if (auto npt_pt = npt->DerivedLocation()) {
+        auto npt_pti = npt_pt->Index();
+        if (npt_pti == pti) {
+          info.printed_tok = std::move(npt);
+
+        } else if (npt_pti > pti) {
+          break;
+        }
+      }
+
+      npt.reset();
+      npt = printed_range.At(next_printed_tok++);
+    }
+
     switch (tok.Role()) {
       default:
       case pasta::TokenRole::kInvalid:
@@ -934,15 +927,16 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
         return nullptr;
 
       case pasta::TokenRole::kBeginOfMacroExpansionMarker: {
+        assert(!is_parsed_tok);
         assert(!last_macro_use_token);
         assert(tok.FileLocation().has_value());
         info.category = TokenInfo::kMarkerToken;
         last_macro_use_token = &info;
-        ++macro_depth;
         break;
       }
 
       case pasta::TokenRole::kEndOfMacroExpansionMarker: {
+        assert(!is_parsed_tok);
         assert(last_macro_use_token != nullptr);
         pasta::File file = pasta::File::Containing(
             last_macro_use_token->file_tok.value());
@@ -950,23 +944,20 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
             last_macro_use_token->file_tok->Index() + 1u);
         info.category = TokenInfo::kMarkerToken;
         last_macro_use_token = nullptr;
-        --macro_depth;
-        assert(0 <= macro_depth);
         break;
       }
 
       case pasta::TokenRole::kInitialMacroUseToken: {
-        assert(0 < macro_depth);
-        assert(last_macro_use_token != nullptr);
+        assert(!is_parsed_tok);
         info.category = TokenInfo::kMacroUseToken;
-        info.is_part_of_sub = true;
+        assert(info.file_tok.has_value());
         assert(info.macro_tok.has_value());
         last_macro_use_token = &info;
         break;
       }
 
       case pasta::TokenRole::kIntermediateMacroExpansionToken: {
-        assert(0 < macro_depth);
+        assert(!is_parsed_tok);
         assert(last_macro_use_token != nullptr);
         info.category = TokenInfo::kMacroStepToken;
         assert(info.macro_tok.has_value());
@@ -974,7 +965,6 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
       }
 
       case pasta::TokenRole::kFinalMacroExpansionToken: {
-        assert(0 < macro_depth);
         assert(last_macro_use_token != nullptr);
         assert(info.macro_tok.has_value());
         info.category = TokenInfo::kMacroExpansionToken;
@@ -990,25 +980,21 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
       }
 
       case pasta::TokenRole::kFileToken: {
-        assert(!macro_depth);
         assert(!last_macro_use_token);
         assert(info.file_tok.has_value());
         assert(info.file_tok->Data() == tok.Data());
         info.category = TokenInfo::kFileToken;
-        info.is_part_of_sub = true;
         break;
       }
 
       case pasta::TokenRole::kEndOfInternalMacroEventMarker: {
-        assert(macro_depth);
+        assert(!is_parsed_tok);
         assert(last_macro_use_token);
         info.category = TokenInfo::kMarkerToken;
         break;
       }
     }
   }
-
-  (void) macro_depth;
 
   // Link all of the tokens together.
   if (auto num_toks = tokens_alloc.size()) {
@@ -1028,7 +1014,19 @@ Substitution *TokenTreeImpl::CreateSubstitution(mx::MacroKind kind_) {
 }
 
 static pasta::Macro RootNodeFrom(const pasta::Macro &node) {
-  if (auto parent = node.Parent()) {
+  
+  // NOTE(pag): We extract macro directives into their own (nested) fragments,
+  //            even if they are logically nested within a macro use. It's
+  //            possible for a `#define` directive to be nested inside of a
+  //            macro use / expansion. In that case, the parent of the directive
+  //            is the expansion, but we want to put the directive into a
+  //            floating fragment all on its own, and so it wouldn't make sense
+  //            for that floating fragment to contain the expansion, which may
+  //            be polymorphic for other reasons.
+  if (ShouldGoInFloatingFragment(node)) {
+    return node;
+  
+  } else if (auto parent = node.Parent()) {
     return RootNodeFrom(parent.value());
   } else {
     return node;
@@ -1127,21 +1125,19 @@ Substitution *TokenTreeImpl::MergeArguments(
     new_nodes.next = sub->before.next;
 
     Substitution *new_arg_sub = CreateSubstitution(mx::MacroKind::SUBSTITUTION);
-    new_arg_sub->before_after_bounds_are_same = true;
     new_arg_sub->before = std::move(sub->before);
     new_arg_sub->after = std::move(pre_exp->before);
     new_arg_sub->parent = sub;
     FixupNodeParents(new_arg_sub);
 
     new_nodes.emplace_back(new_arg_sub);
-
     sub->before = std::move(new_nodes);
 
   // Use `pre_exp` because the original is simple, and so the pre-expansion
   // is either simple or not, so whatever it is is more desirable.
   } else {
-    sub->before.swap(pre_exp->before);
-    sub->after.swap(pre_exp->after);
+    sub->before = std::move(pre_exp->before);
+    sub->after = std::move(pre_exp->after);
     FixupNodeParents(sub);
   }
 
@@ -1170,12 +1166,6 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
   assert(std::get<Substitution *>(sub->after.front()) == pre_exp);
   assert(sub->kind == mx::MacroKind::EXPANSION);
   assert(pre_exp->kind == mx::MacroKind::EXPANSION);
-
-  // If we merge the argument pre-expansions, then the before/after won't be
-  // the same anymore.
-  assert(!pre_exp->before_after_bounds_are_same);
-  assert(sub->before_after_bounds_are_same);
-  sub->before_after_bounds_are_same = false;
 
   Substitution::NodeList new_nodes;
   new_nodes.prev = sub->before.prev;
@@ -1280,7 +1270,6 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
 
       // If the original is a token, then the pre-expansion is more interesting.
       } else if (orig_is_tok) {
-        preexp_lc->is_part_of_sub = orig_rc->is_part_of_sub;
         new_nodes.push_back(preexp_node);
 
       // If the pre-expansion isn't a token, and regardless of what the original
@@ -1288,7 +1277,6 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
       } else {
         Substitution *non_empty_sub = CreateSubstitution(
             mx::MacroKind::SUBSTITUTION);
-        non_empty_sub->before_after_bounds_are_same = true;
         non_empty_sub->parent = sub;
         non_empty_sub->before.emplace_back(orig_node);
         non_empty_sub->after.emplace_back(preexp_node);
@@ -1391,7 +1379,6 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
     info.file_tok = tok->FileLocation();
     info.parsed_tok = tok->ParsedLocation();
     info.macro_tok = std::move(tok);
-    info.is_part_of_sub = info.file_tok.has_value();
     info.category = TokenInfo::kMissingFileToken;
 
     switch (tok_kind) {
@@ -1399,7 +1386,7 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
       case pasta::TokenKind::kEndOfDirective:
         continue;
       default:
-        if (info.is_part_of_sub) {
+        if (info.file_tok.has_value()) {
           if (prev) {
             prev->next = &info;
           }
@@ -1411,7 +1398,6 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
   }
 
   StripWhitespace(body->before);
-  AddOrClearInsaneBounds(body);
 
   D( indent.resize(indent.size()  - 2u); )
   (void)err;
@@ -1558,47 +1544,6 @@ const void *ContainingMacroUse(Substitution *child) {
   return nullptr;
 }
 
-static void LabelUseNodesIn(Substitution::NodeList &nodes,
-                            bool is_top_level_use, const void *node) {
-  for (Substitution::Node &n : nodes) {
-    if (!std::holds_alternative<TokenInfo *>(n)) {
-      continue;
-    }
-
-    TokenInfo *tok = std::get<TokenInfo *>(n);
-    if (!tok->parsed_tok) {
-      continue;
-    }
-
-    if (is_top_level_use) {
-      tok->is_part_of_sub = true;
-      continue;
-    }
-
-    assert(!tok->macro_tok ||
-           (tok->macro_tok->ParsedLocation().RawToken() ==
-               tok->parsed_tok->RawToken()));
-    auto dt = tok->parsed_tok->DerivedLocation();
-    if (!dt) {
-      continue;
-    }
-
-    auto dm = dt->MacroLocation();
-    if (!dm) {
-      continue;
-    }
-
-    auto p = dm->Parent();
-    if (!p) {
-      continue;
-    }
-
-    if (p->RawMacro() == node) {
-      tok->is_part_of_sub = true;
-    }
-  }
-}
-
 Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
     Substitution::NodeList &nodes, const pasta::MacroToken &node,
@@ -1610,11 +1555,6 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     if (curr->category == TokenInfo::kMissingFileToken) {
       nodes.emplace_back(curr);
 
-    // TODO(pag): If/when we get event markers for before/after parameter
-    //            substitutions, then disable this, and allow these tokens
-    //            through, and then update `lb_ub` propagation in
-    //            `FindSubstitutionBoundsRec` to propagate lower/upper bounds
-    //            through these markers.
     } else if (curr->category == TokenInfo::kMarkerToken &&
                (curr->parsed_tok->Role() ==
                    pasta::TokenRole::kEndOfInternalMacroEventMarker)) {
@@ -1632,7 +1572,14 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     }
   }
 
-  if (!curr || !curr->macro_tok) {
+  // Walked off the end of the list. Probably because the root macro is
+  // actually a directive, and so we're dealing with a token range that
+  // doesn't have our begin/end macro markers.
+  if (!curr) {
+    return sub;
+  }
+
+  if (!curr->macro_tok) {
     assert(false);
     err << "Failed to find the next macro token";
     return nullptr;
@@ -1676,9 +1623,6 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   }
   (void) sub_exp;
 
-  LabelUseNodesIn(arg_sub->before, InFileBody(arg_sub),
-                  ContainingMacroDef(arg_sub));
-
   return sub;
 }
 
@@ -1688,6 +1632,8 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     std::ostream &err) {
 
   Substitution *arg_sub = CreateSubstitution(mx::FromPasta(node.Kind()));
+  assert(sub->kind == mx::MacroKind::EXPANSION ||
+         sub->kind == mx::MacroKind::STRINGIFY);
   arg_sub->parent = sub;
   arg_sub->macro = node;
   nodes.emplace_back(arg_sub);
@@ -1702,10 +1648,6 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     assert(sub_exp == arg_sub);
   }
   (void) sub_exp;
-
-  LabelUseNodesIn(arg_sub->before, InFileBody(arg_sub),
-                  ContainingMacroDef(arg_sub));
-
   return sub;
 }
 
@@ -1715,6 +1657,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     std::ostream &err) {
 
   Substitution *arg_sub = CreateSubstitution(mx::FromPasta(node.Kind()));
+  assert(sub->kind == mx::MacroKind::VA_OPT);
   arg_sub->parent = sub;
   arg_sub->macro = node;
   nodes.emplace_back(arg_sub);
@@ -1729,10 +1672,6 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     assert(sub_exp == arg_sub);
   }
   (void) sub_exp;
-
-  LabelUseNodesIn(arg_sub->before, InFileBody(arg_sub),
-                  ContainingMacroDef(arg_sub));
-
   return sub;
 }
 
@@ -1742,6 +1681,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     std::ostream &err) {
 
   Substitution *arg_sub = CreateSubstitution(mx::FromPasta(node.Kind()));
+  assert(sub->kind == mx::MacroKind::DEFINE_DIRECTIVE);
   arg_sub->parent = sub;
   arg_sub->macro = node;
   nodes.emplace_back(arg_sub);
@@ -1755,10 +1695,6 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     }
     assert(sub_exp == arg_sub);
   }
-
-  LabelUseNodesIn(arg_sub->before, InFileBody(arg_sub),
-                  ContainingMacroDef(arg_sub));
-
   return sub;
 }
 
@@ -1782,8 +1718,6 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     assert(sub_exp == exp);
   }
 
-  LabelUseNodesIn(exp->before, InFileBody(exp), ContainingMacroDef(exp));
-
   for (const pasta::Macro &sub_node : node.ReplacementChildren()) {
     sub_exp = BuildMacroSubstitutions(
         prev, curr, exp, exp->after, sub_node, err);
@@ -1802,6 +1736,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     std::ostream &err) {
 
   Substitution *exp = CreateSubstitution(mx::FromPasta(node.Kind()));
+  assert(exp->kind == mx::MacroKind::EXPANSION);
 
   exp->parent = sub;
   exp->macro = node;
@@ -1851,32 +1786,6 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   // as a result of macro argument pre-expansion.
   Substitution *pre_exp = PreExpansionOf(exp);
 
-  if (!node.IsArgumentPreExpansion()) {
-
-    // Go mark the "trusted" tokens in the use.
-    if (InFileBody(exp)) {
-      LabelUseNodesIn(exp->before, true, nullptr);
-      if (pre_exp) {
-        LabelUseNodesIn(pre_exp->before, true, nullptr);
-      }
-
-    // If we're inside of some other macro body, then mark those tokens.
-    } else if (auto cmd = ContainingMacroDef(sub)) {
-      LabelUseNodesIn(exp->before, false, cmd);
-      if (pre_exp) {
-        LabelUseNodesIn(pre_exp->before, false, cmd);
-      }
-    }
-
-    // Go mark the "trusted" tokens in the expansion. These are ones that are
-    // located in the macro body.
-    if (pre_exp) {
-      LabelUseNodesIn(pre_exp->after, false, macro_def->RawMacro());
-    } else {
-      LabelUseNodesIn(exp->after, false, macro_def->RawMacro());
-    }
-  }
-
   // Try to find the real body.
   Substitution *macro_body_sub = GetMacroBody(macro_def.value(), err);
   if (!macro_body_sub) {
@@ -1893,7 +1802,6 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
   // Inherit the `after` bounds from the macro body.
   if (pre_exp) {
-    exp->before_after_bounds_are_same = true;
     if (!MergeArgPreExpansion(exp, pre_exp, err)) {
       if (auto macro_name = macro_def->Name()) {
         err << "Unable to merge argument pre-expansion with use of macro "
@@ -1907,11 +1815,10 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     }
 
     assert(exp->body.empty());
-    exp->body.swap(pre_exp->body);
-    exp->body.prev = pre_exp->body.prev;
-    exp->body.next = pre_exp->body.next;
-
+    exp->body = std::move(pre_exp->body);
     assert(!PreExpansionOf(exp));
+
+    FixupNodeParents(exp);
   }
 
   exp->after.prev = macro_body_sub->before.prev;
@@ -1938,13 +1845,6 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
       return nullptr;
     }
     assert(sub_exp == dir);
-  }
-
-  // Mark all as trusted.
-  for (Substitution::Node &before_node : dir->before) {
-    if (std::holds_alternative<TokenInfo *>(before_node)) {
-      std::get<TokenInfo *>(before_node)->is_part_of_sub = true;
-    }
   }
 
   return sub;
@@ -2156,8 +2056,6 @@ Substitution *TokenTreeImpl::BuildFileSubstitutions(
   file_sub->after.prev = TryGetBeforeToken(first_tok);
   file_sub->after.next = TryGetAfterToken(prev);
 
-  AddOrClearInsaneBounds(file_sub);
-
   // Skip the marker.
   prev = curr;
   curr = curr->next;
@@ -2203,7 +2101,8 @@ Substitution *TokenTreeImpl::BuildSubstitutionsIter(
     // the issue of unbalanced BOF/EOF tokens in `IndexCompileJob.cpp` by
     // identifying when decls include `EOF` markers, and then expanding their
     // ranges to contain the associated `#include` directive.
-    if (curr->parsed_tok->Role() == pasta::TokenRole::kEndOfFileMarker) {
+    if (curr->parsed_tok &&
+        curr->parsed_tok->Role() == pasta::TokenRole::kEndOfFileMarker) {
       prev = curr;
       curr = curr->next;
       continue;
@@ -2232,12 +2131,27 @@ Substitution *TokenTreeImpl::BuildSubstitutions(
         continue;
 
       // Inside of a macro expansion region; this shoudln't happen.
-      case TokenInfo::kMacroUseToken:
       case TokenInfo::kMacroStepToken:
       case TokenInfo::kMacroExpansionToken:
         sub->before.has_error = true;
         Die(this);
-        err << "Macro tokens should not be seen here";
+        err << "Macro step/expansion tokens should not be seen here";
+        return nullptr;
+
+      // If we're here then it means we're probably in a directive that's been
+      // pulled out of its (parent) fragment.
+      case TokenInfo::kMacroUseToken:
+        if (substitutions_alloc.size() == 1u && curr->macro_tok) {
+          pasta::Macro root_macro = RootNodeFrom(curr->macro_tok.value());
+          if (auto dir = pasta::MacroDirective::From(root_macro)) {
+            TryAddBeforeToken(sub, curr);
+            return BuildMacroSubstitutions(
+                prev, curr, sub, sub->before, dir.value(), err);
+          }
+        }
+        sub->before.has_error = true;
+        Die(this);
+        err << "Macro use tokens should not be seen here";
         return nullptr;
 
       // At a marker token.
@@ -2280,293 +2194,13 @@ Substitution *TokenTreeImpl::BuildSubstitutions(
     }
   }
 
-  LabelUseNodesIn(sub->before, true, nullptr);
-
   if (prev) {
-    if (prev->category == TokenInfo::kMarkerToken) {
-      sub->before.next = prev;
-      AddOrClearInsaneBounds(sub);
-    } else {
+    if (prev->category != TokenInfo::kMarkerToken) {
       TryAddAfterToken(sub, prev);
     }
   }
 
   return sub;
-}
-
-// Try to recursively find the bounds of a substitution. This is suprisingly
-// subtle. It means dealing with some of the subtleties of both Clang's
-// behavior, as well as PASTA's.
-bool TokenTreeImpl::FindSubstitutionBoundsRec(
-    Substitution *sub, TokenInfo *lower_bound,
-    TokenInfo *upper_bound) {
-
-  AddOrClearInsaneBounds(sub);
-  auto ret = FindSubstitutionBoundsRec(sub->before, lower_bound, upper_bound);
-
-  if (sub->HasExpansion()) {
-    assert(!PreExpansionOf(sub));
-
-    // E.g. for macro argument pre-expansions, when we merge arguments, or
-    // introduce substitutions of like-for-like.
-    if (sub->before_after_bounds_are_same) {
-      FindSubstitutionBoundsRec(sub->after, sub->before.prev,
-                                sub->before.next);
-
-    } else {
-      FindSubstitutionBoundsRec(sub->after, nullptr, nullptr);
-    }
-  } else {
-    assert(sub->after.empty());
-  }
-
-  return ret;
-}
-
-// Try to recursively find the bounds of a substitution. This is suprisingly
-// subtle. It means dealing with some of the subtleties of both Clang's
-// behaviour, as well as PASTA's.
-bool TokenTreeImpl::FindSubstitutionBoundsRec(
-    Substitution::NodeList &nodes, TokenInfo *lower_bound,
-    TokenInfo *upper_bound) {
-
-//  // Clang special cases `_Pragma` expansions when they appear inside of
-//  // other macro arguments. This is to prevent argument pre-expansion of
-//  // `MACRO(_Pragma("..."))` into `MACRO(#pragma ...)`. In our tree form, this
-//  // manifests as the `_Pragma` macro use appearing in the expansion of `MACRO`.
-//  // At face value, this is fine, except that it means that the bounds taken
-//  // from the definition of `MACRO` cannot be trusted as lower/upper bounds to
-//  // the use of `_Pragma` at the substitution site, so we need to clear out
-//  // `lower_bound` and `upper_bound`.
-//  if (sub->kind == Substitution::kMacroUse && (lower_bound || upper_bound) &&
-//      sub->parent && sub->parent->kind == Substitution::kMacroExpansion) {
-//    TokenInfo *macro_name =
-//        ::indexer::RightCornerOfExpansionOrUse(nodes.front());
-//    assert(macro_name);
-//    if (macro_name->parsed_tok->Data() != "_Pragma") {
-//      goto normal_or_handled_pragma;
-//    }
-//
-//    sub->has_error = true;
-//    Die(this);
-//  }
-//
-//normal_or_handled_pragma:
-
-  auto changed_bounds = false;
-
-  // Empty node.
-  if (nodes.empty()) {
-    return false;
-  }
-
-  if (!nodes.prev && lower_bound) {
-    nodes.prev = lower_bound;
-    changed_bounds = true;
-  }
-
-  if (!nodes.next && upper_bound) {
-    nodes.next = upper_bound;
-    changed_bounds = true;
-  }
-
-  // An empty node should have the same lower/upper bounds.
-  if (!LeftCornerOfUse(nodes)) {
-    if (nodes.prev && !nodes.next) {
-      nodes.next = TryGetAfterToken(nodes.prev);
-      changed_bounds = true;
-
-    } else if (nodes.next && !nodes.prev) {
-      nodes.prev = TryGetBeforeToken(nodes.next);
-      changed_bounds = true;
-    }
-  }
-
-  if (!BoundsAreSane(nodes)) {
-    auto orig_bb = nodes.prev;
-    auto orig_ab = nodes.next;
-
-    nodes.prev = LeftCornerOfUse(nodes);
-    nodes.next = RightCornerOfUse(nodes);
-
-    if (!BoundsAreSane(nodes)) {
-      nodes.has_error = true;
-      nodes.prev = orig_bb;
-      nodes.next = orig_ab;
-
-      // TODO(pag): Re-enable this when we get back into whitespace injection
-      //            and other things.
-      // Die(this);
-      return false;
-    }
-  }
-
-  uint64_t bi = ~0u;
-  uint64_t ai = 0u;
-
-  if (nodes.prev) {
-    bi = nodes.prev->file_tok->Index();
-  }
-
-  if (nodes.next) {
-    ai = nodes.next->file_tok->Index();
-  }
-
-  const auto max_i = nodes.size();
-  std::vector<std::pair<TokenInfo *, TokenInfo *>> lb_ub;
-  std::vector<bool> checked_provenance;
-  std::vector<bool> same_recursive;
-  lb_ub.resize(max_i);
-  checked_provenance.resize(max_i);
-  same_recursive.resize(max_i);
-
-  auto accept = +[] (TokenInfo *lb, TokenInfo *mid, TokenInfo *ub) {
-    return BoundsAreSane(lb, mid) && BoundsAreSane(mid, ub);
-  };
-
-  auto changed = true;
-  for (auto c = 0u; changed && c <= max_i; ++c) {
-    changed = false;
-
-    lower_bound = nodes.prev;
-    upper_bound = nodes.next;
-
-    // Forward pass, collect lower bounds.
-    for (auto i = 0u; i < max_i; ++i) {
-      const Substitution::Node &node = nodes[i];
-      if (std::holds_alternative<TokenInfo *>(node)) {
-        TokenInfo *tok_node = std::get<TokenInfo *>(node);
-
-        lower_bound = nullptr;
-        if (tok_node->is_part_of_sub) {
-          lower_bound = tok_node;
-
-        // Opportunistically try to calculate if this token actually belongs.
-        // This mostly helps with pre-argument expansions.
-        } else if (tok_node->file_tok) {
-          auto fti = tok_node->file_tok->Index();
-          if (bi < fti && fti < ai) {
-            tok_node->is_part_of_sub = true;
-            changed = true;
-            changed_bounds = true;
-            lower_bound = tok_node;
-          }
-        }
-
-      } else if (std::holds_alternative<Substitution *>(node)) {
-        if (lower_bound && lower_bound != lb_ub[i].first) {
-          lb_ub[i].first = lower_bound;
-          same_recursive[i] = false;
-          changed = true;
-        }
-
-        Substitution *sub_node = std::get<Substitution *>(node);
-        if (TokenInfo *next_lb = TryGetBeforeToken(sub_node->before.next);
-            next_lb && accept(lower_bound, next_lb, upper_bound)) {
-          lower_bound = next_lb;
-          continue;
-        }
-
-        if (TokenInfo *rc = RightCornerOfUse(sub_node->before);
-            rc && accept(lower_bound, rc, upper_bound)) {
-          lower_bound = rc;
-        } else {
-          lower_bound = nullptr;
-        }
-      }
-    }
-
-    lower_bound = nodes.prev;
-    upper_bound = nodes.next;
-
-    // Backward pass, collect upper bounds.
-    for (auto j = 1u; j <= max_i; ++j) {
-      auto i = max_i - j;
-      const Substitution::Node &node = nodes[i];
-      if (std::holds_alternative<TokenInfo *>(node)) {
-        TokenInfo *tok_node = std::get<TokenInfo *>(node);
-        upper_bound = nullptr;
-        if (tok_node->is_part_of_sub) {
-          upper_bound = tok_node;
-        }
-
-      } else if (std::holds_alternative<Substitution *>(node)) {
-        if (upper_bound && upper_bound != lb_ub[i].second) {
-          lb_ub[i].second = upper_bound;
-          same_recursive[i] = false;
-          changed = true;
-        }
-
-        Substitution *sub_node = std::get<Substitution *>(node);
-        if (TokenInfo *next_ub = TryGetAfterToken(sub_node->before.prev);
-            next_ub && accept(lower_bound, next_ub, upper_bound)) {
-          upper_bound = next_ub;
-          continue;
-        }
-
-        if (TokenInfo *lc = LeftCornerOfUse(sub_node->before);
-            lc && accept(lower_bound, lc, upper_bound)) {
-          upper_bound = lc;
-        } else {
-          upper_bound = nullptr;
-        }
-      }
-    }
-
-    // Substitution pass
-    for (auto i = 0u; i < max_i; ++i) {
-      const Substitution::Node &node = nodes[i];
-      if (!std::holds_alternative<Substitution *>(node)) {
-        continue;
-      }
-
-      Substitution *sub_node = std::get<Substitution *>(node);
-
-      // Special case: we don't have lower/upper bounds for around us that
-      // come from this sub, but we are surrounded by tokens that share
-      // a common provenance, so we can take their bounds.
-      if (!checked_provenance[i] && 0u < i && (i + 1u) < max_i &&
-          !lb_ub[i].first && !lb_ub[i].second &&
-          std::holds_alternative<TokenInfo *>(nodes[i - 1u]) &&
-          std::holds_alternative<TokenInfo *>(nodes[i + 1u])) {
-        auto bt = std::get<TokenInfo *>(nodes[i - 1u]);
-        auto at = std::get<TokenInfo *>(nodes[i + 1u]);
-        if (!bt->parsed_tok || !at->parsed_tok) {
-          goto keep_going;
-        }
-
-        auto btd = bt->parsed_tok->DerivedLocation();
-        auto atd = at->parsed_tok->DerivedLocation();
-        if (!btd || !atd) {
-          goto keep_going;
-        }
-
-        auto btdm = btd->MacroLocation();
-        auto atdm = atd->MacroLocation();
-        if (!btdm || !atdm) {
-          goto keep_going;
-        }
-
-        auto btdmp = btdm->Parent();
-        auto atdmp = atdm->Parent();
-        if (btdmp && atdmp && btdmp->RawMacro() == atdmp->RawMacro()) {
-          lb_ub[i].first = bt;
-          lb_ub[i].second = at;
-        }
-      }
-
-    keep_going:
-      if (!same_recursive[i] &&
-          FindSubstitutionBoundsRec(sub_node, lb_ub[i].first,
-                                    lb_ub[i].second)) {
-        changed = true;
-      }
-      checked_provenance[i] = true;
-      same_recursive[i] = true;
-    }
-  }
-
-  return changed_bounds;
 }
 
 // Build the initial tree of substitutions.
@@ -2588,30 +2222,17 @@ TokenTree::~TokenTree(void) {}
 
 // Create a token tree from the tokens in the inclusive range
 // `[begin_index, end_index]` from `range`.
-std::optional<TokenTreeNodeRange>
-TokenTree::Create(const pasta::TokenRange &range, uint64_t begin_index,
-                  uint64_t end_index, std::ostream &err) {
-
-  if (begin_index > end_index) {
-    err << "Cannot create token tree; begin index (" << begin_index
-        << ") is greater than end index (" << end_index << ")";
-    return std::nullopt;
-  }
-
-  if (auto range_size = range.Size(); end_index >= range_size) {
-    err << "Cannot create token tree; end index (" << end_index
-        << ") is greater than or equal to the range size ("
-        << range_size << ")";
-    return std::nullopt;
-  }
+std::optional<TokenTreeNodeRange> TokenTree::Create(
+    const std::optional<pasta::TokenRange> &range,
+    const pasta::PrintedTokenRange &printed_range,
+    std::ostream &err) {
 
   auto impl = std::make_shared<TokenTreeImpl>();
 
   try {
 
     // Build and classify the initial list of tokens.
-    if (!impl->BuildInitialTokenList(std::move(range), begin_index,
-                                     end_index, err)) {
+    if (!impl->BuildInitialTokenList(range, printed_range, err)) {
       return std::nullopt;
     }
 
@@ -2624,9 +2245,6 @@ TokenTree::Create(const pasta::TokenRange &range, uint64_t begin_index,
       Die(impl.get());
       return std::nullopt;
     }
-
-//      impl->ProvenanceBasedParameterSubstitutionRec(sub);
-    impl->FindSubstitutionBoundsRec(sub, nullptr, nullptr);
 
 
 //    std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
@@ -2651,6 +2269,15 @@ TokenTree::Create(const pasta::TokenRange &range, uint64_t begin_index,
 
   } catch (const char *msg) {
     err << msg;
+    return std::nullopt;
+  }
+}
+
+std::optional<pasta::PrintedToken> TokenTreeNode::PrintedToken(void) const noexcept {
+  if (const auto &ent = (*impl)[offset];
+      std::holds_alternative<TokenInfo *>(ent)) {
+    return std::get<TokenInfo *>(ent)->printed_tok;
+  } else {
     return std::nullopt;
   }
 }
@@ -2742,6 +2369,7 @@ void TokenTree::Dump(std::ostream &os) const {
 }
 
 mx::MacroKind TokenTree::Kind(void) const noexcept {
+  assert(!impl->macro || mx::FromPasta(impl->macro->Kind()) == impl->kind);
   return impl->kind;
 }
 
@@ -2776,6 +2404,39 @@ TokenTreeNodeRange TokenTree::IntermediateChildren(void) const noexcept {
 TokenTreeNodeRange TokenTree::ReplacementChildren(void) const noexcept {
   std::shared_ptr<const SubstitutionNodeList> ptr(impl, &(impl->after));
   return TokenTreeNodeRange(std::move(ptr));
+}
+
+std::optional<pasta::Token>
+TokenTree::FirstFullySubstitutedToken(void) const noexcept {
+  if (auto lc = LeftCornerOfExp(const_cast<Substitution *>(impl.get()))) {
+    if (lc->parsed_tok) {
+      return lc->parsed_tok;
+    } else if (lc->macro_tok) {
+      return lc->macro_tok->ParsedLocation();
+    }
+  }
+  return std::nullopt;
+}
+
+std::optional<pasta::Token>
+TokenTree::LastFullySubstitutedToken(void) const noexcept {
+  if (auto rc = RightCornerOfExp(const_cast<Substitution *>(impl.get()))) {
+    if (rc->parsed_tok) {
+      return rc->parsed_tok;
+    } else if (rc->macro_tok) {
+      return rc->macro_tok->ParsedLocation();
+    }
+  }
+  return std::nullopt;
+}
+
+std::optional<pasta::MacroToken> TokenTree::NameOrOperator(void) const noexcept {
+  if (impl->macro) {
+    if (auto sub = pasta::MacroSubstitution::From(impl->macro.value())) {
+      return sub->NameOrOperator();
+    }
+  }
+  return std::nullopt;
 }
 
 // Return whether or not this node has intermediate children.

@@ -17,39 +17,36 @@ namespace indexer {
 namespace {
 
 static void TrackRedeclarations(
-    mx::DatabaseWriter &database, const PendingFragment &pf,
+    mx::DatabaseWriter &database, mx::RawEntityId fragment_index,
     const EntityMapper &em, const std::string &mangled_name,
     const pasta::Decl &decl, std::vector<pasta::Decl> redecls) {
 
-  mx::RawEntityId a_id = em.EntityId(decl);
-  mx::VariantId a_vid = mx::EntityId(a_id).Unpack();
-  if (!std::holds_alternative<mx::DeclId>(a_vid)) {
+  auto raw_decl_id = em.EntityId(decl);
+  auto decl_id = mx::EntityId(raw_decl_id).Extract<mx::DeclId>();
+  if (!decl_id) {
+    return;
+  }
+
+  if (decl_id->fragment_id != fragment_index) {
     assert(false);
     return;
   }
 
-  mx::DeclId decl_id = std::get<mx::DeclId>(a_vid);
-  if (decl_id.fragment_id != pf.fragment_index) {
-    assert(false);
-    return;
+  // If the mangled_name is empty, it should not be added to the table.
+  // It goes around it and add redecls to the redecl record table.
+  if (!mangled_name.empty()) {
+    database.AddAsync(mx::MangledNameRecord{raw_decl_id, mangled_name});
   }
-
-  database.AddAsync(mx::MangledNameRecord{a_id, mangled_name});
 
   for (const pasta::Decl &redecl : redecls) {
-    mx::RawEntityId b_id = em.EntityId(redecl);
-    if (a_id == b_id) {
+
+    auto redecl_id = em.SpecificEntityId<mx::DeclId>(redecl);
+    if (!redecl_id || decl_id.value() == redecl_id.value()) {
       continue;
     }
 
-    mx::VariantId b_vid = mx::EntityId(b_id).Unpack();
-    if (!std::holds_alternative<mx::DeclId>(b_vid)) {
-      assert(false);
-      continue;
-    }
-
-    mx::DeclId redecl_id = std::get<mx::DeclId>(b_vid);
-    database.AddAsync(mx::RedeclarationRecord{decl_id, redecl_id});
+    database.AddAsync(mx::RedeclarationRecord{
+        decl_id.value(), redecl_id.value()});
   }
 }
 
@@ -59,19 +56,22 @@ static void TrackRedeclarations(
 // fragments.
 void LinkEntitiesAcrossFragments(
     mx::DatabaseWriter &database, const PendingFragment &pf,
-    const EntityMapper &em, const NameMangler &mangler) {
+    const NameMangler &mangler) {
+
+  const EntityMapper &em = pf.em;
 
   std::string dummy_mangled_name;
-  for (const pasta::Decl &decl : pf.decls_to_serialize) {
+  for (pasta::Decl decl : Entities(pf.decls_to_serialize)) {
     mx::RawEntityId eid = em.EntityId(decl);
     if (eid == mx::kInvalidEntityId) {
+      assert(false);
       continue;
     }
 
     if (auto func = pasta::FunctionDecl::From(decl)) {
       const auto &mangled_name = mangler.Mangle(decl);
       TrackRedeclarations(
-          database, pf, em,
+          database, pf.fragment_index, em,
           (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
           decl, func->Redeclarations());
 
@@ -82,7 +82,7 @@ void LinkEntitiesAcrossFragments(
         case pasta::DeclCategory::kClassMember: {
           const auto &mangled_name = mangler.Mangle(decl);
           TrackRedeclarations(
-              database, pf, em,
+              database, pf.fragment_index, em,
               (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
               decl, var->Redeclarations());
           break;
@@ -92,11 +92,11 @@ void LinkEntitiesAcrossFragments(
       }
 
     } else if (auto tag = pasta::TagDecl::From(decl)) {
-      TrackRedeclarations(database, pf, em, dummy_mangled_name,
+      TrackRedeclarations(database, pf.fragment_index, em, dummy_mangled_name,
                           decl, tag->Redeclarations());
 
     } else if (auto tpl = pasta::RedeclarableTemplateDecl::From(decl)) {
-      TrackRedeclarations(database, pf, em, dummy_mangled_name,
+      TrackRedeclarations(database, pf.fragment_index, em, dummy_mangled_name,
                           decl, tpl->Redeclarations());
 
     } else {

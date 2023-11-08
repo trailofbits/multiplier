@@ -17,14 +17,17 @@ class Index;
 class BuiltinType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class BuiltinType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<BuiltinType> in(const Fragment &frag);
-  static gap::generator<BuiltinType> in(const File &file);
   static gap::generator<BuiltinType> in(const Index &index);
   static gap::generator<BuiltinType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -52,6 +55,7 @@ class BuiltinType : public Type {
   bool is_floating_point(void) const;
   bool is_integer(void) const;
   bool is_sve_bool(void) const;
+  bool is_sve_count(void) const;
   bool is_signed_integer(void) const;
   bool is_sugared(void) const;
   bool is_unsigned_integer(void) const;

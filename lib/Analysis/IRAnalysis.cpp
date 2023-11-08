@@ -4,13 +4,13 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#ifndef __CDT_PARSER__
 #include <multiplier/Analysis/IRAnalysis.h>
 
 #include <iostream>
 #include <sstream>
 #include <unordered_set>
 
-#ifdef MX_ENABLE_SOURCEIR
 #include <mlir/IR/Dialect.h>
 #include <mlir/IR/MLIRContext.h>
 #include <mlir/Parser/Parser.h>
@@ -261,39 +261,4 @@ DependencyTrackingResults DependencyAnalysis::dependents(
 }
 
 } // namespace mx
-
-#else
-
-namespace mx {
-
-class DependencyAnalysisImpl final {
- public:
-
-  std::shared_ptr<const void> module;
-
-  inline DependencyAnalysisImpl(const std::shared_ptr<const void> &module_)
-      : module(module_) {}
-
-  static DependencyTrackingResults NoTaints(void) {
-    co_return;
-  }
-};
-
-DependencyAnalysis::DependencyAnalysis(const Index &) {}
-
-DependencyTrackingResults DependencyAnalysis::dependents(MLIROperationPtr) & {
-  return DependencyAnalysisImpl::NoTaints();
-}
-
-DependencyTrackingResults DependencyAnalysis::dependents(MLIRValuePtr) & {
-  return DependencyAnalysisImpl::NoTaints();
-}
-
-DependencyTrackingResults DependencyAnalysis::dependents(
-    const DependencyTrackingEdge &) & {
-  return DependencyAnalysisImpl::NoTaints();
-}
-
-} // namespace mx
 #endif
-

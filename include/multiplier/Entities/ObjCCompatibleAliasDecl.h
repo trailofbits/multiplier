@@ -19,6 +19,11 @@ class ObjCCompatibleAliasDecl;
 class ObjCInterfaceDecl;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCCompatibleAliasDecl : public NamedDecl {
  private:
@@ -26,12 +31,12 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ObjCCompatibleAliasDecl> in(const Fragment &frag);
-  static gap::generator<ObjCCompatibleAliasDecl> in(const File &file);
   static gap::generator<ObjCCompatibleAliasDecl> in(const Index &index);
   static gap::generator<ObjCCompatibleAliasDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCCompatibleAliasDecl> by_id(const Index &, EntityId);
+  static gap::generator<ObjCCompatibleAliasDecl> in(const Fragment &frag);
+  static gap::generator<ObjCCompatibleAliasDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_COMPATIBLE_ALIAS;

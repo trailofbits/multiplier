@@ -15,6 +15,7 @@ DEFINE_bool(show_implicit, false, "Show implicit casts?");
 DEFINE_bool(show_explicit, false, "Show explicit casts?");
 DEFINE_bool(show_sign_changing, false, "Show sign-changing casts?");
 DEFINE_bool(show_sign_down_cast, false, "Show sign down-casts? E.g. int to short.");
+DEFINE_bool(show_sign_changing_down_cast, false, "Show sign-changing downcasts.");
 
 static constexpr mx::BuiltinTypeKind kSketchyKinds[][2] = {
     {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::INT},
@@ -68,16 +69,18 @@ enum class CastBehavior {
   Sketchy,
   SignDowncast,
   SignChange,
+  SignChangingDowncast
 };
 
 static const std::map<CastBehavior, std::string> kOuts {
   {CastBehavior::Sketchy, "Sketchy"},
   {CastBehavior::SignDowncast, "Sign downcast"},
-  {CastBehavior::SignChange, "Sign change"}
+  {CastBehavior::SignChange, "Sign change"},
+  {CastBehavior::SignChangingDowncast, "Sign-changing downcast"},
 };
 
 // Should we skip a result, e.g. froma `sizeof(blah)`.
-static bool IsIgnorableCallArgument(const mx::Expr expr) {
+static bool IsIgnorableCallArgument(const mx::Expr &expr) {
   if (auto lit = mx::IntegerLiteral::from(expr)) {
     return !lit->token().data().starts_with('-');
 
@@ -114,6 +117,33 @@ std::optional<CastBehavior> ProfileCastBehavior(
       }
     }
   }
+
+  if (FLAGS_show_sign_changing_down_cast) {
+    auto from_kind_signed = source_type_kind;
+    auto from_kind_unsigned = source_type_kind;
+    auto found = false;
+    for (auto [from_kind, to_kind] : kSignChangingKinds) {
+      if (source_type_kind == from_kind && dest_type_kind == to_kind) {
+        from_kind_signed = from_kind;
+        from_kind_unsigned = to_kind;
+        found = true;
+        break;
+      }
+    }
+
+    if (found) {
+      for (auto [from_kind, to_kind] : kSignDownCastKinds) {
+        if (source_type_kind == from_kind || dest_type_kind != to_kind) {
+          continue;
+        }
+
+        if (from_kind_signed == from_kind || from_kind_unsigned == from_kind) {
+          return CastBehavior::SignChangingDowncast;
+        }
+      }
+    }
+  }
+
   return std::nullopt;
 }
 
@@ -283,7 +313,13 @@ static void FindSketchyArgumentCasts(const mx::CallExpr &call_expr) {
 
     mx::Type source_type =
         cast_expr->sub_expression().type()->canonical_type();
-    std::optional<mx::Type> dest_type = cast_expr->type();
+    std::optional<mx::Type> maybe_dest_type = cast_expr->type();
+
+    if (!maybe_dest_type) {
+      continue;
+    }
+
+    mx::Type dest_type = maybe_dest_type->canonical_type();
 
     // Make sure the source and dest types are builtins.
     std::optional<mx::BuiltinType> source_builtin =
@@ -339,13 +375,13 @@ static void FindSketchyReturnValueCasts(const mx::CallExpr &call) {
   }
 }
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
     << " [--db DATABASE]\n"
     << " [--show_implicit] [--show_explicit]\n"
-    << " [--show_sign_changing] [--show_sign_down_cast]\n";
+    << " [--show_sign_changing] [--show_sign_down_cast] [--show_sign_changing_down_cast]\n";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);

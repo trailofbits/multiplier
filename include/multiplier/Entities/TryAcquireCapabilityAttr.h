@@ -19,6 +19,11 @@ class Expr;
 class InheritableAttr;
 class Token;
 class TryAcquireCapabilityAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TryAcquireCapabilityAttr : public InheritableAttr {
  private:
@@ -26,12 +31,12 @@ class TryAcquireCapabilityAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<TryAcquireCapabilityAttr> in(const Fragment &frag);
-  static gap::generator<TryAcquireCapabilityAttr> in(const File &file);
   static gap::generator<TryAcquireCapabilityAttr> in(const Index &index);
   static gap::generator<TryAcquireCapabilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TryAcquireCapabilityAttr> by_id(const Index &, EntityId);
+  static gap::generator<TryAcquireCapabilityAttr> in(const Fragment &frag);
+  static gap::generator<TryAcquireCapabilityAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TRY_ACQUIRE_CAPABILITY;

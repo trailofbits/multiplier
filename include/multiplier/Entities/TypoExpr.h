@@ -19,6 +19,11 @@ class Stmt;
 class Token;
 class TypoExpr;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypoExpr : public Expr {
  private:
@@ -27,12 +32,12 @@ class TypoExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<TypoExpr> in(const Fragment &frag);
-  static gap::generator<TypoExpr> in(const File &file);
   static gap::generator<TypoExpr> in(const Index &index);
   static gap::generator<TypoExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TypoExpr> by_id(const Index &, EntityId);
+  static gap::generator<TypoExpr> in(const Fragment &frag);
+  static gap::generator<TypoExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::TYPO_EXPR;

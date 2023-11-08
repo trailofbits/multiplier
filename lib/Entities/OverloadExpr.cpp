@@ -17,7 +17,7 @@
 #include <multiplier/Entities/UnresolvedMemberExpr.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -77,14 +77,14 @@ gap::generator<OverloadExpr> OverloadExpr::containing(const std::optional<Stmt> 
 
 bool OverloadExpr::contains(const Decl &decl) {
   for (auto &parent : OverloadExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OverloadExpr::contains(const Stmt &stmt) {
   for (auto &parent : OverloadExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -115,7 +115,7 @@ std::optional<OverloadExpr> OverloadExpr::from(const Stmt &parent) {
 }
 
 gap::generator<OverloadExpr> OverloadExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOverloadExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OverloadExpr> e = OverloadExpr::from(Stmt(std::move(eptr)))) {
@@ -126,7 +126,7 @@ gap::generator<OverloadExpr> OverloadExpr::in(const Index &index) {
 }
 
 gap::generator<OverloadExpr> OverloadExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOverloadExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -138,7 +138,7 @@ gap::generator<OverloadExpr> OverloadExpr::in(const Fragment &frag) {
 }
 
 gap::generator<OverloadExpr> OverloadExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOverloadExprDerivedKinds) {
@@ -160,16 +160,16 @@ std::optional<OverloadExpr> OverloadExpr::from(const TokenContext &t) {
 }
 
 Token OverloadExpr::l_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 Token OverloadExpr::name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 std::optional<CXXRecordDecl> OverloadExpr::naming_class(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal40();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -181,11 +181,11 @@ std::optional<CXXRecordDecl> OverloadExpr::naming_class(void) const {
 }
 
 Token OverloadExpr::r_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token OverloadExpr::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 bool OverloadExpr::has_explicit_template_arguments(void) const {

@@ -16,14 +16,17 @@ class Index;
 class MacroQualifiedType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MacroQualifiedType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<MacroQualifiedType> in(const Fragment &frag);
-  static gap::generator<MacroQualifiedType> in(const File &file);
   static gap::generator<MacroQualifiedType> in(const Index &index);
   static gap::generator<MacroQualifiedType> containing(const Token &tok);
   bool contains(const Token &tok) const;

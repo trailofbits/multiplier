@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/TypeDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::containing(const std:
 
 bool TemplateTypeParmDecl::contains(const Decl &decl) {
   for (auto &parent : TemplateTypeParmDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool TemplateTypeParmDecl::contains(const Stmt &stmt) {
   for (auto &parent : TemplateTypeParmDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -137,7 +137,7 @@ std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const Decl &paren
 }
 
 gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kTemplateTypeParmDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<TemplateTypeParmDecl> e = TemplateTypeParmDecl::from(Decl(std::move(eptr)))) {
@@ -148,7 +148,7 @@ gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::in(const Index &index
 }
 
 gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kTemplateTypeParmDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -160,7 +160,7 @@ gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::in(const Fragment &fr
 }
 
 gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kTemplateTypeParmDeclDerivedKinds) {
@@ -182,12 +182,12 @@ std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const TokenContex
 }
 
 bool TemplateTypeParmDecl::default_argument_was_inherited(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal74();
 }
 
 std::optional<Type> TemplateTypeParmDecl::default_argument(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal55();
+    RawEntityId eid = impl->reader.getVal57();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -200,7 +200,7 @@ std::optional<Type> TemplateTypeParmDecl::default_argument(void) const {
 
 std::optional<Type> TemplateTypeParmDecl::default_argument_info(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal56();
+    RawEntityId eid = impl->reader.getVal58();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -212,27 +212,27 @@ std::optional<Type> TemplateTypeParmDecl::default_argument_info(void) const {
 }
 
 Token TemplateTypeParmDecl::default_argument_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 bool TemplateTypeParmDecl::has_default_argument(void) const {
-  return impl->reader.getVal73();
-}
-
-bool TemplateTypeParmDecl::has_type_constraint(void) const {
-  return impl->reader.getVal74();
-}
-
-bool TemplateTypeParmDecl::is_expanded_parameter_pack(void) const {
   return impl->reader.getVal75();
 }
 
+bool TemplateTypeParmDecl::has_type_constraint(void) const {
+  return impl->reader.getVal76();
+}
+
+bool TemplateTypeParmDecl::is_expanded_parameter_pack(void) const {
+  return impl->reader.getVal77();
+}
+
 bool TemplateTypeParmDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal94();
 }
 
 bool TemplateTypeParmDecl::was_declared_with_typename(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal95();
 }
 
 #pragma GCC diagnostic pop

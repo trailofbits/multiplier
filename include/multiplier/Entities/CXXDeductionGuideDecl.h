@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "DeductionCandidate.h"
 #include "FunctionDecl.h"
 
 namespace mx {
@@ -23,6 +24,11 @@ class Stmt;
 class TemplateDecl;
 class Token;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXDeductionGuideDecl : public FunctionDecl {
  private:
@@ -33,12 +39,12 @@ class CXXDeductionGuideDecl : public FunctionDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<CXXDeductionGuideDecl> in(const Fragment &frag);
-  static gap::generator<CXXDeductionGuideDecl> in(const File &file);
   static gap::generator<CXXDeductionGuideDecl> in(const Index &index);
   static gap::generator<CXXDeductionGuideDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXDeductionGuideDecl> by_id(const Index &, EntityId);
+  static gap::generator<CXXDeductionGuideDecl> in(const Fragment &frag);
+  static gap::generator<CXXDeductionGuideDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_DEDUCTION_GUIDE;
@@ -71,7 +77,7 @@ class CXXDeductionGuideDecl : public FunctionDecl {
 
   CXXConstructorDecl corresponding_constructor(void) const;
   TemplateDecl deduced_template(void) const;
-  bool is_copy_deduction_candidate(void) const;
+  DeductionCandidate deduction_candidate_kind(void) const;
   bool is_explicit(void) const;
 };
 

@@ -11,10 +11,9 @@
 #include <multiplier/Entities/Decl.h>
 #include <multiplier/Entities/Expr.h>
 #include <multiplier/Entities/Stmt.h>
-#include <multiplier/Entities/StringLiteral.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -74,14 +73,14 @@ gap::generator<StaticAssertDecl> StaticAssertDecl::containing(const std::optiona
 
 bool StaticAssertDecl::contains(const Decl &decl) {
   for (auto &parent : StaticAssertDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool StaticAssertDecl::contains(const Stmt &stmt) {
   for (auto &parent : StaticAssertDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -136,7 +135,7 @@ std::optional<StaticAssertDecl> StaticAssertDecl::from(const Decl &parent) {
 }
 
 gap::generator<StaticAssertDecl> StaticAssertDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kStaticAssertDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<StaticAssertDecl> e = StaticAssertDecl::from(Decl(std::move(eptr)))) {
@@ -147,7 +146,7 @@ gap::generator<StaticAssertDecl> StaticAssertDecl::in(const Index &index) {
 }
 
 gap::generator<StaticAssertDecl> StaticAssertDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kStaticAssertDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -159,7 +158,7 @@ gap::generator<StaticAssertDecl> StaticAssertDecl::in(const Fragment &frag) {
 }
 
 gap::generator<StaticAssertDecl> StaticAssertDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kStaticAssertDeclDerivedKinds) {
@@ -181,21 +180,21 @@ std::optional<StaticAssertDecl> StaticAssertDecl::from(const TokenContext &t) {
 }
 
 Expr StaticAssertDecl::assert_expression(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal49();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-StringLiteral StaticAssertDecl::message(void) const {
-  RawEntityId eid = impl->reader.getVal54();
-  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+Expr StaticAssertDecl::message(void) const {
+  RawEntityId eid = impl->reader.getVal56();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token StaticAssertDecl::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
 }
 
 bool StaticAssertDecl::is_failed(void) const {
-  return impl->reader.getVal48();
+  return impl->reader.getVal50();
 }
 
 #pragma GCC diagnostic pop

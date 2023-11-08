@@ -20,14 +20,17 @@ class ObjCObjectType;
 class ObjCProtocolDecl;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCObjectPointerType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<ObjCObjectPointerType> in(const Fragment &frag);
-  static gap::generator<ObjCObjectPointerType> in(const File &file);
   static gap::generator<ObjCObjectPointerType> in(const Index &index);
   static gap::generator<ObjCObjectPointerType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,6 +57,7 @@ class ObjCObjectPointerType : public Type {
   ObjCInterfaceDecl interface_declaration(void) const;
   ObjCInterfaceType interface_type(void) const;
   ObjCObjectType object_type(void) const;
+  Type pointee_type(void) const;
   Type super_class_type(void) const;
   std::optional<Type> nth_type_argument(unsigned n) const;
   unsigned num_type_arguments(void) const;

@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class PragmaClangDataSectionAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class PragmaClangDataSectionAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class PragmaClangDataSectionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<PragmaClangDataSectionAttr> in(const Fragment &frag);
-  static gap::generator<PragmaClangDataSectionAttr> in(const File &file);
   static gap::generator<PragmaClangDataSectionAttr> in(const Index &index);
   static gap::generator<PragmaClangDataSectionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<PragmaClangDataSectionAttr> by_id(const Index &, EntityId);
+  static gap::generator<PragmaClangDataSectionAttr> in(const Fragment &frag);
+  static gap::generator<PragmaClangDataSectionAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PRAGMA_CLANG_DATA_SECTION;

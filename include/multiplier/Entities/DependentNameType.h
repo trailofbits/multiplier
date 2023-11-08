@@ -17,6 +17,11 @@ class DependentNameType;
 class Token;
 class Type;
 class TypeWithKeyword;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DependentNameType : public TypeWithKeyword {
  private:
@@ -24,8 +29,6 @@ class DependentNameType : public TypeWithKeyword {
   friend class TypeWithKeyword;
   friend class Type;
  public:
-  static gap::generator<DependentNameType> in(const Fragment &frag);
-  static gap::generator<DependentNameType> in(const File &file);
   static gap::generator<DependentNameType> in(const Index &index);
   static gap::generator<DependentNameType> containing(const Token &tok);
   bool contains(const Token &tok) const;

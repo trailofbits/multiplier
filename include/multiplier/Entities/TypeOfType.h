@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Type.h"
+#include "TypeOfKind.h"
 
 namespace mx {
 class EntityProvider;
@@ -16,14 +17,17 @@ class Index;
 class Token;
 class Type;
 class TypeOfType;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypeOfType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<TypeOfType> in(const Fragment &frag);
-  static gap::generator<TypeOfType> in(const File &file);
   static gap::generator<TypeOfType> in(const Index &index);
   static gap::generator<TypeOfType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -47,6 +51,7 @@ class TypeOfType : public Type {
   static std::optional<TypeOfType> from(const TokenContext &t);
 
   Type desugar(void) const;
+  TypeOfKind type_kind(void) const;
   Type unmodified_type(void) const;
   bool is_sugared(void) const;
 };

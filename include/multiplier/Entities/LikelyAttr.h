@@ -17,6 +17,11 @@ class Attr;
 class LikelyAttr;
 class StmtAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class LikelyAttr : public StmtAttr {
  private:
@@ -24,12 +29,12 @@ class LikelyAttr : public StmtAttr {
   friend class StmtAttr;
   friend class Attr;
  public:
-  static gap::generator<LikelyAttr> in(const Fragment &frag);
-  static gap::generator<LikelyAttr> in(const File &file);
   static gap::generator<LikelyAttr> in(const Index &index);
   static gap::generator<LikelyAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<LikelyAttr> by_id(const Index &, EntityId);
+  static gap::generator<LikelyAttr> in(const Fragment &frag);
+  static gap::generator<LikelyAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LIKELY;

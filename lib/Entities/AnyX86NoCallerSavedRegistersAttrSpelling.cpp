@@ -17,7 +17,7 @@ const char *EnumeratorName(AnyX86NoCallerSavedRegistersAttrSpelling e) {
   switch (e) {
     case AnyX86NoCallerSavedRegistersAttrSpelling::GNU_NO_CALLER_SAVED_REGISTERS: return "GNU_NO_CALLER_SAVED_REGISTERS";
     case AnyX86NoCallerSavedRegistersAttrSpelling::CXX11_GNU_NO_CALLER_SAVED_REGISTERS: return "CXX11_GNU_NO_CALLER_SAVED_REGISTERS";
-    case AnyX86NoCallerSavedRegistersAttrSpelling::C2X_GNU_NO_CALLER_SAVED_REGISTERS: return "C2X_GNU_NO_CALLER_SAVED_REGISTERS";
+    case AnyX86NoCallerSavedRegistersAttrSpelling::C23_GNU_NO_CALLER_SAVED_REGISTERS: return "C23_GNU_NO_CALLER_SAVED_REGISTERS";
     case AnyX86NoCallerSavedRegistersAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

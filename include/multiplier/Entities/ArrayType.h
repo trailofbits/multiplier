@@ -21,14 +21,17 @@ class IncompleteArrayType;
 class Token;
 class Type;
 class VariableArrayType;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ArrayType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<ArrayType> in(const Fragment &frag);
-  static gap::generator<ArrayType> in(const File &file);
   static gap::generator<ArrayType> in(const Index &index);
   static gap::generator<ArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;

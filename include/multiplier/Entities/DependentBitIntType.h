@@ -17,14 +17,17 @@ class DependentBitIntType;
 class Expr;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DependentBitIntType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<DependentBitIntType> in(const Fragment &frag);
-  static gap::generator<DependentBitIntType> in(const File &file);
   static gap::generator<DependentBitIntType> in(const Index &index);
   static gap::generator<DependentBitIntType> containing(const Token &tok);
   bool contains(const Token &tok) const;

@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class MicroMipsAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MicroMipsAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class MicroMipsAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<MicroMipsAttr> in(const Fragment &frag);
-  static gap::generator<MicroMipsAttr> in(const File &file);
   static gap::generator<MicroMipsAttr> in(const Index &index);
   static gap::generator<MicroMipsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MicroMipsAttr> by_id(const Index &, EntityId);
+  static gap::generator<MicroMipsAttr> in(const Fragment &frag);
+  static gap::generator<MicroMipsAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MICRO_MIPS;

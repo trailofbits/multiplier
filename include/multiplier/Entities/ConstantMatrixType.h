@@ -17,6 +17,11 @@ class ConstantMatrixType;
 class MatrixType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ConstantMatrixType : public MatrixType {
  private:
@@ -24,8 +29,6 @@ class ConstantMatrixType : public MatrixType {
   friend class MatrixType;
   friend class Type;
  public:
-  static gap::generator<ConstantMatrixType> in(const Fragment &frag);
-  static gap::generator<ConstantMatrixType> in(const File &file);
   static gap::generator<ConstantMatrixType> in(const Index &index);
   static gap::generator<ConstantMatrixType> containing(const Token &tok);
   bool contains(const Token &tok) const;

@@ -38,6 +38,11 @@ class Token;
 class TokenRange;
 class Type;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class FunctionDecl : public DeclaratorDecl {
  private:
@@ -47,12 +52,12 @@ class FunctionDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<FunctionDecl> in(const Fragment &frag);
-  static gap::generator<FunctionDecl> in(const File &file);
   static gap::generator<FunctionDecl> in(const Index &index);
   static gap::generator<FunctionDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<FunctionDecl> by_id(const Index &, EntityId);
+  static gap::generator<FunctionDecl> in(const Fragment &frag);
+  static gap::generator<FunctionDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FUNCTION;
@@ -83,6 +88,7 @@ class FunctionDecl : public DeclaratorDecl {
   static std::optional<FunctionDecl> from(const Reference &r);
   static std::optional<FunctionDecl> from(const TokenContext &t);
 
+  bool body_contains_immediate_escalating_expressions(void) const;
   bool friend_constraint_refers_to_enclosing_template(void) const;
   bool uses_fp_intrin(void) const;
   std::optional<bool> does_declaration_force_externally_visible_definition(void) const;
@@ -93,19 +99,18 @@ class FunctionDecl : public DeclaratorDecl {
   Token default_token(void) const;
   std::optional<FunctionTemplateDecl> described_function_template(void) const;
   Token ellipsis_token(void) const;
-  TokenRange exception_spec_source_range(void) const;
+  TokenRange exception_spec_tokens(void) const;
   ExceptionSpecificationType exception_spec_type(void) const;
   std::optional<FunctionDecl> instantiated_from_declaration(void) const;
   std::optional<FunctionDecl> instantiated_from_member_function(void) const;
   LanguageLinkage language_linkage(void) const;
   MultiVersionKind multi_version_kind(void) const;
-  std::optional<unsigned> odr_hash(void) const;
+  std::optional<uint32_t> odr_hash(void) const;
   OverloadedOperatorKind overloaded_operator(void) const;
-  TokenRange parameters_source_range(void) const;
+  TokenRange parameters_tokens(void) const;
   Token point_of_instantiation(void) const;
   std::optional<FunctionTemplateDecl> primary_template(void) const;
   Type return_type(void) const;
-  TokenRange return_type_source_range(void) const;
   StorageClass storage_class(void) const;
   std::optional<FunctionDecl> template_instantiation_pattern(void) const;
   TemplateSpecializationKind template_specialization_kind(void) const;
@@ -132,6 +137,8 @@ class FunctionDecl : public DeclaratorDecl {
   bool is_extern_c(void) const;
   bool is_function_template_specialization(void) const;
   bool is_global(void) const;
+  bool is_immediate_escalating(void) const;
+  bool is_immediate_function(void) const;
   bool is_implicitly_instantiable(void) const;
   bool is_in_extern_c_context(void) const;
   bool is_in_extern_cxx_context(void) const;
@@ -144,6 +151,7 @@ class FunctionDecl : public DeclaratorDecl {
   std::optional<bool> is_ms_extern_inline(void) const;
   bool is_msvcrt_entry_point(void) const;
   bool is_main(void) const;
+  bool is_member_like_constrained_friend(void) const;
   bool is_multi_version(void) const;
   bool is_no_return(void) const;
   bool is_overloaded_operator(void) const;

@@ -9,7 +9,7 @@
 #include <multiplier/AST.capnp.h>
 #include <multiplier/Entities/Designator.h>
 
-#include "Entity.h"
+#include "FragmentEntity.h"
 
 namespace mx {
 
@@ -20,13 +20,14 @@ namespace mx {
     m(Designator)
 
 #define MX_DEFINE_PSEUDO(name) \
-    class name ## Impl final : public EntityImpl<ast::name> { \
+    class name ## Impl final : public FragmentEntityImpl<ast::name> { \
      public: \
       const PackedFragmentId fragment_id; \
       const EntityOffset offset; \
       \
-      explicit name ## Impl(std::shared_ptr<EntityProvider> ep_, \
-                            kj::Array<capnp::word> data_, RawEntityId id_); \
+      explicit name ## Impl(FragmentImplPtr frag_, \
+                            ast::name::Reader reader_, \
+                            RawEntityId id_); \
     };
 
 MX_FOR_EACH_PSEUDO(MX_DEFINE_PSEUDO)

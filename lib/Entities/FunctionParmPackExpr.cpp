@@ -15,7 +15,7 @@
 #include <multiplier/Entities/ValueStmt.h>
 #include <multiplier/Entities/VarDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<FunctionParmPackExpr> FunctionParmPackExpr::containing(const std:
 
 bool FunctionParmPackExpr::contains(const Decl &decl) {
   for (auto &parent : FunctionParmPackExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool FunctionParmPackExpr::contains(const Stmt &stmt) {
   for (auto &parent : FunctionParmPackExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -111,7 +111,7 @@ std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const Stmt &paren
 }
 
 gap::generator<FunctionParmPackExpr> FunctionParmPackExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kFunctionParmPackExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<FunctionParmPackExpr> e = FunctionParmPackExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<FunctionParmPackExpr> FunctionParmPackExpr::in(const Index &index
 }
 
 gap::generator<FunctionParmPackExpr> FunctionParmPackExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kFunctionParmPackExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<FunctionParmPackExpr> FunctionParmPackExpr::in(const Fragment &fr
 }
 
 gap::generator<FunctionParmPackExpr> FunctionParmPackExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kFunctionParmPackExprDerivedKinds) {
@@ -156,12 +156,12 @@ std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const TokenContex
 }
 
 VarDecl FunctionParmPackExpr::parameter_pack(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token FunctionParmPackExpr::parameter_pack_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 unsigned FunctionParmPackExpr::num_expansions(void) const {
@@ -173,7 +173,7 @@ std::optional<VarDecl> FunctionParmPackExpr::nth_expansion(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -184,7 +184,7 @@ std::optional<VarDecl> FunctionParmPackExpr::nth_expansion(unsigned n) const {
 
 gap::generator<VarDecl> FunctionParmPackExpr::expansions(void) const & {
   auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->DeclFor(ep, v)) {

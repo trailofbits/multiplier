@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class NSReturnsAutoreleasedAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class NSReturnsAutoreleasedAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class NSReturnsAutoreleasedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<NSReturnsAutoreleasedAttr> in(const Fragment &frag);
-  static gap::generator<NSReturnsAutoreleasedAttr> in(const File &file);
   static gap::generator<NSReturnsAutoreleasedAttr> in(const Index &index);
   static gap::generator<NSReturnsAutoreleasedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NSReturnsAutoreleasedAttr> by_id(const Index &, EntityId);
+  static gap::generator<NSReturnsAutoreleasedAttr> in(const Fragment &frag);
+  static gap::generator<NSReturnsAutoreleasedAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_RETURNS_AUTORELEASED;

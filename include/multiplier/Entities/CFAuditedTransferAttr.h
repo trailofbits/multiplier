@@ -17,6 +17,11 @@ class Attr;
 class CFAuditedTransferAttr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CFAuditedTransferAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class CFAuditedTransferAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<CFAuditedTransferAttr> in(const Fragment &frag);
-  static gap::generator<CFAuditedTransferAttr> in(const File &file);
   static gap::generator<CFAuditedTransferAttr> in(const Index &index);
   static gap::generator<CFAuditedTransferAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CFAuditedTransferAttr> by_id(const Index &, EntityId);
+  static gap::generator<CFAuditedTransferAttr> in(const Fragment &frag);
+  static gap::generator<CFAuditedTransferAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_AUDITED_TRANSFER;

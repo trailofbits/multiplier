@@ -18,7 +18,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -78,14 +78,14 @@ gap::generator<CXXDestructorDecl> CXXDestructorDecl::containing(const std::optio
 
 bool CXXDestructorDecl::contains(const Decl &decl) {
   for (auto &parent : CXXDestructorDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXDestructorDecl::contains(const Stmt &stmt) {
   for (auto &parent : CXXDestructorDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -140,7 +140,7 @@ std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const Decl &parent) {
 }
 
 gap::generator<CXXDestructorDecl> CXXDestructorDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kCXXDestructorDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<CXXDestructorDecl> e = CXXDestructorDecl::from(Decl(std::move(eptr)))) {
@@ -151,7 +151,7 @@ gap::generator<CXXDestructorDecl> CXXDestructorDecl::in(const Index &index) {
 }
 
 gap::generator<CXXDestructorDecl> CXXDestructorDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kCXXDestructorDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -163,7 +163,7 @@ gap::generator<CXXDestructorDecl> CXXDestructorDecl::in(const Fragment &frag) {
 }
 
 gap::generator<CXXDestructorDecl> CXXDestructorDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kCXXDestructorDeclDerivedKinds) {
@@ -186,7 +186,7 @@ std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const TokenContext &t) 
 
 std::optional<FunctionDecl> CXXDestructorDecl::operator_delete(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal176();
+    RawEntityId eid = impl->reader.getVal180();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -199,7 +199,7 @@ std::optional<FunctionDecl> CXXDestructorDecl::operator_delete(void) const {
 
 std::optional<Expr> CXXDestructorDecl::operator_delete_this_argument(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal177();
+    RawEntityId eid = impl->reader.getVal181();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

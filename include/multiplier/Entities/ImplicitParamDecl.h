@@ -22,6 +22,11 @@ class Stmt;
 class Token;
 class ValueDecl;
 class VarDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ImplicitParamDecl : public VarDecl {
  private:
@@ -32,12 +37,12 @@ class ImplicitParamDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ImplicitParamDecl> in(const Fragment &frag);
-  static gap::generator<ImplicitParamDecl> in(const File &file);
   static gap::generator<ImplicitParamDecl> in(const Index &index);
   static gap::generator<ImplicitParamDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ImplicitParamDecl> by_id(const Index &, EntityId);
+  static gap::generator<ImplicitParamDecl> in(const Fragment &frag);
+  static gap::generator<ImplicitParamDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::IMPLICIT_PARAM;

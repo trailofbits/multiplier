@@ -13,24 +13,30 @@
 namespace mx {
 class EntityProvider;
 class Index;
+class CompoundStmt;
 class CoroutineBodyStmt;
 class Decl;
 class Expr;
 class Stmt;
 class Token;
 class VarDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CoroutineBodyStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<CoroutineBodyStmt> in(const Fragment &frag);
-  static gap::generator<CoroutineBodyStmt> in(const File &file);
   static gap::generator<CoroutineBodyStmt> in(const Index &index);
   static gap::generator<CoroutineBodyStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CoroutineBodyStmt> by_id(const Index &, EntityId);
+  static gap::generator<CoroutineBodyStmt> in(const Fragment &frag);
+  static gap::generator<CoroutineBodyStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COROUTINE_BODY_STMT;
@@ -58,8 +64,9 @@ class CoroutineBodyStmt : public Stmt {
   static std::optional<CoroutineBodyStmt> from(const Reference &r);
   static std::optional<CoroutineBodyStmt> from(const TokenContext &t);
 
+  gap::generator<Stmt> children_excl_body(void) const &;
   Expr allocate(void) const;
-  Stmt body(void) const;
+  CompoundStmt body(void) const;
   Expr deallocate(void) const;
   Stmt exception_handler(void) const;
   Stmt fallthrough_handler(void) const;
@@ -70,6 +77,7 @@ class CoroutineBodyStmt : public Stmt {
   gap::generator<Stmt> parameter_moves(void) const &;
   VarDecl promise_declaration(void) const;
   Stmt promise_declaration_statement(void) const;
+  Stmt result_declaration(void) const;
   Stmt return_statement(void) const;
   Stmt return_statement_on_alloc_failure(void) const;
   Expr return_value(void) const;

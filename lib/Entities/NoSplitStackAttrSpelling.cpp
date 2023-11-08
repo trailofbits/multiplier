@@ -17,7 +17,7 @@ const char *EnumeratorName(NoSplitStackAttrSpelling e) {
   switch (e) {
     case NoSplitStackAttrSpelling::GNU_NO_SPLIT_STACK: return "GNU_NO_SPLIT_STACK";
     case NoSplitStackAttrSpelling::CXX11_GNU_NO_SPLIT_STACK: return "CXX11_GNU_NO_SPLIT_STACK";
-    case NoSplitStackAttrSpelling::C2X_GNU_NO_SPLIT_STACK: return "C2X_GNU_NO_SPLIT_STACK";
+    case NoSplitStackAttrSpelling::C23_GNU_NO_SPLIT_STACK: return "C23_GNU_NO_SPLIT_STACK";
     case NoSplitStackAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

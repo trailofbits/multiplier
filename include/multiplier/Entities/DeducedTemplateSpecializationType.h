@@ -17,6 +17,11 @@ class DeducedTemplateSpecializationType;
 class DeducedType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DeducedTemplateSpecializationType : public DeducedType {
  private:
@@ -24,8 +29,6 @@ class DeducedTemplateSpecializationType : public DeducedType {
   friend class DeducedType;
   friend class Type;
  public:
-  static gap::generator<DeducedTemplateSpecializationType> in(const Fragment &frag);
-  static gap::generator<DeducedTemplateSpecializationType> in(const File &file);
   static gap::generator<DeducedTemplateSpecializationType> in(const Index &index);
   static gap::generator<DeducedTemplateSpecializationType> containing(const Token &tok);
   bool contains(const Token &tok) const;

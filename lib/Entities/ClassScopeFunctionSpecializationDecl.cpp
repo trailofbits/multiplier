@@ -13,7 +13,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -73,14 +73,14 @@ gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializ
 
 bool ClassScopeFunctionSpecializationDecl::contains(const Decl &decl) {
   for (auto &parent : ClassScopeFunctionSpecializationDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ClassScopeFunctionSpecializationDecl::contains(const Stmt &stmt) {
   for (auto &parent : ClassScopeFunctionSpecializationDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -135,7 +135,7 @@ std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializa
 }
 
 gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kClassScopeFunctionSpecializationDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ClassScopeFunctionSpecializationDecl> e = ClassScopeFunctionSpecializationDecl::from(Decl(std::move(eptr)))) {
@@ -146,7 +146,7 @@ gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializ
 }
 
 gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kClassScopeFunctionSpecializationDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -158,7 +158,7 @@ gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializ
 }
 
 gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kClassScopeFunctionSpecializationDeclDerivedKinds) {
@@ -180,12 +180,12 @@ std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializa
 }
 
 CXXMethodDecl ClassScopeFunctionSpecializationDecl::specialization(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal49();
   return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool ClassScopeFunctionSpecializationDecl::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal48();
+  return impl->reader.getVal50();
 }
 
 #pragma GCC diagnostic pop

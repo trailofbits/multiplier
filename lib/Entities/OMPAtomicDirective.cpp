@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<OMPAtomicDirective> OMPAtomicDirective::containing(const std::opt
 
 bool OMPAtomicDirective::contains(const Decl &decl) {
   for (auto &parent : OMPAtomicDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPAtomicDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPAtomicDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<OMPAtomicDirective> OMPAtomicDirective::from(const Stmt &parent) {
 }
 
 gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPAtomicDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPAtomicDirective> e = OMPAtomicDirective::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const Index &index) {
 }
 
 gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPAtomicDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const Fragment &frag) 
 }
 
 gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPAtomicDirectiveDerivedKinds) {

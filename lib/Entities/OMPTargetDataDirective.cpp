@@ -13,7 +13,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -73,14 +73,14 @@ gap::generator<OMPTargetDataDirective> OMPTargetDataDirective::containing(const 
 
 bool OMPTargetDataDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetDataDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPTargetDataDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetDataDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -109,7 +109,7 @@ std::optional<OMPTargetDataDirective> OMPTargetDataDirective::from(const Stmt &p
 }
 
 gap::generator<OMPTargetDataDirective> OMPTargetDataDirective::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPTargetDataDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPTargetDataDirective> e = OMPTargetDataDirective::from(Stmt(std::move(eptr)))) {
@@ -120,7 +120,7 @@ gap::generator<OMPTargetDataDirective> OMPTargetDataDirective::in(const Index &i
 }
 
 gap::generator<OMPTargetDataDirective> OMPTargetDataDirective::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPTargetDataDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -132,7 +132,7 @@ gap::generator<OMPTargetDataDirective> OMPTargetDataDirective::in(const Fragment
 }
 
 gap::generator<OMPTargetDataDirective> OMPTargetDataDirective::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPTargetDataDirectiveDerivedKinds) {

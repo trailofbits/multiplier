@@ -17,7 +17,7 @@ const char *EnumeratorName(NoThrowAttrSpelling e) {
   switch (e) {
     case NoThrowAttrSpelling::GNU_NOTHROW: return "GNU_NOTHROW";
     case NoThrowAttrSpelling::CXX11_GNU_NOTHROW: return "CXX11_GNU_NOTHROW";
-    case NoThrowAttrSpelling::C2X_GNU_NOTHROW: return "C2X_GNU_NOTHROW";
+    case NoThrowAttrSpelling::C23_GNU_NOTHROW: return "C23_GNU_NOTHROW";
     case NoThrowAttrSpelling::DECLSPEC_NOTHROW: return "DECLSPEC_NOTHROW";
     case NoThrowAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

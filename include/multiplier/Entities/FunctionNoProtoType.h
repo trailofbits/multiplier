@@ -17,6 +17,11 @@ class FunctionNoProtoType;
 class FunctionType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class FunctionNoProtoType : public FunctionType {
  private:
@@ -24,8 +29,6 @@ class FunctionNoProtoType : public FunctionType {
   friend class FunctionType;
   friend class Type;
  public:
-  static gap::generator<FunctionNoProtoType> in(const Fragment &frag);
-  static gap::generator<FunctionNoProtoType> in(const File &file);
   static gap::generator<FunctionNoProtoType> in(const Index &index);
   static gap::generator<FunctionNoProtoType> containing(const Token &tok);
   bool contains(const Token &tok) const;

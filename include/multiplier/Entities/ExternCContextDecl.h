@@ -17,18 +17,23 @@ class Decl;
 class ExternCContextDecl;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ExternCContextDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<ExternCContextDecl> in(const Fragment &frag);
-  static gap::generator<ExternCContextDecl> in(const File &file);
   static gap::generator<ExternCContextDecl> in(const Index &index);
   static gap::generator<ExternCContextDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ExternCContextDecl> by_id(const Index &, EntityId);
+  static gap::generator<ExternCContextDecl> in(const Fragment &frag);
+  static gap::generator<ExternCContextDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::EXTERN_C_CONTEXT;

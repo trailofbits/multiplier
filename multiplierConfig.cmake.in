@@ -38,7 +38,6 @@ if(NOT TARGET @PROJECT_NAME@::mx-api)
   endif()
   
   if (MX_ENABLE_VAST AND NOT TARGET vast::vast)
-    find_package(Z3 CONFIG REQUIRED)
     find_package(LLVM CONFIG REQUIRED)
     find_package(MLIR CONFIG REQUIRED)
     find_package(Clang CONFIG REQUIRED)
@@ -51,4 +50,9 @@ if(NOT TARGET @PROJECT_NAME@::mx-api)
 
   include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
   check_required_components("@PROJECT_NAME@")
+endif()
+
+
+if(NOT DEFINED MX_FIND_QUIETLY)
+  message(STATUS "Found Multiplier: ${CMAKE_CURRENT_LIST_DIR}")
 endif()

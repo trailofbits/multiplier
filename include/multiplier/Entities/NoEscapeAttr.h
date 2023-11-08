@@ -16,18 +16,23 @@ class Index;
 class Attr;
 class NoEscapeAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class NoEscapeAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<NoEscapeAttr> in(const Fragment &frag);
-  static gap::generator<NoEscapeAttr> in(const File &file);
   static gap::generator<NoEscapeAttr> in(const Index &index);
   static gap::generator<NoEscapeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NoEscapeAttr> by_id(const Index &, EntityId);
+  static gap::generator<NoEscapeAttr> in(const Fragment &frag);
+  static gap::generator<NoEscapeAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_ESCAPE;

@@ -18,14 +18,17 @@ class RValueReferenceType;
 class ReferenceType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ReferenceType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<ReferenceType> in(const Fragment &frag);
-  static gap::generator<ReferenceType> in(const File &file);
   static gap::generator<ReferenceType> in(const Index &index);
   static gap::generator<ReferenceType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,6 +47,7 @@ class ReferenceType : public Type {
   static std::optional<ReferenceType> from(const Reference &r);
   static std::optional<ReferenceType> from(const TokenContext &t);
 
+  Type pointee_type(void) const;
   Type pointee_type_as_written(void) const;
   bool is_inner_reference(void) const;
   bool is_spelled_as_l_value(void) const;

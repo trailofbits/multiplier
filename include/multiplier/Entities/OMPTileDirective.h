@@ -20,6 +20,11 @@ class OMPLoopTransformationDirective;
 class OMPTileDirective;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPTileDirective : public OMPLoopTransformationDirective {
  private:
@@ -29,12 +34,12 @@ class OMPTileDirective : public OMPLoopTransformationDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPTileDirective> in(const Fragment &frag);
-  static gap::generator<OMPTileDirective> in(const File &file);
   static gap::generator<OMPTileDirective> in(const Index &index);
   static gap::generator<OMPTileDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPTileDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPTileDirective> in(const Fragment &frag);
+  static gap::generator<OMPTileDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TILE_DIRECTIVE;

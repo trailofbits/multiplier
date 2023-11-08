@@ -20,6 +20,11 @@ class Stmt;
 class Token;
 class Type;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXPseudoDestructorExpr : public Expr {
  private:
@@ -28,12 +33,12 @@ class CXXPseudoDestructorExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXPseudoDestructorExpr> in(const Fragment &frag);
-  static gap::generator<CXXPseudoDestructorExpr> in(const File &file);
   static gap::generator<CXXPseudoDestructorExpr> in(const Index &index);
   static gap::generator<CXXPseudoDestructorExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXPseudoDestructorExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXPseudoDestructorExpr> in(const Fragment &frag);
+  static gap::generator<CXXPseudoDestructorExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_PSEUDO_DESTRUCTOR_EXPR;
@@ -66,7 +71,6 @@ class CXXPseudoDestructorExpr : public Expr {
   Type destroyed_type(void) const;
   Token destroyed_type_token(void) const;
   Token operator_token(void) const;
-  std::optional<Type> scope_type(void) const;
   Token tilde_token(void) const;
   bool has_qualifier(void) const;
   bool is_arrow(void) const;

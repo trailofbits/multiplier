@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<OMPArraySectionExpr> OMPArraySectionExpr::containing(const std::o
 
 bool OMPArraySectionExpr::contains(const Decl &decl) {
   for (auto &parent : OMPArraySectionExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPArraySectionExpr::contains(const Stmt &stmt) {
   for (auto &parent : OMPArraySectionExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<OMPArraySectionExpr> OMPArraySectionExpr::from(const Stmt &parent)
 }
 
 gap::generator<OMPArraySectionExpr> OMPArraySectionExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPArraySectionExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPArraySectionExpr> e = OMPArraySectionExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<OMPArraySectionExpr> OMPArraySectionExpr::in(const Index &index) 
 }
 
 gap::generator<OMPArraySectionExpr> OMPArraySectionExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPArraySectionExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<OMPArraySectionExpr> OMPArraySectionExpr::in(const Fragment &frag
 }
 
 gap::generator<OMPArraySectionExpr> OMPArraySectionExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPArraySectionExprDerivedKinds) {
@@ -155,34 +155,34 @@ std::optional<OMPArraySectionExpr> OMPArraySectionExpr::from(const TokenContext 
 }
 
 Expr OMPArraySectionExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token OMPArraySectionExpr::first_colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token OMPArraySectionExpr::second_colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Expr OMPArraySectionExpr::length(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPArraySectionExpr::lower_bound(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token OMPArraySectionExpr::r_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 Expr OMPArraySectionExpr::stride(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal43();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

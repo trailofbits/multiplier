@@ -22,6 +22,11 @@ class Token;
 class UnresolvedLookupExpr;
 class UnresolvedMemberExpr;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OverloadExpr : public Expr {
  private:
@@ -30,12 +35,12 @@ class OverloadExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<OverloadExpr> in(const Fragment &frag);
-  static gap::generator<OverloadExpr> in(const File &file);
   static gap::generator<OverloadExpr> in(const Index &index);
   static gap::generator<OverloadExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OverloadExpr> by_id(const Index &, EntityId);
+  static gap::generator<OverloadExpr> in(const Fragment &frag);
+  static gap::generator<OverloadExpr> in(const File &file);
 
   static gap::generator<OverloadExpr> containing(const Decl &decl);
   static gap::generator<OverloadExpr> containing(const std::optional<Decl> &decl);

@@ -19,18 +19,23 @@ class Stmt;
 class Token;
 class Type;
 class VarDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXCatchStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<CXXCatchStmt> in(const Fragment &frag);
-  static gap::generator<CXXCatchStmt> in(const File &file);
   static gap::generator<CXXCatchStmt> in(const Index &index);
   static gap::generator<CXXCatchStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXCatchStmt> by_id(const Index &, EntityId);
+  static gap::generator<CXXCatchStmt> in(const Fragment &frag);
+  static gap::generator<CXXCatchStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_CATCH_STMT;

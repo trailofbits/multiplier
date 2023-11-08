@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::containing(const 
 
 bool ObjCAtSynchronizedStmt::contains(const Decl &decl) {
   for (auto &parent : ObjCAtSynchronizedStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCAtSynchronizedStmt::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAtSynchronizedStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::from(const Stmt &p
 }
 
 gap::generator<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCAtSynchronizedStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ObjCAtSynchronizedStmt> e = ObjCAtSynchronizedStmt::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::in(const Index &i
 }
 
 gap::generator<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCAtSynchronizedStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::in(const Fragment
 }
 
 gap::generator<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCAtSynchronizedStmtDerivedKinds) {

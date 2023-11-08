@@ -15,7 +15,7 @@
 #include <multiplier/Entities/TypeDecl.h>
 #include <multiplier/Entities/TypedefNameDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<ObjCTypeParamDecl> ObjCTypeParamDecl::containing(const std::optio
 
 bool ObjCTypeParamDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCTypeParamDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCTypeParamDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCTypeParamDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -137,7 +137,7 @@ std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const Decl &parent) {
 }
 
 gap::generator<ObjCTypeParamDecl> ObjCTypeParamDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCTypeParamDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ObjCTypeParamDecl> e = ObjCTypeParamDecl::from(Decl(std::move(eptr)))) {
@@ -148,7 +148,7 @@ gap::generator<ObjCTypeParamDecl> ObjCTypeParamDecl::in(const Index &index) {
 }
 
 gap::generator<ObjCTypeParamDecl> ObjCTypeParamDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCTypeParamDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -160,7 +160,7 @@ gap::generator<ObjCTypeParamDecl> ObjCTypeParamDecl::in(const Fragment &frag) {
 }
 
 gap::generator<ObjCTypeParamDecl> ObjCTypeParamDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCTypeParamDeclDerivedKinds) {
@@ -182,19 +182,19 @@ std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const TokenContext &t) 
 }
 
 Token ObjCTypeParamDecl::colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 ObjCTypeParamVariance ObjCTypeParamDecl::variance(void) const {
-  return static_cast<ObjCTypeParamVariance>(impl->reader.getVal78());
+  return static_cast<ObjCTypeParamVariance>(impl->reader.getVal80());
 }
 
 Token ObjCTypeParamDecl::variance_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal65());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal67());
 }
 
 bool ObjCTypeParamDecl::has_explicit_bound(void) const {
-  return impl->reader.getVal74();
+  return impl->reader.getVal76();
 }
 
 #pragma GCC diagnostic pop

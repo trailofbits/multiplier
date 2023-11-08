@@ -34,7 +34,7 @@
 #include <multiplier/Entities/VarTemplatePartialSpecializationDecl.h>
 #include <multiplier/Entities/VarTemplateSpecializationDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -94,14 +94,14 @@ gap::generator<DeclaratorDecl> DeclaratorDecl::containing(const std::optional<St
 
 bool DeclaratorDecl::contains(const Decl &decl) {
   for (auto &parent : DeclaratorDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool DeclaratorDecl::contains(const Stmt &stmt) {
   for (auto &parent : DeclaratorDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -190,7 +190,7 @@ std::optional<DeclaratorDecl> DeclaratorDecl::from(const Decl &parent) {
 }
 
 gap::generator<DeclaratorDecl> DeclaratorDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kDeclaratorDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<DeclaratorDecl> e = DeclaratorDecl::from(Decl(std::move(eptr)))) {
@@ -201,7 +201,7 @@ gap::generator<DeclaratorDecl> DeclaratorDecl::in(const Index &index) {
 }
 
 gap::generator<DeclaratorDecl> DeclaratorDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kDeclaratorDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -213,7 +213,7 @@ gap::generator<DeclaratorDecl> DeclaratorDecl::in(const Fragment &frag) {
 }
 
 gap::generator<DeclaratorDecl> DeclaratorDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kDeclaratorDeclDerivedKinds) {
@@ -235,16 +235,16 @@ std::optional<DeclaratorDecl> DeclaratorDecl::from(const TokenContext &t) {
 }
 
 Token DeclaratorDecl::first_inner_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
 }
 
 Token DeclaratorDecl::first_outer_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 std::optional<Expr> DeclaratorDecl::trailing_requires_clause(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal65();
+    RawEntityId eid = impl->reader.getVal67();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -256,23 +256,23 @@ std::optional<Expr> DeclaratorDecl::trailing_requires_clause(void) const {
 }
 
 Token DeclaratorDecl::type_spec_end_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal68());
 }
 
 Token DeclaratorDecl::type_spec_start_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal76());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal78());
 }
 
 unsigned DeclaratorDecl::num_template_parameter_lists(void) const {
-  return impl->reader.getVal49().size();
+  return impl->reader.getVal51().size();
 }
 
 std::optional<TemplateParameterList> DeclaratorDecl::nth_template_parameter_list(unsigned n) const {
-  auto list = impl->reader.getVal49();
+  auto list = impl->reader.getVal51();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TemplateParameterListFor(ep, v);
   if (!e) {
@@ -282,12 +282,12 @@ std::optional<TemplateParameterList> DeclaratorDecl::nth_template_parameter_list
 }
 
 gap::generator<TemplateParameterList> DeclaratorDecl::template_parameter_lists(void) const & {
-  auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal51();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d49 = ep->TemplateParameterListFor(ep, v)) {
-      co_yield TemplateParameterList(std::move(d49));
+    if (auto d51 = ep->TemplateParameterListFor(ep, v)) {
+      co_yield TemplateParameterList(std::move(d51));
     }
   }
   co_return;

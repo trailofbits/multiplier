@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class ObjCRequiresSuperAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCRequiresSuperAttr : public InheritableAttr {
  private:
@@ -24,12 +29,12 @@ class ObjCRequiresSuperAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ObjCRequiresSuperAttr> in(const Fragment &frag);
-  static gap::generator<ObjCRequiresSuperAttr> in(const File &file);
   static gap::generator<ObjCRequiresSuperAttr> in(const Index &index);
   static gap::generator<ObjCRequiresSuperAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCRequiresSuperAttr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCRequiresSuperAttr> in(const Fragment &frag);
+  static gap::generator<ObjCRequiresSuperAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_REQUIRES_SUPER;

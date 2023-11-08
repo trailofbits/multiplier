@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<AtomicExpr> AtomicExpr::containing(const std::optional<Stmt> &stm
 
 bool AtomicExpr::contains(const Decl &decl) {
   for (auto &parent : AtomicExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool AtomicExpr::contains(const Stmt &stmt) {
   for (auto &parent : AtomicExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -111,7 +111,7 @@ std::optional<AtomicExpr> AtomicExpr::from(const Stmt &parent) {
 }
 
 gap::generator<AtomicExpr> AtomicExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kAtomicExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<AtomicExpr> e = AtomicExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<AtomicExpr> AtomicExpr::in(const Index &index) {
 }
 
 gap::generator<AtomicExpr> AtomicExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kAtomicExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<AtomicExpr> AtomicExpr::in(const Fragment &frag) {
 }
 
 gap::generator<AtomicExpr> AtomicExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kAtomicExprDerivedKinds) {
@@ -156,21 +156,26 @@ std::optional<AtomicExpr> AtomicExpr::from(const TokenContext &t) {
 }
 
 Token AtomicExpr::builtin_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 AtomicExprAtomicOp AtomicExpr::operation(void) const {
-  return static_cast<AtomicExprAtomicOp>(impl->reader.getVal94());
+  return static_cast<AtomicExprAtomicOp>(impl->reader.getVal95());
+}
+
+std::string_view AtomicExpr::operation_as_string(void) const {
+  capnp::Text::Reader data = impl->reader.getVal60();
+  return std::string_view(data.cStr(), data.size());
 }
 
 Expr AtomicExpr::order(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Expr> AtomicExpr::order_fail(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal40();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -182,17 +187,17 @@ std::optional<Expr> AtomicExpr::order_fail(void) const {
 }
 
 Expr AtomicExpr::pointer(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token AtomicExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 std::optional<Expr> AtomicExpr::scope(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal43();
+    RawEntityId eid = impl->reader.getVal42();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -205,7 +210,7 @@ std::optional<Expr> AtomicExpr::scope(void) const {
 
 std::optional<Expr> AtomicExpr::value1(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal44();
+    RawEntityId eid = impl->reader.getVal43();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -218,7 +223,7 @@ std::optional<Expr> AtomicExpr::value1(void) const {
 
 std::optional<Expr> AtomicExpr::value2(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal45();
+    RawEntityId eid = impl->reader.getVal44();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -230,13 +235,13 @@ std::optional<Expr> AtomicExpr::value2(void) const {
 }
 
 Type AtomicExpr::value_type(void) const {
-  RawEntityId eid = impl->reader.getVal46();
+  RawEntityId eid = impl->reader.getVal45();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> AtomicExpr::weak(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal47();
+    RawEntityId eid = impl->reader.getVal46();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -268,7 +273,7 @@ std::optional<Expr> AtomicExpr::nth_sub_expression(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -279,7 +284,7 @@ std::optional<Expr> AtomicExpr::nth_sub_expression(unsigned n) const {
 
 gap::generator<Expr> AtomicExpr::sub_expressions(void) const & {
   auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {

@@ -18,6 +18,11 @@ class HLSLAnnotationAttr;
 class HLSLSV_DispatchThreadIDAttr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class HLSLSV_DispatchThreadIDAttr : public HLSLAnnotationAttr {
  private:
@@ -26,12 +31,12 @@ class HLSLSV_DispatchThreadIDAttr : public HLSLAnnotationAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<HLSLSV_DispatchThreadIDAttr> in(const Fragment &frag);
-  static gap::generator<HLSLSV_DispatchThreadIDAttr> in(const File &file);
   static gap::generator<HLSLSV_DispatchThreadIDAttr> in(const Index &index);
   static gap::generator<HLSLSV_DispatchThreadIDAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<HLSLSV_DispatchThreadIDAttr> by_id(const Index &, EntityId);
+  static gap::generator<HLSLSV_DispatchThreadIDAttr> in(const Fragment &frag);
+  static gap::generator<HLSLSV_DispatchThreadIDAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::HLSLSV__DISPATCH_THREAD_ID;

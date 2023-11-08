@@ -13,7 +13,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/TypeWithKeyword.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {
@@ -61,37 +61,11 @@ std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializati
 }
 
 gap::generator<DependentTemplateSpecializationType> DependentTemplateSpecializationType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kDependentTemplateSpecializationTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<DependentTemplateSpecializationType> e = DependentTemplateSpecializationType::from(Type(std::move(eptr)))) {
         co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<DependentTemplateSpecializationType> DependentTemplateSpecializationType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kDependentTemplateSpecializationTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<DependentTemplateSpecializationType> e = DependentTemplateSpecializationType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<DependentTemplateSpecializationType> DependentTemplateSpecializationType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kDependentTemplateSpecializationTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<DependentTemplateSpecializationType> e = DependentTemplateSpecializationType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
       }
     }
   }
@@ -106,24 +80,24 @@ std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializati
 }
 
 Type DependentTemplateSpecializationType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal17();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool DependentTemplateSpecializationType::is_sugared(void) const {
-  return impl->reader.getVal231();
+  return impl->reader.getVal19();
 }
 
 unsigned DependentTemplateSpecializationType::num_template_arguments(void) const {
-  return impl->reader.getVal234().size();
+  return impl->reader.getVal22().size();
 }
 
 std::optional<TemplateArgument> DependentTemplateSpecializationType::nth_template_argument(unsigned n) const {
-  auto list = impl->reader.getVal234();
+  auto list = impl->reader.getVal22();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TemplateArgumentFor(ep, v);
   if (!e) {
@@ -133,12 +107,12 @@ std::optional<TemplateArgument> DependentTemplateSpecializationType::nth_templat
 }
 
 gap::generator<TemplateArgument> DependentTemplateSpecializationType::template_arguments(void) const & {
-  auto list = impl->reader.getVal234();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal22();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d234 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d234));
+    if (auto d22 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d22));
     }
   }
   co_return;

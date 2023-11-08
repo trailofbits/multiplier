@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::containing(const std:
 
 bool OMPThreadPrivateDecl::contains(const Decl &decl) {
   for (auto &parent : OMPThreadPrivateDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPThreadPrivateDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPThreadPrivateDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -136,7 +136,7 @@ std::optional<OMPThreadPrivateDecl> OMPThreadPrivateDecl::from(const Decl &paren
 }
 
 gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kOMPThreadPrivateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<OMPThreadPrivateDecl> e = OMPThreadPrivateDecl::from(Decl(std::move(eptr)))) {
@@ -147,7 +147,7 @@ gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::in(const Index &index
 }
 
 gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kOMPThreadPrivateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -159,7 +159,7 @@ gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::in(const Fragment &fr
 }
 
 gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kOMPThreadPrivateDeclDerivedKinds) {
@@ -181,15 +181,15 @@ std::optional<OMPThreadPrivateDecl> OMPThreadPrivateDecl::from(const TokenContex
 }
 
 unsigned OMPThreadPrivateDecl::num_varlists(void) const {
-  return impl->reader.getVal49().size();
+  return impl->reader.getVal51().size();
 }
 
 std::optional<Expr> OMPThreadPrivateDecl::nth_varlist(unsigned n) const {
-  auto list = impl->reader.getVal49();
+  auto list = impl->reader.getVal51();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -199,12 +199,12 @@ std::optional<Expr> OMPThreadPrivateDecl::nth_varlist(unsigned n) const {
 }
 
 gap::generator<Expr> OMPThreadPrivateDecl::varlists(void) const & {
-  auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal51();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d49 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d49)))) {
+    if (auto d51 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d51)))) {
         co_yield std::move(*e);
       }
     }

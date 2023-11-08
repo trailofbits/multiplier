@@ -6,7 +6,9 @@
 
 #include "PendingFragment.h"
 
+#include "EntityMapper.h"
 #include "PASTA.h"
+#include "TypeMapper.h"
 #include "Util.h"
 
 #pragma GCC diagnostic push
@@ -27,17 +29,21 @@ namespace {
 // ends up being redundant across fragments.
 class FragmentBuilder final {
  public:
-  EntityIdMap &entity_ids;
-  TypeIdMap &type_ids;
+  EntityMapper &em;
   PendingFragment &fragment;
 
-  inline explicit FragmentBuilder(EntityIdMap &entity_ids_,
-                                  TypeIdMap &type_ids_,
+  // We defer the processing of types as late as possible, as deduplicating
+  // types requires us to look up entity IDs in the entity mapper, and so we
+  // want to see as many declarations first (thus giving them IDs) prior to
+  // us processing types.
+  std::vector<pasta::Type> pending_types;
+
+  inline explicit FragmentBuilder(EntityMapper &em_,
                                   PendingFragment &fragment_)
-      : entity_ids(entity_ids_),
-        type_ids(type_ids_),
+      : em(em_),
         fragment(fragment_) {}
 
+#ifndef __CDT_PARSER__
 #define MX_BEGIN_VISIT_DECL(name) void Visit ## name (const pasta::name &);
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
@@ -45,16 +51,13 @@ class FragmentBuilder final {
 #define MX_BEGIN_VISIT_MACRO MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
+#endif
 
   void Accept(const pasta::Decl &entity);
   void Accept(const pasta::Stmt &entity);
   void Accept(const pasta::Type &entity);
   void Accept(const pasta::Attr &entity);
   void Accept(const pasta::Macro &entity);
-  void Accept(const pasta::TemplateArgument &entity);
-  void Accept(const pasta::CXXBaseSpecifier &entity);
-  void Accept(const pasta::TemplateParameterList &entity);
-  void Accept(const pasta::Designator &entity);
 
   void MaybeVisitNext(std::optional<pasta::MacroToken>) {}
   void MaybeVisitNext(std::optional<pasta::FileToken>) {}
@@ -62,19 +65,19 @@ class FragmentBuilder final {
   void MaybeVisitNext(const pasta::Token &) {}
 
   void MaybeVisitNext(const pasta::Decl &entity) {
-    fragment.Add(entity, entity_ids);
+    fragment.TryAdd(entity);
   }
 
   void MaybeVisitNext(const pasta::Stmt &entity) {
-    fragment.Add(entity, entity_ids);
+    fragment.TryAdd(entity);
   }
 
   void MaybeVisitNext(const pasta::Type &entity) {
-    fragment.Add(entity);
+    pending_types.emplace_back(entity);
   }
 
   void MaybeVisitNext(const pasta::Attr &entity) {
-    fragment.Add(entity, entity_ids);
+    fragment.TryAdd(entity);
   }
 
   void MaybeVisitNext(const pasta::Macro &) {}
@@ -82,22 +85,28 @@ class FragmentBuilder final {
   void MaybeVisitNext(const pasta::File &) {}
 
   void MaybeVisitNext(const pasta::TemplateArgument &pseudo) {
-    fragment.Add(pseudo, entity_ids);
+    fragment.TryAdd(pseudo);
   }
 
   void MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo) {
-    fragment.Add(pseudo, entity_ids);
+    fragment.TryAdd(pseudo);
   }
 
   void MaybeVisitNext(const pasta::TemplateParameterList &pseudo) {
-    fragment.Add(pseudo, entity_ids);
+    fragment.TryAdd(pseudo);
   }
 
   void MaybeVisitNext(const pasta::Designator &pseudo) {
-    fragment.Add(pseudo, entity_ids);
+    fragment.TryAdd(pseudo);
+  }
+
+  template <typename T>
+  void Accept(const T &pseudo) {
+    MaybeVisitNext(pseudo);
   }
 };
 
+#ifndef __CDT_PARSER__
 #define MX_VISIT_BASE(derived_type, base_type) \
     Visit ## base_type(entity);
 
@@ -152,6 +161,7 @@ class FragmentBuilder final {
 #define MX_END_VISIT_MACRO MX_END_VISIT_DECL
 
 #include <multiplier/Visitor.inc.h>
+#endif
 
 void FragmentBuilder::Accept(const pasta::Decl &entity) {
   switch (entity.Kind()) {
@@ -204,7 +214,6 @@ void FragmentBuilder::Accept(const pasta::Type &entity) {
   }
 }
 
-
 void FragmentBuilder::Accept(const pasta::Attr &entity) {
   switch (entity.Kind()) {
 #define MX_VISIT_ATTR(type) \
@@ -227,237 +236,295 @@ void FragmentBuilder::Accept(const pasta::Macro &) {}
 
 }  // namespace
 
-
-bool PendingFragment::Add(const pasta::Decl &entity, EntityIdMap &entity_ids) {
-  auto kind = entity.Kind();
-  switch (kind) {
-    case pasta::DeclKind::kTranslationUnit:
-    case pasta::DeclKind::kNamespace:
-    case pasta::DeclKind::kExternCContext:
-    case pasta::DeclKind::kLinkageSpec:
-      return false;
-
-    // TODO(pag): Think about this a bit more. It's possible that we end up
-    //            internalizing class templates and partial specializations
-    //            into the fragments using their complete specializations.
-    default:
-      if (entity.IsInvalidDeclaration()) {
-        return false;
-      }
-      break;
+// Possibly add an entity to this fragment. We have two entity ID maps:
+// 1) The `EntityMapper::entity_ids` map, which we use to decide if globally we
+// should ignore this entity without formulating an ID, and; 2) the
+// `EntityMapper::token_tree_ids`, which is a fragment-local entity id tracker.
+template <typename Entity, typename MakeId>
+bool PendingFragment::DoTryAdd(const Entity &entity, EntityIdMap &entity_ids,
+                               MakeId make_id) {
+  auto locator = RawEntity(entity);
+  if (entity_ids.contains(locator)) {
+    return false;
   }
 
-  mx::DeclId id;
-  id.fragment_id = fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(decls_to_serialize.size());
-  id.kind = mx::FromPasta(kind);
-  id.is_definition = IsDefinition(entity);
-
-  auto [it, added] = entity_ids.emplace(entity.RawDecl(), id);
-  if (added) {
-    decls_to_serialize.emplace_back(entity);  // New decl found.
-    return true;
+  if (ShouldHideFromIndexer(entity))  {
+    return false;
   }
-  return false;
+
+  auto &entity_list = EntityListFor(entity);
+  auto id = make_id(fragment_index,
+                    static_cast<mx::EntityOffset>(entity_list.size()));
+  entity_ids.emplace(locator, id);
+  entity_list.emplace_back(entity);  // New entity found.
+  return true;
 }
 
-bool PendingFragment::Add(const pasta::Stmt &entity, EntityIdMap &entity_ids) {
-  if (auto expr = pasta::Expr::From(entity)) {
-    if (expr->ContainsErrors()) {
+bool PendingFragment::TryAdd(const pasta::Decl &entity) {
+  return DoTryAdd(
+      entity,
+      em.entity_ids,
+      [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
+        mx::DeclId id;
+        id.fragment_id = fragment_index;
+        id.offset = offset;
+        id.kind = mx::FromPasta(entity.Kind());
+        id.is_definition = IsDefinition(entity);
+        return id;
+      });
+}
+
+bool PendingFragment::TryAdd(const pasta::Stmt &entity) {
+  return DoTryAdd(
+      entity,
+      em.token_tree_ids,
+      [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
+        mx::StmtId id;
+        id.fragment_id = fragment_index;
+        id.offset = offset;
+        id.kind = mx::FromPasta(entity.Kind());
+        return id;
+      });
+}
+
+bool PendingFragment::TryAdd(const pasta::TemplateArgument &entity) {
+  return DoTryAdd(
+      entity,
+      em.token_tree_ids,
+      [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
+        mx::TemplateArgumentId id;
+        id.fragment_id = fragment_index;
+        id.offset = offset;
+        return id;
+      });
+}
+
+bool PendingFragment::TryAdd(const pasta::TemplateParameterList &entity) {
+  return DoTryAdd(
+      entity,
+      em.token_tree_ids,
+      [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
+        mx::TemplateParameterListId id;
+        id.fragment_id = fragment_index;
+        id.offset = offset;
+        return id;
+      });
+}
+
+bool PendingFragment::TryAdd(const pasta::CXXBaseSpecifier &entity) {
+  return DoTryAdd(
+      entity,
+      em.token_tree_ids,
+      [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
+        mx::CXXBaseSpecifierId id;
+        id.fragment_id = fragment_index;
+        id.offset = offset;
+        return id;
+      });
+}
+
+bool PendingFragment::TryAdd(const pasta::Designator &entity) {
+  return DoTryAdd(
+      entity,
+      em.token_tree_ids,
+      [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
+        mx::DesignatorId id;
+        id.fragment_id = fragment_index;
+        id.offset = offset;
+        return id;
+      });
+}
+
+bool PendingFragment::TryAdd(const pasta::Attr &entity) {
+
+  // Attributes can be inherited, and can be pushed by pragmas, e.g.
+  //
+  //    #pragma attribute push(__attribute__((....)), apply_to = (...))
+  //
+  // This complicates things, hence why we try to deduplicate inherited
+  // attributes.
+  //
+  // NOTE(pag): We can't rely on `attr.IsInherited()`, as Clang doesn't
+  //            properly set this attribute for attributes inherited from
+  //            pragmas.
+  EntityIdMap &entity_ids = em.token_tree_ids;
+
+  auto locator = RawEntity(entity);
+  if (entity_ids.contains(locator)) {
+    return false;
+  }
+
+  auto &entity_list = EntityListFor(entity);
+
+  mx::AttrId id;
+  id.fragment_id = fragment_index;
+  id.offset = static_cast<mx::EntityOffset>(entity_list.size());
+  id.kind = mx::FromPasta(entity.Kind());
+
+  if (auto tok = entity.Token(); auto raw_tok = tok.RawToken()) {
+    auto it = em.attr_ids.find(raw_tok);
+    if (it != em.attr_ids.end()) {
+      entity_ids.emplace(locator, it->second);
+      return false;  // We've seen this.
+    }
+
+    // If we have something like:
+    //
+    //      struct CGPoint { int x; int y; };
+    //      typedef struct __attribute__((objc_boxable)) CGPoint CGPoint;
+    //
+    // Then the attribute will apply to the structure definition rather than
+    // the declaration embedded in the declarator of the `typedef`. In these
+    // cases, we opt to defer our attribute merging logic to later.
+    const uint64_t tok_index = tok.Index();
+    if (first_parsed_token_index > tok_index ||
+        last_parsed_token_index < tok_index) {
       return false;
+    }
+
+    em.attr_ids.emplace(raw_tok, id);
+
+  // NOTE(pag): This is pretty ugly, but we need to label the attributes
+  //            when we're processing all fragments, as the attributes may
+  //            be shared/inherited. However, the attributes are fragment-local,
+  //            and so `EntityMapper::ResetForFragment` wipes out our memory
+  //            of what attributes we've already found. Thus, we need to double
+  //            check things. Mostly this just happens with implicit attributes
+  //            on builtin types, e.g. `TypeVisibilityAttr` on
+  //            `__NSConstantString_tag`.
+  } else {
+    mx::EntityOffset i = 0u;
+    for (const pasta::Attr &prev_entity : entity_list) {
+      if (prev_entity == entity) {
+        id.offset = i;
+        entity_ids.emplace(locator, id);
+        return false;
+      }
+      ++i;
     }
   }
 
-  auto kind = entity.Kind();
-  mx::StmtId id;
-  id.fragment_id = fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(stmts_to_serialize.size());
-  id.kind = mx::FromPasta(kind);
-
-  if (entity_ids.emplace(entity.RawStmt(), id).second) {
-    stmts_to_serialize.emplace_back(entity);  // New stmt found.
-    return true;
-  }
-
-  return false;
+  entity_ids.emplace(locator, id);
+  entity_list.emplace_back(entity);  // New attribute found.
+  return true;
 }
 
-bool PendingFragment::Add(const pasta::Type &entity) {
-  auto kind = entity.Kind();
-  mx::TypeId id;
-  id.fragment_id = fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(types_to_serialize.size());
-  id.kind = mx::FromPasta(kind);
-
-  TypeKey type_key(entity.RawType(), entity.RawQualifiers());
-  if (type_ids.emplace(type_key, id).second) {
-    types_to_serialize.emplace_back(entity);  // New type found.
-    return true;
+bool PendingFragment::TryAdd(pasta::Type entity) {
+  if (!em.tm.AddEntityId(em, &entity)) {
+    return false;
   }
 
-  return false;
-}
+  // Types are global but we still need to store them in pending fragment
+  // to build it during the iterative process and discover the references
+  // of other decls and statements by the type and logically belongs to the
+  // fragment. It would otherwise be hard to do "outside" pending fragment
+  // build process.
+  //
+  // For example, AdjustedTypes are a big example, where you might have a
+  // function with a body like:
+  //      `int x;`
+  //      `int y[sizeof(x)];`
+  //
+  // The adjusted type here references a sized array type that references
+  // `sizeof(x)`, and we should capture `sizeof(x)` and the reference to x
+  // in this in the fragment, as it can't be properly captured outside / after
+  // the fragment is serialized.
 
-bool PendingFragment::Add(const pasta::Attr &entity, EntityIdMap &entity_ids) {
-  auto kind = entity.Kind();
-  mx::AttrId id;
-  id.fragment_id = fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(attrs_to_serialize.size());
-  id.kind = mx::FromPasta(kind);
-
-  if (entity_ids.emplace(entity.RawAttr(), id).second) {
-    attrs_to_serialize.emplace_back(entity);  // New attribute found.
-    return true;
-  }
-
-  return false;
-}
-
-bool PendingFragment::Add(const pasta::TemplateArgument &entity,
-                          EntityIdMap &entity_ids) {
-  mx::TemplateArgumentId id;
-  id.fragment_id = fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(
-      template_arguments_to_serialize.size());
-
-  if (entity_ids.emplace(entity.RawTemplateArgument(), id).second) {
-    template_arguments_to_serialize.emplace_back(entity);
-    return true;
-  }
-  return false;
-}
-
-bool PendingFragment::Add(const pasta::TemplateParameterList &entity,
-                          EntityIdMap &entity_ids) {
-  mx::TemplateParameterListId id;
-  id.fragment_id = fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(
-      template_parameter_lists_to_serialize.size());
-
-  if (entity_ids.emplace(entity.RawTemplateParameterList(), id).second) {
-    template_parameter_lists_to_serialize.emplace_back(entity);
-    return true;
-  }
-  return false;
-}
-
-bool PendingFragment::Add(const pasta::CXXBaseSpecifier &entity,
-                          EntityIdMap &entity_ids) {
-  mx::CXXBaseSpecifierId id;
-  id.fragment_id = fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(
-      cxx_base_specifiers_to_serialize.size());
-
-  if (entity_ids.emplace(entity.RawCXXBaseSpecifier(), id).second) {
-    cxx_base_specifiers_to_serialize.emplace_back(entity);
-    return true;
-  }
-  return false;
-}
-
-bool PendingFragment::Add(const pasta::Designator &entity,
-                          EntityIdMap &entity_ids) {
-  mx::DesignatorId id;
-  id.fragment_id = fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(designators_to_serialize.size());
-
-  if (entity_ids.emplace(entity.RawDesignator(), id).second) {
-    designators_to_serialize.emplace_back(entity);
-    return true;
-  }
-  return false;
+  types_to_serialize.emplace_back(entity);
+  return true;
 }
 
 // Build the fragment. This fills out the decls/stmts/types to serialize.
-//
-// NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
-void BuildPendingFragment(
-    PendingFragment &pf, EntityIdMap &entity_ids,
-    const pasta::TokenRange &tokens) {
-  size_t prev_num_decls = 0ul;
-  size_t prev_num_stmts = 0ul;
-  size_t prev_num_types = 0ul;
-  size_t prev_num_attrs = 0ul;
-  size_t prev_num_pseudos = 0ul;
+void BuildPendingFragment(PendingFragment &pf) {
+  EntityMapper &em = pf.em;
 
-  FragmentBuilder builder(entity_ids, pf.type_ids, pf);
+  std::unordered_map<mx::DeclKind, size_t, HashKind<mx::DeclKind>> prev_num_decls;
+  std::unordered_map<mx::StmtKind, size_t, HashKind<mx::StmtKind>> prev_num_stmts;
+  std::unordered_map<mx::AttrKind, size_t, HashKind<mx::AttrKind>> prev_num_attrs;
+  size_t prev_num_types = 0ul;
+  size_t prev_num_designators = 0ul;
+  size_t prev_num_template_args = 0ul;
+  size_t prev_num_template_params = 0ul;
+  size_t prev_num_cxx_base_specifiers = 0ul;
+
+  FragmentBuilder builder(em, pf);
 
   // Make sure to collect everything reachable from token contexts.
-  for (auto i = pf.begin_index; i <= pf.end_index; ++i) {
-    for (auto context = tokens[i].Context(); context;
-         context = context->Parent()) {
-      if (auto decl = pasta::Decl::From(*context)) {
+  for (pasta::PrintedToken tok : pf.parsed_tokens) {
+    for (pasta::TokenContext context : TokenContexts(tok)) {
+      if (auto decl = pasta::Decl::From(context)) {
         builder.MaybeVisitNext(*decl);
 
-      } else if (auto stmt = pasta::Stmt::From(*context)) {
+      } else if (auto stmt = pasta::Stmt::From(context)) {
         builder.MaybeVisitNext(*stmt);
 
-      } else if (auto type = pasta::Type::From(*context)) {
+      } else if (auto type = pasta::Type::From(context)) {
         builder.MaybeVisitNext(*type);
-      
-      } else if (auto attr = pasta::Attr::From(*context)) {
+
+      } else if (auto attr = pasta::Attr::From(context)) {
         builder.MaybeVisitNext(*attr);
-      
-      } else if (auto designator = pasta::Designator::From(*context)) {
+
+      } else if (auto designator = pasta::Designator::From(context)) {
         builder.MaybeVisitNext(*designator);
+
+      } else if (auto arg = pasta::TemplateArgument::From(context)) {
+        builder.MaybeVisitNext(*arg);
+      
+      } else if (auto params = pasta::TemplateParameterList::From(context)) {
+        builder.MaybeVisitNext(*params);
+      
+      } else if (auto spec = pasta::CXXBaseSpecifier::From(context)) {
+        builder.MaybeVisitNext(*spec);
       }
     }
   }
 
-  for (auto changed = true; changed; ) {
-    changed = false;
-
-    size_t num_decls = pf.decls_to_serialize.size();
-    size_t num_stmts = pf.stmts_to_serialize.size();
-    size_t num_types = pf.types_to_serialize.size();
-    size_t num_attrs = pf.attrs_to_serialize.size();
-    size_t num_pseudos = pf.pseudos_to_serialize.size();
-
-    for (size_t i = prev_num_decls; i < num_decls; ++i) {
+  auto do_on_list = [&] (auto &list, size_t &prev_size, bool &changed) {
+    const size_t size = list.size();
+    for (size_t i = prev_size; i < size; ++i) {
       changed = true;
-      pasta::Decl entity = pf.decls_to_serialize[i];
+      auto entity = list[i];  // Copy, not by ref, just in cast `list` resizes.
       builder.Accept(entity);
     }
+    prev_size = size;
+  };
 
-    for (size_t i = prev_num_stmts; i < num_stmts; ++i) {
-      changed = true;
-      pasta::Stmt entity = pf.stmts_to_serialize[i];
-      builder.Accept(entity);
+  auto do_on_map = [&] (auto &map, auto &prev_sizes, bool &changed) {
+    for (auto &[id, list] : map) {
+      do_on_list(list, prev_sizes[id], changed);
+    }
+  };
+
+  for (auto has_new_types = true; has_new_types; ) {
+    has_new_types = false;
+
+    for (auto changed = true; changed; ) {
+      changed = false;
+
+      do_on_map(pf.decls_to_serialize, prev_num_decls, changed);
+      do_on_map(pf.stmts_to_serialize, prev_num_stmts, changed);
+      do_on_map(pf.attrs_to_serialize, prev_num_attrs, changed);
+      do_on_list(pf.types_to_serialize, prev_num_types, changed);
+      do_on_list(pf.template_arguments_to_serialize, prev_num_template_args,
+                 changed);
+      do_on_list(pf.template_parameter_lists_to_serialize,
+                 prev_num_template_params, changed);
+      do_on_list(pf.designators_to_serialize, prev_num_designators, changed);
+      do_on_list(pf.cxx_base_specifiers_to_serialize,
+                 prev_num_cxx_base_specifiers, changed);
     }
 
-    for (size_t i = prev_num_types; i < num_types; ++i) {
-      changed = true;
-      pasta::Type entity = pf.types_to_serialize[i];
-      builder.Accept(entity);
-    }
-
-    for (size_t i = prev_num_attrs; i < num_attrs; ++i) {
-      changed = true;
-      pasta::Attr entity = pf.attrs_to_serialize[i];
-      builder.Accept(entity);
-    }
-
-    for (size_t i = prev_num_pseudos; i < num_pseudos; ++i) {
-      changed = true;
-      Pseudo pseudo = pf.pseudos_to_serialize[i];
-      if (std::holds_alternative<pasta::TemplateArgument>(pseudo)) {
-        builder.VisitTemplateArgument(std::get<pasta::TemplateArgument>(pseudo));
-      } else if (std::holds_alternative<pasta::CXXBaseSpecifier>(pseudo)) {
-        builder.VisitCXXBaseSpecifier(std::get<pasta::CXXBaseSpecifier>(pseudo));
-      } else if (std::holds_alternative<pasta::TemplateParameterList>(pseudo)) {
-        builder.VisitTemplateParameterList(std::get<pasta::TemplateParameterList>(pseudo));
-      } else if (std::holds_alternative<pasta::Designator>(pseudo)) {
-        builder.VisitDesignator(std::get<pasta::Designator>(pseudo));
-      } else {
-        assert(false);
+    // We defer the processing of types as late as possible, as deduplicating
+    // types requires us to look up entity IDs in the entity mapper, and so we
+    // want to see as many declarations first (thus giving them IDs) prior to
+    // us processing types.
+    for (const pasta::Type &entity : builder.pending_types) {
+      if (pf.TryAdd(entity)) {
+        has_new_types = true;
       }
     }
 
-    prev_num_decls = num_decls;
-    prev_num_stmts = num_stmts;
-    prev_num_types = num_types;
-    prev_num_attrs = num_attrs;
-    prev_num_pseudos = num_pseudos;
+    builder.pending_types.clear();
   }
 }
 

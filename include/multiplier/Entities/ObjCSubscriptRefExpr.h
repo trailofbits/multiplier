@@ -20,6 +20,11 @@ class ObjCSubscriptRefExpr;
 class Stmt;
 class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCSubscriptRefExpr : public Expr {
  private:
@@ -28,12 +33,12 @@ class ObjCSubscriptRefExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<ObjCSubscriptRefExpr> in(const Fragment &frag);
-  static gap::generator<ObjCSubscriptRefExpr> in(const File &file);
   static gap::generator<ObjCSubscriptRefExpr> in(const Index &index);
   static gap::generator<ObjCSubscriptRefExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCSubscriptRefExpr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCSubscriptRefExpr> in(const Fragment &frag);
+  static gap::generator<ObjCSubscriptRefExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_SUBSCRIPT_REF_EXPR;

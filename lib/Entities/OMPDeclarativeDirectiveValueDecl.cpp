@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDec
 
 bool OMPDeclarativeDirectiveValueDecl::contains(const Decl &decl) {
   for (auto &parent : OMPDeclarativeDirectiveValueDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPDeclarativeDirectiveValueDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPDeclarativeDirectiveValueDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -137,7 +137,7 @@ std::optional<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl
 }
 
 gap::generator<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kOMPDeclarativeDirectiveValueDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<OMPDeclarativeDirectiveValueDecl> e = OMPDeclarativeDirectiveValueDecl::from(Decl(std::move(eptr)))) {
@@ -148,7 +148,7 @@ gap::generator<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDec
 }
 
 gap::generator<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kOMPDeclarativeDirectiveValueDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -160,7 +160,7 @@ gap::generator<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDec
 }
 
 gap::generator<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kOMPDeclarativeDirectiveValueDeclDerivedKinds) {

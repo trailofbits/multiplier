@@ -18,6 +18,8 @@ class MacroArgument;
 class MacroDirective;
 class MacroExpansion;
 class MacroToken;
+class PrintedToken;
+class PrintedTokenRange;
 class Token;
 class TokenRange;
 }  // namespace pasta
@@ -45,6 +47,7 @@ class TokenTreeNode {
       : impl(std::move(impl_)) {}
 
  public:
+  std::optional<pasta::PrintedToken> PrintedToken(void) const noexcept;
   std::optional<pasta::FileToken> FileToken(void) const noexcept;
   std::optional<pasta::MacroToken> MacroToken(void) const noexcept;
   std::optional<pasta::Token> Token(void) const noexcept;
@@ -135,8 +138,9 @@ class TokenTree {
   // Create a token tree from the tokens in the inclusive range
   // `[begin_index, end_index]` from `range`.
   static std::optional<TokenTreeNodeRange>
-  Create(const pasta::TokenRange &range, uint64_t begin_index,
-         uint64_t end_index, std::ostream &err);
+  Create(const std::optional<pasta::TokenRange> &range,
+         const pasta::PrintedTokenRange &printed_range,
+         std::ostream &err);
 
   // Dump.
   void Dump(std::ostream &os) const;
@@ -145,10 +149,28 @@ class TokenTree {
 
   std::optional<pasta::Macro> Macro(void) const noexcept;
 
+  // NOTE(pag): These mirror methods available on various pasta Macro classes.
+  //            The bootstrapper is aware of these, and custom-generates the
+  //            serialization of pasta macros to call these methods instead of
+  //            the corresponding ones on the macro. This is for two reasons:
+  //
+  //                1.  The TokenTree "compresses" the macro graph, merging
+  //                    macro expansions with their argument pre-expansion
+  //                    phases, which appear as additional expansions in the
+  //                    pasta graph.
+  //
+  //                2.  To allow for the serialization of an invented
+  //                    substitution node for `#include` directives embedded
+  //                    inside of fragments with decls/statements, i.e. to
+  //                    handle the common pattern of an `enum` using an x-macro
+  //                    include pattern to define the enumerators.
   std::optional<TokenTree> Parent(void) const noexcept;
   TokenTreeNodeRange Children(void) const noexcept;
   TokenTreeNodeRange IntermediateChildren(void) const noexcept;
   TokenTreeNodeRange ReplacementChildren(void) const noexcept;
+  std::optional<pasta::Token> FirstFullySubstitutedToken(void) const noexcept;
+  std::optional<pasta::Token> LastFullySubstitutedToken(void) const noexcept;
+  std::optional<pasta::MacroToken> NameOrOperator(void) const noexcept;
 
   // Return whether or not this node has intermediate children.
   bool HasIntermediateChildren(void) const noexcept;

@@ -11,6 +11,10 @@
 #include <multiplier/Entities/AddressSpaceAttr.h>
 #include <multiplier/Entities/AnnotateTypeAttr.h>
 #include <multiplier/Entities/ArmMveStrictPolymorphismAttr.h>
+#include <multiplier/Entities/ArmPreservesZAAttr.h>
+#include <multiplier/Entities/ArmSharedZAAttr.h>
+#include <multiplier/Entities/ArmStreamingAttr.h>
+#include <multiplier/Entities/ArmStreamingCompatibleAttr.h>
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/BTFTypeTagAttr.h>
 #include <multiplier/Entities/CmseNSCallAttr.h>
@@ -35,8 +39,9 @@
 #include <multiplier/Entities/TypeNullableAttr.h>
 #include <multiplier/Entities/TypeNullableResultAttr.h>
 #include <multiplier/Entities/UPtrAttr.h>
+#include <multiplier/Entities/WebAssemblyFuncrefAttr.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Attr.h"
 
 namespace mx {
@@ -76,9 +81,14 @@ static const AttrKind kTypeAttrDerivedKinds[] = {
     TypeNullableAttr::static_kind(),
     TypeNullableResultAttr::static_kind(),
     UPtrAttr::static_kind(),
+    WebAssemblyFuncrefAttr::static_kind(),
     AddressSpaceAttr::static_kind(),
     AnnotateTypeAttr::static_kind(),
     ArmMveStrictPolymorphismAttr::static_kind(),
+    ArmPreservesZAAttr::static_kind(),
+    ArmSharedZAAttr::static_kind(),
+    ArmStreamingAttr::static_kind(),
+    ArmStreamingCompatibleAttr::static_kind(),
     BTFTypeTagAttr::static_kind(),
     CmseNSCallAttr::static_kind(),
     HLSLGroupSharedAddressSpaceAttr::static_kind(),
@@ -105,9 +115,14 @@ std::optional<TypeAttr> TypeAttr::from(const Attr &parent) {
     case TypeNullableAttr::static_kind():
     case TypeNullableResultAttr::static_kind():
     case UPtrAttr::static_kind():
+    case WebAssemblyFuncrefAttr::static_kind():
     case AddressSpaceAttr::static_kind():
     case AnnotateTypeAttr::static_kind():
     case ArmMveStrictPolymorphismAttr::static_kind():
+    case ArmPreservesZAAttr::static_kind():
+    case ArmSharedZAAttr::static_kind():
+    case ArmStreamingAttr::static_kind():
+    case ArmStreamingCompatibleAttr::static_kind():
     case BTFTypeTagAttr::static_kind():
     case CmseNSCallAttr::static_kind():
     case HLSLGroupSharedAddressSpaceAttr::static_kind():
@@ -132,7 +147,7 @@ std::optional<TypeAttr> TypeAttr::from(const Attr &parent) {
 }
 
 gap::generator<TypeAttr> TypeAttr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kTypeAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
       if (std::optional<TypeAttr> e = TypeAttr::from(Attr(std::move(eptr)))) {
@@ -143,7 +158,7 @@ gap::generator<TypeAttr> TypeAttr::in(const Index &index) {
 }
 
 gap::generator<TypeAttr> TypeAttr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kTypeAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
@@ -155,7 +170,7 @@ gap::generator<TypeAttr> TypeAttr::in(const Fragment &frag) {
 }
 
 gap::generator<TypeAttr> TypeAttr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kTypeAttrDerivedKinds) {

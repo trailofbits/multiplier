@@ -20,6 +20,11 @@ class DeducedType;
 class TemplateArgument;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AutoType : public DeducedType {
  private:
@@ -27,8 +32,6 @@ class AutoType : public DeducedType {
   friend class DeducedType;
   friend class Type;
  public:
-  static gap::generator<AutoType> in(const Fragment &frag);
-  static gap::generator<AutoType> in(const File &file);
   static gap::generator<AutoType> in(const Index &index);
   static gap::generator<AutoType> containing(const Token &tok);
   bool contains(const Token &tok) const;

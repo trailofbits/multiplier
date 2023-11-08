@@ -15,6 +15,11 @@ class EntityProvider;
 class Index;
 class Macro;
 class MacroArgument;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MacroArgument : public Macro {
  private:
@@ -51,7 +56,7 @@ class MacroArgument : public Macro {
   static std::optional<MacroArgument> from(const TokenContext &t);
 
   bool is_variadic(void) const;
-  unsigned index(void) const;
+  uint32_t index(void) const;
 };
 
 static_assert(sizeof(MacroArgument) == sizeof(Macro));

@@ -35,6 +35,7 @@
 #pragma clang diagnostic pop
 
 #include "Context.h"
+#include "IdStore.h"
 #include "Importer.h"
 #include "Parser.h"
 
@@ -43,31 +44,37 @@ DECLARE_bool(help);
 
 // Number of threads to use in the executors. These are mostly used for indexing
 // jobs.
-DEFINE_int32(num_indexer_workers, -1, "Number of worker threads to use for parallel indexing jobs");
+DEFINE_int32(num_indexer_workers, -1, "Number of worker threads to use for parallel indexing jobs.");
 
-DEFINE_int32(num_command_workers, -1, "Number of worker threads to use for parallel command interpretation jobs");
+DEFINE_int32(num_command_workers, -1, "Number of worker threads to use for parallel command interpretation jobs.");
 
-// Only execute the target compiler twice per working directory, rather than
-// twice per command.
-DEFINE_bool(fast_import, false, "Operate in a 'fast mode' when importing compile commands.");
+DEFINE_bool(cxx_support, false, "Try to index C++ code.");
 
 // Should we show progress bars when indexing?
-DEFINE_bool(show_progress, false, "Show indexing progress bars");
+DEFINE_bool(show_progress, false, "Show indexing progress bars?");
 
 // Directory where stuff SQLite database is stored.
 DEFINE_string(db, "mx-index.db",
-              "Path to the database file into which semi-permanent indexer data "
+              "Path to the database file into which permanent indexer data "
               "should be stored. Defaults mx-index.db in the current working directory.");
 
-DEFINE_string(target, "", "Path to the binary or JSON (compile commands) file to import");
+DEFINE_string(target, "", "Path to the binary or JSON (compile commands) file to import.");
 
-DEFINE_string(env, "", "Path to the file listing environment variables to import");
-
-DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level declarations");
+DEFINE_string(env, "", "Path to the file listing environment variables to import.");
 
 DEFINE_bool(attach, false, "Print out the process ID for attaching gdb/lldb.");
 
-DEFINE_string(max_queue_size, "24G", "The maximum queue size. Use a K suffix for KiB, M suffix for MiB, or a G suffix for GiB.");
+DEFINE_string(max_queue_size, "12G",
+              "The maximum queue size. Use a K suffix for KiB, M suffix for MiB, or a G suffix for GiB.");
+
+DEFINE_string(workspace, "mx-workspace",
+              "Path to the indexer workspace directory. This is where semi-permanent data "
+              "is stored. When you're done indexing, and if you don't plan to add any additional "
+              "targets into the index, then you can delete this directory.");
+
+#ifndef MX_DISABLE_VAST
+DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level declarations");
+#endif
 
 namespace {
 
@@ -153,7 +160,7 @@ static std::optional<size_t> ParseQueueSize(void) {
 
 }  // namespace
 
-extern "C" int main(int argc, char *argv[], char *envp[]) {
+int main(int argc, char *argv[], char *envp[]) {
   pasta::InitPasta init_pasta;
 
   std::stringstream ss;
@@ -163,8 +170,9 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
      << " [--env PATH_TO_COPIED_ENV_VARS]\n"
      << " [--show_progress]\n"
      << " [--generate_sourceir]\n"
-     << " [--fast_import]\n"
+     << " [--cxx_support]\n"
      << " --db DATABASE\n"
+     << " --workspace INDEXER_WORKSPACE_DIR\n"
      << " --target COMPILE_COMMANDS\n";
 
   google::SetUsageMessage(ss.str());
@@ -209,19 +217,23 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   command_exe_options.num_workers = FLAGS_num_command_workers;
   indexer_exe_options.num_workers = FLAGS_num_indexer_workers;
 
+  indexer::IdStore id_store(FLAGS_workspace);
   indexer::Executor executor(indexer_exe_options);
   mx::DatabaseWriter database(FLAGS_db, *queue_size);
-  auto ic = std::make_shared<indexer::GlobalIndexingState>(database, executor);
+  indexer::GlobalIndexingState context(database, id_store, executor);
+
+  if (FLAGS_show_progress) {
+    context.InitializeProgressBars();
+  }
+
   auto fs = pasta::FileSystem::CreateNative();
   pasta::FileManager fm(fs);
 
-  if (FLAGS_show_progress) {
-    ic->InitializeProgressBars();
-  }
-
+#ifndef MX_DISABLE_VAST
   if (!FLAGS_generate_sourceir) {
-    ic->codegen.Disable();
+    context.codegen.Disable();
   }
+#endif
 
   std::filesystem::path path(FLAGS_target);
 
@@ -271,12 +283,12 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
     return EXIT_FAILURE;
   }
 
-  llvm::LLVMContext context;
-  indexer::Importer importer(path.parent_path(), fm, ic);
+  llvm::LLVMContext llvm_context;
+  indexer::Importer importer(path.parent_path(), fm, context);
 
   // Parse the target, be it a compile commands JSON database or a binary
   // with embedded commands.
-  if (!indexer::Parser(context, importer).Parse(*maybe_buff.get(), env)) {
+  if (!indexer::Parser(llvm_context, importer).Parse(*maybe_buff.get(), env)) {
     std::cerr
           << "An error occurred when trying to import " << FLAGS_target;
     return EXIT_FAILURE;
@@ -286,7 +298,7 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   // commands, albeit slightly modified, so that we can get the compiler to
   // tell us about include search paths, etc. The result of this is that
   // indexing actions are enqueued into the `executor`.
-  importer.Import(command_exe_options, FLAGS_fast_import);
+  importer.Import(command_exe_options, FLAGS_cxx_support);
 
   // Start the executor, so that we can start processing the indexing actions.
   // Wait for all actions to complete.

@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::containing(const std::o
 
 bool CompoundLiteralExpr::contains(const Decl &decl) {
   for (auto &parent : CompoundLiteralExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CompoundLiteralExpr::contains(const Stmt &stmt) {
   for (auto &parent : CompoundLiteralExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const Stmt &parent)
 }
 
 gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCompoundLiteralExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CompoundLiteralExpr> e = CompoundLiteralExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::in(const Index &index) 
 }
 
 gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCompoundLiteralExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::in(const Fragment &frag
 }
 
 gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCompoundLiteralExprDerivedKinds) {
@@ -155,12 +155,12 @@ std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const TokenContext 
 }
 
 Expr CompoundLiteralExpr::initializer(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CompoundLiteralExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 bool CompoundLiteralExpr::is_file_scope(void) const {

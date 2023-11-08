@@ -12,7 +12,7 @@
 #include <multiplier/Entities/InheritableAttr.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Attr.h"
 
 namespace mx {
@@ -60,7 +60,7 @@ std::optional<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::from(const Att
 }
 
 gap::generator<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kExternalSourceSymbolAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
       if (std::optional<ExternalSourceSymbolAttr> e = ExternalSourceSymbolAttr::from(Attr(std::move(eptr)))) {
@@ -71,7 +71,7 @@ gap::generator<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::in(const Inde
 }
 
 gap::generator<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kExternalSourceSymbolAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
@@ -83,7 +83,7 @@ gap::generator<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::in(const Frag
 }
 
 gap::generator<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kExternalSourceSymbolAttrDerivedKinds) {
@@ -115,6 +115,11 @@ bool ExternalSourceSymbolAttr::generated_declaration(void) const {
 
 std::string_view ExternalSourceSymbolAttr::language(void) const {
   capnp::Text::Reader data = impl->reader.getVal17();
+  return std::string_view(data.cStr(), data.size());
+}
+
+std::string_view ExternalSourceSymbolAttr::usr(void) const {
+  capnp::Text::Reader data = impl->reader.getVal18();
   return std::string_view(data.cStr(), data.size());
 }
 

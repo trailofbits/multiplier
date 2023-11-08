@@ -13,14 +13,21 @@
 namespace mx {
 class EntityProvider;
 class Index;
+class ConceptDecl;
 class ConceptSpecializationExpr;
 class Decl;
 class Expr;
 class ImplicitConceptSpecializationDecl;
+class NamedDecl;
 class Stmt;
 class TemplateArgument;
 class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ConceptSpecializationExpr : public Expr {
  private:
@@ -29,12 +36,12 @@ class ConceptSpecializationExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<ConceptSpecializationExpr> in(const Fragment &frag);
-  static gap::generator<ConceptSpecializationExpr> in(const File &file);
   static gap::generator<ConceptSpecializationExpr> in(const Index &index);
   static gap::generator<ConceptSpecializationExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ConceptSpecializationExpr> by_id(const Index &, EntityId);
+  static gap::generator<ConceptSpecializationExpr> in(const Fragment &frag);
+  static gap::generator<ConceptSpecializationExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONCEPT_SPECIALIZATION_EXPR;
@@ -62,10 +69,15 @@ class ConceptSpecializationExpr : public Expr {
   static std::optional<ConceptSpecializationExpr> from(const Reference &r);
   static std::optional<ConceptSpecializationExpr> from(const TokenContext &t);
 
+  Token concept_name_token(void) const;
+  NamedDecl found_declaration(void) const;
+  ConceptDecl named_concept(void) const;
   ImplicitConceptSpecializationDecl specialization_declaration(void) const;
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
   unsigned num_template_arguments(void) const;
   gap::generator<TemplateArgument> template_arguments(void) const &;
+  Token template_keyword_token(void) const;
+  bool has_explicit_template_arguments(void) const;
   bool is_satisfied(void) const;
 };
 

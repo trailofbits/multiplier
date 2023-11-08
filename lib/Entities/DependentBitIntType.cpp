@@ -12,7 +12,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {
@@ -60,37 +60,11 @@ std::optional<DependentBitIntType> DependentBitIntType::from(const Type &parent)
 }
 
 gap::generator<DependentBitIntType> DependentBitIntType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kDependentBitIntTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<DependentBitIntType> e = DependentBitIntType::from(Type(std::move(eptr)))) {
         co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<DependentBitIntType> DependentBitIntType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kDependentBitIntTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<DependentBitIntType> e = DependentBitIntType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<DependentBitIntType> DependentBitIntType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kDependentBitIntTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<DependentBitIntType> e = DependentBitIntType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
       }
     }
   }
@@ -105,25 +79,25 @@ std::optional<DependentBitIntType> DependentBitIntType::from(const TokenContext 
 }
 
 Type DependentBitIntType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal17();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr DependentBitIntType::num_bits_expression(void) const {
-  RawEntityId eid = impl->reader.getVal230();
+  RawEntityId eid = impl->reader.getVal18();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool DependentBitIntType::is_signed(void) const {
-  return impl->reader.getVal231();
+  return impl->reader.getVal19();
 }
 
 bool DependentBitIntType::is_sugared(void) const {
-  return impl->reader.getVal232();
+  return impl->reader.getVal20();
 }
 
 bool DependentBitIntType::is_unsigned(void) const {
-  return impl->reader.getVal233();
+  return impl->reader.getVal21();
 }
 
 #pragma GCC diagnostic pop

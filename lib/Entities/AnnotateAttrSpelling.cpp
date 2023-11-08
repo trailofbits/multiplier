@@ -17,7 +17,7 @@ const char *EnumeratorName(AnnotateAttrSpelling e) {
   switch (e) {
     case AnnotateAttrSpelling::GNU_ANNOTATE: return "GNU_ANNOTATE";
     case AnnotateAttrSpelling::CXX11_CLANG_ANNOTATE: return "CXX11_CLANG_ANNOTATE";
-    case AnnotateAttrSpelling::C2X_CLANG_ANNOTATE: return "C2X_CLANG_ANNOTATE";
+    case AnnotateAttrSpelling::C23_CLANG_ANNOTATE: return "C23_CLANG_ANNOTATE";
     case AnnotateAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Reference.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../File.h"
 #include "../Fragment.h"
 #include "../Designator.h"
@@ -23,6 +23,26 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+std::optional<Decl> Designator::parent_declaration(void) const {
+  if (auto id = impl->reader.getVal0(); id != kInvalidEntityId) {
+    if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {
+      return Decl(std::move(eptr));
+    }
+    assert(false);
+  }
+  return std::nullopt;
+}
+
+std::optional<Stmt> Designator::parent_statement(void) const {
+  if (auto id = impl->reader.getVal1(); id != kInvalidEntityId) {
+    if (auto eptr = impl->ep->StmtFor(impl->ep, id)) {
+      return Stmt(std::move(eptr));
+    }
+    assert(false);
+  }
+  return std::nullopt;
+}
 
 std::shared_ptr<EntityProvider> Designator::entity_provider_of(const Index &index_) {
   return index_.impl;
@@ -45,20 +65,20 @@ std::optional<Designator> Designator::from(const TokenContext &t) {
 }
 
 bool Designator::is_field_designator(void) const {
-  return impl->reader.getVal0();
+  return impl->reader.getVal2();
 }
 
 bool Designator::is_array_designator(void) const {
-  return impl->reader.getVal1();
+  return impl->reader.getVal3();
 }
 
 bool Designator::is_array_range_designator(void) const {
-  return impl->reader.getVal2();
+  return impl->reader.getVal4();
 }
 
 std::optional<FieldDecl> Designator::field(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal3();
+    RawEntityId eid = impl->reader.getVal5();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -70,38 +90,27 @@ std::optional<FieldDecl> Designator::field(void) const {
 }
 
 TokenRange Designator::tokens(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal4(), impl->reader.getVal5());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal6(), impl->reader.getVal7());
 }
 
 Token Designator::dot_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal6());
-}
-
-Token Designator::field_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal7());
-}
-
-Token Designator::left_bracket_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal8());
 }
 
-Token Designator::right_bracket_token(void) const {
+Token Designator::field_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
-Token Designator::ellipsis_token(void) const {
+Token Designator::left_bracket_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
-std::optional<unsigned> Designator::first_expression_index(void) const {
-  if (!impl->reader.getVal12()) {
-    return std::nullopt;
-  } else {
-    return static_cast<unsigned>(impl->reader.getVal11());
-  }
-  return std::nullopt;
+Token Designator::right_bracket_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
+}
+
+Token Designator::ellipsis_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
 }
 
 #pragma GCC diagnostic pop

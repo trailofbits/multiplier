@@ -14,14 +14,17 @@
 #include <vector>
 
 namespace pasta {
+class AST;
 class Decl;
 class File;
 class Macro;
+class PrintedTokenRange;
 class TokenRange;
 }  // namespace pasta
 namespace indexer {
 
-using Entity = std::variant<pasta::Decl, pasta::Macro>;
+using Entity = std::variant<std::monostate, pasta::Decl, pasta::Macro>;
+class EntityMapper;
 
 // Compute a SHA256 hash of some data from a file.
 std::string HashFile(std::string_view data);
@@ -36,8 +39,12 @@ std::string HashFile(std::string_view data);
 // fragment deduplication as part of a compound primary key in the
 // `fragment_hash` database table.
 std::string HashFragment(
-    const std::vector<Entity> &entity_range,
-    const pasta::TokenRange &toks,
-    uint64_t begin_index, uint64_t end_index);
+    const std::vector<pasta::Decl> &decls,
+    const std::vector<pasta::Macro> &macros,
+    const pasta::TokenRange *frag_tok_range,
+    const pasta::PrintedTokenRange &decl_tok_range);
+
+// Hash the entire compilation.
+std::string HashCompilation(const pasta::AST &ast, const EntityMapper &em);
 
 }  // namespace indexer

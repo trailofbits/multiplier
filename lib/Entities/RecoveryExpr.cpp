@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<RecoveryExpr> RecoveryExpr::containing(const std::optional<Stmt> 
 
 bool RecoveryExpr::contains(const Decl &decl) {
   for (auto &parent : RecoveryExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool RecoveryExpr::contains(const Stmt &stmt) {
   for (auto &parent : RecoveryExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<RecoveryExpr> RecoveryExpr::from(const Stmt &parent) {
 }
 
 gap::generator<RecoveryExpr> RecoveryExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kRecoveryExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<RecoveryExpr> e = RecoveryExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<RecoveryExpr> RecoveryExpr::in(const Index &index) {
 }
 
 gap::generator<RecoveryExpr> RecoveryExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kRecoveryExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<RecoveryExpr> RecoveryExpr::in(const Fragment &frag) {
 }
 
 gap::generator<RecoveryExpr> RecoveryExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kRecoveryExprDerivedKinds) {
@@ -163,7 +163,7 @@ std::optional<Expr> RecoveryExpr::nth_sub_expression(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -174,7 +174,7 @@ std::optional<Expr> RecoveryExpr::nth_sub_expression(unsigned n) const {
 
 gap::generator<Expr> RecoveryExpr::sub_expressions(void) const & {
   auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {

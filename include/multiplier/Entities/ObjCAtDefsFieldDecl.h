@@ -21,6 +21,11 @@ class ObjCAtDefsFieldDecl;
 class Stmt;
 class Token;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCAtDefsFieldDecl : public FieldDecl {
  private:
@@ -31,12 +36,12 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ObjCAtDefsFieldDecl> in(const Fragment &frag);
-  static gap::generator<ObjCAtDefsFieldDecl> in(const File &file);
   static gap::generator<ObjCAtDefsFieldDecl> in(const Index &index);
   static gap::generator<ObjCAtDefsFieldDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCAtDefsFieldDecl> by_id(const Index &, EntityId);
+  static gap::generator<ObjCAtDefsFieldDecl> in(const Fragment &frag);
+  static gap::generator<ObjCAtDefsFieldDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_AT_DEFS_FIELD;

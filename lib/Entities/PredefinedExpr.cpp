@@ -15,7 +15,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -75,14 +75,14 @@ gap::generator<PredefinedExpr> PredefinedExpr::containing(const std::optional<St
 
 bool PredefinedExpr::contains(const Decl &decl) {
   for (auto &parent : PredefinedExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool PredefinedExpr::contains(const Stmt &stmt) {
   for (auto &parent : PredefinedExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -111,7 +111,7 @@ std::optional<PredefinedExpr> PredefinedExpr::from(const Stmt &parent) {
 }
 
 gap::generator<PredefinedExpr> PredefinedExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kPredefinedExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<PredefinedExpr> e = PredefinedExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<PredefinedExpr> PredefinedExpr::in(const Index &index) {
 }
 
 gap::generator<PredefinedExpr> PredefinedExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kPredefinedExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<PredefinedExpr> PredefinedExpr::in(const Fragment &frag) {
 }
 
 gap::generator<PredefinedExpr> PredefinedExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kPredefinedExprDerivedKinds) {
@@ -156,12 +156,12 @@ std::optional<PredefinedExpr> PredefinedExpr::from(const TokenContext &t) {
 }
 
 StringLiteral PredefinedExpr::function_name(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 PredefinedExprIdentKind PredefinedExpr::identifier_kind(void) const {
-  return static_cast<PredefinedExprIdentKind>(impl->reader.getVal94());
+  return static_cast<PredefinedExprIdentKind>(impl->reader.getVal95());
 }
 
 std::string_view PredefinedExpr::identifier_kind_name(void) const {
@@ -170,7 +170,11 @@ std::string_view PredefinedExpr::identifier_kind_name(void) const {
 }
 
 Token PredefinedExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+}
+
+bool PredefinedExpr::is_transparent(void) const {
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

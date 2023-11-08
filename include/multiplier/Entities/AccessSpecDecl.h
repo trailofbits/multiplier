@@ -17,18 +17,23 @@ class AccessSpecDecl;
 class Decl;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AccessSpecDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<AccessSpecDecl> in(const Fragment &frag);
-  static gap::generator<AccessSpecDecl> in(const File &file);
   static gap::generator<AccessSpecDecl> in(const Index &index);
   static gap::generator<AccessSpecDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AccessSpecDecl> by_id(const Index &, EntityId);
+  static gap::generator<AccessSpecDecl> in(const Fragment &frag);
+  static gap::generator<AccessSpecDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::ACCESS_SPEC;

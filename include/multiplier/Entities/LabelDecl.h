@@ -19,6 +19,11 @@ class LabelStmt;
 class NamedDecl;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class LabelDecl : public NamedDecl {
  private:
@@ -26,12 +31,12 @@ class LabelDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<LabelDecl> in(const Fragment &frag);
-  static gap::generator<LabelDecl> in(const File &file);
   static gap::generator<LabelDecl> in(const Index &index);
   static gap::generator<LabelDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<LabelDecl> by_id(const Index &, EntityId);
+  static gap::generator<LabelDecl> in(const Fragment &frag);
+  static gap::generator<LabelDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LABEL;

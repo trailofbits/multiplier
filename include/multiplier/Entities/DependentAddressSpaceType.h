@@ -17,14 +17,17 @@ class DependentAddressSpaceType;
 class Expr;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DependentAddressSpaceType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<DependentAddressSpaceType> in(const Fragment &frag);
-  static gap::generator<DependentAddressSpaceType> in(const File &file);
   static gap::generator<DependentAddressSpaceType> in(const Index &index);
   static gap::generator<DependentAddressSpaceType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -50,6 +53,7 @@ class DependentAddressSpaceType : public Type {
   Type desugar(void) const;
   Expr address_space_expression(void) const;
   Token attribute_token(void) const;
+  Type pointee_type(void) const;
   bool is_sugared(void) const;
 };
 

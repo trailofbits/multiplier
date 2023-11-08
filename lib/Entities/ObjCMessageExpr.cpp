@@ -17,7 +17,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Stmt.h"
 
@@ -78,14 +78,14 @@ gap::generator<ObjCMessageExpr> ObjCMessageExpr::containing(const std::optional<
 
 bool ObjCMessageExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCMessageExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCMessageExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCMessageExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -114,7 +114,7 @@ std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const Stmt &parent) {
 }
 
 gap::generator<ObjCMessageExpr> ObjCMessageExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCMessageExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ObjCMessageExpr> e = ObjCMessageExpr::from(Stmt(std::move(eptr)))) {
@@ -125,7 +125,7 @@ gap::generator<ObjCMessageExpr> ObjCMessageExpr::in(const Index &index) {
 }
 
 gap::generator<ObjCMessageExpr> ObjCMessageExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCMessageExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -137,7 +137,7 @@ gap::generator<ObjCMessageExpr> ObjCMessageExpr::in(const Fragment &frag) {
 }
 
 gap::generator<ObjCMessageExpr> ObjCMessageExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCMessageExprDerivedKinds) {
@@ -167,7 +167,7 @@ std::optional<Expr> ObjCMessageExpr::nth_argument(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -178,7 +178,7 @@ std::optional<Expr> ObjCMessageExpr::nth_argument(unsigned n) const {
 
 gap::generator<Expr> ObjCMessageExpr::arguments(void) const & {
   auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
@@ -191,72 +191,65 @@ gap::generator<Expr> ObjCMessageExpr::arguments(void) const & {
 }
 
 Type ObjCMessageExpr::call_return_type(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type ObjCMessageExpr::class_receiver(void) const {
-  RawEntityId eid = impl->reader.getVal39();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
-Type ObjCMessageExpr::class_receiver_type(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal38();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr ObjCMessageExpr::instance_receiver(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token ObjCMessageExpr::left_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 ObjCMethodDecl ObjCMessageExpr::method_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal41();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCMethodFamily ObjCMessageExpr::method_family(void) const {
-  return static_cast<ObjCMethodFamily>(impl->reader.getVal94());
+  return static_cast<ObjCMethodFamily>(impl->reader.getVal95());
 }
 
 ObjCInterfaceDecl ObjCMessageExpr::receiver_interface(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal42();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCMessageExprReceiverKind ObjCMessageExpr::receiver_kind(void) const {
-  return static_cast<ObjCMessageExprReceiverKind>(impl->reader.getVal96());
+  return static_cast<ObjCMessageExprReceiverKind>(impl->reader.getVal97());
 }
 
 TokenRange ObjCMessageExpr::receiver_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal45(), impl->reader.getVal46());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal43(), impl->reader.getVal44());
 }
 
 Type ObjCMessageExpr::receiver_type(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal45();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token ObjCMessageExpr::right_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
 }
 
 Token ObjCMessageExpr::selector_start_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
 }
 
 Token ObjCMessageExpr::super_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal50());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
 }
 
 Type ObjCMessageExpr::super_type(void) const {
-  RawEntityId eid = impl->reader.getVal51();
+  RawEntityId eid = impl->reader.getVal49();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
@@ -285,7 +278,7 @@ std::optional<Token> ObjCMessageExpr::nth_selector_token(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TokenFor(ep, v);
   if (!e) {
@@ -296,7 +289,7 @@ std::optional<Token> ObjCMessageExpr::nth_selector_token(unsigned n) const {
 
 gap::generator<Token> ObjCMessageExpr::selector_tokens(void) const & {
   auto list = impl->reader.getVal26();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
   if (!fragment) {
     assert(false);

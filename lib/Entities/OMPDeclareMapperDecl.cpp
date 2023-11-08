@@ -16,7 +16,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {
@@ -76,14 +76,14 @@ gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::containing(const std:
 
 bool OMPDeclareMapperDecl::contains(const Decl &decl) {
   for (auto &parent : OMPDeclareMapperDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPDeclareMapperDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPDeclareMapperDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -138,7 +138,7 @@ std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const Decl &paren
 }
 
 gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kOMPDeclareMapperDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<OMPDeclareMapperDecl> e = OMPDeclareMapperDecl::from(Decl(std::move(eptr)))) {
@@ -149,7 +149,7 @@ gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::in(const Index &index
 }
 
 gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kOMPDeclareMapperDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -161,7 +161,7 @@ gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::in(const Fragment &fr
 }
 
 gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kOMPDeclareMapperDeclDerivedKinds) {
@@ -183,13 +183,13 @@ std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const TokenContex
 }
 
 Expr OMPDeclareMapperDecl::mapper_variable_reference(void) const {
-  RawEntityId eid = impl->reader.getVal56();
+  RawEntityId eid = impl->reader.getVal58();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<Decl> OMPDeclareMapperDecl::declarations_in_context(void) const & {
-  EntityProvider::Ptr ep = impl->ep;
-  auto list = impl->reader.getVal49();
+  EntityProviderPtr ep = impl->ep;
+  auto list = impl->reader.getVal51();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

@@ -18,7 +18,7 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Decl.h"
 
@@ -79,14 +79,14 @@ gap::generator<ObjCCategoryDecl> ObjCCategoryDecl::containing(const std::optiona
 
 bool ObjCCategoryDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCCategoryDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCCategoryDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCCategoryDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -141,7 +141,7 @@ std::optional<ObjCCategoryDecl> ObjCCategoryDecl::from(const Decl &parent) {
 }
 
 gap::generator<ObjCCategoryDecl> ObjCCategoryDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCCategoryDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ObjCCategoryDecl> e = ObjCCategoryDecl::from(Decl(std::move(eptr)))) {
@@ -152,7 +152,7 @@ gap::generator<ObjCCategoryDecl> ObjCCategoryDecl::in(const Index &index) {
 }
 
 gap::generator<ObjCCategoryDecl> ObjCCategoryDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCCategoryDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -164,7 +164,7 @@ gap::generator<ObjCCategoryDecl> ObjCCategoryDecl::in(const Fragment &frag) {
 }
 
 gap::generator<ObjCCategoryDecl> ObjCCategoryDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCCategoryDeclDerivedKinds) {
@@ -186,46 +186,46 @@ std::optional<ObjCCategoryDecl> ObjCCategoryDecl::from(const TokenContext &t) {
 }
 
 bool ObjCCategoryDecl::is_class_extension(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal74();
 }
 
 Token ObjCCategoryDecl::category_name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 ObjCInterfaceDecl ObjCCategoryDecl::class_interface(void) const {
-  RawEntityId eid = impl->reader.getVal65();
+  RawEntityId eid = impl->reader.getVal67();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCCategoryImplDecl ObjCCategoryDecl::implementation(void) const {
-  RawEntityId eid = impl->reader.getVal66();
+  RawEntityId eid = impl->reader.getVal68();
   return ObjCCategoryImplDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCCategoryDecl::instance_variable_l_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal76());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal78());
 }
 
 Token ObjCCategoryDecl::instance_variable_r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal77());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal79());
 }
 
 ObjCCategoryDecl ObjCCategoryDecl::next_class_category(void) const {
-  RawEntityId eid = impl->reader.getVal79();
+  RawEntityId eid = impl->reader.getVal81();
   return ObjCCategoryDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 unsigned ObjCCategoryDecl::num_instance_variables(void) const {
-  return impl->reader.getVal313().size();
+  return impl->reader.getVal315().size();
 }
 
 std::optional<ObjCIvarDecl> ObjCCategoryDecl::nth_instance_variable(unsigned n) const {
-  auto list = impl->reader.getVal313();
+  auto list = impl->reader.getVal315();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -235,12 +235,12 @@ std::optional<ObjCIvarDecl> ObjCCategoryDecl::nth_instance_variable(unsigned n) 
 }
 
 gap::generator<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const & {
-  auto list = impl->reader.getVal313();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal315();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d313 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCIvarDecl::from(Decl(std::move(d313)))) {
+    if (auto d315 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCIvarDecl::from(Decl(std::move(d315)))) {
         co_yield std::move(*e);
       }
     }
@@ -249,15 +249,15 @@ gap::generator<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const & 
 }
 
 unsigned ObjCCategoryDecl::num_protocol_tokens(void) const {
-  return impl->reader.getVal339().size();
+  return impl->reader.getVal341().size();
 }
 
 std::optional<Token> ObjCCategoryDecl::nth_protocol_token(unsigned n) const {
-  auto list = impl->reader.getVal339();
+  auto list = impl->reader.getVal341();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TokenFor(ep, v);
   if (!e) {
@@ -267,8 +267,8 @@ std::optional<Token> ObjCCategoryDecl::nth_protocol_token(unsigned n) const {
 }
 
 gap::generator<Token> ObjCCategoryDecl::protocol_tokens(void) const & {
-  auto list = impl->reader.getVal339();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal341();
+  EntityProviderPtr ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
   if (!fragment) {
     assert(false);
@@ -277,23 +277,23 @@ gap::generator<Token> ObjCCategoryDecl::protocol_tokens(void) const & {
   auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
-    if (auto t339 = ep->TokenFor(ep, tok_reader, v)) {
-      co_yield t339;
+    if (auto t341 = ep->TokenFor(ep, tok_reader, v)) {
+      co_yield t341;
     }
   }
   co_return;
 }
 
 unsigned ObjCCategoryDecl::num_protocols(void) const {
-  return impl->reader.getVal341().size();
+  return impl->reader.getVal352().size();
 }
 
 std::optional<ObjCProtocolDecl> ObjCCategoryDecl::nth_protocol(unsigned n) const {
-  auto list = impl->reader.getVal341();
+  auto list = impl->reader.getVal352();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -303,12 +303,12 @@ std::optional<ObjCProtocolDecl> ObjCCategoryDecl::nth_protocol(unsigned n) const
 }
 
 gap::generator<ObjCProtocolDecl> ObjCCategoryDecl::protocols(void) const & {
-  auto list = impl->reader.getVal341();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal352();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d341 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d341)))) {
+    if (auto d352 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d352)))) {
         co_yield std::move(*e);
       }
     }

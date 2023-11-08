@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {
@@ -74,14 +74,14 @@ gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::containing(const 
 
 bool CXXScalarValueInitExpr::contains(const Decl &decl) {
   for (auto &parent : CXXScalarValueInitExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXScalarValueInitExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXScalarValueInitExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
@@ -110,7 +110,7 @@ std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const Stmt &p
 }
 
 gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXScalarValueInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXScalarValueInitExpr> e = CXXScalarValueInitExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::in(const Index &i
 }
 
 gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXScalarValueInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::in(const Fragment
 }
 
 gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXScalarValueInitExprDerivedKinds) {
@@ -155,7 +155,7 @@ std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const TokenCo
 }
 
 Token CXXScalarValueInitExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 #pragma GCC diagnostic pop
