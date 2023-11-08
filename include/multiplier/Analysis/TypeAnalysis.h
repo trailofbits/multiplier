@@ -7,22 +7,45 @@
 #include <gap/core/generator.hpp>
 #include <multiplier/Index.h>
 
+#include <multiplier/Entities/CastExpr.h>
+#include <multiplier/Entities/ImplicitCastExpr.h>
+
+#include <unordered_set>
+
 namespace mx {
 
-enum class CastKind {
+enum class CastWidthChange {
   SIGN_CHANGE,
   TYPE_DOWNCAST,
   TYPE_UPCAST,
 };
 
-typedef struct {
-  int before;
-  int after;
+// Enriched metadata after the CastExpr
+class CastState final {
 
-  CastKind kind;
-} TCast;
+  // what entity was the casting performed on?s
+  EntityId referenced_entity;
 
-using TypeCastChain = std::list<TypecastChainNode>;
+  Type type_before;
+  Type type_after;
+
+  bool type_before_is_builtin;
+  bool type_after_is_builtin;
+
+  CastKind cast_kind;
+  bool is_implicit;
+public:
+  CastState()
+};
+
+class TypeCastChain final {
+private:
+  std::unordered_set<CastState> transitions;
+
+public:
+  TypeCastChain();
+};
+
 
 class TypecastAnalysis final {
 private:
@@ -32,14 +55,11 @@ private:
 public:
   TypecastAnalysis(const Index &);
 
-  // Traverse the AST tree of a starting statement to recover all casting instances.
-  void cast_instances(const Stmt &);
-
-  // Traverse the AST tree of a starting declaration to recover all casting instances.
-  void cast_instances(const Expr &);
+  // Traverse the AST tree of a starting fragment to recover all casting instances.
+  void cast_instances(const Fragment &);
 
   // At each use of an entity, generate a TypecastChain
-  void cast_chain(const EntityId &);
+  TypeCastChain cast_chain(const EntityId &);
 
 };
 } // namespace mx
