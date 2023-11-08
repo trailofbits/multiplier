@@ -7,20 +7,39 @@
 #include <gap/core/generator.hpp>
 #include <multiplier/Index.h>
 
-enum class CastingBehaviorTags {
+namespace mx {
+
+enum class CastKind {
   SIGN_CHANGE,
   TYPE_DOWNCAST,
   TYPE_UPCAST,
 };
 
-namespace mx {
+typedef struct {
+  int before;
+  int after;
 
-class TypecastAnalysisImpl final {
+  CastKind kind;
+} TCast;
+
+using TypeCastChain = std::list<TypecastChainNode>;
+
+class TypecastAnalysis final {
+private:
+
+  TypecastAnalysis(void) = delete;
+
 public:
-    Index index;
+  TypecastAnalysis(const Index &);
 
-    inline TypecastAnalysisImpl(const Index &index_)
-    : index(index_) {}
+  // Traverse the AST tree of a starting statement to recover all casting instances.
+  void cast_instances(const Stmt &);
+
+  // Traverse the AST tree of a starting declaration to recover all casting instances.
+  void cast_instances(const Expr &);
+
+  // At each use of an entity, generate a TypecastChain
+  void cast_chain(const EntityId &);
 
 };
 } // namespace mx
