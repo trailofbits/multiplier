@@ -47,14 +47,19 @@ DEFINE_string(filter_offset_type, FILTER_OFFSET_PLACEHOLDER,
 
 enum FieldType {
   Elastic,
-  SinglySelfReferencing,
-  DoublySelfReferencing,
+  DirectSelfReferencing,
+  IndirectSelfReferencing,
   CustomFilter,
 };
 
-using FieldMap = std::unordered_map<mx::PackedDeclId, FieldType>;
+//
+using HighlightedFields = std::unordered_map<mx::PackedDeclId, FieldType>;
 
-static void RenderRecord(const mx::RecordDecl &record, FieldMap &field_map) {
+// maps a RecordDecl to a set of significant child fields
+using SelfReferenceMap =
+    std::unordered_map<mx::PackedDeclId, std::unordered_set<mx::PackedDeclId>>;
+
+static void RenderRecord(const mx::RecordDecl &record) {
   auto fragment = mx::Fragment::containing(record);
   std::cout << "Frag ID: " << fragment.id() << "\nStructure ID: " << record.id()
             << "\nStructure Size: " << *record.size() << "\n";
@@ -63,9 +68,30 @@ static void RenderRecord(const mx::RecordDecl &record, FieldMap &field_map) {
   std::cout << "\n\n";
 }
 
+static int FieldTypeColor(const FieldType &field_type) {
+  unsigned ascii_color;
+  switch (field_type) {
+  case Elastic:
+    ascii_color = 43;
+    break;
+  case DirectSelfReferencing:
+    ascii_color = 44;
+    break;
+  case IndirectSelfReferencing:
+    ascii_color = 45;
+    break;
+  case CustomFilter:
+    ascii_color = 46;
+    break;
+  default:
+    break;
+  }
+  return ascii_color;
+}
+
 static void RenderRecordHighlightedFields(const mx::Index index,
                                           const mx::RecordDecl &record,
-                                          FieldMap &field_map) {
+                                          HighlightedFields &field_map) {
   auto fragment = mx::Fragment::containing(record);
   auto frag_tokens = fragment.file_tokens();
   std::cout << "Frag ID: " << fragment.id() << "\nStructure ID: " << record.id()
@@ -73,62 +99,34 @@ static void RenderRecordHighlightedFields(const mx::Index index,
             << "\nNumber of Highlighted Fields: " << field_map.size() << "\n\n";
 
   // populate map with field tokens and the color to highlight with
-  std::unordered_map<mx::PackedDeclId, unsigned> highlights;
+  std::unordered_map<mx::EntityId, unsigned> highlights;
   for (const auto &[field_id, field_type] : field_map) {
-    unsigned ascii_color;
-    switch (field_type) {
-    case Elastic:
-      ascii_color = 43;
-      break;
-    case SinglySelfReferencing:
-      ascii_color = 44;
-      break;
-    case DoublySelfReferencing:
-      ascii_color = 45;
-      break;
-    case CustomFilter:
-      ascii_color = 46;
-      break;
-    default:
-      break;
-    }
+    auto field = mx::FieldDecl::by_id(index, field_id);
+    if (!field)
+      continue;
 
-    // TODO: deal with a field that has multiple properties matched?
-    highlights[field_id] = ascii_color;
+    auto colored_range = field->tokens().file_tokens();
+    for (auto token : colored_range) {
+      highlights.emplace(token.id(), FieldTypeColor(field_type));
+    }
   }
 
   // render record with highlighted structs
   for (auto tok : frag_tokens) {
-    auto found = false;
-    for (const auto &[field_id, ascii_color] : highlights) {
-      auto field = mx::FieldDecl::by_id(index, field_id);
-      if (!field)
-        continue;
-
-      auto colored_range = field->tokens().file_tokens();
-      if (colored_range.index_of(tok)) {
-        std::cout << "\u001b[" << ascii_color << "m\033[1m" << tok.data()
-                  << "\033[0m";
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
+    auto highligted_tok = highlights.find(tok.id());
+    if (highligted_tok != highlights.end()) {
+      std::cout << "\u001b[" << highligted_tok->second << "m\033[1m"
+                << tok.data() << "\033[0m";
+    } else {
       std::cout << tok.data();
     }
   }
   std::cout << "\n\n";
 }
 
-static int GetSelfReferences(const mx::RecordDecl &record,
-                             FieldMap &field_map) {
-  std::unordered_set<mx::PackedDeclId> seen;
-  std::unordered_set<mx::PackedDeclId> self_referencing;
-  int level = 0;
-  int found = 0;
-
-  // First pass: identify all directly self-linking / singly linked fields
-  for (mx::FieldDecl field : record.fields()) {
+static void GetInitialSelfReferences(mx::Index &index,
+                                     SelfReferenceMap &self_refs) {
+  for (mx::FieldDecl field : mx::FieldDecl::in(index)) {
     auto pointer_type = mx::PointerType::from(field.type());
     if (!pointer_type) {
       continue;
@@ -140,54 +138,48 @@ static int GetSelfReferences(const mx::RecordDecl &record,
       continue;
     }
 
-    if (record != record_type->declaration()) {
+    auto record = mx::RecordDecl::from(field.parent_declaration());
+    if (!record) {
       continue;
     }
 
-    found++;
-    field_map[field.id()] = SinglySelfReferencing;
-    seen.insert(field.id());
-    self_referencing.insert(field.id());
+    // field type matches parent record type
+    if (record != record_type->declaration()) {
+      continue;
+    }
+    self_refs[record->id()].insert(field.id());
   }
+}
 
-  // Second pass: indirectly self-linking structures, e.g. users of `list_head`.
-  for (size_t prev_size = 0u; prev_size < self_referencing.size();) {
-    prev_size = self_referencing.size();
-    ++level;
+static bool GetIndirectSelfReferences(const mx::RecordDecl &record,
+                                      SelfReferenceMap &self_refs,
+                                      HighlightedFields &field_map) {
+  bool found = false;
+  for (mx::FieldDecl field : record.fields()) {
 
-    for (mx::FieldDecl field : record.fields()) {
+    // skip if already to be highlighted
+    if (field_map.contains(field.id())) {
+      continue;
+    }
 
-      // already seen as a singly-linked reference
-      if (seen.contains(field.id())) {
-        continue;
-      }
+    auto record_type = mx::RecordType::from(field.type().desugared_type());
+    if (!record_type) {
+      continue;
+    }
 
-      auto record_type = mx::RecordType::from(field.type().desugared_type());
-      if (!record_type) {
-        continue;
-      }
-
-      auto byval_record = record_type->declaration();
-      if (!self_referencing.contains(byval_record.id())) {
-        continue;
-      }
-
-      auto record = mx::RecordDecl::from(field.parent_declaration());
-      if (!record) {
-        continue;
-      }
-
-      found++;
-      field_map[field.id()] = DoublySelfReferencing;
-      seen.insert(field.id());
+    auto byval_record = record_type->declaration();
+    if (self_refs.contains(byval_record.id())) {
+      field_map[field.id()] = IndirectSelfReferencing;
+      found = true;
     }
   }
   return found;
 }
 
+// Helper to test if a type matches at a field offset for a target struct
 static bool MatchTypeAndOffset(const mx::RecordDecl &record,
                                std::string type_to_match, int offset_to_match,
-                               FieldMap &field_map) {
+                               HighlightedFields &field_map) {
   for (mx::FieldDecl field : record.fields()) {
     auto field_type = field.type().desugared_type();
     std::string_view field_name = field_type.tokens().data();
@@ -222,6 +214,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  // validate size check range
   if (FLAGS_min_size > FLAGS_max_size) {
     std::cerr << "ERROR: min_size > max_size" << std::endl;
     return EXIT_FAILURE;
@@ -250,6 +243,13 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::Index index = InitExample(true);
   std::unordered_set<mx::PackedDeclId> seen_records;
+  SelfReferenceMap self_reference_uses;
+
+  // do an initial run to get all self-referencing records to later help
+  // determine if a target struct is has a field reference to it
+  if (FLAGS_filter_self_referencing) {
+    GetInitialSelfReferences(index, self_reference_uses);
+  }
 
   for (const mx::RecordDecl record_decl : mx::RecordDecl::in(index)) {
 
@@ -267,8 +267,6 @@ extern "C" int main(int argc, char *argv[]) {
     if (record.size() == 0 || record.name() == "")
       continue;
 
-    FieldMap current_field_map;
-
     // size range check will take precedence in filtering
     if (FLAGS_max_size != UINT64_MAX || FLAGS_min_size != 0) {
       if (auto size = record.size()) {
@@ -279,6 +277,8 @@ extern "C" int main(int argc, char *argv[]) {
       }
     }
 
+    HighlightedFields highlighted_fields;
+
     // Match on a field type and an offset if set
     if (FLAGS_filter_offset_type != FILTER_OFFSET_PLACEHOLDER) {
 
@@ -288,7 +288,7 @@ extern "C" int main(int argc, char *argv[]) {
           type_to_match.end());
 
       bool matched = MatchTypeAndOffset(record_decl, type_to_match,
-                                        offset_to_match, current_field_map);
+                                        offset_to_match, highlighted_fields);
       if (!matched)
         continue;
     }
@@ -308,15 +308,31 @@ extern "C" int main(int argc, char *argv[]) {
       // if (!last_field->is_zero_size())
       //  continue;
 
-      current_field_map[last_field->id()] = Elastic;
+      highlighted_fields[last_field->id()] = Elastic;
     } else if (FLAGS_filter_elastic && !is_flexible) {
       continue;
     }
 
-    // Grab potentially multiple fields that are self-referencing
-    if (FLAGS_filter_self_referencing &&
-        !GetSelfReferences(record, current_field_map)) {
-      continue;
+    // Grab potentially multiple fields that are self-referencing from initial
+    // run
+    if (FLAGS_filter_self_referencing) {
+      bool found_self_referencing = false;
+
+      // our record itself is directly self-referencing
+      if (self_reference_uses.contains(record.id())) {
+        for (auto field_id : self_reference_uses[record.id()]) {
+          highlighted_fields[field_id] = DirectSelfReferencing;
+        }
+        found_self_referencing = true;
+      }
+
+      // our current target's fields contains other self-referencing records
+      found_self_referencing = GetIndirectSelfReferences(
+          record, self_reference_uses, highlighted_fields);
+
+      // skip outputting this
+      if (!found_self_referencing)
+        continue;
     }
 
     if (FLAGS_names_only) {
@@ -326,12 +342,12 @@ extern "C" int main(int argc, char *argv[]) {
 
     // Just output struct definition with no field highlighting if no filters
     // applied
-    if (current_field_map.empty()) {
-      RenderRecord(record, current_field_map);
+    if (highlighted_fields.empty()) {
+      RenderRecord(record);
 
       // Otherwise render the struct with all significant fields highlighted
     } else {
-      RenderRecordHighlightedFields(index, record, current_field_map);
+      RenderRecordHighlightedFields(index, record, highlighted_fields);
     }
   }
   return EXIT_SUCCESS;
