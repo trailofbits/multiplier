@@ -14,7 +14,7 @@ namespace mx {
 enum class GNUInlineAttrSpelling : unsigned char {
   GNU_GNU_INLINE,
   CXX11_GNU_GNU_INLINE,
-  C23_GNU_GNU_INLINE,
+  C2X_GNU_GNU_INLINE,
   SPELLING_NOT_CALCULATED,
 };
 

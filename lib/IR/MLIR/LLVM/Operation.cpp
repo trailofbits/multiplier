@@ -13,12 +13,9 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
   switch (that.kind()) {
     default: return std::nullopt;
     case mx::ir::OperationKind::LLVM_ASHR:
-    case mx::ir::OperationKind::LLVM_ACCESS_GROUP:
     case mx::ir::OperationKind::LLVM_ADD:
     case mx::ir::OperationKind::LLVM_ADDRSPACECAST:
     case mx::ir::OperationKind::LLVM_MLIR_ADDRESSOF:
-    case mx::ir::OperationKind::LLVM_ALIAS_SCOPE_DOMAIN:
-    case mx::ir::OperationKind::LLVM_ALIAS_SCOPE:
     case mx::ir::OperationKind::LLVM_ALLOCA:
     case mx::ir::OperationKind::LLVM_AND:
     case mx::ir::OperationKind::LLVM_CMPXCHG:
@@ -26,6 +23,8 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::LLVM_BITCAST:
     case mx::ir::OperationKind::LLVM_BR:
     case mx::ir::OperationKind::LLVM_CALL:
+    case mx::ir::OperationKind::LLVM_COMDAT:
+    case mx::ir::OperationKind::LLVM_COMDAT_SELECTOR:
     case mx::ir::OperationKind::LLVM_COND_BR:
     case mx::ir::OperationKind::LLVM_MLIR_CONSTANT:
     case mx::ir::OperationKind::LLVM_EXTRACTELEMENT:
@@ -61,6 +60,7 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::LLVM_MUL:
     case mx::ir::OperationKind::LLVM_MLIR_NULL:
     case mx::ir::OperationKind::LLVM_OR:
+    case mx::ir::OperationKind::LLVM_MLIR_POISON:
     case mx::ir::OperationKind::LLVM_PTRTOINT:
     case mx::ir::OperationKind::LLVM_RESUME:
     case mx::ir::OperationKind::LLVM_RETURN:
@@ -74,9 +74,6 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::LLVM_STORE:
     case mx::ir::OperationKind::LLVM_SUB:
     case mx::ir::OperationKind::LLVM_SWITCH:
-    case mx::ir::OperationKind::LLVM_TBAA_ROOT:
-    case mx::ir::OperationKind::LLVM_TBAA_TAG:
-    case mx::ir::OperationKind::LLVM_TBAA_TYPE_DESC:
     case mx::ir::OperationKind::LLVM_TRUNC:
     case mx::ir::OperationKind::LLVM_UDIV:
     case mx::ir::OperationKind::LLVM_UITOFP:
@@ -86,8 +83,10 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::LLVM_XOR:
     case mx::ir::OperationKind::LLVM_ZEXT:
     case mx::ir::OperationKind::LLVM_INTR_ABS:
+    case mx::ir::OperationKind::LLVM_INTR_ANNOTATION:
     case mx::ir::OperationKind::LLVM_INTR_ASSUME:
     case mx::ir::OperationKind::LLVM_INTR_BITREVERSE:
+    case mx::ir::OperationKind::LLVM_INTR_BSWAP:
     case mx::ir::OperationKind::LLVM_CALL_INTRINSIC:
     case mx::ir::OperationKind::LLVM_INTR_COPYSIGN:
     case mx::ir::OperationKind::LLVM_INTR_CORO_ALIGN:
@@ -103,25 +102,35 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::LLVM_INTR_CTLZ:
     case mx::ir::OperationKind::LLVM_INTR_CTTZ:
     case mx::ir::OperationKind::LLVM_INTR_CTPOP:
-    case mx::ir::OperationKind::LLVM_INTR_DBG_ADDR:
     case mx::ir::OperationKind::LLVM_INTR_DBG_DECLARE:
+    case mx::ir::OperationKind::LLVM_INTR_DBG_LABEL:
     case mx::ir::OperationKind::LLVM_INTR_DBG_VALUE:
+    case mx::ir::OperationKind::LLVM_INTR_DEBUGTRAP:
     case mx::ir::OperationKind::LLVM_INTR_EH_TYPEID_FOR:
     case mx::ir::OperationKind::LLVM_INTR_EXP2:
     case mx::ir::OperationKind::LLVM_INTR_EXP:
+    case mx::ir::OperationKind::LLVM_INTR_EXPECT:
+    case mx::ir::OperationKind::LLVM_INTR_EXPECT_WITH_PROBABILITY:
     case mx::ir::OperationKind::LLVM_INTR_FABS:
     case mx::ir::OperationKind::LLVM_INTR_CEIL:
     case mx::ir::OperationKind::LLVM_INTR_FLOOR:
     case mx::ir::OperationKind::LLVM_INTR_FMA:
     case mx::ir::OperationKind::LLVM_INTR_FMULADD:
     case mx::ir::OperationKind::LLVM_INTR_TRUNC:
+    case mx::ir::OperationKind::LLVM_INTR_FSHL:
+    case mx::ir::OperationKind::LLVM_INTR_FSHR:
     case mx::ir::OperationKind::LLVM_INTR_GET_ACTIVE_LANE_MASK:
+    case mx::ir::OperationKind::LLVM_INTR_IS_CONSTANT:
     case mx::ir::OperationKind::LLVM_INTR_IS_FPCLASS:
     case mx::ir::OperationKind::LLVM_INTR_LIFETIME_END:
     case mx::ir::OperationKind::LLVM_INTR_LIFETIME_START:
+    case mx::ir::OperationKind::LLVM_INTR_LLRINT:
+    case mx::ir::OperationKind::LLVM_INTR_LLROUND:
     case mx::ir::OperationKind::LLVM_INTR_LOG10:
     case mx::ir::OperationKind::LLVM_INTR_LOG2:
     case mx::ir::OperationKind::LLVM_INTR_LOG:
+    case mx::ir::OperationKind::LLVM_INTR_LRINT:
+    case mx::ir::OperationKind::LLVM_INTR_LROUND:
     case mx::ir::OperationKind::LLVM_INTR_MASKED_LOAD:
     case mx::ir::OperationKind::LLVM_INTR_MASKED_STORE:
     case mx::ir::OperationKind::LLVM_INTR_MATRIX_COLUMN_MAJOR_LOAD:
@@ -136,31 +145,46 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::LLVM_INTR_MEMSET:
     case mx::ir::OperationKind::LLVM_INTR_MINNUM:
     case mx::ir::OperationKind::LLVM_INTR_MINIMUM:
+    case mx::ir::OperationKind::LLVM_INTR_NEARBYINT:
+    case mx::ir::OperationKind::LLVM_INTR_EXPERIMENTAL_NOALIAS_SCOPE_DECL:
     case mx::ir::OperationKind::LLVM_INTR_POWI:
     case mx::ir::OperationKind::LLVM_INTR_POW:
     case mx::ir::OperationKind::LLVM_INTR_PREFETCH:
+    case mx::ir::OperationKind::LLVM_INTR_PTR_ANNOTATION:
+    case mx::ir::OperationKind::LLVM_INTR_RINT:
     case mx::ir::OperationKind::LLVM_INTR_ROUNDEVEN:
     case mx::ir::OperationKind::LLVM_INTR_ROUND:
+    case mx::ir::OperationKind::LLVM_INTR_SADD_SAT:
     case mx::ir::OperationKind::LLVM_INTR_SADD_WITH_OVERFLOW:
     case mx::ir::OperationKind::LLVM_INTR_SMAX:
     case mx::ir::OperationKind::LLVM_INTR_SMIN:
     case mx::ir::OperationKind::LLVM_INTR_SMUL_WITH_OVERFLOW:
+    case mx::ir::OperationKind::LLVM_INTR_SSA_COPY:
+    case mx::ir::OperationKind::LLVM_INTR_SSHL_SAT:
+    case mx::ir::OperationKind::LLVM_INTR_SSUB_SAT:
     case mx::ir::OperationKind::LLVM_INTR_SSUB_WITH_OVERFLOW:
     case mx::ir::OperationKind::LLVM_INTR_SIN:
     case mx::ir::OperationKind::LLVM_INTR_SQRT:
     case mx::ir::OperationKind::LLVM_INTR_STACKRESTORE:
     case mx::ir::OperationKind::LLVM_INTR_STACKSAVE:
     case mx::ir::OperationKind::LLVM_INTR_EXPERIMENTAL_STEPVECTOR:
+    case mx::ir::OperationKind::LLVM_INTR_THREADLOCAL_ADDRESS:
+    case mx::ir::OperationKind::LLVM_INTR_TRAP:
+    case mx::ir::OperationKind::LLVM_INTR_UADD_SAT:
     case mx::ir::OperationKind::LLVM_INTR_UADD_WITH_OVERFLOW:
+    case mx::ir::OperationKind::LLVM_INTR_UBSANTRAP:
     case mx::ir::OperationKind::LLVM_INTR_UMAX:
     case mx::ir::OperationKind::LLVM_INTR_UMIN:
     case mx::ir::OperationKind::LLVM_INTR_UMUL_WITH_OVERFLOW:
+    case mx::ir::OperationKind::LLVM_INTR_USHL_SAT:
+    case mx::ir::OperationKind::LLVM_INTR_USUB_SAT:
     case mx::ir::OperationKind::LLVM_INTR_USUB_WITH_OVERFLOW:
     case mx::ir::OperationKind::LLVM_INTR_VP_ASHR:
     case mx::ir::OperationKind::LLVM_INTR_VP_ADD:
     case mx::ir::OperationKind::LLVM_INTR_VP_AND:
     case mx::ir::OperationKind::LLVM_INTR_VP_FADD:
     case mx::ir::OperationKind::LLVM_INTR_VP_FDIV:
+    case mx::ir::OperationKind::LLVM_INTR_VP_FMULADD:
     case mx::ir::OperationKind::LLVM_INTR_VP_FMUL:
     case mx::ir::OperationKind::LLVM_INTR_VP_FNEG:
     case mx::ir::OperationKind::LLVM_INTR_VP_FPEXT:
@@ -209,6 +233,7 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::LLVM_INTR_VACOPY:
     case mx::ir::OperationKind::LLVM_INTR_VAEND:
     case mx::ir::OperationKind::LLVM_INTR_VASTART:
+    case mx::ir::OperationKind::LLVM_INTR_VAR_ANNOTATION:
     case mx::ir::OperationKind::LLVM_INTR_MASKED_COMPRESSSTORE:
     case mx::ir::OperationKind::LLVM_INTR_MASKED_EXPANDLOAD:
     case mx::ir::OperationKind::LLVM_INTR_MASKED_GATHER:
@@ -219,7 +244,9 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_AND:
     case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_FADD:
     case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_FMAX:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_FMAXIMUM:
     case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_FMIN:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_FMINIMUM:
     case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_FMUL:
     case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_MUL:
     case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_OR:

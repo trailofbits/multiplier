@@ -15,7 +15,7 @@ enum class RestrictAttrSpelling : unsigned char {
   DECLSPEC_RESTRICT,
   GNU_MALLOC,
   CXX11_GNU_MALLOC,
-  C23_GNU_MALLOC,
+  C2X_GNU_MALLOC,
   SPELLING_NOT_CALCULATED,
 };
 

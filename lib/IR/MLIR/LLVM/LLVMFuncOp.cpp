@@ -79,6 +79,19 @@ std::optional<std::string_view> LLVMFuncOp::garbage_collector(void) const {
   }
 }
 
+std::optional<std::string_view> LLVMFuncOp::section(void) const {
+  auto opt_val = underlying_op().getSection();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
 bool LLVMFuncOp::is_var_arg(void) const {
   auto val = underlying_op().isVarArg();
   return val;

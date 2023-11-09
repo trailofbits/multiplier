@@ -19,6 +19,7 @@ enum class VectorLibrary : unsigned char {
   SVML,
   SLEEF,
   DARWIN_LIBSYSTEM_M,
+  ARM_PL,
 };
 
 inline static const char *EnumerationName(VectorLibrary) {
@@ -26,7 +27,7 @@ inline static const char *EnumerationName(VectorLibrary) {
 }
 
 inline static constexpr unsigned NumEnumerators(VectorLibrary) {
-  return 7;
+  return 8;
 }
 
 const char *EnumeratorName(VectorLibrary);

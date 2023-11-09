@@ -44,4 +44,9 @@ std::optional<IsFPClass> IsFPClass::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+uint32_t IsFPClass::bit(void) const {
+  auto val = underlying_op().getBit();
+  return val;
+}
+
 }  // namespace mx::ir::llvm

@@ -14,7 +14,7 @@ namespace mx {
 enum class ObjCRuntimeNameAttrSpelling : unsigned char {
   GNU_OBJC_RUNTIME_NAME,
   CXX11_CLANG_OBJC_RUNTIME_NAME,
-  C23_CLANG_OBJC_RUNTIME_NAME,
+  C2X_CLANG_OBJC_RUNTIME_NAME,
   SPELLING_NOT_CALCULATED,
 };
 

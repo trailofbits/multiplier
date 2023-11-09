@@ -17,7 +17,7 @@ const char *EnumeratorName(DisableTailCallsAttrSpelling e) {
   switch (e) {
     case DisableTailCallsAttrSpelling::GNU_DISABLE_TAIL_CALLS: return "GNU_DISABLE_TAIL_CALLS";
     case DisableTailCallsAttrSpelling::CXX11_CLANG_DISABLE_TAIL_CALLS: return "CXX11_CLANG_DISABLE_TAIL_CALLS";
-    case DisableTailCallsAttrSpelling::C23_CLANG_DISABLE_TAIL_CALLS: return "C23_CLANG_DISABLE_TAIL_CALLS";
+    case DisableTailCallsAttrSpelling::C2X_CLANG_DISABLE_TAIL_CALLS: return "C2X_CLANG_DISABLE_TAIL_CALLS";
     case DisableTailCallsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

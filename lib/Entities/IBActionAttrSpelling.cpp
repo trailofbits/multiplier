@@ -17,7 +17,7 @@ const char *EnumeratorName(IBActionAttrSpelling e) {
   switch (e) {
     case IBActionAttrSpelling::GNU_IBACTION: return "GNU_IBACTION";
     case IBActionAttrSpelling::CXX11_CLANG_IBACTION: return "CXX11_CLANG_IBACTION";
-    case IBActionAttrSpelling::C23_CLANG_IBACTION: return "C23_CLANG_IBACTION";
+    case IBActionAttrSpelling::C2X_CLANG_IBACTION: return "C2X_CLANG_IBACTION";
     case IBActionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

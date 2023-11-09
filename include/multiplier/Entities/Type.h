@@ -115,9 +115,11 @@ class Type {
   bool contains_errors(void) const;
   bool contains_unexpanded_parameter_pack(void) const;
   Linkage linkage(void) const;
+  Type rvv_elt_type(void) const;
   TypeKind kind(void) const;
   Type unqualified_desugared_type(void) const;
   Visibility visibility(void) const;
+  bool is_vlst_builtin_type(void) const;
 };
 
 #endif

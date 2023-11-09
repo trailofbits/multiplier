@@ -49,13 +49,8 @@ const char *EnumeratorName(AttrKind e) {
     case AttrKind::ARC_WEAKREF_UNAVAILABLE: return "ARC_WEAKREF_UNAVAILABLE";
     case AttrKind::ARGUMENT_WITH_TYPE_TAG: return "ARGUMENT_WITH_TYPE_TAG";
     case AttrKind::ARM_BUILTIN_ALIAS: return "ARM_BUILTIN_ALIAS";
-    case AttrKind::ARM_LOCALLY_STREAMING: return "ARM_LOCALLY_STREAMING";
     case AttrKind::ARM_MVE_STRICT_POLYMORPHISM: return "ARM_MVE_STRICT_POLYMORPHISM";
-    case AttrKind::ARM_NEW_ZA: return "ARM_NEW_ZA";
-    case AttrKind::ARM_PRESERVES_ZA: return "ARM_PRESERVES_ZA";
-    case AttrKind::ARM_SHARED_ZA: return "ARM_SHARED_ZA";
     case AttrKind::ARM_STREAMING: return "ARM_STREAMING";
-    case AttrKind::ARM_STREAMING_COMPATIBLE: return "ARM_STREAMING_COMPATIBLE";
     case AttrKind::ARTIFICIAL: return "ARTIFICIAL";
     case AttrKind::ASM_LABEL: return "ASM_LABEL";
     case AttrKind::ASSERT_CAPABILITY: return "ASSERT_CAPABILITY";

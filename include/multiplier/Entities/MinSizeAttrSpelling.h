@@ -14,7 +14,7 @@ namespace mx {
 enum class MinSizeAttrSpelling : unsigned char {
   GNU_MINSIZE,
   CXX11_CLANG_MINSIZE,
-  C23_CLANG_MINSIZE,
+  C2X_CLANG_MINSIZE,
   SPELLING_NOT_CALCULATED,
 };
 

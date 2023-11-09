@@ -26,7 +26,7 @@ class ReinterpretCastOp final : public Operation {
   ::mlir::memref::ReinterpretCastOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value source(void) const;
+  //::mlir::TypedValue<::mlir::BaseMemRefType> source(void) const;
   gap::generator<::mx::ir::Operand> offsets(void) const;
   gap::generator<::mx::ir::Operand> sizes(void) const;
   gap::generator<::mx::ir::Operand> strides(void) const;

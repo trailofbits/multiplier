@@ -190,11 +190,11 @@ std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::
 }
 
 Token ClassTemplateSpecializationDecl::extern_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal143());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal144());
 }
 
 Token ClassTemplateSpecializationDecl::point_of_instantiation(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal144());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal167());
 }
 
 TemplateSpecializationKind ClassTemplateSpecializationDecl::specialization_kind(void) const {
@@ -202,7 +202,7 @@ TemplateSpecializationKind ClassTemplateSpecializationDecl::specialization_kind(
 }
 
 ClassTemplateDecl ClassTemplateSpecializationDecl::specialized_template(void) const {
-  RawEntityId eid = impl->reader.getVal167();
+  RawEntityId eid = impl->reader.getVal169();
   return ClassTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
@@ -267,12 +267,12 @@ gap::generator<TemplateArgument> ClassTemplateSpecializationDecl::template_insta
 }
 
 Token ClassTemplateSpecializationDecl::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal169());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal170());
 }
 
 std::optional<Type> ClassTemplateSpecializationDecl::type_as_written(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal170();
+    RawEntityId eid = impl->reader.getVal180();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

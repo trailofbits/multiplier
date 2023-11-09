@@ -14,7 +14,7 @@ namespace mx {
 enum class NakedAttrSpelling : unsigned char {
   GNU_NAKED,
   CXX11_GNU_NAKED,
-  C23_GNU_NAKED,
+  C2X_GNU_NAKED,
   DECLSPEC_NAKED,
   SPELLING_NOT_CALCULATED,
 };

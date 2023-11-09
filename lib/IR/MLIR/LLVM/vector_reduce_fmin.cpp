@@ -34,6 +34,11 @@ std::optional<vector_reduce_fmin> vector_reduce_fmin::producing(const ::mx::ir::
   return ::mlir::LLVM::vector_reduce_fmin(this->Operation::op_);
 }
 
+::mx::ir::Value vector_reduce_fmin::in(void) const {
+  auto val = underlying_op().getIn();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
 ::mx::ir::Value vector_reduce_fmin::res(void) const {
   auto val = underlying_op().getRes();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());

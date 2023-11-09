@@ -26,7 +26,9 @@ class vector_reduce_fmax final : public Operation {
   ::mlir::LLVM::vector_reduce_fmax underlying_op(void) const noexcept;
 
   // Imported methods:
+  ::mx::ir::Value in(void) const;
   ::mx::ir::Value res(void) const;
+  //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(vector_reduce_fmax) == sizeof(Operation));
 

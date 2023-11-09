@@ -14,7 +14,7 @@ namespace mx {
 enum class PcsAttrSpelling : unsigned char {
   GNU_PCS,
   CXX11_GNU_PCS,
-  C23_GNU_PCS,
+  C2X_GNU_PCS,
   SPELLING_NOT_CALCULATED,
 };
 

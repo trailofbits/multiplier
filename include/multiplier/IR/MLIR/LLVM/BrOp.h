@@ -28,6 +28,7 @@ class BrOp final : public Operation {
   // Imported methods:
   gap::generator<::mx::ir::Operand> dest_operands(void) const;
   //::mlir::Block* dest(void) const;
+  //::std::optional<::mlir::LLVM::LoopAnnotationAttr> loop_annotation(void) const;
 };
 static_assert(sizeof(BrOp) == sizeof(Operation));
 

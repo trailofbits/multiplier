@@ -14,10 +14,10 @@ namespace mx {
 enum class ErrorAttrSpelling : unsigned char {
   GNU_ERROR,
   CXX11_GNU_ERROR,
-  C23_GNU_ERROR,
+  C2X_GNU_ERROR,
   GNU_WARNING,
   CXX11_GNU_WARNING,
-  C23_GNU_WARNING,
+  C2X_GNU_WARNING,
   SPELLING_NOT_CALCULATED,
 };
 

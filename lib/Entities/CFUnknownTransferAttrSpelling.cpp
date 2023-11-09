@@ -17,7 +17,7 @@ const char *EnumeratorName(CFUnknownTransferAttrSpelling e) {
   switch (e) {
     case CFUnknownTransferAttrSpelling::GNU_CF_UNKNOWN_TRANSFER: return "GNU_CF_UNKNOWN_TRANSFER";
     case CFUnknownTransferAttrSpelling::CXX11_CLANG_CF_UNKNOWN_TRANSFER: return "CXX11_CLANG_CF_UNKNOWN_TRANSFER";
-    case CFUnknownTransferAttrSpelling::C23_CLANG_CF_UNKNOWN_TRANSFER: return "C23_CLANG_CF_UNKNOWN_TRANSFER";
+    case CFUnknownTransferAttrSpelling::C2X_CLANG_CF_UNKNOWN_TRANSFER: return "C2X_CLANG_CF_UNKNOWN_TRANSFER";
     case CFUnknownTransferAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

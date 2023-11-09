@@ -29,7 +29,12 @@ class CallOp final : public Operation {
   ::mx::ir::Value result(void) const;
   std::optional<std::string_view> callee(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
-  //::std::optional<::mlir::ElementsAttr> branch_weights(void) const;
+  //::std::optional<::llvm::ArrayRef<int32_t>> branch_weights(void) const;
+  //::std::optional<::mlir::ArrayAttr> access_groups(void) const;
+  //::std::optional<::mlir::ArrayAttr> alias_scopes(void) const;
+  //::std::optional<::mlir::ArrayAttr> noalias_scopes(void) const;
+  //::std::optional<::mlir::ArrayAttr> tbaa(void) const;
+  //::llvm::SmallVector<::mlir::Value> accessed_operands(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
   gap::generator<::mx::ir::Operand> arg_operands(void) const;
 };

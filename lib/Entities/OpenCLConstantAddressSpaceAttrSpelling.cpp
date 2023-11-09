@@ -18,7 +18,7 @@ const char *EnumeratorName(OpenCLConstantAddressSpaceAttrSpelling e) {
     case OpenCLConstantAddressSpaceAttrSpelling::KEYWORD_CONSTANT: return "KEYWORD_CONSTANT";
     case OpenCLConstantAddressSpaceAttrSpelling::GNU_OPENCL_CONSTANT: return "GNU_OPENCL_CONSTANT";
     case OpenCLConstantAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_CONSTANT: return "CXX11_CLANG_OPENCL_CONSTANT";
-    case OpenCLConstantAddressSpaceAttrSpelling::C23_CLANG_OPENCL_CONSTANT: return "C23_CLANG_OPENCL_CONSTANT";
+    case OpenCLConstantAddressSpaceAttrSpelling::C2X_CLANG_OPENCL_CONSTANT: return "C2X_CLANG_OPENCL_CONSTANT";
     case OpenCLConstantAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

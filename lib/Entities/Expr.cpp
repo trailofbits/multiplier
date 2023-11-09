@@ -694,70 +694,60 @@ std::optional<bool> Expr::is_integer_constant_expression(void) const {
   return std::nullopt;
 }
 
-std::optional<bool> Expr::is_known_to_have_boolean_value(void) const {
-  if (!impl->reader.getVal74()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal73());
-  }
-  return std::nullopt;
+bool Expr::is_known_to_have_boolean_value(void) const {
+  return impl->reader.getVal73();
 }
 
 bool Expr::is_l_value(void) const {
-  return impl->reader.getVal75();
+  return impl->reader.getVal74();
 }
 
 bool Expr::is_objcgc_candidate(void) const {
-  return impl->reader.getVal76();
+  return impl->reader.getVal75();
 }
 
 bool Expr::is_obj_c_self_expression(void) const {
-  return impl->reader.getVal77();
+  return impl->reader.getVal76();
 }
 
 bool Expr::is_ordinary_or_bit_field_object(void) const {
-  return impl->reader.getVal78();
+  return impl->reader.getVal77();
 }
 
 bool Expr::is_pr_value(void) const {
+  return impl->reader.getVal78();
+}
+
+bool Expr::is_read_if_discarded_in_c_plus_plus11(void) const {
   return impl->reader.getVal79();
 }
 
-std::optional<bool> Expr::is_read_if_discarded_in_c_plus_plus11(void) const {
-  if (!impl->reader.getVal81()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal80());
-  }
-  return std::nullopt;
-}
-
 bool Expr::is_type_dependent(void) const {
-  return impl->reader.getVal82();
+  return impl->reader.getVal80();
 }
 
 bool Expr::is_value_dependent(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal81();
 }
 
 bool Expr::is_x_value(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal82();
 }
 
 bool Expr::refers_to_bit_field(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal83();
 }
 
 bool Expr::refers_to_global_register_variable(void) const {
-  return impl->reader.getVal86();
+  return impl->reader.getVal84();
 }
 
 bool Expr::refers_to_matrix_element(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal85();
 }
 
 bool Expr::refers_to_vector_element(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal86();
 }
 
 #pragma GCC diagnostic pop

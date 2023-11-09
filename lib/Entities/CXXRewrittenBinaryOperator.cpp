@@ -160,7 +160,7 @@ Expr CXXRewrittenBinaryOperator::lhs(void) const {
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::opcode(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal95());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal93());
 }
 
 std::string_view CXXRewrittenBinaryOperator::opcode_string(void) const {
@@ -169,7 +169,7 @@ std::string_view CXXRewrittenBinaryOperator::opcode_string(void) const {
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::operator_(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal97());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal95());
 }
 
 Token CXXRewrittenBinaryOperator::operator_token(void) const {
@@ -187,15 +187,15 @@ Expr CXXRewrittenBinaryOperator::semantic_form(void) const {
 }
 
 bool CXXRewrittenBinaryOperator::is_assignment_operation(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool CXXRewrittenBinaryOperator::is_comparison_operation(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal88();
 }
 
 bool CXXRewrittenBinaryOperator::is_reversed(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

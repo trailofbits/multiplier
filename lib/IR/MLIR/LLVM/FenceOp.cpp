@@ -34,8 +34,12 @@ std::optional<FenceOp> FenceOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::FenceOp(this->Operation::op_);
 }
 
-std::string_view FenceOp::syncscope(void) const {
-  auto val = underlying_op().getSyncscope();
+std::optional<std::string_view> FenceOp::syncscope(void) const {
+  auto opt_val = underlying_op().getSyncscope();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {

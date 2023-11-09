@@ -18,9 +18,9 @@ const char *EnumeratorName(NoInlineAttrSpelling e) {
     case NoInlineAttrSpelling::KEYWORD_NOINLINE: return "KEYWORD_NOINLINE";
     case NoInlineAttrSpelling::GNU_NOINLINE: return "GNU_NOINLINE";
     case NoInlineAttrSpelling::CXX11_GNU_NOINLINE: return "CXX11_GNU_NOINLINE";
-    case NoInlineAttrSpelling::C23_GNU_NOINLINE: return "C23_GNU_NOINLINE";
+    case NoInlineAttrSpelling::C2X_GNU_NOINLINE: return "C2X_GNU_NOINLINE";
     case NoInlineAttrSpelling::CXX11_CLANG_NOINLINE: return "CXX11_CLANG_NOINLINE";
-    case NoInlineAttrSpelling::C23_CLANG_NOINLINE: return "C23_CLANG_NOINLINE";
+    case NoInlineAttrSpelling::C2X_CLANG_NOINLINE: return "C2X_CLANG_NOINLINE";
     case NoInlineAttrSpelling::DECLSPEC_NOINLINE: return "DECLSPEC_NOINLINE";
     case NoInlineAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

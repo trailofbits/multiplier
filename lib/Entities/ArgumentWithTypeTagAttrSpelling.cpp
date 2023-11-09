@@ -17,10 +17,10 @@ const char *EnumeratorName(ArgumentWithTypeTagAttrSpelling e) {
   switch (e) {
     case ArgumentWithTypeTagAttrSpelling::GNU_ARGUMENT_WITH_TYPE_TAG: return "GNU_ARGUMENT_WITH_TYPE_TAG";
     case ArgumentWithTypeTagAttrSpelling::CXX11_CLANG_ARGUMENT_WITH_TYPE_TAG: return "CXX11_CLANG_ARGUMENT_WITH_TYPE_TAG";
-    case ArgumentWithTypeTagAttrSpelling::C23_CLANG_ARGUMENT_WITH_TYPE_TAG: return "C23_CLANG_ARGUMENT_WITH_TYPE_TAG";
+    case ArgumentWithTypeTagAttrSpelling::C2X_CLANG_ARGUMENT_WITH_TYPE_TAG: return "C2X_CLANG_ARGUMENT_WITH_TYPE_TAG";
     case ArgumentWithTypeTagAttrSpelling::GNU_POINTER_WITH_TYPE_TAG: return "GNU_POINTER_WITH_TYPE_TAG";
     case ArgumentWithTypeTagAttrSpelling::CXX11_CLANG_POINTER_WITH_TYPE_TAG: return "CXX11_CLANG_POINTER_WITH_TYPE_TAG";
-    case ArgumentWithTypeTagAttrSpelling::C23_CLANG_POINTER_WITH_TYPE_TAG: return "C23_CLANG_POINTER_WITH_TYPE_TAG";
+    case ArgumentWithTypeTagAttrSpelling::C2X_CLANG_POINTER_WITH_TYPE_TAG: return "C2X_CLANG_POINTER_WITH_TYPE_TAG";
     case ArgumentWithTypeTagAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -17,7 +17,7 @@ const char *EnumeratorName(IBOutletAttrSpelling e) {
   switch (e) {
     case IBOutletAttrSpelling::GNU_IBOUTLET: return "GNU_IBOUTLET";
     case IBOutletAttrSpelling::CXX11_CLANG_IBOUTLET: return "CXX11_CLANG_IBOUTLET";
-    case IBOutletAttrSpelling::C23_CLANG_IBOUTLET: return "C23_CLANG_IBOUTLET";
+    case IBOutletAttrSpelling::C2X_CLANG_IBOUTLET: return "C2X_CLANG_IBOUTLET";
     case IBOutletAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

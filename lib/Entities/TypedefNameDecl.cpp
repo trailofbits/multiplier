@@ -202,8 +202,13 @@ std::optional<TagDecl> TypedefNameDecl::anonymous_declaration_with_typedef_name(
   return std::nullopt;
 }
 
-Type TypedefNameDecl::underlying_type(void) const {
+Type TypedefNameDecl::type(void) const {
   RawEntityId eid = impl->reader.getVal58();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
+}
+
+Type TypedefNameDecl::underlying_type(void) const {
+  RawEntityId eid = impl->reader.getVal66();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

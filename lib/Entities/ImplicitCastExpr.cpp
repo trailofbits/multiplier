@@ -156,7 +156,7 @@ std::optional<ImplicitCastExpr> ImplicitCastExpr::from(const TokenContext &t) {
 }
 
 bool ImplicitCastExpr::is_part_of_explicit_cast(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

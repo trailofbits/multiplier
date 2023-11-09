@@ -27,8 +27,8 @@ class AbsOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> is_int_min_poison(void) const;
   ::mx::ir::Value res(void) const;
+  bool is_int_min_poison(void) const;
 };
 static_assert(sizeof(AbsOp) == sizeof(Operation));
 

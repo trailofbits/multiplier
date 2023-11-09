@@ -179,35 +179,35 @@ Token DeclRefExpr::template_keyword_token(void) const {
 }
 
 bool DeclRefExpr::had_multiple_candidates(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool DeclRefExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal88();
 }
 
 bool DeclRefExpr::has_qualifier(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal89();
 }
 
 bool DeclRefExpr::has_template_keyword_and_arguments_info(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal90();
 }
 
 bool DeclRefExpr::has_template_keyword(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal91();
 }
 
 bool DeclRefExpr::is_immediate_escalating(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal92();
 }
 
 NonOdrUseReason DeclRefExpr::is_non_odr_use(void) const {
-  return static_cast<NonOdrUseReason>(impl->reader.getVal95());
+  return static_cast<NonOdrUseReason>(impl->reader.getVal93());
 }
 
 bool DeclRefExpr::refers_to_enclosing_variable_or_capture(void) const {
-  return impl->reader.getVal96();
+  return impl->reader.getVal94();
 }
 
 #pragma GCC diagnostic pop

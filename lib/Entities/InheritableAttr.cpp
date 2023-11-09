@@ -37,8 +37,6 @@
 #include <multiplier/Entities/ArcWeakrefUnavailableAttr.h>
 #include <multiplier/Entities/ArgumentWithTypeTagAttr.h>
 #include <multiplier/Entities/ArmBuiltinAliasAttr.h>
-#include <multiplier/Entities/ArmLocallyStreamingAttr.h>
-#include <multiplier/Entities/ArmNewZAAttr.h>
 #include <multiplier/Entities/ArtificialAttr.h>
 #include <multiplier/Entities/AsmLabelAttr.h>
 #include <multiplier/Entities/AssertCapabilityAttr.h>
@@ -563,8 +561,6 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     ArcWeakrefUnavailableAttr::static_kind(),
     ArgumentWithTypeTagAttr::static_kind(),
     ArmBuiltinAliasAttr::static_kind(),
-    ArmLocallyStreamingAttr::static_kind(),
-    ArmNewZAAttr::static_kind(),
     ArtificialAttr::static_kind(),
     AsmLabelAttr::static_kind(),
     AssertCapabilityAttr::static_kind(),
@@ -879,8 +875,6 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
     case ArcWeakrefUnavailableAttr::static_kind():
     case ArgumentWithTypeTagAttr::static_kind():
     case ArmBuiltinAliasAttr::static_kind():
-    case ArmLocallyStreamingAttr::static_kind():
-    case ArmNewZAAttr::static_kind():
     case ArtificialAttr::static_kind():
     case AsmLabelAttr::static_kind():
     case AssertCapabilityAttr::static_kind():

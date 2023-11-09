@@ -79,26 +79,26 @@ std::optional<DependentSizedExtVectorType> DependentSizedExtVectorType::from(con
 }
 
 Type DependentSizedExtVectorType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal17();
+  RawEntityId eid = impl->reader.getVal19();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token DependentSizedExtVectorType::attribute_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal18());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal20());
 }
 
 Type DependentSizedExtVectorType::element_type(void) const {
-  RawEntityId eid = impl->reader.getVal24();
+  RawEntityId eid = impl->reader.getVal26();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr DependentSizedExtVectorType::size_expression(void) const {
-  RawEntityId eid = impl->reader.getVal25();
+  RawEntityId eid = impl->reader.getVal27();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool DependentSizedExtVectorType::is_sugared(void) const {
-  return impl->reader.getVal19();
+  return impl->reader.getVal21();
 }
 
 #pragma GCC diagnostic pop

@@ -182,7 +182,7 @@ std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const TokenContext &t) 
 }
 
 Token ObjCTypeParamDecl::colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal67());
 }
 
 ObjCTypeParamVariance ObjCTypeParamDecl::variance(void) const {
@@ -190,7 +190,7 @@ ObjCTypeParamVariance ObjCTypeParamDecl::variance(void) const {
 }
 
 Token ObjCTypeParamDecl::variance_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal67());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal68());
 }
 
 bool ObjCTypeParamDecl::has_explicit_bound(void) const {

@@ -17,7 +17,7 @@ const char *EnumeratorName(RegCallAttrSpelling e) {
   switch (e) {
     case RegCallAttrSpelling::GNU_REGCALL: return "GNU_REGCALL";
     case RegCallAttrSpelling::CXX11_GNU_REGCALL: return "CXX11_GNU_REGCALL";
-    case RegCallAttrSpelling::C23_GNU_REGCALL: return "C23_GNU_REGCALL";
+    case RegCallAttrSpelling::C2X_GNU_REGCALL: return "C2X_GNU_REGCALL";
     case RegCallAttrSpelling::KEYWORD_REGCALL: return "KEYWORD_REGCALL";
     case RegCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

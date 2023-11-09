@@ -14,7 +14,7 @@ namespace mx {
 enum class ReturnsTwiceAttrSpelling : unsigned char {
   GNU_RETURNS_TWICE,
   CXX11_GNU_RETURNS_TWICE,
-  C23_GNU_RETURNS_TWICE,
+  C2X_GNU_RETURNS_TWICE,
   SPELLING_NOT_CALCULATED,
 };
 

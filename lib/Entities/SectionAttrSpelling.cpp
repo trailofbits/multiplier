@@ -17,7 +17,7 @@ const char *EnumeratorName(SectionAttrSpelling e) {
   switch (e) {
     case SectionAttrSpelling::GNU_SECTION: return "GNU_SECTION";
     case SectionAttrSpelling::CXX11_GNU_SECTION: return "CXX11_GNU_SECTION";
-    case SectionAttrSpelling::C23_GNU_SECTION: return "C23_GNU_SECTION";
+    case SectionAttrSpelling::C2X_GNU_SECTION: return "C2X_GNU_SECTION";
     case SectionAttrSpelling::DECLSPEC_ALLOCATE: return "DECLSPEC_ALLOCATE";
     case SectionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

@@ -17,7 +17,7 @@ const char *EnumeratorName(TypeVisibilityAttrSpelling e) {
   switch (e) {
     case TypeVisibilityAttrSpelling::GNU_TYPE_VISIBILITY: return "GNU_TYPE_VISIBILITY";
     case TypeVisibilityAttrSpelling::CXX11_CLANG_TYPE_VISIBILITY: return "CXX11_CLANG_TYPE_VISIBILITY";
-    case TypeVisibilityAttrSpelling::C23_CLANG_TYPE_VISIBILITY: return "C23_CLANG_TYPE_VISIBILITY";
+    case TypeVisibilityAttrSpelling::C2X_CLANG_TYPE_VISIBILITY: return "C2X_CLANG_TYPE_VISIBILITY";
     case TypeVisibilityAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

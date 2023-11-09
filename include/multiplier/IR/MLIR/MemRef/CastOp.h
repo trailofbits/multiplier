@@ -26,8 +26,8 @@ class CastOp final : public Operation {
   ::mlir::memref::CastOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value source(void) const;
-  ::mx::ir::Value dest(void) const;
+  //::mlir::TypedValue<::mlir::BaseMemRefType> source(void) const;
+  //::mlir::TypedValue<::mlir::BaseMemRefType> dest(void) const;
   //Value view_source(void) const;
 };
 static_assert(sizeof(CastOp) == sizeof(Operation));

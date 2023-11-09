@@ -17,13 +17,13 @@ const char *EnumeratorName(OwnershipAttrSpelling e) {
   switch (e) {
     case OwnershipAttrSpelling::GNU_OWNERSHIP_HOLDS: return "GNU_OWNERSHIP_HOLDS";
     case OwnershipAttrSpelling::CXX11_CLANG_OWNERSHIP_HOLDS: return "CXX11_CLANG_OWNERSHIP_HOLDS";
-    case OwnershipAttrSpelling::C23_CLANG_OWNERSHIP_HOLDS: return "C23_CLANG_OWNERSHIP_HOLDS";
+    case OwnershipAttrSpelling::C2X_CLANG_OWNERSHIP_HOLDS: return "C2X_CLANG_OWNERSHIP_HOLDS";
     case OwnershipAttrSpelling::GNU_OWNERSHIP_RETURNS: return "GNU_OWNERSHIP_RETURNS";
     case OwnershipAttrSpelling::CXX11_CLANG_OWNERSHIP_RETURNS: return "CXX11_CLANG_OWNERSHIP_RETURNS";
-    case OwnershipAttrSpelling::C23_CLANG_OWNERSHIP_RETURNS: return "C23_CLANG_OWNERSHIP_RETURNS";
+    case OwnershipAttrSpelling::C2X_CLANG_OWNERSHIP_RETURNS: return "C2X_CLANG_OWNERSHIP_RETURNS";
     case OwnershipAttrSpelling::GNU_OWNERSHIP_TAKES: return "GNU_OWNERSHIP_TAKES";
     case OwnershipAttrSpelling::CXX11_CLANG_OWNERSHIP_TAKES: return "CXX11_CLANG_OWNERSHIP_TAKES";
-    case OwnershipAttrSpelling::C23_CLANG_OWNERSHIP_TAKES: return "C23_CLANG_OWNERSHIP_TAKES";
+    case OwnershipAttrSpelling::C2X_CLANG_OWNERSHIP_TAKES: return "C2X_CLANG_OWNERSHIP_TAKES";
     case OwnershipAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -30,6 +30,9 @@ class Extract final : public Operation {
   ::mx::ir::Value result(void) const;
   //::mlir::TypedAttr from(void) const;
   //::mlir::TypedAttr to(void) const;
+  //std::size_t from(void) const;
+  //std::size_t to(void) const;
+  //std::size_t size(void) const;
 };
 static_assert(sizeof(Extract) == sizeof(Operation));
 

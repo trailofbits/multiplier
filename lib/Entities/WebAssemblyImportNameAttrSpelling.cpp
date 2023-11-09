@@ -17,7 +17,7 @@ const char *EnumeratorName(WebAssemblyImportNameAttrSpelling e) {
   switch (e) {
     case WebAssemblyImportNameAttrSpelling::GNU_IMPORT_NAME: return "GNU_IMPORT_NAME";
     case WebAssemblyImportNameAttrSpelling::CXX11_CLANG_IMPORT_NAME: return "CXX11_CLANG_IMPORT_NAME";
-    case WebAssemblyImportNameAttrSpelling::C23_CLANG_IMPORT_NAME: return "C23_CLANG_IMPORT_NAME";
+    case WebAssemblyImportNameAttrSpelling::C2X_CLANG_IMPORT_NAME: return "C2X_CLANG_IMPORT_NAME";
     case WebAssemblyImportNameAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

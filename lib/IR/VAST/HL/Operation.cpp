@@ -22,17 +22,19 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::HL_ALIGNOF_EXPR:
     case mx::ir::OperationKind::HL_ALIGNOF_TYPE:
     case mx::ir::OperationKind::HL_ASSIGN:
+    case mx::ir::OperationKind::HL_ASSIGN_BIN_ASHR:
+    case mx::ir::OperationKind::HL_BIN_ASHR:
     case mx::ir::OperationKind::HL_ASSIGN_BIN_AND:
     case mx::ir::OperationKind::HL_BIN_AND:
     case mx::ir::OperationKind::HL_BIN_COMMA:
     case mx::ir::OperationKind::HL_BIN_LAND:
     case mx::ir::OperationKind::HL_BIN_LOR:
+    case mx::ir::OperationKind::HL_ASSIGN_BIN_LSHR:
+    case mx::ir::OperationKind::HL_BIN_LSHR:
     case mx::ir::OperationKind::HL_ASSIGN_BIN_OR:
     case mx::ir::OperationKind::HL_BIN_OR:
     case mx::ir::OperationKind::HL_ASSIGN_BIN_SHL:
     case mx::ir::OperationKind::HL_BIN_SHL:
-    case mx::ir::OperationKind::HL_ASSIGN_BIN_SHR:
-    case mx::ir::OperationKind::HL_BIN_SHR:
     case mx::ir::OperationKind::HL_ASSIGN_BIN_XOR:
     case mx::ir::OperationKind::HL_BIN_XOR:
     case mx::ir::OperationKind::HL_BUILTIN_BITCAST:

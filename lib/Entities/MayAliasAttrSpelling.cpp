@@ -17,7 +17,7 @@ const char *EnumeratorName(MayAliasAttrSpelling e) {
   switch (e) {
     case MayAliasAttrSpelling::GNU_MAY_ALIAS: return "GNU_MAY_ALIAS";
     case MayAliasAttrSpelling::CXX11_GNU_MAY_ALIAS: return "CXX11_GNU_MAY_ALIAS";
-    case MayAliasAttrSpelling::C23_GNU_MAY_ALIAS: return "C23_GNU_MAY_ALIAS";
+    case MayAliasAttrSpelling::C2X_GNU_MAY_ALIAS: return "C2X_GNU_MAY_ALIAS";
     case MayAliasAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

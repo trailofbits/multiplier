@@ -166,7 +166,7 @@ Type ArrayTypeTraitExpr::queried_type(void) const {
 }
 
 ArrayTypeTrait ArrayTypeTraitExpr::trait(void) const {
-  return static_cast<ArrayTypeTrait>(impl->reader.getVal95());
+  return static_cast<ArrayTypeTrait>(impl->reader.getVal93());
 }
 
 #pragma GCC diagnostic pop

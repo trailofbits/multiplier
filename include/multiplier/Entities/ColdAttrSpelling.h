@@ -14,7 +14,7 @@ namespace mx {
 enum class ColdAttrSpelling : unsigned char {
   GNU_COLD,
   CXX11_GNU_COLD,
-  C23_GNU_COLD,
+  C2X_GNU_COLD,
   SPELLING_NOT_CALCULATED,
 };
 

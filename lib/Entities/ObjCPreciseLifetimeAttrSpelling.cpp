@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCPreciseLifetimeAttrSpelling e) {
   switch (e) {
     case ObjCPreciseLifetimeAttrSpelling::GNU_OBJC_PRECISE_LIFETIME: return "GNU_OBJC_PRECISE_LIFETIME";
     case ObjCPreciseLifetimeAttrSpelling::CXX11_CLANG_OBJC_PRECISE_LIFETIME: return "CXX11_CLANG_OBJC_PRECISE_LIFETIME";
-    case ObjCPreciseLifetimeAttrSpelling::C23_CLANG_OBJC_PRECISE_LIFETIME: return "C23_CLANG_OBJC_PRECISE_LIFETIME";
+    case ObjCPreciseLifetimeAttrSpelling::C2X_CLANG_OBJC_PRECISE_LIFETIME: return "C2X_CLANG_OBJC_PRECISE_LIFETIME";
     case ObjCPreciseLifetimeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

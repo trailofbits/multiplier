@@ -202,7 +202,7 @@ Token RequiresExpr::requires_keyword_token(void) const {
 }
 
 bool RequiresExpr::is_satisfied(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal87();
 }
 
 #pragma GCC diagnostic pop

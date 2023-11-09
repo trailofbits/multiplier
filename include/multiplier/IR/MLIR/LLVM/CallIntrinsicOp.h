@@ -29,6 +29,7 @@ class CallIntrinsicOp final : public Operation {
   gap::generator<::mx::ir::Operand> args(void) const;
   gap::generator<::mx::ir::Result> results(void) const;
   std::string_view intrin(void) const;
+  //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(CallIntrinsicOp) == sizeof(Operation));
 

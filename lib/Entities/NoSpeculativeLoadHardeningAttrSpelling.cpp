@@ -17,7 +17,7 @@ const char *EnumeratorName(NoSpeculativeLoadHardeningAttrSpelling e) {
   switch (e) {
     case NoSpeculativeLoadHardeningAttrSpelling::GNU_NO_SPECULATIVE_LOAD_HARDENING: return "GNU_NO_SPECULATIVE_LOAD_HARDENING";
     case NoSpeculativeLoadHardeningAttrSpelling::CXX11_CLANG_NO_SPECULATIVE_LOAD_HARDENING: return "CXX11_CLANG_NO_SPECULATIVE_LOAD_HARDENING";
-    case NoSpeculativeLoadHardeningAttrSpelling::C23_CLANG_NO_SPECULATIVE_LOAD_HARDENING: return "C23_CLANG_NO_SPECULATIVE_LOAD_HARDENING";
+    case NoSpeculativeLoadHardeningAttrSpelling::C2X_CLANG_NO_SPECULATIVE_LOAD_HARDENING: return "C2X_CLANG_NO_SPECULATIVE_LOAD_HARDENING";
     case NoSpeculativeLoadHardeningAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

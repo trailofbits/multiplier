@@ -217,13 +217,13 @@ class Expr : public ValueStmt {
   bool is_implicit_cxx_this(void) const;
   bool is_instantiation_dependent(void) const;
   std::optional<bool> is_integer_constant_expression(void) const;
-  std::optional<bool> is_known_to_have_boolean_value(void) const;
+  bool is_known_to_have_boolean_value(void) const;
   bool is_l_value(void) const;
   bool is_objcgc_candidate(void) const;
   bool is_obj_c_self_expression(void) const;
   bool is_ordinary_or_bit_field_object(void) const;
   bool is_pr_value(void) const;
-  std::optional<bool> is_read_if_discarded_in_c_plus_plus11(void) const;
+  bool is_read_if_discarded_in_c_plus_plus11(void) const;
   bool is_type_dependent(void) const;
   bool is_value_dependent(void) const;
   bool is_x_value(void) const;

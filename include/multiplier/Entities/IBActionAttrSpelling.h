@@ -14,7 +14,7 @@ namespace mx {
 enum class IBActionAttrSpelling : unsigned char {
   GNU_IBACTION,
   CXX11_CLANG_IBACTION,
-  C23_CLANG_IBACTION,
+  C2X_CLANG_IBACTION,
   SPELLING_NOT_CALCULATED,
 };
 

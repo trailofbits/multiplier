@@ -14,7 +14,7 @@ namespace mx {
 enum class RetainAttrSpelling : unsigned char {
   GNU_RETAIN,
   CXX11_GNU_RETAIN,
-  C23_GNU_RETAIN,
+  C2X_GNU_RETAIN,
   SPELLING_NOT_CALCULATED,
 };
 

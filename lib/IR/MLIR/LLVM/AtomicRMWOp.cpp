@@ -44,4 +44,22 @@ std::optional<AtomicRMWOp> AtomicRMWOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+std::optional<std::string_view> AtomicRMWOp::syncscope(void) const {
+  auto opt_val = underlying_op().getSyncscope();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+bool AtomicRMWOp::volatile__(void) const {
+  auto val = underlying_op().getVolatile_();
+  return val;
+}
+
 }  // namespace mx::ir::llvm
