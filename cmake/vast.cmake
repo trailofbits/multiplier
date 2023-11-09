@@ -8,4 +8,7 @@
 
 set(VAST_LIBS
   VAST::VASTTargetLLVMIR
+  VAST::VASTAliasTypeInterface
+  VAST::VASTElementTypeInterface
+  VAST::VASTCodeGen
 )

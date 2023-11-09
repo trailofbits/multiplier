@@ -6,7 +6,7 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.20)
 
 include("cmake/ccache.cmake")
 
@@ -85,6 +85,8 @@ find_package(reproc++ CONFIG REQUIRED)
 find_package(RocksDB CONFIG REQUIRED)
 
 if(MX_ENABLE_VAST)
+  find_package(LLVM CONFIG REQUIRED)
+  find_package(MLIR CONFIG REQUIRED)
   find_package(VAST CONFIG REQUIRED)
 endif()
 
