@@ -14,7 +14,7 @@ namespace mx {
 enum class ObjCBridgeAttrSpelling : unsigned char {
   GNU_OBJC_BRIDGE,
   CXX11_CLANG_OBJC_BRIDGE,
-  C23_CLANG_OBJC_BRIDGE,
+  C2X_CLANG_OBJC_BRIDGE,
   SPELLING_NOT_CALCULATED,
 };
 

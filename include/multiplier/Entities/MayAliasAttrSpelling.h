@@ -14,7 +14,7 @@ namespace mx {
 enum class MayAliasAttrSpelling : unsigned char {
   GNU_MAY_ALIAS,
   CXX11_GNU_MAY_ALIAS,
-  C23_GNU_MAY_ALIAS,
+  C2X_GNU_MAY_ALIAS,
   SPELLING_NOT_CALCULATED,
 };
 

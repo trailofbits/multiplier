@@ -47,4 +47,9 @@ gap::generator<::mx::ir::Operand> StoreOp::indices(void) const {
   }
 }
 
+bool StoreOp::nontemporal(void) const {
+  auto val = underlying_op().getNontemporal();
+  return val;
+}
+
 }  // namespace mx::ir::memref

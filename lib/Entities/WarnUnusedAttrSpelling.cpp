@@ -17,7 +17,7 @@ const char *EnumeratorName(WarnUnusedAttrSpelling e) {
   switch (e) {
     case WarnUnusedAttrSpelling::GNU_WARN_UNUSED: return "GNU_WARN_UNUSED";
     case WarnUnusedAttrSpelling::CXX11_GNU_WARN_UNUSED: return "CXX11_GNU_WARN_UNUSED";
-    case WarnUnusedAttrSpelling::C23_GNU_WARN_UNUSED: return "C23_GNU_WARN_UNUSED";
+    case WarnUnusedAttrSpelling::C2X_GNU_WARN_UNUSED: return "C2X_GNU_WARN_UNUSED";
     case WarnUnusedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

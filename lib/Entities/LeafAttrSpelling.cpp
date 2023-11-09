@@ -17,7 +17,7 @@ const char *EnumeratorName(LeafAttrSpelling e) {
   switch (e) {
     case LeafAttrSpelling::GNU_LEAF: return "GNU_LEAF";
     case LeafAttrSpelling::CXX11_GNU_LEAF: return "CXX11_GNU_LEAF";
-    case LeafAttrSpelling::C23_GNU_LEAF: return "C23_GNU_LEAF";
+    case LeafAttrSpelling::C2X_GNU_LEAF: return "C2X_GNU_LEAF";
     case LeafAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

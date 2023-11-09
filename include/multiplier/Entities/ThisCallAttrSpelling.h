@@ -14,7 +14,7 @@ namespace mx {
 enum class ThisCallAttrSpelling : unsigned char {
   GNU_THISCALL,
   CXX11_GNU_THISCALL,
-  C23_GNU_THISCALL,
+  C2X_GNU_THISCALL,
   KEYWORD_THISCALL,
   SPELLING_NOT_CALCULATED,
 };

@@ -17,7 +17,7 @@ const char *EnumeratorName(WeakRefAttrSpelling e) {
   switch (e) {
     case WeakRefAttrSpelling::GNU_WEAKREF: return "GNU_WEAKREF";
     case WeakRefAttrSpelling::CXX11_GNU_WEAKREF: return "CXX11_GNU_WEAKREF";
-    case WeakRefAttrSpelling::C23_GNU_WEAKREF: return "C23_GNU_WEAKREF";
+    case WeakRefAttrSpelling::C2X_GNU_WEAKREF: return "C2X_GNU_WEAKREF";
     case WeakRefAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

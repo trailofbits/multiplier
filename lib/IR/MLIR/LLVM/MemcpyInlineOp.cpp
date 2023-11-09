@@ -34,4 +34,9 @@ std::optional<MemcpyInlineOp> MemcpyInlineOp::producing(const ::mx::ir::Value &t
   return ::mlir::LLVM::MemcpyInlineOp(this->Operation::op_);
 }
 
+bool MemcpyInlineOp::is_volatile(void) const {
+  auto val = underlying_op().getIsVolatile();
+  return val;
+}
+
 }  // namespace mx::ir::llvm

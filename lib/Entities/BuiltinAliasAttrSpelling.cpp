@@ -16,7 +16,7 @@ namespace mx {
 const char *EnumeratorName(BuiltinAliasAttrSpelling e) {
   switch (e) {
     case BuiltinAliasAttrSpelling::CXX11_CLANG_BUILTIN_ALIAS: return "CXX11_CLANG_BUILTIN_ALIAS";
-    case BuiltinAliasAttrSpelling::C23_CLANG_BUILTIN_ALIAS: return "C23_CLANG_BUILTIN_ALIAS";
+    case BuiltinAliasAttrSpelling::C2X_CLANG_BUILTIN_ALIAS: return "C2X_CLANG_BUILTIN_ALIAS";
     case BuiltinAliasAttrSpelling::GNU_CLANG_BUILTIN_ALIAS: return "GNU_CLANG_BUILTIN_ALIAS";
     case BuiltinAliasAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

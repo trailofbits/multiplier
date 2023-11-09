@@ -14,7 +14,7 @@ namespace mx {
 enum class WebAssemblyExportNameAttrSpelling : unsigned char {
   GNU_EXPORT_NAME,
   CXX11_CLANG_EXPORT_NAME,
-  C23_CLANG_EXPORT_NAME,
+  C2X_CLANG_EXPORT_NAME,
   SPELLING_NOT_CALCULATED,
 };
 

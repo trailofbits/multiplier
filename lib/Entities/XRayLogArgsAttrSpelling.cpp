@@ -17,7 +17,7 @@ const char *EnumeratorName(XRayLogArgsAttrSpelling e) {
   switch (e) {
     case XRayLogArgsAttrSpelling::GNU_XRAY_LOG_ARGUMENTS: return "GNU_XRAY_LOG_ARGUMENTS";
     case XRayLogArgsAttrSpelling::CXX11_CLANG_XRAY_LOG_ARGUMENTS: return "CXX11_CLANG_XRAY_LOG_ARGUMENTS";
-    case XRayLogArgsAttrSpelling::C23_CLANG_XRAY_LOG_ARGUMENTS: return "C23_CLANG_XRAY_LOG_ARGUMENTS";
+    case XRayLogArgsAttrSpelling::C2X_CLANG_XRAY_LOG_ARGUMENTS: return "C2X_CLANG_XRAY_LOG_ARGUMENTS";
     case XRayLogArgsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

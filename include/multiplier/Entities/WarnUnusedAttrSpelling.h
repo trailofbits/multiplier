@@ -14,7 +14,7 @@ namespace mx {
 enum class WarnUnusedAttrSpelling : unsigned char {
   GNU_WARN_UNUSED,
   CXX11_GNU_WARN_UNUSED,
-  C23_GNU_WARN_UNUSED,
+  C2X_GNU_WARN_UNUSED,
   SPELLING_NOT_CALCULATED,
 };
 

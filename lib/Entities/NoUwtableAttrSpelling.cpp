@@ -17,7 +17,7 @@ const char *EnumeratorName(NoUwtableAttrSpelling e) {
   switch (e) {
     case NoUwtableAttrSpelling::GNU_NOUWTABLE: return "GNU_NOUWTABLE";
     case NoUwtableAttrSpelling::CXX11_CLANG_NOUWTABLE: return "CXX11_CLANG_NOUWTABLE";
-    case NoUwtableAttrSpelling::C23_CLANG_NOUWTABLE: return "C23_CLANG_NOUWTABLE";
+    case NoUwtableAttrSpelling::C2X_CLANG_NOUWTABLE: return "C2X_CLANG_NOUWTABLE";
     case NoUwtableAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

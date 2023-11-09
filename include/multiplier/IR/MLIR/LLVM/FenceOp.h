@@ -27,7 +27,7 @@ class FenceOp final : public Operation {
 
   // Imported methods:
   //::mlir::LLVM::AtomicOrdering ordering(void) const;
-  std::string_view syncscope(void) const;
+  std::optional<std::string_view> syncscope(void) const;
 };
 static_assert(sizeof(FenceOp) == sizeof(Operation));
 

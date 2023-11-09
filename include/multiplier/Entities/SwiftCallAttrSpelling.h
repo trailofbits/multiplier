@@ -14,7 +14,7 @@ namespace mx {
 enum class SwiftCallAttrSpelling : unsigned char {
   GNU_SWIFTCALL,
   CXX11_CLANG_SWIFTCALL,
-  C23_CLANG_SWIFTCALL,
+  C2X_CLANG_SWIFTCALL,
   SPELLING_NOT_CALCULATED,
 };
 

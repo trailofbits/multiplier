@@ -49,4 +49,17 @@ bool StoreOp::nontemporal(void) const {
   return val;
 }
 
+std::optional<std::string_view> StoreOp::syncscope(void) const {
+  auto opt_val = underlying_op().getSyncscope();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
 }  // namespace mx::ir::llvm

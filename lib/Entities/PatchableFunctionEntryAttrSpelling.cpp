@@ -17,7 +17,7 @@ const char *EnumeratorName(PatchableFunctionEntryAttrSpelling e) {
   switch (e) {
     case PatchableFunctionEntryAttrSpelling::GNU_PATCHABLE_FUNCTION_ENTRY: return "GNU_PATCHABLE_FUNCTION_ENTRY";
     case PatchableFunctionEntryAttrSpelling::CXX11_GNU_PATCHABLE_FUNCTION_ENTRY: return "CXX11_GNU_PATCHABLE_FUNCTION_ENTRY";
-    case PatchableFunctionEntryAttrSpelling::C23_GNU_PATCHABLE_FUNCTION_ENTRY: return "C23_GNU_PATCHABLE_FUNCTION_ENTRY";
+    case PatchableFunctionEntryAttrSpelling::C2X_GNU_PATCHABLE_FUNCTION_ENTRY: return "C2X_GNU_PATCHABLE_FUNCTION_ENTRY";
     case PatchableFunctionEntryAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

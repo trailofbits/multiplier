@@ -6,7 +6,7 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.23)
 
 include("cmake/ccache.cmake")
 
@@ -30,6 +30,7 @@ list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 
 include("cmake/system.cmake")
 include("cmake/llvm.cmake")
+include("cmake/linker.cmake")
 
 if(MX_ENABLE_INSTALL)
   include("cmake/packaging.cmake")
@@ -42,6 +43,8 @@ elseif(PLATFORM_LINUX)
 endif()
 
 add_subdirectory("vendor")
+include("cmake/mlir.cmake")
+include("cmake/vast.cmake")
 
 if(MX_ENABLE_RE2)
   find_package(re2 CONFIG REQUIRED)
@@ -82,6 +85,8 @@ find_package(reproc++ CONFIG REQUIRED)
 find_package(RocksDB CONFIG REQUIRED)
 
 if(MX_ENABLE_VAST)
+  find_package(LLVM CONFIG REQUIRED)
+  find_package(MLIR CONFIG REQUIRED)
   find_package(VAST CONFIG REQUIRED)
 endif()
 
@@ -107,17 +112,6 @@ if(MX_ENABLE_INSTALL)
     NAMESPACE "${PROJECT_NAME}::"
   )
 endif(MX_ENABLE_INSTALL)
-
-# TODO(pag): Handle this better. We need to make sure all symbols from
-#            tools are linked in, otherwise global constructors in tools
-#            won't be called, and then they won't get created in `ToolMain.cpp`.
-if(PLATFORM_MACOS)
-  set("MX_BEGIN_FORCE_LOAD_LIB" "-Wl,-force_load")
-  set("MX_END_FORCE_LOAD_LIB" "")
-elseif(PLATFORM_LINUX)
-  set("MX_BEGIN_FORCE_LOAD_GROUP" "-Wl,--whole-archive")
-  set("MX_END_FORCE_LOAD_GROUP" "-Wl,--no-whole-archive")
-endif()
 
 # The remaining arguments to `mx-bootstrap` are the paths to the files that will
 # be generated based on analyzing the types/classes in the `pasta` namespace.

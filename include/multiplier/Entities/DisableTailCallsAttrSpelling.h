@@ -14,7 +14,7 @@ namespace mx {
 enum class DisableTailCallsAttrSpelling : unsigned char {
   GNU_DISABLE_TAIL_CALLS,
   CXX11_CLANG_DISABLE_TAIL_CALLS,
-  C23_CLANG_DISABLE_TAIL_CALLS,
+  C2X_CLANG_DISABLE_TAIL_CALLS,
   SPELLING_NOT_CALCULATED,
 };
 

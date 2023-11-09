@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCDirectAttrSpelling e) {
   switch (e) {
     case ObjCDirectAttrSpelling::GNU_OBJC_DIRECT: return "GNU_OBJC_DIRECT";
     case ObjCDirectAttrSpelling::CXX11_CLANG_OBJC_DIRECT: return "CXX11_CLANG_OBJC_DIRECT";
-    case ObjCDirectAttrSpelling::C23_CLANG_OBJC_DIRECT: return "C23_CLANG_OBJC_DIRECT";
+    case ObjCDirectAttrSpelling::C2X_CLANG_OBJC_DIRECT: return "C2X_CLANG_OBJC_DIRECT";
     case ObjCDirectAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

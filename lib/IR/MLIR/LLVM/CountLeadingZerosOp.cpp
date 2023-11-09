@@ -44,4 +44,9 @@ std::optional<CountLeadingZerosOp> CountLeadingZerosOp::producing(const ::mx::ir
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+bool CountLeadingZerosOp::is_zero_poison(void) const {
+  auto val = underlying_op().getIsZeroPoison();
+  return val;
+}
+
 }  // namespace mx::ir::llvm

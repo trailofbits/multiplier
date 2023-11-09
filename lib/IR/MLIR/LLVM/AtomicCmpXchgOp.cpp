@@ -49,4 +49,27 @@ std::optional<AtomicCmpXchgOp> AtomicCmpXchgOp::producing(const ::mx::ir::Value 
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+std::optional<std::string_view> AtomicCmpXchgOp::syncscope(void) const {
+  auto opt_val = underlying_op().getSyncscope();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+bool AtomicCmpXchgOp::weak(void) const {
+  auto val = underlying_op().getWeak();
+  return val;
+}
+
+bool AtomicCmpXchgOp::volatile__(void) const {
+  auto val = underlying_op().getVolatile_();
+  return val;
+}
+
 }  // namespace mx::ir::llvm

@@ -31,7 +31,8 @@ class CondBrOp final : public Operation {
   gap::generator<::mx::ir::Operand> false_dest_operands(void) const;
   //::mlir::Block* true_dest(void) const;
   //::mlir::Block* false_dest(void) const;
-  //::std::optional<::mlir::ElementsAttr> branch_weights(void) const;
+  //::std::optional<::llvm::ArrayRef<int32_t>> branch_weights(void) const;
+  //::std::optional<::mlir::LLVM::LoopAnnotationAttr> loop_annotation(void) const;
 };
 static_assert(sizeof(CondBrOp) == sizeof(Operation));
 

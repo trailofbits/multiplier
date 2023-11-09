@@ -17,7 +17,7 @@ const char *EnumeratorName(NoDuplicateAttrSpelling e) {
   switch (e) {
     case NoDuplicateAttrSpelling::GNU_NODUPLICATE: return "GNU_NODUPLICATE";
     case NoDuplicateAttrSpelling::CXX11_CLANG_NODUPLICATE: return "CXX11_CLANG_NODUPLICATE";
-    case NoDuplicateAttrSpelling::C23_CLANG_NODUPLICATE: return "C23_CLANG_NODUPLICATE";
+    case NoDuplicateAttrSpelling::C2X_CLANG_NODUPLICATE: return "C2X_CLANG_NODUPLICATE";
     case NoDuplicateAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -14,7 +14,7 @@ namespace mx {
 enum class AllocSizeAttrSpelling : unsigned char {
   GNU_ALLOC_SIZE,
   CXX11_GNU_ALLOC_SIZE,
-  C23_GNU_ALLOC_SIZE,
+  C2X_GNU_ALLOC_SIZE,
   SPELLING_NOT_CALCULATED,
 };
 

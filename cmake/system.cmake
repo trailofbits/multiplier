@@ -21,3 +21,18 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 else()
   message(FATAL_ERROR "Unsupported platform")
 endif ()
+
+# TODO(pag): Handle this better. We need to make sure all symbols from
+#            tools are linked in, otherwise global constructors in tools
+#            won't be called, and then they won't get created in `ToolMain.cpp`.
+if(PLATFORM_MACOS)
+  set("MX_BEGIN_FORCE_LOAD_LIB" "-Wl,-force_load")
+  set("MX_END_FORCE_LOAD_LIB" "")
+
+elseif(PLATFORM_LINUX)
+  set("MX_BEGIN_FORCE_LOAD_GROUP" "-Wl,--whole-archive")
+  set("MX_END_FORCE_LOAD_GROUP" "-Wl,--no-whole-archive")
+
+  set("MX_BEGIN_LIBRARY_GROUP" "-Wl,--start-group")
+  set("MX_END_LIBRARY_GROUP" "-Wl,--end-group")
+endif()

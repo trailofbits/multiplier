@@ -17,7 +17,7 @@ const char *EnumeratorName(MinSizeAttrSpelling e) {
   switch (e) {
     case MinSizeAttrSpelling::GNU_MINSIZE: return "GNU_MINSIZE";
     case MinSizeAttrSpelling::CXX11_CLANG_MINSIZE: return "CXX11_CLANG_MINSIZE";
-    case MinSizeAttrSpelling::C23_CLANG_MINSIZE: return "C23_CLANG_MINSIZE";
+    case MinSizeAttrSpelling::C2X_CLANG_MINSIZE: return "C2X_CLANG_MINSIZE";
     case MinSizeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -17,7 +17,7 @@ const char *EnumeratorName(NoThreadSafetyAnalysisAttrSpelling e) {
   switch (e) {
     case NoThreadSafetyAnalysisAttrSpelling::GNU_NO_THREAD_SAFETY_ANALYSIS: return "GNU_NO_THREAD_SAFETY_ANALYSIS";
     case NoThreadSafetyAnalysisAttrSpelling::CXX11_CLANG_NO_THREAD_SAFETY_ANALYSIS: return "CXX11_CLANG_NO_THREAD_SAFETY_ANALYSIS";
-    case NoThreadSafetyAnalysisAttrSpelling::C23_CLANG_NO_THREAD_SAFETY_ANALYSIS: return "C23_CLANG_NO_THREAD_SAFETY_ANALYSIS";
+    case NoThreadSafetyAnalysisAttrSpelling::C2X_CLANG_NO_THREAD_SAFETY_ANALYSIS: return "C2X_CLANG_NO_THREAD_SAFETY_ANALYSIS";
     case NoThreadSafetyAnalysisAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -14,7 +14,7 @@ namespace mx {
 enum class NoMicroMipsAttrSpelling : unsigned char {
   GNU_NOMICROMIPS,
   CXX11_GNU_NOMICROMIPS,
-  C23_GNU_NOMICROMIPS,
+  C2X_GNU_NOMICROMIPS,
   SPELLING_NOT_CALCULATED,
 };
 

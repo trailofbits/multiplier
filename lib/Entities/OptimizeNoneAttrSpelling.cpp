@@ -17,7 +17,7 @@ const char *EnumeratorName(OptimizeNoneAttrSpelling e) {
   switch (e) {
     case OptimizeNoneAttrSpelling::GNU_OPTNONE: return "GNU_OPTNONE";
     case OptimizeNoneAttrSpelling::CXX11_CLANG_OPTNONE: return "CXX11_CLANG_OPTNONE";
-    case OptimizeNoneAttrSpelling::C23_CLANG_OPTNONE: return "C23_CLANG_OPTNONE";
+    case OptimizeNoneAttrSpelling::C2X_CLANG_OPTNONE: return "C2X_CLANG_OPTNONE";
     case OptimizeNoneAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

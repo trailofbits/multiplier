@@ -14,7 +14,7 @@ namespace mx {
 enum class OpenCLGlobalDeviceAddressSpaceAttrSpelling : unsigned char {
   GNU_OPENCL_GLOBAL_DEVICE,
   CXX11_CLANG_OPENCL_GLOBAL_DEVICE,
-  C23_CLANG_OPENCL_GLOBAL_DEVICE,
+  C2X_CLANG_OPENCL_GLOBAL_DEVICE,
   SPELLING_NOT_CALCULATED,
 };
 

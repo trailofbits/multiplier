@@ -14,7 +14,7 @@ namespace mx {
 enum class ObjCNSObjectAttrSpelling : unsigned char {
   GNUNS_OBJECT,
   CXX11_CLANG_NS_OBJECT,
-  C23_CLANG_NS_OBJECT,
+  C2X_CLANG_NS_OBJECT,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -27,9 +27,9 @@ class Prefetch final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> addr(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> rw(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> hint(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> cache(void) const;
+  uint32_t rw(void) const;
+  uint32_t hint(void) const;
+  uint32_t cache(void) const;
 };
 static_assert(sizeof(Prefetch) == sizeof(Operation));
 

@@ -14,7 +14,7 @@ namespace mx {
 enum class UnsafeBufferUsageAttrSpelling : unsigned char {
   GNU_UNSAFE_BUFFER_USAGE,
   CXX11_CLANG_UNSAFE_BUFFER_USAGE,
-  C23_CLANG_UNSAFE_BUFFER_USAGE,
+  C2X_CLANG_UNSAFE_BUFFER_USAGE,
   SPELLING_NOT_CALCULATED,
 };
 

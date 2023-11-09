@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCMethodFamilyAttrSpelling e) {
   switch (e) {
     case ObjCMethodFamilyAttrSpelling::GNU_OBJC_METHOD_FAMILY: return "GNU_OBJC_METHOD_FAMILY";
     case ObjCMethodFamilyAttrSpelling::CXX11_CLANG_OBJC_METHOD_FAMILY: return "CXX11_CLANG_OBJC_METHOD_FAMILY";
-    case ObjCMethodFamilyAttrSpelling::C23_CLANG_OBJC_METHOD_FAMILY: return "C23_CLANG_OBJC_METHOD_FAMILY";
+    case ObjCMethodFamilyAttrSpelling::C2X_CLANG_OBJC_METHOD_FAMILY: return "C2X_CLANG_OBJC_METHOD_FAMILY";
     case ObjCMethodFamilyAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

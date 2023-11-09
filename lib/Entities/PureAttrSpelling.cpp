@@ -17,7 +17,7 @@ const char *EnumeratorName(PureAttrSpelling e) {
   switch (e) {
     case PureAttrSpelling::GNU_PURE: return "GNU_PURE";
     case PureAttrSpelling::CXX11_GNU_PURE: return "CXX11_GNU_PURE";
-    case PureAttrSpelling::C23_GNU_PURE: return "C23_GNU_PURE";
+    case PureAttrSpelling::C2X_GNU_PURE: return "C2X_GNU_PURE";
     case PureAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

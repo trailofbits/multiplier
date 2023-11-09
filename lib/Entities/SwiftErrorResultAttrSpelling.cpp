@@ -17,7 +17,7 @@ const char *EnumeratorName(SwiftErrorResultAttrSpelling e) {
   switch (e) {
     case SwiftErrorResultAttrSpelling::GNU_SWIFT_ERROR_RESULT: return "GNU_SWIFT_ERROR_RESULT";
     case SwiftErrorResultAttrSpelling::CXX11_CLANG_SWIFT_ERROR_RESULT: return "CXX11_CLANG_SWIFT_ERROR_RESULT";
-    case SwiftErrorResultAttrSpelling::C23_CLANG_SWIFT_ERROR_RESULT: return "C23_CLANG_SWIFT_ERROR_RESULT";
+    case SwiftErrorResultAttrSpelling::C2X_CLANG_SWIFT_ERROR_RESULT: return "C2X_CLANG_SWIFT_ERROR_RESULT";
     case SwiftErrorResultAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

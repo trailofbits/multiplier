@@ -34,6 +34,7 @@ class ExtractStridedMetadataOp final : public Operation {
   //SmallVector<OpFoldResult> constified_mixed_sizes(void) const;
   //SmallVector<OpFoldResult> constified_mixed_strides(void) const;
   //OpFoldResult constified_mixed_offset(void) const;
+  ::mx::ir::Value view_source(void) const;
 };
 static_assert(sizeof(ExtractStridedMetadataOp) == sizeof(Operation));
 

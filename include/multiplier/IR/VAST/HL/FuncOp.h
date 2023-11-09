@@ -28,13 +28,16 @@ class FuncOp final : public Operation {
   // Imported methods:
   ::mx::ir::Region body(void) const;
   std::string_view sym_name(void) const;
-  //::mlir::FunctionType function_type(void) const;
+  //::vast::core::FunctionType function_type(void) const;
   //::vast::core::GlobalLinkageKind linkage(void) const;
   std::optional<std::string_view> sym_visibility(void) const;
   //::std::optional<::mlir::ArrayAttr> arg_attrs(void) const;
   //::std::optional<::mlir::ArrayAttr> res_attrs(void) const;
+  bool is_var_arg(void) const;
   //::mlir::Region* callable_region(void) const;
   //llvm::ArrayRef<Type> callable_results(void) const;
+  //::mlir::ArrayAttr callable_arg_attrs(void) const;
+  //::mlir::ArrayAttr callable_res_attrs(void) const;
   //llvm::ArrayRef<Type> argument_types(void) const;
   //llvm::ArrayRef<Type> result_types(void) const;
   bool is_declaration(void) const;

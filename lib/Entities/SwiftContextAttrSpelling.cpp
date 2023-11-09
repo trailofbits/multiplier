@@ -17,7 +17,7 @@ const char *EnumeratorName(SwiftContextAttrSpelling e) {
   switch (e) {
     case SwiftContextAttrSpelling::GNU_SWIFT_CONTEXT: return "GNU_SWIFT_CONTEXT";
     case SwiftContextAttrSpelling::CXX11_CLANG_SWIFT_CONTEXT: return "CXX11_CLANG_SWIFT_CONTEXT";
-    case SwiftContextAttrSpelling::C23_CLANG_SWIFT_CONTEXT: return "C23_CLANG_SWIFT_CONTEXT";
+    case SwiftContextAttrSpelling::C2X_CLANG_SWIFT_CONTEXT: return "C2X_CLANG_SWIFT_CONTEXT";
     case SwiftContextAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

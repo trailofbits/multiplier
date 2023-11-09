@@ -32,6 +32,7 @@ class GEPOp final : public Operation {
   //::llvm::ArrayRef<int32_t> raw_constant_indices(void) const;
   //::std::optional<::mlir::Type> elem_type(void) const;
   bool inbounds(void) const;
+  //Type result_ptr_element_type(void) const;
   //Type source_element_type(void) const;
   //GEPIndicesAdaptor<ValueRange> indices(void) const;
 };

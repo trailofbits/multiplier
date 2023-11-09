@@ -29,6 +29,7 @@ class LoadOp final : public Operation {
   //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
   gap::generator<::mx::ir::Operand> indices(void) const;
   ::mx::ir::Value result(void) const;
+  bool nontemporal(void) const;
   //Value mem_ref(void) const;
   //MemRefType mem_ref_type(void) const;
 };

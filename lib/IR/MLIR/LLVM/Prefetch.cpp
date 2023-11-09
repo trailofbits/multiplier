@@ -34,4 +34,19 @@ std::optional<Prefetch> Prefetch::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::Prefetch(this->Operation::op_);
 }
 
+uint32_t Prefetch::rw(void) const {
+  auto val = underlying_op().getRw();
+  return val;
+}
+
+uint32_t Prefetch::hint(void) const {
+  auto val = underlying_op().getHint();
+  return val;
+}
+
+uint32_t Prefetch::cache(void) const {
+  auto val = underlying_op().getCache();
+  return val;
+}
+
 }  // namespace mx::ir::llvm

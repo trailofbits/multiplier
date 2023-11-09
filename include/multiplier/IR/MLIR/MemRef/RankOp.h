@@ -26,7 +26,7 @@ class RankOp final : public Operation {
   ::mlir::memref::RankOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value memref(void) const;
+  //::mlir::TypedValue<::mlir::BaseMemRefType> memref(void) const;
 };
 static_assert(sizeof(RankOp) == sizeof(Operation));
 

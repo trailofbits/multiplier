@@ -14,7 +14,7 @@ namespace mx {
 enum class CFConsumedAttrSpelling : unsigned char {
   GNU_CF_CONSUMED,
   CXX11_CLANG_CF_CONSUMED,
-  C23_CLANG_CF_CONSUMED,
+  C2X_CLANG_CF_CONSUMED,
   SPELLING_NOT_CALCULATED,
 };
 

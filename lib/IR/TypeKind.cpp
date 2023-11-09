@@ -18,6 +18,7 @@ const char *EnumeratorName(ir::TypeKind kind) {
     case ir::TypeKind::LLVMFUNCTIONTYPE: return "LLVMFUNCTIONTYPE";
     case ir::TypeKind::LLVMPOINTERTYPE: return "LLVMPOINTERTYPE";
     case ir::TypeKind::LLVMSCALABLEVECTORTYPE: return "LLVMSCALABLEVECTORTYPE";
+    case ir::TypeKind::LLVMTARGETEXTTYPE: return "LLVMTARGETEXTTYPE";
     case ir::TypeKind::LLVMVOIDTYPE: return "LLVMVOIDTYPE";
     case ir::TypeKind::LLVMPPCFP128TYPE: return "LLVMPPCFP128TYPE";
     case ir::TypeKind::LLVMX86MMXTYPE: return "LLVMX86MMXTYPE";
@@ -55,6 +56,7 @@ const char *EnumeratorName(ir::TypeKind kind) {
     case ir::TypeKind::TYPEOFTYPETYPE: return "TYPEOFTYPETYPE";
     case ir::TypeKind::TYPEDEFTYPE: return "TYPEDEFTYPE";
     case ir::TypeKind::VOIDTYPE: return "VOIDTYPE";
+    case ir::TypeKind::FUNCTIONTYPE: return "FUNCTIONTYPE";
     case ir::TypeKind::UNSUPPORTEDTYPE: return "UNSUPPORTEDTYPE";
   }
 }

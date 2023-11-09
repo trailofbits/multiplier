@@ -31,9 +31,9 @@ class SwitchOp final : public Operation {
   //::mlir::OperandRangeRange case_operands(void) const;
   //::mlir::Block* default_destination(void) const;
   //::mlir::SuccessorRange case_destinations(void) const;
-  //::std::optional<::mlir::ElementsAttr> case_values(void) const;
+  //::std::optional<::mlir::DenseIntElementsAttr> case_values(void) const;
   //::llvm::ArrayRef<int32_t> case_operand_segments(void) const;
-  //::std::optional<::mlir::ElementsAttr> branch_weights(void) const;
+  //::std::optional<::llvm::ArrayRef<int32_t>> branch_weights(void) const;
 };
 static_assert(sizeof(SwitchOp) == sizeof(Operation));
 

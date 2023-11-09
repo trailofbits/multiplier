@@ -68,47 +68,21 @@ set_target_properties("mx-mlir"
       YES
 )
 
+target_link_directories("mx-mlir"
+  PRIVATE
+    "${MLIR_LIB_DIR}"
+)
+
 target_link_libraries("mx-mlir"
   PUBLIC
-
     "gap::gap"
     "gap::gap-core"
     "std::coroutines"
     "gap::gap-settings"
-    
-    VAST::VASTCodeGen
-    VAST::VASTCore
-    VAST::VASTMeta
-    VAST::VASTLowLevel
-    VAST::VASTHighLevel
-    VAST::VASTUnsupported
-    VAST::VASTElementTypeInterface
 
-    MLIRDialect
-    MLIRAMDGPUDialect
-    MLIRAsyncDialect
-    MLIREmitCDialect
-    MLIRIndexDialect
-    MLIRMLProgramDialect
-    MLIRNVGPUDialect
-    MLIROpenACCDialect
-    MLIROpenMPDialect
-    MLIRROCDLDialect
-    MLIRShapeDialect
-    MLIRSPIRVDialect
-    MLIRTosaDialect
-
-    MLIRLLVMIRTransforms
-    MLIRShapeOpsTransforms
-    MLIRSparseTensorTransforms
-    MLIRAffineTransformOps
-    MLIRBufferizationTransformOps
-    MLIRGPUTransformOps
-    MLIRLinalgTransformOps
-    MLIRMemRefTransformOps
-    MLIRSCFTransformOps
-    MLIRVectorTransformOps
-    MLIRTensorInferTypeOpInterfaceImpl
+  PRIVATE
+    ${MLIR_LIBS}
+    ${VAST_LIBS}
 )
 
 if(MX_ENABLE_INSTALL)
