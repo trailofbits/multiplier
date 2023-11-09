@@ -14,7 +14,7 @@ else()
   get_property(MLIR_EXTENSION_LIBS GLOBAL PROPERTY MLIR_EXTENSION_LIBS)
   get_property(MLIR_TRANSLATION_LIBS GLOBAL PROPERTY MLIR_TRANSLATION_LIBS)
 
-  set(mlir_libs
+  set(MLIR_LIBS
     MLIRAnalysis
     MLIRDialect
     MLIRExecutionEngine
@@ -35,11 +35,15 @@ else()
   cmake_path(GET MLIR_DIR PARENT_PATH lib_cmake_dir)
   cmake_path(GET lib_cmake_dir PARENT_PATH lib_dir)
 
-  foreach(mlir_lib IN LISTS mlir_libs)
+  foreach(mlir_lib IN LISTS MLIR_LIBS)
     find_library(mlir_lib_path "${mlir_lib}" HINTS "${lib_dir}" "${MX_VENDOR_INSTALL_DIR}/lib" "${MX_INSTALL_LIB_DIR}")
     if (mlir_lib_path STREQUAL "mlir_lib_path-NOTFOUND")
       message(FATAL_ERROR "Cannot locate MLIR library ${mlir_lib}")
     endif()
-    list(APPEND MLIR_LIBS "${mlir_lib_path}")
+
+    cmake_path(GET mlir_lib_path PARENT_PATH MLIR_LIB_DIR)
+    break()
   endforeach()
+
+  message(STATUS "Found MLIR libraries in ${MLIR_LIB_DIR}")
 endif()
