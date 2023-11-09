@@ -6,4 +6,6 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-get_property(VAST_LIBS GLOBAL PROPERTY VAST_ALL_LIBS)
+set(VAST_LIBS
+  VAST::VASTTargetLLVMIR
+)
