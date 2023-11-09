@@ -113,17 +113,6 @@ if(MX_ENABLE_INSTALL)
   )
 endif(MX_ENABLE_INSTALL)
 
-# TODO(pag): Handle this better. We need to make sure all symbols from
-#            tools are linked in, otherwise global constructors in tools
-#            won't be called, and then they won't get created in `ToolMain.cpp`.
-if(PLATFORM_MACOS)
-  set("MX_BEGIN_FORCE_LOAD_LIB" "-Wl,-force_load")
-  set("MX_END_FORCE_LOAD_LIB" "")
-elseif(PLATFORM_LINUX)
-  set("MX_BEGIN_FORCE_LOAD_GROUP" "-Wl,--whole-archive")
-  set("MX_END_FORCE_LOAD_GROUP" "-Wl,--no-whole-archive")
-endif()
-
 # The remaining arguments to `mx-bootstrap` are the paths to the files that will
 # be generated based on analyzing the types/classes in the `pasta` namespace.
 set(MX_BOOTSTRAP_LIB_AST_CAPNP "${PROJECT_SOURCE_DIR}/lib/AST.capnp")
