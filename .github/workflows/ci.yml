@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LLVM_PASTA_VER: 6afc10b
+  LLVM_PASTA_VER: beeda8d
 
 jobs:
   build:
@@ -71,8 +71,8 @@ jobs:
             -DMX_ENABLE_BOOTSTRAP=OFF \
             -DMX_BOOTSTRAP_VAST=OFF \
             -DMX_BOOTSTRAP_PASTA=OFF \
-            -DMX_ENABLE_RE2=OFF \
-            -DMX_ENABLE_VAST=OFF \
+            -DMX_ENABLE_RE2=ON \
+            -DMX_ENABLE_VAST=ON \
             -DMX_ENABLE_INSTALL=ON \
             -DMX_USE_VENDORED_CLANG=OFF \
             -DMX_USE_VENDORED_PASTA=OFF \
