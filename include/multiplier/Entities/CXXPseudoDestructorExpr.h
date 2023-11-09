@@ -71,7 +71,6 @@ class CXXPseudoDestructorExpr : public Expr {
   Type destroyed_type(void) const;
   Token destroyed_type_token(void) const;
   Token operator_token(void) const;
-  std::optional<Type> scope_type(void) const;
   Token tilde_token(void) const;
   bool has_qualifier(void) const;
   bool is_arrow(void) const;

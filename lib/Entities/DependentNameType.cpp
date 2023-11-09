@@ -79,12 +79,12 @@ std::optional<DependentNameType> DependentNameType::from(const TokenContext &t) 
 }
 
 Type DependentNameType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal19();
+  RawEntityId eid = impl->reader.getVal18();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool DependentNameType::is_sugared(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal20();
 }
 
 #pragma GCC diagnostic pop

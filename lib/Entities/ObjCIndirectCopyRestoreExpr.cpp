@@ -160,7 +160,7 @@ Expr ObjCIndirectCopyRestoreExpr::sub_expression(void) const {
 }
 
 bool ObjCIndirectCopyRestoreExpr::should_copy(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

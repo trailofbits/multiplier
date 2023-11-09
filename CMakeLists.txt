@@ -30,6 +30,7 @@ list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 
 include("cmake/system.cmake")
 include("cmake/llvm.cmake")
+include("cmake/linker.cmake")
 
 if(MX_ENABLE_INSTALL)
   include("cmake/packaging.cmake")
@@ -42,6 +43,8 @@ elseif(PLATFORM_LINUX)
 endif()
 
 add_subdirectory("vendor")
+include("cmake/mlir.cmake")
+include("cmake/vast.cmake")
 
 if(MX_ENABLE_RE2)
   find_package(re2 CONFIG REQUIRED)

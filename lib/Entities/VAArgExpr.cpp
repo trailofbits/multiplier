@@ -12,7 +12,6 @@
 #include <multiplier/Entities/Expr.h>
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
-#include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/ValueStmt.h>
 
 #include "../EntityProvider.h"
@@ -168,13 +167,8 @@ Expr VAArgExpr::sub_expression(void) const {
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Type VAArgExpr::written_type(void) const {
-  RawEntityId eid = impl->reader.getVal40();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
 bool VAArgExpr::is_microsoft_abi(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

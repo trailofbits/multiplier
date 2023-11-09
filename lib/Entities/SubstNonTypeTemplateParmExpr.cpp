@@ -166,10 +166,10 @@ Token SubstNonTypeTemplateParmExpr::name_token(void) const {
 }
 
 std::optional<uint32_t> SubstNonTypeTemplateParmExpr::pack_index(void) const {
-  if (!impl->reader.getVal87()) {
+  if (!impl->reader.getVal89()) {
     return std::nullopt;
   } else {
-    return static_cast<uint32_t>(impl->reader.getVal103());
+    return static_cast<uint32_t>(impl->reader.getVal105());
   }
   return std::nullopt;
 }
@@ -190,7 +190,7 @@ Expr SubstNonTypeTemplateParmExpr::replacement(void) const {
 }
 
 bool SubstNonTypeTemplateParmExpr::is_reference_parameter(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal90();
 }
 
 #pragma GCC diagnostic pop

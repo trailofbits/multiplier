@@ -183,11 +183,11 @@ Token ChooseExpr::r_paren_token(void) const {
 }
 
 bool ChooseExpr::is_condition_dependent(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal89();
 }
 
 bool ChooseExpr::is_condition_true(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal90();
 }
 
 #pragma GCC diagnostic pop

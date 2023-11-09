@@ -149,26 +149,21 @@ Linkage Type::linkage(void) const {
   return static_cast<Linkage>(impl->reader.getVal13());
 }
 
-Type Type::rvv_elt_type(void) const {
-  RawEntityId eid = impl->reader.getVal14();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
 TypeKind Type::kind(void) const {
-  return static_cast<TypeKind>(impl->reader.getVal15());
+  return static_cast<TypeKind>(impl->reader.getVal14());
 }
 
 Type Type::unqualified_desugared_type(void) const {
-  RawEntityId eid = impl->reader.getVal16();
+  RawEntityId eid = impl->reader.getVal15();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Visibility Type::visibility(void) const {
-  return static_cast<Visibility>(impl->reader.getVal17());
+  return static_cast<Visibility>(impl->reader.getVal16());
 }
 
 bool Type::is_vlst_builtin_type(void) const {
-  return impl->reader.getVal18();
+  return impl->reader.getVal17();
 }
 
 #pragma GCC diagnostic pop

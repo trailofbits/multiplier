@@ -68,6 +68,11 @@ set_target_properties("mx-mlir"
       YES
 )
 
+target_link_directories("mx-mlir"
+  PRIVATE
+    "${MX_INSTALL_LIB_DIR}"
+)
+
 target_link_libraries("mx-mlir"
   PUBLIC
 
@@ -76,6 +81,7 @@ target_link_libraries("mx-mlir"
     "std::coroutines"
     "gap::gap-settings"
 
+  PRIVATE
     ${MLIR_LIBS}
     ${VAST_LIBS}
 )

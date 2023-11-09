@@ -164,7 +164,7 @@ Expr OpaqueValueExpr::source_expression(void) const {
 }
 
 bool OpaqueValueExpr::is_unique(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

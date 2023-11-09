@@ -48,26 +48,26 @@ class MetaGenerator {
         mctx(mctx),
         unknown_location(mlir::UnknownLoc::get(mctx)) {}
 
-  vast::cg::DefaultMeta get(const clang::Decl *decl) const {
+  mlir::Location get(const clang::Decl *decl) const {
     return {Location(decl)};
   }
 
-  vast::cg::DefaultMeta get(const clang::Stmt *stmt) const {
+  mlir::Location get(const clang::Stmt *stmt) const {
     return {Location(stmt)};
   }
 
-  vast::cg::DefaultMeta get(const clang::Type *type) const {
+  mlir::Location get(const clang::Type *type) const {
     return {Location(type)};
   }
 
-  vast::cg::DefaultMeta get(const clang::QualType type) const {
+  mlir::Location get(const clang::QualType type) const {
     if (auto type_ptr = type.getTypePtrOrNull()) {
       return {Location(type_ptr)};
     }
     return {unknown_location};
   }
 
-  vast::cg::DefaultMeta get(auto token) const {
+  mlir::Location get(auto token) const {
     return {unknown_location};
   }
 

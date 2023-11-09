@@ -273,14 +273,5 @@ mlir::Operation *SourceIRImpl::scope(void) const {
 //  return Index::containing(f).entity(eid);
 //}
 
-void SourceIRImpl::print(std::ostream &os) const {
-  std::string result;
-  auto flags = mlir::OpPrintingFlags();
-  flags.enableDebugInfo(false);
-  llvm::raw_string_ostream ss(result);
-  mod.get()->print(ss, flags);
-  os << result;
-}
-
 }  // namespace ir
 }  // namespace mx

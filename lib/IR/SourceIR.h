@@ -84,8 +84,6 @@ class SourceIRImpl {
 //                              MX_DECLARE_ENTITY_FUNCTION)
 //#undef MX_DECLARE_ENTITY_FUNCTION
 
-  void print(std::ostream &os) const;
-
 };
 
 }  // namespace ir
