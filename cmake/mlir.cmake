@@ -31,8 +31,12 @@ else()
     ${MLIR_TRANSLATION_LIBS}
   )
 
+  # `MLIR_DIR` is something like `<prefix>/lib/cmake/mlir`
+  cmake_path(GET MLIR_DIR PARENT_PATH lib_cmake_dir)
+  cmake_path(GET lib_cmake_dir PARENT_PATH lib_dir)
+
   foreach(mlir_lib IN LISTS mlir_libs)
-    find_library(mlir_lib_path "${mlir_lib}" HINTS "${MX_INSTALL_LIB_DIR}")
+    find_library(mlir_lib_path "${mlir_lib}" HINTS "${lib_dir}" "${MX_VENDOR_INSTALL_DIR}/lib" "${MX_INSTALL_LIB_DIR}")
     if (mlir_lib_path STREQUAL "mlir_lib_path-NOTFOUND")
       message(FATAL_ERROR "Cannot locate MLIR library ${mlir_lib}")
     endif()
