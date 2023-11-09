@@ -78,17 +78,17 @@ std::optional<ComplexType> ComplexType::from(const TokenContext &t) {
 }
 
 Type ComplexType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal17();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
-Type ComplexType::element_type(void) const {
   RawEntityId eid = impl->reader.getVal18();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
+Type ComplexType::element_type(void) const {
+  RawEntityId eid = impl->reader.getVal19();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
+}
+
 bool ComplexType::is_sugared(void) const {
-  return impl->reader.getVal19();
+  return impl->reader.getVal20();
 }
 
 #pragma GCC diagnostic pop

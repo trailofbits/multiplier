@@ -35,14 +35,4 @@ std::optional<CastOp> CastOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::memref::CastOp(this->Operation::op_);
 }
 
-::mx::ir::Value CastOp::source(void) const {
-  auto val = underlying_op().getSource();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-::mx::ir::Value CastOp::dest(void) const {
-  auto val = underlying_op().getDest();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
 }  // namespace mx::ir::memref

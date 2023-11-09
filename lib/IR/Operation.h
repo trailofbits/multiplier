@@ -12,12 +12,9 @@
    _builtin("builtin.module", OperationKind::BUILTIN_MODULE, mlir::ModuleOp) \
    _builtin("builtin.unrealized_conversion_cast", OperationKind::BUILTIN_UNREALIZED_CONVERSION_CAST, mlir::UnrealizedConversionCastOp) \
    _llvm("llvm.ashr", OperationKind::LLVM_ASHR, mlir::LLVM::AShrOp) \
-   _llvm("llvm.access_group", OperationKind::LLVM_ACCESS_GROUP, mlir::LLVM::AccessGroupMetadataOp) \
    _llvm("llvm.add", OperationKind::LLVM_ADD, mlir::LLVM::AddOp) \
    _llvm("llvm.addrspacecast", OperationKind::LLVM_ADDRSPACECAST, mlir::LLVM::AddrSpaceCastOp) \
    _llvm("llvm.mlir.addressof", OperationKind::LLVM_MLIR_ADDRESSOF, mlir::LLVM::AddressOfOp) \
-   _llvm("llvm.alias_scope_domain", OperationKind::LLVM_ALIAS_SCOPE_DOMAIN, mlir::LLVM::AliasScopeDomainMetadataOp) \
-   _llvm("llvm.alias_scope", OperationKind::LLVM_ALIAS_SCOPE, mlir::LLVM::AliasScopeMetadataOp) \
    _llvm("llvm.alloca", OperationKind::LLVM_ALLOCA, mlir::LLVM::AllocaOp) \
    _llvm("llvm.and", OperationKind::LLVM_AND, mlir::LLVM::AndOp) \
    _llvm("llvm.cmpxchg", OperationKind::LLVM_CMPXCHG, mlir::LLVM::AtomicCmpXchgOp) \
@@ -25,6 +22,8 @@
    _llvm("llvm.bitcast", OperationKind::LLVM_BITCAST, mlir::LLVM::BitcastOp) \
    _llvm("llvm.br", OperationKind::LLVM_BR, mlir::LLVM::BrOp) \
    _llvm("llvm.call", OperationKind::LLVM_CALL, mlir::LLVM::CallOp) \
+   _llvm("llvm.comdat", OperationKind::LLVM_COMDAT, mlir::LLVM::ComdatOp) \
+   _llvm("llvm.comdat_selector", OperationKind::LLVM_COMDAT_SELECTOR, mlir::LLVM::ComdatSelectorOp) \
    _llvm("llvm.cond_br", OperationKind::LLVM_COND_BR, mlir::LLVM::CondBrOp) \
    _llvm("llvm.mlir.constant", OperationKind::LLVM_MLIR_CONSTANT, mlir::LLVM::ConstantOp) \
    _llvm("llvm.extractelement", OperationKind::LLVM_EXTRACTELEMENT, mlir::LLVM::ExtractElementOp) \
@@ -60,6 +59,7 @@
    _llvm("llvm.mul", OperationKind::LLVM_MUL, mlir::LLVM::MulOp) \
    _llvm("llvm.mlir.null", OperationKind::LLVM_MLIR_NULL, mlir::LLVM::NullOp) \
    _llvm("llvm.or", OperationKind::LLVM_OR, mlir::LLVM::OrOp) \
+   _llvm("llvm.mlir.poison", OperationKind::LLVM_MLIR_POISON, mlir::LLVM::PoisonOp) \
    _llvm("llvm.ptrtoint", OperationKind::LLVM_PTRTOINT, mlir::LLVM::PtrToIntOp) \
    _llvm("llvm.resume", OperationKind::LLVM_RESUME, mlir::LLVM::ResumeOp) \
    _llvm("llvm.return", OperationKind::LLVM_RETURN, mlir::LLVM::ReturnOp) \
@@ -73,9 +73,6 @@
    _llvm("llvm.store", OperationKind::LLVM_STORE, mlir::LLVM::StoreOp) \
    _llvm("llvm.sub", OperationKind::LLVM_SUB, mlir::LLVM::SubOp) \
    _llvm("llvm.switch", OperationKind::LLVM_SWITCH, mlir::LLVM::SwitchOp) \
-   _llvm("llvm.tbaa_root", OperationKind::LLVM_TBAA_ROOT, mlir::LLVM::TBAARootMetadataOp) \
-   _llvm("llvm.tbaa_tag", OperationKind::LLVM_TBAA_TAG, mlir::LLVM::TBAATagOp) \
-   _llvm("llvm.tbaa_type_desc", OperationKind::LLVM_TBAA_TYPE_DESC, mlir::LLVM::TBAATypeDescriptorOp) \
    _llvm("llvm.trunc", OperationKind::LLVM_TRUNC, mlir::LLVM::TruncOp) \
    _llvm("llvm.udiv", OperationKind::LLVM_UDIV, mlir::LLVM::UDivOp) \
    _llvm("llvm.uitofp", OperationKind::LLVM_UITOFP, mlir::LLVM::UIToFPOp) \
@@ -85,8 +82,10 @@
    _llvm("llvm.xor", OperationKind::LLVM_XOR, mlir::LLVM::XOrOp) \
    _llvm("llvm.zext", OperationKind::LLVM_ZEXT, mlir::LLVM::ZExtOp) \
    _llvm("llvm.intr.abs", OperationKind::LLVM_INTR_ABS, mlir::LLVM::AbsOp) \
+   _llvm("llvm.intr.annotation", OperationKind::LLVM_INTR_ANNOTATION, mlir::LLVM::Annotation) \
    _llvm("llvm.intr.assume", OperationKind::LLVM_INTR_ASSUME, mlir::LLVM::AssumeOp) \
    _llvm("llvm.intr.bitreverse", OperationKind::LLVM_INTR_BITREVERSE, mlir::LLVM::BitReverseOp) \
+   _llvm("llvm.intr.bswap", OperationKind::LLVM_INTR_BSWAP, mlir::LLVM::ByteSwapOp) \
    _llvm("llvm.call_intrinsic", OperationKind::LLVM_CALL_INTRINSIC, mlir::LLVM::CallIntrinsicOp) \
    _llvm("llvm.intr.copysign", OperationKind::LLVM_INTR_COPYSIGN, mlir::LLVM::CopySignOp) \
    _llvm("llvm.intr.coro.align", OperationKind::LLVM_INTR_CORO_ALIGN, mlir::LLVM::CoroAlignOp) \
@@ -102,25 +101,35 @@
    _llvm("llvm.intr.ctlz", OperationKind::LLVM_INTR_CTLZ, mlir::LLVM::CountLeadingZerosOp) \
    _llvm("llvm.intr.cttz", OperationKind::LLVM_INTR_CTTZ, mlir::LLVM::CountTrailingZerosOp) \
    _llvm("llvm.intr.ctpop", OperationKind::LLVM_INTR_CTPOP, mlir::LLVM::CtPopOp) \
-   _llvm("llvm.intr.dbg.addr", OperationKind::LLVM_INTR_DBG_ADDR, mlir::LLVM::DbgAddrOp) \
    _llvm("llvm.intr.dbg.declare", OperationKind::LLVM_INTR_DBG_DECLARE, mlir::LLVM::DbgDeclareOp) \
+   _llvm("llvm.intr.dbg.label", OperationKind::LLVM_INTR_DBG_LABEL, mlir::LLVM::DbgLabelOp) \
    _llvm("llvm.intr.dbg.value", OperationKind::LLVM_INTR_DBG_VALUE, mlir::LLVM::DbgValueOp) \
+   _llvm("llvm.intr.debugtrap", OperationKind::LLVM_INTR_DEBUGTRAP, mlir::LLVM::DebugTrap) \
    _llvm("llvm.intr.eh.typeid.for", OperationKind::LLVM_INTR_EH_TYPEID_FOR, mlir::LLVM::EhTypeidForOp) \
    _llvm("llvm.intr.exp2", OperationKind::LLVM_INTR_EXP2, mlir::LLVM::Exp2Op) \
    _llvm("llvm.intr.exp", OperationKind::LLVM_INTR_EXP, mlir::LLVM::ExpOp) \
+   _llvm("llvm.intr.expect", OperationKind::LLVM_INTR_EXPECT, mlir::LLVM::ExpectOp) \
+   _llvm("llvm.intr.expect.with.probability", OperationKind::LLVM_INTR_EXPECT_WITH_PROBABILITY, mlir::LLVM::ExpectWithProbabilityOp) \
    _llvm("llvm.intr.fabs", OperationKind::LLVM_INTR_FABS, mlir::LLVM::FAbsOp) \
    _llvm("llvm.intr.ceil", OperationKind::LLVM_INTR_CEIL, mlir::LLVM::FCeilOp) \
    _llvm("llvm.intr.floor", OperationKind::LLVM_INTR_FLOOR, mlir::LLVM::FFloorOp) \
    _llvm("llvm.intr.fma", OperationKind::LLVM_INTR_FMA, mlir::LLVM::FMAOp) \
    _llvm("llvm.intr.fmuladd", OperationKind::LLVM_INTR_FMULADD, mlir::LLVM::FMulAddOp) \
    _llvm("llvm.intr.trunc", OperationKind::LLVM_INTR_TRUNC, mlir::LLVM::FTruncOp) \
+   _llvm("llvm.intr.fshl", OperationKind::LLVM_INTR_FSHL, mlir::LLVM::FshlOp) \
+   _llvm("llvm.intr.fshr", OperationKind::LLVM_INTR_FSHR, mlir::LLVM::FshrOp) \
    _llvm("llvm.intr.get.active.lane.mask", OperationKind::LLVM_INTR_GET_ACTIVE_LANE_MASK, mlir::LLVM::GetActiveLaneMaskOp) \
+   _llvm("llvm.intr.is.constant", OperationKind::LLVM_INTR_IS_CONSTANT, mlir::LLVM::IsConstantOp) \
    _llvm("llvm.intr.is.fpclass", OperationKind::LLVM_INTR_IS_FPCLASS, mlir::LLVM::IsFPClass) \
    _llvm("llvm.intr.lifetime.end", OperationKind::LLVM_INTR_LIFETIME_END, mlir::LLVM::LifetimeEndOp) \
    _llvm("llvm.intr.lifetime.start", OperationKind::LLVM_INTR_LIFETIME_START, mlir::LLVM::LifetimeStartOp) \
+   _llvm("llvm.intr.llrint", OperationKind::LLVM_INTR_LLRINT, mlir::LLVM::LlrintOp) \
+   _llvm("llvm.intr.llround", OperationKind::LLVM_INTR_LLROUND, mlir::LLVM::LlroundOp) \
    _llvm("llvm.intr.log10", OperationKind::LLVM_INTR_LOG10, mlir::LLVM::Log10Op) \
    _llvm("llvm.intr.log2", OperationKind::LLVM_INTR_LOG2, mlir::LLVM::Log2Op) \
    _llvm("llvm.intr.log", OperationKind::LLVM_INTR_LOG, mlir::LLVM::LogOp) \
+   _llvm("llvm.intr.lrint", OperationKind::LLVM_INTR_LRINT, mlir::LLVM::LrintOp) \
+   _llvm("llvm.intr.lround", OperationKind::LLVM_INTR_LROUND, mlir::LLVM::LroundOp) \
    _llvm("llvm.intr.masked.load", OperationKind::LLVM_INTR_MASKED_LOAD, mlir::LLVM::MaskedLoadOp) \
    _llvm("llvm.intr.masked.store", OperationKind::LLVM_INTR_MASKED_STORE, mlir::LLVM::MaskedStoreOp) \
    _llvm("llvm.intr.matrix.column.major.load", OperationKind::LLVM_INTR_MATRIX_COLUMN_MAJOR_LOAD, mlir::LLVM::MatrixColumnMajorLoadOp) \
@@ -135,31 +144,46 @@
    _llvm("llvm.intr.memset", OperationKind::LLVM_INTR_MEMSET, mlir::LLVM::MemsetOp) \
    _llvm("llvm.intr.minnum", OperationKind::LLVM_INTR_MINNUM, mlir::LLVM::MinNumOp) \
    _llvm("llvm.intr.minimum", OperationKind::LLVM_INTR_MINIMUM, mlir::LLVM::MinimumOp) \
+   _llvm("llvm.intr.nearbyint", OperationKind::LLVM_INTR_NEARBYINT, mlir::LLVM::NearbyintOp) \
+   _llvm("llvm.intr.experimental.noalias.scope.decl", OperationKind::LLVM_INTR_EXPERIMENTAL_NOALIAS_SCOPE_DECL, mlir::LLVM::NoAliasScopeDeclOp) \
    _llvm("llvm.intr.powi", OperationKind::LLVM_INTR_POWI, mlir::LLVM::PowIOp) \
    _llvm("llvm.intr.pow", OperationKind::LLVM_INTR_POW, mlir::LLVM::PowOp) \
    _llvm("llvm.intr.prefetch", OperationKind::LLVM_INTR_PREFETCH, mlir::LLVM::Prefetch) \
+   _llvm("llvm.intr.ptr.annotation", OperationKind::LLVM_INTR_PTR_ANNOTATION, mlir::LLVM::PtrAnnotation) \
+   _llvm("llvm.intr.rint", OperationKind::LLVM_INTR_RINT, mlir::LLVM::RintOp) \
    _llvm("llvm.intr.roundeven", OperationKind::LLVM_INTR_ROUNDEVEN, mlir::LLVM::RoundEvenOp) \
    _llvm("llvm.intr.round", OperationKind::LLVM_INTR_ROUND, mlir::LLVM::RoundOp) \
+   _llvm("llvm.intr.sadd.sat", OperationKind::LLVM_INTR_SADD_SAT, mlir::LLVM::SAddSat) \
    _llvm("llvm.intr.sadd.with.overflow", OperationKind::LLVM_INTR_SADD_WITH_OVERFLOW, mlir::LLVM::SAddWithOverflowOp) \
    _llvm("llvm.intr.smax", OperationKind::LLVM_INTR_SMAX, mlir::LLVM::SMaxOp) \
    _llvm("llvm.intr.smin", OperationKind::LLVM_INTR_SMIN, mlir::LLVM::SMinOp) \
    _llvm("llvm.intr.smul.with.overflow", OperationKind::LLVM_INTR_SMUL_WITH_OVERFLOW, mlir::LLVM::SMulWithOverflowOp) \
+   _llvm("llvm.intr.ssa.copy", OperationKind::LLVM_INTR_SSA_COPY, mlir::LLVM::SSACopyOp) \
+   _llvm("llvm.intr.sshl.sat", OperationKind::LLVM_INTR_SSHL_SAT, mlir::LLVM::SSHLSat) \
+   _llvm("llvm.intr.ssub.sat", OperationKind::LLVM_INTR_SSUB_SAT, mlir::LLVM::SSubSat) \
    _llvm("llvm.intr.ssub.with.overflow", OperationKind::LLVM_INTR_SSUB_WITH_OVERFLOW, mlir::LLVM::SSubWithOverflowOp) \
    _llvm("llvm.intr.sin", OperationKind::LLVM_INTR_SIN, mlir::LLVM::SinOp) \
    _llvm("llvm.intr.sqrt", OperationKind::LLVM_INTR_SQRT, mlir::LLVM::SqrtOp) \
    _llvm("llvm.intr.stackrestore", OperationKind::LLVM_INTR_STACKRESTORE, mlir::LLVM::StackRestoreOp) \
    _llvm("llvm.intr.stacksave", OperationKind::LLVM_INTR_STACKSAVE, mlir::LLVM::StackSaveOp) \
    _llvm("llvm.intr.experimental.stepvector", OperationKind::LLVM_INTR_EXPERIMENTAL_STEPVECTOR, mlir::LLVM::StepVectorOp) \
+   _llvm("llvm.intr.threadlocal.address", OperationKind::LLVM_INTR_THREADLOCAL_ADDRESS, mlir::LLVM::ThreadlocalAddressOp) \
+   _llvm("llvm.intr.trap", OperationKind::LLVM_INTR_TRAP, mlir::LLVM::Trap) \
+   _llvm("llvm.intr.uadd.sat", OperationKind::LLVM_INTR_UADD_SAT, mlir::LLVM::UAddSat) \
    _llvm("llvm.intr.uadd.with.overflow", OperationKind::LLVM_INTR_UADD_WITH_OVERFLOW, mlir::LLVM::UAddWithOverflowOp) \
+   _llvm("llvm.intr.ubsantrap", OperationKind::LLVM_INTR_UBSANTRAP, mlir::LLVM::UBSanTrap) \
    _llvm("llvm.intr.umax", OperationKind::LLVM_INTR_UMAX, mlir::LLVM::UMaxOp) \
    _llvm("llvm.intr.umin", OperationKind::LLVM_INTR_UMIN, mlir::LLVM::UMinOp) \
    _llvm("llvm.intr.umul.with.overflow", OperationKind::LLVM_INTR_UMUL_WITH_OVERFLOW, mlir::LLVM::UMulWithOverflowOp) \
+   _llvm("llvm.intr.ushl.sat", OperationKind::LLVM_INTR_USHL_SAT, mlir::LLVM::USHLSat) \
+   _llvm("llvm.intr.usub.sat", OperationKind::LLVM_INTR_USUB_SAT, mlir::LLVM::USubSat) \
    _llvm("llvm.intr.usub.with.overflow", OperationKind::LLVM_INTR_USUB_WITH_OVERFLOW, mlir::LLVM::USubWithOverflowOp) \
    _llvm("llvm.intr.vp.ashr", OperationKind::LLVM_INTR_VP_ASHR, mlir::LLVM::VPAShrOp) \
    _llvm("llvm.intr.vp.add", OperationKind::LLVM_INTR_VP_ADD, mlir::LLVM::VPAddOp) \
    _llvm("llvm.intr.vp.and", OperationKind::LLVM_INTR_VP_AND, mlir::LLVM::VPAndOp) \
    _llvm("llvm.intr.vp.fadd", OperationKind::LLVM_INTR_VP_FADD, mlir::LLVM::VPFAddOp) \
    _llvm("llvm.intr.vp.fdiv", OperationKind::LLVM_INTR_VP_FDIV, mlir::LLVM::VPFDivOp) \
+   _llvm("llvm.intr.vp.fmuladd", OperationKind::LLVM_INTR_VP_FMULADD, mlir::LLVM::VPFMulAddOp) \
    _llvm("llvm.intr.vp.fmul", OperationKind::LLVM_INTR_VP_FMUL, mlir::LLVM::VPFMulOp) \
    _llvm("llvm.intr.vp.fneg", OperationKind::LLVM_INTR_VP_FNEG, mlir::LLVM::VPFNegOp) \
    _llvm("llvm.intr.vp.fpext", OperationKind::LLVM_INTR_VP_FPEXT, mlir::LLVM::VPFPExtOp) \
@@ -208,6 +232,7 @@
    _llvm("llvm.intr.vacopy", OperationKind::LLVM_INTR_VACOPY, mlir::LLVM::VaCopyOp) \
    _llvm("llvm.intr.vaend", OperationKind::LLVM_INTR_VAEND, mlir::LLVM::VaEndOp) \
    _llvm("llvm.intr.vastart", OperationKind::LLVM_INTR_VASTART, mlir::LLVM::VaStartOp) \
+   _llvm("llvm.intr.var.annotation", OperationKind::LLVM_INTR_VAR_ANNOTATION, mlir::LLVM::VarAnnotation) \
    _llvm("llvm.intr.masked.compressstore", OperationKind::LLVM_INTR_MASKED_COMPRESSSTORE, mlir::LLVM::masked_compressstore) \
    _llvm("llvm.intr.masked.expandload", OperationKind::LLVM_INTR_MASKED_EXPANDLOAD, mlir::LLVM::masked_expandload) \
    _llvm("llvm.intr.masked.gather", OperationKind::LLVM_INTR_MASKED_GATHER, mlir::LLVM::masked_gather) \
@@ -218,7 +243,9 @@
    _llvm("llvm.intr.vector.reduce.and", OperationKind::LLVM_INTR_VECTOR_REDUCE_AND, mlir::LLVM::vector_reduce_and) \
    _llvm("llvm.intr.vector.reduce.fadd", OperationKind::LLVM_INTR_VECTOR_REDUCE_FADD, mlir::LLVM::vector_reduce_fadd) \
    _llvm("llvm.intr.vector.reduce.fmax", OperationKind::LLVM_INTR_VECTOR_REDUCE_FMAX, mlir::LLVM::vector_reduce_fmax) \
+   _llvm("llvm.intr.vector.reduce.fmaximum", OperationKind::LLVM_INTR_VECTOR_REDUCE_FMAXIMUM, mlir::LLVM::vector_reduce_fmaximum) \
    _llvm("llvm.intr.vector.reduce.fmin", OperationKind::LLVM_INTR_VECTOR_REDUCE_FMIN, mlir::LLVM::vector_reduce_fmin) \
+   _llvm("llvm.intr.vector.reduce.fminimum", OperationKind::LLVM_INTR_VECTOR_REDUCE_FMINIMUM, mlir::LLVM::vector_reduce_fminimum) \
    _llvm("llvm.intr.vector.reduce.fmul", OperationKind::LLVM_INTR_VECTOR_REDUCE_FMUL, mlir::LLVM::vector_reduce_fmul) \
    _llvm("llvm.intr.vector.reduce.mul", OperationKind::LLVM_INTR_VECTOR_REDUCE_MUL, mlir::LLVM::vector_reduce_mul) \
    _llvm("llvm.intr.vector.reduce.or", OperationKind::LLVM_INTR_VECTOR_REDUCE_OR, mlir::LLVM::vector_reduce_or) \
@@ -231,11 +258,11 @@
    _scf("scf.condition", OperationKind::SCF_CONDITION, mlir::scf::ConditionOp) \
    _scf("scf.execute_region", OperationKind::SCF_EXECUTE_REGION, mlir::scf::ExecuteRegionOp) \
    _scf("scf.for", OperationKind::SCF_FOR, mlir::scf::ForOp) \
-   _scf("scf.foreach_thread", OperationKind::SCF_FOREACH_THREAD, mlir::scf::ForeachThreadOp) \
+   _scf("scf.forall", OperationKind::SCF_FORALL, mlir::scf::ForallOp) \
    _scf("scf.if", OperationKind::SCF_IF, mlir::scf::IfOp) \
+   _scf("scf.forall.in_parallel", OperationKind::SCF_FORALL_IN_PARALLEL, mlir::scf::InParallelOp) \
    _scf("scf.index_switch", OperationKind::SCF_INDEX_SWITCH, mlir::scf::IndexSwitchOp) \
    _scf("scf.parallel", OperationKind::SCF_PARALLEL, mlir::scf::ParallelOp) \
-   _scf("scf.foreach_thread.perform_concurrently", OperationKind::SCF_FOREACH_THREAD_PERFORM_CONCURRENTLY, mlir::scf::PerformConcurrentlyOp) \
    _scf("scf.reduce", OperationKind::SCF_REDUCE, mlir::scf::ReduceOp) \
    _scf("scf.reduce.return", OperationKind::SCF_REDUCE_RETURN, mlir::scf::ReduceReturnOp) \
    _scf("scf.while", OperationKind::SCF_WHILE, mlir::scf::WhileOp) \
@@ -261,6 +288,7 @@
    _memref("memref.extract_strided_metadata", OperationKind::MEMREF_EXTRACT_STRIDED_METADATA, mlir::memref::ExtractStridedMetadataOp) \
    _memref("memref.get_global", OperationKind::MEMREF_GET_GLOBAL, mlir::memref::GetGlobalOp) \
    _memref("memref.global", OperationKind::MEMREF_GLOBAL, mlir::memref::GlobalOp) \
+   _memref("memref.memory_space_cast", OperationKind::MEMREF_MEMORY_SPACE_CAST, mlir::memref::MemorySpaceCastOp) \
    _memref("memref.prefetch", OperationKind::MEMREF_PREFETCH, mlir::memref::PrefetchOp) \
    _memref("memref.rank", OperationKind::MEMREF_RANK, mlir::memref::RankOp) \
    _memref("memref.realloc", OperationKind::MEMREF_REALLOC, mlir::memref::ReallocOp) \
@@ -295,17 +323,19 @@
    _hl("hl.alignof.expr", OperationKind::HL_ALIGNOF_EXPR, vast::hl::AlignOfExprOp) \
    _hl("hl.alignof.type", OperationKind::HL_ALIGNOF_TYPE, vast::hl::AlignOfTypeOp) \
    _hl("hl.assign", OperationKind::HL_ASSIGN, vast::hl::AssignOp) \
+   _hl("hl.assign.bin.ashr", OperationKind::HL_ASSIGN_BIN_ASHR, vast::hl::BinAShrAssignOp) \
+   _hl("hl.bin.ashr", OperationKind::HL_BIN_ASHR, vast::hl::BinAShrOp) \
    _hl("hl.assign.bin.and", OperationKind::HL_ASSIGN_BIN_AND, vast::hl::BinAndAssignOp) \
    _hl("hl.bin.and", OperationKind::HL_BIN_AND, vast::hl::BinAndOp) \
    _hl("hl.bin.comma", OperationKind::HL_BIN_COMMA, vast::hl::BinComma) \
    _hl("hl.bin.land", OperationKind::HL_BIN_LAND, vast::hl::BinLAndOp) \
    _hl("hl.bin.lor", OperationKind::HL_BIN_LOR, vast::hl::BinLOrOp) \
+   _hl("hl.assign.bin.lshr", OperationKind::HL_ASSIGN_BIN_LSHR, vast::hl::BinLShrAssignOp) \
+   _hl("hl.bin.lshr", OperationKind::HL_BIN_LSHR, vast::hl::BinLShrOp) \
    _hl("hl.assign.bin.or", OperationKind::HL_ASSIGN_BIN_OR, vast::hl::BinOrAssignOp) \
    _hl("hl.bin.or", OperationKind::HL_BIN_OR, vast::hl::BinOrOp) \
    _hl("hl.assign.bin.shl", OperationKind::HL_ASSIGN_BIN_SHL, vast::hl::BinShlAssignOp) \
    _hl("hl.bin.shl", OperationKind::HL_BIN_SHL, vast::hl::BinShlOp) \
-   _hl("hl.assign.bin.shr", OperationKind::HL_ASSIGN_BIN_SHR, vast::hl::BinShrAssignOp) \
-   _hl("hl.bin.shr", OperationKind::HL_BIN_SHR, vast::hl::BinShrOp) \
    _hl("hl.assign.bin.xor", OperationKind::HL_ASSIGN_BIN_XOR, vast::hl::BinXorAssignOp) \
    _hl("hl.bin.xor", OperationKind::HL_BIN_XOR, vast::hl::BinXorOp) \
    _hl("hl.builtin_bitcast", OperationKind::HL_BUILTIN_BITCAST, vast::hl::BuiltinBitCastOp) \
@@ -396,11 +426,12 @@
    _hl("hl.unreachable", OperationKind::HL_UNREACHABLE, vast::hl::UnreachableOp) \
    _core("core.bin.land", OperationKind::CORE_BIN_LAND, vast::core::BinLAndOp) \
    _core("core.bin.lor", OperationKind::CORE_BIN_LOR, vast::core::BinLOrOp) \
+   _core("core.implicit.return", OperationKind::CORE_IMPLICIT_RETURN, vast::core::ImplicitReturnOp) \
    _core("core.lazy.op", OperationKind::CORE_LAZY_OP, vast::core::LazyOp) \
-   _core("core.select", OperationKind::CORE_SELECT, vast::core::SelectOp) \
    _core("core.scope", OperationKind::CORE_SCOPE, vast::core::ScopeOp) \
+   _core("core.select", OperationKind::CORE_SELECT, vast::core::SelectOp) \
    _unsup("unsup.decl", OperationKind::UNSUP_DECL, vast::unsup::UnsupportedDecl) \
    _unsup("unsup.stmt", OperationKind::UNSUP_STMT, vast::unsup::UnsupportedStmt)
 
-#define MX_IR_NUM_MLIR_OPS 392
+#define MX_IR_NUM_MLIR_OPS 423
 

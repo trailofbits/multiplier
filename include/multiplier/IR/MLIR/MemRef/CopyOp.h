@@ -26,8 +26,8 @@ class CopyOp final : public Operation {
   ::mlir::memref::CopyOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value source(void) const;
-  ::mx::ir::Value target(void) const;
+  //::mlir::TypedValue<::mlir::BaseMemRefType> source(void) const;
+  //::mlir::TypedValue<::mlir::BaseMemRefType> target(void) const;
 };
 static_assert(sizeof(CopyOp) == sizeof(Operation));
 

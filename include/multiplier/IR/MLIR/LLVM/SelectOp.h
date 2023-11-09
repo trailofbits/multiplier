@@ -30,6 +30,7 @@ class SelectOp final : public Operation {
   ::mx::ir::Value true_value(void) const;
   ::mx::ir::Value false_value(void) const;
   ::mx::ir::Value res(void) const;
+  //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(SelectOp) == sizeof(Operation));
 

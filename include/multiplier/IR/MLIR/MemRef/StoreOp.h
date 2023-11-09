@@ -29,6 +29,7 @@ class StoreOp final : public Operation {
   ::mx::ir::Value value(void) const;
   //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
   gap::generator<::mx::ir::Operand> indices(void) const;
+  bool nontemporal(void) const;
   //Value value_to_store(void) const;
   //Value mem_ref(void) const;
   //MemRefType mem_ref_type(void) const;

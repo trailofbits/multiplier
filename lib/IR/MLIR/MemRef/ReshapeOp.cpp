@@ -35,14 +35,4 @@ std::optional<ReshapeOp> ReshapeOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::memref::ReshapeOp(this->Operation::op_);
 }
 
-::mx::ir::Value ReshapeOp::source(void) const {
-  auto val = underlying_op().getSource();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-::mx::ir::Value ReshapeOp::result(void) const {
-  auto val = underlying_op().getResult();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
 }  // namespace mx::ir::memref

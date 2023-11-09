@@ -14,7 +14,7 @@ namespace mx {
 enum class TargetAttrSpelling : unsigned char {
   GNU_TARGET,
   CXX11_GNU_TARGET,
-  C23_GNU_TARGET,
+  C2X_GNU_TARGET,
   SPELLING_NOT_CALCULATED,
 };
 

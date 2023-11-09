@@ -14,7 +14,7 @@ namespace mx {
 enum class ReleaseHandleAttrSpelling : unsigned char {
   GNU_RELEASE_HANDLE,
   CXX11_CLANG_RELEASE_HANDLE,
-  C23_CLANG_RELEASE_HANDLE,
+  C2X_CLANG_RELEASE_HANDLE,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -34,6 +34,11 @@ std::optional<vector_reduce_fmax> vector_reduce_fmax::producing(const ::mx::ir::
   return ::mlir::LLVM::vector_reduce_fmax(this->Operation::op_);
 }
 
+::mx::ir::Value vector_reduce_fmax::in(void) const {
+  auto val = underlying_op().getIn();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
 ::mx::ir::Value vector_reduce_fmax::res(void) const {
   auto val = underlying_op().getRes();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());

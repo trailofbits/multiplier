@@ -32,6 +32,7 @@ class LLVMFuncOp final : public Operation {
   //::mlir::LLVM::Linkage linkage(void) const;
   bool dso_local(void) const;
   //::mlir::LLVM::cconv::CConv c_conv(void) const;
+  //::std::optional<::mlir::SymbolRefAttr> comdat(void) const;
   std::optional<std::string_view> personality(void) const;
   std::optional<std::string_view> garbage_collector(void) const;
   //::std::optional<::mlir::ArrayAttr> passthrough(void) const;
@@ -39,12 +40,20 @@ class LLVMFuncOp final : public Operation {
   //::std::optional<::mlir::ArrayAttr> res_attrs(void) const;
   //::std::optional<uint64_t> function_entry_count(void) const;
   //::std::optional<::mlir::LLVM::MemoryEffectsAttr> memory(void) const;
+  //::mlir::LLVM::Visibility visibility__(void) const;
+  //::std::optional<bool> arm_streaming(void) const;
+  //::std::optional<bool> arm_locally_streaming(void) const;
+  std::optional<std::string_view> section(void) const;
+  //::std::optional<::mlir::LLVM::UnnamedAddr> unnamed_addr(void) const;
+  //::std::optional<uint64_t> alignment(void) const;
   //Block* add_entry_block(void) const;
   bool is_var_arg(void) const;
   //ArrayRef<Type> argument_types(void) const;
   //ArrayRef<Type> result_types(void) const;
   //Region* callable_region(void) const;
   //ArrayRef<Type> callable_results(void) const;
+  //::mlir::ArrayAttr callable_arg_attrs(void) const;
+  //::mlir::ArrayAttr callable_res_attrs(void) const;
 };
 static_assert(sizeof(LLVMFuncOp) == sizeof(Operation));
 

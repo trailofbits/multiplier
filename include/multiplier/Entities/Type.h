@@ -118,6 +118,7 @@ class Type {
   TypeKind kind(void) const;
   Type unqualified_desugared_type(void) const;
   Visibility visibility(void) const;
+  bool is_vlst_builtin_type(void) const;
 };
 
 #endif

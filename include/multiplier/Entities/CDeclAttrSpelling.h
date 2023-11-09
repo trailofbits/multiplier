@@ -14,7 +14,7 @@ namespace mx {
 enum class CDeclAttrSpelling : unsigned char {
   GNU_CDECL,
   CXX11_GNU_CDECL,
-  C23_GNU_CDECL,
+  C2X_GNU_CDECL,
   KEYWORD_CDECL,
   SPELLING_NOT_CALCULATED,
 };

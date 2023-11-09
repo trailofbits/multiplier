@@ -30,6 +30,10 @@ class AllocaOp final : public Operation {
   //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> res(void) const;
   //::std::optional<uint64_t> alignment(void) const;
   //::std::optional<::mlir::Type> elem_type(void) const;
+  bool inalloca(void) const;
+  //::llvm::SmallVector<::mlir::MemorySlot> promotable_slots(void) const;
+  //::llvm::SmallVector<::mlir::DestructurableMemorySlot> destructurable_slots(void) const;
+  //Type result_ptr_element_type(void) const;
 };
 static_assert(sizeof(AllocaOp) == sizeof(Operation));
 

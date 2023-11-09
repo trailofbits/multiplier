@@ -41,15 +41,14 @@ VAST_UNRELAX_WARNINGS
 namespace indexer {
 namespace {
 
-using MXCodeGenContext = vast::cg::CodeGenContext;
+using MXCodeGenContext = vast::cg::codegen_context;
 
 template <typename Derived>
-struct TypeCompressingGenVisitor
-    : vast::cg::CodeGenTypeVisitorWithDataLayout< Derived > {
+struct TypeCompressingGenVisitor : vast::cg::type_visitor_with_dl< Derived > {
  public:
 
   // The base class is logically our "next" class in the proxy pattern.
-  using Base = vast::cg::CodeGenTypeVisitorWithDataLayout< Derived >;
+  using Base = vast::cg::type_visitor_with_dl< Derived >;
 
   // Apply the `TypeMapper`s type compression, which eagerly desugars things
   // like `AutoType`, `ElaboratedType`, etc. (but isn't as aggressive when
@@ -62,11 +61,11 @@ struct TypeCompressingGenVisitor
   // `Derived::visit`, the most derived type, and represents the "top" code
   // generator visitor, which will lead us back into here to apply compression
   // on the pointer element type.
-  vast::cg::mlir_type Visit(clang::QualType type) {
+  vast::mlir_type Visit(clang::QualType type) {
     return Base::Visit(TypeMapper::Compress(Base::acontext(), type));
   }
 
-  vast::cg::mlir_type Visit(const clang::Type *type) {
+  vast::mlir_type Visit(const clang::Type *type) {
     auto new_qtype = TypeMapper::Compress(Base::acontext(), type);
     auto new_type = new_qtype.getTypePtrOrNull();
     if (new_type != type) {
@@ -83,31 +82,54 @@ struct TypeCompressingGenVisitor
 
 template< typename Derived >
 struct MXDefaultCodeGenVisitor
-    : vast::cg::CodeGenDeclVisitor< Derived >
-    , vast::cg::CodeGenStmtVisitor< Derived >
+    : vast::cg::decl_visitor_with_attrs< Derived >
+    , vast::cg::default_stmt_visitor< Derived >
     , TypeCompressingGenVisitor< Derived >
+    , vast::cg::default_attr_visitor< Derived >
 {
-    using DeclVisitor = vast::cg::CodeGenDeclVisitor< Derived >;
-    using StmtVisitor = vast::cg::CodeGenStmtVisitor< Derived >;
+    using DeclVisitor = vast::cg::decl_visitor_with_attrs< Derived >;
+    using StmtVisitor = vast::cg::default_stmt_visitor< Derived >;
     using TypeVisitor = TypeCompressingGenVisitor< Derived >;
+    using AttrVisitor = vast::cg::default_attr_visitor< Derived >;
 
     using DeclVisitor::Visit;
     using StmtVisitor::Visit;
     using TypeVisitor::Visit;
+    using AttrVisitor::Visit;
 };
 
 template< typename Derived >
-using MXVisitorConfig = vast::cg::FallBackVisitor< Derived,
+using MXVisitorConfig = vast::cg::fallback_visitor< Derived,
     MXDefaultCodeGenVisitor,
-    vast::cg::UnsupportedVisitor,
-    vast::cg::UnreachableVisitor
+    vast::cg::unsup_visitor,
+    vast::cg::unreach_visitor
 >;
 
-using MXCodeGenVisitor = vast::cg::CodeGenVisitor<
-    vast::cg::CodeGenContext, MXVisitorConfig, MetaGenerator
+using MXCodeGenVisitor = vast::cg::visitor_instance<
+    vast::cg::codegen_context, MXVisitorConfig, MetaGenerator
     >;
 
-using MXCodeGenerator = vast::cg::CodeGenBase<MXCodeGenVisitor, MXCodeGenContext>;
+using MXCodeGenerator = vast::cg::codegen_base<MXCodeGenVisitor, MXCodeGenContext>;
+
+static vast::cg::source_language GetSourceLanguage(
+    const vast::cc::language_options &opts) {
+  using ClangStd = clang::LangStandard;
+
+  if (opts.CPlusPlus || opts.CPlusPlus11 || opts.CPlusPlus14 ||
+      opts.CPlusPlus17 || opts.CPlusPlus20 || opts.CPlusPlus23 ||
+      opts.CPlusPlus26) {
+    return vast::cg::source_language::CXX;
+  }
+  
+  if (opts.C99 || opts.C11 || opts.C17 || opts.C2x ||
+      opts.LangStd == ClangStd::lang_c89) {
+    return vast::cg::source_language::C;
+  }
+
+  // TODO: support remaining source languages.
+  vast::vast_error() << "VAST does not yet support the given source language";
+  return vast::cg::source_language::C;
+}
 
 }  // namespace
 
@@ -149,18 +171,19 @@ std::string CodeGenerator::GenerateSourceIR(
   // parsable.
   flags.enableDebugInfo(true, false);
 
-  mlir::MLIRContext context(impl->registry);
+  auto &actx = ast.UnderlyingAST();
+  auto &opts = actx.getLangOpts();
 
-  MetaGenerator meta(ast, context, em);
-  MXCodeGenContext cgctx(context, ast.UnderlyingAST());
+  vast::mcontext_t mctx(impl->registry);
+  vast::cg::codegen_context cgctx(mctx, actx, GetSourceLanguage(opts));
+  MetaGenerator meta(ast, mctx, em);
   MXCodeGenerator codegen(cgctx, meta);
   llvm::raw_string_ostream os(ret);
 
   try {
-    auto mod = codegen.emit_module(
-        const_cast<clang::TranslationUnitDecl *>(
-            ast.TranslationUnit().RawDecl()));
-    mod->print(os, flags);
+    codegen.emit_module(const_cast<clang::TranslationUnitDecl *>(
+        ast.TranslationUnit().RawDecl()));
+    cgctx.mod->print(os, flags);
 
   } catch (std::exception &e) {
     LOG(ERROR) << e.what();

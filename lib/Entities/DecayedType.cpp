@@ -79,7 +79,7 @@ std::optional<DecayedType> DecayedType::from(const TokenContext &t) {
 }
 
 Type DecayedType::pointee_type(void) const {
-  RawEntityId eid = impl->reader.getVal25();
+  RawEntityId eid = impl->reader.getVal26();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

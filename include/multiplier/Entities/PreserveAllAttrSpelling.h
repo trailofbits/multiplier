@@ -14,7 +14,7 @@ namespace mx {
 enum class PreserveAllAttrSpelling : unsigned char {
   GNU_PRESERVE_ALL,
   CXX11_CLANG_PRESERVE_ALL,
-  C23_CLANG_PRESERVE_ALL,
+  C2X_CLANG_PRESERVE_ALL,
   SPELLING_NOT_CALCULATED,
 };
 

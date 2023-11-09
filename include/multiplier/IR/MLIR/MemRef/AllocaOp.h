@@ -30,8 +30,11 @@ class AllocaOp final : public Operation {
   gap::generator<::mx::ir::Operand> symbol_operands(void) const;
   //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
   //::std::optional<uint64_t> alignment(void) const;
+  //::llvm::SmallVector<::mlir::MemorySlot> promotable_slots(void) const;
+  //::llvm::SmallVector<::mlir::DestructurableMemorySlot> destructurable_slots(void) const;
   //StringRef alignment_attr_str_name(void) const;
   //MemRefType type(void) const;
+  //SmallVector<OpFoldResult> mixed_sizes(void) const;
 };
 static_assert(sizeof(AllocaOp) == sizeof(Operation));
 

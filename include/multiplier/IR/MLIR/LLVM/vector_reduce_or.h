@@ -26,6 +26,7 @@ class vector_reduce_or final : public Operation {
   ::mlir::LLVM::vector_reduce_or underlying_op(void) const noexcept;
 
   // Imported methods:
+  ::mx::ir::Value in(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(vector_reduce_or) == sizeof(Operation));

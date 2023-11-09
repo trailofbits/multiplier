@@ -14,7 +14,7 @@ namespace mx {
 enum class UsedAttrSpelling : unsigned char {
   GNU_USED,
   CXX11_GNU_USED,
-  C23_GNU_USED,
+  C2X_GNU_USED,
   SPELLING_NOT_CALCULATED,
 };
 

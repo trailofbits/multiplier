@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCRequiresSuperAttrSpelling e) {
   switch (e) {
     case ObjCRequiresSuperAttrSpelling::GNU_OBJC_REQUIRES_SUPER: return "GNU_OBJC_REQUIRES_SUPER";
     case ObjCRequiresSuperAttrSpelling::CXX11_CLANG_OBJC_REQUIRES_SUPER: return "CXX11_CLANG_OBJC_REQUIRES_SUPER";
-    case ObjCRequiresSuperAttrSpelling::C23_CLANG_OBJC_REQUIRES_SUPER: return "C23_CLANG_OBJC_REQUIRES_SUPER";
+    case ObjCRequiresSuperAttrSpelling::C2X_CLANG_OBJC_REQUIRES_SUPER: return "C2X_CLANG_OBJC_REQUIRES_SUPER";
     case ObjCRequiresSuperAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

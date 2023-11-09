@@ -14,7 +14,7 @@ namespace mx {
 enum class StdCallAttrSpelling : unsigned char {
   GNU_STDCALL,
   CXX11_GNU_STDCALL,
-  C23_GNU_STDCALL,
+  C2X_GNU_STDCALL,
   KEYWORD_STDCALL,
   SPELLING_NOT_CALCULATED,
 };

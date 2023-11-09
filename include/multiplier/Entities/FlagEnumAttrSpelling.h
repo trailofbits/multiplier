@@ -14,7 +14,7 @@ namespace mx {
 enum class FlagEnumAttrSpelling : unsigned char {
   GNU_FLAG_ENUM,
   CXX11_CLANG_FLAG_ENUM,
-  C23_CLANG_FLAG_ENUM,
+  C2X_CLANG_FLAG_ENUM,
   SPELLING_NOT_CALCULATED,
 };
 

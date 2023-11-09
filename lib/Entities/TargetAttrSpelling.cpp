@@ -17,7 +17,7 @@ const char *EnumeratorName(TargetAttrSpelling e) {
   switch (e) {
     case TargetAttrSpelling::GNU_TARGET: return "GNU_TARGET";
     case TargetAttrSpelling::CXX11_GNU_TARGET: return "CXX11_GNU_TARGET";
-    case TargetAttrSpelling::C23_GNU_TARGET: return "C23_GNU_TARGET";
+    case TargetAttrSpelling::C2X_GNU_TARGET: return "C2X_GNU_TARGET";
     case TargetAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

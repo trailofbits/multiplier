@@ -17,7 +17,7 @@ const char *EnumeratorName(AliasAttrSpelling e) {
   switch (e) {
     case AliasAttrSpelling::GNU_ALIAS: return "GNU_ALIAS";
     case AliasAttrSpelling::CXX11_GNU_ALIAS: return "CXX11_GNU_ALIAS";
-    case AliasAttrSpelling::C23_GNU_ALIAS: return "C23_GNU_ALIAS";
+    case AliasAttrSpelling::C2X_GNU_ALIAS: return "C2X_GNU_ALIAS";
     case AliasAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

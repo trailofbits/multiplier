@@ -33,7 +33,7 @@ if(NOT EXISTS "${src_dir}/llvm/CMakeLists.txt")
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 
   execute_process(
-    COMMAND "${GIT_EXECUTABLE}" submodule set-branch --branch pasta vendor/llvm-project/src
+    COMMAND "${GIT_EXECUTABLE}" submodule set-branch --branch pasta-llvmorg-17.0.4 vendor/llvm-project/src
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 endif()
 

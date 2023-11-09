@@ -44,4 +44,9 @@ std::optional<AbsOp> AbsOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+bool AbsOp::is_int_min_poison(void) const {
+  auto val = underlying_op().getIsIntMinPoison();
+  return val;
+}
+
 }  // namespace mx::ir::llvm

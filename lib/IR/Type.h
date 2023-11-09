@@ -14,6 +14,7 @@
    _llvm(LLVMFunctionType, TypeKind::LLVMFUNCTIONTYPE, mlir::LLVM::LLVMFunctionType) \
    _llvm(LLVMPointerType, TypeKind::LLVMPOINTERTYPE, mlir::LLVM::LLVMPointerType) \
    _llvm(LLVMScalableVectorType, TypeKind::LLVMSCALABLEVECTORTYPE, mlir::LLVM::LLVMScalableVectorType) \
+   _llvm(LLVMTargetExtType, TypeKind::LLVMTARGETEXTTYPE, mlir::LLVM::LLVMTargetExtType) \
    _llvm(LLVMVoidType, TypeKind::LLVMVOIDTYPE, mlir::LLVM::LLVMVoidType) \
    _llvm(LLVMPPCFP128Type, TypeKind::LLVMPPCFP128TYPE, mlir::LLVM::LLVMPPCFP128Type) \
    _llvm(LLVMX86MMXType, TypeKind::LLVMX86MMXTYPE, mlir::LLVM::LLVMX86MMXType) \
@@ -51,7 +52,8 @@
    _hl(TypeOfTypeType, TypeKind::TYPEOFTYPETYPE, vast::hl::TypeOfTypeType) \
    _hl(TypedefType, TypeKind::TYPEDEFTYPE, vast::hl::TypedefType) \
    _hl(VoidType, TypeKind::VOIDTYPE, vast::hl::VoidType) \
+   _core(FunctionType, TypeKind::FUNCTIONTYPE, vast::core::FunctionType) \
    _unsup(UnsupportedType, TypeKind::UNSUPPORTEDTYPE, vast::unsup::UnsupportedType)
 
-#define MX_IR_NUM_MLIR_TYPES 43
+#define MX_IR_NUM_MLIR_TYPES 45
 

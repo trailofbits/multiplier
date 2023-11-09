@@ -17,7 +17,7 @@ const char *EnumeratorName(FlattenAttrSpelling e) {
   switch (e) {
     case FlattenAttrSpelling::GNU_FLATTEN: return "GNU_FLATTEN";
     case FlattenAttrSpelling::CXX11_GNU_FLATTEN: return "CXX11_GNU_FLATTEN";
-    case FlattenAttrSpelling::C23_GNU_FLATTEN: return "C23_GNU_FLATTEN";
+    case FlattenAttrSpelling::C2X_GNU_FLATTEN: return "C2X_GNU_FLATTEN";
     case FlattenAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

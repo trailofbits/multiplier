@@ -17,7 +17,7 @@ const char *EnumeratorName(AssumptionAttrSpelling e) {
   switch (e) {
     case AssumptionAttrSpelling::GNU_ASSUME: return "GNU_ASSUME";
     case AssumptionAttrSpelling::CXX11_CLANG_ASSUME: return "CXX11_CLANG_ASSUME";
-    case AssumptionAttrSpelling::C23_CLANG_ASSUME: return "C23_CLANG_ASSUME";
+    case AssumptionAttrSpelling::C2X_CLANG_ASSUME: return "C2X_CLANG_ASSUME";
     case AssumptionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

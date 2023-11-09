@@ -35,9 +35,4 @@ std::optional<DeallocOp> DeallocOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::memref::DeallocOp(this->Operation::op_);
 }
 
-::mx::ir::Value DeallocOp::memref(void) const {
-  auto val = underlying_op().getMemref();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
 }  // namespace mx::ir::memref

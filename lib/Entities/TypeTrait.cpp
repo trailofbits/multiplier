@@ -82,7 +82,6 @@ const char *EnumeratorName(TypeTrait e) {
     case TypeTrait::IS_CONVERTIBLE_TO: return "IS_CONVERTIBLE_TO";
     case TypeTrait::IS_TRIVIALLY_ASSIGNABLE: return "IS_TRIVIALLY_ASSIGNABLE";
     case TypeTrait::REFERENCE_BINDS_TO_TEMPORARY: return "REFERENCE_BINDS_TO_TEMPORARY";
-    case TypeTrait::REFERENCE_CONSTRUCTS_FROM_TEMPORARY: return "REFERENCE_CONSTRUCTS_FROM_TEMPORARY";
     case TypeTrait::IS_SAME: return "IS_SAME";
     case TypeTrait::IS_CONVERTIBLE: return "IS_CONVERTIBLE";
     case TypeTrait::XNU_TYPE_COMPATIBLE: return "XNU_TYPE_COMPATIBLE";

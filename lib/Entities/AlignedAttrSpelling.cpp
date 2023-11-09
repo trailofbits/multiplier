@@ -17,7 +17,7 @@ const char *EnumeratorName(AlignedAttrSpelling e) {
   switch (e) {
     case AlignedAttrSpelling::GNU_ALIGNED: return "GNU_ALIGNED";
     case AlignedAttrSpelling::CXX11_GNU_ALIGNED: return "CXX11_GNU_ALIGNED";
-    case AlignedAttrSpelling::C23_GNU_ALIGNED: return "C23_GNU_ALIGNED";
+    case AlignedAttrSpelling::C2X_GNU_ALIGNED: return "C2X_GNU_ALIGNED";
     case AlignedAttrSpelling::DECLSPEC_ALIGN: return "DECLSPEC_ALIGN";
     case AlignedAttrSpelling::KEYWORD_ALIGNAS: return "KEYWORD_ALIGNAS";
     case AlignedAttrSpelling::KEYWORD__ALIGNAS: return "KEYWORD__ALIGNAS";

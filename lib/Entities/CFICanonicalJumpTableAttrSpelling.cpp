@@ -17,7 +17,7 @@ const char *EnumeratorName(CFICanonicalJumpTableAttrSpelling e) {
   switch (e) {
     case CFICanonicalJumpTableAttrSpelling::GNU_CFI_CANONICAL_JUMP_TABLE: return "GNU_CFI_CANONICAL_JUMP_TABLE";
     case CFICanonicalJumpTableAttrSpelling::CXX11_CLANG_CFI_CANONICAL_JUMP_TABLE: return "CXX11_CLANG_CFI_CANONICAL_JUMP_TABLE";
-    case CFICanonicalJumpTableAttrSpelling::C23_CLANG_CFI_CANONICAL_JUMP_TABLE: return "C23_CLANG_CFI_CANONICAL_JUMP_TABLE";
+    case CFICanonicalJumpTableAttrSpelling::C2X_CLANG_CFI_CANONICAL_JUMP_TABLE: return "C2X_CLANG_CFI_CANONICAL_JUMP_TABLE";
     case CFICanonicalJumpTableAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

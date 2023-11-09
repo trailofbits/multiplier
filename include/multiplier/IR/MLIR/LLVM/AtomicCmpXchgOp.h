@@ -32,6 +32,15 @@ class AtomicCmpXchgOp final : public Operation {
   ::mx::ir::Value res(void) const;
   //::mlir::LLVM::AtomicOrdering success_ordering(void) const;
   //::mlir::LLVM::AtomicOrdering failure_ordering(void) const;
+  std::optional<std::string_view> syncscope(void) const;
+  //::std::optional<uint64_t> alignment(void) const;
+  bool weak(void) const;
+  bool volatile__(void) const;
+  //::std::optional<::mlir::ArrayAttr> access_groups(void) const;
+  //::std::optional<::mlir::ArrayAttr> alias_scopes(void) const;
+  //::std::optional<::mlir::ArrayAttr> noalias_scopes(void) const;
+  //::std::optional<::mlir::ArrayAttr> tbaa(void) const;
+  //::llvm::SmallVector<::mlir::Value> accessed_operands(void) const;
 };
 static_assert(sizeof(AtomicCmpXchgOp) == sizeof(Operation));
 

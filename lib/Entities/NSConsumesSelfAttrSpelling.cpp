@@ -17,7 +17,7 @@ const char *EnumeratorName(NSConsumesSelfAttrSpelling e) {
   switch (e) {
     case NSConsumesSelfAttrSpelling::GNU_NS_CONSUMES_SELF: return "GNU_NS_CONSUMES_SELF";
     case NSConsumesSelfAttrSpelling::CXX11_CLANG_NS_CONSUMES_SELF: return "CXX11_CLANG_NS_CONSUMES_SELF";
-    case NSConsumesSelfAttrSpelling::C23_CLANG_NS_CONSUMES_SELF: return "C23_CLANG_NS_CONSUMES_SELF";
+    case NSConsumesSelfAttrSpelling::C2X_CLANG_NS_CONSUMES_SELF: return "C2X_CLANG_NS_CONSUMES_SELF";
     case NSConsumesSelfAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

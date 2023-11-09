@@ -14,7 +14,7 @@ namespace mx {
 enum class Mips16AttrSpelling : unsigned char {
   GNU_MIPS16,
   CXX11_GNU_MIPS16,
-  C23_GNU_MIPS16,
+  C2X_GNU_MIPS16,
   SPELLING_NOT_CALCULATED,
 };
 

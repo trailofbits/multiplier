@@ -15,11 +15,11 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::SCF_CONDITION:
     case mx::ir::OperationKind::SCF_EXECUTE_REGION:
     case mx::ir::OperationKind::SCF_FOR:
-    case mx::ir::OperationKind::SCF_FOREACH_THREAD:
+    case mx::ir::OperationKind::SCF_FORALL:
     case mx::ir::OperationKind::SCF_IF:
+    case mx::ir::OperationKind::SCF_FORALL_IN_PARALLEL:
     case mx::ir::OperationKind::SCF_INDEX_SWITCH:
     case mx::ir::OperationKind::SCF_PARALLEL:
-    case mx::ir::OperationKind::SCF_FOREACH_THREAD_PERFORM_CONCURRENTLY:
     case mx::ir::OperationKind::SCF_REDUCE:
     case mx::ir::OperationKind::SCF_REDUCE_RETURN:
     case mx::ir::OperationKind::SCF_WHILE:

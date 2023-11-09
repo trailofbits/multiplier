@@ -44,4 +44,9 @@ std::optional<CountTrailingZerosOp> CountTrailingZerosOp::producing(const ::mx::
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+bool CountTrailingZerosOp::is_zero_poison(void) const {
+  auto val = underlying_op().getIsZeroPoison();
+  return val;
+}
+
 }  // namespace mx::ir::llvm

@@ -33,6 +33,7 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::MEMREF_EXTRACT_STRIDED_METADATA:
     case mx::ir::OperationKind::MEMREF_GET_GLOBAL:
     case mx::ir::OperationKind::MEMREF_GLOBAL:
+    case mx::ir::OperationKind::MEMREF_MEMORY_SPACE_CAST:
     case mx::ir::OperationKind::MEMREF_PREFETCH:
     case mx::ir::OperationKind::MEMREF_RANK:
     case mx::ir::OperationKind::MEMREF_REALLOC:

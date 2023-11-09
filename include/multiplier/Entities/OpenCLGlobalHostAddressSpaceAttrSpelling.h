@@ -14,7 +14,7 @@ namespace mx {
 enum class OpenCLGlobalHostAddressSpaceAttrSpelling : unsigned char {
   GNU_OPENCL_GLOBAL_HOST,
   CXX11_CLANG_OPENCL_GLOBAL_HOST,
-  C23_CLANG_OPENCL_GLOBAL_HOST,
+  C2X_CLANG_OPENCL_GLOBAL_HOST,
   SPELLING_NOT_CALCULATED,
 };
 

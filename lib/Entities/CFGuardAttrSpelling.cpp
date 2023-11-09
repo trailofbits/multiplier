@@ -18,7 +18,7 @@ const char *EnumeratorName(CFGuardAttrSpelling e) {
     case CFGuardAttrSpelling::DECLSPEC_GUARD: return "DECLSPEC_GUARD";
     case CFGuardAttrSpelling::GNU_GUARD: return "GNU_GUARD";
     case CFGuardAttrSpelling::CXX11_CLANG_GUARD: return "CXX11_CLANG_GUARD";
-    case CFGuardAttrSpelling::C23_CLANG_GUARD: return "C23_CLANG_GUARD";
+    case CFGuardAttrSpelling::C2X_CLANG_GUARD: return "C2X_CLANG_GUARD";
     case CFGuardAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

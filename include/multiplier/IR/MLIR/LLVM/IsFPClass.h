@@ -27,8 +27,8 @@ class IsFPClass final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> bit(void) const;
   ::mx::ir::Value res(void) const;
+  uint32_t bit(void) const;
 };
 static_assert(sizeof(IsFPClass) == sizeof(Operation));
 

@@ -34,6 +34,11 @@ std::optional<vector_reduce_xor> vector_reduce_xor::producing(const ::mx::ir::Va
   return ::mlir::LLVM::vector_reduce_xor(this->Operation::op_);
 }
 
+::mx::ir::Value vector_reduce_xor::in(void) const {
+  auto val = underlying_op().getIn();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
 ::mx::ir::Value vector_reduce_xor::res(void) const {
   auto val = underlying_op().getRes();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());

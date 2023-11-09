@@ -17,7 +17,7 @@ const char *EnumeratorName(NoCommonAttrSpelling e) {
   switch (e) {
     case NoCommonAttrSpelling::GNU_NOCOMMON: return "GNU_NOCOMMON";
     case NoCommonAttrSpelling::CXX11_GNU_NOCOMMON: return "CXX11_GNU_NOCOMMON";
-    case NoCommonAttrSpelling::C23_GNU_NOCOMMON: return "C23_GNU_NOCOMMON";
+    case NoCommonAttrSpelling::C2X_GNU_NOCOMMON: return "C2X_GNU_NOCOMMON";
     case NoCommonAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

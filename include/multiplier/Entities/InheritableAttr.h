@@ -42,8 +42,6 @@ class AnyX86NoCfCheckAttr;
 class ArcWeakrefUnavailableAttr;
 class ArgumentWithTypeTagAttr;
 class ArmBuiltinAliasAttr;
-class ArmLocallyStreamingAttr;
-class ArmNewZAAttr;
 class ArtificialAttr;
 class AsmLabelAttr;
 class AssertCapabilityAttr;

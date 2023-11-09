@@ -14,7 +14,7 @@ namespace mx {
 enum class CallbackAttrSpelling : unsigned char {
   GNU_CALLBACK,
   CXX11_CLANG_CALLBACK,
-  C23_CLANG_CALLBACK,
+  C2X_CLANG_CALLBACK,
   SPELLING_NOT_CALCULATED,
 };
 

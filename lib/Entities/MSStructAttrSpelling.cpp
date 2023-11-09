@@ -17,7 +17,7 @@ const char *EnumeratorName(MSStructAttrSpelling e) {
   switch (e) {
     case MSStructAttrSpelling::GNU_MS_STRUCT: return "GNU_MS_STRUCT";
     case MSStructAttrSpelling::CXX11_GNU_MS_STRUCT: return "CXX11_GNU_MS_STRUCT";
-    case MSStructAttrSpelling::C23_GNU_MS_STRUCT: return "C23_GNU_MS_STRUCT";
+    case MSStructAttrSpelling::C2X_GNU_MS_STRUCT: return "C2X_GNU_MS_STRUCT";
     case MSStructAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

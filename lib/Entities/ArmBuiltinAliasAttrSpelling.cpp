@@ -17,7 +17,7 @@ const char *EnumeratorName(ArmBuiltinAliasAttrSpelling e) {
   switch (e) {
     case ArmBuiltinAliasAttrSpelling::GNU_CLANG_ARM_BUILTIN_ALIAS: return "GNU_CLANG_ARM_BUILTIN_ALIAS";
     case ArmBuiltinAliasAttrSpelling::CXX11_CLANG_CLANG_ARM_BUILTIN_ALIAS: return "CXX11_CLANG_CLANG_ARM_BUILTIN_ALIAS";
-    case ArmBuiltinAliasAttrSpelling::C23_CLANG_CLANG_ARM_BUILTIN_ALIAS: return "C23_CLANG_CLANG_ARM_BUILTIN_ALIAS";
+    case ArmBuiltinAliasAttrSpelling::C2X_CLANG_CLANG_ARM_BUILTIN_ALIAS: return "C2X_CLANG_CLANG_ARM_BUILTIN_ALIAS";
     case ArmBuiltinAliasAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

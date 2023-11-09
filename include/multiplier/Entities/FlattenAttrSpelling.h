@@ -14,7 +14,7 @@ namespace mx {
 enum class FlattenAttrSpelling : unsigned char {
   GNU_FLATTEN,
   CXX11_GNU_FLATTEN,
-  C23_GNU_FLATTEN,
+  C2X_GNU_FLATTEN,
   SPELLING_NOT_CALCULATED,
 };
 

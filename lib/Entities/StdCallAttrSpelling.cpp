@@ -17,7 +17,7 @@ const char *EnumeratorName(StdCallAttrSpelling e) {
   switch (e) {
     case StdCallAttrSpelling::GNU_STDCALL: return "GNU_STDCALL";
     case StdCallAttrSpelling::CXX11_GNU_STDCALL: return "CXX11_GNU_STDCALL";
-    case StdCallAttrSpelling::C23_GNU_STDCALL: return "C23_GNU_STDCALL";
+    case StdCallAttrSpelling::C2X_GNU_STDCALL: return "C2X_GNU_STDCALL";
     case StdCallAttrSpelling::KEYWORD_STDCALL: return "KEYWORD_STDCALL";
     case StdCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

@@ -35,9 +35,4 @@ std::optional<TensorStoreOp> TensorStoreOp::producing(const ::mx::ir::Value &tha
   return ::mlir::memref::TensorStoreOp(this->Operation::op_);
 }
 
-::mx::ir::Value TensorStoreOp::memref(void) const {
-  auto val = underlying_op().getMemref();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
 }  // namespace mx::ir::memref
