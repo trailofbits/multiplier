@@ -72,7 +72,7 @@ jobs:
             -DMX_BOOTSTRAP_VAST=OFF \
             -DMX_BOOTSTRAP_PASTA=OFF \
             -DMX_ENABLE_RE2=ON \
-            -DMX_ENABLE_VAST=ON \
+            -DMX_ENABLE_VAST=OFF \
             -DMX_ENABLE_INSTALL=ON \
             -DMX_USE_VENDORED_CLANG=OFF \
             -DMX_USE_VENDORED_PASTA=OFF \
