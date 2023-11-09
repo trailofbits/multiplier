@@ -17,7 +17,7 @@ const char *EnumeratorName(DestructorAttrSpelling e) {
   switch (e) {
     case DestructorAttrSpelling::GNU_DESTRUCTOR: return "GNU_DESTRUCTOR";
     case DestructorAttrSpelling::CXX11_GNU_DESTRUCTOR: return "CXX11_GNU_DESTRUCTOR";
-    case DestructorAttrSpelling::C23_GNU_DESTRUCTOR: return "C23_GNU_DESTRUCTOR";
+    case DestructorAttrSpelling::C2X_GNU_DESTRUCTOR: return "C2X_GNU_DESTRUCTOR";
     case DestructorAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

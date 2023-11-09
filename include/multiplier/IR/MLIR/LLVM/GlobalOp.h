@@ -38,6 +38,8 @@ class GlobalOp final : public Operation {
   uint32_t addr_space(void) const;
   //::std::optional<::mlir::LLVM::UnnamedAddr> unnamed_addr(void) const;
   std::optional<std::string_view> section(void) const;
+  //::std::optional<::mlir::SymbolRefAttr> comdat(void) const;
+  //::mlir::LLVM::Visibility visibility__(void) const;
   //Type type(void) const;
   //Attribute value_or_null(void) const;
   //Region& initializer_region(void) const;

@@ -14,7 +14,7 @@ namespace mx {
 enum class ObjCClassStubAttrSpelling : unsigned char {
   GNU_OBJC_CLASS_STUB,
   CXX11_CLANG_OBJC_CLASS_STUB,
-  C23_CLANG_OBJC_CLASS_STUB,
+  C2X_CLANG_OBJC_CLASS_STUB,
   SPELLING_NOT_CALCULATED,
 };
 

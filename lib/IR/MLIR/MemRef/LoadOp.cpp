@@ -47,4 +47,9 @@ gap::generator<::mx::ir::Operand> LoadOp::indices(void) const {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+bool LoadOp::nontemporal(void) const {
+  auto val = underlying_op().getNontemporal();
+  return val;
+}
+
 }  // namespace mx::ir::memref

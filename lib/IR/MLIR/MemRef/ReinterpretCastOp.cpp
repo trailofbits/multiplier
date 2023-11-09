@@ -35,11 +35,6 @@ std::optional<ReinterpretCastOp> ReinterpretCastOp::producing(const ::mx::ir::Va
   return ::mlir::memref::ReinterpretCastOp(this->Operation::op_);
 }
 
-::mx::ir::Value ReinterpretCastOp::source(void) const {
-  auto val = underlying_op().getSource();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
 gap::generator<::mx::ir::Operand> ReinterpretCastOp::offsets(void) const {
   auto range = underlying_op().getOffsets();
   for (auto val : range) {

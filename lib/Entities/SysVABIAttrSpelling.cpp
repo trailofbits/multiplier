@@ -17,7 +17,7 @@ const char *EnumeratorName(SysVABIAttrSpelling e) {
   switch (e) {
     case SysVABIAttrSpelling::GNU_SYSV_ABI: return "GNU_SYSV_ABI";
     case SysVABIAttrSpelling::CXX11_GNU_SYSV_ABI: return "CXX11_GNU_SYSV_ABI";
-    case SysVABIAttrSpelling::C23_GNU_SYSV_ABI: return "C23_GNU_SYSV_ABI";
+    case SysVABIAttrSpelling::C2X_GNU_SYSV_ABI: return "C2X_GNU_SYSV_ABI";
     case SysVABIAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

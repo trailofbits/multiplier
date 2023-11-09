@@ -79,25 +79,25 @@ std::optional<DependentBitIntType> DependentBitIntType::from(const TokenContext 
 }
 
 Type DependentBitIntType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal17();
+  RawEntityId eid = impl->reader.getVal18();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr DependentBitIntType::num_bits_expression(void) const {
-  RawEntityId eid = impl->reader.getVal18();
+  RawEntityId eid = impl->reader.getVal19();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool DependentBitIntType::is_signed(void) const {
-  return impl->reader.getVal19();
-}
-
-bool DependentBitIntType::is_sugared(void) const {
   return impl->reader.getVal20();
 }
 
-bool DependentBitIntType::is_unsigned(void) const {
+bool DependentBitIntType::is_sugared(void) const {
   return impl->reader.getVal21();
+}
+
+bool DependentBitIntType::is_unsigned(void) const {
+  return impl->reader.getVal22();
 }
 
 #pragma GCC diagnostic pop

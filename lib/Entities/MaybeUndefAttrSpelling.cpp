@@ -17,7 +17,7 @@ const char *EnumeratorName(MaybeUndefAttrSpelling e) {
   switch (e) {
     case MaybeUndefAttrSpelling::GNU_MAYBE_UNDEF: return "GNU_MAYBE_UNDEF";
     case MaybeUndefAttrSpelling::CXX11_CLANG_MAYBE_UNDEF: return "CXX11_CLANG_MAYBE_UNDEF";
-    case MaybeUndefAttrSpelling::C23_CLANG_MAYBE_UNDEF: return "C23_CLANG_MAYBE_UNDEF";
+    case MaybeUndefAttrSpelling::C2X_CLANG_MAYBE_UNDEF: return "C2X_CLANG_MAYBE_UNDEF";
     case MaybeUndefAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

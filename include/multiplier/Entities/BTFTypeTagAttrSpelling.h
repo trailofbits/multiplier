@@ -14,7 +14,7 @@ namespace mx {
 enum class BTFTypeTagAttrSpelling : unsigned char {
   GNU_BTF_TYPE_TAG,
   CXX11_CLANG_BTF_TYPE_TAG,
-  C23_CLANG_BTF_TYPE_TAG,
+  C2X_CLANG_BTF_TYPE_TAG,
   SPELLING_NOT_CALCULATED,
 };
 

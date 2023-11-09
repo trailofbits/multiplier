@@ -13,8 +13,8 @@
 #include <multiplier/IR/Type.h>
 
 #include <mlir/Dialect/SCF/IR/SCF.h>
-#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <vast/Dialect/Dialects.hpp>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/LowLevel/LowLevelOps.hpp>
 
 namespace mx::ir::ll {
@@ -61,6 +61,11 @@ std::optional<std::string_view> FuncOp::sym_visibility(void) const {
   } else {
     return {};
   }
+}
+
+bool FuncOp::is_var_arg(void) const {
+  auto val = underlying_op().isVarArg();
+  return val;
 }
 
 bool FuncOp::is_declaration(void) const {

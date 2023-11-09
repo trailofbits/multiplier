@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCIndependentClassAttrSpelling e) {
   switch (e) {
     case ObjCIndependentClassAttrSpelling::GNU_OBJC_INDEPENDENT_CLASS: return "GNU_OBJC_INDEPENDENT_CLASS";
     case ObjCIndependentClassAttrSpelling::CXX11_CLANG_OBJC_INDEPENDENT_CLASS: return "CXX11_CLANG_OBJC_INDEPENDENT_CLASS";
-    case ObjCIndependentClassAttrSpelling::C23_CLANG_OBJC_INDEPENDENT_CLASS: return "C23_CLANG_OBJC_INDEPENDENT_CLASS";
+    case ObjCIndependentClassAttrSpelling::C2X_CLANG_OBJC_INDEPENDENT_CLASS: return "C2X_CLANG_OBJC_INDEPENDENT_CLASS";
     case ObjCIndependentClassAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

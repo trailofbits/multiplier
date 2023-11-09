@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCNonLazyClassAttrSpelling e) {
   switch (e) {
     case ObjCNonLazyClassAttrSpelling::GNU_OBJC_NONLAZY_CLASS: return "GNU_OBJC_NONLAZY_CLASS";
     case ObjCNonLazyClassAttrSpelling::CXX11_CLANG_OBJC_NONLAZY_CLASS: return "CXX11_CLANG_OBJC_NONLAZY_CLASS";
-    case ObjCNonLazyClassAttrSpelling::C23_CLANG_OBJC_NONLAZY_CLASS: return "C23_CLANG_OBJC_NONLAZY_CLASS";
+    case ObjCNonLazyClassAttrSpelling::C2X_CLANG_OBJC_NONLAZY_CLASS: return "C2X_CLANG_OBJC_NONLAZY_CLASS";
     case ObjCNonLazyClassAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

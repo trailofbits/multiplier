@@ -29,7 +29,6 @@ class TransposeOp final : public Operation {
   //::mlir::TypedValue<::mlir::MemRefType> in(void) const;
   //::mlir::AffineMap permutation(void) const;
   //StringRef permutation_attr_str_name(void) const;
-  //ShapedType shaped_type(void) const;
 };
 static_assert(sizeof(TransposeOp) == sizeof(Operation));
 

@@ -18,6 +18,7 @@ enum class TypeKind : unsigned {
   LLVMFUNCTIONTYPE,
   LLVMPOINTERTYPE,
   LLVMSCALABLEVECTORTYPE,
+  LLVMTARGETEXTTYPE,
   LLVMVOIDTYPE,
   LLVMPPCFP128TYPE,
   LLVMX86MMXTYPE,
@@ -55,6 +56,7 @@ enum class TypeKind : unsigned {
   TYPEOFTYPETYPE,
   TYPEDEFTYPE,
   VOIDTYPE,
+  FUNCTIONTYPE,
   UNSUPPORTEDTYPE,
 };
 
@@ -65,7 +67,7 @@ inline static const char *EnumerationName(ir::TypeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::TypeKind) {
-  return 43;
+  return 45;
 }
 
 const char *EnumeratorName(ir::TypeKind);

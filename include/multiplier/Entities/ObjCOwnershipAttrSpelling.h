@@ -14,7 +14,7 @@ namespace mx {
 enum class ObjCOwnershipAttrSpelling : unsigned char {
   GNU_OBJC_OWNERSHIP,
   CXX11_CLANG_OBJC_OWNERSHIP,
-  C23_CLANG_OBJC_OWNERSHIP,
+  C2X_CLANG_OBJC_OWNERSHIP,
   SPELLING_NOT_CALCULATED,
 };
 

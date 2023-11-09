@@ -27,7 +27,7 @@ class TensorStoreOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::TensorType> tensor(void) const;
-  ::mx::ir::Value memref(void) const;
+  //::mlir::TypedValue<::mlir::BaseMemRefType> memref(void) const;
 };
 static_assert(sizeof(TensorStoreOp) == sizeof(Operation));
 

@@ -17,7 +17,7 @@ const char *EnumeratorName(PreserveAllAttrSpelling e) {
   switch (e) {
     case PreserveAllAttrSpelling::GNU_PRESERVE_ALL: return "GNU_PRESERVE_ALL";
     case PreserveAllAttrSpelling::CXX11_CLANG_PRESERVE_ALL: return "CXX11_CLANG_PRESERVE_ALL";
-    case PreserveAllAttrSpelling::C23_CLANG_PRESERVE_ALL: return "C23_CLANG_PRESERVE_ALL";
+    case PreserveAllAttrSpelling::C2X_CLANG_PRESERVE_ALL: return "C2X_CLANG_PRESERVE_ALL";
     case PreserveAllAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -26,7 +26,7 @@ class DeallocOp final : public Operation {
   ::mlir::memref::DeallocOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value memref(void) const;
+  //::mlir::TypedValue<::mlir::BaseMemRefType> memref(void) const;
 };
 static_assert(sizeof(DeallocOp) == sizeof(Operation));
 

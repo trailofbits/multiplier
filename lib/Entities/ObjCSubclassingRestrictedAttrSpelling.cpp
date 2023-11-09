@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCSubclassingRestrictedAttrSpelling e) {
   switch (e) {
     case ObjCSubclassingRestrictedAttrSpelling::GNU_OBJC_SUBCLASSING_RESTRICTED: return "GNU_OBJC_SUBCLASSING_RESTRICTED";
     case ObjCSubclassingRestrictedAttrSpelling::CXX11_CLANG_OBJC_SUBCLASSING_RESTRICTED: return "CXX11_CLANG_OBJC_SUBCLASSING_RESTRICTED";
-    case ObjCSubclassingRestrictedAttrSpelling::C23_CLANG_OBJC_SUBCLASSING_RESTRICTED: return "C23_CLANG_OBJC_SUBCLASSING_RESTRICTED";
+    case ObjCSubclassingRestrictedAttrSpelling::C2X_CLANG_OBJC_SUBCLASSING_RESTRICTED: return "C2X_CLANG_OBJC_SUBCLASSING_RESTRICTED";
     case ObjCSubclassingRestrictedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

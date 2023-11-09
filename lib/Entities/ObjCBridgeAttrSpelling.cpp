@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCBridgeAttrSpelling e) {
   switch (e) {
     case ObjCBridgeAttrSpelling::GNU_OBJC_BRIDGE: return "GNU_OBJC_BRIDGE";
     case ObjCBridgeAttrSpelling::CXX11_CLANG_OBJC_BRIDGE: return "CXX11_CLANG_OBJC_BRIDGE";
-    case ObjCBridgeAttrSpelling::C23_CLANG_OBJC_BRIDGE: return "C23_CLANG_OBJC_BRIDGE";
+    case ObjCBridgeAttrSpelling::C2X_CLANG_OBJC_BRIDGE: return "C2X_CLANG_OBJC_BRIDGE";
     case ObjCBridgeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

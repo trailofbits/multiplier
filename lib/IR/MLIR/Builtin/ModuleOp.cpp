@@ -13,7 +13,6 @@
 #include <multiplier/IR/Type.h>
 
 #include <mlir/Dialect/SCF/IR/SCF.h>
-#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 
 namespace mx::ir::builtin {
 std::optional<ModuleOp> ModuleOp::from(const ::mx::ir::Operation &that) {

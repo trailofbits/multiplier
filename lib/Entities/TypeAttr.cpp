@@ -11,10 +11,7 @@
 #include <multiplier/Entities/AddressSpaceAttr.h>
 #include <multiplier/Entities/AnnotateTypeAttr.h>
 #include <multiplier/Entities/ArmMveStrictPolymorphismAttr.h>
-#include <multiplier/Entities/ArmPreservesZAAttr.h>
-#include <multiplier/Entities/ArmSharedZAAttr.h>
 #include <multiplier/Entities/ArmStreamingAttr.h>
-#include <multiplier/Entities/ArmStreamingCompatibleAttr.h>
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/BTFTypeTagAttr.h>
 #include <multiplier/Entities/CmseNSCallAttr.h>
@@ -85,10 +82,7 @@ static const AttrKind kTypeAttrDerivedKinds[] = {
     AddressSpaceAttr::static_kind(),
     AnnotateTypeAttr::static_kind(),
     ArmMveStrictPolymorphismAttr::static_kind(),
-    ArmPreservesZAAttr::static_kind(),
-    ArmSharedZAAttr::static_kind(),
     ArmStreamingAttr::static_kind(),
-    ArmStreamingCompatibleAttr::static_kind(),
     BTFTypeTagAttr::static_kind(),
     CmseNSCallAttr::static_kind(),
     HLSLGroupSharedAddressSpaceAttr::static_kind(),
@@ -119,10 +113,7 @@ std::optional<TypeAttr> TypeAttr::from(const Attr &parent) {
     case AddressSpaceAttr::static_kind():
     case AnnotateTypeAttr::static_kind():
     case ArmMveStrictPolymorphismAttr::static_kind():
-    case ArmPreservesZAAttr::static_kind():
-    case ArmSharedZAAttr::static_kind():
     case ArmStreamingAttr::static_kind():
-    case ArmStreamingCompatibleAttr::static_kind():
     case BTFTypeTagAttr::static_kind():
     case CmseNSCallAttr::static_kind():
     case HLSLGroupSharedAddressSpaceAttr::static_kind():

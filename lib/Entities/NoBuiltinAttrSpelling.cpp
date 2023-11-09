@@ -17,7 +17,7 @@ const char *EnumeratorName(NoBuiltinAttrSpelling e) {
   switch (e) {
     case NoBuiltinAttrSpelling::GNU_NO_BUILTIN: return "GNU_NO_BUILTIN";
     case NoBuiltinAttrSpelling::CXX11_CLANG_NO_BUILTIN: return "CXX11_CLANG_NO_BUILTIN";
-    case NoBuiltinAttrSpelling::C23_CLANG_NO_BUILTIN: return "C23_CLANG_NO_BUILTIN";
+    case NoBuiltinAttrSpelling::C2X_CLANG_NO_BUILTIN: return "C2X_CLANG_NO_BUILTIN";
     case NoBuiltinAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

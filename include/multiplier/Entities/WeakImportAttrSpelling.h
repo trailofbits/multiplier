@@ -14,7 +14,7 @@ namespace mx {
 enum class WeakImportAttrSpelling : unsigned char {
   GNU_WEAK_IMPORT,
   CXX11_CLANG_WEAK_IMPORT,
-  C23_CLANG_WEAK_IMPORT,
+  C2X_CLANG_WEAK_IMPORT,
   SPELLING_NOT_CALCULATED,
 };
 

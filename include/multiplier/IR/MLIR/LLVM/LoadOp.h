@@ -28,12 +28,16 @@ class LoadOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> addr(void) const;
   ::mx::ir::Value res(void) const;
-  //::std::optional<::mlir::ArrayAttr> access_groups(void) const;
-  //::std::optional<::mlir::ArrayAttr> alias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> noalias_scopes(void) const;
   //::std::optional<uint64_t> alignment(void) const;
   bool volatile__(void) const;
   bool nontemporal(void) const;
+  //::mlir::LLVM::AtomicOrdering ordering(void) const;
+  std::optional<std::string_view> syncscope(void) const;
+  //::std::optional<::mlir::ArrayAttr> access_groups(void) const;
+  //::std::optional<::mlir::ArrayAttr> alias_scopes(void) const;
+  //::std::optional<::mlir::ArrayAttr> noalias_scopes(void) const;
+  //::std::optional<::mlir::ArrayAttr> tbaa(void) const;
+  //::llvm::SmallVector<::mlir::Value> accessed_operands(void) const;
 };
 static_assert(sizeof(LoadOp) == sizeof(Operation));
 

@@ -36,43 +36,45 @@ class MetaGenerator {
   const EntityMapper &em;
 
   // MLIR context for generating the mlir location from source loc
-  _Nonnull mlir::MLIRContext * const mctx;
+  mlir::MLIRContext * const mctx;
 
   const mlir::Location unknown_location;
 
  public:
-  MetaGenerator(const pasta::AST &ast, mlir::MLIRContext &mctx,
+  MetaGenerator(const pasta::AST &ast, mlir::MLIRContext &mctx_,
                 const EntityMapper &em)
       : ast(ast),
         em(em),
-        mctx(mctx),
+        mctx(&mctx_),
         unknown_location(mlir::UnknownLoc::get(mctx)) {}
 
-  vast::cg::DefaultMeta get(const clang::Decl *decl) const {
+  mlir::Location location(const clang::Decl *decl) const {
     return {Location(decl)};
   }
 
-  vast::cg::DefaultMeta get(const clang::Stmt *stmt) const {
+  mlir::Location location(const clang::Stmt *stmt) const {
     return {Location(stmt)};
   }
 
-  vast::cg::DefaultMeta get(const clang::Type *type) const {
+  mlir::Location location(const clang::Type *type) const {
     return {Location(type)};
   }
 
-  vast::cg::DefaultMeta get(const clang::QualType type) const {
+  mlir::Location location(const clang::QualType type) const {
     if (auto type_ptr = type.getTypePtrOrNull()) {
       return {Location(type_ptr)};
     }
     return {unknown_location};
   }
 
-  vast::cg::DefaultMeta get(auto token) const {
+  mlir::Location location(auto token) const {
     return {unknown_location};
   }
 
  private:
-  // Get mlir Location from the clang source location
+  // Get mlir Location from the clang source location.
+  //
+  // TODO(pag): Use a named MLIR location for the file?
   mlir::Location Location(clang::SourceLocation loc) const {
     auto file_token = ast.Adopt(loc).FileLocation();
 

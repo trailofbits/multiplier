@@ -32,7 +32,7 @@ class InvokeOp final : public Operation {
   //::mlir::Block* normal_dest(void) const;
   //::mlir::Block* unwind_dest(void) const;
   std::optional<std::string_view> callee(void) const;
-  //::std::optional<::mlir::ElementsAttr> branch_weights(void) const;
+  //::std::optional<::llvm::ArrayRef<int32_t>> branch_weights(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
   gap::generator<::mx::ir::Operand> arg_operands(void) const;
 };

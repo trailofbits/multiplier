@@ -14,7 +14,7 @@ namespace mx {
 enum class IBOutletAttrSpelling : unsigned char {
   GNU_IBOUTLET,
   CXX11_CLANG_IBOUTLET,
-  C23_CLANG_IBOUTLET,
+  C2X_CLANG_IBOUTLET,
   SPELLING_NOT_CALCULATED,
 };
 

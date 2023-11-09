@@ -79,12 +79,12 @@ std::optional<EnumType> EnumType::from(const TokenContext &t) {
 }
 
 Type EnumType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal18();
+  RawEntityId eid = impl->reader.getVal19();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool EnumType::is_sugared(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal21();
 }
 
 #pragma GCC diagnostic pop

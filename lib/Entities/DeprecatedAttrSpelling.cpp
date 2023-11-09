@@ -17,10 +17,10 @@ const char *EnumeratorName(DeprecatedAttrSpelling e) {
   switch (e) {
     case DeprecatedAttrSpelling::GNU_DEPRECATED: return "GNU_DEPRECATED";
     case DeprecatedAttrSpelling::CXX11_GNU_DEPRECATED: return "CXX11_GNU_DEPRECATED";
-    case DeprecatedAttrSpelling::C23_GNU_DEPRECATED: return "C23_GNU_DEPRECATED";
+    case DeprecatedAttrSpelling::C2X_GNU_DEPRECATED: return "C2X_GNU_DEPRECATED";
     case DeprecatedAttrSpelling::DECLSPEC_DEPRECATED: return "DECLSPEC_DEPRECATED";
     case DeprecatedAttrSpelling::CXX11_DEPRECATED: return "CXX11_DEPRECATED";
-    case DeprecatedAttrSpelling::C23_DEPRECATED: return "C23_DEPRECATED";
+    case DeprecatedAttrSpelling::C2X_DEPRECATED: return "C2X_DEPRECATED";
     case DeprecatedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

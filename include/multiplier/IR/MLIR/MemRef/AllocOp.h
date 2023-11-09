@@ -32,6 +32,7 @@ class AllocOp final : public Operation {
   //::std::optional<uint64_t> alignment(void) const;
   //StringRef alignment_attr_str_name(void) const;
   //MemRefType type(void) const;
+  //SmallVector<OpFoldResult> mixed_sizes(void) const;
 };
 static_assert(sizeof(AllocOp) == sizeof(Operation));
 

@@ -14,7 +14,7 @@ namespace mx {
 enum class ObjCRootClassAttrSpelling : unsigned char {
   GNU_OBJC_ROOT_CLASS,
   CXX11_CLANG_OBJC_ROOT_CLASS,
-  C23_CLANG_OBJC_ROOT_CLASS,
+  C2X_CLANG_OBJC_ROOT_CLASS,
   SPELLING_NOT_CALCULATED,
 };
 

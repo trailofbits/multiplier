@@ -54,4 +54,9 @@ gap::generator<::mx::ir::Result> ExtractStridedMetadataOp::strides(void) const {
   }
 }
 
+::mx::ir::Value ExtractStridedMetadataOp::view_source(void) const {
+  auto val = underlying_op().getViewSource();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
 }  // namespace mx::ir::memref

@@ -18,7 +18,7 @@ const char *EnumeratorName(OpenCLPrivateAddressSpaceAttrSpelling e) {
     case OpenCLPrivateAddressSpaceAttrSpelling::KEYWORD_PRIVATE: return "KEYWORD_PRIVATE";
     case OpenCLPrivateAddressSpaceAttrSpelling::GNU_OPENCL_PRIVATE: return "GNU_OPENCL_PRIVATE";
     case OpenCLPrivateAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_PRIVATE: return "CXX11_CLANG_OPENCL_PRIVATE";
-    case OpenCLPrivateAddressSpaceAttrSpelling::C23_CLANG_OPENCL_PRIVATE: return "C23_CLANG_OPENCL_PRIVATE";
+    case OpenCLPrivateAddressSpaceAttrSpelling::C2X_CLANG_OPENCL_PRIVATE: return "C2X_CLANG_OPENCL_PRIVATE";
     case OpenCLPrivateAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

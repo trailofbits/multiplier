@@ -28,8 +28,13 @@ class MemcpyInlineOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> dst(void) const;
   //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> src(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> len(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> is_volatile(void) const;
+  //::mlir::APInt len(void) const;
+  bool is_volatile(void) const;
+  //::std::optional<::mlir::ArrayAttr> access_groups(void) const;
+  //::std::optional<::mlir::ArrayAttr> alias_scopes(void) const;
+  //::std::optional<::mlir::ArrayAttr> noalias_scopes(void) const;
+  //::std::optional<::mlir::ArrayAttr> tbaa(void) const;
+  //::llvm::SmallVector<::mlir::Value> accessed_operands(void) const;
 };
 static_assert(sizeof(MemcpyInlineOp) == sizeof(Operation));
 

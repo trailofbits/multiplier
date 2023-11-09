@@ -17,7 +17,7 @@ const char *EnumeratorName(ReadOnlyPlacementAttrSpelling e) {
   switch (e) {
     case ReadOnlyPlacementAttrSpelling::GNU_ENFORCE_READ_ONLY_PLACEMENT: return "GNU_ENFORCE_READ_ONLY_PLACEMENT";
     case ReadOnlyPlacementAttrSpelling::CXX11_CLANG_ENFORCE_READ_ONLY_PLACEMENT: return "CXX11_CLANG_ENFORCE_READ_ONLY_PLACEMENT";
-    case ReadOnlyPlacementAttrSpelling::C23_CLANG_ENFORCE_READ_ONLY_PLACEMENT: return "C23_CLANG_ENFORCE_READ_ONLY_PLACEMENT";
+    case ReadOnlyPlacementAttrSpelling::C2X_CLANG_ENFORCE_READ_ONLY_PLACEMENT: return "C2X_CLANG_ENFORCE_READ_ONLY_PLACEMENT";
     case ReadOnlyPlacementAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

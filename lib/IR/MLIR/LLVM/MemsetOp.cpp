@@ -34,4 +34,9 @@ std::optional<MemsetOp> MemsetOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::MemsetOp(this->Operation::op_);
 }
 
+bool MemsetOp::is_volatile(void) const {
+  auto val = underlying_op().getIsVolatile();
+  return val;
+}
+
 }  // namespace mx::ir::llvm

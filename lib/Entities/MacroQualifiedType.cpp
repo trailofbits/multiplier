@@ -78,22 +78,22 @@ std::optional<MacroQualifiedType> MacroQualifiedType::from(const TokenContext &t
 }
 
 Type MacroQualifiedType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal17();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
-Type MacroQualifiedType::modified_type(void) const {
   RawEntityId eid = impl->reader.getVal18();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
+Type MacroQualifiedType::modified_type(void) const {
+  RawEntityId eid = impl->reader.getVal19();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
+}
+
 Type MacroQualifiedType::underlying_type(void) const {
-  RawEntityId eid = impl->reader.getVal24();
+  RawEntityId eid = impl->reader.getVal25();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool MacroQualifiedType::is_sugared(void) const {
-  return impl->reader.getVal19();
+  return impl->reader.getVal20();
 }
 
 #pragma GCC diagnostic pop

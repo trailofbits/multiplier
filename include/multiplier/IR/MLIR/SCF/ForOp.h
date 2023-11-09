@@ -26,9 +26,9 @@ class ForOp final : public Operation {
   ::mlir::scf::ForOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IndexType> lower_bound(void) const;
-  //::mlir::TypedValue<::mlir::IndexType> upper_bound(void) const;
-  //::mlir::TypedValue<::mlir::IndexType> step(void) const;
+  ::mx::ir::Value lower_bound(void) const;
+  ::mx::ir::Value upper_bound(void) const;
+  ::mx::ir::Value step(void) const;
   gap::generator<::mx::ir::Operand> init_args(void) const;
   gap::generator<::mx::ir::Result> results(void) const;
   ::mx::ir::Region region(void) const;

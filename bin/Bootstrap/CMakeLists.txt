@@ -86,38 +86,9 @@ if(MX_BOOTSTRAP_VAST)
   target_link_libraries("mx-bootstrap-vast"
     PRIVATE
       "mx-bootstrap"
-      
-      VAST::VASTCore
-      VAST::VASTMeta
-      VAST::VASTLowLevel
-      VAST::VASTHighLevel
-      VAST::VASTUnsupported
 
-      MLIRDialect
-      MLIRAMDGPUDialect
-      MLIRAsyncDialect
-      MLIREmitCDialect
-      MLIRIndexDialect
-      MLIRMLProgramDialect
-      MLIRNVGPUDialect
-      MLIROpenACCDialect
-      MLIROpenMPDialect
-      MLIRROCDLDialect
-      MLIRShapeDialect
-      MLIRSPIRVDialect
-      MLIRTosaDialect
-  
-      MLIRLLVMIRTransforms
-      MLIRShapeOpsTransforms
-      MLIRSparseTensorTransforms
-      MLIRAffineTransformOps
-      MLIRBufferizationTransformOps
-      MLIRGPUTransformOps
-      MLIRLinalgTransformOps
-      MLIRMemRefTransformOps
-      MLIRSCFTransformOps
-      MLIRVectorTransformOps
-      MLIRTensorInferTypeOpInterfaceImpl
+      ${MLIR_LIBS}
+      ${VAST_LIBS}
   )
   
   # Run `mx-bootstrap-vast` to auto-generate the files.

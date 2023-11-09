@@ -46,13 +46,8 @@ enum class AttrKind : unsigned short {
   ARC_WEAKREF_UNAVAILABLE,
   ARGUMENT_WITH_TYPE_TAG,
   ARM_BUILTIN_ALIAS,
-  ARM_LOCALLY_STREAMING,
   ARM_MVE_STRICT_POLYMORPHISM,
-  ARM_NEW_ZA,
-  ARM_PRESERVES_ZA,
-  ARM_SHARED_ZA,
   ARM_STREAMING,
-  ARM_STREAMING_COMPATIBLE,
   ARTIFICIAL,
   ASM_LABEL,
   ASSERT_CAPABILITY,
@@ -396,7 +391,7 @@ inline static const char *EnumerationName(AttrKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(AttrKind) {
-  return 377;
+  return 372;
 }
 
 const char *EnumeratorName(AttrKind);

@@ -17,7 +17,7 @@ const char *EnumeratorName(FastCallAttrSpelling e) {
   switch (e) {
     case FastCallAttrSpelling::GNU_FASTCALL: return "GNU_FASTCALL";
     case FastCallAttrSpelling::CXX11_GNU_FASTCALL: return "CXX11_GNU_FASTCALL";
-    case FastCallAttrSpelling::C23_GNU_FASTCALL: return "C23_GNU_FASTCALL";
+    case FastCallAttrSpelling::C2X_GNU_FASTCALL: return "C2X_GNU_FASTCALL";
     case FastCallAttrSpelling::KEYWORD_FASTCALL: return "KEYWORD_FASTCALL";
     case FastCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

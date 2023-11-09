@@ -47,7 +47,6 @@
 #include <multiplier/Entities/OMPParallelMasterTaskLoopSimdDirective.h>
 #include <multiplier/Entities/OMPParallelSectionsDirective.h>
 #include <multiplier/Entities/OMPScanDirective.h>
-#include <multiplier/Entities/OMPScopeDirective.h>
 #include <multiplier/Entities/OMPSectionDirective.h>
 #include <multiplier/Entities/OMPSectionsDirective.h>
 #include <multiplier/Entities/OMPSimdDirective.h>
@@ -179,7 +178,6 @@ static const StmtKind kOMPExecutableDirectiveDerivedKinds[] = {
     OMPParallelMasterDirective::static_kind(),
     OMPParallelSectionsDirective::static_kind(),
     OMPScanDirective::static_kind(),
-    OMPScopeDirective::static_kind(),
     OMPSectionDirective::static_kind(),
     OMPSectionsDirective::static_kind(),
     OMPSingleDirective::static_kind(),
@@ -255,7 +253,6 @@ std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const Stmt &p
     case OMPParallelMasterDirective::static_kind():
     case OMPParallelSectionsDirective::static_kind():
     case OMPScanDirective::static_kind():
-    case OMPScopeDirective::static_kind():
     case OMPSectionDirective::static_kind():
     case OMPSectionsDirective::static_kind():
     case OMPSingleDirective::static_kind():

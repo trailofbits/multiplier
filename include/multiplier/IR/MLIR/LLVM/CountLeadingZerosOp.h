@@ -27,8 +27,8 @@ class CountLeadingZerosOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> zero_undefined(void) const;
   ::mx::ir::Value res(void) const;
+  bool is_zero_poison(void) const;
 };
 static_assert(sizeof(CountLeadingZerosOp) == sizeof(Operation));
 

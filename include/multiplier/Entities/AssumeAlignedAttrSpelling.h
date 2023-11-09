@@ -14,7 +14,7 @@ namespace mx {
 enum class AssumeAlignedAttrSpelling : unsigned char {
   GNU_ASSUME_ALIGNED,
   CXX11_GNU_ASSUME_ALIGNED,
-  C23_GNU_ASSUME_ALIGNED,
+  C2X_GNU_ASSUME_ALIGNED,
   SPELLING_NOT_CALCULATED,
 };
 

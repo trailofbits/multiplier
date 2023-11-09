@@ -14,7 +14,7 @@ namespace mx {
 enum class NoSplitStackAttrSpelling : unsigned char {
   GNU_NO_SPLIT_STACK,
   CXX11_GNU_NO_SPLIT_STACK,
-  C23_GNU_NO_SPLIT_STACK,
+  C2X_GNU_NO_SPLIT_STACK,
   SPELLING_NOT_CALCULATED,
 };
 

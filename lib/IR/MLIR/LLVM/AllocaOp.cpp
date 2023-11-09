@@ -34,4 +34,9 @@ std::optional<AllocaOp> AllocaOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::AllocaOp(this->Operation::op_);
 }
 
+bool AllocaOp::inalloca(void) const {
+  auto val = underlying_op().getInalloca();
+  return val;
+}
+
 }  // namespace mx::ir::llvm

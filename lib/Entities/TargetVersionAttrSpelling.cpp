@@ -17,7 +17,7 @@ const char *EnumeratorName(TargetVersionAttrSpelling e) {
   switch (e) {
     case TargetVersionAttrSpelling::GNU_TARGET_VERSION: return "GNU_TARGET_VERSION";
     case TargetVersionAttrSpelling::CXX11_GNU_TARGET_VERSION: return "CXX11_GNU_TARGET_VERSION";
-    case TargetVersionAttrSpelling::C23_GNU_TARGET_VERSION: return "C23_GNU_TARGET_VERSION";
+    case TargetVersionAttrSpelling::C2X_GNU_TARGET_VERSION: return "C2X_GNU_TARGET_VERSION";
     case TargetVersionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }
