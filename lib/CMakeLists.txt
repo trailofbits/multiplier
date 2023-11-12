@@ -155,6 +155,7 @@ add_library("mx-api" STATIC
   "Types.h"
   "Types.cpp"
   "Util.h"
+  "Util.cpp"
 
   # Auto-generated.
   ${copied_headers}

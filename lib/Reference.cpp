@@ -129,7 +129,7 @@ gap::generator<Reference> EmptyReferences(void) {
 gap::generator<Reference> References(EntityProviderPtr ep, RawEntityId raw_id,
                                      EntityProvider::ReferenceDirection dir) {
   for (auto [entity_id, context_id, kind_id] : ep->References(ep, raw_id, dir)) {
-    if (auto eptr = ReferencedEntity(ep, entity_id); eptr) {
+    if (auto eptr = ReferencedEntity(ep, entity_id)) {
       co_yield Reference(std::move(eptr), context_id, entity_id, kind_id);
     }
   }
@@ -140,17 +140,15 @@ RawEntityId ReferenceKind::id(void) const noexcept {
 }
 
 // Get a reference kind for a builtin kind.
-ReferenceKind ReferenceKind::get(const Index &index, BuiltinReferenceKind kind) {
+ReferenceKind ReferenceKind::get(const Index &index,
+                                 BuiltinReferenceKind kind) {
   const auto &ep = index.impl;
-  ReferenceKindImplPtr rptr =
-      ep->ReferenceKindFor(ep, static_cast<RawEntityId>(kind));
-  if (!rptr) {
-    assert(false);
-    rptr = std::make_shared<ReferenceKindImpl>(
-        kInvalidEP, ~0ull, "<invalid>");
+  if (auto rptr = ep->ReferenceKindFor(ep, static_cast<RawEntityId>(kind))) {
+    return rptr;
   }
 
-  return rptr;
+  assert(false);
+  return std::make_shared<ReferenceKindImpl>(kInvalidEP, ~0ull, "<invalid>");
 }
 
 // Get or create a reference kind.

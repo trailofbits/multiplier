@@ -3608,8 +3608,7 @@ MethodListPtr CodeGenerator::RunOnClass(
   if (class_name == "FunctionDecl") {
     forward_decls.insert("CallExpr");
     class_os
-        << "  gap::generator<CallExpr> callers(void) const &;\n"
-        << "  gap::generator<CallExpr> callees(void) const &;\n";
+        << "  gap::generator<Stmt> callers(void) const &;\n";
   }
 
   // Allows CallExpr to conveniently get post-cast types if exists

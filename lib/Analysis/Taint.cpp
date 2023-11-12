@@ -38,6 +38,7 @@
 #include <unordered_set>
 
 #include "../Types.h"
+#include "../Util.h"
 
 namespace mx {
 
@@ -188,27 +189,6 @@ TaintTrackingResults TaintTrackerImpl::AcceptDecl(Decl decl) {
     for (TaintTrackingResult res : TaintValue(std::move(val.value()))) {
       co_yield res;
     }
-  }
-}
-
-static bool IsNonValueStatement(StmtKind kind) {
-  switch (kind) {
-    case StmtKind::CASE_STMT:
-    case StmtKind::DEFAULT_STMT:
-    case StmtKind::LABEL_STMT:
-    case StmtKind::COMPOUND_STMT:
-    case StmtKind::SWITCH_STMT:
-    case StmtKind::DO_STMT:
-    case StmtKind::WHILE_STMT:
-    case StmtKind::FOR_STMT:
-    case StmtKind::IF_STMT:
-    case StmtKind::CXX_TRY_STMT:
-    case StmtKind::CXX_FOR_RANGE_STMT:
-    case StmtKind::CXX_CATCH_STMT:
-    case StmtKind::COROUTINE_BODY_STMT:  // Not sure what this is.
-      return true;
-    default:
-      return false;
   }
 }
 

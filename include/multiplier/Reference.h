@@ -24,12 +24,67 @@ using OpaqueImplPtr = std::shared_ptr<const void>;
 using ReferenceKindImplPtr = std::shared_ptr<const ReferenceKindImpl>;
 using WeakReferenceKindImplPtr = std::weak_ptr<const ReferenceKindImpl>;
 
+// Multiplier's builtin reference kinds are slightly odd. In practice, an
+// automatically added reference always has the referenced entity as a
+// `Decl`, and the referencing entity as a `Stmt`, specifically one of
+// `DeclRefExpr`, `MemberExpr`, `AddrLabelExpr`, `CXXConstructExpr`,
+// `DesignatedInitExpr`, or `InitListExpr`. And yet, the builtin reference kind
+// presents higher level "verbs" that describe the context of the reference.
+//
+// This can be understood in terms of our reference representation, specifically
+// the `context` field:
+//
+//      from:     Entity which refers to `to`.
+//      kind:     The kind of the reference.
+//      to:       Entity referenced by `from`.
+//      context:  For builtin reference kinds, this is either `from`, or it is
+//                a parent of `from`.
+//
+// Thus, with builtin reference kinds, one is to understand the `kind` as a verb
+// of the form "`from` is or is in `context`, and `kind` `to`". For example,
+// "`DeclRefExpr` is or is in `CallExpr`, and `CALLS` `FunctionDecl`".
+//
+// This is a bit of a funny representation, but it provides useful baseline
+// classification of the reference, while maintaining the precision of `from`,
+// i.e. via the `from` entity, we should always be able to find the `to` entity
+// (or a redeclaration thereof), e.g. via a method call.
 enum class BuiltinReferenceKind {
-  USE,  // Default value as some kind of uses.
-  ADDRESS_OF,
-  ASSIGNED_TO,
-  ASSIGNEMENT,
+
+  // Default kind when we don't have a better classification.
+  USES,
+
+  // In the case of variables, this corresponds to `&var`. We say that the
+  // expression `&...` takes the address of `var`.
+  //
+  // In the case of fields, this corresponds to `&....field` or
+  // `&...->field`, and we say that the expression `&...` takes the address
+  // of `field`. This also applies through reference casts and paren
+  // expressions.
+  //
+  // In the case of functions, this corresponds to raw uses of function/method
+  // pointers, and the `&` unary operation. For example, if we have `... = func`,
+  // or `&func`, or `...(func)` then we say the expression `... = ...`,
+  // `&...`, or `...(...)` takes the address of `func`, respectively.
+  // `func`.
+  TAKES_ADDRESS_OF,
+
+  // Corresponds to an assignment. E.g. if `... = b`, then we say that the
+  // expression `... = ...` copies the value of `b`.
+  COPIES_VALUE,
+
+  // If we have `a(...)` then we say that the expression `...(...)` calls `a`.
   CALLS,
+
+  // If we have `...(a), then we say that the expression `...(...)` takes the
+  // value `a`.
+  TAKES_VALUE,
+
+  // If we have something like `while (a) ...` or `do ... while (a);` or
+  // `switch(a) ...` or `for(; a; ) ...` or `if (a) ...` or `a ? ... : ...`
+  // then we say that the expression, e.g. `while (...) ...`, tests the value
+  // `a`.
+  TESTS_VALUE,
+
   CALL_ARGUMENT,
   USED_BY,
   DEREFERENCE,
@@ -39,8 +94,8 @@ enum class BuiltinReferenceKind {
   INITIALZATION,
   CONDITIONAL_TEST,
   TYPE_CASTS,
-  STATEMENT_USES,
   TYPE_TRAIT_USES,
+  TYPE_DECLARATORS,
 };
 
 inline static const char *EnumerationName(BuiltinReferenceKind) {

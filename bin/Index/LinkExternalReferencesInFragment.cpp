@@ -41,11 +41,11 @@ extern void DeclReferenceKind(
 
 namespace {
 
-template <typename Entity>
+template <typename Entity, mx::BuiltinReferenceKind kDefaultKind>
 static void AddDeclReferenceFrom(
     const pasta::AST &ast, mx::DatabaseWriter &database, const EntityMapper &em,
     const Entity &from_entity, mx::RawEntityId from_id,
-    const pasta::Decl &to_entity) {
+    const pasta::Decl &to_entity, mx::BuiltinReferenceKind default_kind) {
 
   auto to_id = em.EntityId(to_entity);
   if (!mx::EntityId(to_id).Extract<mx::DeclId>()) {
@@ -56,8 +56,7 @@ static void AddDeclReferenceFrom(
   // The referer context id will be same as `from_id` by default. The
   // DeclReferenceKind function updates it based on the AST analysis
   // of the context in which declaration is referred.
-  mx::ReferenceRecord record{
-      from_id, to_id, from_id, mx::BuiltinReferenceKind::USE};
+  mx::ReferenceRecord record{from_id, to_id, from_id, default_kind};
   DeclReferenceKind(ast, em, from_entity, to_entity, record);
   database.AddAsync(record);
 }
@@ -66,7 +65,8 @@ template <typename EntityId, typename EntityKindListMap>
 static void AddDeclReferencesFrom(
     const pasta::AST &ast, mx::DatabaseWriter &database,
     const PendingFragment &pf,
-    const EntityKindListMap &entities) {
+    const EntityKindListMap &entities,
+    mx::BuiltinReferenceKind default_kind) {
 
   for (auto from_entity : Entities(entities)) {
     mx::RawEntityId from_id = pf.em.EntityId(from_entity);
@@ -83,7 +83,8 @@ static void AddDeclReferencesFrom(
     }
 
     for (pasta::Decl to_entity : DeclReferencesFrom(from_entity)) {
-      AddDeclReferenceFrom(ast, database, pf.em, from_entity, from_id, to_entity);
+      AddDeclReferenceFrom(ast, database, pf.em, from_entity, from_id,
+                           to_entity, default_kind);
     }
   }
 }
@@ -102,8 +103,11 @@ void LinkExternalReferencesInFragment(
   //            expressed in types. In PASTA, we don't present Clang's
   //            `TypeLoc`s, so we need to instead go through the types to find
   //            which ones are explicitly referenced.
-  AddDeclReferencesFrom<mx::DeclId>(ast, database, pf, pf.decls_to_serialize);
-  AddDeclReferencesFrom<mx::StmtId>(ast, database, pf, pf.stmts_to_serialize);
+  AddDeclReferencesFrom<mx::DeclId>(ast, database, pf, pf.decls_to_serialize,
+                                    mx::BuiltinReferenceKind::TYPE_DECLARATORS);
+
+  AddDeclReferencesFrom<mx::StmtId>(ast, database, pf, pf.stmts_to_serialize,
+                                    mx::BuiltinReferenceKind::USES);
 
   // XREF(pag): Issue #192. Make sure we record references from designators
   //            to fields.
