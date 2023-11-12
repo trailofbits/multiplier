@@ -24,6 +24,7 @@
 #include "EntityMapper.h"
 #include "PASTA.h"
 #include "PendingFragment.h"
+#include "References.h"
 #include "TokenTree.h"
 #include "Util.h"
 namespace indexer {

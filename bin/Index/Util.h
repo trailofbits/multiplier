@@ -93,21 +93,6 @@ mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity);
 // Returns `true` if `decl` is a definition.
 bool IsDefinition(const pasta::Decl &decl);
 
-// Try to find the `Decl` referenced by a particular `type`.
-std::optional<pasta::Decl> ReferencedDecl(const pasta::Type &type);
-
-// Try to find the `Decl` referenced by a particular `stmt`.
-std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt);
-
-// Try to find the `Decl` referenced by a particular `stmt`.
-gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Decl decl);
-
-// Try to find the `Decl` referenced by a particular `stmt`.
-gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt);
-
-// Try to find the `Decl` referenced by a particular `type`.
-gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type);
-
 // Generate the token contexts associated with a printed token.
 gap::generator<pasta::TokenContext> TokenContexts(pasta::PrintedToken tok);
 

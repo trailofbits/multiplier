@@ -3907,6 +3907,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#include \"Entity.h\"\n"
       << "#include \"EntityMapper.h\"\n"
       << "#include \"PASTA.h\"\n"
+      << "#include \"References.h\"\n"
       << "#include \"PendingFragment.h\"\n"
       << "#include \"TokenTree.h\"\n"
       << "#include \"Util.h\"\n"

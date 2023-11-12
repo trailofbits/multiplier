@@ -903,7 +903,7 @@ bool BulkInserterState::InsertAsync(
       record.to_entity_id != kInvalidEntityId) {
     insert.BindValuesWithoutCopying(record.from_entity_id,
                                     record.to_entity_id,
-                                    record.context_id,
+                                    record.context_entity_id,
                                     static_cast<unsigned>(record.kind));
     return true;
   }

@@ -300,7 +300,9 @@ struct ReferenceRecord {
 
   // Entity id of the context in which reference has happened. It will
   // be either same as `from_entity_id` or ancestor of `from_entity_id`.
-  RawEntityId context_id;
+  RawEntityId context_entity_id;
+
+  // Kind of this reference.
   mx::BuiltinReferenceKind kind;
 };
 

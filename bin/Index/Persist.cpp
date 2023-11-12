@@ -383,8 +383,8 @@ struct TokenTreeSerializationSchedule {
 //
 // NOTE(pag): This is a *backup* approach when building a token tree fails.
 static void PersistParsedTokens(
-    mx::DatabaseWriter &database, PendingFragment &pf,
-    mx::rpc::Fragment::Builder &fb, TokenProvenanceCalculator &provenance) {
+    PendingFragment &pf, mx::rpc::Fragment::Builder &fb,
+    TokenProvenanceCalculator &provenance) {
 
   std::string utf8_fragment_data;
 
@@ -451,9 +451,8 @@ static std::string MainSourceFile(const PendingFragment &pf) {
 // are macro tokens. The top-level substitution points to the macro code in
 // before IDs, and the
 static void PersistTokenTree(
-    mx::DatabaseWriter &database, PendingFragment &pf,
-    mx::rpc::Fragment::Builder &fb, TokenTreeNodeRange nodes,
-    TokenProvenanceCalculator &provenance) {
+    PendingFragment &pf, mx::rpc::Fragment::Builder &fb,
+    TokenTreeNodeRange nodes, TokenProvenanceCalculator &provenance) {
 
   const EntityMapper &em = pf.em;
 
@@ -765,7 +764,7 @@ void GlobalIndexingState::PersistFragment(
       pf.original_tokens, pf.parsed_tokens, tok_tree_err);
 
   if (maybe_tt) {
-    PersistTokenTree(database, pf, fb, std::move(maybe_tt.value()), provenance);
+    PersistTokenTree(pf, fb, std::move(maybe_tt.value()), provenance);
 
   // If we don't have the normal or the backup token tree, then do a best
   // effort saving of macro tokens. Don't bother organizing them into
@@ -785,7 +784,7 @@ void GlobalIndexingState::PersistFragment(
           << MainSourceFile(ast);
     }
 
-    PersistParsedTokens(database, pf, fb, provenance);
+    PersistParsedTokens(pf, fb, provenance);
   }
 
   PersistTokenContexts(em, pf.parsed_tokens, pf.fragment_index, fb);

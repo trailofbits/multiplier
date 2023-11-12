@@ -229,7 +229,7 @@ class BuildCommandAction final : public Action {
 
   bool CanRunCompileJob(const pasta::CompileJob &job) const;
 
-  std::variant<CompilerPathInfo, std::string> GetCompilerInfo(
+  static std::variant<CompilerPathInfo, std::string> GetCompilerInfo(
       const Command &command);
 
  public:

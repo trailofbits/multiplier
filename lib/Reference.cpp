@@ -103,22 +103,19 @@ static bool AddReference(const EntityProviderPtr &ep, RawEntityId kind_id,
 
 const char *EnumeratorName(BuiltinReferenceKind kind) {
   switch (kind) {
-    case BuiltinReferenceKind::USE: return "USE";
-    case BuiltinReferenceKind::ADDRESS_OF: return "ADDRESS_OF";
-    case BuiltinReferenceKind::ASSIGNED_TO: return "ASSIGNED_TO";
-    case BuiltinReferenceKind::ASSIGNEMENT: return "ASSIGNEMENT";
+    case BuiltinReferenceKind::USES_VALUE: return "USES_VALUE";
+    case BuiltinReferenceKind::USES_TYPE: return "USES_TYPE";
+    case BuiltinReferenceKind::CASTS_WITH_TYPE: return "CASTS_WITH_TYPE";
+    case BuiltinReferenceKind::COPIES_VALUE: return "COPIES_VALUE";
+    case BuiltinReferenceKind::TESTS_VALUE: return "TESTS_VALUE";
+    case BuiltinReferenceKind::WRITES_VALUE: return "WRITES_VALUE";
+    case BuiltinReferenceKind::UPDATES_VALUE: return "UPDATES_VALUE";
+    case BuiltinReferenceKind::ACCESSES_VALUE: return "ACCESSES_VALUE";
+    case BuiltinReferenceKind::TAKES_VALUE: return "TAKES_VALUE";
     case BuiltinReferenceKind::CALLS: return "CALLS";
-    case BuiltinReferenceKind::CALL_ARGUMENT: return "CALL_ARGUMENT";
-    case BuiltinReferenceKind::USED_BY: return "USED_BY";
-    case BuiltinReferenceKind::DEREFERENCE: return "DEREFERENCE";
-    case BuiltinReferenceKind::ENUMERATIONS: return "ENUMERATIONS";
+    case BuiltinReferenceKind::TAKES_ADDRESS: return "TAKES_ADDRESS";
+    case BuiltinReferenceKind::INCLUDES_FILE: return "INCLUDES_FILE";
     case BuiltinReferenceKind::EXPANSION_OF: return "EXPANSION_OF";
-    case BuiltinReferenceKind::INCLUSION: return "INCLUSION";
-    case BuiltinReferenceKind::INITIALZATION: return "INITIALZATION";
-    case BuiltinReferenceKind::CONDITIONAL_TEST: return "CONDITIONAL_TEST";
-    case BuiltinReferenceKind::TYPE_CASTS: return "TYPE_CASTS";
-    case BuiltinReferenceKind::STATEMENT_USES: return "STATEMENT_USES";
-    case BuiltinReferenceKind::TYPE_TRAIT_USES: return "TYPE_TRAIT_USES";
   }
 }
 
@@ -148,20 +145,20 @@ ReferenceKind ReferenceKind::get(const Index &index,
   }
 
   assert(false);
-  return std::make_shared<ReferenceKindImpl>(kInvalidEP, ~0ull, "<invalid>");
+  return std::make_shared<const ReferenceKindImpl>(
+      kInvalidEP, ~0ull, "<invalid>");
 }
 
 // Get or create a reference kind.
 ReferenceKind ReferenceKind::get(const Index &index, std::string_view name) {
   const auto &ep = index.impl;
-  ReferenceKindImplPtr rptr = ep->ReferenceKindFor(ep, name);
-  if (!rptr) {
-    assert(false);
-    rptr = std::make_shared<ReferenceKindImpl>(
-        kInvalidEP, ~0ull, "<invalid>");
+  if (ReferenceKindImplPtr rptr = ep->ReferenceKindFor(ep, name)) {
+    return rptr;
   }
 
-  return rptr;
+  assert(false);
+  return std::make_shared<const ReferenceKindImpl>(
+      kInvalidEP, ~0ull, "<invalid>");
 }
 
 // Is this a built-in reference kind?

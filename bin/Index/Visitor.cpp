@@ -571,12 +571,12 @@ void EntityVisitor::Accept(const pasta::TemplateArgument &entity) {
   }
 }
 
-void EntityVisitor::Accept(const pasta::Designator &entity) {
+void EntityVisitor::Accept(const pasta::Designator &) {
   // NOTE(pag): Don't need to enter the fields of the designators; they're
   //            likely defined elsewhere.
 }
 
-void EntityVisitor::Accept(const pasta::CXXBaseSpecifier &entity) {
+void EntityVisitor::Accept(const pasta::CXXBaseSpecifier &) {
   // NOTE(pag): Don't need to enter the bases; they're likely top-level
   //            declarations.
 }

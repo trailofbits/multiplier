@@ -195,15 +195,18 @@ gap::generator<Stmt> FunctionDecl::callers() const & {
     }
 
     // The `context_id` should point to a `CallExpr`.
-    if (auto context_id = EntityId(context_id).Extract<StmtId>()) {
-      if (context_id->kind == StmtKind::CALL_EXPR) {
+    if (auto context_stmt_id = EntityId(context_id).Extract<StmtId>()) {
+      if (context_stmt_id->kind == StmtKind::CALL_EXPR ||
+          context_stmt_id->kind == StmtKind::CXX_NEW_EXPR ||
+          context_stmt_id->kind == StmtKind::CXX_DELETE_EXPR) {
         if (auto eptr = ep->StmtFor(ep, context_id)) {
           co_yield Stmt(std::move(eptr));
           continue;
         }
       }
 
-      if (context_id->kind == StmtKind::CXX_CONSTRUCT_EXPR && is_constructor) {
+      if (context_stmt_id->kind == StmtKind::CXX_CONSTRUCT_EXPR &&
+          is_constructor) {
         if (auto eptr = ep->StmtFor(ep, context_id)) {
           co_yield Stmt(std::move(eptr));
           continue;

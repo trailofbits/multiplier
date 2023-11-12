@@ -176,8 +176,7 @@ class FunctionDecl : public DeclaratorDecl {
   bool will_have_body(void) const;
   std::optional<Stmt> body(void) const;
   gap::generator<Decl> declarations_in_context(void) const &;
-  gap::generator<CallExpr> callers(void) const &;
-  gap::generator<CallExpr> callees(void) const &;
+  gap::generator<Stmt> callers(void) const &;
 };
 
 static_assert(sizeof(FunctionDecl) == sizeof(DeclaratorDecl));

@@ -50,8 +50,45 @@ using WeakReferenceKindImplPtr = std::weak_ptr<const ReferenceKindImpl>;
 // (or a redeclaration thereof), e.g. via a method call.
 enum class BuiltinReferenceKind {
 
-  // Default kind when we don't have a better classification.
-  USES,
+  // Default kind when the `to` entity is a `ValueDecl`.
+  USES_VALUE,
+
+  // Default kind when the `to` entity is a `TypeDecl`. Generally, this
+  // corresponds to a use of type in a declarator.
+  USES_TYPE,
+
+  // Used in a cast expression.
+  CASTS_WITH_TYPE,
+
+  // Corresponds to an assignment. E.g. if `... = b`, then we say that the
+  // expression `... = ...` copies the value of `b`.
+  COPIES_VALUE,
+
+  // If we have something like `while (a) ...` or `do ... while (a);` or
+  // `switch(a) ...` or `for(; a; ) ...` or `if (a) ...` or `a ? ... : ...`
+  // then we say that the expression, e.g. `while (...) ...`, tests the value
+  // `a`. This is a special form of `READS_VALUE`.
+  TESTS_VALUE,
+
+  // If we have `a = ...` then we say that the expression `... = ...` writes
+  // to the value `a`.
+  WRITES_VALUE,
+
+  // If an expression mutates something in place, e.g. `++a`, then we say that
+  // the expression `++...` updates `a`.
+  UPDATES_VALUE,
+
+  // If we have something like `*a`, `a. ...`, `a->...`, or `a[...]` then we say
+  // that the exression `*...`, `... . ...`, `...->...`, or `...[...]` accesses
+  // the value `a`, respectively.
+  ACCESSES_VALUE,
+
+  // If we have `...(a), then we say that the expression `...(...)` takes the
+  // value `a`. This is similar to `COPIES_VALUE`.
+  TAKES_VALUE,
+
+  // If we have `a(...)` then we say that the expression `...(...)` calls `a`.
+  CALLS,
 
   // In the case of variables, this corresponds to `&var`. We say that the
   // expression `&...` takes the address of `var`.
@@ -66,36 +103,16 @@ enum class BuiltinReferenceKind {
   // or `&func`, or `...(func)` then we say the expression `... = ...`,
   // `&...`, or `...(...)` takes the address of `func`, respectively.
   // `func`.
-  TAKES_ADDRESS_OF,
+  TAKES_ADDRESS,
 
-  // Corresponds to an assignment. E.g. if `... = b`, then we say that the
-  // expression `... = ...` copies the value of `b`.
-  COPIES_VALUE,
+  // If there is a `#include "a"`, `#include <a>`, `#include_next ...`,
+  // `#import ...`, then we say the macro `#include ...` includes the
+  // entity `a`.
+  INCLUDES_FILE,
 
-  // If we have `a(...)` then we say that the expression `...(...)` calls `a`.
-  CALLS,
-
-  // If we have `...(a), then we say that the expression `...(...)` takes the
-  // value `a`.
-  TAKES_VALUE,
-
-  // If we have something like `while (a) ...` or `do ... while (a);` or
-  // `switch(a) ...` or `for(; a; ) ...` or `if (a) ...` or `a ? ... : ...`
-  // then we say that the expression, e.g. `while (...) ...`, tests the value
-  // `a`.
-  TESTS_VALUE,
-
-  CALL_ARGUMENT,
-  USED_BY,
-  DEREFERENCE,
-  ENUMERATIONS,
-  EXPANSION_OF,
-  INCLUSION,
-  INITIALZATION,
-  CONDITIONAL_TEST,
-  TYPE_CASTS,
-  TYPE_TRAIT_USES,
-  TYPE_DECLARATORS,
+  // If there is a use of a macro like `a` or `a(...)` then we say the macro
+  // `...` or `...(...)` is an expansion of `a`.
+  EXPANSION_OF 
 };
 
 inline static const char *EnumerationName(BuiltinReferenceKind) {
@@ -105,7 +122,7 @@ inline static const char *EnumerationName(BuiltinReferenceKind) {
 const char *EnumeratorName(BuiltinReferenceKind);
 
 inline static constexpr unsigned NumEnumerators(BuiltinReferenceKind) {
-  return 16;
+  return 13;
 }
 
 class ReferenceKind {
