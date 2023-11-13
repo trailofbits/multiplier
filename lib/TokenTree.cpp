@@ -2009,10 +2009,6 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
       // We've hit the end of our outermost fragment.
       } else if (skip_stop_file_tok_id == file_tok_id) {
         stop_skip_after.reset();
-
-      } else {
-        assert(false);
-        stop_skip_after.reset();
       }
       continue;
     }
