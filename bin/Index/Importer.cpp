@@ -300,7 +300,8 @@ BuildCommandAction::GetCompilerInfo(const Command &command) {
                arg.starts_with("-fxray-attr-list=") ||
                arg.starts_with("-tsan-compound-read-before-write=") ||
                arg.starts_with("-tsan-distinguish-volatile=") ||
-               arg.starts_with("-treat")) {
+               arg.starts_with("-treat") ||
+               arg.starts_with("-ftrivial-auto-var-init=")) {
       continue;
 
     // Output file.
