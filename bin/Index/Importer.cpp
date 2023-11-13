@@ -274,7 +274,10 @@ BuildCommandAction::GetCompilerInfo(const Command &command) {
     // Drop things like `-Wall`, `-Werror, `-fsanitize=..`, etc.
     } else if (arg.starts_with("-W") ||
                arg.starts_with("-pedantic") ||
-               arg == "-pic-is-pie") {
+               arg.starts_with("-ftrivial-auto-var-init=") ||
+               arg.starts_with("-fpatchable-function-entry=") ||
+               arg == "-pic-is-pie" ||
+               arg == "-mindirect-branch-cs-prefix") {
       continue;  // Skip the argument.
 
     } else if (arg == "-mllvm" ||
@@ -285,7 +288,7 @@ BuildCommandAction::GetCompilerInfo(const Command &command) {
                arg == "-stack-usage-file" ||
                arg == "-mrelocation-model" ||
                arg == "-pic-level" ||
-               arg == "-main-file-name") {
+               arg == "-main-file-name" ||) {
       skip = true;
       continue;  // Skip the argument and the next argument.
 
@@ -300,10 +303,7 @@ BuildCommandAction::GetCompilerInfo(const Command &command) {
                arg.starts_with("-fxray-attr-list=") ||
                arg.starts_with("-tsan-compound-read-before-write=") ||
                arg.starts_with("-tsan-distinguish-volatile=") ||
-               arg.starts_with("-treat") ||
-               arg.starts_with("-ftrivial-auto-var-init=") ||
-               arg.starts_with("-mindirect-branch-cs-prefix") ||
-               arg.starts_with("-fpatchable-function-entry=")) {
+               arg.starts_with("-treat")) {
       continue;
 
     // Output file.
