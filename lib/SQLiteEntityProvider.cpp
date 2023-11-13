@@ -206,11 +206,11 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
       get_file_paths_by_id(db.Prepare(
           "SELECT path FROM file_path WHERE file_id = ?1")),
       get_file_fragments(db.Prepare(
-          "SELECT DISTINCT(fragment_id) "
+          "SELECT DISTINCT fragment_id "
           "FROM fragment_file "
           "WHERE file_id = ?1")),
       get_nested_fragments(db.Prepare(
-          "SELECT DISTINCT(child_id) "
+          "SELECT DISTINCT child_id "
           "FROM nested_fragment "
           "WHERE parent_id = ?1")),
       clear_entity_id_list(db.Prepare(
@@ -242,7 +242,7 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
 
 #if MX_DATABASE_HAS_FTS5
       get_entities_by_name(db.Prepare(
-          "SELECT DISTINCT(rowid) "
+          "SELECT DISTINCT rowid "
           "FROM named_entity_index "
           "WHERE name MATCH ?1 || '*' "
           "  AND rowid > ?2 "
@@ -250,7 +250,7 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
           "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))),
 #else
       get_entities_by_name(db.Prepare(
-          "SELECT DISTINCT(rowid) "
+          "SELECT DISTINCT rowid "
           "FROM named_entity "
           "WHERE name LIKE '%' || ?1 || '%' "
           "  AND entity_id > ?2 "
@@ -259,7 +259,7 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
 #endif
 
       get_references_to(db.Prepare(
-          "SELECT DISTINCT(r.from_entity_id, r.context_id, r.kind_id) "
+          "SELECT DISTINCT r.from_entity_id, r.context_id, r.kind_id "
           "FROM reference AS r "
           "WHERE r.from_entity_id > ?1 "
           "  AND r.to_entity_id IN (SELECT l.entity_id "
@@ -272,7 +272,7 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
           "LIMIT " MX_TO_STR(MX_REFERENCE_PAGE_SIZE))),
 
       get_references_from(db.Prepare(
-          "SELECT DISTINCT(r.to_entity_id, r.context_id, r.kind_id) "
+          "SELECT DISTINCT r.to_entity_id, r.context_id, r.kind_id "
           "FROM reference AS r "
           "WHERE r.to_entity_id > ?1 "
           "  AND r.from_entity_id IN (SELECT l.entity_id "
@@ -285,7 +285,7 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
           "LIMIT " MX_TO_STR(MX_REFERENCE_PAGE_SIZE))),
 
       get_fragments_covered_by_tokens(db.Prepare(
-          "SELECT DISTINCT(ffr.fragment_id) "
+          "SELECT DISTINCT ffr.fragment_id "
           "FROM fragment_file_range AS ffr "
           "JOIN " + entity_id_list + " AS el "
           "ON ffr.first_file_token_offset <= el.entity_id "
