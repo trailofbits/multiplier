@@ -62,13 +62,22 @@ gap::generator<mx::ReferenceRecord> EnumeratorStmtToDeclReferences(
       mx::BuiltinReferenceKind::USES_VALUE
   };
 
-  auto is_type_decl = pasta::TypeDecl::From(to_decl).has_value();
   auto is_function_decl = pasta::FunctionDecl::From(to_decl).has_value();
   if (is_function_decl) {
     record.kind = mx::BuiltinReferenceKind::TAKES_ADDRESS;
   }
 
-  std::optional<pasta::Stmt> maybe_parent = em->ParentStmt(ast, stmt);
+  std::optional<pasta::Stmt> maybe_parent;
+
+  // If we're referencing a type, then we're probably referencing it from
+  // a `CastExpr` or something like that.
+  auto is_type_decl = pasta::TypeDecl::From(to_decl).has_value();
+  if (is_type_decl) {
+    record.kind = mx::BuiltinReferenceKind::USES_TYPE;
+    maybe_parent = stmt;
+  } else {
+    maybe_parent = em->ParentStmt(ast, stmt);
+  }
 
   while (maybe_parent) {
     const auto &parent = maybe_parent.value();
@@ -247,6 +256,7 @@ gap::generator<mx::ReferenceRecord> EnumeratorStmtToDeclReferences(
             co_yield record;  // Default.
             co_return;
         }
+        break;
 
       case pasta::StmtKind::kDeclRefExpr:
         assert(false);
@@ -291,7 +301,6 @@ gap::generator<mx::ReferenceRecord> EnumeratorStmtToDeclReferences(
           if (is_function_decl) {
             record.kind = mx::BuiltinReferenceKind::TAKES_ADDRESS;
           } else if (is_type_decl) {
-            assert(false);
             record.kind = mx::BuiltinReferenceKind::USES_TYPE;
           } else {
             record.kind = mx::BuiltinReferenceKind::TAKES_VALUE;

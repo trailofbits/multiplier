@@ -142,6 +142,9 @@ static void CheckFragOffsetKind(const PendingFragment &pf, mx::RawEntityId eid,
   assert(vid->offset == i);
   assert(vid->kind == kind);
   (void) vid;
+  (void) pf;
+  (void) kind;
+  (void) i;
 }
 
 template <typename IdType>
@@ -152,6 +155,8 @@ static void CheckFragOffset(const PendingFragment &pf, mx::RawEntityId eid,
   assert(vid->fragment_id == pf.fragment_index);
   assert(vid->offset == i);
   (void) vid;
+  (void) pf;
+  (void) i;
 }
 
 }  // namespace
@@ -225,6 +230,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
       assert(is_new_eid(eid));
       check_id(pf, eid, kind, i);
 #endif
+      (void) kind;
 
       DispatchSerializeEntity(pf, pf.em, list_builder[i++], entity);
     }
