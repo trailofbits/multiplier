@@ -306,7 +306,7 @@ static uint64_t ParsedIndexOfMacroDirective(const pasta::Macro &macro) {
   return macro.BeginToken()->ParsedLocation().Index();
 }
 
-static bool IsOpeningConditionalDirective(const pasta::Macro &macro) {
+static bool IsOpeningConditionalDirective(const pasta::MacroDirective &macro) {
   switch (macro.Kind()) {
     case pasta::MacroKind::kIfDirective:
     case pasta::MacroKind::kIfDefinedDirective:
@@ -364,6 +364,29 @@ static std::string MacroLocation(pasta::Macro macro) {
   return "<unknown-loc>";
 }
 
+// Generate all top-level macro defintions. They can be nested inside of macro
+// expansions.
+static gap::generator<pasta::MacroDirective>
+FindDirectivesInMacro(pasta::Macro mn) {
+  switch (mn.Kind()) {
+    case pasta::MacroKind::kArgument:
+    case pasta::MacroKind::kExpansion:
+    case pasta::MacroKind::kSubstitution:
+      for (pasta::Macro child : mn.Children()) {
+        for (auto def : FindDirectivesInMacro(child)) {
+          co_yield def;
+        }
+      }
+      break;
+
+    default:
+      if (auto dir = pasta::MacroDirective::From(mn)) {
+        co_yield std::move(dir.value());
+      }
+      break;
+  }
+}
+
 // Map `#if` to `#endif` or `#if` to `#else` and then `#else` to `#elif` or
 // `#endif`, etc. This helps with Issue #457, where we have something like the
 // following (found in cURL):
@@ -406,16 +429,18 @@ static std::map<uint64_t, pasta::Macro> FindNextPrevConditionalMacros(
   };
 
   for (pasta::Macro macro : ast.Macros()) {
-    if (IsOpeningConditionalDirective(macro)) {
-      prev.emplace_back(macro);
+    for (auto dir : FindDirectivesInMacro(macro)) {
+      if (IsOpeningConditionalDirective(dir)) {
+        prev.emplace_back(std::move(dir));
 
-    } else if (IsContinuingConditionalDirective(macro)) {
-      add_to_prev(macro, "continuing conditional directive");
-      prev.back() = macro;
+      } else if (IsContinuingConditionalDirective(dir)) {
+        add_to_prev(dir, "continuing conditional directive");
+        prev.back() = std::move(dir);
 
-    } else if (IsClosingConditionalDirective(macro)) {
-      add_to_prev(macro, "closing conditional directive");
-      prev.pop_back();
+      } else if (IsClosingConditionalDirective(dir)) {
+        add_to_prev(dir, "closing conditional directive");
+        prev.pop_back();
+      }
     }
   }
   return next;
@@ -1107,30 +1132,6 @@ static void AddDeclRangeToEntityListFor(
   entity_ranges.emplace_back(std::move(decl), begin_index, end_index);
 }
 
-// Generate all top-level macro defintions. They can be nested inside of macro
-// expansions.
-static gap::generator<pasta::DefineMacroDirective>
-FindDefinesInMacro(pasta::Macro mn) {
-  switch (mn.Kind()) {
-    case pasta::MacroKind::kArgument:
-    case pasta::MacroKind::kExpansion:
-    case pasta::MacroKind::kSubstitution:
-      for (pasta::Macro child : mn.Children()) {
-        for (auto def : FindDefinesInMacro(child)) {
-          co_yield def;
-        }
-      }
-      break;
-
-    case pasta::MacroKind::kDefineDirective:
-      co_yield reinterpret_cast<pasta::DefineMacroDirective &>(mn);
-      break;
-
-    default:
-      break;
-  }
-}
-
 // Go find the macro definitions, and for each definition, find the uses, then
 // find the "root" of that use.
 static std::vector<OrderedMacro> FindTLMs(
@@ -1196,36 +1197,42 @@ static std::vector<OrderedMacro> FindTLMs(
         break;
       }
     } else {
-      for (pasta::DefineMacroDirective md : FindDefinesInMacro(mn)) {
+      for (pasta::MacroDirective md : FindDirectivesInMacro(mn)) {
+        if (auto dmd = pasta::DefineMacroDirective::From(md)) {
 
-        // If this macro definition doesn't have a name, then it's in a
-        // conditionally disabled region.
-        std::optional<pasta::MacroToken> name = md.Name();
-        if (!name) {
-          continue;
-        }
+          // If this macro definition doesn't have a name, then it's in a
+          // conditionally disabled region.
+          std::optional<pasta::MacroToken> name = dmd->Name();
+          if (!name) {
+            continue;
+          }
 
-        // Builtin or command-line specified macros have no location.
-        //
-        // NOTE(pag): The persistence for macros re-interprets macros with no
-        //            definition site as substitutions instead of macro
-        //            expansions.
-        //
-        // TODO(pag): Find a way to give these file locations.
-        if (!name->FileLocation()) {
-          continue;
-        }
+          // Builtin or command-line specified macros have no location.
+          //
+          // NOTE(pag): The persistence for macros re-interprets macros with no
+          //            definition site as substitutions instead of macro
+          //            expansions.
+          //
+          // TODO(pag): Find a way to give these file locations.
+          if (!name->FileLocation()) {
+            continue;
+          }
 
-        // We found a nested macro definition.
-        if (md.RawMacro() != mn.RawMacro()) {
-          tlms.emplace_back(md, order++);
+          // We found a nested macro definition.
+          if (md.RawMacro() != mn.RawMacro()) {
+            tlms.emplace_back(md, order++);
 
-        // We found a top-level macro definition.
-        } else {
+          // We found a top-level macro definition.
+          } else {
+            tlms.emplace_back(mn, order++);
+          }
+
+          defs.push_back(std::move(dmd.value()));
+        
+        // We found a nested macro directive.
+        } else if (md.RawMacro() != mn.RawMacro()) {
           tlms.emplace_back(mn, order++);
         }
-
-        defs.push_back(std::move(md));
       }
     }
   }
