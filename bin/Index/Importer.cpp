@@ -276,6 +276,7 @@ BuildCommandAction::GetCompilerInfo(const Command &command) {
                arg.starts_with("-pedantic") ||
                arg.starts_with("-ftrivial-auto-var-init=") ||
                arg.starts_with("-fpatchable-function-entry=") ||
+               arg.starts_with("-fpatchable-function-entry-offset=") ||
                arg == "-pic-is-pie" ||
                arg == "-mindirect-branch-cs-prefix") {
       continue;  // Skip the argument.
