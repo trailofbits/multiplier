@@ -268,7 +268,7 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
           "ORDER BY r.from_entity_id ASC, "
           "         r.context_id ASC, "
           "         r.kind_id ASC, "
-          "         r.to_entity_id ASC"
+          "         r.to_entity_id ASC "
           "LIMIT " MX_TO_STR(MX_REFERENCE_PAGE_SIZE))),
 
       get_references_from(db.Prepare(
@@ -281,7 +281,7 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
           "ORDER BY r.to_entity_id ASC, "
           "         r.context_id ASC, "
           "         r.kind_id ASC, "
-          "         r.from_entity_id ASC"
+          "         r.from_entity_id ASC "
           "LIMIT " MX_TO_STR(MX_REFERENCE_PAGE_SIZE))),
 
       get_fragments_covered_by_tokens(db.Prepare(
