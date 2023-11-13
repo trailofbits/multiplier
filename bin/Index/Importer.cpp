@@ -288,7 +288,7 @@ BuildCommandAction::GetCompilerInfo(const Command &command) {
                arg == "-stack-usage-file" ||
                arg == "-mrelocation-model" ||
                arg == "-pic-level" ||
-               arg == "-main-file-name" ||) {
+               arg == "-main-file-name") {
       skip = true;
       continue;  // Skip the argument and the next argument.
 
