@@ -333,6 +333,37 @@ static bool IsClosingConditionalDirective(const pasta::Macro &macro) {
   return macro.Kind() == pasta::MacroKind::kEndIfDirective;
 }
 
+static pasta::Macro RootMacroFrom(pasta::Macro node) {
+  if (auto parent = node.Parent()) {
+    return RootMacroFrom(parent.value());
+  } else {
+    return node;
+  }
+}
+
+static std::optional<pasta::MacroToken> BeginToken(pasta::Macro macro) {
+  auto tok = pasta::MacroToken::From(macro);
+  if (tok) {
+    return tok;
+  }
+
+  return macro.BeginToken();
+}
+
+static std::string MacroLocation(pasta::Macro macro) {
+  if (auto tok = BeginToken(RootMacroFrom(macro))) {
+    if (auto ftok = tok->ParsedLocation().FileLocation()) {
+      auto file = pasta::File::Containing(ftok.value());
+      std::stringstream ss;
+      ss << file.Path().generic_string() << ':' << ftok->Line()
+         << ':' << ftok->Column();
+      return ss.str();
+    }
+  }
+
+  return "<unknown-loc>";
+}
+
 // Map `#if` to `#endif` or `#if` to `#else` and then `#else` to `#elif` or
 // `#endif`, etc. This helps with Issue #457, where we have something like the
 // following (found in cURL):
@@ -358,13 +389,16 @@ static bool IsClosingConditionalDirective(const pasta::Macro &macro) {
 //
 // XREF(pag): https://github.com/trailofbits/multiplier/issues/457
 static std::map<uint64_t, pasta::Macro> FindNextPrevConditionalMacros(
-    const pasta::AST &ast) {
+    const pasta::AST &ast, std::string_view main_file_path) {
 
   std::vector<pasta::Macro> prev;
   std::map<uint64_t, pasta::Macro> next;
 
-  auto add_to_prev = [&] (const pasta::Macro &macro) {
-    CHECK(!prev.empty());
+  auto add_to_prev = [&] (const pasta::Macro &macro, const char *what) {
+    CHECK(!prev.empty())
+        << "Failed to add " << what << " when indexing " << main_file_path
+        << " near " << MacroLocation(macro);
+
     auto prev_index = ParsedIndexOfMacroDirective(prev.back());
     auto index = ParsedIndexOfMacroDirective(macro);
     next.emplace(prev_index, macro);
@@ -376,11 +410,11 @@ static std::map<uint64_t, pasta::Macro> FindNextPrevConditionalMacros(
       prev.emplace_back(macro);
 
     } else if (IsContinuingConditionalDirective(macro)) {
-      add_to_prev(macro);
+      add_to_prev(macro, "continuing conditional directive");
       prev.back() = macro;
 
     } else if (IsClosingConditionalDirective(macro)) {
-      add_to_prev(macro);
+      add_to_prev(macro, "closing conditional directive");
       prev.pop_back();
     }
   }
@@ -1073,14 +1107,6 @@ static void AddDeclRangeToEntityListFor(
   entity_ranges.emplace_back(std::move(decl), begin_index, end_index);
 }
 
-static pasta::Macro RootMacroFrom(pasta::Macro node) {
-  if (auto parent = node.Parent()) {
-    return RootMacroFrom(parent.value());
-  } else {
-    return node;
-  }
-}
-
 // Generate all top-level macro defintions. They can be nested inside of macro
 // expansions.
 static gap::generator<pasta::DefineMacroDirective>
@@ -1345,7 +1371,9 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
                                  std::move(ordered_entry.first), entity_ranges);
   }
 
-  auto dir_index_to_next_dir = FindNextPrevConditionalMacros(ast);
+  auto dir_index_to_next_dir = FindNextPrevConditionalMacros(
+      ast, main_file_path);
+
   for (OrderedDecl ordered_entry : FindTLDs(ast)) {
     AddDeclRangeToEntityListFor(tokens, eof_index_to_include, bof_to_eof,
                                 dir_index_to_next_dir, main_file_path, 
