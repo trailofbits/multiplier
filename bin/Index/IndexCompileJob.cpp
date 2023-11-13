@@ -484,10 +484,64 @@ static std::pair<uint64_t, uint64_t> BaselineEntityRange(
   return {begin_tok_index, end_tok_index};
 }
 
+// Compute the last token of a macro.
+static std::optional<pasta::MacroToken> EndToken(pasta::Macro macro);
+
+// Compute the last token of a macro.
+static std::optional<pasta::MacroToken> EndToken(pasta::MacroRange range,
+                                                 const void *parent) {
+  std::optional<pasta::MacroToken> last_tok;
+
+  for (pasta::Macro child_node : range) {
+    auto parent_of_child = child_node.Parent();
+    if (!parent_of_child) {
+      assert(false);
+      break;
+    }
+
+    if (parent_of_child->RawMacro() != parent) {
+      break;
+    }
+
+    if (auto new_end_tok = EndToken(std::move(child_node))) {
+      last_tok = new_end_tok;
+    }
+  }
+
+  return last_tok;
+}
+
+// Compute the last token of a macro.
+std::optional<pasta::MacroToken> EndToken(pasta::Macro macro) {
+
+  auto parent = macro.RawMacro();
+
+  if (auto sub = pasta::MacroSubstitution::From(macro)) {
+    if (auto last_repl_tok = EndToken(sub->ReplacementChildren(), parent)) {
+      return last_repl_tok;
+    }
+
+    if (auto exp = pasta::MacroExpansion::From(macro)) {
+      if (auto last_body_tok = EndToken(exp->IntermediateChildren(), parent)) {
+        return last_body_tok;
+      }
+    }
+  }
+
+  if (auto tok = pasta::MacroToken::From(macro)) {
+    return tok;
+  }
+
+  // NOTE(pag): `pasta::Macro::EndToken` returns the last use token. That
+  //            sometimes ends up being the right-corner of some internal left
+  //            corner.
+  return EndToken(macro.Children(), parent);
+}
+
 static pasta::TokenRange BaselineEntityRange(const pasta::Macro &macro) {
 
   std::optional<pasta::MacroToken> begin_tok = macro.BeginToken();
-  std::optional<pasta::MacroToken> end_tok = macro.EndToken();
+  std::optional<pasta::MacroToken> end_tok = EndToken(macro);
 
   CHECK(begin_tok.has_value());
   CHECK(end_tok.has_value());
@@ -637,6 +691,9 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
   // We should always at least hit the end of file marker token first.
   CHECK_LT(end_tok_index, max_tok_index);
 
+  auto in_macro = false;
+  auto seen_marker = false;
+
   // Now adjust for macros at the beginning and ending. If we find macro
   // expansion ranges, then the expand until we find the beginning of the
   // range.
@@ -657,6 +714,7 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
         }
         break;
       case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+        seen_marker = true;
         done = true;
         break;
       case pasta::TokenRole::kBeginOfFileMarker:
@@ -670,9 +728,14 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
       case pasta::TokenRole::kFinalMacroExpansionToken:
       case pasta::TokenRole::kEndOfInternalMacroEventMarker:
         --begin_tok_index;  // Include it.
+        in_macro = true;
         break;
     }
   }
+
+  assert(!in_macro || seen_marker);
+  in_macro = false;
+  seen_marker = false;
 
   done = false;
   while (!done && 0u < end_tok_index && end_tok_index < max_tok_index) {
@@ -691,6 +754,7 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
         }
         break;
       case pasta::TokenRole::kEndOfMacroExpansionMarker:
+        seen_marker = true;
         done = true;
         break;
       case pasta::TokenRole::kBeginOfFileMarker:
@@ -704,9 +768,12 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
       case pasta::TokenRole::kFinalMacroExpansionToken:
       case pasta::TokenRole::kEndOfInternalMacroEventMarker:
         ++end_tok_index;  // Include it.
+        in_macro = true;
         break;
     }
   }
+
+  assert(!in_macro || seen_marker);
 
   // Expand to trailing semicolon.
   if ((end_tok_index + 1u) < max_tok_index) {
