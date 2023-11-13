@@ -1350,8 +1350,7 @@ void CodeGenerator::RunOnOptional(
     } else if (g ## name ## Names.count(element_name.value())) { \
       lib_cpp_os \
           << "    if (auto eptr = impl->ep->" #name "For(impl->ep, eid)) {\n" \
-          << "      return " << element_name.value() \
-          << "::from(" #name "(std::move(eptr)));\n" \
+          << "      return " << element_name.value() << "::from_base(std::move(eptr));\n" \
           << "    }\n";
 
 
@@ -1366,26 +1365,7 @@ void CodeGenerator::RunOnOptional(
 
   // Pseudo-entities.
   } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
-    assert(needs_test);
-
-    forward_decls.insert(cxx_element_name);
-    serializer = "MX_VISIT_OPTIONAL_PSEUDO";
-
-    serialize_cpp_os
-        << "  if (v" << i << ") {\n"
-        << "    b." << setter_name << "(es.PseudoId(v" << i << ".value()));\n"
-        << "    b." << ip_setter_name << "(true);\n"
-        << "  } else {\n"
-        << "    b." << ip_setter_name << "(false);\n"
-        << "  }\n";
-
-    lib_cpp_os
-        << "    if (RawEntityId eid = impl->reader." << getter_name << "();\n"
-        << "        eid != kInvalidEntityId) {\n"
-        << "      if (auto eptr = impl->ep->PseudoFor(impl->ep, eid)) {\n"
-        << "        return " << element_name.value() << "(std::move(eptr.value()));\n"
-        << "      }\n"
-        << "    }\n";
+    assert(false);
 
   // Enums, bools, ints, etc.
   } else {
@@ -1553,7 +1533,7 @@ void CodeGenerator::RunOnVector(
             << "  if (!e) {\n" \
             << "    return std::nullopt;\n" \
             << "  }\n" \
-            << "  return " << cxx_element_name << "::from(" #name << "(std::move(e)));\n";
+            << "  return " << element_name.value() << "::from_base(std::move(e));\n";
 
     YIELD_ENTITY(File, file)
     YIELD_ENTITY(Token, token)
@@ -1760,16 +1740,14 @@ void CodeGenerator::RunOnVector(
       if (optional) { \
         lib_cpp_os \
             << "    if (auto d" << i << " = ep->" #name "For(ep, v)) {\n" \
-            << "      if (auto e = " << (*element_name) \
-            << "::from(" #name "(std::move(d" << i << ")))) {\n" \
+            << "      if (auto e = " << *element_name << "::from_base(std::move(d" << i << "))) {\n" \
             << "        vec.emplace_back(std::move(*e));\n" \
             << "      }\n" \
             << "    }\n"; \
       } else { \
         lib_cpp_os \
             << "    if (auto d" << i << " = ep->" #name "For(ep, v)) {\n" \
-            << "      if (auto e = " << (*element_name) \
-            << "::from(" #name "(std::move(d" << i << ")))) {\n" \
+            << "      if (auto e = " << *element_name << "::from_base(std::move(d" << i << "))) {\n" \
             << "        co_yield std::move(*e);\n" \
             << "      }\n" \
             << "    }\n"; \
@@ -2762,7 +2740,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     lib_cpp_os
         << class_name << " " << class_name << "::canonical_declaration(void) const {\n"
-        << "  if (auto canon = " << class_name << "::from(this->Decl::canonical_declaration())) {\n"
+        << "  if (auto canon = from_base(this->Decl::canonical_declaration())) {\n"
         << "    return std::move(canon.value());\n"
         << "  }\n"
         << "  for (" << class_name << " redecl : redeclarations()) {\n"
@@ -2771,13 +2749,15 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  __builtin_unreachable();\n"
         << "}\n\n"
         << "std::optional<" << class_name << "> " << class_name << "::definition(void) const {\n"
-        << "  return " << class_name << "::from(this->Decl::definition());\n"
+        << "  if (auto def = this->Decl::definition()) {\n"
+        << "    return from_base(def.value());\n"
+        << "  }\n"
+        << "  return std::nullopt;\n"
         << "}\n\n"
         << "gap::generator<" << class_name
         << "> " << class_name << "::redeclarations(void) const & {\n"
         << "  for (Decl r : Decl::redeclarations()) {\n"
-        << "    if (std::optional<" << class_name << "> dr = "
-        << class_name << "::from(r)) {\n"
+        << "    if (std::optional<" << class_name << "> dr = from_base(r)) {\n"
         << "      co_yield std::move(dr.value());\n"
         << "      continue;\n"
         << "    }\n"
@@ -2801,8 +2781,9 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    index." << lower_name << "(eid.Pack());\n";
     } else {
       lib_cpp_os
-          << "    return " << class_name << "::from(index."
-          << lower_name << "(eid.Pack()));\n";
+          << "    if (auto base = index." << lower_name << "(eid.Pack())) {\n"
+          << "      return from_base(base.value());\n"
+          << "    }\n";
     }
 
     lib_cpp_os
@@ -2814,19 +2795,16 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     if (class_name == base_name) {
       lib_cpp_os
-          << "gap::generator<" << class_name << "> " << class_name
+          << "gap::generator<" << base_name << "> " << base_name
           << "::in(const Index &index) {\n"
           << "  const EntityProviderPtr ep = entity_provider_of(index);\n"
           << "  for (" << base_name << "ImplPtr eptr : ep->"
           << base_name << "sFor(ep)) {\n"
-          << "    if (std::optional<" << class_name << "> e = "
-          << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
-          << "      co_yield std::move(e.value());\n"
-          << "    }\n"
+          << "    co_yield " << base_name << "(std::move(eptr));\n"
           << "  }\n"
           << "}\n\n"
-          << "gap::generator<" << class_name << "> " << class_name
-          << "::in(const Index &index, std::span<" << class_name << "Kind> kinds) {\n"
+          << "gap::generator<" << base_name << "> " << base_name
+          << "::in(const Index &index, std::span<" << base_name << "Kind> kinds) {\n"
           << "  const EntityProviderPtr ep = entity_provider_of(index);\n"
           << "  for (" << base_name << "Kind k : kinds) {\n"
           << "    for (" << base_name << "ImplPtr eptr : ep->"
@@ -2838,34 +2816,28 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       if (!is_type) {
         lib_cpp_os
-            << "gap::generator<" << class_name << "> " << class_name
+            << "gap::generator<" << base_name << "> " << base_name
             << "::in(const File &file) {\n"
             << "  const EntityProviderPtr ep = entity_provider_of(file);\n"
             << "  PackedFileId file_id = file.id();\n"
             << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
             << "    for (" << base_name << "ImplPtr eptr : ep->"
             << base_name << "sFor(ep, frag_id)) {\n"
-            << "      if (std::optional<" << class_name << "> e = "
-            << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
-            << "        co_yield std::move(e.value());\n"
-            << "      }\n"
+            << "      co_yield " << base_name << "(std::move(eptr));\n"
             << "    }\n"
             << "  }\n"
             << "}\n\n"
-            << "gap::generator<" << class_name << "> " << class_name
+            << "gap::generator<" << base_name << "> " << base_name
             << "::in(const Fragment &frag) {\n"
             << "  const EntityProviderPtr ep = entity_provider_of(frag);\n"
             << "  PackedFragmentId frag_id = frag.id();\n"
             << "  for (" << base_name << "ImplPtr eptr : ep->"
             << base_name << "sFor(ep, frag_id)) {\n"
-            << "    if (std::optional<" << class_name << "> e = "
-            << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
-            << "      co_yield std::move(e.value());\n"
-            << "    }\n"
+            << "    co_yield " << base_name << "(std::move(eptr));\n"
             << "  }\n"
             << "}\n\n"
-            << "gap::generator<" << class_name << "> " << class_name
-            << "::in(const Fragment &frag, std::span<" << class_name << "Kind> kinds) {\n"
+            << "gap::generator<" << base_name << "> " << base_name
+            << "::in(const Fragment &frag, std::span<" << base_name << "Kind> kinds) {\n"
             << "  const EntityProviderPtr ep = entity_provider_of(frag);\n"
             << "  PackedFragmentId frag_id = frag.id();\n"
             << "  for (" << base_name << "Kind k : kinds) {\n"
@@ -2875,8 +2847,8 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "    }\n"
             << "  }\n"
             << "}\n\n"
-            << "gap::generator<" << class_name << "> " << class_name
-            << "::in(const File &file, std::span<" << class_name << "Kind> kinds) {\n"
+            << "gap::generator<" << base_name << "> " << base_name
+            << "::in(const File &file, std::span<" << base_name << "Kind> kinds) {\n"
             << "  const EntityProviderPtr ep = entity_provider_of(file);\n"
             << "  PackedFileId file_id = file.id();\n"
             << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
@@ -2894,19 +2866,26 @@ MethodListPtr CodeGenerator::RunOnClass(
       // Derived classes have optional conversions that need to account for
       // derived kinds.
       class_os
-        << "  static std::optional<" << class_name << "> from(const "
-        << base_name << " &parent);\n\n"
-        << "  inline static std::optional<" << class_name
+        << "  static std::optional<" << class_name << "> from_base(const "
+        << base_name << " &parent);\n"
+        << "  inline static std::optional<" << class_name << "> from(const "
+        << base_name << " &parent) {\n"
+        << "    return from_base(parent);\n"
+        << "  }\n"
+        << "  static std::optional<" << class_name
         << "> from(const std::optional<"
-        << base_name << "> &parent) {\n"
-        << "    if (parent) {\n"
-        << "      return " << class_name << "::from(parent.value());\n"
-        << "    } else {\n"
-        << "      return std::nullopt;\n"
-        << "    }\n"
-        << "  }\n\n";
+        << base_name << "> &parent);\n";
 
       lib_cpp_os
+          << "std::optional<" << class_name << "> " << class_name
+          << "::from(const std::optional<"
+          << base_name << "> &parent) {\n"
+          << "  if (parent) {\n"
+          << "    return from_base(parent.value());\n"
+          << "  }\n"
+          << "  return std::nullopt;\n"
+          << "}\n\n"
+          << "namespace {\n"
           << "static const " << base_name << "Kind k"
           << class_name << "DerivedKinds[] = {\n";
 
@@ -2926,8 +2905,9 @@ MethodListPtr CodeGenerator::RunOnClass(
       }
       lib_cpp_os
           << "};\n\n"
+          << "}  // namespace\n\n"
           << "std::optional<" << class_name << "> " << class_name
-          << "::from(const " << base_name << " &parent) {\n"
+          << "::from_base(const " << base_name << " &parent) {\n"
           << "  switch (parent.kind()) {\n";
       for (const ClassHierarchy *c : wl) {
         std::string c_name = c->record.Name();
@@ -2947,8 +2927,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
           << "    for (" << base_name << "ImplPtr eptr : ep->"
           << base_name << "sFor(ep, k)) {\n"
-          << "      if (std::optional<" << class_name << "> e = "
-          << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
+          << "      if (std::optional<" << class_name << "> e = from_base(std::move(eptr))) {\n"
           << "        co_yield std::move(e.value());\n"
           << "      }\n"
           << "    }\n"
@@ -2964,8 +2943,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
             << "    for (" << base_name << "ImplPtr eptr : ep->"
             << base_name << "sFor(ep, k, frag_id)) {\n"
-            << "      if (std::optional<" << class_name << "> e = "
-            << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
+            << "      if (std::optional<" << class_name << "> e = from_base(std::move(eptr))) {\n"
             << "        co_yield std::move(e.value());\n"
             << "      }\n"
             << "    }\n"
@@ -2979,8 +2957,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "    for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
             << "      for (" << base_name << "ImplPtr eptr : ep->"
             << base_name << "sFor(ep, k, frag_id)) {\n"
-            << "        if (std::optional<" << class_name << "> e = "
-            << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
+            << "        if (std::optional<" << class_name << "> e = from_base(std::move(eptr))) {\n"
             << "          co_yield std::move(e.value());\n"
             << "        }\n"
             << "      }\n"
@@ -3021,10 +2998,10 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n" \
           << "std::optional<" << class_name \
           << "> " << class_name << "::from(const VariantEntity &e) {\n" \
-          << "  if (!std::holds_alternative<" << base_name << ">(e)) {\n" \
+          << "  if (!std::holds_alternative<" << class_name << ">(e)) {\n" \
           << "    return std::nullopt;\n" \
-          << "  }\n"
-          << "  return std::get<" << base_name << ">(e);\n" \
+          << "  }\n" \
+          << "  return std::get<" << class_name << ">(e);\n" \
           << "}\n\n" \
           << "std::optional<" << class_name \
           << "> " << class_name << "::from(const TokenContext &t) {\n" \
@@ -3049,12 +3026,16 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "> " << class_name << "::from(const VariantEntity &e) {\n" \
           << "  if (!std::holds_alternative<" << base_name << ">(e)) {\n" \
           << "    return std::nullopt;\n" \
-          << "  }\n"
-          << "  return from(std::get<" << base_name << ">(e));\n" \
+          << "  }\n" \
+          << "  return from_base(std::get<" \
+          << base_name << ">(e));\n" \
           << "}\n\n" \
           << "std::optional<" << class_name \
           << "> " << class_name << "::from(const TokenContext &t) {\n" \
-          << "  return " << class_name << "::from(t.as_" #lower_name "());\n" \
+          << "  if (auto base = t.as_" #lower_name "()) {\n" \
+          << "    return from_base(base.value());\n" \
+          << "  }\n" \
+          << "  return std::nullopt;\n" \
           << "}\n\n";
 
   FOR_EACH_ENTITY_CATEGORY(DECLARE_DEFINE_FROM)
@@ -3448,7 +3429,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         } else if (g ## name ## Names.count(record_name)) { \
           lib_cpp_os \
               << "  return " << record_name \
-              << "::from(" #name "(impl->ep->" #name "For(impl->ep, eid))).value();\n";
+              << "::from_base(impl->ep->" #name "For(impl->ep, eid)).value();\n";
 
         GET_ENTITY(File, file)
         FOR_EACH_ENTITY_CATEGORY(GET_ENTITY)

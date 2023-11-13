@@ -37,8 +37,8 @@ static void FindDivergentCandidates(mx::Index index) {
       if (auto unary_op = mx::UnaryOperator::from(child)) {
         mx::UnaryOperatorKind operator_kind = unary_op->opcode();
         switch (operator_kind) {
-          case mx::UnaryOperatorKind::POST_DEC:
-          case mx::UnaryOperatorKind::PRE_DEC:
+          case mx::UnaryOperatorKind::POST_DECREMENT:
+          case mx::UnaryOperatorKind::PRE_DECREMENT:
           case mx::UnaryOperatorKind::POST_INCREMENT:
           case mx::UnaryOperatorKind::PRE_INCREMENT:
             break;
