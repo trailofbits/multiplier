@@ -137,14 +137,14 @@ gap::generator<mx::ReferenceRecord> EnumeratorStmtToDeclReferences(
       case pasta::StmtKind::kUnaryOperator:
         switch (auto uop = pasta::UnaryOperator::From(parent); uop->Opcode()) {
           case pasta::UnaryOperatorKind::kPostIncrement:
-          case pasta::UnaryOperatorKind::kPostDec:
+          case pasta::UnaryOperatorKind::kPostDecrement:
             record.context_entity_id = em->EntityId(parent);
             record.kind = mx::BuiltinReferenceKind::UPDATES_VALUE;
             co_yield record;
             co_return;
 
           case pasta::UnaryOperatorKind::kPreIncrement:
-          case pasta::UnaryOperatorKind::kPreDec:
+          case pasta::UnaryOperatorKind::kPreDecrement:
             record.context_entity_id = em->EntityId(parent);
             record.kind = mx::BuiltinReferenceKind::UPDATES_VALUE;
             co_yield record;
