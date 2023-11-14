@@ -62,17 +62,13 @@ class CXXConversionDecl : public CXXMethodDecl {
   CXXConversionDecl canonical_declaration(void) const;
   std::optional<CXXConversionDecl> definition(void) const;
   gap::generator<CXXConversionDecl> redeclarations(void) const &;
-  static std::optional<CXXConversionDecl> from(const Decl &parent);
-
-  inline static std::optional<CXXConversionDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return CXXConversionDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CXXConversionDecl> from_base(const Decl &parent);
+  inline static std::optional<CXXConversionDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CXXConversionDecl> from(const std::optional<Decl> &parent);
   static std::optional<CXXConversionDecl> from(const Reference &r);
+  static std::optional<CXXConversionDecl> from(const VariantEntity &e);
   static std::optional<CXXConversionDecl> from(const TokenContext &t);
 
   Type conversion_type(void) const;

@@ -40,17 +40,13 @@ class OMPDeclareSimdDeclAttr : public Attr {
     return AttrKind::OMP_DECLARE_SIMD_DECL;
   }
 
-  static std::optional<OMPDeclareSimdDeclAttr> from(const Attr &parent);
-
-  inline static std::optional<OMPDeclareSimdDeclAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OMPDeclareSimdDeclAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPDeclareSimdDeclAttr> from_base(const Attr &parent);
+  inline static std::optional<OMPDeclareSimdDeclAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPDeclareSimdDeclAttr> from(const std::optional<Attr> &parent);
   static std::optional<OMPDeclareSimdDeclAttr> from(const Reference &r);
+  static std::optional<OMPDeclareSimdDeclAttr> from(const VariantEntity &e);
   static std::optional<OMPDeclareSimdDeclAttr> from(const TokenContext &t);
 
   OMPDeclareSimdDeclAttrBranchStateTy branch_state(void) const;

@@ -40,17 +40,13 @@ class HotAttr : public InheritableAttr {
     return AttrKind::HOT;
   }
 
-  static std::optional<HotAttr> from(const Attr &parent);
-
-  inline static std::optional<HotAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return HotAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<HotAttr> from_base(const Attr &parent);
+  inline static std::optional<HotAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<HotAttr> from(const std::optional<Attr> &parent);
   static std::optional<HotAttr> from(const Reference &r);
+  static std::optional<HotAttr> from(const VariantEntity &e);
   static std::optional<HotAttr> from(const TokenContext &t);
 
 };

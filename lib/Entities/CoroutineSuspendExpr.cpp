@@ -92,19 +92,31 @@ bool CoroutineSuspendExpr::contains(const Stmt &stmt) {
 std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CoroutineSuspendExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCoroutineSuspendExprDerivedKinds[] = {
     CoyieldExpr::static_kind(),
     CoawaitExpr::static_kind(),
 };
 
-std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CoyieldExpr::static_kind():
     case CoawaitExpr::static_kind():
@@ -118,7 +130,7 @@ gap::generator<CoroutineSuspendExpr> CoroutineSuspendExpr::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCoroutineSuspendExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CoroutineSuspendExpr> e = CoroutineSuspendExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CoroutineSuspendExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -130,7 +142,7 @@ gap::generator<CoroutineSuspendExpr> CoroutineSuspendExpr::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCoroutineSuspendExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CoroutineSuspendExpr> e = CoroutineSuspendExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CoroutineSuspendExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -143,7 +155,7 @@ gap::generator<CoroutineSuspendExpr> CoroutineSuspendExpr::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCoroutineSuspendExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CoroutineSuspendExpr> e = CoroutineSuspendExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CoroutineSuspendExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -155,13 +167,23 @@ std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const Reference &
   return CoroutineSuspendExpr::from(r.as_statement());
 }
 
+std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const TokenContext &t) {
-  return CoroutineSuspendExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr CoroutineSuspendExpr::common_expression(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token CoroutineSuspendExpr::keyword_token(void) const {
@@ -170,27 +192,27 @@ Token CoroutineSuspendExpr::keyword_token(void) const {
 
 OpaqueValueExpr CoroutineSuspendExpr::opaque_value(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return OpaqueValueExpr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr CoroutineSuspendExpr::operand(void) const {
   RawEntityId eid = impl->reader.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr CoroutineSuspendExpr::ready_expression(void) const {
   RawEntityId eid = impl->reader.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr CoroutineSuspendExpr::resume_expression(void) const {
   RawEntityId eid = impl->reader.getVal42();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr CoroutineSuspendExpr::suspend_expression(void) const {
   RawEntityId eid = impl->reader.getVal43();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

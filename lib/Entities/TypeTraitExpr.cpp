@@ -90,18 +90,30 @@ bool TypeTraitExpr::contains(const Stmt &stmt) {
 std::optional<TypeTraitExpr> TypeTraitExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return TypeTraitExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TypeTraitExpr> TypeTraitExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kTypeTraitExprDerivedKinds[] = {
     TypeTraitExpr::static_kind(),
 };
 
-std::optional<TypeTraitExpr> TypeTraitExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<TypeTraitExpr> TypeTraitExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case TypeTraitExpr::static_kind():
       return reinterpret_cast<const TypeTraitExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<TypeTraitExpr> TypeTraitExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kTypeTraitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<TypeTraitExpr> e = TypeTraitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<TypeTraitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<TypeTraitExpr> TypeTraitExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kTypeTraitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<TypeTraitExpr> e = TypeTraitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<TypeTraitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<TypeTraitExpr> TypeTraitExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kTypeTraitExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<TypeTraitExpr> e = TypeTraitExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<TypeTraitExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<TypeTraitExpr> TypeTraitExpr::from(const Reference &r) {
   return TypeTraitExpr::from(r.as_statement());
 }
 
+std::optional<TypeTraitExpr> TypeTraitExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<TypeTraitExpr> TypeTraitExpr::from(const TokenContext &t) {
-  return TypeTraitExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 TypeTrait TypeTraitExpr::trait(void) const {

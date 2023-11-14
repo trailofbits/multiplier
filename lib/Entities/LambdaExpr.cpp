@@ -96,18 +96,30 @@ bool LambdaExpr::contains(const Stmt &stmt) {
 std::optional<LambdaExpr> LambdaExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return LambdaExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<LambdaExpr> LambdaExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kLambdaExprDerivedKinds[] = {
     LambdaExpr::static_kind(),
 };
 
-std::optional<LambdaExpr> LambdaExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<LambdaExpr> LambdaExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case LambdaExpr::static_kind():
       return reinterpret_cast<const LambdaExpr &>(parent);
@@ -120,7 +132,7 @@ gap::generator<LambdaExpr> LambdaExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kLambdaExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<LambdaExpr> e = LambdaExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<LambdaExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -132,7 +144,7 @@ gap::generator<LambdaExpr> LambdaExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kLambdaExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<LambdaExpr> e = LambdaExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<LambdaExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -145,7 +157,7 @@ gap::generator<LambdaExpr> LambdaExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kLambdaExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<LambdaExpr> e = LambdaExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<LambdaExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -157,8 +169,18 @@ std::optional<LambdaExpr> LambdaExpr::from(const Reference &r) {
   return LambdaExpr::from(r.as_statement());
 }
 
+std::optional<LambdaExpr> LambdaExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<LambdaExpr> LambdaExpr::from(const TokenContext &t) {
-  return LambdaExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Stmt LambdaExpr::body(void) const {
@@ -168,7 +190,7 @@ Stmt LambdaExpr::body(void) const {
 
 CXXMethodDecl LambdaExpr::call_operator(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return CXXMethodDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 LambdaCaptureDefault LambdaExpr::capture_default(void) const {
@@ -181,7 +203,7 @@ Token LambdaExpr::capture_default_token(void) const {
 
 CompoundStmt LambdaExpr::compound_statement_body(void) const {
   RawEntityId eid = impl->reader.getVal40();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return CompoundStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 std::optional<FunctionTemplateDecl> LambdaExpr::dependent_call_operator(void) const {
@@ -191,7 +213,7 @@ std::optional<FunctionTemplateDecl> LambdaExpr::dependent_call_operator(void) co
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionTemplateDecl::from(Decl(std::move(eptr)));
+      return FunctionTemplateDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -212,7 +234,7 @@ std::optional<NamedDecl> LambdaExpr::nth_explicit_template_parameter(unsigned n)
   if (!e) {
     return std::nullopt;
   }
-  return NamedDecl::from(Decl(std::move(e)));
+  return NamedDecl::from_base(std::move(e));
 }
 
 gap::generator<NamedDecl> LambdaExpr::explicit_template_parameters(void) const & {
@@ -221,7 +243,7 @@ gap::generator<NamedDecl> LambdaExpr::explicit_template_parameters(void) const &
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from(Decl(std::move(d15)))) {
+      if (auto e = NamedDecl::from_base(std::move(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -235,7 +257,7 @@ TokenRange LambdaExpr::introducer_range(void) const {
 
 CXXRecordDecl LambdaExpr::lambda_class(void) const {
   RawEntityId eid = impl->reader.getVal44();
-  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return CXXRecordDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 std::optional<TemplateParameterList> LambdaExpr::template_parameter_list(void) const {
@@ -258,7 +280,7 @@ std::optional<Expr> LambdaExpr::trailing_requires_clause(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

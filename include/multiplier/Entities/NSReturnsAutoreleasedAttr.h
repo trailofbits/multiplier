@@ -40,17 +40,13 @@ class NSReturnsAutoreleasedAttr : public InheritableAttr {
     return AttrKind::NS_RETURNS_AUTORELEASED;
   }
 
-  static std::optional<NSReturnsAutoreleasedAttr> from(const Attr &parent);
-
-  inline static std::optional<NSReturnsAutoreleasedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NSReturnsAutoreleasedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NSReturnsAutoreleasedAttr> from_base(const Attr &parent);
+  inline static std::optional<NSReturnsAutoreleasedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NSReturnsAutoreleasedAttr> from(const std::optional<Attr> &parent);
   static std::optional<NSReturnsAutoreleasedAttr> from(const Reference &r);
+  static std::optional<NSReturnsAutoreleasedAttr> from(const VariantEntity &e);
   static std::optional<NSReturnsAutoreleasedAttr> from(const TokenContext &t);
 
 };

@@ -40,17 +40,13 @@ class OSConsumesThisAttr : public InheritableAttr {
     return AttrKind::OS_CONSUMES_THIS;
   }
 
-  static std::optional<OSConsumesThisAttr> from(const Attr &parent);
-
-  inline static std::optional<OSConsumesThisAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OSConsumesThisAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OSConsumesThisAttr> from_base(const Attr &parent);
+  inline static std::optional<OSConsumesThisAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OSConsumesThisAttr> from(const std::optional<Attr> &parent);
   static std::optional<OSConsumesThisAttr> from(const Reference &r);
+  static std::optional<OSConsumesThisAttr> from(const VariantEntity &e);
   static std::optional<OSConsumesThisAttr> from(const TokenContext &t);
 
 };

@@ -51,17 +51,13 @@ class ExportDecl : public Decl {
   ExportDecl canonical_declaration(void) const;
   std::optional<ExportDecl> definition(void) const;
   gap::generator<ExportDecl> redeclarations(void) const &;
-  static std::optional<ExportDecl> from(const Decl &parent);
-
-  inline static std::optional<ExportDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ExportDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ExportDecl> from_base(const Decl &parent);
+  inline static std::optional<ExportDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ExportDecl> from(const std::optional<Decl> &parent);
   static std::optional<ExportDecl> from(const Reference &r);
+  static std::optional<ExportDecl> from(const VariantEntity &e);
   static std::optional<ExportDecl> from(const TokenContext &t);
 
   Token export_token(void) const;

@@ -57,17 +57,13 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
   FunctionTemplateDecl canonical_declaration(void) const;
   std::optional<FunctionTemplateDecl> definition(void) const;
   gap::generator<FunctionTemplateDecl> redeclarations(void) const &;
-  static std::optional<FunctionTemplateDecl> from(const Decl &parent);
-
-  inline static std::optional<FunctionTemplateDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return FunctionTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<FunctionTemplateDecl> from_base(const Decl &parent);
+  inline static std::optional<FunctionTemplateDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<FunctionTemplateDecl> from(const std::optional<Decl> &parent);
   static std::optional<FunctionTemplateDecl> from(const Reference &r);
+  static std::optional<FunctionTemplateDecl> from(const VariantEntity &e);
   static std::optional<FunctionTemplateDecl> from(const TokenContext &t);
 
   bool is_abbreviated(void) const;

@@ -87,7 +87,7 @@ bool MSGuidDecl::contains(const Stmt &stmt) {
 }
 
 MSGuidDecl MSGuidDecl::canonical_declaration(void) const {
-  if (auto canon = MSGuidDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (MSGuidDecl redecl : redeclarations()) {
@@ -97,12 +97,15 @@ MSGuidDecl MSGuidDecl::canonical_declaration(void) const {
 }
 
 std::optional<MSGuidDecl> MSGuidDecl::definition(void) const {
-  return MSGuidDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<MSGuidDecl> MSGuidDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<MSGuidDecl> dr = MSGuidDecl::from(r)) {
+    if (std::optional<MSGuidDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -115,18 +118,30 @@ gap::generator<MSGuidDecl> MSGuidDecl::redeclarations(void) const & {
 std::optional<MSGuidDecl> MSGuidDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return MSGuidDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MSGuidDecl> MSGuidDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kMSGuidDeclDerivedKinds[] = {
     MSGuidDecl::static_kind(),
 };
 
-std::optional<MSGuidDecl> MSGuidDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<MSGuidDecl> MSGuidDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case MSGuidDecl::static_kind():
       return reinterpret_cast<const MSGuidDecl &>(parent);
@@ -139,7 +154,7 @@ gap::generator<MSGuidDecl> MSGuidDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kMSGuidDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<MSGuidDecl> e = MSGuidDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<MSGuidDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -151,7 +166,7 @@ gap::generator<MSGuidDecl> MSGuidDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kMSGuidDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<MSGuidDecl> e = MSGuidDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<MSGuidDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -164,7 +179,7 @@ gap::generator<MSGuidDecl> MSGuidDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kMSGuidDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<MSGuidDecl> e = MSGuidDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<MSGuidDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -176,8 +191,18 @@ std::optional<MSGuidDecl> MSGuidDecl::from(const Reference &r) {
   return MSGuidDecl::from(r.as_declaration());
 }
 
+std::optional<MSGuidDecl> MSGuidDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<MSGuidDecl> MSGuidDecl::from(const TokenContext &t) {
-  return MSGuidDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

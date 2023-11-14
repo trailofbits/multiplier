@@ -95,7 +95,7 @@ bool TagDecl::contains(const Stmt &stmt) {
 }
 
 TagDecl TagDecl::canonical_declaration(void) const {
-  if (auto canon = TagDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (TagDecl redecl : redeclarations()) {
@@ -105,12 +105,15 @@ TagDecl TagDecl::canonical_declaration(void) const {
 }
 
 std::optional<TagDecl> TagDecl::definition(void) const {
-  return TagDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<TagDecl> TagDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<TagDecl> dr = TagDecl::from(r)) {
+    if (std::optional<TagDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -123,13 +126,23 @@ gap::generator<TagDecl> TagDecl::redeclarations(void) const & {
 std::optional<TagDecl> TagDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return TagDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TagDecl> TagDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kTagDeclDerivedKinds[] = {
     EnumDecl::static_kind(),
     RecordDecl::static_kind(),
@@ -138,7 +151,9 @@ static const DeclKind kTagDeclDerivedKinds[] = {
     ClassTemplatePartialSpecializationDecl::static_kind(),
 };
 
-std::optional<TagDecl> TagDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<TagDecl> TagDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case EnumDecl::static_kind():
     case RecordDecl::static_kind():
@@ -155,7 +170,7 @@ gap::generator<TagDecl> TagDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kTagDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<TagDecl> e = TagDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<TagDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -167,7 +182,7 @@ gap::generator<TagDecl> TagDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kTagDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<TagDecl> e = TagDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<TagDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -180,7 +195,7 @@ gap::generator<TagDecl> TagDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kTagDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<TagDecl> e = TagDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<TagDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -192,8 +207,18 @@ std::optional<TagDecl> TagDecl::from(const Reference &r) {
   return TagDecl::from(r.as_declaration());
 }
 
+std::optional<TagDecl> TagDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<TagDecl> TagDecl::from(const TokenContext &t) {
-  return TagDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 TokenRange TagDecl::brace_range(void) const {
@@ -219,7 +244,7 @@ std::optional<TypedefNameDecl> TagDecl::typedef_name_for_anonymous_declaration(v
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return TypedefNameDecl::from(Decl(std::move(eptr)));
+      return TypedefNameDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

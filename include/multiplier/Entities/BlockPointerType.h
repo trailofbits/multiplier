@@ -36,17 +36,13 @@ class BlockPointerType : public Type {
     return TypeKind::BLOCK_POINTER;
   }
 
-  static std::optional<BlockPointerType> from(const Type &parent);
-
-  inline static std::optional<BlockPointerType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return BlockPointerType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<BlockPointerType> from_base(const Type &parent);
+  inline static std::optional<BlockPointerType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<BlockPointerType> from(const std::optional<Type> &parent);
   static std::optional<BlockPointerType> from(const Reference &r);
+  static std::optional<BlockPointerType> from(const VariantEntity &e);
   static std::optional<BlockPointerType> from(const TokenContext &t);
 
   Type desugar(void) const;

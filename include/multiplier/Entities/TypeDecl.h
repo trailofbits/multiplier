@@ -60,17 +60,13 @@ class TypeDecl : public NamedDecl {
   TypeDecl canonical_declaration(void) const;
   std::optional<TypeDecl> definition(void) const;
   gap::generator<TypeDecl> redeclarations(void) const &;
-  static std::optional<TypeDecl> from(const Decl &parent);
-
-  inline static std::optional<TypeDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return TypeDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TypeDecl> from_base(const Decl &parent);
+  inline static std::optional<TypeDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TypeDecl> from(const std::optional<Decl> &parent);
   static std::optional<TypeDecl> from(const Reference &r);
+  static std::optional<TypeDecl> from(const VariantEntity &e);
   static std::optional<TypeDecl> from(const TokenContext &t);
 
   std::optional<Type> type_for_declaration(void) const;

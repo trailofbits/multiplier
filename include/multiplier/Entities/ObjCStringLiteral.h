@@ -53,17 +53,13 @@ class ObjCStringLiteral : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ObjCStringLiteral> from(const Stmt &parent);
-
-  inline static std::optional<ObjCStringLiteral> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return ObjCStringLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCStringLiteral> from_base(const Stmt &parent);
+  inline static std::optional<ObjCStringLiteral> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCStringLiteral> from(const std::optional<Stmt> &parent);
   static std::optional<ObjCStringLiteral> from(const Reference &r);
+  static std::optional<ObjCStringLiteral> from(const VariantEntity &e);
   static std::optional<ObjCStringLiteral> from(const TokenContext &t);
 
   Token at_token(void) const;

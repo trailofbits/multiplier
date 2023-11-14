@@ -40,17 +40,13 @@ class RandomizeLayoutAttr : public InheritableAttr {
     return AttrKind::RANDOMIZE_LAYOUT;
   }
 
-  static std::optional<RandomizeLayoutAttr> from(const Attr &parent);
-
-  inline static std::optional<RandomizeLayoutAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return RandomizeLayoutAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<RandomizeLayoutAttr> from_base(const Attr &parent);
+  inline static std::optional<RandomizeLayoutAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<RandomizeLayoutAttr> from(const std::optional<Attr> &parent);
   static std::optional<RandomizeLayoutAttr> from(const Reference &r);
+  static std::optional<RandomizeLayoutAttr> from(const VariantEntity &e);
   static std::optional<RandomizeLayoutAttr> from(const TokenContext &t);
 
 };

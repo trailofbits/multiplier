@@ -57,17 +57,13 @@ class IndirectFieldDecl : public ValueDecl {
   IndirectFieldDecl canonical_declaration(void) const;
   std::optional<IndirectFieldDecl> definition(void) const;
   gap::generator<IndirectFieldDecl> redeclarations(void) const &;
-  static std::optional<IndirectFieldDecl> from(const Decl &parent);
-
-  inline static std::optional<IndirectFieldDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return IndirectFieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<IndirectFieldDecl> from_base(const Decl &parent);
+  inline static std::optional<IndirectFieldDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<IndirectFieldDecl> from(const std::optional<Decl> &parent);
   static std::optional<IndirectFieldDecl> from(const Reference &r);
+  static std::optional<IndirectFieldDecl> from(const VariantEntity &e);
   static std::optional<IndirectFieldDecl> from(const TokenContext &t);
 
   gap::generator<NamedDecl> chain(void) const &;

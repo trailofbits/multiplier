@@ -38,18 +38,30 @@ bool AtomicType::contains(const Token &tok) const {
 std::optional<AtomicType> AtomicType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return AtomicType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<AtomicType> AtomicType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kAtomicTypeDerivedKinds[] = {
     AtomicType::static_kind(),
 };
 
-std::optional<AtomicType> AtomicType::from(const Type &parent) {
+}  // namespace
+
+std::optional<AtomicType> AtomicType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case AtomicType::static_kind():
       return reinterpret_cast<const AtomicType &>(parent);
@@ -62,7 +74,7 @@ gap::generator<AtomicType> AtomicType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kAtomicTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<AtomicType> e = AtomicType::from(Type(std::move(eptr)))) {
+      if (std::optional<AtomicType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -73,8 +85,18 @@ std::optional<AtomicType> AtomicType::from(const Reference &r) {
   return AtomicType::from(r.as_type());
 }
 
+std::optional<AtomicType> AtomicType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<AtomicType> AtomicType::from(const TokenContext &t) {
-  return AtomicType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type AtomicType::desugar(void) const {

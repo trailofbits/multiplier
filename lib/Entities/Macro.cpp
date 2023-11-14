@@ -81,9 +81,7 @@ std::optional<Macro> Macro::by_id(const Index &index, EntityId eid) {
 gap::generator<Macro> Macro::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroImplPtr eptr : ep->MacrosFor(ep)) {
-    if (std::optional<Macro> e = Macro::from(Macro(std::move(eptr)))) {
-      co_yield std::move(e.value());
-    }
+    co_yield Macro(std::move(eptr));
   }
 }
 
@@ -101,9 +99,7 @@ gap::generator<Macro> Macro::in(const File &file) {
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, frag_id)) {
-      if (std::optional<Macro> e = Macro::from(Macro(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
+      co_yield Macro(std::move(eptr));
     }
   }
 }
@@ -112,9 +108,7 @@ gap::generator<Macro> Macro::in(const Fragment &frag) {
   const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (MacroImplPtr eptr : ep->MacrosFor(ep, frag_id)) {
-    if (std::optional<Macro> e = Macro::from(Macro(std::move(eptr)))) {
-      co_yield std::move(e.value());
-    }
+    co_yield Macro(std::move(eptr));
   }
 }
 

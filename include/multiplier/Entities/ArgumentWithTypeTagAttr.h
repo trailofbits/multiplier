@@ -41,17 +41,13 @@ class ArgumentWithTypeTagAttr : public InheritableAttr {
     return AttrKind::ARGUMENT_WITH_TYPE_TAG;
   }
 
-  static std::optional<ArgumentWithTypeTagAttr> from(const Attr &parent);
-
-  inline static std::optional<ArgumentWithTypeTagAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ArgumentWithTypeTagAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ArgumentWithTypeTagAttr> from_base(const Attr &parent);
+  inline static std::optional<ArgumentWithTypeTagAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ArgumentWithTypeTagAttr> from(const std::optional<Attr> &parent);
   static std::optional<ArgumentWithTypeTagAttr> from(const Reference &r);
+  static std::optional<ArgumentWithTypeTagAttr> from(const VariantEntity &e);
   static std::optional<ArgumentWithTypeTagAttr> from(const TokenContext &t);
 
   bool is_pointer(void) const;

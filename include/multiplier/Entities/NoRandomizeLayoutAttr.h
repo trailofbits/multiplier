@@ -40,17 +40,13 @@ class NoRandomizeLayoutAttr : public InheritableAttr {
     return AttrKind::NO_RANDOMIZE_LAYOUT;
   }
 
-  static std::optional<NoRandomizeLayoutAttr> from(const Attr &parent);
-
-  inline static std::optional<NoRandomizeLayoutAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoRandomizeLayoutAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoRandomizeLayoutAttr> from_base(const Attr &parent);
+  inline static std::optional<NoRandomizeLayoutAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoRandomizeLayoutAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoRandomizeLayoutAttr> from(const Reference &r);
+  static std::optional<NoRandomizeLayoutAttr> from(const VariantEntity &e);
   static std::optional<NoRandomizeLayoutAttr> from(const TokenContext &t);
 
 };

@@ -40,19 +40,31 @@ bool MatrixType::contains(const Token &tok) const {
 std::optional<MatrixType> MatrixType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return MatrixType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MatrixType> MatrixType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kMatrixTypeDerivedKinds[] = {
     ConstantMatrixType::static_kind(),
     DependentSizedMatrixType::static_kind(),
 };
 
-std::optional<MatrixType> MatrixType::from(const Type &parent) {
+}  // namespace
+
+std::optional<MatrixType> MatrixType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case ConstantMatrixType::static_kind():
     case DependentSizedMatrixType::static_kind():
@@ -66,7 +78,7 @@ gap::generator<MatrixType> MatrixType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kMatrixTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<MatrixType> e = MatrixType::from(Type(std::move(eptr)))) {
+      if (std::optional<MatrixType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -77,8 +89,18 @@ std::optional<MatrixType> MatrixType::from(const Reference &r) {
   return MatrixType::from(r.as_type());
 }
 
+std::optional<MatrixType> MatrixType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<MatrixType> MatrixType::from(const TokenContext &t) {
-  return MatrixType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type MatrixType::desugar(void) const {

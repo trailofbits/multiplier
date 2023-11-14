@@ -38,17 +38,13 @@ class NoBuiltinAttr : public Attr {
     return AttrKind::NO_BUILTIN;
   }
 
-  static std::optional<NoBuiltinAttr> from(const Attr &parent);
-
-  inline static std::optional<NoBuiltinAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoBuiltinAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoBuiltinAttr> from_base(const Attr &parent);
+  inline static std::optional<NoBuiltinAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoBuiltinAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoBuiltinAttr> from(const Reference &r);
+  static std::optional<NoBuiltinAttr> from(const VariantEntity &e);
   static std::optional<NoBuiltinAttr> from(const TokenContext &t);
 
 };

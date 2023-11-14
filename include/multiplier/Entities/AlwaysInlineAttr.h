@@ -43,17 +43,13 @@ class AlwaysInlineAttr : public DeclOrStmtAttr {
     return AttrKind::ALWAYS_INLINE;
   }
 
-  static std::optional<AlwaysInlineAttr> from(const Attr &parent);
-
-  inline static std::optional<AlwaysInlineAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AlwaysInlineAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AlwaysInlineAttr> from_base(const Attr &parent);
+  inline static std::optional<AlwaysInlineAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AlwaysInlineAttr> from(const std::optional<Attr> &parent);
   static std::optional<AlwaysInlineAttr> from(const Reference &r);
+  static std::optional<AlwaysInlineAttr> from(const VariantEntity &e);
   static std::optional<AlwaysInlineAttr> from(const TokenContext &t);
 
   AlwaysInlineAttrSpelling semantic_spelling(void) const;

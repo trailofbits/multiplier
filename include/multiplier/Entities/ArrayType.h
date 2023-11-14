@@ -37,17 +37,13 @@ class ArrayType : public Type {
   bool contains(const Token &tok) const;
   static std::optional<ArrayType> by_id(const Index &, EntityId);
 
-  static std::optional<ArrayType> from(const Type &parent);
-
-  inline static std::optional<ArrayType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return ArrayType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ArrayType> from_base(const Type &parent);
+  inline static std::optional<ArrayType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ArrayType> from(const std::optional<Type> &parent);
   static std::optional<ArrayType> from(const Reference &r);
+  static std::optional<ArrayType> from(const VariantEntity &e);
   static std::optional<ArrayType> from(const TokenContext &t);
 
   Type element_type(void) const;

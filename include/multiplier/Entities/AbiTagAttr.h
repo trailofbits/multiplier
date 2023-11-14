@@ -38,17 +38,13 @@ class AbiTagAttr : public Attr {
     return AttrKind::ABI_TAG;
   }
 
-  static std::optional<AbiTagAttr> from(const Attr &parent);
-
-  inline static std::optional<AbiTagAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AbiTagAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AbiTagAttr> from_base(const Attr &parent);
+  inline static std::optional<AbiTagAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AbiTagAttr> from(const std::optional<Attr> &parent);
   static std::optional<AbiTagAttr> from(const Reference &r);
+  static std::optional<AbiTagAttr> from(const VariantEntity &e);
   static std::optional<AbiTagAttr> from(const TokenContext &t);
 
 };

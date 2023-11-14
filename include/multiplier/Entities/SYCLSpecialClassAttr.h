@@ -40,17 +40,13 @@ class SYCLSpecialClassAttr : public InheritableAttr {
     return AttrKind::SYCL_SPECIAL_CLASS;
   }
 
-  static std::optional<SYCLSpecialClassAttr> from(const Attr &parent);
-
-  inline static std::optional<SYCLSpecialClassAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SYCLSpecialClassAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SYCLSpecialClassAttr> from_base(const Attr &parent);
+  inline static std::optional<SYCLSpecialClassAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SYCLSpecialClassAttr> from(const std::optional<Attr> &parent);
   static std::optional<SYCLSpecialClassAttr> from(const Reference &r);
+  static std::optional<SYCLSpecialClassAttr> from(const VariantEntity &e);
   static std::optional<SYCLSpecialClassAttr> from(const TokenContext &t);
 
 };

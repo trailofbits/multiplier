@@ -91,18 +91,30 @@ bool SwitchStmt::contains(const Stmt &stmt) {
 std::optional<SwitchStmt> SwitchStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return SwitchStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<SwitchStmt> SwitchStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kSwitchStmtDerivedKinds[] = {
     SwitchStmt::static_kind(),
 };
 
-std::optional<SwitchStmt> SwitchStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<SwitchStmt> SwitchStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case SwitchStmt::static_kind():
       return reinterpret_cast<const SwitchStmt &>(parent);
@@ -115,7 +127,7 @@ gap::generator<SwitchStmt> SwitchStmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kSwitchStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<SwitchStmt> e = SwitchStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<SwitchStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -127,7 +139,7 @@ gap::generator<SwitchStmt> SwitchStmt::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kSwitchStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<SwitchStmt> e = SwitchStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<SwitchStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -140,7 +152,7 @@ gap::generator<SwitchStmt> SwitchStmt::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kSwitchStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<SwitchStmt> e = SwitchStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<SwitchStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -152,8 +164,18 @@ std::optional<SwitchStmt> SwitchStmt::from(const Reference &r) {
   return SwitchStmt::from(r.as_statement());
 }
 
+std::optional<SwitchStmt> SwitchStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<SwitchStmt> SwitchStmt::from(const TokenContext &t) {
-  return SwitchStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Stmt SwitchStmt::body(void) const {
@@ -163,7 +185,7 @@ Stmt SwitchStmt::body(void) const {
 
 Expr SwitchStmt::condition(void) const {
   RawEntityId eid = impl->reader.getVal10();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 std::optional<VarDecl> SwitchStmt::condition_variable(void) const {
@@ -173,7 +195,7 @@ std::optional<VarDecl> SwitchStmt::condition_variable(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr)));
+      return VarDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -186,7 +208,7 @@ std::optional<DeclStmt> SwitchStmt::condition_variable_declaration_statement(voi
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return DeclStmt::from(Stmt(std::move(eptr)));
+      return DeclStmt::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -220,7 +242,7 @@ std::optional<SwitchCase> SwitchStmt::first_switch_case(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return SwitchCase::from(Stmt(std::move(eptr)));
+      return SwitchCase::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

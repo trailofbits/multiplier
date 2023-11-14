@@ -41,17 +41,13 @@ class NoStackProtectorAttr : public InheritableAttr {
     return AttrKind::NO_STACK_PROTECTOR;
   }
 
-  static std::optional<NoStackProtectorAttr> from(const Attr &parent);
-
-  inline static std::optional<NoStackProtectorAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoStackProtectorAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoStackProtectorAttr> from_base(const Attr &parent);
+  inline static std::optional<NoStackProtectorAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoStackProtectorAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoStackProtectorAttr> from(const Reference &r);
+  static std::optional<NoStackProtectorAttr> from(const VariantEntity &e);
   static std::optional<NoStackProtectorAttr> from(const TokenContext &t);
 
   NoStackProtectorAttrSpelling semantic_spelling(void) const;

@@ -61,17 +61,13 @@ class CXXConstructorDecl : public CXXMethodDecl {
   CXXConstructorDecl canonical_declaration(void) const;
   std::optional<CXXConstructorDecl> definition(void) const;
   gap::generator<CXXConstructorDecl> redeclarations(void) const &;
-  static std::optional<CXXConstructorDecl> from(const Decl &parent);
-
-  inline static std::optional<CXXConstructorDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return CXXConstructorDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CXXConstructorDecl> from_base(const Decl &parent);
+  inline static std::optional<CXXConstructorDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CXXConstructorDecl> from(const std::optional<Decl> &parent);
   static std::optional<CXXConstructorDecl> from(const Reference &r);
+  static std::optional<CXXConstructorDecl> from(const VariantEntity &e);
   static std::optional<CXXConstructorDecl> from(const TokenContext &t);
 
   std::optional<CXXConstructorDecl> target_constructor(void) const;

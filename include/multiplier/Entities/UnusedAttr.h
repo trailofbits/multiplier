@@ -41,17 +41,13 @@ class UnusedAttr : public InheritableAttr {
     return AttrKind::UNUSED;
   }
 
-  static std::optional<UnusedAttr> from(const Attr &parent);
-
-  inline static std::optional<UnusedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return UnusedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UnusedAttr> from_base(const Attr &parent);
+  inline static std::optional<UnusedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UnusedAttr> from(const std::optional<Attr> &parent);
   static std::optional<UnusedAttr> from(const Reference &r);
+  static std::optional<UnusedAttr> from(const VariantEntity &e);
   static std::optional<UnusedAttr> from(const TokenContext &t);
 
   UnusedAttrSpelling semantic_spelling(void) const;

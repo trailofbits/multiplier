@@ -89,18 +89,30 @@ bool CXXNoexceptExpr::contains(const Stmt &stmt) {
 std::optional<CXXNoexceptExpr> CXXNoexceptExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXNoexceptExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXNoexceptExprDerivedKinds[] = {
     CXXNoexceptExpr::static_kind(),
 };
 
-std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXNoexceptExpr::static_kind():
       return reinterpret_cast<const CXXNoexceptExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<CXXNoexceptExpr> CXXNoexceptExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXNoexceptExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXNoexceptExpr> e = CXXNoexceptExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXNoexceptExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<CXXNoexceptExpr> CXXNoexceptExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXNoexceptExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXNoexceptExpr> e = CXXNoexceptExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXNoexceptExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<CXXNoexceptExpr> CXXNoexceptExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXNoexceptExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXNoexceptExpr> e = CXXNoexceptExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXNoexceptExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,13 +162,23 @@ std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const Reference &r) {
   return CXXNoexceptExpr::from(r.as_statement());
 }
 
+std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const TokenContext &t) {
-  return CXXNoexceptExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr CXXNoexceptExpr::operand(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool CXXNoexceptExpr::value(void) const {

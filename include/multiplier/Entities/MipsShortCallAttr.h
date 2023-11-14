@@ -41,17 +41,13 @@ class MipsShortCallAttr : public InheritableAttr {
     return AttrKind::MIPS_SHORT_CALL;
   }
 
-  static std::optional<MipsShortCallAttr> from(const Attr &parent);
-
-  inline static std::optional<MipsShortCallAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MipsShortCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MipsShortCallAttr> from_base(const Attr &parent);
+  inline static std::optional<MipsShortCallAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MipsShortCallAttr> from(const std::optional<Attr> &parent);
   static std::optional<MipsShortCallAttr> from(const Reference &r);
+  static std::optional<MipsShortCallAttr> from(const VariantEntity &e);
   static std::optional<MipsShortCallAttr> from(const TokenContext &t);
 
   MipsShortCallAttrSpelling semantic_spelling(void) const;

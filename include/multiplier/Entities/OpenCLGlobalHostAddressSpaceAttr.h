@@ -40,17 +40,13 @@ class OpenCLGlobalHostAddressSpaceAttr : public TypeAttr {
     return AttrKind::OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE;
   }
 
-  static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const Attr &parent);
-
-  inline static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OpenCLGlobalHostAddressSpaceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OpenCLGlobalHostAddressSpaceAttr> from_base(const Attr &parent);
+  inline static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const std::optional<Attr> &parent);
   static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const Reference &r);
+  static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const VariantEntity &e);
   static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const TokenContext &t);
 
 };

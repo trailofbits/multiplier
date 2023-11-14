@@ -40,17 +40,13 @@ class NoCommonAttr : public InheritableAttr {
     return AttrKind::NO_COMMON;
   }
 
-  static std::optional<NoCommonAttr> from(const Attr &parent);
-
-  inline static std::optional<NoCommonAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoCommonAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoCommonAttr> from_base(const Attr &parent);
+  inline static std::optional<NoCommonAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoCommonAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoCommonAttr> from(const Reference &r);
+  static std::optional<NoCommonAttr> from(const VariantEntity &e);
   static std::optional<NoCommonAttr> from(const TokenContext &t);
 
 };

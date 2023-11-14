@@ -42,17 +42,13 @@ class OwnershipAttr : public InheritableAttr {
     return AttrKind::OWNERSHIP;
   }
 
-  static std::optional<OwnershipAttr> from(const Attr &parent);
-
-  inline static std::optional<OwnershipAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OwnershipAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OwnershipAttr> from_base(const Attr &parent);
+  inline static std::optional<OwnershipAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OwnershipAttr> from(const std::optional<Attr> &parent);
   static std::optional<OwnershipAttr> from(const Reference &r);
+  static std::optional<OwnershipAttr> from(const VariantEntity &e);
   static std::optional<OwnershipAttr> from(const TokenContext &t);
 
   OwnershipAttrOwnershipKind own_kind(void) const;

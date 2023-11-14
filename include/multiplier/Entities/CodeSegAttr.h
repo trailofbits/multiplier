@@ -40,17 +40,13 @@ class CodeSegAttr : public InheritableAttr {
     return AttrKind::CODE_SEG;
   }
 
-  static std::optional<CodeSegAttr> from(const Attr &parent);
-
-  inline static std::optional<CodeSegAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CodeSegAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CodeSegAttr> from_base(const Attr &parent);
+  inline static std::optional<CodeSegAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CodeSegAttr> from(const std::optional<Attr> &parent);
   static std::optional<CodeSegAttr> from(const Reference &r);
+  static std::optional<CodeSegAttr> from(const VariantEntity &e);
   static std::optional<CodeSegAttr> from(const TokenContext &t);
 
   std::string_view name(void) const;

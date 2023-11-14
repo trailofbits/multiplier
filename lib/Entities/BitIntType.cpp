@@ -38,18 +38,30 @@ bool BitIntType::contains(const Token &tok) const {
 std::optional<BitIntType> BitIntType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return BitIntType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<BitIntType> BitIntType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kBitIntTypeDerivedKinds[] = {
     BitIntType::static_kind(),
 };
 
-std::optional<BitIntType> BitIntType::from(const Type &parent) {
+}  // namespace
+
+std::optional<BitIntType> BitIntType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case BitIntType::static_kind():
       return reinterpret_cast<const BitIntType &>(parent);
@@ -62,7 +74,7 @@ gap::generator<BitIntType> BitIntType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kBitIntTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<BitIntType> e = BitIntType::from(Type(std::move(eptr)))) {
+      if (std::optional<BitIntType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -73,8 +85,18 @@ std::optional<BitIntType> BitIntType::from(const Reference &r) {
   return BitIntType::from(r.as_type());
 }
 
+std::optional<BitIntType> BitIntType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<BitIntType> BitIntType::from(const TokenContext &t) {
-  return BitIntType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type BitIntType::desugar(void) const {

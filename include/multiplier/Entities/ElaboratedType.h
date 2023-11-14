@@ -39,17 +39,13 @@ class ElaboratedType : public TypeWithKeyword {
     return TypeKind::ELABORATED;
   }
 
-  static std::optional<ElaboratedType> from(const Type &parent);
-
-  inline static std::optional<ElaboratedType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return ElaboratedType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ElaboratedType> from_base(const Type &parent);
+  inline static std::optional<ElaboratedType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ElaboratedType> from(const std::optional<Type> &parent);
   static std::optional<ElaboratedType> from(const Reference &r);
+  static std::optional<ElaboratedType> from(const VariantEntity &e);
   static std::optional<ElaboratedType> from(const TokenContext &t);
 
   Type desugar(void) const;

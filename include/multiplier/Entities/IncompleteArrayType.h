@@ -38,17 +38,13 @@ class IncompleteArrayType : public ArrayType {
     return TypeKind::INCOMPLETE_ARRAY;
   }
 
-  static std::optional<IncompleteArrayType> from(const Type &parent);
-
-  inline static std::optional<IncompleteArrayType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return IncompleteArrayType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<IncompleteArrayType> from_base(const Type &parent);
+  inline static std::optional<IncompleteArrayType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<IncompleteArrayType> from(const std::optional<Type> &parent);
   static std::optional<IncompleteArrayType> from(const Reference &r);
+  static std::optional<IncompleteArrayType> from(const VariantEntity &e);
   static std::optional<IncompleteArrayType> from(const TokenContext &t);
 
   Type desugar(void) const;

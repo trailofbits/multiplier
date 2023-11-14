@@ -54,17 +54,13 @@ class FriendTemplateDecl : public Decl {
   FriendTemplateDecl canonical_declaration(void) const;
   std::optional<FriendTemplateDecl> definition(void) const;
   gap::generator<FriendTemplateDecl> redeclarations(void) const &;
-  static std::optional<FriendTemplateDecl> from(const Decl &parent);
-
-  inline static std::optional<FriendTemplateDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return FriendTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<FriendTemplateDecl> from_base(const Decl &parent);
+  inline static std::optional<FriendTemplateDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<FriendTemplateDecl> from(const std::optional<Decl> &parent);
   static std::optional<FriendTemplateDecl> from(const Reference &r);
+  static std::optional<FriendTemplateDecl> from(const VariantEntity &e);
   static std::optional<FriendTemplateDecl> from(const TokenContext &t);
 
   NamedDecl friend_declaration(void) const;

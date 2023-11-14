@@ -52,17 +52,13 @@ class SYCLUniqueStableNameExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<SYCLUniqueStableNameExpr> from(const Stmt &parent);
-
-  inline static std::optional<SYCLUniqueStableNameExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return SYCLUniqueStableNameExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SYCLUniqueStableNameExpr> from_base(const Stmt &parent);
+  inline static std::optional<SYCLUniqueStableNameExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SYCLUniqueStableNameExpr> from(const std::optional<Stmt> &parent);
   static std::optional<SYCLUniqueStableNameExpr> from(const Reference &r);
+  static std::optional<SYCLUniqueStableNameExpr> from(const VariantEntity &e);
   static std::optional<SYCLUniqueStableNameExpr> from(const TokenContext &t);
 
   std::string_view compute_name(void) const;

@@ -42,18 +42,30 @@ bool ObjCObjectPointerType::contains(const Token &tok) const {
 std::optional<ObjCObjectPointerType> ObjCObjectPointerType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return ObjCObjectPointerType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCObjectPointerType> ObjCObjectPointerType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kObjCObjectPointerTypeDerivedKinds[] = {
     ObjCObjectPointerType::static_kind(),
 };
 
-std::optional<ObjCObjectPointerType> ObjCObjectPointerType::from(const Type &parent) {
+}  // namespace
+
+std::optional<ObjCObjectPointerType> ObjCObjectPointerType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case ObjCObjectPointerType::static_kind():
       return reinterpret_cast<const ObjCObjectPointerType &>(parent);
@@ -66,7 +78,7 @@ gap::generator<ObjCObjectPointerType> ObjCObjectPointerType::in(const Index &ind
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kObjCObjectPointerTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<ObjCObjectPointerType> e = ObjCObjectPointerType::from(Type(std::move(eptr)))) {
+      if (std::optional<ObjCObjectPointerType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -77,8 +89,18 @@ std::optional<ObjCObjectPointerType> ObjCObjectPointerType::from(const Reference
   return ObjCObjectPointerType::from(r.as_type());
 }
 
+std::optional<ObjCObjectPointerType> ObjCObjectPointerType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<ObjCObjectPointerType> ObjCObjectPointerType::from(const TokenContext &t) {
-  return ObjCObjectPointerType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type ObjCObjectPointerType::desugar(void) const {
@@ -88,17 +110,17 @@ Type ObjCObjectPointerType::desugar(void) const {
 
 ObjCInterfaceDecl ObjCObjectPointerType::interface_declaration(void) const {
   RawEntityId eid = impl->reader.getVal19();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ObjCInterfaceType ObjCObjectPointerType::interface_type(void) const {
   RawEntityId eid = impl->reader.getVal25();
-  return ObjCInterfaceType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
+  return ObjCInterfaceType::from_base(impl->ep->TypeFor(impl->ep, eid)).value();
 }
 
 ObjCObjectType ObjCObjectPointerType::object_type(void) const {
   RawEntityId eid = impl->reader.getVal26();
-  return ObjCObjectType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
+  return ObjCObjectType::from_base(impl->ep->TypeFor(impl->ep, eid)).value();
 }
 
 Type ObjCObjectPointerType::pointee_type(void) const {
@@ -196,7 +218,7 @@ std::optional<ObjCProtocolDecl> ObjCObjectPointerType::nth_qualifier(unsigned n)
   if (!e) {
     return std::nullopt;
   }
-  return ObjCProtocolDecl::from(Decl(std::move(e)));
+  return ObjCProtocolDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::qualifiers(void) const & {
@@ -205,7 +227,7 @@ gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::qualifiers(void) const &
   for (auto v : list) {
     EntityId id(v);
     if (auto d61 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d61)))) {
+      if (auto e = ObjCProtocolDecl::from_base(std::move(d61))) {
         co_yield std::move(*e);
       }
     }
@@ -215,7 +237,7 @@ gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::qualifiers(void) const &
 
 ObjCObjectPointerType ObjCObjectPointerType::strip_obj_c_kind_of_type_and_qualifiers(void) const {
   RawEntityId eid = impl->reader.getVal62();
-  return ObjCObjectPointerType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
+  return ObjCObjectPointerType::from_base(impl->ep->TypeFor(impl->ep, eid)).value();
 }
 
 unsigned ObjCObjectPointerType::num_protocols(void) const {
@@ -233,7 +255,7 @@ std::optional<ObjCProtocolDecl> ObjCObjectPointerType::nth_protocol(unsigned n) 
   if (!e) {
     return std::nullopt;
   }
-  return ObjCProtocolDecl::from(Decl(std::move(e)));
+  return ObjCProtocolDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::protocols(void) const & {
@@ -242,7 +264,7 @@ gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::protocols(void) const & 
   for (auto v : list) {
     EntityId id(v);
     if (auto d63 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d63)))) {
+      if (auto e = ObjCProtocolDecl::from_base(std::move(d63))) {
         co_yield std::move(*e);
       }
     }

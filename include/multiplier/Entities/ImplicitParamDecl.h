@@ -60,17 +60,13 @@ class ImplicitParamDecl : public VarDecl {
   ImplicitParamDecl canonical_declaration(void) const;
   std::optional<ImplicitParamDecl> definition(void) const;
   gap::generator<ImplicitParamDecl> redeclarations(void) const &;
-  static std::optional<ImplicitParamDecl> from(const Decl &parent);
-
-  inline static std::optional<ImplicitParamDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ImplicitParamDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ImplicitParamDecl> from_base(const Decl &parent);
+  inline static std::optional<ImplicitParamDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ImplicitParamDecl> from(const std::optional<Decl> &parent);
   static std::optional<ImplicitParamDecl> from(const Reference &r);
+  static std::optional<ImplicitParamDecl> from(const VariantEntity &e);
   static std::optional<ImplicitParamDecl> from(const TokenContext &t);
 
   ImplicitParamDeclImplicitParamKind parameter_kind(void) const;

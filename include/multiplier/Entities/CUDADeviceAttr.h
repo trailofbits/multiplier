@@ -40,17 +40,13 @@ class CUDADeviceAttr : public InheritableAttr {
     return AttrKind::CUDA_DEVICE;
   }
 
-  static std::optional<CUDADeviceAttr> from(const Attr &parent);
-
-  inline static std::optional<CUDADeviceAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CUDADeviceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CUDADeviceAttr> from_base(const Attr &parent);
+  inline static std::optional<CUDADeviceAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CUDADeviceAttr> from(const std::optional<Attr> &parent);
   static std::optional<CUDADeviceAttr> from(const Reference &r);
+  static std::optional<CUDADeviceAttr> from(const VariantEntity &e);
   static std::optional<CUDADeviceAttr> from(const TokenContext &t);
 
 };

@@ -53,17 +53,13 @@ class NamespaceDecl : public NamedDecl {
   NamespaceDecl canonical_declaration(void) const;
   std::optional<NamespaceDecl> definition(void) const;
   gap::generator<NamespaceDecl> redeclarations(void) const &;
-  static std::optional<NamespaceDecl> from(const Decl &parent);
-
-  inline static std::optional<NamespaceDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return NamespaceDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NamespaceDecl> from_base(const Decl &parent);
+  inline static std::optional<NamespaceDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NamespaceDecl> from(const std::optional<Decl> &parent);
   static std::optional<NamespaceDecl> from(const Reference &r);
+  static std::optional<NamespaceDecl> from(const VariantEntity &e);
   static std::optional<NamespaceDecl> from(const TokenContext &t);
 
   gap::generator<Decl> declarations_in_context(void) const &;

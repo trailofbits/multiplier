@@ -55,17 +55,13 @@ class DeclRefExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<DeclRefExpr> from(const Stmt &parent);
-
-  inline static std::optional<DeclRefExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return DeclRefExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<DeclRefExpr> from_base(const Stmt &parent);
+  inline static std::optional<DeclRefExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<DeclRefExpr> from(const std::optional<Stmt> &parent);
   static std::optional<DeclRefExpr> from(const Reference &r);
+  static std::optional<DeclRefExpr> from(const VariantEntity &e);
   static std::optional<DeclRefExpr> from(const TokenContext &t);
 
   ValueDecl declaration(void) const;

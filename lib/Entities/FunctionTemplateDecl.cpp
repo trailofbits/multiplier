@@ -88,7 +88,7 @@ bool FunctionTemplateDecl::contains(const Stmt &stmt) {
 }
 
 FunctionTemplateDecl FunctionTemplateDecl::canonical_declaration(void) const {
-  if (auto canon = FunctionTemplateDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (FunctionTemplateDecl redecl : redeclarations()) {
@@ -98,12 +98,15 @@ FunctionTemplateDecl FunctionTemplateDecl::canonical_declaration(void) const {
 }
 
 std::optional<FunctionTemplateDecl> FunctionTemplateDecl::definition(void) const {
-  return FunctionTemplateDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<FunctionTemplateDecl> FunctionTemplateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<FunctionTemplateDecl> dr = FunctionTemplateDecl::from(r)) {
+    if (std::optional<FunctionTemplateDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -116,18 +119,30 @@ gap::generator<FunctionTemplateDecl> FunctionTemplateDecl::redeclarations(void) 
 std::optional<FunctionTemplateDecl> FunctionTemplateDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return FunctionTemplateDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kFunctionTemplateDeclDerivedKinds[] = {
     FunctionTemplateDecl::static_kind(),
 };
 
-std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case FunctionTemplateDecl::static_kind():
       return reinterpret_cast<const FunctionTemplateDecl &>(parent);
@@ -140,7 +155,7 @@ gap::generator<FunctionTemplateDecl> FunctionTemplateDecl::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kFunctionTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<FunctionTemplateDecl> e = FunctionTemplateDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<FunctionTemplateDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -152,7 +167,7 @@ gap::generator<FunctionTemplateDecl> FunctionTemplateDecl::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kFunctionTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<FunctionTemplateDecl> e = FunctionTemplateDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<FunctionTemplateDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -165,7 +180,7 @@ gap::generator<FunctionTemplateDecl> FunctionTemplateDecl::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kFunctionTemplateDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<FunctionTemplateDecl> e = FunctionTemplateDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<FunctionTemplateDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -177,8 +192,18 @@ std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const Reference &
   return FunctionTemplateDecl::from(r.as_declaration());
 }
 
+std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const TokenContext &t) {
-  return FunctionTemplateDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool FunctionTemplateDecl::is_abbreviated(void) const {

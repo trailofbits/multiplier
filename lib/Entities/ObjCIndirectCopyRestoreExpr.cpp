@@ -89,18 +89,30 @@ bool ObjCIndirectCopyRestoreExpr::contains(const Stmt &stmt) {
 std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ObjCIndirectCopyRestoreExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kObjCIndirectCopyRestoreExprDerivedKinds[] = {
     ObjCIndirectCopyRestoreExpr::static_kind(),
 };
 
-std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCIndirectCopyRestoreExpr::static_kind():
       return reinterpret_cast<const ObjCIndirectCopyRestoreExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::in(cons
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCIndirectCopyRestoreExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ObjCIndirectCopyRestoreExpr> e = ObjCIndirectCopyRestoreExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCIndirectCopyRestoreExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::in(cons
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCIndirectCopyRestoreExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCIndirectCopyRestoreExpr> e = ObjCIndirectCopyRestoreExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCIndirectCopyRestoreExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::in(cons
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCIndirectCopyRestoreExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCIndirectCopyRestoreExpr> e = ObjCIndirectCopyRestoreExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ObjCIndirectCopyRestoreExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,13 +162,23 @@ std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(con
   return ObjCIndirectCopyRestoreExpr::from(r.as_statement());
 }
 
+std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(const TokenContext &t) {
-  return ObjCIndirectCopyRestoreExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr ObjCIndirectCopyRestoreExpr::sub_expression(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool ObjCIndirectCopyRestoreExpr::should_copy(void) const {

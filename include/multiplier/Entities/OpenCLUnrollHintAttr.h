@@ -40,17 +40,13 @@ class OpenCLUnrollHintAttr : public StmtAttr {
     return AttrKind::OPEN_CL_UNROLL_HINT;
   }
 
-  static std::optional<OpenCLUnrollHintAttr> from(const Attr &parent);
-
-  inline static std::optional<OpenCLUnrollHintAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OpenCLUnrollHintAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OpenCLUnrollHintAttr> from_base(const Attr &parent);
+  inline static std::optional<OpenCLUnrollHintAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OpenCLUnrollHintAttr> from(const std::optional<Attr> &parent);
   static std::optional<OpenCLUnrollHintAttr> from(const Reference &r);
+  static std::optional<OpenCLUnrollHintAttr> from(const VariantEntity &e);
   static std::optional<OpenCLUnrollHintAttr> from(const TokenContext &t);
 
 };

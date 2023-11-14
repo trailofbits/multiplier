@@ -40,17 +40,13 @@ class NoDerefAttr : public TypeAttr {
     return AttrKind::NO_DEREF;
   }
 
-  static std::optional<NoDerefAttr> from(const Attr &parent);
-
-  inline static std::optional<NoDerefAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoDerefAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoDerefAttr> from_base(const Attr &parent);
+  inline static std::optional<NoDerefAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoDerefAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoDerefAttr> from(const Reference &r);
+  static std::optional<NoDerefAttr> from(const VariantEntity &e);
   static std::optional<NoDerefAttr> from(const TokenContext &t);
 
 };

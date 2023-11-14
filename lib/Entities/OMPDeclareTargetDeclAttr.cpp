@@ -40,18 +40,30 @@ bool OMPDeclareTargetDeclAttr::contains(const Token &tok) const {
 std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return OMPDeclareTargetDeclAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kOMPDeclareTargetDeclAttrDerivedKinds[] = {
     OMPDeclareTargetDeclAttr::static_kind(),
 };
 
-std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case OMPDeclareTargetDeclAttr::static_kind():
       return reinterpret_cast<const OMPDeclareTargetDeclAttr &>(parent);
@@ -64,7 +76,7 @@ gap::generator<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::in(const Inde
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kOMPDeclareTargetDeclAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<OMPDeclareTargetDeclAttr> e = OMPDeclareTargetDeclAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<OMPDeclareTargetDeclAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -76,7 +88,7 @@ gap::generator<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::in(const Frag
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kOMPDeclareTargetDeclAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<OMPDeclareTargetDeclAttr> e = OMPDeclareTargetDeclAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<OMPDeclareTargetDeclAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -89,7 +101,7 @@ gap::generator<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::in(const File
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kOMPDeclareTargetDeclAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<OMPDeclareTargetDeclAttr> e = OMPDeclareTargetDeclAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<OMPDeclareTargetDeclAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -101,8 +113,18 @@ std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const Ref
   return OMPDeclareTargetDeclAttr::from(r.as_attribute());
 }
 
+std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const TokenContext &t) {
-  return OMPDeclareTargetDeclAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 OMPDeclareTargetDeclAttrDevTypeTy OMPDeclareTargetDeclAttr::dev_type(void) const {
@@ -115,7 +137,7 @@ bool OMPDeclareTargetDeclAttr::indirect(void) const {
 
 Expr OMPDeclareTargetDeclAttr::indirect_expression(void) const {
   RawEntityId eid = impl->reader.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 OMPDeclareTargetDeclAttrMapTypeTy OMPDeclareTargetDeclAttr::map_type(void) const {

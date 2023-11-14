@@ -40,17 +40,13 @@ class ObjCRootClassAttr : public InheritableAttr {
     return AttrKind::OBJ_C_ROOT_CLASS;
   }
 
-  static std::optional<ObjCRootClassAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCRootClassAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCRootClassAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCRootClassAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCRootClassAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCRootClassAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCRootClassAttr> from(const Reference &r);
+  static std::optional<ObjCRootClassAttr> from(const VariantEntity &e);
   static std::optional<ObjCRootClassAttr> from(const TokenContext &t);
 
 };

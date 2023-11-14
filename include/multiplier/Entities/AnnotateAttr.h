@@ -42,17 +42,13 @@ class AnnotateAttr : public InheritableParamAttr {
     return AttrKind::ANNOTATE;
   }
 
-  static std::optional<AnnotateAttr> from(const Attr &parent);
-
-  inline static std::optional<AnnotateAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AnnotateAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AnnotateAttr> from_base(const Attr &parent);
+  inline static std::optional<AnnotateAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AnnotateAttr> from(const std::optional<Attr> &parent);
   static std::optional<AnnotateAttr> from(const Reference &r);
+  static std::optional<AnnotateAttr> from(const VariantEntity &e);
   static std::optional<AnnotateAttr> from(const TokenContext &t);
 
   std::string_view annotation(void) const;

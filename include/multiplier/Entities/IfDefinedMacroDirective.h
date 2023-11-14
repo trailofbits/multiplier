@@ -46,17 +46,13 @@ class IfDefinedMacroDirective : public ConditionalMacroDirective {
   static gap::generator<IfDefinedMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  static std::optional<IfDefinedMacroDirective> from(const Macro &parent);
-
-  inline static std::optional<IfDefinedMacroDirective> from(const std::optional<Macro> &parent) {
-    if (parent) {
-      return IfDefinedMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<IfDefinedMacroDirective> from_base(const Macro &parent);
+  inline static std::optional<IfDefinedMacroDirective> from(const Macro &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<IfDefinedMacroDirective> from(const std::optional<Macro> &parent);
   static std::optional<IfDefinedMacroDirective> from(const Reference &r);
+  static std::optional<IfDefinedMacroDirective> from(const VariantEntity &e);
   static std::optional<IfDefinedMacroDirective> from(const TokenContext &t);
 
 };

@@ -65,9 +65,7 @@ std::optional<Type> Type::by_id(const Index &index, EntityId eid) {
 gap::generator<Type> Type::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeImplPtr eptr : ep->TypesFor(ep)) {
-    if (std::optional<Type> e = Type::from(Type(std::move(eptr)))) {
-      co_yield std::move(e.value());
-    }
+    co_yield Type(std::move(eptr));
   }
 }
 

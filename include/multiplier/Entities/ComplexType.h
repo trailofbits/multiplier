@@ -36,17 +36,13 @@ class ComplexType : public Type {
     return TypeKind::COMPLEX;
   }
 
-  static std::optional<ComplexType> from(const Type &parent);
-
-  inline static std::optional<ComplexType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return ComplexType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ComplexType> from_base(const Type &parent);
+  inline static std::optional<ComplexType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ComplexType> from(const std::optional<Type> &parent);
   static std::optional<ComplexType> from(const Reference &r);
+  static std::optional<ComplexType> from(const VariantEntity &e);
   static std::optional<ComplexType> from(const TokenContext &t);
 
   Type desugar(void) const;

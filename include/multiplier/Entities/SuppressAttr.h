@@ -40,17 +40,13 @@ class SuppressAttr : public StmtAttr {
     return AttrKind::SUPPRESS;
   }
 
-  static std::optional<SuppressAttr> from(const Attr &parent);
-
-  inline static std::optional<SuppressAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SuppressAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SuppressAttr> from_base(const Attr &parent);
+  inline static std::optional<SuppressAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SuppressAttr> from(const std::optional<Attr> &parent);
   static std::optional<SuppressAttr> from(const Reference &r);
+  static std::optional<SuppressAttr> from(const VariantEntity &e);
   static std::optional<SuppressAttr> from(const TokenContext &t);
 
 };

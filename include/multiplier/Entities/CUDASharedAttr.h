@@ -40,17 +40,13 @@ class CUDASharedAttr : public InheritableAttr {
     return AttrKind::CUDA_SHARED;
   }
 
-  static std::optional<CUDASharedAttr> from(const Attr &parent);
-
-  inline static std::optional<CUDASharedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CUDASharedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CUDASharedAttr> from_base(const Attr &parent);
+  inline static std::optional<CUDASharedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CUDASharedAttr> from(const std::optional<Attr> &parent);
   static std::optional<CUDASharedAttr> from(const Reference &r);
+  static std::optional<CUDASharedAttr> from(const VariantEntity &e);
   static std::optional<CUDASharedAttr> from(const TokenContext &t);
 
 };

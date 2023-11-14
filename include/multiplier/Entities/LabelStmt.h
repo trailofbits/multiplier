@@ -51,17 +51,13 @@ class LabelStmt : public ValueStmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<LabelStmt> from(const Stmt &parent);
-
-  inline static std::optional<LabelStmt> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return LabelStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<LabelStmt> from_base(const Stmt &parent);
+  inline static std::optional<LabelStmt> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<LabelStmt> from(const std::optional<Stmt> &parent);
   static std::optional<LabelStmt> from(const Reference &r);
+  static std::optional<LabelStmt> from(const VariantEntity &e);
   static std::optional<LabelStmt> from(const TokenContext &t);
 
   LabelDecl declaration(void) const;

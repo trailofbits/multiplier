@@ -90,18 +90,30 @@ bool GCCAsmStmt::contains(const Stmt &stmt) {
 std::optional<GCCAsmStmt> GCCAsmStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return GCCAsmStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<GCCAsmStmt> GCCAsmStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kGCCAsmStmtDerivedKinds[] = {
     GCCAsmStmt::static_kind(),
 };
 
-std::optional<GCCAsmStmt> GCCAsmStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<GCCAsmStmt> GCCAsmStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case GCCAsmStmt::static_kind():
       return reinterpret_cast<const GCCAsmStmt &>(parent);
@@ -114,7 +126,7 @@ gap::generator<GCCAsmStmt> GCCAsmStmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kGCCAsmStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<GCCAsmStmt> e = GCCAsmStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<GCCAsmStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<GCCAsmStmt> GCCAsmStmt::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kGCCAsmStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<GCCAsmStmt> e = GCCAsmStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<GCCAsmStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<GCCAsmStmt> GCCAsmStmt::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kGCCAsmStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<GCCAsmStmt> e = GCCAsmStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<GCCAsmStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,13 +163,23 @@ std::optional<GCCAsmStmt> GCCAsmStmt::from(const Reference &r) {
   return GCCAsmStmt::from(r.as_statement());
 }
 
+std::optional<GCCAsmStmt> GCCAsmStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<GCCAsmStmt> GCCAsmStmt::from(const TokenContext &t) {
-  return GCCAsmStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 StringLiteral GCCAsmStmt::assembly_string(void) const {
   RawEntityId eid = impl->reader.getVal10();
-  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return StringLiteral::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token GCCAsmStmt::r_paren_token(void) const {
@@ -183,7 +205,7 @@ std::optional<AddrLabelExpr> GCCAsmStmt::nth_label(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return AddrLabelExpr::from(Stmt(std::move(e)));
+  return AddrLabelExpr::from_base(std::move(e));
 }
 
 gap::generator<AddrLabelExpr> GCCAsmStmt::labels(void) const & {
@@ -192,7 +214,7 @@ gap::generator<AddrLabelExpr> GCCAsmStmt::labels(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d29 = ep->StmtFor(ep, v)) {
-      if (auto e = AddrLabelExpr::from(Stmt(std::move(d29)))) {
+      if (auto e = AddrLabelExpr::from_base(std::move(d29))) {
         co_yield std::move(*e);
       }
     }
@@ -215,7 +237,7 @@ std::optional<StringLiteral> GCCAsmStmt::nth_output_constraint_literal(unsigned 
   if (!e) {
     return std::nullopt;
   }
-  return StringLiteral::from(Stmt(std::move(e)));
+  return StringLiteral::from_base(std::move(e));
 }
 
 gap::generator<StringLiteral> GCCAsmStmt::output_constraint_literals(void) const & {
@@ -224,7 +246,7 @@ gap::generator<StringLiteral> GCCAsmStmt::output_constraint_literals(void) const
   for (auto v : list) {
     EntityId id(v);
     if (auto d52 = ep->StmtFor(ep, v)) {
-      if (auto e = StringLiteral::from(Stmt(std::move(d52)))) {
+      if (auto e = StringLiteral::from_base(std::move(d52))) {
         co_yield std::move(*e);
       }
     }
@@ -256,7 +278,7 @@ std::optional<StringLiteral> GCCAsmStmt::nth_input_constraint_literal(unsigned n
   if (!e) {
     return std::nullopt;
   }
-  return StringLiteral::from(Stmt(std::move(e)));
+  return StringLiteral::from_base(std::move(e));
 }
 
 gap::generator<StringLiteral> GCCAsmStmt::input_constraint_literals(void) const & {
@@ -265,7 +287,7 @@ gap::generator<StringLiteral> GCCAsmStmt::input_constraint_literals(void) const 
   for (auto v : list) {
     EntityId id(v);
     if (auto d53 = ep->StmtFor(ep, v)) {
-      if (auto e = StringLiteral::from(Stmt(std::move(d53)))) {
+      if (auto e = StringLiteral::from_base(std::move(d53))) {
         co_yield std::move(*e);
       }
     }
@@ -297,7 +319,7 @@ std::optional<StringLiteral> GCCAsmStmt::nth_clobber_string_literal(unsigned n) 
   if (!e) {
     return std::nullopt;
   }
-  return StringLiteral::from(Stmt(std::move(e)));
+  return StringLiteral::from_base(std::move(e));
 }
 
 gap::generator<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const & {
@@ -306,7 +328,7 @@ gap::generator<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const & 
   for (auto v : list) {
     EntityId id(v);
     if (auto d54 = ep->StmtFor(ep, v)) {
-      if (auto e = StringLiteral::from(Stmt(std::move(d54)))) {
+      if (auto e = StringLiteral::from_base(std::move(d54))) {
         co_yield std::move(*e);
       }
     }
@@ -329,7 +351,7 @@ std::optional<AddrLabelExpr> GCCAsmStmt::nth_label_expression(unsigned n) const 
   if (!e) {
     return std::nullopt;
   }
-  return AddrLabelExpr::from(Stmt(std::move(e)));
+  return AddrLabelExpr::from_base(std::move(e));
 }
 
 gap::generator<AddrLabelExpr> GCCAsmStmt::label_expressions(void) const & {
@@ -338,7 +360,7 @@ gap::generator<AddrLabelExpr> GCCAsmStmt::label_expressions(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d67 = ep->StmtFor(ep, v)) {
-      if (auto e = AddrLabelExpr::from(Stmt(std::move(d67)))) {
+      if (auto e = AddrLabelExpr::from_base(std::move(d67))) {
         co_yield std::move(*e);
       }
     }

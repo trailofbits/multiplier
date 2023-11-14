@@ -55,17 +55,13 @@ class UsingDecl : public BaseUsingDecl {
   UsingDecl canonical_declaration(void) const;
   std::optional<UsingDecl> definition(void) const;
   gap::generator<UsingDecl> redeclarations(void) const &;
-  static std::optional<UsingDecl> from(const Decl &parent);
-
-  inline static std::optional<UsingDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return UsingDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UsingDecl> from_base(const Decl &parent);
+  inline static std::optional<UsingDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UsingDecl> from(const std::optional<Decl> &parent);
   static std::optional<UsingDecl> from(const Reference &r);
+  static std::optional<UsingDecl> from(const VariantEntity &e);
   static std::optional<UsingDecl> from(const TokenContext &t);
 
   Token using_token(void) const;

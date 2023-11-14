@@ -55,17 +55,13 @@ class MacroDirective : public Macro {
   static gap::generator<MacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  static std::optional<MacroDirective> from(const Macro &parent);
-
-  inline static std::optional<MacroDirective> from(const std::optional<Macro> &parent) {
-    if (parent) {
-      return MacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MacroDirective> from_base(const Macro &parent);
+  inline static std::optional<MacroDirective> from(const Macro &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MacroDirective> from(const std::optional<Macro> &parent);
   static std::optional<MacroDirective> from(const Reference &r);
+  static std::optional<MacroDirective> from(const VariantEntity &e);
   static std::optional<MacroDirective> from(const TokenContext &t);
 
   Token hash(void) const;

@@ -38,17 +38,13 @@ class SwiftObjCMembersAttr : public Attr {
     return AttrKind::SWIFT_OBJ_C_MEMBERS;
   }
 
-  static std::optional<SwiftObjCMembersAttr> from(const Attr &parent);
-
-  inline static std::optional<SwiftObjCMembersAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SwiftObjCMembersAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SwiftObjCMembersAttr> from_base(const Attr &parent);
+  inline static std::optional<SwiftObjCMembersAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SwiftObjCMembersAttr> from(const std::optional<Attr> &parent);
   static std::optional<SwiftObjCMembersAttr> from(const Reference &r);
+  static std::optional<SwiftObjCMembersAttr> from(const VariantEntity &e);
   static std::optional<SwiftObjCMembersAttr> from(const TokenContext &t);
 
 };

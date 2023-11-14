@@ -41,17 +41,13 @@ class BlocksAttr : public InheritableAttr {
     return AttrKind::BLOCKS;
   }
 
-  static std::optional<BlocksAttr> from(const Attr &parent);
-
-  inline static std::optional<BlocksAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return BlocksAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<BlocksAttr> from_base(const Attr &parent);
+  inline static std::optional<BlocksAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<BlocksAttr> from(const std::optional<Attr> &parent);
   static std::optional<BlocksAttr> from(const Reference &r);
+  static std::optional<BlocksAttr> from(const VariantEntity &e);
   static std::optional<BlocksAttr> from(const TokenContext &t);
 
   BlocksAttrBlockType type(void) const;

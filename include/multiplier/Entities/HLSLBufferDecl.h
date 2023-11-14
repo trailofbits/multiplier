@@ -53,17 +53,13 @@ class HLSLBufferDecl : public NamedDecl {
   HLSLBufferDecl canonical_declaration(void) const;
   std::optional<HLSLBufferDecl> definition(void) const;
   gap::generator<HLSLBufferDecl> redeclarations(void) const &;
-  static std::optional<HLSLBufferDecl> from(const Decl &parent);
-
-  inline static std::optional<HLSLBufferDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return HLSLBufferDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<HLSLBufferDecl> from_base(const Decl &parent);
+  inline static std::optional<HLSLBufferDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<HLSLBufferDecl> from(const std::optional<Decl> &parent);
   static std::optional<HLSLBufferDecl> from(const Reference &r);
+  static std::optional<HLSLBufferDecl> from(const VariantEntity &e);
   static std::optional<HLSLBufferDecl> from(const TokenContext &t);
 
   Token l_brace_token(void) const;

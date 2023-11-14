@@ -61,17 +61,13 @@ class TypeAttr : public Attr {
   static gap::generator<TypeAttr> in(const Fragment &frag);
   static gap::generator<TypeAttr> in(const File &file);
 
-  static std::optional<TypeAttr> from(const Attr &parent);
-
-  inline static std::optional<TypeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return TypeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TypeAttr> from_base(const Attr &parent);
+  inline static std::optional<TypeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TypeAttr> from(const std::optional<Attr> &parent);
   static std::optional<TypeAttr> from(const Reference &r);
+  static std::optional<TypeAttr> from(const VariantEntity &e);
   static std::optional<TypeAttr> from(const TokenContext &t);
 
 };

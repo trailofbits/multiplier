@@ -60,17 +60,13 @@ class ExplicitCastExpr : public CastExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ExplicitCastExpr> from(const Stmt &parent);
-
-  inline static std::optional<ExplicitCastExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return ExplicitCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ExplicitCastExpr> from_base(const Stmt &parent);
+  inline static std::optional<ExplicitCastExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ExplicitCastExpr> from(const std::optional<Stmt> &parent);
   static std::optional<ExplicitCastExpr> from(const Reference &r);
+  static std::optional<ExplicitCastExpr> from(const VariantEntity &e);
   static std::optional<ExplicitCastExpr> from(const TokenContext &t);
 
   Type type_as_written(void) const;

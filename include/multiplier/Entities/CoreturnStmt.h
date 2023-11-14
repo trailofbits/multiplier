@@ -49,17 +49,13 @@ class CoreturnStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<CoreturnStmt> from(const Stmt &parent);
-
-  inline static std::optional<CoreturnStmt> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return CoreturnStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CoreturnStmt> from_base(const Stmt &parent);
+  inline static std::optional<CoreturnStmt> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CoreturnStmt> from(const std::optional<Stmt> &parent);
   static std::optional<CoreturnStmt> from(const Reference &r);
+  static std::optional<CoreturnStmt> from(const VariantEntity &e);
   static std::optional<CoreturnStmt> from(const TokenContext &t);
 
   Token keyword_token(void) const;

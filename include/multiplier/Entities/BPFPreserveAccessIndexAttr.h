@@ -40,17 +40,13 @@ class BPFPreserveAccessIndexAttr : public InheritableAttr {
     return AttrKind::BPF_PRESERVE_ACCESS_INDEX;
   }
 
-  static std::optional<BPFPreserveAccessIndexAttr> from(const Attr &parent);
-
-  inline static std::optional<BPFPreserveAccessIndexAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return BPFPreserveAccessIndexAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<BPFPreserveAccessIndexAttr> from_base(const Attr &parent);
+  inline static std::optional<BPFPreserveAccessIndexAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<BPFPreserveAccessIndexAttr> from(const std::optional<Attr> &parent);
   static std::optional<BPFPreserveAccessIndexAttr> from(const Reference &r);
+  static std::optional<BPFPreserveAccessIndexAttr> from(const VariantEntity &e);
   static std::optional<BPFPreserveAccessIndexAttr> from(const TokenContext &t);
 
 };

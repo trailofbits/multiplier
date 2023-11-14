@@ -40,17 +40,13 @@ class PatchableFunctionEntryAttr : public InheritableAttr {
     return AttrKind::PATCHABLE_FUNCTION_ENTRY;
   }
 
-  static std::optional<PatchableFunctionEntryAttr> from(const Attr &parent);
-
-  inline static std::optional<PatchableFunctionEntryAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return PatchableFunctionEntryAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PatchableFunctionEntryAttr> from_base(const Attr &parent);
+  inline static std::optional<PatchableFunctionEntryAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PatchableFunctionEntryAttr> from(const std::optional<Attr> &parent);
   static std::optional<PatchableFunctionEntryAttr> from(const Reference &r);
+  static std::optional<PatchableFunctionEntryAttr> from(const VariantEntity &e);
   static std::optional<PatchableFunctionEntryAttr> from(const TokenContext &t);
 
 };

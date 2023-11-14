@@ -40,17 +40,13 @@ class AVRInterruptAttr : public InheritableAttr {
     return AttrKind::AVR_INTERRUPT;
   }
 
-  static std::optional<AVRInterruptAttr> from(const Attr &parent);
-
-  inline static std::optional<AVRInterruptAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AVRInterruptAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AVRInterruptAttr> from_base(const Attr &parent);
+  inline static std::optional<AVRInterruptAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AVRInterruptAttr> from(const std::optional<Attr> &parent);
   static std::optional<AVRInterruptAttr> from(const Reference &r);
+  static std::optional<AVRInterruptAttr> from(const VariantEntity &e);
   static std::optional<AVRInterruptAttr> from(const TokenContext &t);
 
 };

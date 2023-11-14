@@ -90,18 +90,30 @@ bool GenericSelectionExpr::contains(const Stmt &stmt) {
 std::optional<GenericSelectionExpr> GenericSelectionExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return GenericSelectionExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kGenericSelectionExprDerivedKinds[] = {
     GenericSelectionExpr::static_kind(),
 };
 
-std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<GenericSelectionExpr> GenericSelectionExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case GenericSelectionExpr::static_kind():
       return reinterpret_cast<const GenericSelectionExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kGenericSelectionExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<GenericSelectionExpr> e = GenericSelectionExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<GenericSelectionExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kGenericSelectionExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<GenericSelectionExpr> e = GenericSelectionExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<GenericSelectionExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kGenericSelectionExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<GenericSelectionExpr> e = GenericSelectionExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<GenericSelectionExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const Reference &
   return GenericSelectionExpr::from(r.as_statement());
 }
 
+std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const TokenContext &t) {
-  return GenericSelectionExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 unsigned GenericSelectionExpr::num_association_expressions(void) const {
@@ -170,7 +192,7 @@ std::optional<Expr> GenericSelectionExpr::nth_association_expression(unsigned n)
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const & {
@@ -179,7 +201,7 @@ gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const &
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+      if (auto e = Expr::from_base(std::move(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -187,14 +209,30 @@ gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const &
   co_return;
 }
 
-Expr GenericSelectionExpr::controlling_expression(void) const {
-  RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+std::optional<Expr> GenericSelectionExpr::controlling_expression(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal37();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
-Type GenericSelectionExpr::controlling_type(void) const {
-  RawEntityId eid = impl->reader.getVal38();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
+std::optional<Type> GenericSelectionExpr::controlling_type(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal38();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 Token GenericSelectionExpr::default_token(void) const {
@@ -209,9 +247,17 @@ Token GenericSelectionExpr::r_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
-Expr GenericSelectionExpr::result_expression(void) const {
-  RawEntityId eid = impl->reader.getVal42();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+std::optional<Expr> GenericSelectionExpr::result_expression(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal42();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 bool GenericSelectionExpr::is_expression_predicate(void) const {

@@ -40,17 +40,13 @@ class ReinitializesAttr : public InheritableAttr {
     return AttrKind::REINITIALIZES;
   }
 
-  static std::optional<ReinitializesAttr> from(const Attr &parent);
-
-  inline static std::optional<ReinitializesAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ReinitializesAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ReinitializesAttr> from_base(const Attr &parent);
+  inline static std::optional<ReinitializesAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ReinitializesAttr> from(const std::optional<Attr> &parent);
   static std::optional<ReinitializesAttr> from(const Reference &r);
+  static std::optional<ReinitializesAttr> from(const VariantEntity &e);
   static std::optional<ReinitializesAttr> from(const TokenContext &t);
 
 };

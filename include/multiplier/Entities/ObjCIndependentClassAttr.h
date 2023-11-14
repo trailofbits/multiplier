@@ -40,17 +40,13 @@ class ObjCIndependentClassAttr : public InheritableAttr {
     return AttrKind::OBJ_C_INDEPENDENT_CLASS;
   }
 
-  static std::optional<ObjCIndependentClassAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCIndependentClassAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCIndependentClassAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCIndependentClassAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCIndependentClassAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCIndependentClassAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCIndependentClassAttr> from(const Reference &r);
+  static std::optional<ObjCIndependentClassAttr> from(const VariantEntity &e);
   static std::optional<ObjCIndependentClassAttr> from(const TokenContext &t);
 
 };

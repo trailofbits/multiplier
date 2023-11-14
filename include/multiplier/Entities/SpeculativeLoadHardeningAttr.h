@@ -40,17 +40,13 @@ class SpeculativeLoadHardeningAttr : public InheritableAttr {
     return AttrKind::SPECULATIVE_LOAD_HARDENING;
   }
 
-  static std::optional<SpeculativeLoadHardeningAttr> from(const Attr &parent);
-
-  inline static std::optional<SpeculativeLoadHardeningAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SpeculativeLoadHardeningAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SpeculativeLoadHardeningAttr> from_base(const Attr &parent);
+  inline static std::optional<SpeculativeLoadHardeningAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SpeculativeLoadHardeningAttr> from(const std::optional<Attr> &parent);
   static std::optional<SpeculativeLoadHardeningAttr> from(const Reference &r);
+  static std::optional<SpeculativeLoadHardeningAttr> from(const VariantEntity &e);
   static std::optional<SpeculativeLoadHardeningAttr> from(const TokenContext &t);
 
 };

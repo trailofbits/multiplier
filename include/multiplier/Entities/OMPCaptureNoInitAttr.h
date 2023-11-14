@@ -40,17 +40,13 @@ class OMPCaptureNoInitAttr : public InheritableAttr {
     return AttrKind::OMP_CAPTURE_NO_INIT;
   }
 
-  static std::optional<OMPCaptureNoInitAttr> from(const Attr &parent);
-
-  inline static std::optional<OMPCaptureNoInitAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OMPCaptureNoInitAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPCaptureNoInitAttr> from_base(const Attr &parent);
+  inline static std::optional<OMPCaptureNoInitAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPCaptureNoInitAttr> from(const std::optional<Attr> &parent);
   static std::optional<OMPCaptureNoInitAttr> from(const Reference &r);
+  static std::optional<OMPCaptureNoInitAttr> from(const VariantEntity &e);
   static std::optional<OMPCaptureNoInitAttr> from(const TokenContext &t);
 
 };

@@ -39,18 +39,30 @@ bool AttributedType::contains(const Token &tok) const {
 std::optional<AttributedType> AttributedType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return AttributedType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<AttributedType> AttributedType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kAttributedTypeDerivedKinds[] = {
     AttributedType::static_kind(),
 };
 
-std::optional<AttributedType> AttributedType::from(const Type &parent) {
+}  // namespace
+
+std::optional<AttributedType> AttributedType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case AttributedType::static_kind():
       return reinterpret_cast<const AttributedType &>(parent);
@@ -63,7 +75,7 @@ gap::generator<AttributedType> AttributedType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kAttributedTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<AttributedType> e = AttributedType::from(Type(std::move(eptr)))) {
+      if (std::optional<AttributedType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -74,8 +86,18 @@ std::optional<AttributedType> AttributedType::from(const Reference &r) {
   return AttributedType::from(r.as_type());
 }
 
+std::optional<AttributedType> AttributedType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<AttributedType> AttributedType::from(const TokenContext &t) {
-  return AttributedType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type AttributedType::desugar(void) const {

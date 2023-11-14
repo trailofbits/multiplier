@@ -44,17 +44,13 @@ class PragmaMacroDirective : public MacroDirective {
   static gap::generator<PragmaMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  static std::optional<PragmaMacroDirective> from(const Macro &parent);
-
-  inline static std::optional<PragmaMacroDirective> from(const std::optional<Macro> &parent) {
-    if (parent) {
-      return PragmaMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PragmaMacroDirective> from_base(const Macro &parent);
+  inline static std::optional<PragmaMacroDirective> from(const Macro &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PragmaMacroDirective> from(const std::optional<Macro> &parent);
   static std::optional<PragmaMacroDirective> from(const Reference &r);
+  static std::optional<PragmaMacroDirective> from(const VariantEntity &e);
   static std::optional<PragmaMacroDirective> from(const TokenContext &t);
 
 };

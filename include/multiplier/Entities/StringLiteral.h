@@ -53,17 +53,13 @@ class StringLiteral : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<StringLiteral> from(const Stmt &parent);
-
-  inline static std::optional<StringLiteral> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return StringLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<StringLiteral> from_base(const Stmt &parent);
+  inline static std::optional<StringLiteral> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<StringLiteral> from(const std::optional<Stmt> &parent);
   static std::optional<StringLiteral> from(const Reference &r);
+  static std::optional<StringLiteral> from(const VariantEntity &e);
   static std::optional<StringLiteral> from(const TokenContext &t);
 
   std::optional<bool> contains_non_ascii(void) const;

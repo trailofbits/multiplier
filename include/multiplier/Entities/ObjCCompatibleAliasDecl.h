@@ -54,17 +54,13 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
   ObjCCompatibleAliasDecl canonical_declaration(void) const;
   std::optional<ObjCCompatibleAliasDecl> definition(void) const;
   gap::generator<ObjCCompatibleAliasDecl> redeclarations(void) const &;
-  static std::optional<ObjCCompatibleAliasDecl> from(const Decl &parent);
-
-  inline static std::optional<ObjCCompatibleAliasDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ObjCCompatibleAliasDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCCompatibleAliasDecl> from_base(const Decl &parent);
+  inline static std::optional<ObjCCompatibleAliasDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCCompatibleAliasDecl> from(const std::optional<Decl> &parent);
   static std::optional<ObjCCompatibleAliasDecl> from(const Reference &r);
+  static std::optional<ObjCCompatibleAliasDecl> from(const VariantEntity &e);
   static std::optional<ObjCCompatibleAliasDecl> from(const TokenContext &t);
 
   ObjCInterfaceDecl class_interface(void) const;

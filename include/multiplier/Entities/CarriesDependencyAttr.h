@@ -42,17 +42,13 @@ class CarriesDependencyAttr : public InheritableParamAttr {
     return AttrKind::CARRIES_DEPENDENCY;
   }
 
-  static std::optional<CarriesDependencyAttr> from(const Attr &parent);
-
-  inline static std::optional<CarriesDependencyAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CarriesDependencyAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CarriesDependencyAttr> from_base(const Attr &parent);
+  inline static std::optional<CarriesDependencyAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CarriesDependencyAttr> from(const std::optional<Attr> &parent);
   static std::optional<CarriesDependencyAttr> from(const Reference &r);
+  static std::optional<CarriesDependencyAttr> from(const VariantEntity &e);
   static std::optional<CarriesDependencyAttr> from(const TokenContext &t);
 
 };

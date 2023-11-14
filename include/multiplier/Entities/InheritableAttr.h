@@ -344,17 +344,13 @@ class InheritableAttr : public Attr {
   static gap::generator<InheritableAttr> in(const Fragment &frag);
   static gap::generator<InheritableAttr> in(const File &file);
 
-  static std::optional<InheritableAttr> from(const Attr &parent);
-
-  inline static std::optional<InheritableAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return InheritableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<InheritableAttr> from_base(const Attr &parent);
+  inline static std::optional<InheritableAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<InheritableAttr> from(const std::optional<Attr> &parent);
   static std::optional<InheritableAttr> from(const Reference &r);
+  static std::optional<InheritableAttr> from(const VariantEntity &e);
   static std::optional<InheritableAttr> from(const TokenContext &t);
 
   bool should_inherit_even_if_already_present(void) const;

@@ -52,17 +52,13 @@ class PackExpansionExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<PackExpansionExpr> from(const Stmt &parent);
-
-  inline static std::optional<PackExpansionExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return PackExpansionExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PackExpansionExpr> from_base(const Stmt &parent);
+  inline static std::optional<PackExpansionExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PackExpansionExpr> from(const std::optional<Stmt> &parent);
   static std::optional<PackExpansionExpr> from(const Reference &r);
+  static std::optional<PackExpansionExpr> from(const VariantEntity &e);
   static std::optional<PackExpansionExpr> from(const TokenContext &t);
 
   Token ellipsis_token(void) const;

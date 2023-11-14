@@ -51,17 +51,13 @@ class EmptyDecl : public Decl {
   EmptyDecl canonical_declaration(void) const;
   std::optional<EmptyDecl> definition(void) const;
   gap::generator<EmptyDecl> redeclarations(void) const &;
-  static std::optional<EmptyDecl> from(const Decl &parent);
-
-  inline static std::optional<EmptyDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return EmptyDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<EmptyDecl> from_base(const Decl &parent);
+  inline static std::optional<EmptyDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<EmptyDecl> from(const std::optional<Decl> &parent);
   static std::optional<EmptyDecl> from(const Reference &r);
+  static std::optional<EmptyDecl> from(const VariantEntity &e);
   static std::optional<EmptyDecl> from(const TokenContext &t);
 
 };

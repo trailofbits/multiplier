@@ -49,17 +49,13 @@ class ObjCAtCatchStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ObjCAtCatchStmt> from(const Stmt &parent);
-
-  inline static std::optional<ObjCAtCatchStmt> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return ObjCAtCatchStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCAtCatchStmt> from_base(const Stmt &parent);
+  inline static std::optional<ObjCAtCatchStmt> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCAtCatchStmt> from(const std::optional<Stmt> &parent);
   static std::optional<ObjCAtCatchStmt> from(const Reference &r);
+  static std::optional<ObjCAtCatchStmt> from(const VariantEntity &e);
   static std::optional<ObjCAtCatchStmt> from(const TokenContext &t);
 
   Token at_catch_token(void) const;

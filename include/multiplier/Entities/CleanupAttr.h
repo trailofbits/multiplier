@@ -41,17 +41,13 @@ class CleanupAttr : public InheritableAttr {
     return AttrKind::CLEANUP;
   }
 
-  static std::optional<CleanupAttr> from(const Attr &parent);
-
-  inline static std::optional<CleanupAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CleanupAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CleanupAttr> from_base(const Attr &parent);
+  inline static std::optional<CleanupAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CleanupAttr> from(const std::optional<Attr> &parent);
   static std::optional<CleanupAttr> from(const Reference &r);
+  static std::optional<CleanupAttr> from(const VariantEntity &e);
   static std::optional<CleanupAttr> from(const TokenContext &t);
 
   FunctionDecl function_declaration(void) const;

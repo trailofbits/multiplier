@@ -55,17 +55,13 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
   UnresolvedUsingTypenameDecl canonical_declaration(void) const;
   std::optional<UnresolvedUsingTypenameDecl> definition(void) const;
   gap::generator<UnresolvedUsingTypenameDecl> redeclarations(void) const &;
-  static std::optional<UnresolvedUsingTypenameDecl> from(const Decl &parent);
-
-  inline static std::optional<UnresolvedUsingTypenameDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return UnresolvedUsingTypenameDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UnresolvedUsingTypenameDecl> from_base(const Decl &parent);
+  inline static std::optional<UnresolvedUsingTypenameDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UnresolvedUsingTypenameDecl> from(const std::optional<Decl> &parent);
   static std::optional<UnresolvedUsingTypenameDecl> from(const Reference &r);
+  static std::optional<UnresolvedUsingTypenameDecl> from(const VariantEntity &e);
   static std::optional<UnresolvedUsingTypenameDecl> from(const TokenContext &t);
 
   Token ellipsis_token(void) const;

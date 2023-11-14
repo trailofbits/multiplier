@@ -40,17 +40,13 @@ class AMDGPUKernelCallAttr : public InheritableAttr {
     return AttrKind::AMDGPU_KERNEL_CALL;
   }
 
-  static std::optional<AMDGPUKernelCallAttr> from(const Attr &parent);
-
-  inline static std::optional<AMDGPUKernelCallAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AMDGPUKernelCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AMDGPUKernelCallAttr> from_base(const Attr &parent);
+  inline static std::optional<AMDGPUKernelCallAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AMDGPUKernelCallAttr> from(const std::optional<Attr> &parent);
   static std::optional<AMDGPUKernelCallAttr> from(const Reference &r);
+  static std::optional<AMDGPUKernelCallAttr> from(const VariantEntity &e);
   static std::optional<AMDGPUKernelCallAttr> from(const TokenContext &t);
 
 };

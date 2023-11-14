@@ -40,17 +40,13 @@ class TypeNullableAttr : public TypeAttr {
     return AttrKind::TYPE_NULLABLE;
   }
 
-  static std::optional<TypeNullableAttr> from(const Attr &parent);
-
-  inline static std::optional<TypeNullableAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return TypeNullableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TypeNullableAttr> from_base(const Attr &parent);
+  inline static std::optional<TypeNullableAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TypeNullableAttr> from(const std::optional<Attr> &parent);
   static std::optional<TypeNullableAttr> from(const Reference &r);
+  static std::optional<TypeNullableAttr> from(const VariantEntity &e);
   static std::optional<TypeNullableAttr> from(const TokenContext &t);
 
 };

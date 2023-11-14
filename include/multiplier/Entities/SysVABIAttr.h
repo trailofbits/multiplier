@@ -40,17 +40,13 @@ class SysVABIAttr : public InheritableAttr {
     return AttrKind::SYS_VABI;
   }
 
-  static std::optional<SysVABIAttr> from(const Attr &parent);
-
-  inline static std::optional<SysVABIAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SysVABIAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SysVABIAttr> from_base(const Attr &parent);
+  inline static std::optional<SysVABIAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SysVABIAttr> from(const std::optional<Attr> &parent);
   static std::optional<SysVABIAttr> from(const Reference &r);
+  static std::optional<SysVABIAttr> from(const VariantEntity &e);
   static std::optional<SysVABIAttr> from(const TokenContext &t);
 
 };

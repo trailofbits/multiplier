@@ -85,7 +85,7 @@ bool TopLevelStmtDecl::contains(const Stmt &stmt) {
 }
 
 TopLevelStmtDecl TopLevelStmtDecl::canonical_declaration(void) const {
-  if (auto canon = TopLevelStmtDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (TopLevelStmtDecl redecl : redeclarations()) {
@@ -95,12 +95,15 @@ TopLevelStmtDecl TopLevelStmtDecl::canonical_declaration(void) const {
 }
 
 std::optional<TopLevelStmtDecl> TopLevelStmtDecl::definition(void) const {
-  return TopLevelStmtDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<TopLevelStmtDecl> TopLevelStmtDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<TopLevelStmtDecl> dr = TopLevelStmtDecl::from(r)) {
+    if (std::optional<TopLevelStmtDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -113,18 +116,30 @@ gap::generator<TopLevelStmtDecl> TopLevelStmtDecl::redeclarations(void) const & 
 std::optional<TopLevelStmtDecl> TopLevelStmtDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return TopLevelStmtDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TopLevelStmtDecl> TopLevelStmtDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kTopLevelStmtDeclDerivedKinds[] = {
     TopLevelStmtDecl::static_kind(),
 };
 
-std::optional<TopLevelStmtDecl> TopLevelStmtDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<TopLevelStmtDecl> TopLevelStmtDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case TopLevelStmtDecl::static_kind():
       return reinterpret_cast<const TopLevelStmtDecl &>(parent);
@@ -137,7 +152,7 @@ gap::generator<TopLevelStmtDecl> TopLevelStmtDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kTopLevelStmtDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<TopLevelStmtDecl> e = TopLevelStmtDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<TopLevelStmtDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -149,7 +164,7 @@ gap::generator<TopLevelStmtDecl> TopLevelStmtDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kTopLevelStmtDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<TopLevelStmtDecl> e = TopLevelStmtDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<TopLevelStmtDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -162,7 +177,7 @@ gap::generator<TopLevelStmtDecl> TopLevelStmtDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kTopLevelStmtDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<TopLevelStmtDecl> e = TopLevelStmtDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<TopLevelStmtDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -174,8 +189,18 @@ std::optional<TopLevelStmtDecl> TopLevelStmtDecl::from(const Reference &r) {
   return TopLevelStmtDecl::from(r.as_declaration());
 }
 
+std::optional<TopLevelStmtDecl> TopLevelStmtDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<TopLevelStmtDecl> TopLevelStmtDecl::from(const TokenContext &t) {
-  return TopLevelStmtDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Stmt TopLevelStmtDecl::statement(void) const {

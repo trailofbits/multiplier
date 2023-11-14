@@ -40,17 +40,13 @@ class ArmMveStrictPolymorphismAttr : public TypeAttr {
     return AttrKind::ARM_MVE_STRICT_POLYMORPHISM;
   }
 
-  static std::optional<ArmMveStrictPolymorphismAttr> from(const Attr &parent);
-
-  inline static std::optional<ArmMveStrictPolymorphismAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ArmMveStrictPolymorphismAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ArmMveStrictPolymorphismAttr> from_base(const Attr &parent);
+  inline static std::optional<ArmMveStrictPolymorphismAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ArmMveStrictPolymorphismAttr> from(const std::optional<Attr> &parent);
   static std::optional<ArmMveStrictPolymorphismAttr> from(const Reference &r);
+  static std::optional<ArmMveStrictPolymorphismAttr> from(const VariantEntity &e);
   static std::optional<ArmMveStrictPolymorphismAttr> from(const TokenContext &t);
 
 };

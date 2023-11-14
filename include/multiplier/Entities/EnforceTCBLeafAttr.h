@@ -40,17 +40,13 @@ class EnforceTCBLeafAttr : public InheritableAttr {
     return AttrKind::ENFORCE_TCB_LEAF;
   }
 
-  static std::optional<EnforceTCBLeafAttr> from(const Attr &parent);
-
-  inline static std::optional<EnforceTCBLeafAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return EnforceTCBLeafAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<EnforceTCBLeafAttr> from_base(const Attr &parent);
+  inline static std::optional<EnforceTCBLeafAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<EnforceTCBLeafAttr> from(const std::optional<Attr> &parent);
   static std::optional<EnforceTCBLeafAttr> from(const Reference &r);
+  static std::optional<EnforceTCBLeafAttr> from(const VariantEntity &e);
   static std::optional<EnforceTCBLeafAttr> from(const TokenContext &t);
 
   std::string_view tcb_name(void) const;

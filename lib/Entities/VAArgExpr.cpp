@@ -89,18 +89,30 @@ bool VAArgExpr::contains(const Stmt &stmt) {
 std::optional<VAArgExpr> VAArgExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return VAArgExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<VAArgExpr> VAArgExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kVAArgExprDerivedKinds[] = {
     VAArgExpr::static_kind(),
 };
 
-std::optional<VAArgExpr> VAArgExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<VAArgExpr> VAArgExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case VAArgExpr::static_kind():
       return reinterpret_cast<const VAArgExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<VAArgExpr> VAArgExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kVAArgExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<VAArgExpr> e = VAArgExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<VAArgExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<VAArgExpr> VAArgExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kVAArgExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<VAArgExpr> e = VAArgExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<VAArgExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<VAArgExpr> VAArgExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kVAArgExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<VAArgExpr> e = VAArgExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<VAArgExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,8 +162,18 @@ std::optional<VAArgExpr> VAArgExpr::from(const Reference &r) {
   return VAArgExpr::from(r.as_statement());
 }
 
+std::optional<VAArgExpr> VAArgExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<VAArgExpr> VAArgExpr::from(const TokenContext &t) {
-  return VAArgExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token VAArgExpr::builtin_token(void) const {
@@ -164,7 +186,7 @@ Token VAArgExpr::r_paren_token(void) const {
 
 Expr VAArgExpr::sub_expression(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool VAArgExpr::is_microsoft_abi(void) const {

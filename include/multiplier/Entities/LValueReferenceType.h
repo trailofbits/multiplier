@@ -38,17 +38,13 @@ class LValueReferenceType : public ReferenceType {
     return TypeKind::L_VALUE_REFERENCE;
   }
 
-  static std::optional<LValueReferenceType> from(const Type &parent);
-
-  inline static std::optional<LValueReferenceType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return LValueReferenceType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<LValueReferenceType> from_base(const Type &parent);
+  inline static std::optional<LValueReferenceType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<LValueReferenceType> from(const std::optional<Type> &parent);
   static std::optional<LValueReferenceType> from(const Reference &r);
+  static std::optional<LValueReferenceType> from(const VariantEntity &e);
   static std::optional<LValueReferenceType> from(const TokenContext &t);
 
   Type desugar(void) const;

@@ -89,18 +89,30 @@ bool CapturedStmt::contains(const Stmt &stmt) {
 std::optional<CapturedStmt> CapturedStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CapturedStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CapturedStmt> CapturedStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCapturedStmtDerivedKinds[] = {
     CapturedStmt::static_kind(),
 };
 
-std::optional<CapturedStmt> CapturedStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CapturedStmt> CapturedStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CapturedStmt::static_kind():
       return reinterpret_cast<const CapturedStmt &>(parent);
@@ -113,7 +125,7 @@ gap::generator<CapturedStmt> CapturedStmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCapturedStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CapturedStmt> e = CapturedStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CapturedStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<CapturedStmt> CapturedStmt::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCapturedStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CapturedStmt> e = CapturedStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CapturedStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<CapturedStmt> CapturedStmt::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCapturedStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CapturedStmt> e = CapturedStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CapturedStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,18 +162,28 @@ std::optional<CapturedStmt> CapturedStmt::from(const Reference &r) {
   return CapturedStmt::from(r.as_statement());
 }
 
+std::optional<CapturedStmt> CapturedStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CapturedStmt> CapturedStmt::from(const TokenContext &t) {
-  return CapturedStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 CapturedDecl CapturedStmt::captured_declaration(void) const {
   RawEntityId eid = impl->reader.getVal9();
-  return CapturedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return CapturedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 RecordDecl CapturedStmt::captured_record_declaration(void) const {
   RawEntityId eid = impl->reader.getVal10();
-  return RecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return RecordDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 CapturedRegionKind CapturedStmt::captured_region_kind(void) const {

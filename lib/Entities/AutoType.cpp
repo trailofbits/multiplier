@@ -41,18 +41,30 @@ bool AutoType::contains(const Token &tok) const {
 std::optional<AutoType> AutoType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return AutoType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<AutoType> AutoType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kAutoTypeDerivedKinds[] = {
     AutoType::static_kind(),
 };
 
-std::optional<AutoType> AutoType::from(const Type &parent) {
+}  // namespace
+
+std::optional<AutoType> AutoType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case AutoType::static_kind():
       return reinterpret_cast<const AutoType &>(parent);
@@ -65,7 +77,7 @@ gap::generator<AutoType> AutoType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kAutoTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<AutoType> e = AutoType::from(Type(std::move(eptr)))) {
+      if (std::optional<AutoType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -76,8 +88,18 @@ std::optional<AutoType> AutoType::from(const Reference &r) {
   return AutoType::from(r.as_type());
 }
 
+std::optional<AutoType> AutoType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<AutoType> AutoType::from(const TokenContext &t) {
-  return AutoType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 AutoTypeKeyword AutoType::keyword(void) const {
@@ -121,7 +143,7 @@ std::optional<ConceptDecl> AutoType::type_constraint_concept(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return ConceptDecl::from(Decl(std::move(eptr)));
+      return ConceptDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

@@ -86,7 +86,7 @@ bool UnresolvedUsingIfExistsDecl::contains(const Stmt &stmt) {
 }
 
 UnresolvedUsingIfExistsDecl UnresolvedUsingIfExistsDecl::canonical_declaration(void) const {
-  if (auto canon = UnresolvedUsingIfExistsDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (UnresolvedUsingIfExistsDecl redecl : redeclarations()) {
@@ -96,12 +96,15 @@ UnresolvedUsingIfExistsDecl UnresolvedUsingIfExistsDecl::canonical_declaration(v
 }
 
 std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::definition(void) const {
-  return UnresolvedUsingIfExistsDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<UnresolvedUsingIfExistsDecl> dr = UnresolvedUsingIfExistsDecl::from(r)) {
+    if (std::optional<UnresolvedUsingIfExistsDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -114,18 +117,30 @@ gap::generator<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::redecla
 std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return UnresolvedUsingIfExistsDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kUnresolvedUsingIfExistsDeclDerivedKinds[] = {
     UnresolvedUsingIfExistsDecl::static_kind(),
 };
 
-std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case UnresolvedUsingIfExistsDecl::static_kind():
       return reinterpret_cast<const UnresolvedUsingIfExistsDecl &>(parent);
@@ -138,7 +153,7 @@ gap::generator<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::in(cons
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kUnresolvedUsingIfExistsDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<UnresolvedUsingIfExistsDecl> e = UnresolvedUsingIfExistsDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<UnresolvedUsingIfExistsDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -150,7 +165,7 @@ gap::generator<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::in(cons
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kUnresolvedUsingIfExistsDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<UnresolvedUsingIfExistsDecl> e = UnresolvedUsingIfExistsDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<UnresolvedUsingIfExistsDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -163,7 +178,7 @@ gap::generator<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::in(cons
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kUnresolvedUsingIfExistsDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<UnresolvedUsingIfExistsDecl> e = UnresolvedUsingIfExistsDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<UnresolvedUsingIfExistsDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -175,8 +190,18 @@ std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::from(con
   return UnresolvedUsingIfExistsDecl::from(r.as_declaration());
 }
 
+std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::from(const TokenContext &t) {
-  return UnresolvedUsingIfExistsDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

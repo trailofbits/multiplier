@@ -53,17 +53,13 @@ class ObjCSubscriptRefExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ObjCSubscriptRefExpr> from(const Stmt &parent);
-
-  inline static std::optional<ObjCSubscriptRefExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return ObjCSubscriptRefExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCSubscriptRefExpr> from_base(const Stmt &parent);
+  inline static std::optional<ObjCSubscriptRefExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCSubscriptRefExpr> from(const std::optional<Stmt> &parent);
   static std::optional<ObjCSubscriptRefExpr> from(const Reference &r);
+  static std::optional<ObjCSubscriptRefExpr> from(const VariantEntity &e);
   static std::optional<ObjCSubscriptRefExpr> from(const TokenContext &t);
 
   ObjCMethodDecl at_index_method_declaration(void) const;

@@ -57,17 +57,13 @@ class OMPDeclareReductionDecl : public ValueDecl {
   OMPDeclareReductionDecl canonical_declaration(void) const;
   std::optional<OMPDeclareReductionDecl> definition(void) const;
   gap::generator<OMPDeclareReductionDecl> redeclarations(void) const &;
-  static std::optional<OMPDeclareReductionDecl> from(const Decl &parent);
-
-  inline static std::optional<OMPDeclareReductionDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return OMPDeclareReductionDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPDeclareReductionDecl> from_base(const Decl &parent);
+  inline static std::optional<OMPDeclareReductionDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPDeclareReductionDecl> from(const std::optional<Decl> &parent);
   static std::optional<OMPDeclareReductionDecl> from(const Reference &r);
+  static std::optional<OMPDeclareReductionDecl> from(const VariantEntity &e);
   static std::optional<OMPDeclareReductionDecl> from(const TokenContext &t);
 
   Expr combiner(void) const;

@@ -52,17 +52,13 @@ class ExtVectorElementExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ExtVectorElementExpr> from(const Stmt &parent);
-
-  inline static std::optional<ExtVectorElementExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return ExtVectorElementExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ExtVectorElementExpr> from_base(const Stmt &parent);
+  inline static std::optional<ExtVectorElementExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ExtVectorElementExpr> from(const std::optional<Stmt> &parent);
   static std::optional<ExtVectorElementExpr> from(const Reference &r);
+  static std::optional<ExtVectorElementExpr> from(const VariantEntity &e);
   static std::optional<ExtVectorElementExpr> from(const TokenContext &t);
 
   bool contains_duplicate_elements(void) const;

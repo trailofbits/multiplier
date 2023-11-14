@@ -90,18 +90,30 @@ bool WhileStmt::contains(const Stmt &stmt) {
 std::optional<WhileStmt> WhileStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return WhileStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<WhileStmt> WhileStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kWhileStmtDerivedKinds[] = {
     WhileStmt::static_kind(),
 };
 
-std::optional<WhileStmt> WhileStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<WhileStmt> WhileStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case WhileStmt::static_kind():
       return reinterpret_cast<const WhileStmt &>(parent);
@@ -114,7 +126,7 @@ gap::generator<WhileStmt> WhileStmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kWhileStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<WhileStmt> e = WhileStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<WhileStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<WhileStmt> WhileStmt::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kWhileStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<WhileStmt> e = WhileStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<WhileStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<WhileStmt> WhileStmt::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kWhileStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<WhileStmt> e = WhileStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<WhileStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<WhileStmt> WhileStmt::from(const Reference &r) {
   return WhileStmt::from(r.as_statement());
 }
 
+std::optional<WhileStmt> WhileStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<WhileStmt> WhileStmt::from(const TokenContext &t) {
-  return WhileStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Stmt WhileStmt::body(void) const {
@@ -162,7 +184,7 @@ Stmt WhileStmt::body(void) const {
 
 Expr WhileStmt::condition(void) const {
   RawEntityId eid = impl->reader.getVal10();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 std::optional<VarDecl> WhileStmt::condition_variable(void) const {
@@ -172,7 +194,7 @@ std::optional<VarDecl> WhileStmt::condition_variable(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr)));
+      return VarDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -185,7 +207,7 @@ std::optional<DeclStmt> WhileStmt::condition_variable_declaration_statement(void
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return DeclStmt::from(Stmt(std::move(eptr)));
+      return DeclStmt::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

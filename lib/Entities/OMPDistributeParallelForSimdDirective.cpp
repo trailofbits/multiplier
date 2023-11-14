@@ -90,18 +90,30 @@ bool OMPDistributeParallelForSimdDirective::contains(const Stmt &stmt) {
 std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPDistributeParallelForSimdDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPDistributeParallelForSimdDirectiveDerivedKinds[] = {
     OMPDistributeParallelForSimdDirective::static_kind(),
 };
 
-std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPDistributeParallelForSimdDirective::static_kind():
       return reinterpret_cast<const OMPDistributeParallelForSimdDirective &>(parent);
@@ -114,7 +126,7 @@ gap::generator<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSi
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPDistributeParallelForSimdDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPDistributeParallelForSimdDirective> e = OMPDistributeParallelForSimdDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPDistributeParallelForSimdDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSi
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPDistributeParallelForSimdDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPDistributeParallelForSimdDirective> e = OMPDistributeParallelForSimdDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPDistributeParallelForSimdDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSi
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPDistributeParallelForSimdDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPDistributeParallelForSimdDirective> e = OMPDistributeParallelForSimdDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPDistributeParallelForSimdDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSim
   return OMPDistributeParallelForSimdDirective::from(r.as_statement());
 }
 
+std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from(const TokenContext &t) {
-  return OMPDistributeParallelForSimdDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

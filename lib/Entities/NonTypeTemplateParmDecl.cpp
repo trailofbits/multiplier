@@ -90,7 +90,7 @@ bool NonTypeTemplateParmDecl::contains(const Stmt &stmt) {
 }
 
 NonTypeTemplateParmDecl NonTypeTemplateParmDecl::canonical_declaration(void) const {
-  if (auto canon = NonTypeTemplateParmDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (NonTypeTemplateParmDecl redecl : redeclarations()) {
@@ -100,12 +100,15 @@ NonTypeTemplateParmDecl NonTypeTemplateParmDecl::canonical_declaration(void) con
 }
 
 std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::definition(void) const {
-  return NonTypeTemplateParmDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<NonTypeTemplateParmDecl> dr = NonTypeTemplateParmDecl::from(r)) {
+    if (std::optional<NonTypeTemplateParmDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -118,18 +121,30 @@ gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::redeclarations(
 std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return NonTypeTemplateParmDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kNonTypeTemplateParmDeclDerivedKinds[] = {
     NonTypeTemplateParmDecl::static_kind(),
 };
 
-std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case NonTypeTemplateParmDecl::static_kind():
       return reinterpret_cast<const NonTypeTemplateParmDecl &>(parent);
@@ -142,7 +157,7 @@ gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const Index 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kNonTypeTemplateParmDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<NonTypeTemplateParmDecl> e = NonTypeTemplateParmDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<NonTypeTemplateParmDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -154,7 +169,7 @@ gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const Fragme
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kNonTypeTemplateParmDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<NonTypeTemplateParmDecl> e = NonTypeTemplateParmDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<NonTypeTemplateParmDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -167,7 +182,7 @@ gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const File &
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kNonTypeTemplateParmDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<NonTypeTemplateParmDecl> e = NonTypeTemplateParmDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<NonTypeTemplateParmDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -179,8 +194,18 @@ std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const Refer
   return NonTypeTemplateParmDecl::from(r.as_declaration());
 }
 
+std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const TokenContext &t) {
-  return NonTypeTemplateParmDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool NonTypeTemplateParmDecl::default_argument_was_inherited(void) const {
@@ -194,7 +219,7 @@ std::optional<Expr> NonTypeTemplateParmDecl::default_argument(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -211,7 +236,7 @@ std::optional<Expr> NonTypeTemplateParmDecl::placeholder_type_constraint(void) c
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

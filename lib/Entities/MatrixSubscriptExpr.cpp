@@ -89,18 +89,30 @@ bool MatrixSubscriptExpr::contains(const Stmt &stmt) {
 std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return MatrixSubscriptExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kMatrixSubscriptExprDerivedKinds[] = {
     MatrixSubscriptExpr::static_kind(),
 };
 
-std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case MatrixSubscriptExpr::static_kind():
       return reinterpret_cast<const MatrixSubscriptExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<MatrixSubscriptExpr> MatrixSubscriptExpr::in(const Index &index) 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kMatrixSubscriptExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<MatrixSubscriptExpr> e = MatrixSubscriptExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<MatrixSubscriptExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<MatrixSubscriptExpr> MatrixSubscriptExpr::in(const Fragment &frag
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kMatrixSubscriptExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<MatrixSubscriptExpr> e = MatrixSubscriptExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<MatrixSubscriptExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<MatrixSubscriptExpr> MatrixSubscriptExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kMatrixSubscriptExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<MatrixSubscriptExpr> e = MatrixSubscriptExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<MatrixSubscriptExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,18 +162,28 @@ std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const Reference &r)
   return MatrixSubscriptExpr::from(r.as_statement());
 }
 
+std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const TokenContext &t) {
-  return MatrixSubscriptExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr MatrixSubscriptExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr MatrixSubscriptExpr::column_index(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token MatrixSubscriptExpr::r_bracket_token(void) const {
@@ -170,7 +192,7 @@ Token MatrixSubscriptExpr::r_bracket_token(void) const {
 
 Expr MatrixSubscriptExpr::row_index(void) const {
   RawEntityId eid = impl->reader.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool MatrixSubscriptExpr::is_incomplete(void) const {

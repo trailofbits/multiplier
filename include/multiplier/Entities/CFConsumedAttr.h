@@ -42,17 +42,13 @@ class CFConsumedAttr : public InheritableParamAttr {
     return AttrKind::CF_CONSUMED;
   }
 
-  static std::optional<CFConsumedAttr> from(const Attr &parent);
-
-  inline static std::optional<CFConsumedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CFConsumedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CFConsumedAttr> from_base(const Attr &parent);
+  inline static std::optional<CFConsumedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CFConsumedAttr> from(const std::optional<Attr> &parent);
   static std::optional<CFConsumedAttr> from(const Reference &r);
+  static std::optional<CFConsumedAttr> from(const VariantEntity &e);
   static std::optional<CFConsumedAttr> from(const TokenContext &t);
 
 };

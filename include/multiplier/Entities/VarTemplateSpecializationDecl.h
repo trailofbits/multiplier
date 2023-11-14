@@ -64,17 +64,13 @@ class VarTemplateSpecializationDecl : public VarDecl {
   VarTemplateSpecializationDecl canonical_declaration(void) const;
   std::optional<VarTemplateSpecializationDecl> definition(void) const;
   gap::generator<VarTemplateSpecializationDecl> redeclarations(void) const &;
-  static std::optional<VarTemplateSpecializationDecl> from(const Decl &parent);
-
-  inline static std::optional<VarTemplateSpecializationDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return VarTemplateSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<VarTemplateSpecializationDecl> from_base(const Decl &parent);
+  inline static std::optional<VarTemplateSpecializationDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<VarTemplateSpecializationDecl> from(const std::optional<Decl> &parent);
   static std::optional<VarTemplateSpecializationDecl> from(const Reference &r);
+  static std::optional<VarTemplateSpecializationDecl> from(const VariantEntity &e);
   static std::optional<VarTemplateSpecializationDecl> from(const TokenContext &t);
 
   Token extern_token(void) const;

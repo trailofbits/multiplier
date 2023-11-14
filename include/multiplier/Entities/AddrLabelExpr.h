@@ -53,17 +53,13 @@ class AddrLabelExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<AddrLabelExpr> from(const Stmt &parent);
-
-  inline static std::optional<AddrLabelExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return AddrLabelExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AddrLabelExpr> from_base(const Stmt &parent);
+  inline static std::optional<AddrLabelExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AddrLabelExpr> from(const std::optional<Stmt> &parent);
   static std::optional<AddrLabelExpr> from(const Reference &r);
+  static std::optional<AddrLabelExpr> from(const VariantEntity &e);
   static std::optional<AddrLabelExpr> from(const TokenContext &t);
 
   Token amp_amp_token(void) const;

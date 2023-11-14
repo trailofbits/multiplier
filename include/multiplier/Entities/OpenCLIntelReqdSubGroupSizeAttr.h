@@ -40,17 +40,13 @@ class OpenCLIntelReqdSubGroupSizeAttr : public InheritableAttr {
     return AttrKind::OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE;
   }
 
-  static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const Attr &parent);
-
-  inline static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OpenCLIntelReqdSubGroupSizeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from_base(const Attr &parent);
+  inline static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const std::optional<Attr> &parent);
   static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const Reference &r);
+  static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const VariantEntity &e);
   static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const TokenContext &t);
 
 };

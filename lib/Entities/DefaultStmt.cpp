@@ -88,18 +88,30 @@ bool DefaultStmt::contains(const Stmt &stmt) {
 std::optional<DefaultStmt> DefaultStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return DefaultStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<DefaultStmt> DefaultStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kDefaultStmtDerivedKinds[] = {
     DefaultStmt::static_kind(),
 };
 
-std::optional<DefaultStmt> DefaultStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<DefaultStmt> DefaultStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case DefaultStmt::static_kind():
       return reinterpret_cast<const DefaultStmt &>(parent);
@@ -112,7 +124,7 @@ gap::generator<DefaultStmt> DefaultStmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kDefaultStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<DefaultStmt> e = DefaultStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<DefaultStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -124,7 +136,7 @@ gap::generator<DefaultStmt> DefaultStmt::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kDefaultStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<DefaultStmt> e = DefaultStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<DefaultStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -137,7 +149,7 @@ gap::generator<DefaultStmt> DefaultStmt::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kDefaultStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<DefaultStmt> e = DefaultStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<DefaultStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -149,8 +161,18 @@ std::optional<DefaultStmt> DefaultStmt::from(const Reference &r) {
   return DefaultStmt::from(r.as_statement());
 }
 
+std::optional<DefaultStmt> DefaultStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<DefaultStmt> DefaultStmt::from(const TokenContext &t) {
-  return DefaultStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token DefaultStmt::default_token(void) const {

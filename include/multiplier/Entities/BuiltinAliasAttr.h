@@ -39,17 +39,13 @@ class BuiltinAliasAttr : public Attr {
     return AttrKind::BUILTIN_ALIAS;
   }
 
-  static std::optional<BuiltinAliasAttr> from(const Attr &parent);
-
-  inline static std::optional<BuiltinAliasAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return BuiltinAliasAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<BuiltinAliasAttr> from_base(const Attr &parent);
+  inline static std::optional<BuiltinAliasAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<BuiltinAliasAttr> from(const std::optional<Attr> &parent);
   static std::optional<BuiltinAliasAttr> from(const Reference &r);
+  static std::optional<BuiltinAliasAttr> from(const VariantEntity &e);
   static std::optional<BuiltinAliasAttr> from(const TokenContext &t);
 
   BuiltinAliasAttrSpelling semantic_spelling(void) const;

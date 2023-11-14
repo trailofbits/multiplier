@@ -40,18 +40,30 @@ bool CUDALaunchBoundsAttr::contains(const Token &tok) const {
 std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return CUDALaunchBoundsAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kCUDALaunchBoundsAttrDerivedKinds[] = {
     CUDALaunchBoundsAttr::static_kind(),
 };
 
-std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case CUDALaunchBoundsAttr::static_kind():
       return reinterpret_cast<const CUDALaunchBoundsAttr &>(parent);
@@ -64,7 +76,7 @@ gap::generator<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kCUDALaunchBoundsAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<CUDALaunchBoundsAttr> e = CUDALaunchBoundsAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<CUDALaunchBoundsAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -76,7 +88,7 @@ gap::generator<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kCUDALaunchBoundsAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<CUDALaunchBoundsAttr> e = CUDALaunchBoundsAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<CUDALaunchBoundsAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -89,7 +101,7 @@ gap::generator<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kCUDALaunchBoundsAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<CUDALaunchBoundsAttr> e = CUDALaunchBoundsAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<CUDALaunchBoundsAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -101,18 +113,28 @@ std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from(const Reference &
   return CUDALaunchBoundsAttr::from(r.as_attribute());
 }
 
+std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from(const TokenContext &t) {
-  return CUDALaunchBoundsAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr CUDALaunchBoundsAttr::max_threads(void) const {
   RawEntityId eid = impl->reader.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr CUDALaunchBoundsAttr::min_blocks(void) const {
   RawEntityId eid = impl->reader.getVal16();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

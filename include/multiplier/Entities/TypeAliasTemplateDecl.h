@@ -57,17 +57,13 @@ class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
   TypeAliasTemplateDecl canonical_declaration(void) const;
   std::optional<TypeAliasTemplateDecl> definition(void) const;
   gap::generator<TypeAliasTemplateDecl> redeclarations(void) const &;
-  static std::optional<TypeAliasTemplateDecl> from(const Decl &parent);
-
-  inline static std::optional<TypeAliasTemplateDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return TypeAliasTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TypeAliasTemplateDecl> from_base(const Decl &parent);
+  inline static std::optional<TypeAliasTemplateDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TypeAliasTemplateDecl> from(const std::optional<Decl> &parent);
   static std::optional<TypeAliasTemplateDecl> from(const Reference &r);
+  static std::optional<TypeAliasTemplateDecl> from(const VariantEntity &e);
   static std::optional<TypeAliasTemplateDecl> from(const TokenContext &t);
 
 };

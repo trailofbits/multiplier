@@ -61,17 +61,13 @@ class ObjCIvarDecl : public FieldDecl {
   ObjCIvarDecl canonical_declaration(void) const;
   std::optional<ObjCIvarDecl> definition(void) const;
   gap::generator<ObjCIvarDecl> redeclarations(void) const &;
-  static std::optional<ObjCIvarDecl> from(const Decl &parent);
-
-  inline static std::optional<ObjCIvarDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ObjCIvarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCIvarDecl> from_base(const Decl &parent);
+  inline static std::optional<ObjCIvarDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCIvarDecl> from(const std::optional<Decl> &parent);
   static std::optional<ObjCIvarDecl> from(const Reference &r);
+  static std::optional<ObjCIvarDecl> from(const VariantEntity &e);
   static std::optional<ObjCIvarDecl> from(const TokenContext &t);
 
   ObjCIvarDeclAccessControl access_control(void) const;

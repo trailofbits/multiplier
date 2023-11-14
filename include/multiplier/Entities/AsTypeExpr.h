@@ -52,17 +52,13 @@ class AsTypeExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<AsTypeExpr> from(const Stmt &parent);
-
-  inline static std::optional<AsTypeExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return AsTypeExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AsTypeExpr> from_base(const Stmt &parent);
+  inline static std::optional<AsTypeExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AsTypeExpr> from(const std::optional<Stmt> &parent);
   static std::optional<AsTypeExpr> from(const Reference &r);
+  static std::optional<AsTypeExpr> from(const VariantEntity &e);
   static std::optional<AsTypeExpr> from(const TokenContext &t);
 
   Token builtin_token(void) const;

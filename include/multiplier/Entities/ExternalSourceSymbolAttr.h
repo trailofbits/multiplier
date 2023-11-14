@@ -40,17 +40,13 @@ class ExternalSourceSymbolAttr : public InheritableAttr {
     return AttrKind::EXTERNAL_SOURCE_SYMBOL;
   }
 
-  static std::optional<ExternalSourceSymbolAttr> from(const Attr &parent);
-
-  inline static std::optional<ExternalSourceSymbolAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ExternalSourceSymbolAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ExternalSourceSymbolAttr> from_base(const Attr &parent);
+  inline static std::optional<ExternalSourceSymbolAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ExternalSourceSymbolAttr> from(const std::optional<Attr> &parent);
   static std::optional<ExternalSourceSymbolAttr> from(const Reference &r);
+  static std::optional<ExternalSourceSymbolAttr> from(const VariantEntity &e);
   static std::optional<ExternalSourceSymbolAttr> from(const TokenContext &t);
 
   std::string_view defined_in(void) const;

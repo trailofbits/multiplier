@@ -93,7 +93,7 @@ bool CXXMethodDecl::contains(const Stmt &stmt) {
 }
 
 CXXMethodDecl CXXMethodDecl::canonical_declaration(void) const {
-  if (auto canon = CXXMethodDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (CXXMethodDecl redecl : redeclarations()) {
@@ -103,12 +103,15 @@ CXXMethodDecl CXXMethodDecl::canonical_declaration(void) const {
 }
 
 std::optional<CXXMethodDecl> CXXMethodDecl::definition(void) const {
-  return CXXMethodDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<CXXMethodDecl> CXXMethodDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<CXXMethodDecl> dr = CXXMethodDecl::from(r)) {
+    if (std::optional<CXXMethodDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -121,13 +124,23 @@ gap::generator<CXXMethodDecl> CXXMethodDecl::redeclarations(void) const & {
 std::optional<CXXMethodDecl> CXXMethodDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return CXXMethodDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXMethodDecl> CXXMethodDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kCXXMethodDeclDerivedKinds[] = {
     CXXMethodDecl::static_kind(),
     CXXConstructorDecl::static_kind(),
@@ -135,7 +148,9 @@ static const DeclKind kCXXMethodDeclDerivedKinds[] = {
     CXXDestructorDecl::static_kind(),
 };
 
-std::optional<CXXMethodDecl> CXXMethodDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<CXXMethodDecl> CXXMethodDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case CXXMethodDecl::static_kind():
     case CXXConstructorDecl::static_kind():
@@ -151,7 +166,7 @@ gap::generator<CXXMethodDecl> CXXMethodDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kCXXMethodDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<CXXMethodDecl> e = CXXMethodDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<CXXMethodDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -163,7 +178,7 @@ gap::generator<CXXMethodDecl> CXXMethodDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kCXXMethodDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<CXXMethodDecl> e = CXXMethodDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<CXXMethodDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -176,7 +191,7 @@ gap::generator<CXXMethodDecl> CXXMethodDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kCXXMethodDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<CXXMethodDecl> e = CXXMethodDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<CXXMethodDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -188,8 +203,18 @@ std::optional<CXXMethodDecl> CXXMethodDecl::from(const Reference &r) {
   return CXXMethodDecl::from(r.as_declaration());
 }
 
+std::optional<CXXMethodDecl> CXXMethodDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<CXXMethodDecl> CXXMethodDecl::from(const TokenContext &t) {
-  return CXXMethodDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 RefQualifierKind CXXMethodDecl::reference_qualifier(void) const {
@@ -269,7 +294,7 @@ std::optional<CXXMethodDecl> CXXMethodDecl::nth_overridden_method(unsigned n) co
   if (!e) {
     return std::nullopt;
   }
-  return CXXMethodDecl::from(Decl(std::move(e)));
+  return CXXMethodDecl::from_base(std::move(e));
 }
 
 gap::generator<CXXMethodDecl> CXXMethodDecl::overridden_methods(void) const & {
@@ -278,7 +303,7 @@ gap::generator<CXXMethodDecl> CXXMethodDecl::overridden_methods(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d179 = ep->DeclFor(ep, v)) {
-      if (auto e = CXXMethodDecl::from(Decl(std::move(d179)))) {
+      if (auto e = CXXMethodDecl::from_base(std::move(d179))) {
         co_yield std::move(*e);
       }
     }

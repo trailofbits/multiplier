@@ -54,17 +54,13 @@ class ArrayTypeTraitExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ArrayTypeTraitExpr> from(const Stmt &parent);
-
-  inline static std::optional<ArrayTypeTraitExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return ArrayTypeTraitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ArrayTypeTraitExpr> from_base(const Stmt &parent);
+  inline static std::optional<ArrayTypeTraitExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ArrayTypeTraitExpr> from(const std::optional<Stmt> &parent);
   static std::optional<ArrayTypeTraitExpr> from(const Reference &r);
+  static std::optional<ArrayTypeTraitExpr> from(const VariantEntity &e);
   static std::optional<ArrayTypeTraitExpr> from(const TokenContext &t);
 
   Expr dimension_expression(void) const;

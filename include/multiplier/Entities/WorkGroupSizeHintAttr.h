@@ -40,17 +40,13 @@ class WorkGroupSizeHintAttr : public InheritableAttr {
     return AttrKind::WORK_GROUP_SIZE_HINT;
   }
 
-  static std::optional<WorkGroupSizeHintAttr> from(const Attr &parent);
-
-  inline static std::optional<WorkGroupSizeHintAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return WorkGroupSizeHintAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<WorkGroupSizeHintAttr> from_base(const Attr &parent);
+  inline static std::optional<WorkGroupSizeHintAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<WorkGroupSizeHintAttr> from(const std::optional<Attr> &parent);
   static std::optional<WorkGroupSizeHintAttr> from(const Reference &r);
+  static std::optional<WorkGroupSizeHintAttr> from(const VariantEntity &e);
   static std::optional<WorkGroupSizeHintAttr> from(const TokenContext &t);
 
 };

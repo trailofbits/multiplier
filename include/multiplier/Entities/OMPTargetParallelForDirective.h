@@ -55,17 +55,13 @@ class OMPTargetParallelForDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<OMPTargetParallelForDirective> from(const Stmt &parent);
-
-  inline static std::optional<OMPTargetParallelForDirective> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return OMPTargetParallelForDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPTargetParallelForDirective> from_base(const Stmt &parent);
+  inline static std::optional<OMPTargetParallelForDirective> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPTargetParallelForDirective> from(const std::optional<Stmt> &parent);
   static std::optional<OMPTargetParallelForDirective> from(const Reference &r);
+  static std::optional<OMPTargetParallelForDirective> from(const VariantEntity &e);
   static std::optional<OMPTargetParallelForDirective> from(const TokenContext &t);
 
   Expr task_reduction_reference_expression(void) const;

@@ -53,18 +53,30 @@ gap::generator<MacroArgument> MacroArgument::containing(const Token &token) {
 std::optional<MacroArgument> MacroArgument::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<MacroId>(vid)) {
-    return MacroArgument::from(index.macro(eid.Pack()));
+    if (auto base = index.macro(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MacroArgument> MacroArgument::from(const std::optional<Macro> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const MacroKind kMacroArgumentDerivedKinds[] = {
     MacroArgument::static_kind(),
 };
 
-std::optional<MacroArgument> MacroArgument::from(const Macro &parent) {
+}  // namespace
+
+std::optional<MacroArgument> MacroArgument::from_base(const Macro &parent) {
   switch (parent.kind()) {
     case MacroArgument::static_kind():
       return reinterpret_cast<const MacroArgument &>(parent);
@@ -77,7 +89,7 @@ gap::generator<MacroArgument> MacroArgument::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroKind k : kMacroArgumentDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
-      if (std::optional<MacroArgument> e = MacroArgument::from(Macro(std::move(eptr)))) {
+      if (std::optional<MacroArgument> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -89,7 +101,7 @@ gap::generator<MacroArgument> MacroArgument::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (MacroKind k : kMacroArgumentDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-      if (std::optional<MacroArgument> e = MacroArgument::from(Macro(std::move(eptr)))) {
+      if (std::optional<MacroArgument> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -102,7 +114,7 @@ gap::generator<MacroArgument> MacroArgument::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (MacroKind k : kMacroArgumentDerivedKinds) {
       for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-        if (std::optional<MacroArgument> e = MacroArgument::from(Macro(std::move(eptr)))) {
+        if (std::optional<MacroArgument> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -114,8 +126,18 @@ std::optional<MacroArgument> MacroArgument::from(const Reference &r) {
   return MacroArgument::from(r.as_macro());
 }
 
+std::optional<MacroArgument> MacroArgument::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Macro>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Macro>(e));
+}
+
 std::optional<MacroArgument> MacroArgument::from(const TokenContext &t) {
-  return MacroArgument::from(t.as_macro());
+  if (auto base = t.as_macro()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool MacroArgument::is_variadic(void) const {

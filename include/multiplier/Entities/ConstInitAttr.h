@@ -41,17 +41,13 @@ class ConstInitAttr : public InheritableAttr {
     return AttrKind::CONST_INIT;
   }
 
-  static std::optional<ConstInitAttr> from(const Attr &parent);
-
-  inline static std::optional<ConstInitAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ConstInitAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ConstInitAttr> from_base(const Attr &parent);
+  inline static std::optional<ConstInitAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ConstInitAttr> from(const std::optional<Attr> &parent);
   static std::optional<ConstInitAttr> from(const Reference &r);
+  static std::optional<ConstInitAttr> from(const VariantEntity &e);
   static std::optional<ConstInitAttr> from(const TokenContext &t);
 
   ConstInitAttrSpelling semantic_spelling(void) const;

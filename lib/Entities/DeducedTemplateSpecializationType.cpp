@@ -39,18 +39,30 @@ bool DeducedTemplateSpecializationType::contains(const Token &tok) const {
 std::optional<DeducedTemplateSpecializationType> DeducedTemplateSpecializationType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return DeducedTemplateSpecializationType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<DeducedTemplateSpecializationType> DeducedTemplateSpecializationType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kDeducedTemplateSpecializationTypeDerivedKinds[] = {
     DeducedTemplateSpecializationType::static_kind(),
 };
 
-std::optional<DeducedTemplateSpecializationType> DeducedTemplateSpecializationType::from(const Type &parent) {
+}  // namespace
+
+std::optional<DeducedTemplateSpecializationType> DeducedTemplateSpecializationType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case DeducedTemplateSpecializationType::static_kind():
       return reinterpret_cast<const DeducedTemplateSpecializationType &>(parent);
@@ -63,7 +75,7 @@ gap::generator<DeducedTemplateSpecializationType> DeducedTemplateSpecializationT
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kDeducedTemplateSpecializationTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<DeducedTemplateSpecializationType> e = DeducedTemplateSpecializationType::from(Type(std::move(eptr)))) {
+      if (std::optional<DeducedTemplateSpecializationType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -74,8 +86,18 @@ std::optional<DeducedTemplateSpecializationType> DeducedTemplateSpecializationTy
   return DeducedTemplateSpecializationType::from(r.as_type());
 }
 
+std::optional<DeducedTemplateSpecializationType> DeducedTemplateSpecializationType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<DeducedTemplateSpecializationType> DeducedTemplateSpecializationType::from(const TokenContext &t) {
-  return DeducedTemplateSpecializationType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

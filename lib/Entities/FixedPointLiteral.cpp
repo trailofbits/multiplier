@@ -89,18 +89,30 @@ bool FixedPointLiteral::contains(const Stmt &stmt) {
 std::optional<FixedPointLiteral> FixedPointLiteral::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return FixedPointLiteral::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<FixedPointLiteral> FixedPointLiteral::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kFixedPointLiteralDerivedKinds[] = {
     FixedPointLiteral::static_kind(),
 };
 
-std::optional<FixedPointLiteral> FixedPointLiteral::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<FixedPointLiteral> FixedPointLiteral::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case FixedPointLiteral::static_kind():
       return reinterpret_cast<const FixedPointLiteral &>(parent);
@@ -113,7 +125,7 @@ gap::generator<FixedPointLiteral> FixedPointLiteral::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kFixedPointLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<FixedPointLiteral> e = FixedPointLiteral::from(Stmt(std::move(eptr)))) {
+      if (std::optional<FixedPointLiteral> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<FixedPointLiteral> FixedPointLiteral::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kFixedPointLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<FixedPointLiteral> e = FixedPointLiteral::from(Stmt(std::move(eptr)))) {
+      if (std::optional<FixedPointLiteral> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<FixedPointLiteral> FixedPointLiteral::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kFixedPointLiteralDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<FixedPointLiteral> e = FixedPointLiteral::from(Stmt(std::move(eptr)))) {
+        if (std::optional<FixedPointLiteral> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,8 +162,18 @@ std::optional<FixedPointLiteral> FixedPointLiteral::from(const Reference &r) {
   return FixedPointLiteral::from(r.as_statement());
 }
 
+std::optional<FixedPointLiteral> FixedPointLiteral::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<FixedPointLiteral> FixedPointLiteral::from(const TokenContext &t) {
-  return FixedPointLiteral::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token FixedPointLiteral::token(void) const {

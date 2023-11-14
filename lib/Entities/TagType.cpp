@@ -41,19 +41,31 @@ bool TagType::contains(const Token &tok) const {
 std::optional<TagType> TagType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return TagType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TagType> TagType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kTagTypeDerivedKinds[] = {
     EnumType::static_kind(),
     RecordType::static_kind(),
 };
 
-std::optional<TagType> TagType::from(const Type &parent) {
+}  // namespace
+
+std::optional<TagType> TagType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case EnumType::static_kind():
     case RecordType::static_kind():
@@ -67,7 +79,7 @@ gap::generator<TagType> TagType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kTagTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<TagType> e = TagType::from(Type(std::move(eptr)))) {
+      if (std::optional<TagType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -78,13 +90,23 @@ std::optional<TagType> TagType::from(const Reference &r) {
   return TagType::from(r.as_type());
 }
 
+std::optional<TagType> TagType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<TagType> TagType::from(const TokenContext &t) {
-  return TagType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 TagDecl TagType::declaration(void) const {
   RawEntityId eid = impl->reader.getVal18();
-  return TagDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return TagDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool TagType::is_being_defined(void) const {

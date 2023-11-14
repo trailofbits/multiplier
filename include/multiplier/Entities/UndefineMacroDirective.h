@@ -44,17 +44,13 @@ class UndefineMacroDirective : public MacroDirective {
   static gap::generator<UndefineMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  static std::optional<UndefineMacroDirective> from(const Macro &parent);
-
-  inline static std::optional<UndefineMacroDirective> from(const std::optional<Macro> &parent) {
-    if (parent) {
-      return UndefineMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UndefineMacroDirective> from_base(const Macro &parent);
+  inline static std::optional<UndefineMacroDirective> from(const Macro &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UndefineMacroDirective> from(const std::optional<Macro> &parent);
   static std::optional<UndefineMacroDirective> from(const Reference &r);
+  static std::optional<UndefineMacroDirective> from(const VariantEntity &e);
   static std::optional<UndefineMacroDirective> from(const TokenContext &t);
 
 };

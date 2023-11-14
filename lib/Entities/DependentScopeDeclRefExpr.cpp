@@ -89,18 +89,30 @@ bool DependentScopeDeclRefExpr::contains(const Stmt &stmt) {
 std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return DependentScopeDeclRefExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kDependentScopeDeclRefExprDerivedKinds[] = {
     DependentScopeDeclRefExpr::static_kind(),
 };
 
-std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case DependentScopeDeclRefExpr::static_kind():
       return reinterpret_cast<const DependentScopeDeclRefExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::in(const In
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kDependentScopeDeclRefExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<DependentScopeDeclRefExpr> e = DependentScopeDeclRefExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<DependentScopeDeclRefExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::in(const Fr
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kDependentScopeDeclRefExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<DependentScopeDeclRefExpr> e = DependentScopeDeclRefExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<DependentScopeDeclRefExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::in(const Fi
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kDependentScopeDeclRefExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<DependentScopeDeclRefExpr> e = DependentScopeDeclRefExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<DependentScopeDeclRefExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,8 +162,18 @@ std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const R
   return DependentScopeDeclRefExpr::from(r.as_statement());
 }
 
+std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const TokenContext &t) {
-  return DependentScopeDeclRefExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token DependentScopeDeclRefExpr::l_angle_token(void) const {

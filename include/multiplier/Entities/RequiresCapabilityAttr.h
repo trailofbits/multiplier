@@ -41,17 +41,13 @@ class RequiresCapabilityAttr : public InheritableAttr {
     return AttrKind::REQUIRES_CAPABILITY;
   }
 
-  static std::optional<RequiresCapabilityAttr> from(const Attr &parent);
-
-  inline static std::optional<RequiresCapabilityAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return RequiresCapabilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<RequiresCapabilityAttr> from_base(const Attr &parent);
+  inline static std::optional<RequiresCapabilityAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<RequiresCapabilityAttr> from(const std::optional<Attr> &parent);
   static std::optional<RequiresCapabilityAttr> from(const Reference &r);
+  static std::optional<RequiresCapabilityAttr> from(const VariantEntity &e);
   static std::optional<RequiresCapabilityAttr> from(const TokenContext &t);
 
   RequiresCapabilityAttrSpelling semantic_spelling(void) const;

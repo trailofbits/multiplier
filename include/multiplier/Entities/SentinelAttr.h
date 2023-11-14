@@ -40,17 +40,13 @@ class SentinelAttr : public InheritableAttr {
     return AttrKind::SENTINEL;
   }
 
-  static std::optional<SentinelAttr> from(const Attr &parent);
-
-  inline static std::optional<SentinelAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SentinelAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SentinelAttr> from_base(const Attr &parent);
+  inline static std::optional<SentinelAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SentinelAttr> from(const std::optional<Attr> &parent);
   static std::optional<SentinelAttr> from(const Reference &r);
+  static std::optional<SentinelAttr> from(const VariantEntity &e);
   static std::optional<SentinelAttr> from(const TokenContext &t);
 
 };

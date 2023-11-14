@@ -40,18 +40,30 @@ bool HLSLSV_GroupIndexAttr::contains(const Token &tok) const {
 std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return HLSLSV_GroupIndexAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kHLSLSV_GroupIndexAttrDerivedKinds[] = {
     HLSLSV_GroupIndexAttr::static_kind(),
 };
 
-std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case HLSLSV_GroupIndexAttr::static_kind():
       return reinterpret_cast<const HLSLSV_GroupIndexAttr &>(parent);
@@ -64,7 +76,7 @@ gap::generator<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::in(const Index &ind
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kHLSLSV_GroupIndexAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<HLSLSV_GroupIndexAttr> e = HLSLSV_GroupIndexAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<HLSLSV_GroupIndexAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -76,7 +88,7 @@ gap::generator<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::in(const Fragment &
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kHLSLSV_GroupIndexAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<HLSLSV_GroupIndexAttr> e = HLSLSV_GroupIndexAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<HLSLSV_GroupIndexAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -89,7 +101,7 @@ gap::generator<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::in(const File &file
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kHLSLSV_GroupIndexAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<HLSLSV_GroupIndexAttr> e = HLSLSV_GroupIndexAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<HLSLSV_GroupIndexAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -101,8 +113,18 @@ std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from(const Reference
   return HLSLSV_GroupIndexAttr::from(r.as_attribute());
 }
 
+std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from(const TokenContext &t) {
-  return HLSLSV_GroupIndexAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

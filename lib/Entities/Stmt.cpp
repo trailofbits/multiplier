@@ -157,9 +157,7 @@ std::optional<Stmt> Stmt::by_id(const Index &index, EntityId eid) {
 gap::generator<Stmt> Stmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtImplPtr eptr : ep->StmtsFor(ep)) {
-    if (std::optional<Stmt> e = Stmt::from(Stmt(std::move(eptr)))) {
-      co_yield std::move(e.value());
-    }
+    co_yield Stmt(std::move(eptr));
   }
 }
 
@@ -177,9 +175,7 @@ gap::generator<Stmt> Stmt::in(const File &file) {
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, frag_id)) {
-      if (std::optional<Stmt> e = Stmt::from(Stmt(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
+      co_yield Stmt(std::move(eptr));
     }
   }
 }
@@ -188,9 +184,7 @@ gap::generator<Stmt> Stmt::in(const Fragment &frag) {
   const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtImplPtr eptr : ep->StmtsFor(ep, frag_id)) {
-    if (std::optional<Stmt> e = Stmt::from(Stmt(std::move(eptr)))) {
-      co_yield std::move(e.value());
-    }
+    co_yield Stmt(std::move(eptr));
   }
 }
 

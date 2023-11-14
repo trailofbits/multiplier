@@ -57,17 +57,13 @@ class UsingEnumDecl : public BaseUsingDecl {
   UsingEnumDecl canonical_declaration(void) const;
   std::optional<UsingEnumDecl> definition(void) const;
   gap::generator<UsingEnumDecl> redeclarations(void) const &;
-  static std::optional<UsingEnumDecl> from(const Decl &parent);
-
-  inline static std::optional<UsingEnumDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return UsingEnumDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UsingEnumDecl> from_base(const Decl &parent);
+  inline static std::optional<UsingEnumDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UsingEnumDecl> from(const std::optional<Decl> &parent);
   static std::optional<UsingEnumDecl> from(const Reference &r);
+  static std::optional<UsingEnumDecl> from(const VariantEntity &e);
   static std::optional<UsingEnumDecl> from(const TokenContext &t);
 
   EnumDecl enum_declaration(void) const;

@@ -40,17 +40,13 @@ class ObjCBridgeRelatedAttr : public InheritableAttr {
     return AttrKind::OBJ_C_BRIDGE_RELATED;
   }
 
-  static std::optional<ObjCBridgeRelatedAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCBridgeRelatedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCBridgeRelatedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCBridgeRelatedAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCBridgeRelatedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCBridgeRelatedAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCBridgeRelatedAttr> from(const Reference &r);
+  static std::optional<ObjCBridgeRelatedAttr> from(const VariantEntity &e);
   static std::optional<ObjCBridgeRelatedAttr> from(const TokenContext &t);
 
 };

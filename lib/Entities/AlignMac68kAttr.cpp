@@ -39,18 +39,30 @@ bool AlignMac68kAttr::contains(const Token &tok) const {
 std::optional<AlignMac68kAttr> AlignMac68kAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return AlignMac68kAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<AlignMac68kAttr> AlignMac68kAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kAlignMac68kAttrDerivedKinds[] = {
     AlignMac68kAttr::static_kind(),
 };
 
-std::optional<AlignMac68kAttr> AlignMac68kAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<AlignMac68kAttr> AlignMac68kAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case AlignMac68kAttr::static_kind():
       return reinterpret_cast<const AlignMac68kAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<AlignMac68kAttr> AlignMac68kAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kAlignMac68kAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<AlignMac68kAttr> e = AlignMac68kAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<AlignMac68kAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<AlignMac68kAttr> AlignMac68kAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kAlignMac68kAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<AlignMac68kAttr> e = AlignMac68kAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<AlignMac68kAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<AlignMac68kAttr> AlignMac68kAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kAlignMac68kAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<AlignMac68kAttr> e = AlignMac68kAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<AlignMac68kAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<AlignMac68kAttr> AlignMac68kAttr::from(const Reference &r) {
   return AlignMac68kAttr::from(r.as_attribute());
 }
 
+std::optional<AlignMac68kAttr> AlignMac68kAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<AlignMac68kAttr> AlignMac68kAttr::from(const TokenContext &t) {
-  return AlignMac68kAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

@@ -90,7 +90,7 @@ std::optional<FieldDecl> Designator::field(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FieldDecl::from(Decl(std::move(eptr)));
+      return FieldDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

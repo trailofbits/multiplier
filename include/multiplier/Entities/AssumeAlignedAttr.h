@@ -41,17 +41,13 @@ class AssumeAlignedAttr : public InheritableAttr {
     return AttrKind::ASSUME_ALIGNED;
   }
 
-  static std::optional<AssumeAlignedAttr> from(const Attr &parent);
-
-  inline static std::optional<AssumeAlignedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AssumeAlignedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AssumeAlignedAttr> from_base(const Attr &parent);
+  inline static std::optional<AssumeAlignedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AssumeAlignedAttr> from(const std::optional<Attr> &parent);
   static std::optional<AssumeAlignedAttr> from(const Reference &r);
+  static std::optional<AssumeAlignedAttr> from(const VariantEntity &e);
   static std::optional<AssumeAlignedAttr> from(const TokenContext &t);
 
   Expr alignment(void) const;

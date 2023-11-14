@@ -40,17 +40,13 @@ class ThisCallAttr : public InheritableAttr {
     return AttrKind::THIS_CALL;
   }
 
-  static std::optional<ThisCallAttr> from(const Attr &parent);
-
-  inline static std::optional<ThisCallAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ThisCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ThisCallAttr> from_base(const Attr &parent);
+  inline static std::optional<ThisCallAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ThisCallAttr> from(const std::optional<Attr> &parent);
   static std::optional<ThisCallAttr> from(const Reference &r);
+  static std::optional<ThisCallAttr> from(const VariantEntity &e);
   static std::optional<ThisCallAttr> from(const TokenContext &t);
 
 };

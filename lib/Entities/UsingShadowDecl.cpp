@@ -88,7 +88,7 @@ bool UsingShadowDecl::contains(const Stmt &stmt) {
 }
 
 UsingShadowDecl UsingShadowDecl::canonical_declaration(void) const {
-  if (auto canon = UsingShadowDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (UsingShadowDecl redecl : redeclarations()) {
@@ -98,12 +98,15 @@ UsingShadowDecl UsingShadowDecl::canonical_declaration(void) const {
 }
 
 std::optional<UsingShadowDecl> UsingShadowDecl::definition(void) const {
-  return UsingShadowDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<UsingShadowDecl> UsingShadowDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<UsingShadowDecl> dr = UsingShadowDecl::from(r)) {
+    if (std::optional<UsingShadowDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -116,19 +119,31 @@ gap::generator<UsingShadowDecl> UsingShadowDecl::redeclarations(void) const & {
 std::optional<UsingShadowDecl> UsingShadowDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return UsingShadowDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<UsingShadowDecl> UsingShadowDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kUsingShadowDeclDerivedKinds[] = {
     UsingShadowDecl::static_kind(),
     ConstructorUsingShadowDecl::static_kind(),
 };
 
-std::optional<UsingShadowDecl> UsingShadowDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<UsingShadowDecl> UsingShadowDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case UsingShadowDecl::static_kind():
     case ConstructorUsingShadowDecl::static_kind():
@@ -142,7 +157,7 @@ gap::generator<UsingShadowDecl> UsingShadowDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kUsingShadowDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<UsingShadowDecl> e = UsingShadowDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<UsingShadowDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -154,7 +169,7 @@ gap::generator<UsingShadowDecl> UsingShadowDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kUsingShadowDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<UsingShadowDecl> e = UsingShadowDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<UsingShadowDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -167,7 +182,7 @@ gap::generator<UsingShadowDecl> UsingShadowDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kUsingShadowDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<UsingShadowDecl> e = UsingShadowDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<UsingShadowDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -179,13 +194,23 @@ std::optional<UsingShadowDecl> UsingShadowDecl::from(const Reference &r) {
   return UsingShadowDecl::from(r.as_declaration());
 }
 
+std::optional<UsingShadowDecl> UsingShadowDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<UsingShadowDecl> UsingShadowDecl::from(const TokenContext &t) {
-  return UsingShadowDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 BaseUsingDecl UsingShadowDecl::introducer(void) const {
   RawEntityId eid = impl->reader.getVal56();
-  return BaseUsingDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return BaseUsingDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 std::optional<UsingShadowDecl> UsingShadowDecl::next_using_shadow_declaration(void) const {
@@ -195,7 +220,7 @@ std::optional<UsingShadowDecl> UsingShadowDecl::next_using_shadow_declaration(vo
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return UsingShadowDecl::from(Decl(std::move(eptr)));
+      return UsingShadowDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -203,7 +228,7 @@ std::optional<UsingShadowDecl> UsingShadowDecl::next_using_shadow_declaration(vo
 
 NamedDecl UsingShadowDecl::target_declaration(void) const {
   RawEntityId eid = impl->reader.getVal58();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

@@ -93,18 +93,30 @@ bool ObjCMessageExpr::contains(const Stmt &stmt) {
 std::optional<ObjCMessageExpr> ObjCMessageExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ObjCMessageExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kObjCMessageExprDerivedKinds[] = {
     ObjCMessageExpr::static_kind(),
 };
 
-std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ObjCMessageExpr> ObjCMessageExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCMessageExpr::static_kind():
       return reinterpret_cast<const ObjCMessageExpr &>(parent);
@@ -117,7 +129,7 @@ gap::generator<ObjCMessageExpr> ObjCMessageExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCMessageExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ObjCMessageExpr> e = ObjCMessageExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCMessageExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -129,7 +141,7 @@ gap::generator<ObjCMessageExpr> ObjCMessageExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCMessageExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCMessageExpr> e = ObjCMessageExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCMessageExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -142,7 +154,7 @@ gap::generator<ObjCMessageExpr> ObjCMessageExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCMessageExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCMessageExpr> e = ObjCMessageExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ObjCMessageExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -154,8 +166,18 @@ std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const Reference &r) {
   return ObjCMessageExpr::from(r.as_statement());
 }
 
+std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const TokenContext &t) {
-  return ObjCMessageExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 unsigned ObjCMessageExpr::num_arguments(void) const {
@@ -173,7 +195,7 @@ std::optional<Expr> ObjCMessageExpr::nth_argument(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> ObjCMessageExpr::arguments(void) const & {
@@ -182,7 +204,7 @@ gap::generator<Expr> ObjCMessageExpr::arguments(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+      if (auto e = Expr::from_base(std::move(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -202,7 +224,7 @@ Type ObjCMessageExpr::class_receiver(void) const {
 
 Expr ObjCMessageExpr::instance_receiver(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token ObjCMessageExpr::left_token(void) const {
@@ -211,7 +233,7 @@ Token ObjCMessageExpr::left_token(void) const {
 
 ObjCMethodDecl ObjCMessageExpr::method_declaration(void) const {
   RawEntityId eid = impl->reader.getVal41();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCMethodDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ObjCMethodFamily ObjCMessageExpr::method_family(void) const {
@@ -220,7 +242,7 @@ ObjCMethodFamily ObjCMessageExpr::method_family(void) const {
 
 ObjCInterfaceDecl ObjCMessageExpr::receiver_interface(void) const {
   RawEntityId eid = impl->reader.getVal42();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ObjCMessageExprReceiverKind ObjCMessageExpr::receiver_kind(void) const {

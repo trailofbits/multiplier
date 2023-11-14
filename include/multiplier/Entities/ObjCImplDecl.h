@@ -55,17 +55,13 @@ class ObjCImplDecl : public ObjCContainerDecl {
   ObjCImplDecl canonical_declaration(void) const;
   std::optional<ObjCImplDecl> definition(void) const;
   gap::generator<ObjCImplDecl> redeclarations(void) const &;
-  static std::optional<ObjCImplDecl> from(const Decl &parent);
-
-  inline static std::optional<ObjCImplDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ObjCImplDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCImplDecl> from_base(const Decl &parent);
+  inline static std::optional<ObjCImplDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCImplDecl> from(const std::optional<Decl> &parent);
   static std::optional<ObjCImplDecl> from(const Reference &r);
+  static std::optional<ObjCImplDecl> from(const VariantEntity &e);
   static std::optional<ObjCImplDecl> from(const TokenContext &t);
 
   ObjCInterfaceDecl class_interface(void) const;

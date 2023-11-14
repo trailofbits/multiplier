@@ -52,17 +52,13 @@ class ImportDecl : public Decl {
   ImportDecl canonical_declaration(void) const;
   std::optional<ImportDecl> definition(void) const;
   gap::generator<ImportDecl> redeclarations(void) const &;
-  static std::optional<ImportDecl> from(const Decl &parent);
-
-  inline static std::optional<ImportDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ImportDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ImportDecl> from_base(const Decl &parent);
+  inline static std::optional<ImportDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ImportDecl> from(const std::optional<Decl> &parent);
   static std::optional<ImportDecl> from(const Reference &r);
+  static std::optional<ImportDecl> from(const VariantEntity &e);
   static std::optional<ImportDecl> from(const TokenContext &t);
 
   std::optional<Token> nth_identifier_token(unsigned n) const;

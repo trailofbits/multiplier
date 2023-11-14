@@ -40,17 +40,13 @@ class AllocAlignAttr : public InheritableAttr {
     return AttrKind::ALLOC_ALIGN;
   }
 
-  static std::optional<AllocAlignAttr> from(const Attr &parent);
-
-  inline static std::optional<AllocAlignAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AllocAlignAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AllocAlignAttr> from_base(const Attr &parent);
+  inline static std::optional<AllocAlignAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AllocAlignAttr> from(const std::optional<Attr> &parent);
   static std::optional<AllocAlignAttr> from(const Reference &r);
+  static std::optional<AllocAlignAttr> from(const VariantEntity &e);
   static std::optional<AllocAlignAttr> from(const TokenContext &t);
 
 };

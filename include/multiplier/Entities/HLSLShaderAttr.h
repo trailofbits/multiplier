@@ -41,17 +41,13 @@ class HLSLShaderAttr : public InheritableAttr {
     return AttrKind::HLSL_SHADER;
   }
 
-  static std::optional<HLSLShaderAttr> from(const Attr &parent);
-
-  inline static std::optional<HLSLShaderAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return HLSLShaderAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<HLSLShaderAttr> from_base(const Attr &parent);
+  inline static std::optional<HLSLShaderAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<HLSLShaderAttr> from(const std::optional<Attr> &parent);
   static std::optional<HLSLShaderAttr> from(const Reference &r);
+  static std::optional<HLSLShaderAttr> from(const VariantEntity &e);
   static std::optional<HLSLShaderAttr> from(const TokenContext &t);
 
   HLSLShaderAttrShaderType type(void) const;

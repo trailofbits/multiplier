@@ -40,17 +40,13 @@ class MSABIAttr : public InheritableAttr {
     return AttrKind::MSABI;
   }
 
-  static std::optional<MSABIAttr> from(const Attr &parent);
-
-  inline static std::optional<MSABIAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MSABIAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MSABIAttr> from_base(const Attr &parent);
+  inline static std::optional<MSABIAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MSABIAttr> from(const std::optional<Attr> &parent);
   static std::optional<MSABIAttr> from(const Reference &r);
+  static std::optional<MSABIAttr> from(const VariantEntity &e);
   static std::optional<MSABIAttr> from(const TokenContext &t);
 
 };

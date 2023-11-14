@@ -43,17 +43,13 @@ class ParameterABIAttr : public InheritableParamAttr {
   static gap::generator<ParameterABIAttr> in(const Fragment &frag);
   static gap::generator<ParameterABIAttr> in(const File &file);
 
-  static std::optional<ParameterABIAttr> from(const Attr &parent);
-
-  inline static std::optional<ParameterABIAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ParameterABIAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ParameterABIAttr> from_base(const Attr &parent);
+  inline static std::optional<ParameterABIAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ParameterABIAttr> from(const std::optional<Attr> &parent);
   static std::optional<ParameterABIAttr> from(const Reference &r);
+  static std::optional<ParameterABIAttr> from(const VariantEntity &e);
   static std::optional<ParameterABIAttr> from(const TokenContext &t);
 
   ParameterABI abi(void) const;

@@ -40,17 +40,13 @@ class AcquiredAfterAttr : public InheritableAttr {
     return AttrKind::ACQUIRED_AFTER;
   }
 
-  static std::optional<AcquiredAfterAttr> from(const Attr &parent);
-
-  inline static std::optional<AcquiredAfterAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AcquiredAfterAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AcquiredAfterAttr> from_base(const Attr &parent);
+  inline static std::optional<AcquiredAfterAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AcquiredAfterAttr> from(const std::optional<Attr> &parent);
   static std::optional<AcquiredAfterAttr> from(const Reference &r);
+  static std::optional<AcquiredAfterAttr> from(const VariantEntity &e);
   static std::optional<AcquiredAfterAttr> from(const TokenContext &t);
 
 };

@@ -39,18 +39,30 @@ bool ObjCReturnsInnerPointerAttr::contains(const Token &tok) const {
 std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return ObjCReturnsInnerPointerAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kObjCReturnsInnerPointerAttrDerivedKinds[] = {
     ObjCReturnsInnerPointerAttr::static_kind(),
 };
 
-std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case ObjCReturnsInnerPointerAttr::static_kind():
       return reinterpret_cast<const ObjCReturnsInnerPointerAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::in(cons
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kObjCReturnsInnerPointerAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<ObjCReturnsInnerPointerAttr> e = ObjCReturnsInnerPointerAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<ObjCReturnsInnerPointerAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::in(cons
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kObjCReturnsInnerPointerAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCReturnsInnerPointerAttr> e = ObjCReturnsInnerPointerAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<ObjCReturnsInnerPointerAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::in(cons
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kObjCReturnsInnerPointerAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCReturnsInnerPointerAttr> e = ObjCReturnsInnerPointerAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<ObjCReturnsInnerPointerAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::from(con
   return ObjCReturnsInnerPointerAttr::from(r.as_attribute());
 }
 
+std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::from(const TokenContext &t) {
-  return ObjCReturnsInnerPointerAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

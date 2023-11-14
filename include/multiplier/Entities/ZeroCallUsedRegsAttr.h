@@ -41,17 +41,13 @@ class ZeroCallUsedRegsAttr : public InheritableAttr {
     return AttrKind::ZERO_CALL_USED_REGS;
   }
 
-  static std::optional<ZeroCallUsedRegsAttr> from(const Attr &parent);
-
-  inline static std::optional<ZeroCallUsedRegsAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ZeroCallUsedRegsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ZeroCallUsedRegsAttr> from_base(const Attr &parent);
+  inline static std::optional<ZeroCallUsedRegsAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ZeroCallUsedRegsAttr> from(const std::optional<Attr> &parent);
   static std::optional<ZeroCallUsedRegsAttr> from(const Reference &r);
+  static std::optional<ZeroCallUsedRegsAttr> from(const VariantEntity &e);
   static std::optional<ZeroCallUsedRegsAttr> from(const TokenContext &t);
 
   ZeroCallUsedRegsAttrZeroCallUsedRegsKind zero_call_used_regs(void) const;

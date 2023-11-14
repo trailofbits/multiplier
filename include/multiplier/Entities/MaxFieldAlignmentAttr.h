@@ -40,17 +40,13 @@ class MaxFieldAlignmentAttr : public InheritableAttr {
     return AttrKind::MAX_FIELD_ALIGNMENT;
   }
 
-  static std::optional<MaxFieldAlignmentAttr> from(const Attr &parent);
-
-  inline static std::optional<MaxFieldAlignmentAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MaxFieldAlignmentAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MaxFieldAlignmentAttr> from_base(const Attr &parent);
+  inline static std::optional<MaxFieldAlignmentAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MaxFieldAlignmentAttr> from(const std::optional<Attr> &parent);
   static std::optional<MaxFieldAlignmentAttr> from(const Reference &r);
+  static std::optional<MaxFieldAlignmentAttr> from(const VariantEntity &e);
   static std::optional<MaxFieldAlignmentAttr> from(const TokenContext &t);
 
 };

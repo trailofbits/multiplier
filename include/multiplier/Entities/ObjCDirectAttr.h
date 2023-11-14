@@ -38,17 +38,13 @@ class ObjCDirectAttr : public Attr {
     return AttrKind::OBJ_C_DIRECT;
   }
 
-  static std::optional<ObjCDirectAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCDirectAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCDirectAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCDirectAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCDirectAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCDirectAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCDirectAttr> from(const Reference &r);
+  static std::optional<ObjCDirectAttr> from(const VariantEntity &e);
   static std::optional<ObjCDirectAttr> from(const TokenContext &t);
 
 };

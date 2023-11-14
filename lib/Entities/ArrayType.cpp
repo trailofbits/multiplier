@@ -42,13 +42,23 @@ bool ArrayType::contains(const Token &tok) const {
 std::optional<ArrayType> ArrayType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return ArrayType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ArrayType> ArrayType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kArrayTypeDerivedKinds[] = {
     ConstantArrayType::static_kind(),
     DependentSizedArrayType::static_kind(),
@@ -56,7 +66,9 @@ static const TypeKind kArrayTypeDerivedKinds[] = {
     VariableArrayType::static_kind(),
 };
 
-std::optional<ArrayType> ArrayType::from(const Type &parent) {
+}  // namespace
+
+std::optional<ArrayType> ArrayType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case ConstantArrayType::static_kind():
     case DependentSizedArrayType::static_kind():
@@ -72,7 +84,7 @@ gap::generator<ArrayType> ArrayType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kArrayTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<ArrayType> e = ArrayType::from(Type(std::move(eptr)))) {
+      if (std::optional<ArrayType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -83,8 +95,18 @@ std::optional<ArrayType> ArrayType::from(const Reference &r) {
   return ArrayType::from(r.as_type());
 }
 
+std::optional<ArrayType> ArrayType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<ArrayType> ArrayType::from(const TokenContext &t) {
-  return ArrayType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type ArrayType::element_type(void) const {

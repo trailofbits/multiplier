@@ -41,17 +41,13 @@ class CFGuardAttr : public InheritableAttr {
     return AttrKind::CF_GUARD;
   }
 
-  static std::optional<CFGuardAttr> from(const Attr &parent);
-
-  inline static std::optional<CFGuardAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CFGuardAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CFGuardAttr> from_base(const Attr &parent);
+  inline static std::optional<CFGuardAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CFGuardAttr> from(const std::optional<Attr> &parent);
   static std::optional<CFGuardAttr> from(const Reference &r);
+  static std::optional<CFGuardAttr> from(const VariantEntity &e);
   static std::optional<CFGuardAttr> from(const TokenContext &t);
 
   CFGuardAttrGuardArg guard(void) const;

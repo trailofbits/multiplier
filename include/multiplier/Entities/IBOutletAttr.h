@@ -40,17 +40,13 @@ class IBOutletAttr : public InheritableAttr {
     return AttrKind::IB_OUTLET;
   }
 
-  static std::optional<IBOutletAttr> from(const Attr &parent);
-
-  inline static std::optional<IBOutletAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return IBOutletAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<IBOutletAttr> from_base(const Attr &parent);
+  inline static std::optional<IBOutletAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<IBOutletAttr> from(const std::optional<Attr> &parent);
   static std::optional<IBOutletAttr> from(const Reference &r);
+  static std::optional<IBOutletAttr> from(const VariantEntity &e);
   static std::optional<IBOutletAttr> from(const TokenContext &t);
 
 };

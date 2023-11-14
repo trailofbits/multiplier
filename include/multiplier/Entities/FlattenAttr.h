@@ -40,17 +40,13 @@ class FlattenAttr : public InheritableAttr {
     return AttrKind::FLATTEN;
   }
 
-  static std::optional<FlattenAttr> from(const Attr &parent);
-
-  inline static std::optional<FlattenAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return FlattenAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<FlattenAttr> from_base(const Attr &parent);
+  inline static std::optional<FlattenAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<FlattenAttr> from(const std::optional<Attr> &parent);
   static std::optional<FlattenAttr> from(const Reference &r);
+  static std::optional<FlattenAttr> from(const VariantEntity &e);
   static std::optional<FlattenAttr> from(const TokenContext &t);
 
 };

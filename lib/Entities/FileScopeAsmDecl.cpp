@@ -86,7 +86,7 @@ bool FileScopeAsmDecl::contains(const Stmt &stmt) {
 }
 
 FileScopeAsmDecl FileScopeAsmDecl::canonical_declaration(void) const {
-  if (auto canon = FileScopeAsmDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (FileScopeAsmDecl redecl : redeclarations()) {
@@ -96,12 +96,15 @@ FileScopeAsmDecl FileScopeAsmDecl::canonical_declaration(void) const {
 }
 
 std::optional<FileScopeAsmDecl> FileScopeAsmDecl::definition(void) const {
-  return FileScopeAsmDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<FileScopeAsmDecl> dr = FileScopeAsmDecl::from(r)) {
+    if (std::optional<FileScopeAsmDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -114,18 +117,30 @@ gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::redeclarations(void) const & 
 std::optional<FileScopeAsmDecl> FileScopeAsmDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return FileScopeAsmDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kFileScopeAsmDeclDerivedKinds[] = {
     FileScopeAsmDecl::static_kind(),
 };
 
-std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case FileScopeAsmDecl::static_kind():
       return reinterpret_cast<const FileScopeAsmDecl &>(parent);
@@ -138,7 +153,7 @@ gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kFileScopeAsmDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<FileScopeAsmDecl> e = FileScopeAsmDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<FileScopeAsmDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -150,7 +165,7 @@ gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kFileScopeAsmDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<FileScopeAsmDecl> e = FileScopeAsmDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<FileScopeAsmDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -163,7 +178,7 @@ gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kFileScopeAsmDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<FileScopeAsmDecl> e = FileScopeAsmDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<FileScopeAsmDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -175,8 +190,18 @@ std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const Reference &r) {
   return FileScopeAsmDecl::from(r.as_declaration());
 }
 
+std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const TokenContext &t) {
-  return FileScopeAsmDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token FileScopeAsmDecl::assembly_token(void) const {
@@ -185,7 +210,7 @@ Token FileScopeAsmDecl::assembly_token(void) const {
 
 StringLiteral FileScopeAsmDecl::assembly_string(void) const {
   RawEntityId eid = impl->reader.getVal56();
-  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return StringLiteral::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token FileScopeAsmDecl::r_paren_token(void) const {

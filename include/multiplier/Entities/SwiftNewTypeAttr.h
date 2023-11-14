@@ -42,17 +42,13 @@ class SwiftNewTypeAttr : public InheritableAttr {
     return AttrKind::SWIFT_NEW_TYPE;
   }
 
-  static std::optional<SwiftNewTypeAttr> from(const Attr &parent);
-
-  inline static std::optional<SwiftNewTypeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SwiftNewTypeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SwiftNewTypeAttr> from_base(const Attr &parent);
+  inline static std::optional<SwiftNewTypeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SwiftNewTypeAttr> from(const std::optional<Attr> &parent);
   static std::optional<SwiftNewTypeAttr> from(const Reference &r);
+  static std::optional<SwiftNewTypeAttr> from(const VariantEntity &e);
   static std::optional<SwiftNewTypeAttr> from(const TokenContext &t);
 
   SwiftNewTypeAttrNewtypeKind newtype_kind(void) const;

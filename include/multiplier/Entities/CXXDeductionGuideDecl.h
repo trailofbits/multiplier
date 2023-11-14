@@ -62,17 +62,13 @@ class CXXDeductionGuideDecl : public FunctionDecl {
   CXXDeductionGuideDecl canonical_declaration(void) const;
   std::optional<CXXDeductionGuideDecl> definition(void) const;
   gap::generator<CXXDeductionGuideDecl> redeclarations(void) const &;
-  static std::optional<CXXDeductionGuideDecl> from(const Decl &parent);
-
-  inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return CXXDeductionGuideDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CXXDeductionGuideDecl> from_base(const Decl &parent);
+  inline static std::optional<CXXDeductionGuideDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CXXDeductionGuideDecl> from(const std::optional<Decl> &parent);
   static std::optional<CXXDeductionGuideDecl> from(const Reference &r);
+  static std::optional<CXXDeductionGuideDecl> from(const VariantEntity &e);
   static std::optional<CXXDeductionGuideDecl> from(const TokenContext &t);
 
   CXXConstructorDecl corresponding_constructor(void) const;

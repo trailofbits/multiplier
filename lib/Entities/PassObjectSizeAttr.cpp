@@ -40,18 +40,30 @@ bool PassObjectSizeAttr::contains(const Token &tok) const {
 std::optional<PassObjectSizeAttr> PassObjectSizeAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return PassObjectSizeAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<PassObjectSizeAttr> PassObjectSizeAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kPassObjectSizeAttrDerivedKinds[] = {
     PassObjectSizeAttr::static_kind(),
 };
 
-std::optional<PassObjectSizeAttr> PassObjectSizeAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<PassObjectSizeAttr> PassObjectSizeAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case PassObjectSizeAttr::static_kind():
       return reinterpret_cast<const PassObjectSizeAttr &>(parent);
@@ -64,7 +76,7 @@ gap::generator<PassObjectSizeAttr> PassObjectSizeAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kPassObjectSizeAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<PassObjectSizeAttr> e = PassObjectSizeAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<PassObjectSizeAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -76,7 +88,7 @@ gap::generator<PassObjectSizeAttr> PassObjectSizeAttr::in(const Fragment &frag) 
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kPassObjectSizeAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<PassObjectSizeAttr> e = PassObjectSizeAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<PassObjectSizeAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -89,7 +101,7 @@ gap::generator<PassObjectSizeAttr> PassObjectSizeAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kPassObjectSizeAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<PassObjectSizeAttr> e = PassObjectSizeAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<PassObjectSizeAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -101,8 +113,18 @@ std::optional<PassObjectSizeAttr> PassObjectSizeAttr::from(const Reference &r) {
   return PassObjectSizeAttr::from(r.as_attribute());
 }
 
+std::optional<PassObjectSizeAttr> PassObjectSizeAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<PassObjectSizeAttr> PassObjectSizeAttr::from(const TokenContext &t) {
-  return PassObjectSizeAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 PassObjectSizeAttrSpelling PassObjectSizeAttr::semantic_spelling(void) const {

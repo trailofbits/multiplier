@@ -40,18 +40,30 @@ bool TryAcquireCapabilityAttr::contains(const Token &tok) const {
 std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return TryAcquireCapabilityAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kTryAcquireCapabilityAttrDerivedKinds[] = {
     TryAcquireCapabilityAttr::static_kind(),
 };
 
-std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case TryAcquireCapabilityAttr::static_kind():
       return reinterpret_cast<const TryAcquireCapabilityAttr &>(parent);
@@ -64,7 +76,7 @@ gap::generator<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::in(const Inde
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kTryAcquireCapabilityAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<TryAcquireCapabilityAttr> e = TryAcquireCapabilityAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<TryAcquireCapabilityAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -76,7 +88,7 @@ gap::generator<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::in(const Frag
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kTryAcquireCapabilityAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<TryAcquireCapabilityAttr> e = TryAcquireCapabilityAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<TryAcquireCapabilityAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -89,7 +101,7 @@ gap::generator<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::in(const File
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kTryAcquireCapabilityAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<TryAcquireCapabilityAttr> e = TryAcquireCapabilityAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<TryAcquireCapabilityAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -101,8 +113,18 @@ std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::from(const Ref
   return TryAcquireCapabilityAttr::from(r.as_attribute());
 }
 
+std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::from(const TokenContext &t) {
-  return TryAcquireCapabilityAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 TryAcquireCapabilityAttrSpelling TryAcquireCapabilityAttr::semantic_spelling(void) const {
@@ -111,7 +133,7 @@ TryAcquireCapabilityAttrSpelling TryAcquireCapabilityAttr::semantic_spelling(voi
 
 Expr TryAcquireCapabilityAttr::success_value(void) const {
   RawEntityId eid = impl->reader.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool TryAcquireCapabilityAttr::is_shared(void) const {

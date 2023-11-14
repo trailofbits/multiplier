@@ -87,18 +87,30 @@ bool ObjCAtFinallyStmt::contains(const Stmt &stmt) {
 std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ObjCAtFinallyStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kObjCAtFinallyStmtDerivedKinds[] = {
     ObjCAtFinallyStmt::static_kind(),
 };
 
-std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCAtFinallyStmt::static_kind():
       return reinterpret_cast<const ObjCAtFinallyStmt &>(parent);
@@ -111,7 +123,7 @@ gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCAtFinallyStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ObjCAtFinallyStmt> e = ObjCAtFinallyStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCAtFinallyStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -123,7 +135,7 @@ gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCAtFinallyStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCAtFinallyStmt> e = ObjCAtFinallyStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCAtFinallyStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -136,7 +148,7 @@ gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCAtFinallyStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCAtFinallyStmt> e = ObjCAtFinallyStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ObjCAtFinallyStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -148,8 +160,18 @@ std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const Reference &r) {
   return ObjCAtFinallyStmt::from(r.as_statement());
 }
 
+std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const TokenContext &t) {
-  return ObjCAtFinallyStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token ObjCAtFinallyStmt::at_finally_token(void) const {

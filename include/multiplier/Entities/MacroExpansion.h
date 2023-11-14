@@ -46,17 +46,13 @@ class MacroExpansion : public MacroSubstitution {
   static gap::generator<MacroExpansion> containing(const Token &token);
   bool contains(const Token &token);
 
-  static std::optional<MacroExpansion> from(const Macro &parent);
-
-  inline static std::optional<MacroExpansion> from(const std::optional<Macro> &parent) {
-    if (parent) {
-      return MacroExpansion::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MacroExpansion> from_base(const Macro &parent);
+  inline static std::optional<MacroExpansion> from(const Macro &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MacroExpansion> from(const std::optional<Macro> &parent);
   static std::optional<MacroExpansion> from(const Reference &r);
+  static std::optional<MacroExpansion> from(const VariantEntity &e);
   static std::optional<MacroExpansion> from(const TokenContext &t);
 
   gap::generator<MacroOrToken> intermediate_children(void) const &;

@@ -41,17 +41,13 @@ class SwiftAsyncErrorAttr : public InheritableAttr {
     return AttrKind::SWIFT_ASYNC_ERROR;
   }
 
-  static std::optional<SwiftAsyncErrorAttr> from(const Attr &parent);
-
-  inline static std::optional<SwiftAsyncErrorAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SwiftAsyncErrorAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SwiftAsyncErrorAttr> from_base(const Attr &parent);
+  inline static std::optional<SwiftAsyncErrorAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SwiftAsyncErrorAttr> from(const std::optional<Attr> &parent);
   static std::optional<SwiftAsyncErrorAttr> from(const Reference &r);
+  static std::optional<SwiftAsyncErrorAttr> from(const VariantEntity &e);
   static std::optional<SwiftAsyncErrorAttr> from(const TokenContext &t);
 
   SwiftAsyncErrorAttrConventionKind convention(void) const;

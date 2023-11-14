@@ -40,17 +40,13 @@ class ArtificialAttr : public InheritableAttr {
     return AttrKind::ARTIFICIAL;
   }
 
-  static std::optional<ArtificialAttr> from(const Attr &parent);
-
-  inline static std::optional<ArtificialAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ArtificialAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ArtificialAttr> from_base(const Attr &parent);
+  inline static std::optional<ArtificialAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ArtificialAttr> from(const std::optional<Attr> &parent);
   static std::optional<ArtificialAttr> from(const Reference &r);
+  static std::optional<ArtificialAttr> from(const VariantEntity &e);
   static std::optional<ArtificialAttr> from(const TokenContext &t);
 
 };

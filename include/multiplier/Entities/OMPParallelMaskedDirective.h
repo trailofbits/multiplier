@@ -51,17 +51,13 @@ class OMPParallelMaskedDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<OMPParallelMaskedDirective> from(const Stmt &parent);
-
-  inline static std::optional<OMPParallelMaskedDirective> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return OMPParallelMaskedDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPParallelMaskedDirective> from_base(const Stmt &parent);
+  inline static std::optional<OMPParallelMaskedDirective> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPParallelMaskedDirective> from(const std::optional<Stmt> &parent);
   static std::optional<OMPParallelMaskedDirective> from(const Reference &r);
+  static std::optional<OMPParallelMaskedDirective> from(const VariantEntity &e);
   static std::optional<OMPParallelMaskedDirective> from(const TokenContext &t);
 
   Expr task_reduction_reference_expression(void) const;

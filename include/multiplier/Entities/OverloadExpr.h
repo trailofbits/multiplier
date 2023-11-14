@@ -51,17 +51,13 @@ class OverloadExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<OverloadExpr> from(const Stmt &parent);
-
-  inline static std::optional<OverloadExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return OverloadExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OverloadExpr> from_base(const Stmt &parent);
+  inline static std::optional<OverloadExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OverloadExpr> from(const std::optional<Stmt> &parent);
   static std::optional<OverloadExpr> from(const Reference &r);
+  static std::optional<OverloadExpr> from(const VariantEntity &e);
   static std::optional<OverloadExpr> from(const TokenContext &t);
 
   Token l_angle_token(void) const;

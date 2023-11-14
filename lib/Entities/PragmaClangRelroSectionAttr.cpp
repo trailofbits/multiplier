@@ -39,18 +39,30 @@ bool PragmaClangRelroSectionAttr::contains(const Token &tok) const {
 std::optional<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return PragmaClangRelroSectionAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kPragmaClangRelroSectionAttrDerivedKinds[] = {
     PragmaClangRelroSectionAttr::static_kind(),
 };
 
-std::optional<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case PragmaClangRelroSectionAttr::static_kind():
       return reinterpret_cast<const PragmaClangRelroSectionAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::in(cons
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kPragmaClangRelroSectionAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<PragmaClangRelroSectionAttr> e = PragmaClangRelroSectionAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<PragmaClangRelroSectionAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::in(cons
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kPragmaClangRelroSectionAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<PragmaClangRelroSectionAttr> e = PragmaClangRelroSectionAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<PragmaClangRelroSectionAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::in(cons
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kPragmaClangRelroSectionAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<PragmaClangRelroSectionAttr> e = PragmaClangRelroSectionAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<PragmaClangRelroSectionAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::from(con
   return PragmaClangRelroSectionAttr::from(r.as_attribute());
 }
 
+std::optional<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::from(const TokenContext &t) {
-  return PragmaClangRelroSectionAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::string_view PragmaClangRelroSectionAttr::name(void) const {

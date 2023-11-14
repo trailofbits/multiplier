@@ -91,18 +91,30 @@ bool DesignatedInitExpr::contains(const Stmt &stmt) {
 std::optional<DesignatedInitExpr> DesignatedInitExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return DesignatedInitExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kDesignatedInitExprDerivedKinds[] = {
     DesignatedInitExpr::static_kind(),
 };
 
-std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<DesignatedInitExpr> DesignatedInitExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case DesignatedInitExpr::static_kind():
       return reinterpret_cast<const DesignatedInitExpr &>(parent);
@@ -115,7 +127,7 @@ gap::generator<DesignatedInitExpr> DesignatedInitExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kDesignatedInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<DesignatedInitExpr> e = DesignatedInitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<DesignatedInitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -127,7 +139,7 @@ gap::generator<DesignatedInitExpr> DesignatedInitExpr::in(const Fragment &frag) 
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kDesignatedInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<DesignatedInitExpr> e = DesignatedInitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<DesignatedInitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -140,7 +152,7 @@ gap::generator<DesignatedInitExpr> DesignatedInitExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kDesignatedInitExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<DesignatedInitExpr> e = DesignatedInitExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<DesignatedInitExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -152,8 +164,18 @@ std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const Reference &r) {
   return DesignatedInitExpr::from(r.as_statement());
 }
 
+std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const TokenContext &t) {
-  return DesignatedInitExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 unsigned DesignatedInitExpr::num_designators(void) const {
@@ -196,7 +218,7 @@ Token DesignatedInitExpr::equal_or_colon_token(void) const {
 
 Expr DesignatedInitExpr::initializer(void) const {
   RawEntityId eid = impl->reader.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool DesignatedInitExpr::is_direct_initializer(void) const {
@@ -222,7 +244,7 @@ std::optional<Expr> DesignatedInitExpr::nth_sub_expression(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> DesignatedInitExpr::sub_expressions(void) const & {
@@ -231,7 +253,7 @@ gap::generator<Expr> DesignatedInitExpr::sub_expressions(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d26 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d26)))) {
+      if (auto e = Expr::from_base(std::move(d26))) {
         co_yield std::move(*e);
       }
     }

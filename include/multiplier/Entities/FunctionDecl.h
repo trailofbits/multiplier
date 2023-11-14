@@ -75,17 +75,13 @@ class FunctionDecl : public DeclaratorDecl {
   FunctionDecl canonical_declaration(void) const;
   std::optional<FunctionDecl> definition(void) const;
   gap::generator<FunctionDecl> redeclarations(void) const &;
-  static std::optional<FunctionDecl> from(const Decl &parent);
-
-  inline static std::optional<FunctionDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return FunctionDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<FunctionDecl> from_base(const Decl &parent);
+  inline static std::optional<FunctionDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<FunctionDecl> from(const std::optional<Decl> &parent);
   static std::optional<FunctionDecl> from(const Reference &r);
+  static std::optional<FunctionDecl> from(const VariantEntity &e);
   static std::optional<FunctionDecl> from(const TokenContext &t);
 
   bool body_contains_immediate_escalating_expressions(void) const;

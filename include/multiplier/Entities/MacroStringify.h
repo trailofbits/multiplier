@@ -44,17 +44,13 @@ class MacroStringify : public MacroSubstitution {
   static gap::generator<MacroStringify> containing(const Token &token);
   bool contains(const Token &token);
 
-  static std::optional<MacroStringify> from(const Macro &parent);
-
-  inline static std::optional<MacroStringify> from(const std::optional<Macro> &parent) {
-    if (parent) {
-      return MacroStringify::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MacroStringify> from_base(const Macro &parent);
+  inline static std::optional<MacroStringify> from(const Macro &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MacroStringify> from(const std::optional<Macro> &parent);
   static std::optional<MacroStringify> from(const Reference &r);
+  static std::optional<MacroStringify> from(const VariantEntity &e);
   static std::optional<MacroStringify> from(const TokenContext &t);
 
   Token stringified_token(void) const;

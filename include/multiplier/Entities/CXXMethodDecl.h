@@ -64,17 +64,13 @@ class CXXMethodDecl : public FunctionDecl {
   CXXMethodDecl canonical_declaration(void) const;
   std::optional<CXXMethodDecl> definition(void) const;
   gap::generator<CXXMethodDecl> redeclarations(void) const &;
-  static std::optional<CXXMethodDecl> from(const Decl &parent);
-
-  inline static std::optional<CXXMethodDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return CXXMethodDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CXXMethodDecl> from_base(const Decl &parent);
+  inline static std::optional<CXXMethodDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CXXMethodDecl> from(const std::optional<Decl> &parent);
   static std::optional<CXXMethodDecl> from(const Reference &r);
+  static std::optional<CXXMethodDecl> from(const VariantEntity &e);
   static std::optional<CXXMethodDecl> from(const TokenContext &t);
 
   RefQualifierKind reference_qualifier(void) const;

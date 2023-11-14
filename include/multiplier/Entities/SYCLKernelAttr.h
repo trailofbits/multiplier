@@ -40,17 +40,13 @@ class SYCLKernelAttr : public InheritableAttr {
     return AttrKind::SYCL_KERNEL;
   }
 
-  static std::optional<SYCLKernelAttr> from(const Attr &parent);
-
-  inline static std::optional<SYCLKernelAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SYCLKernelAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SYCLKernelAttr> from_base(const Attr &parent);
+  inline static std::optional<SYCLKernelAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SYCLKernelAttr> from(const std::optional<Attr> &parent);
   static std::optional<SYCLKernelAttr> from(const Reference &r);
+  static std::optional<SYCLKernelAttr> from(const VariantEntity &e);
   static std::optional<SYCLKernelAttr> from(const TokenContext &t);
 
 };

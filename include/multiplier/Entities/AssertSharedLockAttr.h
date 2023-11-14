@@ -40,17 +40,13 @@ class AssertSharedLockAttr : public InheritableAttr {
     return AttrKind::ASSERT_SHARED_LOCK;
   }
 
-  static std::optional<AssertSharedLockAttr> from(const Attr &parent);
-
-  inline static std::optional<AssertSharedLockAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AssertSharedLockAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AssertSharedLockAttr> from_base(const Attr &parent);
+  inline static std::optional<AssertSharedLockAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AssertSharedLockAttr> from(const std::optional<Attr> &parent);
   static std::optional<AssertSharedLockAttr> from(const Reference &r);
+  static std::optional<AssertSharedLockAttr> from(const VariantEntity &e);
   static std::optional<AssertSharedLockAttr> from(const TokenContext &t);
 
 };

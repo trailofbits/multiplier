@@ -40,17 +40,13 @@ class WeakImportAttr : public InheritableAttr {
     return AttrKind::WEAK_IMPORT;
   }
 
-  static std::optional<WeakImportAttr> from(const Attr &parent);
-
-  inline static std::optional<WeakImportAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return WeakImportAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<WeakImportAttr> from_base(const Attr &parent);
+  inline static std::optional<WeakImportAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<WeakImportAttr> from(const std::optional<Attr> &parent);
   static std::optional<WeakImportAttr> from(const Reference &r);
+  static std::optional<WeakImportAttr> from(const VariantEntity &e);
   static std::optional<WeakImportAttr> from(const TokenContext &t);
 
 };

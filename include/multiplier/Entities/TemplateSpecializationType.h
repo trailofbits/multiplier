@@ -37,17 +37,13 @@ class TemplateSpecializationType : public Type {
     return TypeKind::TEMPLATE_SPECIALIZATION;
   }
 
-  static std::optional<TemplateSpecializationType> from(const Type &parent);
-
-  inline static std::optional<TemplateSpecializationType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return TemplateSpecializationType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TemplateSpecializationType> from_base(const Type &parent);
+  inline static std::optional<TemplateSpecializationType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TemplateSpecializationType> from(const std::optional<Type> &parent);
   static std::optional<TemplateSpecializationType> from(const Reference &r);
+  static std::optional<TemplateSpecializationType> from(const VariantEntity &e);
   static std::optional<TemplateSpecializationType> from(const TokenContext &t);
 
   Type desugar(void) const;

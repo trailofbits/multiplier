@@ -40,17 +40,13 @@ class UsingIfExistsAttr : public InheritableAttr {
     return AttrKind::USING_IF_EXISTS;
   }
 
-  static std::optional<UsingIfExistsAttr> from(const Attr &parent);
-
-  inline static std::optional<UsingIfExistsAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return UsingIfExistsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UsingIfExistsAttr> from_base(const Attr &parent);
+  inline static std::optional<UsingIfExistsAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UsingIfExistsAttr> from(const std::optional<Attr> &parent);
   static std::optional<UsingIfExistsAttr> from(const Reference &r);
+  static std::optional<UsingIfExistsAttr> from(const VariantEntity &e);
   static std::optional<UsingIfExistsAttr> from(const TokenContext &t);
 
 };

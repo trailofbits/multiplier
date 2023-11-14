@@ -43,17 +43,13 @@ class DiagnoseIfAttr : public InheritableAttr {
     return AttrKind::DIAGNOSE_IF;
   }
 
-  static std::optional<DiagnoseIfAttr> from(const Attr &parent);
-
-  inline static std::optional<DiagnoseIfAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return DiagnoseIfAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<DiagnoseIfAttr> from_base(const Attr &parent);
+  inline static std::optional<DiagnoseIfAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<DiagnoseIfAttr> from(const std::optional<Attr> &parent);
   static std::optional<DiagnoseIfAttr> from(const Reference &r);
+  static std::optional<DiagnoseIfAttr> from(const VariantEntity &e);
   static std::optional<DiagnoseIfAttr> from(const TokenContext &t);
 
   bool argument_dependent(void) const;

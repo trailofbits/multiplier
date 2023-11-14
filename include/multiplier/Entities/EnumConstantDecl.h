@@ -56,17 +56,13 @@ class EnumConstantDecl : public ValueDecl {
   EnumConstantDecl canonical_declaration(void) const;
   std::optional<EnumConstantDecl> definition(void) const;
   gap::generator<EnumConstantDecl> redeclarations(void) const &;
-  static std::optional<EnumConstantDecl> from(const Decl &parent);
-
-  inline static std::optional<EnumConstantDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return EnumConstantDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<EnumConstantDecl> from_base(const Decl &parent);
+  inline static std::optional<EnumConstantDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<EnumConstantDecl> from(const std::optional<Decl> &parent);
   static std::optional<EnumConstantDecl> from(const Reference &r);
+  static std::optional<EnumConstantDecl> from(const VariantEntity &e);
   static std::optional<EnumConstantDecl> from(const TokenContext &t);
 
   std::optional<Expr> initializer_expression(void) const;

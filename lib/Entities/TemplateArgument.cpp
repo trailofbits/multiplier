@@ -103,7 +103,7 @@ std::optional<ValueDecl> TemplateArgument::as_declaration(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return ValueDecl::from(Decl(std::move(eptr)));
+      return ValueDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

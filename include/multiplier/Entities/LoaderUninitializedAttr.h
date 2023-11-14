@@ -38,17 +38,13 @@ class LoaderUninitializedAttr : public Attr {
     return AttrKind::LOADER_UNINITIALIZED;
   }
 
-  static std::optional<LoaderUninitializedAttr> from(const Attr &parent);
-
-  inline static std::optional<LoaderUninitializedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return LoaderUninitializedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<LoaderUninitializedAttr> from_base(const Attr &parent);
+  inline static std::optional<LoaderUninitializedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<LoaderUninitializedAttr> from(const std::optional<Attr> &parent);
   static std::optional<LoaderUninitializedAttr> from(const Reference &r);
+  static std::optional<LoaderUninitializedAttr> from(const VariantEntity &e);
   static std::optional<LoaderUninitializedAttr> from(const TokenContext &t);
 
 };

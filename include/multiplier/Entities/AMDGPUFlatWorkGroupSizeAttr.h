@@ -41,17 +41,13 @@ class AMDGPUFlatWorkGroupSizeAttr : public InheritableAttr {
     return AttrKind::AMDGPU_FLAT_WORK_GROUP_SIZE;
   }
 
-  static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const Attr &parent);
-
-  inline static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AMDGPUFlatWorkGroupSizeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AMDGPUFlatWorkGroupSizeAttr> from_base(const Attr &parent);
+  inline static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const std::optional<Attr> &parent);
   static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const Reference &r);
+  static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const VariantEntity &e);
   static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const TokenContext &t);
 
   Expr max(void) const;

@@ -40,17 +40,13 @@ class PreserveAllAttr : public InheritableAttr {
     return AttrKind::PRESERVE_ALL;
   }
 
-  static std::optional<PreserveAllAttr> from(const Attr &parent);
-
-  inline static std::optional<PreserveAllAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return PreserveAllAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PreserveAllAttr> from_base(const Attr &parent);
+  inline static std::optional<PreserveAllAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PreserveAllAttr> from(const std::optional<Attr> &parent);
   static std::optional<PreserveAllAttr> from(const Reference &r);
+  static std::optional<PreserveAllAttr> from(const VariantEntity &e);
   static std::optional<PreserveAllAttr> from(const TokenContext &t);
 
 };

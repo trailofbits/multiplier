@@ -40,17 +40,13 @@ class CUDADeviceBuiltinSurfaceTypeAttr : public InheritableAttr {
     return AttrKind::CUDA_DEVICE_BUILTIN_SURFACE_TYPE;
   }
 
-  static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from(const Attr &parent);
-
-  inline static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CUDADeviceBuiltinSurfaceTypeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from_base(const Attr &parent);
+  inline static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from(const std::optional<Attr> &parent);
   static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from(const Reference &r);
+  static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from(const VariantEntity &e);
   static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from(const TokenContext &t);
 
 };
