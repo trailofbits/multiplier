@@ -107,16 +107,16 @@ void LinkExternalReferencesInFragment(
   //            `TypeLoc`s, so we need to instead go through the types to find
   //            which ones are explicitly referenced.
   AddDeclReferencesFrom<mx::DeclId>(ast, database, pf, pf.decls_to_serialize,
-                                    EnumeratorDeclToTypeReferences);
+                                    EnumerateDeclToTypeReferences);
 
   AddDeclReferencesFrom<mx::StmtId>(ast, database, pf, pf.stmts_to_serialize,
-                                    EnumeratorStmtToDeclReferences);
+                                    EnumerateStmtToDeclReferences);
 
   // XREF(pag): Issue #192. Make sure we record references from designators
   //            to fields.
   AddDeclReferencesFrom<mx::DesignatorId>(
       ast, database, pf, pf.designators_to_serialize,
-      EnumeratorDesignatorToDeclReferences);
+      EnumerateDesignatorToDeclReferences);
 
   // TODO(pag): Issue #464. Add support for `CXXBaseSpecifier`s to the
   //            references.

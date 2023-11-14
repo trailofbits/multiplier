@@ -92,6 +92,19 @@ class ParentTrackerVisitor : public EntityVisitor {
     }
   }
 
+  void VisitStaticAssertDecl(const pasta::StaticAssertDecl &decl) final {
+    if (EnterDecl(decl)) {
+      Accept(decl.AssertExpression());
+      Accept(decl.Message());
+    }
+  }
+
+  void VisitFileScopeAsmDecl(const pasta::FileScopeAsmDecl &decl) final {
+    if (EnterDecl(decl)) {
+      Accept(decl.AssemblyString());
+    }
+  }
+
   void Accept(const pasta::Decl &entity) final {
     auto eid = em.SpecificEntityId<mx::DeclId>(entity);
     if (!eid) {
@@ -243,8 +256,8 @@ static bool ResolveParents(ParentTrackerVisitor &vis, const void *parent_stmt,
     vis.parent_stmt = GetOrNullptr(em.parent_decls, vis.parent_stmt);
   }
 
-  vis.parent_stmt_id = em.ParentStmtId(vis.parent_stmt);
-  vis.parent_decl_id = em.ParentDeclId(vis.parent_decl);
+  vis.parent_stmt_id = em.EntityId(vis.parent_stmt);
+  vis.parent_decl_id = em.EntityId(vis.parent_decl);
 
   return (vis.parent_stmt && vis.parent_stmt_id != mx::kInvalidEntityId) ||
          (vis.parent_decl && vis.parent_decl_id != mx::kInvalidEntityId);

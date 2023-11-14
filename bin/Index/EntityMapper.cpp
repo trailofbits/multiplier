@@ -75,6 +75,10 @@ mx::RawEntityId EntityMapper::ParentStmtId(const pasta::TemplateArgument &entity
 }
 
 mx::RawEntityId EntityMapper::EntityId(const void *entity) const {
+  if (!entity) {
+    return mx::kInvalidEntityId;
+  }
+
   if (auto it = entity_ids.find(entity); it != entity_ids.end()) {
     if (mx::RawEntityId eid = it->second.Pack(); eid != mx::kInvalidEntityId) {
       return eid;

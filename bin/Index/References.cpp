@@ -50,7 +50,7 @@ static std::optional<pasta::Expr> ConditionExpr(const pasta::Stmt &t) {
 // This function works by starting at `stmt`, which is something like a
 // `DeclRefExpr` which references `to_decl`, and then ascends up through the
 // parent links.
-gap::generator<mx::ReferenceRecord> EnumeratorStmtToDeclReferences(
+gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
     pasta::AST ast, const EntityMapper *em,
     pasta::Stmt /* from_ */ stmt, pasta::Decl to_decl) {
 
@@ -348,8 +348,8 @@ gap::generator<mx::ReferenceRecord> EnumeratorStmtToDeclReferences(
   co_return;
 }
 
-// Get the reference kind for types referenced by a statement.
-gap::generator<mx::ReferenceRecord> EnumeratorDeclToTypeReferences(
+// Get the reference kind for types referenced by a declaration.
+gap::generator<mx::ReferenceRecord> EnumerateDeclToTypeReferences(
     pasta::AST ast, const EntityMapper *em,
     pasta::Decl from_decl, pasta::Decl to_decl) {
 
@@ -363,7 +363,7 @@ gap::generator<mx::ReferenceRecord> EnumeratorDeclToTypeReferences(
 }
 
 // Get the references for fields referenced by a designator.
-gap::generator<mx::ReferenceRecord> EnumeratorDesignatorToDeclReferences(
+gap::generator<mx::ReferenceRecord> EnumerateDesignatorToDeclReferences(
     pasta::AST ast, const EntityMapper *em,
     pasta::Designator from_designator, pasta::Decl to_decl) {
 
