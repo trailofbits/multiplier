@@ -171,6 +171,21 @@ void EntityVisitor::VisitTypedefNameDecl(const pasta::TypedefNameDecl &decl) {
   }
 }
 
+void EntityVisitor::VisitStaticAssertDecl(const pasta::StaticAssertDecl &decl) {
+  if (EnterDecl(decl)) {
+    Accept(decl.AssertExpression());
+    if (auto message = decl.Message()) {
+      Accept(message.value());
+    }
+  }
+}
+
+void EntityVisitor::VisitFileScopeAsmDecl(const pasta::FileScopeAsmDecl &decl) {
+  if (EnterDecl(decl)) {
+    Accept(decl.AssemblyString());
+  }
+}
+
 void EntityVisitor::VisitDeclStmt(const pasta::DeclStmt &stmt) {
   if (EnterStmt(stmt)) {
     for (const pasta::Decl &child : stmt.Declarations()) {

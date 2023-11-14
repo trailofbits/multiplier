@@ -25,12 +25,14 @@ struct SaveRestoreEntity {
   mx::RawEntityId &ref;
   const void *&ref_ptr;
   const mx::RawEntityId old_val;
-  const void *oldval_ptr;
+  const void * const oldval_ptr;
 
   SaveRestoreEntity(mx::RawEntityId &ref_, const void *&ptr_,
                     mx::EntityId new_val, const void *newval_ptr)
-      : ref(ref_), ref_ptr(ptr_),
-        old_val(ref), oldval_ptr(ref_ptr) {
+      : ref(ref_),
+        ref_ptr(ptr_),
+        old_val(ref),
+        oldval_ptr(ref_ptr) {
     ref = new_val.Pack();
     ref_ptr = newval_ptr;
   }
@@ -82,32 +84,24 @@ class ParentTrackerVisitor : public EntityVisitor {
 
   void AddToMaps(const void *entity) {
     if (parent_decl_id != mx::kInvalidEntityId && parent_decl) {
+      assert(entity != parent_decl);
+      assert(mx::EntityId(parent_decl_id).Extract<mx::DeclId>());
       em.parent_decl_ids.emplace(entity, parent_decl_id);
       em.parent_decls.emplace(entity, parent_decl);
     }
 
     if (parent_stmt_id != mx::kInvalidEntityId && parent_stmt) {
+      assert(entity != parent_stmt);
+      assert(mx::EntityId(parent_stmt_id).Extract<mx::StmtId>());
       em.parent_stmt_ids.emplace(entity, parent_stmt_id);
       em.parent_stmts.emplace(entity, parent_stmt);
-    }
-  }
-
-  void VisitStaticAssertDecl(const pasta::StaticAssertDecl &decl) final {
-    if (EnterDecl(decl)) {
-      Accept(decl.AssertExpression());
-      Accept(decl.Message());
-    }
-  }
-
-  void VisitFileScopeAsmDecl(const pasta::FileScopeAsmDecl &decl) final {
-    if (EnterDecl(decl)) {
-      Accept(decl.AssemblyString());
     }
   }
 
   void Accept(const pasta::Decl &entity) final {
     auto eid = em.SpecificEntityId<mx::DeclId>(entity);
     if (!eid) {
+      assert(false);
       return;
     }
 
@@ -130,6 +124,7 @@ class ParentTrackerVisitor : public EntityVisitor {
   void Accept(const pasta::Stmt &entity) final {
     auto eid = em.SpecificEntityId<mx::StmtId>(entity);
     if (!eid) {
+      assert(false);
       return;
     }
 
@@ -253,7 +248,7 @@ static bool ResolveParents(ParentTrackerVisitor &vis, const void *parent_stmt,
   }
 
   if (!vis.parent_decl && vis.parent_stmt) {
-    vis.parent_stmt = GetOrNullptr(em.parent_decls, vis.parent_stmt);
+    vis.parent_decl = GetOrNullptr(em.parent_decls, vis.parent_stmt);
   }
 
   vis.parent_stmt_id = em.EntityId(vis.parent_stmt);

@@ -43,6 +43,90 @@ static std::optional<pasta::Expr> ConditionExpr(const pasta::Stmt &t) {
   }
 }
 
+// Assuming `parent` is something like a `CallExpr`, and `child` is some child
+// statement nested directly inside of `parent`, and `decl` is transitively
+// referenced by `child`, then classify the usage of `decl` within the context
+// of `parent`.
+static mx::BuiltinReferenceKind ClassifyCall(const pasta::Stmt &parent,
+                                             const pasta::Stmt &child,
+                                             const pasta::Decl &decl) {
+  // This function is used as a callee.
+  if (CalleeExpr(parent) == child ||
+      ReferencedDecl(parent) == decl) {
+    return mx::BuiltinReferenceKind::CALLS;
+  
+  // This declaration is used as an argument.
+  } else {
+    if (pasta::FunctionDecl::From(decl)) {
+      return mx::BuiltinReferenceKind::TAKES_ADDRESS;
+    } else if (pasta::TypeDecl::From(decl)) {
+      return mx::BuiltinReferenceKind::USES_TYPE;
+    } else {
+      return mx::BuiltinReferenceKind::TAKES_VALUE;
+    }
+  }
+}
+
+// Assuming `parent` is an `ArraySubscriptExpr`, and `child` is either the base
+// or `index` of that array subscript, go and classify the access of `child`
+// within `parent`.
+//
+// NOTE(pag): We don't check `parent.base() == child`, but instead look at the
+//            type of `child`, as C has a rather dumb idiom where you can do
+//            `index[base]` or `base[index]`.
+static mx::BuiltinReferenceKind ClassifyArraySubscript(
+    const pasta::Stmt & /* parent */, const pasta::Stmt &child_) {
+  auto child = pasta::Expr::From(child_);
+  if (!child) {
+    return mx::BuiltinReferenceKind::TAKES_VALUE;
+  }
+
+  auto child_type = child->Type();
+  if (!child_type) {
+    return mx::BuiltinReferenceKind::TAKES_VALUE;
+  }
+
+  if (child_type->DesugaredType().IsAnyPointerType()) {
+    return mx::BuiltinReferenceKind::ACCESSES_VALUE;
+  }
+  
+  return mx::BuiltinReferenceKind::TAKES_VALUE;
+}
+
+// Given that `parent` is an assignment, and `child` is either the destination
+// or source, classify the use of a declaration transitively reachable from
+// `child` inside of `parent`.
+static mx::BuiltinReferenceKind ClassifyAssignmentOperator(
+    const pasta::BinaryOperator &parent, const pasta::Stmt &child) {
+  if (parent.LHS() == child) {
+    if (parent.Kind() == pasta::StmtKind::kCompoundAssignOperator) {
+      return mx::BuiltinReferenceKind::UPDATES_VALUE;
+    } else {
+      return mx::BuiltinReferenceKind::WRITES_VALUE;
+    }
+  } else {
+    assert(parent.RHS() == child);
+    return mx::BuiltinReferenceKind::COPIES_VALUE;
+  }
+}
+
+// Given that `member_pointer` is on the right-hand side of something like
+// `base.*member_pointer` or `base->*member_pointer`, check to see if the
+// type of `member_pointer` is a member function pointer type.
+static bool MemberPointerIsMethodPointer(pasta::Expr member_pointer) {
+  auto t = member_pointer.Type();
+  if (!t) {
+    return false;
+  }
+
+  auto mpt = pasta::MemberPointerType::From(t->DesugaredType());
+  if (!mpt) {
+    return false;
+  }
+
+  return mpt->IsMemberFunctionPointer();
+}
+
 }  // namespace
 
 // Generate reference records to functions, variables, fields, enumerators, etc.
@@ -81,6 +165,11 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
 
   while (maybe_parent) {
     const auto &parent = maybe_parent.value();
+
+    auto update_record_to_parent = [&] (mx::BuiltinReferenceKind new_kind) {
+      record.context_entity_id = em->EntityId(parent);
+      record.kind = new_kind;
+    };
     
     switch (auto pk = parent.Kind()) {
       // Treat sources of casts kind of like taints from the perspective of
@@ -97,8 +186,7 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
       case pasta::StmtKind::kObjCBridgedCastExpr:
       case pasta::StmtKind::kImplicitCastExpr:
         if (is_type_decl) {
-          record.context_entity_id = em->EntityId(parent);
-          record.kind = mx::BuiltinReferenceKind::CASTS_WITH_TYPE;
+          update_record_to_parent(mx::BuiltinReferenceKind::CASTS_WITH_TYPE);
           co_yield record;
           co_return;
         }
@@ -115,8 +203,7 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
       case pasta::StmtKind::kConditionalOperator:
         if (auto cond_expr = ConditionExpr(parent)) {
           if (cond_expr.value() == stmt) {
-            record.context_entity_id = em->EntityId(parent);
-            record.kind = mx::BuiltinReferenceKind::TESTS_VALUE;
+            update_record_to_parent(mx::BuiltinReferenceKind::TESTS_VALUE);
           }
         } else {
           assert(false);
@@ -138,17 +225,15 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
         switch (auto uop = pasta::UnaryOperator::From(parent); uop->Opcode()) {
           case pasta::UnaryOperatorKind::kPostIncrement:
           case pasta::UnaryOperatorKind::kPostDecrement:
-            record.context_entity_id = em->EntityId(parent);
-            record.kind = mx::BuiltinReferenceKind::UPDATES_VALUE;
+            update_record_to_parent(mx::BuiltinReferenceKind::UPDATES_VALUE);
             co_yield record;
             co_return;
 
           case pasta::UnaryOperatorKind::kPreIncrement:
           case pasta::UnaryOperatorKind::kPreDecrement:
-            record.context_entity_id = em->EntityId(parent);
-            record.kind = mx::BuiltinReferenceKind::UPDATES_VALUE;
+            update_record_to_parent(mx::BuiltinReferenceKind::UPDATES_VALUE);
             co_yield record;
-            [[fallthrough]];
+            break;  // Keep ascending.
 
           case pasta::UnaryOperatorKind::kPlus:
           case pasta::UnaryOperatorKind::kMinus:
@@ -158,20 +243,17 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
             break;  // Keep ascending.
 
           case pasta::UnaryOperatorKind::kAddressOf:
-            record.context_entity_id = em->EntityId(parent);
-            record.kind = mx::BuiltinReferenceKind::TAKES_ADDRESS;
+            update_record_to_parent(mx::BuiltinReferenceKind::TAKES_ADDRESS);
             co_yield record;
             co_return;
 
           case pasta::UnaryOperatorKind::kDeref:
-            record.context_entity_id = em->EntityId(parent);
-            record.kind = mx::BuiltinReferenceKind::ACCESSES_VALUE;
+            update_record_to_parent(mx::BuiltinReferenceKind::ACCESSES_VALUE);
             co_yield record;
             co_return;
 
           case pasta::UnaryOperatorKind::kLNot:
-            record.context_entity_id = em->EntityId(parent);
-            record.kind = mx::BuiltinReferenceKind::TESTS_VALUE;
+            update_record_to_parent(mx::BuiltinReferenceKind::TESTS_VALUE);
             co_yield record;
             co_return;
 
@@ -188,8 +270,7 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
           // `base.*member` and `base->*member`.
           case pasta::BinaryOperatorKind::kPointerMemoryD:
           case pasta::BinaryOperatorKind::kPointerMemoryI:
-            record.context_entity_id = em->EntityId(parent);
-            record.kind = mx::BuiltinReferenceKind::ACCESSES_VALUE;
+            update_record_to_parent(mx::BuiltinReferenceKind::ACCESSES_VALUE);
 
             if (bin->LHS() == stmt) {
               co_yield record;
@@ -199,7 +280,11 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
             // This could be a call, e.g. `base->*member()`, and so we want
             // it to look like a `CALLS` of `member`. But that has to be done
             // by the next iteration, so we'll update the default.
-            break;
+            if (MemberPointerIsMethodPointer(bin->RHS())) {
+              break;
+            }
+
+            co_return;
 
           // `lhs = rhs`, or `lhs <op>= *`.
           case pasta::BinaryOperatorKind::kAssign:
@@ -213,22 +298,15 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
           case pasta::BinaryOperatorKind::kAndAssign:
           case pasta::BinaryOperatorKind::kXorAssign:
           case pasta::BinaryOperatorKind::kOrAssign:
-            if (bin->LHS() == stmt) {
-              record.context_entity_id = em->EntityId(parent);
-              if (pasta::StmtKind::kCompoundAssignOperator == pk) {
-                record.kind = mx::BuiltinReferenceKind::UPDATES_VALUE;
-              } else {
-                record.kind = mx::BuiltinReferenceKind::WRITES_VALUE;
-              }
-              co_yield record;
-              co_return;
-
-            } else if (bin->RHS() == stmt) {
-              record.context_entity_id = em->EntityId(parent);
-              record.kind = mx::BuiltinReferenceKind::COPIES_VALUE;
-              co_yield record;
-              co_return;
-            }
+            update_record_to_parent(ClassifyAssignmentOperator(*bin, stmt));
+            co_yield record;
+            
+            // Keep ascending. This assignment might be, for example, a
+            // function argument, and so the source/dest is also passed as an
+            // argument. Similarly, it might be inside of a larger assignment,
+            // e.g. `a = b = c`, or inside of a comma operator, e.g.
+            // `..., a = b`.
+            break;
 
           // The right-hand side of a comma operator propagates up.
           case pasta::BinaryOperatorKind::kComma:
@@ -247,8 +325,7 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
           case pasta::BinaryOperatorKind::kNE:
           case pasta::BinaryOperatorKind::kLAnd:
           case pasta::BinaryOperatorKind::kLOr:
-            record.context_entity_id = em->EntityId(parent);
-            record.kind = mx::BuiltinReferenceKind::TESTS_VALUE;
+            update_record_to_parent(mx::BuiltinReferenceKind::TESTS_VALUE);
             co_yield record;
             co_return;
 
@@ -266,8 +343,7 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
         if (auto member = pasta::MemberExpr::From(parent);
             member && member->Base() == stmt) {
 
-          record.context_entity_id = em->EntityId(parent);
-          record.kind = mx::BuiltinReferenceKind::ACCESSES_VALUE;
+          update_record_to_parent(mx::BuiltinReferenceKind::ACCESSES_VALUE);
           co_yield record;
           co_return;
 
@@ -277,58 +353,34 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
         }
 
       case pasta::StmtKind::kArraySubscriptExpr:
-        if (auto arr = pasta::ArraySubscriptExpr::From(parent)) {
-          record.context_entity_id = em->EntityId(parent);
-          record.kind = mx::BuiltinReferenceKind::ACCESSES_VALUE;
-          co_yield record;
-          co_return;
-        }
-        break;
+        update_record_to_parent(ClassifyArraySubscript(parent, stmt));
+        co_yield record;
+        co_return;
 
       case pasta::StmtKind::kCallExpr:
       case pasta::StmtKind::kCXXConstructExpr:
       case pasta::StmtKind::kCXXNewExpr:
       case pasta::StmtKind::kCXXDeleteExpr:
-        record.context_entity_id = em->EntityId(parent);
-
-        // This function is used as a callee.
-        if (CalleeExpr(parent) == stmt ||
-            ReferencedDecl(parent) == to_decl) {
-          record.kind = mx::BuiltinReferenceKind::CALLS;
-        
-        // This declaration is used as an argument.
-        } else {
-          if (is_function_decl) {
-            record.kind = mx::BuiltinReferenceKind::TAKES_ADDRESS;
-          } else if (is_type_decl) {
-            record.kind = mx::BuiltinReferenceKind::USES_TYPE;
-          } else {
-            record.kind = mx::BuiltinReferenceKind::TAKES_VALUE;
-          }
-        }
-
+        update_record_to_parent(ClassifyCall(parent, stmt, to_decl));
         co_yield record;
         co_return;
 
       case pasta::StmtKind::kTypeTraitExpr:
       case pasta::StmtKind::kUnaryExprOrTypeTraitExpr:
-        record.context_entity_id = em->EntityId(parent);
-        if (is_type_decl) {
-          record.kind = mx::BuiltinReferenceKind::USES_TYPE;
-        } else {
-          record.kind = mx::BuiltinReferenceKind::TAKES_VALUE;
-        }
+        update_record_to_parent(
+            is_type_decl ?
+            mx::BuiltinReferenceKind::USES_TYPE :
+            mx::BuiltinReferenceKind::TAKES_VALUE);
         co_yield record;
         co_return;
 
       case pasta::StmtKind::kDeclStmt:
       case pasta::StmtKind::kDesignatedInitExpr:
       case pasta::StmtKind::kDesignatedInitUpdateExpr:
-        record.context_entity_id = em->EntityId(parent);
         for (auto init : parent.Children()) {
           if (init == stmt) {
-            // initialized by the expression
-            record.kind = mx::BuiltinReferenceKind::COPIES_VALUE;
+            update_record_to_parent(mx::BuiltinReferenceKind::COPIES_VALUE);
+            break;
           }
         }
         co_yield record;

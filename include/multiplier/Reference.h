@@ -83,8 +83,9 @@ enum class BuiltinReferenceKind {
   // the value `a`, respectively.
   ACCESSES_VALUE,
 
-  // If we have `...(a), then we say that the expression `...(...)` takes the
-  // value `a`. This is similar to `COPIES_VALUE`.
+  // If we have `...(a)`, or `...[a]`, then we say that the expression
+  // `...(...)` and `...[...]` takes the value `a`, respectively. This is
+  // similar to `COPIES_VALUE`.
   TAKES_VALUE,
 
   // If we have `a(...)` then we say that the expression `...(...)` calls `a`.

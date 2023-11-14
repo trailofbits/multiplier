@@ -80,7 +80,6 @@ add_custom_target("copy_headers"
 set(api_headers
   "${source_include_dir}/AST.h"
   "${source_include_dir}/Compilation.h"
-  $<BUILD_INTERFACE:${source_include_dir}/Database.h>
   "${source_include_dir}/Entity.h"
   "${source_include_dir}/File.h"
   "${source_include_dir}/Fragment.h"
@@ -92,13 +91,15 @@ set(api_headers
   "${source_include_dir}/Token.h"
   "${source_include_dir}/TokenTree.h"
   "${source_include_dir}/Types.h"
-  "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"
 )
 
 add_library("mx-api" STATIC
   ${api_headers}
   ${entity_headers}  # Auto-generated
   ${entity_sources}  # Auto-generated
+
+  $<BUILD_INTERFACE:${source_include_dir}/Database.h>
+  $<BUILD_INTERFACE:${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}>
   
   "Attr.h"
   "Attr.cpp"

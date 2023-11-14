@@ -20,6 +20,7 @@ namespace indexer {
 
 mx::RawEntityId EntityMapper::ParentDeclId(const void *entity) const {
   if (auto it = parent_decl_ids.find(entity); it != parent_decl_ids.end()) {
+    assert(it->second.Extract<mx::DeclId>());
     return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
@@ -28,6 +29,7 @@ mx::RawEntityId EntityMapper::ParentDeclId(const void *entity) const {
 
 mx::RawEntityId EntityMapper::ParentStmtId(const void *entity) const {
   if (auto it = parent_stmt_ids.find(entity); it != parent_stmt_ids.end()) {
+    assert(it->second.Extract<mx::StmtId>());
     return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
