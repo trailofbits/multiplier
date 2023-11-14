@@ -89,18 +89,30 @@ bool CXXCatchStmt::contains(const Stmt &stmt) {
 std::optional<CXXCatchStmt> CXXCatchStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXCatchStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXCatchStmt> CXXCatchStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXCatchStmtDerivedKinds[] = {
     CXXCatchStmt::static_kind(),
 };
 
-std::optional<CXXCatchStmt> CXXCatchStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXCatchStmt> CXXCatchStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXCatchStmt::static_kind():
       return reinterpret_cast<const CXXCatchStmt &>(parent);
@@ -113,7 +125,7 @@ gap::generator<CXXCatchStmt> CXXCatchStmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXCatchStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXCatchStmt> e = CXXCatchStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXCatchStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<CXXCatchStmt> CXXCatchStmt::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXCatchStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXCatchStmt> e = CXXCatchStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXCatchStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<CXXCatchStmt> CXXCatchStmt::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXCatchStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXCatchStmt> e = CXXCatchStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXCatchStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,8 +162,18 @@ std::optional<CXXCatchStmt> CXXCatchStmt::from(const Reference &r) {
   return CXXCatchStmt::from(r.as_statement());
 }
 
+std::optional<CXXCatchStmt> CXXCatchStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXCatchStmt> CXXCatchStmt::from(const TokenContext &t) {
-  return CXXCatchStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token CXXCatchStmt::catch_token(void) const {
@@ -170,7 +192,7 @@ std::optional<VarDecl> CXXCatchStmt::exception_declaration(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr)));
+      return VarDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

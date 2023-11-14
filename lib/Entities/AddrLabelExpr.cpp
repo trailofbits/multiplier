@@ -90,18 +90,30 @@ bool AddrLabelExpr::contains(const Stmt &stmt) {
 std::optional<AddrLabelExpr> AddrLabelExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return AddrLabelExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<AddrLabelExpr> AddrLabelExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kAddrLabelExprDerivedKinds[] = {
     AddrLabelExpr::static_kind(),
 };
 
-std::optional<AddrLabelExpr> AddrLabelExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<AddrLabelExpr> AddrLabelExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case AddrLabelExpr::static_kind():
       return reinterpret_cast<const AddrLabelExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<AddrLabelExpr> AddrLabelExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kAddrLabelExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<AddrLabelExpr> e = AddrLabelExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<AddrLabelExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<AddrLabelExpr> AddrLabelExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kAddrLabelExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<AddrLabelExpr> e = AddrLabelExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<AddrLabelExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<AddrLabelExpr> AddrLabelExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kAddrLabelExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<AddrLabelExpr> e = AddrLabelExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<AddrLabelExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<AddrLabelExpr> AddrLabelExpr::from(const Reference &r) {
   return AddrLabelExpr::from(r.as_statement());
 }
 
+std::optional<AddrLabelExpr> AddrLabelExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<AddrLabelExpr> AddrLabelExpr::from(const TokenContext &t) {
-  return AddrLabelExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token AddrLabelExpr::amp_amp_token(void) const {
@@ -161,7 +183,7 @@ Token AddrLabelExpr::amp_amp_token(void) const {
 
 LabelDecl AddrLabelExpr::label(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return LabelDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token AddrLabelExpr::label_token(void) const {

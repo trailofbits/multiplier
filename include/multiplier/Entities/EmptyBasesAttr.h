@@ -40,17 +40,13 @@ class EmptyBasesAttr : public InheritableAttr {
     return AttrKind::EMPTY_BASES;
   }
 
-  static std::optional<EmptyBasesAttr> from(const Attr &parent);
-
-  inline static std::optional<EmptyBasesAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return EmptyBasesAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<EmptyBasesAttr> from_base(const Attr &parent);
+  inline static std::optional<EmptyBasesAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<EmptyBasesAttr> from(const std::optional<Attr> &parent);
   static std::optional<EmptyBasesAttr> from(const Reference &r);
+  static std::optional<EmptyBasesAttr> from(const VariantEntity &e);
   static std::optional<EmptyBasesAttr> from(const TokenContext &t);
 
 };

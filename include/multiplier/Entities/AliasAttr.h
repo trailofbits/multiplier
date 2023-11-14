@@ -38,17 +38,13 @@ class AliasAttr : public Attr {
     return AttrKind::ALIAS;
   }
 
-  static std::optional<AliasAttr> from(const Attr &parent);
-
-  inline static std::optional<AliasAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AliasAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AliasAttr> from_base(const Attr &parent);
+  inline static std::optional<AliasAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AliasAttr> from(const std::optional<Attr> &parent);
   static std::optional<AliasAttr> from(const Reference &r);
+  static std::optional<AliasAttr> from(const VariantEntity &e);
   static std::optional<AliasAttr> from(const TokenContext &t);
 
   std::string_view aliasee(void) const;

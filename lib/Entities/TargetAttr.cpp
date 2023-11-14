@@ -39,18 +39,30 @@ bool TargetAttr::contains(const Token &tok) const {
 std::optional<TargetAttr> TargetAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return TargetAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TargetAttr> TargetAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kTargetAttrDerivedKinds[] = {
     TargetAttr::static_kind(),
 };
 
-std::optional<TargetAttr> TargetAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<TargetAttr> TargetAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case TargetAttr::static_kind():
       return reinterpret_cast<const TargetAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<TargetAttr> TargetAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kTargetAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<TargetAttr> e = TargetAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<TargetAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<TargetAttr> TargetAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kTargetAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<TargetAttr> e = TargetAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<TargetAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<TargetAttr> TargetAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kTargetAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<TargetAttr> e = TargetAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<TargetAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<TargetAttr> TargetAttr::from(const Reference &r) {
   return TargetAttr::from(r.as_attribute());
 }
 
+std::optional<TargetAttr> TargetAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<TargetAttr> TargetAttr::from(const TokenContext &t) {
-  return TargetAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::string_view TargetAttr::architecture(void) const {

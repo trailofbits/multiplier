@@ -89,7 +89,7 @@ bool ObjCCategoryImplDecl::contains(const Stmt &stmt) {
 }
 
 ObjCCategoryImplDecl ObjCCategoryImplDecl::canonical_declaration(void) const {
-  if (auto canon = ObjCCategoryImplDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (ObjCCategoryImplDecl redecl : redeclarations()) {
@@ -99,12 +99,15 @@ ObjCCategoryImplDecl ObjCCategoryImplDecl::canonical_declaration(void) const {
 }
 
 std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::definition(void) const {
-  return ObjCCategoryImplDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<ObjCCategoryImplDecl> dr = ObjCCategoryImplDecl::from(r)) {
+    if (std::optional<ObjCCategoryImplDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -117,18 +120,30 @@ gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::redeclarations(void) 
 std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return ObjCCategoryImplDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kObjCCategoryImplDeclDerivedKinds[] = {
     ObjCCategoryImplDecl::static_kind(),
 };
 
-std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case ObjCCategoryImplDecl::static_kind():
       return reinterpret_cast<const ObjCCategoryImplDecl &>(parent);
@@ -141,7 +156,7 @@ gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCCategoryImplDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<ObjCCategoryImplDecl> e = ObjCCategoryImplDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCCategoryImplDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -153,7 +168,7 @@ gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCCategoryImplDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCCategoryImplDecl> e = ObjCCategoryImplDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCCategoryImplDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -166,7 +181,7 @@ gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCCategoryImplDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCCategoryImplDecl> e = ObjCCategoryImplDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<ObjCCategoryImplDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -178,13 +193,23 @@ std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const Reference &
   return ObjCCategoryImplDecl::from(r.as_declaration());
 }
 
+std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const TokenContext &t) {
-  return ObjCCategoryImplDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 ObjCCategoryDecl ObjCCategoryImplDecl::category_declaration(void) const {
   RawEntityId eid = impl->reader.getVal67();
-  return ObjCCategoryDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCCategoryDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token ObjCCategoryImplDecl::category_name_token(void) const {

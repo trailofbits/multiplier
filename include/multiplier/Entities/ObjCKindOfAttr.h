@@ -40,17 +40,13 @@ class ObjCKindOfAttr : public TypeAttr {
     return AttrKind::OBJ_C_KIND_OF;
   }
 
-  static std::optional<ObjCKindOfAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCKindOfAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCKindOfAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCKindOfAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCKindOfAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCKindOfAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCKindOfAttr> from(const Reference &r);
+  static std::optional<ObjCKindOfAttr> from(const VariantEntity &e);
   static std::optional<ObjCKindOfAttr> from(const TokenContext &t);
 
 };

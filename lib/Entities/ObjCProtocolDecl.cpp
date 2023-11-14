@@ -88,7 +88,7 @@ bool ObjCProtocolDecl::contains(const Stmt &stmt) {
 }
 
 ObjCProtocolDecl ObjCProtocolDecl::canonical_declaration(void) const {
-  if (auto canon = ObjCProtocolDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (ObjCProtocolDecl redecl : redeclarations()) {
@@ -98,12 +98,15 @@ ObjCProtocolDecl ObjCProtocolDecl::canonical_declaration(void) const {
 }
 
 std::optional<ObjCProtocolDecl> ObjCProtocolDecl::definition(void) const {
-  return ObjCProtocolDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<ObjCProtocolDecl> dr = ObjCProtocolDecl::from(r)) {
+    if (std::optional<ObjCProtocolDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -116,18 +119,30 @@ gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::redeclarations(void) const & 
 std::optional<ObjCProtocolDecl> ObjCProtocolDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return ObjCProtocolDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kObjCProtocolDeclDerivedKinds[] = {
     ObjCProtocolDecl::static_kind(),
 };
 
-std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case ObjCProtocolDecl::static_kind():
       return reinterpret_cast<const ObjCProtocolDecl &>(parent);
@@ -140,7 +155,7 @@ gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCProtocolDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<ObjCProtocolDecl> e = ObjCProtocolDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCProtocolDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -152,7 +167,7 @@ gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCProtocolDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCProtocolDecl> e = ObjCProtocolDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCProtocolDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -165,7 +180,7 @@ gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCProtocolDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCProtocolDecl> e = ObjCProtocolDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<ObjCProtocolDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -177,8 +192,18 @@ std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const Reference &r) {
   return ObjCProtocolDecl::from(r.as_declaration());
 }
 
+std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const TokenContext &t) {
-  return ObjCProtocolDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::string_view ObjCProtocolDecl::obj_c_runtime_name_as_string(void) const {
@@ -249,7 +274,7 @@ std::optional<ObjCProtocolDecl> ObjCProtocolDecl::nth_protocol(unsigned n) const
   if (!e) {
     return std::nullopt;
   }
-  return ObjCProtocolDecl::from(Decl(std::move(e)));
+  return ObjCProtocolDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const & {
@@ -258,7 +283,7 @@ gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d341 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d341)))) {
+      if (auto e = ObjCProtocolDecl::from_base(std::move(d341))) {
         co_yield std::move(*e);
       }
     }

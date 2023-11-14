@@ -40,18 +40,30 @@ bool NSErrorDomainAttr::contains(const Token &tok) const {
 std::optional<NSErrorDomainAttr> NSErrorDomainAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return NSErrorDomainAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kNSErrorDomainAttrDerivedKinds[] = {
     NSErrorDomainAttr::static_kind(),
 };
 
-std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case NSErrorDomainAttr::static_kind():
       return reinterpret_cast<const NSErrorDomainAttr &>(parent);
@@ -64,7 +76,7 @@ gap::generator<NSErrorDomainAttr> NSErrorDomainAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kNSErrorDomainAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<NSErrorDomainAttr> e = NSErrorDomainAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<NSErrorDomainAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -76,7 +88,7 @@ gap::generator<NSErrorDomainAttr> NSErrorDomainAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kNSErrorDomainAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<NSErrorDomainAttr> e = NSErrorDomainAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<NSErrorDomainAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -89,7 +101,7 @@ gap::generator<NSErrorDomainAttr> NSErrorDomainAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kNSErrorDomainAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<NSErrorDomainAttr> e = NSErrorDomainAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<NSErrorDomainAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -101,13 +113,23 @@ std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from(const Reference &r) {
   return NSErrorDomainAttr::from(r.as_attribute());
 }
 
+std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from(const TokenContext &t) {
-  return NSErrorDomainAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 VarDecl NSErrorDomainAttr::error_domain(void) const {
   RawEntityId eid = impl->reader.getVal8();
-  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return VarDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

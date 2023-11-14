@@ -40,17 +40,13 @@ class MSAllocatorAttr : public InheritableAttr {
     return AttrKind::MS_ALLOCATOR;
   }
 
-  static std::optional<MSAllocatorAttr> from(const Attr &parent);
-
-  inline static std::optional<MSAllocatorAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MSAllocatorAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MSAllocatorAttr> from_base(const Attr &parent);
+  inline static std::optional<MSAllocatorAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MSAllocatorAttr> from(const std::optional<Attr> &parent);
   static std::optional<MSAllocatorAttr> from(const Reference &r);
+  static std::optional<MSAllocatorAttr> from(const VariantEntity &e);
   static std::optional<MSAllocatorAttr> from(const TokenContext &t);
 
 };

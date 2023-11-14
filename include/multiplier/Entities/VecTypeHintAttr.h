@@ -41,17 +41,13 @@ class VecTypeHintAttr : public InheritableAttr {
     return AttrKind::VEC_TYPE_HINT;
   }
 
-  static std::optional<VecTypeHintAttr> from(const Attr &parent);
-
-  inline static std::optional<VecTypeHintAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return VecTypeHintAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<VecTypeHintAttr> from_base(const Attr &parent);
+  inline static std::optional<VecTypeHintAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<VecTypeHintAttr> from(const std::optional<Attr> &parent);
   static std::optional<VecTypeHintAttr> from(const Reference &r);
+  static std::optional<VecTypeHintAttr> from(const VariantEntity &e);
   static std::optional<VecTypeHintAttr> from(const TokenContext &t);
 
   Type type_hint(void) const;

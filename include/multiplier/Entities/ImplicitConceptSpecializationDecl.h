@@ -52,17 +52,13 @@ class ImplicitConceptSpecializationDecl : public Decl {
   ImplicitConceptSpecializationDecl canonical_declaration(void) const;
   std::optional<ImplicitConceptSpecializationDecl> definition(void) const;
   gap::generator<ImplicitConceptSpecializationDecl> redeclarations(void) const &;
-  static std::optional<ImplicitConceptSpecializationDecl> from(const Decl &parent);
-
-  inline static std::optional<ImplicitConceptSpecializationDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ImplicitConceptSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ImplicitConceptSpecializationDecl> from_base(const Decl &parent);
+  inline static std::optional<ImplicitConceptSpecializationDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ImplicitConceptSpecializationDecl> from(const std::optional<Decl> &parent);
   static std::optional<ImplicitConceptSpecializationDecl> from(const Reference &r);
+  static std::optional<ImplicitConceptSpecializationDecl> from(const VariantEntity &e);
   static std::optional<ImplicitConceptSpecializationDecl> from(const TokenContext &t);
 
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;

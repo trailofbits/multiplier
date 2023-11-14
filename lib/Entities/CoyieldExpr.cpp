@@ -90,18 +90,30 @@ bool CoyieldExpr::contains(const Stmt &stmt) {
 std::optional<CoyieldExpr> CoyieldExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CoyieldExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CoyieldExpr> CoyieldExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCoyieldExprDerivedKinds[] = {
     CoyieldExpr::static_kind(),
 };
 
-std::optional<CoyieldExpr> CoyieldExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CoyieldExpr> CoyieldExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CoyieldExpr::static_kind():
       return reinterpret_cast<const CoyieldExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<CoyieldExpr> CoyieldExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCoyieldExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CoyieldExpr> e = CoyieldExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CoyieldExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<CoyieldExpr> CoyieldExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCoyieldExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CoyieldExpr> e = CoyieldExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CoyieldExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<CoyieldExpr> CoyieldExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCoyieldExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CoyieldExpr> e = CoyieldExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CoyieldExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<CoyieldExpr> CoyieldExpr::from(const Reference &r) {
   return CoyieldExpr::from(r.as_statement());
 }
 
+std::optional<CoyieldExpr> CoyieldExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CoyieldExpr> CoyieldExpr::from(const TokenContext &t) {
-  return CoyieldExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

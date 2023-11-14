@@ -36,17 +36,13 @@ class PointerType : public Type {
     return TypeKind::POINTER;
   }
 
-  static std::optional<PointerType> from(const Type &parent);
-
-  inline static std::optional<PointerType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return PointerType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PointerType> from_base(const Type &parent);
+  inline static std::optional<PointerType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PointerType> from(const std::optional<Type> &parent);
   static std::optional<PointerType> from(const Reference &r);
+  static std::optional<PointerType> from(const VariantEntity &e);
   static std::optional<PointerType> from(const TokenContext &t);
 
   Type desugar(void) const;

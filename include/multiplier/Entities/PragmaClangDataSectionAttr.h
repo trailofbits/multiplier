@@ -40,17 +40,13 @@ class PragmaClangDataSectionAttr : public InheritableAttr {
     return AttrKind::PRAGMA_CLANG_DATA_SECTION;
   }
 
-  static std::optional<PragmaClangDataSectionAttr> from(const Attr &parent);
-
-  inline static std::optional<PragmaClangDataSectionAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return PragmaClangDataSectionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PragmaClangDataSectionAttr> from_base(const Attr &parent);
+  inline static std::optional<PragmaClangDataSectionAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PragmaClangDataSectionAttr> from(const std::optional<Attr> &parent);
   static std::optional<PragmaClangDataSectionAttr> from(const Reference &r);
+  static std::optional<PragmaClangDataSectionAttr> from(const VariantEntity &e);
   static std::optional<PragmaClangDataSectionAttr> from(const TokenContext &t);
 
   std::string_view name(void) const;

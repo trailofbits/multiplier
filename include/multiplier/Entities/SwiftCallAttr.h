@@ -40,17 +40,13 @@ class SwiftCallAttr : public InheritableAttr {
     return AttrKind::SWIFT_CALL;
   }
 
-  static std::optional<SwiftCallAttr> from(const Attr &parent);
-
-  inline static std::optional<SwiftCallAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SwiftCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SwiftCallAttr> from_base(const Attr &parent);
+  inline static std::optional<SwiftCallAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SwiftCallAttr> from(const std::optional<Attr> &parent);
   static std::optional<SwiftCallAttr> from(const Reference &r);
+  static std::optional<SwiftCallAttr> from(const VariantEntity &e);
   static std::optional<SwiftCallAttr> from(const TokenContext &t);
 
 };

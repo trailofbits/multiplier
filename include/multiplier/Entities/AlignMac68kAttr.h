@@ -40,17 +40,13 @@ class AlignMac68kAttr : public InheritableAttr {
     return AttrKind::ALIGN_MAC68K;
   }
 
-  static std::optional<AlignMac68kAttr> from(const Attr &parent);
-
-  inline static std::optional<AlignMac68kAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AlignMac68kAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AlignMac68kAttr> from_base(const Attr &parent);
+  inline static std::optional<AlignMac68kAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AlignMac68kAttr> from(const std::optional<Attr> &parent);
   static std::optional<AlignMac68kAttr> from(const Reference &r);
+  static std::optional<AlignMac68kAttr> from(const VariantEntity &e);
   static std::optional<AlignMac68kAttr> from(const TokenContext &t);
 
 };

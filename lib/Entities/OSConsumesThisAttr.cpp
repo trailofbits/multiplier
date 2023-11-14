@@ -39,18 +39,30 @@ bool OSConsumesThisAttr::contains(const Token &tok) const {
 std::optional<OSConsumesThisAttr> OSConsumesThisAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return OSConsumesThisAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OSConsumesThisAttr> OSConsumesThisAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kOSConsumesThisAttrDerivedKinds[] = {
     OSConsumesThisAttr::static_kind(),
 };
 
-std::optional<OSConsumesThisAttr> OSConsumesThisAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<OSConsumesThisAttr> OSConsumesThisAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case OSConsumesThisAttr::static_kind():
       return reinterpret_cast<const OSConsumesThisAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<OSConsumesThisAttr> OSConsumesThisAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kOSConsumesThisAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<OSConsumesThisAttr> e = OSConsumesThisAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<OSConsumesThisAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<OSConsumesThisAttr> OSConsumesThisAttr::in(const Fragment &frag) 
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kOSConsumesThisAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<OSConsumesThisAttr> e = OSConsumesThisAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<OSConsumesThisAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<OSConsumesThisAttr> OSConsumesThisAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kOSConsumesThisAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<OSConsumesThisAttr> e = OSConsumesThisAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<OSConsumesThisAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<OSConsumesThisAttr> OSConsumesThisAttr::from(const Reference &r) {
   return OSConsumesThisAttr::from(r.as_attribute());
 }
 
+std::optional<OSConsumesThisAttr> OSConsumesThisAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<OSConsumesThisAttr> OSConsumesThisAttr::from(const TokenContext &t) {
-  return OSConsumesThisAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

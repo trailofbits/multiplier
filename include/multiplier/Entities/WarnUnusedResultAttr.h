@@ -41,17 +41,13 @@ class WarnUnusedResultAttr : public InheritableAttr {
     return AttrKind::WARN_UNUSED_RESULT;
   }
 
-  static std::optional<WarnUnusedResultAttr> from(const Attr &parent);
-
-  inline static std::optional<WarnUnusedResultAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return WarnUnusedResultAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<WarnUnusedResultAttr> from_base(const Attr &parent);
+  inline static std::optional<WarnUnusedResultAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<WarnUnusedResultAttr> from(const std::optional<Attr> &parent);
   static std::optional<WarnUnusedResultAttr> from(const Reference &r);
+  static std::optional<WarnUnusedResultAttr> from(const VariantEntity &e);
   static std::optional<WarnUnusedResultAttr> from(const TokenContext &t);
 
   bool is_cxx11_no_discard(void) const;

@@ -40,17 +40,13 @@ class HLSLResourceBindingAttr : public InheritableAttr {
     return AttrKind::HLSL_RESOURCE_BINDING;
   }
 
-  static std::optional<HLSLResourceBindingAttr> from(const Attr &parent);
-
-  inline static std::optional<HLSLResourceBindingAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return HLSLResourceBindingAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<HLSLResourceBindingAttr> from_base(const Attr &parent);
+  inline static std::optional<HLSLResourceBindingAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<HLSLResourceBindingAttr> from(const std::optional<Attr> &parent);
   static std::optional<HLSLResourceBindingAttr> from(const Reference &r);
+  static std::optional<HLSLResourceBindingAttr> from(const VariantEntity &e);
   static std::optional<HLSLResourceBindingAttr> from(const TokenContext &t);
 
   std::string_view slot(void) const;

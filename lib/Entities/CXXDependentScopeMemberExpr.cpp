@@ -91,18 +91,30 @@ bool CXXDependentScopeMemberExpr::contains(const Stmt &stmt) {
 std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXDependentScopeMemberExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXDependentScopeMemberExprDerivedKinds[] = {
     CXXDependentScopeMemberExpr::static_kind(),
 };
 
-std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXDependentScopeMemberExpr::static_kind():
       return reinterpret_cast<const CXXDependentScopeMemberExpr &>(parent);
@@ -115,7 +127,7 @@ gap::generator<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::in(cons
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXDependentScopeMemberExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXDependentScopeMemberExpr> e = CXXDependentScopeMemberExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXDependentScopeMemberExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -127,7 +139,7 @@ gap::generator<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::in(cons
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXDependentScopeMemberExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXDependentScopeMemberExpr> e = CXXDependentScopeMemberExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXDependentScopeMemberExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -140,7 +152,7 @@ gap::generator<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::in(cons
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXDependentScopeMemberExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXDependentScopeMemberExpr> e = CXXDependentScopeMemberExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXDependentScopeMemberExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -152,8 +164,18 @@ std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(con
   return CXXDependentScopeMemberExpr::from(r.as_statement());
 }
 
+std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(const TokenContext &t) {
-  return CXXDependentScopeMemberExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::optional<Expr> CXXDependentScopeMemberExpr::base(void) const {
@@ -163,7 +185,7 @@ std::optional<Expr> CXXDependentScopeMemberExpr::base(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -181,7 +203,7 @@ std::optional<NamedDecl> CXXDependentScopeMemberExpr::first_qualifier_found_in_s
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return NamedDecl::from(Decl(std::move(eptr)));
+      return NamedDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

@@ -52,17 +52,13 @@ class CapturedDecl : public Decl {
   CapturedDecl canonical_declaration(void) const;
   std::optional<CapturedDecl> definition(void) const;
   gap::generator<CapturedDecl> redeclarations(void) const &;
-  static std::optional<CapturedDecl> from(const Decl &parent);
-
-  inline static std::optional<CapturedDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return CapturedDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CapturedDecl> from_base(const Decl &parent);
+  inline static std::optional<CapturedDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CapturedDecl> from(const std::optional<Decl> &parent);
   static std::optional<CapturedDecl> from(const Reference &r);
+  static std::optional<CapturedDecl> from(const VariantEntity &e);
   static std::optional<CapturedDecl> from(const TokenContext &t);
 
   ImplicitParamDecl context_parameter(void) const;

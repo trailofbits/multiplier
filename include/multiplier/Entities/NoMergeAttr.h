@@ -42,17 +42,13 @@ class NoMergeAttr : public DeclOrStmtAttr {
     return AttrKind::NO_MERGE;
   }
 
-  static std::optional<NoMergeAttr> from(const Attr &parent);
-
-  inline static std::optional<NoMergeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoMergeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoMergeAttr> from_base(const Attr &parent);
+  inline static std::optional<NoMergeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoMergeAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoMergeAttr> from(const Reference &r);
+  static std::optional<NoMergeAttr> from(const VariantEntity &e);
   static std::optional<NoMergeAttr> from(const TokenContext &t);
 
 };

@@ -40,17 +40,13 @@ class DLLImportStaticLocalAttr : public InheritableAttr {
     return AttrKind::DLL_IMPORT_STATIC_LOCAL;
   }
 
-  static std::optional<DLLImportStaticLocalAttr> from(const Attr &parent);
-
-  inline static std::optional<DLLImportStaticLocalAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return DLLImportStaticLocalAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<DLLImportStaticLocalAttr> from_base(const Attr &parent);
+  inline static std::optional<DLLImportStaticLocalAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<DLLImportStaticLocalAttr> from(const std::optional<Attr> &parent);
   static std::optional<DLLImportStaticLocalAttr> from(const Reference &r);
+  static std::optional<DLLImportStaticLocalAttr> from(const VariantEntity &e);
   static std::optional<DLLImportStaticLocalAttr> from(const TokenContext &t);
 
 };

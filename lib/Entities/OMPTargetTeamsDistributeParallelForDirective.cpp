@@ -91,18 +91,30 @@ bool OMPTargetTeamsDistributeParallelForDirective::contains(const Stmt &stmt) {
 std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPTargetTeamsDistributeParallelForDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPTargetTeamsDistributeParallelForDirectiveDerivedKinds[] = {
     OMPTargetTeamsDistributeParallelForDirective::static_kind(),
 };
 
-std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPTargetTeamsDistributeParallelForDirective::static_kind():
       return reinterpret_cast<const OMPTargetTeamsDistributeParallelForDirective &>(parent);
@@ -115,7 +127,7 @@ gap::generator<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistr
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPTargetTeamsDistributeParallelForDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPTargetTeamsDistributeParallelForDirective> e = OMPTargetTeamsDistributeParallelForDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPTargetTeamsDistributeParallelForDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -127,7 +139,7 @@ gap::generator<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistr
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPTargetTeamsDistributeParallelForDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPTargetTeamsDistributeParallelForDirective> e = OMPTargetTeamsDistributeParallelForDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPTargetTeamsDistributeParallelForDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -140,7 +152,7 @@ gap::generator<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistr
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPTargetTeamsDistributeParallelForDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPTargetTeamsDistributeParallelForDirective> e = OMPTargetTeamsDistributeParallelForDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPTargetTeamsDistributeParallelForDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -152,13 +164,23 @@ std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistri
   return OMPTargetTeamsDistributeParallelForDirective::from(r.as_statement());
 }
 
+std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::from(const TokenContext &t) {
-  return OMPTargetTeamsDistributeParallelForDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr OMPTargetTeamsDistributeParallelForDirective::task_reduction_reference_expression(void) const {
   RawEntityId eid = impl->reader.getVal55();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool OMPTargetTeamsDistributeParallelForDirective::has_cancel(void) const {

@@ -40,17 +40,13 @@ class UninitializedAttr : public InheritableAttr {
     return AttrKind::UNINITIALIZED;
   }
 
-  static std::optional<UninitializedAttr> from(const Attr &parent);
-
-  inline static std::optional<UninitializedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return UninitializedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UninitializedAttr> from_base(const Attr &parent);
+  inline static std::optional<UninitializedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UninitializedAttr> from(const std::optional<Attr> &parent);
   static std::optional<UninitializedAttr> from(const Reference &r);
+  static std::optional<UninitializedAttr> from(const VariantEntity &e);
   static std::optional<UninitializedAttr> from(const TokenContext &t);
 
 };

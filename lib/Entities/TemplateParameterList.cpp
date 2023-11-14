@@ -71,7 +71,7 @@ std::optional<Expr> TemplateParameterList::requires_clause(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -108,7 +108,7 @@ std::optional<NamedDecl> TemplateParameterList::nth_parameter(unsigned n) const 
   if (!e) {
     return std::nullopt;
   }
-  return NamedDecl::from(Decl(std::move(e)));
+  return NamedDecl::from_base(std::move(e));
 }
 
 gap::generator<NamedDecl> TemplateParameterList::parameters(void) const & {
@@ -117,7 +117,7 @@ gap::generator<NamedDecl> TemplateParameterList::parameters(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d9 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from(Decl(std::move(d9)))) {
+      if (auto e = NamedDecl::from_base(std::move(d9))) {
         co_yield std::move(*e);
       }
     }

@@ -113,17 +113,13 @@ class NamedDecl : public Decl {
   NamedDecl canonical_declaration(void) const;
   std::optional<NamedDecl> definition(void) const;
   gap::generator<NamedDecl> redeclarations(void) const &;
-  static std::optional<NamedDecl> from(const Decl &parent);
-
-  inline static std::optional<NamedDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return NamedDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NamedDecl> from_base(const Decl &parent);
+  inline static std::optional<NamedDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NamedDecl> from(const std::optional<Decl> &parent);
   static std::optional<NamedDecl> from(const Reference &r);
+  static std::optional<NamedDecl> from(const VariantEntity &e);
   static std::optional<NamedDecl> from(const TokenContext &t);
 
   Linkage formal_linkage(void) const;

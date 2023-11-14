@@ -55,17 +55,13 @@ class CompoundAssignOperator : public BinaryOperator {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<CompoundAssignOperator> from(const Stmt &parent);
-
-  inline static std::optional<CompoundAssignOperator> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return CompoundAssignOperator::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CompoundAssignOperator> from_base(const Stmt &parent);
+  inline static std::optional<CompoundAssignOperator> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CompoundAssignOperator> from(const std::optional<Stmt> &parent);
   static std::optional<CompoundAssignOperator> from(const Reference &r);
+  static std::optional<CompoundAssignOperator> from(const VariantEntity &e);
   static std::optional<CompoundAssignOperator> from(const TokenContext &t);
 
   Type computation_lhs_type(void) const;

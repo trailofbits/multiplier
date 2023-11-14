@@ -40,17 +40,13 @@ class PreserveMostAttr : public InheritableAttr {
     return AttrKind::PRESERVE_MOST;
   }
 
-  static std::optional<PreserveMostAttr> from(const Attr &parent);
-
-  inline static std::optional<PreserveMostAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return PreserveMostAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PreserveMostAttr> from_base(const Attr &parent);
+  inline static std::optional<PreserveMostAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PreserveMostAttr> from(const std::optional<Attr> &parent);
   static std::optional<PreserveMostAttr> from(const Reference &r);
+  static std::optional<PreserveMostAttr> from(const VariantEntity &e);
   static std::optional<PreserveMostAttr> from(const TokenContext &t);
 
 };

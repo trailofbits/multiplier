@@ -92,7 +92,7 @@ bool ObjCMethodDecl::contains(const Stmt &stmt) {
 }
 
 ObjCMethodDecl ObjCMethodDecl::canonical_declaration(void) const {
-  if (auto canon = ObjCMethodDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (ObjCMethodDecl redecl : redeclarations()) {
@@ -102,12 +102,15 @@ ObjCMethodDecl ObjCMethodDecl::canonical_declaration(void) const {
 }
 
 std::optional<ObjCMethodDecl> ObjCMethodDecl::definition(void) const {
-  return ObjCMethodDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<ObjCMethodDecl> ObjCMethodDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<ObjCMethodDecl> dr = ObjCMethodDecl::from(r)) {
+    if (std::optional<ObjCMethodDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -120,18 +123,30 @@ gap::generator<ObjCMethodDecl> ObjCMethodDecl::redeclarations(void) const & {
 std::optional<ObjCMethodDecl> ObjCMethodDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return ObjCMethodDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kObjCMethodDeclDerivedKinds[] = {
     ObjCMethodDecl::static_kind(),
 };
 
-std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<ObjCMethodDecl> ObjCMethodDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case ObjCMethodDecl::static_kind():
       return reinterpret_cast<const ObjCMethodDecl &>(parent);
@@ -144,7 +159,7 @@ gap::generator<ObjCMethodDecl> ObjCMethodDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCMethodDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<ObjCMethodDecl> e = ObjCMethodDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCMethodDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -156,7 +171,7 @@ gap::generator<ObjCMethodDecl> ObjCMethodDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCMethodDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCMethodDecl> e = ObjCMethodDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCMethodDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -169,7 +184,7 @@ gap::generator<ObjCMethodDecl> ObjCMethodDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCMethodDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCMethodDecl> e = ObjCMethodDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<ObjCMethodDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -181,8 +196,18 @@ std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const Reference &r) {
   return ObjCMethodDecl::from(r.as_declaration());
 }
 
+std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const TokenContext &t) {
-  return ObjCMethodDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool ObjCMethodDecl::defined_in_ns_object(void) const {
@@ -191,17 +216,17 @@ bool ObjCMethodDecl::defined_in_ns_object(void) const {
 
 ObjCPropertyDecl ObjCMethodDecl::find_property_declaration(void) const {
   RawEntityId eid = impl->reader.getVal56();
-  return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCPropertyDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ObjCInterfaceDecl ObjCMethodDecl::class_interface(void) const {
   RawEntityId eid = impl->reader.getVal57();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ImplicitParamDecl ObjCMethodDecl::command_declaration(void) const {
   RawEntityId eid = impl->reader.getVal58();
-  return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ImplicitParamDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token ObjCMethodDecl::declarator_end_token(void) const {
@@ -235,7 +260,7 @@ Token ObjCMethodDecl::selector_start_token(void) const {
 
 ImplicitParamDecl ObjCMethodDecl::self_declaration(void) const {
   RawEntityId eid = impl->reader.getVal81();
-  return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ImplicitParamDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool ObjCMethodDecl::has_parameter_destroyed_in_callee(void) const {
@@ -321,7 +346,7 @@ std::optional<ParmVarDecl> ObjCMethodDecl::nth_parameter(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return ParmVarDecl::from(Decl(std::move(e)));
+  return ParmVarDecl::from_base(std::move(e));
 }
 
 gap::generator<ParmVarDecl> ObjCMethodDecl::parameters(void) const & {
@@ -330,7 +355,7 @@ gap::generator<ParmVarDecl> ObjCMethodDecl::parameters(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d51 = ep->DeclFor(ep, v)) {
-      if (auto e = ParmVarDecl::from(Decl(std::move(d51)))) {
+      if (auto e = ParmVarDecl::from_base(std::move(d51))) {
         co_yield std::move(*e);
       }
     }

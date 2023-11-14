@@ -40,17 +40,13 @@ class NoUniqueAddressAttr : public InheritableAttr {
     return AttrKind::NO_UNIQUE_ADDRESS;
   }
 
-  static std::optional<NoUniqueAddressAttr> from(const Attr &parent);
-
-  inline static std::optional<NoUniqueAddressAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoUniqueAddressAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoUniqueAddressAttr> from_base(const Attr &parent);
+  inline static std::optional<NoUniqueAddressAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoUniqueAddressAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoUniqueAddressAttr> from(const Reference &r);
+  static std::optional<NoUniqueAddressAttr> from(const VariantEntity &e);
   static std::optional<NoUniqueAddressAttr> from(const TokenContext &t);
 
 };

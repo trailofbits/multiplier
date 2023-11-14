@@ -46,17 +46,13 @@ class EndIfMacroDirective : public ConditionalMacroDirective {
   static gap::generator<EndIfMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  static std::optional<EndIfMacroDirective> from(const Macro &parent);
-
-  inline static std::optional<EndIfMacroDirective> from(const std::optional<Macro> &parent) {
-    if (parent) {
-      return EndIfMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<EndIfMacroDirective> from_base(const Macro &parent);
+  inline static std::optional<EndIfMacroDirective> from(const Macro &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<EndIfMacroDirective> from(const std::optional<Macro> &parent);
   static std::optional<EndIfMacroDirective> from(const Reference &r);
+  static std::optional<EndIfMacroDirective> from(const VariantEntity &e);
   static std::optional<EndIfMacroDirective> from(const TokenContext &t);
 
 };

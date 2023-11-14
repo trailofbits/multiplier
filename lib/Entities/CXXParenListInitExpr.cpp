@@ -90,18 +90,30 @@ bool CXXParenListInitExpr::contains(const Stmt &stmt) {
 std::optional<CXXParenListInitExpr> CXXParenListInitExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXParenListInitExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXParenListInitExpr> CXXParenListInitExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXParenListInitExprDerivedKinds[] = {
     CXXParenListInitExpr::static_kind(),
 };
 
-std::optional<CXXParenListInitExpr> CXXParenListInitExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXParenListInitExpr> CXXParenListInitExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXParenListInitExpr::static_kind():
       return reinterpret_cast<const CXXParenListInitExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<CXXParenListInitExpr> CXXParenListInitExpr::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXParenListInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXParenListInitExpr> e = CXXParenListInitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXParenListInitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<CXXParenListInitExpr> CXXParenListInitExpr::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXParenListInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXParenListInitExpr> e = CXXParenListInitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXParenListInitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<CXXParenListInitExpr> CXXParenListInitExpr::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXParenListInitExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXParenListInitExpr> e = CXXParenListInitExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXParenListInitExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,13 +163,23 @@ std::optional<CXXParenListInitExpr> CXXParenListInitExpr::from(const Reference &
   return CXXParenListInitExpr::from(r.as_statement());
 }
 
+std::optional<CXXParenListInitExpr> CXXParenListInitExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXParenListInitExpr> CXXParenListInitExpr::from(const TokenContext &t) {
-  return CXXParenListInitExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr CXXParenListInitExpr::array_filler(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token CXXParenListInitExpr::initializer_token(void) const {
@@ -166,7 +188,7 @@ Token CXXParenListInitExpr::initializer_token(void) const {
 
 FieldDecl CXXParenListInitExpr::initialized_field_in_union(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return FieldDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return FieldDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

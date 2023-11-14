@@ -40,17 +40,13 @@ class AnnotateTypeAttr : public TypeAttr {
     return AttrKind::ANNOTATE_TYPE;
   }
 
-  static std::optional<AnnotateTypeAttr> from(const Attr &parent);
-
-  inline static std::optional<AnnotateTypeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AnnotateTypeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AnnotateTypeAttr> from_base(const Attr &parent);
+  inline static std::optional<AnnotateTypeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AnnotateTypeAttr> from(const std::optional<Attr> &parent);
   static std::optional<AnnotateTypeAttr> from(const Reference &r);
+  static std::optional<AnnotateTypeAttr> from(const VariantEntity &e);
   static std::optional<AnnotateTypeAttr> from(const TokenContext &t);
 
   std::string_view annotation(void) const;

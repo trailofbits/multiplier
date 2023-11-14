@@ -88,7 +88,7 @@ bool OMPDeclarativeDirectiveDecl::contains(const Stmt &stmt) {
 }
 
 OMPDeclarativeDirectiveDecl OMPDeclarativeDirectiveDecl::canonical_declaration(void) const {
-  if (auto canon = OMPDeclarativeDirectiveDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (OMPDeclarativeDirectiveDecl redecl : redeclarations()) {
@@ -98,12 +98,15 @@ OMPDeclarativeDirectiveDecl OMPDeclarativeDirectiveDecl::canonical_declaration(v
 }
 
 std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::definition(void) const {
-  return OMPDeclarativeDirectiveDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<OMPDeclarativeDirectiveDecl> dr = OMPDeclarativeDirectiveDecl::from(r)) {
+    if (std::optional<OMPDeclarativeDirectiveDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -116,20 +119,32 @@ gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::redecla
 std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return OMPDeclarativeDirectiveDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kOMPDeclarativeDirectiveDeclDerivedKinds[] = {
     OMPAllocateDecl::static_kind(),
     OMPRequiresDecl::static_kind(),
     OMPThreadPrivateDecl::static_kind(),
 };
 
-std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case OMPAllocateDecl::static_kind():
     case OMPRequiresDecl::static_kind():
@@ -144,7 +159,7 @@ gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::in(cons
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kOMPDeclarativeDirectiveDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<OMPDeclarativeDirectiveDecl> e = OMPDeclarativeDirectiveDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<OMPDeclarativeDirectiveDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -156,7 +171,7 @@ gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::in(cons
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kOMPDeclarativeDirectiveDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<OMPDeclarativeDirectiveDecl> e = OMPDeclarativeDirectiveDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<OMPDeclarativeDirectiveDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -169,7 +184,7 @@ gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::in(cons
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kOMPDeclarativeDirectiveDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<OMPDeclarativeDirectiveDecl> e = OMPDeclarativeDirectiveDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<OMPDeclarativeDirectiveDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -181,8 +196,18 @@ std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from(con
   return OMPDeclarativeDirectiveDecl::from(r.as_declaration());
 }
 
+std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from(const TokenContext &t) {
-  return OMPDeclarativeDirectiveDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

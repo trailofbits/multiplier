@@ -52,17 +52,13 @@ class PseudoObjectExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<PseudoObjectExpr> from(const Stmt &parent);
-
-  inline static std::optional<PseudoObjectExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return PseudoObjectExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PseudoObjectExpr> from_base(const Stmt &parent);
+  inline static std::optional<PseudoObjectExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PseudoObjectExpr> from(const std::optional<Stmt> &parent);
   static std::optional<PseudoObjectExpr> from(const Reference &r);
+  static std::optional<PseudoObjectExpr> from(const VariantEntity &e);
   static std::optional<PseudoObjectExpr> from(const TokenContext &t);
 
   Expr result_expression(void) const;

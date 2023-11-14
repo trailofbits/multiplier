@@ -40,17 +40,13 @@ class CUDAHostAttr : public InheritableAttr {
     return AttrKind::CUDA_HOST;
   }
 
-  static std::optional<CUDAHostAttr> from(const Attr &parent);
-
-  inline static std::optional<CUDAHostAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CUDAHostAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CUDAHostAttr> from_base(const Attr &parent);
+  inline static std::optional<CUDAHostAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CUDAHostAttr> from(const std::optional<Attr> &parent);
   static std::optional<CUDAHostAttr> from(const Reference &r);
+  static std::optional<CUDAHostAttr> from(const VariantEntity &e);
   static std::optional<CUDAHostAttr> from(const TokenContext &t);
 
 };

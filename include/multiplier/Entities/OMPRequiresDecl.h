@@ -53,17 +53,13 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
   OMPRequiresDecl canonical_declaration(void) const;
   std::optional<OMPRequiresDecl> definition(void) const;
   gap::generator<OMPRequiresDecl> redeclarations(void) const &;
-  static std::optional<OMPRequiresDecl> from(const Decl &parent);
-
-  inline static std::optional<OMPRequiresDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return OMPRequiresDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPRequiresDecl> from_base(const Decl &parent);
+  inline static std::optional<OMPRequiresDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPRequiresDecl> from(const std::optional<Decl> &parent);
   static std::optional<OMPRequiresDecl> from(const Reference &r);
+  static std::optional<OMPRequiresDecl> from(const VariantEntity &e);
   static std::optional<OMPRequiresDecl> from(const TokenContext &t);
 
 };

@@ -62,17 +62,13 @@ class ObjCMethodDecl : public NamedDecl {
   ObjCMethodDecl canonical_declaration(void) const;
   std::optional<ObjCMethodDecl> definition(void) const;
   gap::generator<ObjCMethodDecl> redeclarations(void) const &;
-  static std::optional<ObjCMethodDecl> from(const Decl &parent);
-
-  inline static std::optional<ObjCMethodDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ObjCMethodDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCMethodDecl> from_base(const Decl &parent);
+  inline static std::optional<ObjCMethodDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCMethodDecl> from(const std::optional<Decl> &parent);
   static std::optional<ObjCMethodDecl> from(const Reference &r);
+  static std::optional<ObjCMethodDecl> from(const VariantEntity &e);
   static std::optional<ObjCMethodDecl> from(const TokenContext &t);
 
   bool defined_in_ns_object(void) const;

@@ -86,7 +86,7 @@ bool UsingDirectiveDecl::contains(const Stmt &stmt) {
 }
 
 UsingDirectiveDecl UsingDirectiveDecl::canonical_declaration(void) const {
-  if (auto canon = UsingDirectiveDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (UsingDirectiveDecl redecl : redeclarations()) {
@@ -96,12 +96,15 @@ UsingDirectiveDecl UsingDirectiveDecl::canonical_declaration(void) const {
 }
 
 std::optional<UsingDirectiveDecl> UsingDirectiveDecl::definition(void) const {
-  return UsingDirectiveDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<UsingDirectiveDecl> dr = UsingDirectiveDecl::from(r)) {
+    if (std::optional<UsingDirectiveDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -114,18 +117,30 @@ gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::redeclarations(void) cons
 std::optional<UsingDirectiveDecl> UsingDirectiveDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return UsingDirectiveDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kUsingDirectiveDeclDerivedKinds[] = {
     UsingDirectiveDecl::static_kind(),
 };
 
-std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case UsingDirectiveDecl::static_kind():
       return reinterpret_cast<const UsingDirectiveDecl &>(parent);
@@ -138,7 +153,7 @@ gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kUsingDirectiveDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<UsingDirectiveDecl> e = UsingDirectiveDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<UsingDirectiveDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -150,7 +165,7 @@ gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::in(const Fragment &frag) 
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kUsingDirectiveDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<UsingDirectiveDecl> e = UsingDirectiveDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<UsingDirectiveDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -163,7 +178,7 @@ gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kUsingDirectiveDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<UsingDirectiveDecl> e = UsingDirectiveDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<UsingDirectiveDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -175,8 +190,18 @@ std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const Reference &r) {
   return UsingDirectiveDecl::from(r.as_declaration());
 }
 
+std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const TokenContext &t) {
-  return UsingDirectiveDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token UsingDirectiveDecl::identifier_token(void) const {
@@ -189,7 +214,7 @@ Token UsingDirectiveDecl::namespace_key_token(void) const {
 
 NamedDecl UsingDirectiveDecl::nominated_namespace_as_written(void) const {
   RawEntityId eid = impl->reader.getVal58();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token UsingDirectiveDecl::using_token(void) const {

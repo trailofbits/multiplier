@@ -92,19 +92,31 @@ bool CXXConstructExpr::contains(const Stmt &stmt) {
 std::optional<CXXConstructExpr> CXXConstructExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXConstructExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXConstructExpr> CXXConstructExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXConstructExprDerivedKinds[] = {
     CXXConstructExpr::static_kind(),
     CXXTemporaryObjectExpr::static_kind(),
 };
 
-std::optional<CXXConstructExpr> CXXConstructExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXConstructExpr> CXXConstructExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXConstructExpr::static_kind():
     case CXXTemporaryObjectExpr::static_kind():
@@ -118,7 +130,7 @@ gap::generator<CXXConstructExpr> CXXConstructExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXConstructExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXConstructExpr> e = CXXConstructExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXConstructExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -130,7 +142,7 @@ gap::generator<CXXConstructExpr> CXXConstructExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXConstructExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXConstructExpr> e = CXXConstructExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXConstructExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -143,7 +155,7 @@ gap::generator<CXXConstructExpr> CXXConstructExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXConstructExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXConstructExpr> e = CXXConstructExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXConstructExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -155,8 +167,18 @@ std::optional<CXXConstructExpr> CXXConstructExpr::from(const Reference &r) {
   return CXXConstructExpr::from(r.as_statement());
 }
 
+std::optional<CXXConstructExpr> CXXConstructExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXConstructExpr> CXXConstructExpr::from(const TokenContext &t) {
-  return CXXConstructExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 unsigned CXXConstructExpr::num_arguments(void) const {
@@ -174,7 +196,7 @@ std::optional<Expr> CXXConstructExpr::nth_argument(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> CXXConstructExpr::arguments(void) const & {
@@ -183,7 +205,7 @@ gap::generator<Expr> CXXConstructExpr::arguments(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+      if (auto e = Expr::from_base(std::move(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -197,7 +219,7 @@ CXXConstructExprConstructionKind CXXConstructExpr::construction_kind(void) const
 
 CXXConstructorDecl CXXConstructExpr::constructor(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return CXXConstructorDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token CXXConstructExpr::token(void) const {

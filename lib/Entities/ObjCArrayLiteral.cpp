@@ -90,18 +90,30 @@ bool ObjCArrayLiteral::contains(const Stmt &stmt) {
 std::optional<ObjCArrayLiteral> ObjCArrayLiteral::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ObjCArrayLiteral::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kObjCArrayLiteralDerivedKinds[] = {
     ObjCArrayLiteral::static_kind(),
 };
 
-std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCArrayLiteral::static_kind():
       return reinterpret_cast<const ObjCArrayLiteral &>(parent);
@@ -114,7 +126,7 @@ gap::generator<ObjCArrayLiteral> ObjCArrayLiteral::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCArrayLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ObjCArrayLiteral> e = ObjCArrayLiteral::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCArrayLiteral> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<ObjCArrayLiteral> ObjCArrayLiteral::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCArrayLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCArrayLiteral> e = ObjCArrayLiteral::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCArrayLiteral> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<ObjCArrayLiteral> ObjCArrayLiteral::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCArrayLiteralDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCArrayLiteral> e = ObjCArrayLiteral::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ObjCArrayLiteral> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,13 +163,23 @@ std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const Reference &r) {
   return ObjCArrayLiteral::from(r.as_statement());
 }
 
+std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const TokenContext &t) {
-  return ObjCArrayLiteral::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 ObjCMethodDecl ObjCArrayLiteral::array_with_objects_method(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCMethodDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 unsigned ObjCArrayLiteral::num_elements(void) const {
@@ -175,7 +197,7 @@ std::optional<Expr> ObjCArrayLiteral::nth_element(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> ObjCArrayLiteral::elements(void) const & {
@@ -184,7 +206,7 @@ gap::generator<Expr> ObjCArrayLiteral::elements(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+      if (auto e = Expr::from_base(std::move(d15))) {
         co_yield std::move(*e);
       }
     }

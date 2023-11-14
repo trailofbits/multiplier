@@ -40,17 +40,13 @@ class CmseNSEntryAttr : public InheritableAttr {
     return AttrKind::CMSE_NS_ENTRY;
   }
 
-  static std::optional<CmseNSEntryAttr> from(const Attr &parent);
-
-  inline static std::optional<CmseNSEntryAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CmseNSEntryAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CmseNSEntryAttr> from_base(const Attr &parent);
+  inline static std::optional<CmseNSEntryAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CmseNSEntryAttr> from(const std::optional<Attr> &parent);
   static std::optional<CmseNSEntryAttr> from(const Reference &r);
+  static std::optional<CmseNSEntryAttr> from(const VariantEntity &e);
   static std::optional<CmseNSEntryAttr> from(const TokenContext &t);
 
 };

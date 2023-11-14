@@ -41,17 +41,13 @@ class OwnerAttr : public InheritableAttr {
     return AttrKind::OWNER;
   }
 
-  static std::optional<OwnerAttr> from(const Attr &parent);
-
-  inline static std::optional<OwnerAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OwnerAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OwnerAttr> from_base(const Attr &parent);
+  inline static std::optional<OwnerAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OwnerAttr> from(const std::optional<Attr> &parent);
   static std::optional<OwnerAttr> from(const Reference &r);
+  static std::optional<OwnerAttr> from(const VariantEntity &e);
   static std::optional<OwnerAttr> from(const TokenContext &t);
 
   Type deref_type(void) const;

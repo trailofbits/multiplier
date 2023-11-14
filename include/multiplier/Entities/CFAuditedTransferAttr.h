@@ -40,17 +40,13 @@ class CFAuditedTransferAttr : public InheritableAttr {
     return AttrKind::CF_AUDITED_TRANSFER;
   }
 
-  static std::optional<CFAuditedTransferAttr> from(const Attr &parent);
-
-  inline static std::optional<CFAuditedTransferAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CFAuditedTransferAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CFAuditedTransferAttr> from_base(const Attr &parent);
+  inline static std::optional<CFAuditedTransferAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CFAuditedTransferAttr> from(const std::optional<Attr> &parent);
   static std::optional<CFAuditedTransferAttr> from(const Reference &r);
+  static std::optional<CFAuditedTransferAttr> from(const VariantEntity &e);
   static std::optional<CFAuditedTransferAttr> from(const TokenContext &t);
 
 };

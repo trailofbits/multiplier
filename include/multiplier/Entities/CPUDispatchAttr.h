@@ -40,17 +40,13 @@ class CPUDispatchAttr : public InheritableAttr {
     return AttrKind::CPU_DISPATCH;
   }
 
-  static std::optional<CPUDispatchAttr> from(const Attr &parent);
-
-  inline static std::optional<CPUDispatchAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CPUDispatchAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CPUDispatchAttr> from_base(const Attr &parent);
+  inline static std::optional<CPUDispatchAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CPUDispatchAttr> from(const std::optional<Attr> &parent);
   static std::optional<CPUDispatchAttr> from(const Reference &r);
+  static std::optional<CPUDispatchAttr> from(const VariantEntity &e);
   static std::optional<CPUDispatchAttr> from(const TokenContext &t);
 
 };

@@ -40,17 +40,13 @@ class TrivialABIAttr : public InheritableAttr {
     return AttrKind::TRIVIAL_ABI;
   }
 
-  static std::optional<TrivialABIAttr> from(const Attr &parent);
-
-  inline static std::optional<TrivialABIAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return TrivialABIAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TrivialABIAttr> from_base(const Attr &parent);
+  inline static std::optional<TrivialABIAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TrivialABIAttr> from(const std::optional<Attr> &parent);
   static std::optional<TrivialABIAttr> from(const Reference &r);
+  static std::optional<TrivialABIAttr> from(const VariantEntity &e);
   static std::optional<TrivialABIAttr> from(const TokenContext &t);
 
 };

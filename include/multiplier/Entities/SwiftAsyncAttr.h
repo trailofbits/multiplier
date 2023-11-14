@@ -41,17 +41,13 @@ class SwiftAsyncAttr : public InheritableAttr {
     return AttrKind::SWIFT_ASYNC;
   }
 
-  static std::optional<SwiftAsyncAttr> from(const Attr &parent);
-
-  inline static std::optional<SwiftAsyncAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SwiftAsyncAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SwiftAsyncAttr> from_base(const Attr &parent);
+  inline static std::optional<SwiftAsyncAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SwiftAsyncAttr> from(const std::optional<Attr> &parent);
   static std::optional<SwiftAsyncAttr> from(const Reference &r);
+  static std::optional<SwiftAsyncAttr> from(const VariantEntity &e);
   static std::optional<SwiftAsyncAttr> from(const TokenContext &t);
 
   SwiftAsyncAttrKind attribute_kind(void) const;

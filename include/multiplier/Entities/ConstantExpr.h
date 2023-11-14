@@ -55,17 +55,13 @@ class ConstantExpr : public FullExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ConstantExpr> from(const Stmt &parent);
-
-  inline static std::optional<ConstantExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return ConstantExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ConstantExpr> from_base(const Stmt &parent);
+  inline static std::optional<ConstantExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ConstantExpr> from(const std::optional<Stmt> &parent);
   static std::optional<ConstantExpr> from(const Reference &r);
+  static std::optional<ConstantExpr> from(const VariantEntity &e);
   static std::optional<ConstantExpr> from(const TokenContext &t);
 
   ConstantExprResultStorageKind result_storage_kind(void) const;

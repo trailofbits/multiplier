@@ -88,7 +88,7 @@ bool FriendTemplateDecl::contains(const Stmt &stmt) {
 }
 
 FriendTemplateDecl FriendTemplateDecl::canonical_declaration(void) const {
-  if (auto canon = FriendTemplateDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (FriendTemplateDecl redecl : redeclarations()) {
@@ -98,12 +98,15 @@ FriendTemplateDecl FriendTemplateDecl::canonical_declaration(void) const {
 }
 
 std::optional<FriendTemplateDecl> FriendTemplateDecl::definition(void) const {
-  return FriendTemplateDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<FriendTemplateDecl> FriendTemplateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<FriendTemplateDecl> dr = FriendTemplateDecl::from(r)) {
+    if (std::optional<FriendTemplateDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -116,18 +119,30 @@ gap::generator<FriendTemplateDecl> FriendTemplateDecl::redeclarations(void) cons
 std::optional<FriendTemplateDecl> FriendTemplateDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return FriendTemplateDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kFriendTemplateDeclDerivedKinds[] = {
     FriendTemplateDecl::static_kind(),
 };
 
-std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<FriendTemplateDecl> FriendTemplateDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case FriendTemplateDecl::static_kind():
       return reinterpret_cast<const FriendTemplateDecl &>(parent);
@@ -140,7 +155,7 @@ gap::generator<FriendTemplateDecl> FriendTemplateDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kFriendTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<FriendTemplateDecl> e = FriendTemplateDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<FriendTemplateDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -152,7 +167,7 @@ gap::generator<FriendTemplateDecl> FriendTemplateDecl::in(const Fragment &frag) 
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kFriendTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<FriendTemplateDecl> e = FriendTemplateDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<FriendTemplateDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -165,7 +180,7 @@ gap::generator<FriendTemplateDecl> FriendTemplateDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kFriendTemplateDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<FriendTemplateDecl> e = FriendTemplateDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<FriendTemplateDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -177,13 +192,23 @@ std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const Reference &r) {
   return FriendTemplateDecl::from(r.as_declaration());
 }
 
+std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const TokenContext &t) {
-  return FriendTemplateDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 NamedDecl FriendTemplateDecl::friend_declaration(void) const {
   RawEntityId eid = impl->reader.getVal49();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token FriendTemplateDecl::friend_token(void) const {

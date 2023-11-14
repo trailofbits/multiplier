@@ -40,17 +40,13 @@ class ObjCExplicitProtocolImplAttr : public InheritableAttr {
     return AttrKind::OBJ_C_EXPLICIT_PROTOCOL_IMPL;
   }
 
-  static std::optional<ObjCExplicitProtocolImplAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCExplicitProtocolImplAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCExplicitProtocolImplAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCExplicitProtocolImplAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCExplicitProtocolImplAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCExplicitProtocolImplAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCExplicitProtocolImplAttr> from(const Reference &r);
+  static std::optional<ObjCExplicitProtocolImplAttr> from(const VariantEntity &e);
   static std::optional<ObjCExplicitProtocolImplAttr> from(const TokenContext &t);
 
 };

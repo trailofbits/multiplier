@@ -40,17 +40,13 @@ class AlignNaturalAttr : public InheritableAttr {
     return AttrKind::ALIGN_NATURAL;
   }
 
-  static std::optional<AlignNaturalAttr> from(const Attr &parent);
-
-  inline static std::optional<AlignNaturalAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AlignNaturalAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AlignNaturalAttr> from_base(const Attr &parent);
+  inline static std::optional<AlignNaturalAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AlignNaturalAttr> from(const std::optional<Attr> &parent);
   static std::optional<AlignNaturalAttr> from(const Reference &r);
+  static std::optional<AlignNaturalAttr> from(const VariantEntity &e);
   static std::optional<AlignNaturalAttr> from(const TokenContext &t);
 
 };

@@ -35,17 +35,13 @@ class FunctionType : public Type {
   bool contains(const Token &tok) const;
   static std::optional<FunctionType> by_id(const Index &, EntityId);
 
-  static std::optional<FunctionType> from(const Type &parent);
-
-  inline static std::optional<FunctionType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return FunctionType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<FunctionType> from_base(const Type &parent);
+  inline static std::optional<FunctionType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<FunctionType> from(const std::optional<Type> &parent);
   static std::optional<FunctionType> from(const Reference &r);
+  static std::optional<FunctionType> from(const VariantEntity &e);
   static std::optional<FunctionType> from(const TokenContext &t);
 
   CallingConv call_conv(void) const;

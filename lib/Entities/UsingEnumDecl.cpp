@@ -89,7 +89,7 @@ bool UsingEnumDecl::contains(const Stmt &stmt) {
 }
 
 UsingEnumDecl UsingEnumDecl::canonical_declaration(void) const {
-  if (auto canon = UsingEnumDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (UsingEnumDecl redecl : redeclarations()) {
@@ -99,12 +99,15 @@ UsingEnumDecl UsingEnumDecl::canonical_declaration(void) const {
 }
 
 std::optional<UsingEnumDecl> UsingEnumDecl::definition(void) const {
-  return UsingEnumDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<UsingEnumDecl> UsingEnumDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<UsingEnumDecl> dr = UsingEnumDecl::from(r)) {
+    if (std::optional<UsingEnumDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -117,18 +120,30 @@ gap::generator<UsingEnumDecl> UsingEnumDecl::redeclarations(void) const & {
 std::optional<UsingEnumDecl> UsingEnumDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return UsingEnumDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<UsingEnumDecl> UsingEnumDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kUsingEnumDeclDerivedKinds[] = {
     UsingEnumDecl::static_kind(),
 };
 
-std::optional<UsingEnumDecl> UsingEnumDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<UsingEnumDecl> UsingEnumDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case UsingEnumDecl::static_kind():
       return reinterpret_cast<const UsingEnumDecl &>(parent);
@@ -141,7 +156,7 @@ gap::generator<UsingEnumDecl> UsingEnumDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kUsingEnumDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<UsingEnumDecl> e = UsingEnumDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<UsingEnumDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -153,7 +168,7 @@ gap::generator<UsingEnumDecl> UsingEnumDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kUsingEnumDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<UsingEnumDecl> e = UsingEnumDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<UsingEnumDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -166,7 +181,7 @@ gap::generator<UsingEnumDecl> UsingEnumDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kUsingEnumDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<UsingEnumDecl> e = UsingEnumDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<UsingEnumDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -178,13 +193,23 @@ std::optional<UsingEnumDecl> UsingEnumDecl::from(const Reference &r) {
   return UsingEnumDecl::from(r.as_declaration());
 }
 
+std::optional<UsingEnumDecl> UsingEnumDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<UsingEnumDecl> UsingEnumDecl::from(const TokenContext &t) {
-  return UsingEnumDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 EnumDecl UsingEnumDecl::enum_declaration(void) const {
   RawEntityId eid = impl->reader.getVal56();
-  return EnumDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return EnumDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token UsingEnumDecl::enum_token(void) const {

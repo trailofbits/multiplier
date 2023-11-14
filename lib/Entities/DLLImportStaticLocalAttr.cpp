@@ -39,18 +39,30 @@ bool DLLImportStaticLocalAttr::contains(const Token &tok) const {
 std::optional<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return DLLImportStaticLocalAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kDLLImportStaticLocalAttrDerivedKinds[] = {
     DLLImportStaticLocalAttr::static_kind(),
 };
 
-std::optional<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case DLLImportStaticLocalAttr::static_kind():
       return reinterpret_cast<const DLLImportStaticLocalAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::in(const Inde
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kDLLImportStaticLocalAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<DLLImportStaticLocalAttr> e = DLLImportStaticLocalAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<DLLImportStaticLocalAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::in(const Frag
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kDLLImportStaticLocalAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<DLLImportStaticLocalAttr> e = DLLImportStaticLocalAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<DLLImportStaticLocalAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::in(const File
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kDLLImportStaticLocalAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<DLLImportStaticLocalAttr> e = DLLImportStaticLocalAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<DLLImportStaticLocalAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::from(const Ref
   return DLLImportStaticLocalAttr::from(r.as_attribute());
 }
 
+std::optional<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::from(const TokenContext &t) {
-  return DLLImportStaticLocalAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

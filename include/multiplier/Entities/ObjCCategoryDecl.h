@@ -60,17 +60,13 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
   ObjCCategoryDecl canonical_declaration(void) const;
   std::optional<ObjCCategoryDecl> definition(void) const;
   gap::generator<ObjCCategoryDecl> redeclarations(void) const &;
-  static std::optional<ObjCCategoryDecl> from(const Decl &parent);
-
-  inline static std::optional<ObjCCategoryDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ObjCCategoryDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCCategoryDecl> from_base(const Decl &parent);
+  inline static std::optional<ObjCCategoryDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCCategoryDecl> from(const std::optional<Decl> &parent);
   static std::optional<ObjCCategoryDecl> from(const Reference &r);
+  static std::optional<ObjCCategoryDecl> from(const VariantEntity &e);
   static std::optional<ObjCCategoryDecl> from(const TokenContext &t);
 
   bool is_class_extension(void) const;

@@ -100,13 +100,23 @@ bool ExplicitCastExpr::contains(const Stmt &stmt) {
 std::optional<ExplicitCastExpr> ExplicitCastExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ExplicitCastExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kExplicitCastExprDerivedKinds[] = {
     ObjCBridgedCastExpr::static_kind(),
     BuiltinBitCastExpr::static_kind(),
@@ -119,7 +129,9 @@ static const StmtKind kExplicitCastExprDerivedKinds[] = {
     CXXDynamicCastExpr::static_kind(),
 };
 
-std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ExplicitCastExpr> ExplicitCastExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCBridgedCastExpr::static_kind():
     case BuiltinBitCastExpr::static_kind():
@@ -140,7 +152,7 @@ gap::generator<ExplicitCastExpr> ExplicitCastExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kExplicitCastExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ExplicitCastExpr> e = ExplicitCastExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ExplicitCastExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -152,7 +164,7 @@ gap::generator<ExplicitCastExpr> ExplicitCastExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kExplicitCastExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ExplicitCastExpr> e = ExplicitCastExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ExplicitCastExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -165,7 +177,7 @@ gap::generator<ExplicitCastExpr> ExplicitCastExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kExplicitCastExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ExplicitCastExpr> e = ExplicitCastExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ExplicitCastExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -177,8 +189,18 @@ std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const Reference &r) {
   return ExplicitCastExpr::from(r.as_statement());
 }
 
+std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const TokenContext &t) {
-  return ExplicitCastExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type ExplicitCastExpr::type_as_written(void) const {

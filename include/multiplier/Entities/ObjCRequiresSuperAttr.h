@@ -40,17 +40,13 @@ class ObjCRequiresSuperAttr : public InheritableAttr {
     return AttrKind::OBJ_C_REQUIRES_SUPER;
   }
 
-  static std::optional<ObjCRequiresSuperAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCRequiresSuperAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCRequiresSuperAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCRequiresSuperAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCRequiresSuperAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCRequiresSuperAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCRequiresSuperAttr> from(const Reference &r);
+  static std::optional<ObjCRequiresSuperAttr> from(const VariantEntity &e);
   static std::optional<ObjCRequiresSuperAttr> from(const TokenContext &t);
 
 };

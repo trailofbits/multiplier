@@ -52,17 +52,13 @@ class PragmaCommentDecl : public Decl {
   PragmaCommentDecl canonical_declaration(void) const;
   std::optional<PragmaCommentDecl> definition(void) const;
   gap::generator<PragmaCommentDecl> redeclarations(void) const &;
-  static std::optional<PragmaCommentDecl> from(const Decl &parent);
-
-  inline static std::optional<PragmaCommentDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return PragmaCommentDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PragmaCommentDecl> from_base(const Decl &parent);
+  inline static std::optional<PragmaCommentDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PragmaCommentDecl> from(const std::optional<Decl> &parent);
   static std::optional<PragmaCommentDecl> from(const Reference &r);
+  static std::optional<PragmaCommentDecl> from(const VariantEntity &e);
   static std::optional<PragmaCommentDecl> from(const TokenContext &t);
 
   std::string_view argument(void) const;

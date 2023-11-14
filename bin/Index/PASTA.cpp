@@ -7951,9 +7951,9 @@ UnaryExprOrTypeTrait FromPasta(pasta::UnaryExprOrTypeTrait e) {
 UnaryOperatorKind FromPasta(pasta::UnaryOperatorKind e) {
   switch (static_cast<uint32_t>(e)) {
     case 0: return UnaryOperatorKind::POST_INCREMENT;
-    case 1: return UnaryOperatorKind::POST_DEC;
+    case 1: return UnaryOperatorKind::POST_DECREMENT;
     case 2: return UnaryOperatorKind::PRE_INCREMENT;
-    case 3: return UnaryOperatorKind::PRE_DEC;
+    case 3: return UnaryOperatorKind::PRE_DECREMENT;
     case 4: return UnaryOperatorKind::ADDRESS_OF;
     case 5: return UnaryOperatorKind::DEREF;
     case 6: return UnaryOperatorKind::PLUS;

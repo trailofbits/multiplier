@@ -38,18 +38,30 @@ bool BlockPointerType::contains(const Token &tok) const {
 std::optional<BlockPointerType> BlockPointerType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return BlockPointerType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<BlockPointerType> BlockPointerType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kBlockPointerTypeDerivedKinds[] = {
     BlockPointerType::static_kind(),
 };
 
-std::optional<BlockPointerType> BlockPointerType::from(const Type &parent) {
+}  // namespace
+
+std::optional<BlockPointerType> BlockPointerType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case BlockPointerType::static_kind():
       return reinterpret_cast<const BlockPointerType &>(parent);
@@ -62,7 +74,7 @@ gap::generator<BlockPointerType> BlockPointerType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kBlockPointerTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<BlockPointerType> e = BlockPointerType::from(Type(std::move(eptr)))) {
+      if (std::optional<BlockPointerType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -73,8 +85,18 @@ std::optional<BlockPointerType> BlockPointerType::from(const Reference &r) {
   return BlockPointerType::from(r.as_type());
 }
 
+std::optional<BlockPointerType> BlockPointerType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<BlockPointerType> BlockPointerType::from(const TokenContext &t) {
-  return BlockPointerType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type BlockPointerType::desugar(void) const {

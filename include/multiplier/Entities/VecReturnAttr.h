@@ -40,17 +40,13 @@ class VecReturnAttr : public InheritableAttr {
     return AttrKind::VEC_RETURN;
   }
 
-  static std::optional<VecReturnAttr> from(const Attr &parent);
-
-  inline static std::optional<VecReturnAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return VecReturnAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<VecReturnAttr> from_base(const Attr &parent);
+  inline static std::optional<VecReturnAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<VecReturnAttr> from(const std::optional<Attr> &parent);
   static std::optional<VecReturnAttr> from(const Reference &r);
+  static std::optional<VecReturnAttr> from(const VariantEntity &e);
   static std::optional<VecReturnAttr> from(const TokenContext &t);
 
 };

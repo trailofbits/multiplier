@@ -16,9 +16,9 @@ namespace mx {
 const char *EnumeratorName(UnaryOperatorKind e) {
   switch (e) {
     case UnaryOperatorKind::POST_INCREMENT: return "POST_INCREMENT";
-    case UnaryOperatorKind::POST_DEC: return "POST_DEC";
+    case UnaryOperatorKind::POST_DECREMENT: return "POST_DECREMENT";
     case UnaryOperatorKind::PRE_INCREMENT: return "PRE_INCREMENT";
-    case UnaryOperatorKind::PRE_DEC: return "PRE_DEC";
+    case UnaryOperatorKind::PRE_DECREMENT: return "PRE_DECREMENT";
     case UnaryOperatorKind::ADDRESS_OF: return "ADDRESS_OF";
     case UnaryOperatorKind::DEREF: return "DEREF";
     case UnaryOperatorKind::PLUS: return "PLUS";

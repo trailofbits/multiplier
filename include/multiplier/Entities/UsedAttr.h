@@ -40,17 +40,13 @@ class UsedAttr : public InheritableAttr {
     return AttrKind::USED;
   }
 
-  static std::optional<UsedAttr> from(const Attr &parent);
-
-  inline static std::optional<UsedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return UsedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UsedAttr> from_base(const Attr &parent);
+  inline static std::optional<UsedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UsedAttr> from(const std::optional<Attr> &parent);
   static std::optional<UsedAttr> from(const Reference &r);
+  static std::optional<UsedAttr> from(const VariantEntity &e);
   static std::optional<UsedAttr> from(const TokenContext &t);
 
 };

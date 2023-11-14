@@ -39,18 +39,30 @@ bool DependentBitIntType::contains(const Token &tok) const {
 std::optional<DependentBitIntType> DependentBitIntType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return DependentBitIntType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<DependentBitIntType> DependentBitIntType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kDependentBitIntTypeDerivedKinds[] = {
     DependentBitIntType::static_kind(),
 };
 
-std::optional<DependentBitIntType> DependentBitIntType::from(const Type &parent) {
+}  // namespace
+
+std::optional<DependentBitIntType> DependentBitIntType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case DependentBitIntType::static_kind():
       return reinterpret_cast<const DependentBitIntType &>(parent);
@@ -63,7 +75,7 @@ gap::generator<DependentBitIntType> DependentBitIntType::in(const Index &index) 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kDependentBitIntTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<DependentBitIntType> e = DependentBitIntType::from(Type(std::move(eptr)))) {
+      if (std::optional<DependentBitIntType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -74,8 +86,18 @@ std::optional<DependentBitIntType> DependentBitIntType::from(const Reference &r)
   return DependentBitIntType::from(r.as_type());
 }
 
+std::optional<DependentBitIntType> DependentBitIntType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<DependentBitIntType> DependentBitIntType::from(const TokenContext &t) {
-  return DependentBitIntType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type DependentBitIntType::desugar(void) const {
@@ -85,7 +107,7 @@ Type DependentBitIntType::desugar(void) const {
 
 Expr DependentBitIntType::num_bits_expression(void) const {
   RawEntityId eid = impl->reader.getVal19();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool DependentBitIntType::is_signed(void) const {

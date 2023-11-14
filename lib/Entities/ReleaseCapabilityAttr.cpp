@@ -39,18 +39,30 @@ bool ReleaseCapabilityAttr::contains(const Token &tok) const {
 std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return ReleaseCapabilityAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kReleaseCapabilityAttrDerivedKinds[] = {
     ReleaseCapabilityAttr::static_kind(),
 };
 
-std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case ReleaseCapabilityAttr::static_kind():
       return reinterpret_cast<const ReleaseCapabilityAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<ReleaseCapabilityAttr> ReleaseCapabilityAttr::in(const Index &ind
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kReleaseCapabilityAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<ReleaseCapabilityAttr> e = ReleaseCapabilityAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<ReleaseCapabilityAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<ReleaseCapabilityAttr> ReleaseCapabilityAttr::in(const Fragment &
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kReleaseCapabilityAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<ReleaseCapabilityAttr> e = ReleaseCapabilityAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<ReleaseCapabilityAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<ReleaseCapabilityAttr> ReleaseCapabilityAttr::in(const File &file
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kReleaseCapabilityAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<ReleaseCapabilityAttr> e = ReleaseCapabilityAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<ReleaseCapabilityAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from(const Reference
   return ReleaseCapabilityAttr::from(r.as_attribute());
 }
 
+std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from(const TokenContext &t) {
-  return ReleaseCapabilityAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 ReleaseCapabilityAttrSpelling ReleaseCapabilityAttr::semantic_spelling(void) const {

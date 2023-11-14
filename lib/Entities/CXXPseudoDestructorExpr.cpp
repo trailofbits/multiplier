@@ -90,18 +90,30 @@ bool CXXPseudoDestructorExpr::contains(const Stmt &stmt) {
 std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXPseudoDestructorExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXPseudoDestructorExprDerivedKinds[] = {
     CXXPseudoDestructorExpr::static_kind(),
 };
 
-std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXPseudoDestructorExpr::static_kind():
       return reinterpret_cast<const CXXPseudoDestructorExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::in(const Index 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXPseudoDestructorExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXPseudoDestructorExpr> e = CXXPseudoDestructorExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXPseudoDestructorExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::in(const Fragme
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXPseudoDestructorExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXPseudoDestructorExpr> e = CXXPseudoDestructorExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXPseudoDestructorExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::in(const File &
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXPseudoDestructorExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXPseudoDestructorExpr> e = CXXPseudoDestructorExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXPseudoDestructorExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,13 +163,23 @@ std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const Refer
   return CXXPseudoDestructorExpr::from(r.as_statement());
 }
 
+std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const TokenContext &t) {
-  return CXXPseudoDestructorExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr CXXPseudoDestructorExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token CXXPseudoDestructorExpr::colon_colon_token(void) const {

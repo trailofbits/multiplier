@@ -39,18 +39,30 @@ bool CodeSegAttr::contains(const Token &tok) const {
 std::optional<CodeSegAttr> CodeSegAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return CodeSegAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CodeSegAttr> CodeSegAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kCodeSegAttrDerivedKinds[] = {
     CodeSegAttr::static_kind(),
 };
 
-std::optional<CodeSegAttr> CodeSegAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<CodeSegAttr> CodeSegAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case CodeSegAttr::static_kind():
       return reinterpret_cast<const CodeSegAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<CodeSegAttr> CodeSegAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kCodeSegAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<CodeSegAttr> e = CodeSegAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<CodeSegAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<CodeSegAttr> CodeSegAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kCodeSegAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<CodeSegAttr> e = CodeSegAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<CodeSegAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<CodeSegAttr> CodeSegAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kCodeSegAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<CodeSegAttr> e = CodeSegAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<CodeSegAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<CodeSegAttr> CodeSegAttr::from(const Reference &r) {
   return CodeSegAttr::from(r.as_attribute());
 }
 
+std::optional<CodeSegAttr> CodeSegAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<CodeSegAttr> CodeSegAttr::from(const TokenContext &t) {
-  return CodeSegAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::string_view CodeSegAttr::name(void) const {

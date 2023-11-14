@@ -40,17 +40,13 @@ class UPtrAttr : public TypeAttr {
     return AttrKind::U_PTR;
   }
 
-  static std::optional<UPtrAttr> from(const Attr &parent);
-
-  inline static std::optional<UPtrAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return UPtrAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UPtrAttr> from_base(const Attr &parent);
+  inline static std::optional<UPtrAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UPtrAttr> from(const std::optional<Attr> &parent);
   static std::optional<UPtrAttr> from(const Reference &r);
+  static std::optional<UPtrAttr> from(const VariantEntity &e);
   static std::optional<UPtrAttr> from(const TokenContext &t);
 
 };

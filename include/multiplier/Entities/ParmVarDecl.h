@@ -63,17 +63,13 @@ class ParmVarDecl : public VarDecl {
   ParmVarDecl canonical_declaration(void) const;
   std::optional<ParmVarDecl> definition(void) const;
   gap::generator<ParmVarDecl> redeclarations(void) const &;
-  static std::optional<ParmVarDecl> from(const Decl &parent);
-
-  inline static std::optional<ParmVarDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ParmVarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ParmVarDecl> from_base(const Decl &parent);
+  inline static std::optional<ParmVarDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ParmVarDecl> from(const std::optional<Decl> &parent);
   static std::optional<ParmVarDecl> from(const Reference &r);
+  static std::optional<ParmVarDecl> from(const VariantEntity &e);
   static std::optional<ParmVarDecl> from(const TokenContext &t);
 
   std::optional<Expr> default_argument(void) const;

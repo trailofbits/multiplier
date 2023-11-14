@@ -23,8 +23,8 @@
 #include "Entity.h"
 #include "EntityMapper.h"
 #include "PASTA.h"
-#include "PendingFragment.h"
 #include "References.h"
+#include "PendingFragment.h"
 #include "TokenTree.h"
 #include "Util.h"
 namespace indexer {
@@ -8230,15 +8230,33 @@ void SerializeGenericSelectionExpr(const PendingFragment &pf, const EntityMapper
       ++i15;
     }
   } while (false);
-  b.setVal37(es.EntityId(e.ControllingExpression()));
-  b.setVal38(es.EntityId(e.ControllingType()));
+  auto v37 = e.ControllingExpression();
+  if (v37) {
+    auto id37 = es.EntityId(v37.value());
+    b.setVal37(id37);
+  } else {
+    b.setVal37(mx::kInvalidEntityId);
+  }
+  auto v38 = e.ControllingType();
+  if (v38) {
+    auto id38 = es.EntityId(v38.value());
+    b.setVal38(id38);
+  } else {
+    b.setVal38(mx::kInvalidEntityId);
+  }
   auto et39 = es.EntityId(e.DefaultToken());
   b.setVal39(et39);
   auto et40 = es.EntityId(e.GenericToken());
   b.setVal40(et40);
   auto et41 = es.EntityId(e.RParenToken());
   b.setVal41(et41);
-  b.setVal42(es.EntityId(e.ResultExpression()));
+  auto v42 = e.ResultExpression();
+  if (v42) {
+    auto id42 = es.EntityId(v42.value());
+    b.setVal42(id42);
+  } else {
+    b.setVal42(mx::kInvalidEntityId);
+  }
   b.setVal89(e.IsExpressionPredicate());
   b.setVal90(e.IsResultDependent());
   b.setVal91(e.IsTypePredicate());
@@ -8720,7 +8738,13 @@ void SerializeStaticAssertDecl(const PendingFragment &pf, const EntityMapper &es
   (void) e;
   SerializeDecl(pf, es, b, e, nullptr);
   b.setVal49(es.EntityId(e.AssertExpression()));
-  b.setVal56(es.EntityId(e.Message()));
+  auto v56 = e.Message();
+  if (v56) {
+    auto id56 = es.EntityId(v56.value());
+    b.setVal56(id56);
+  } else {
+    b.setVal56(mx::kInvalidEntityId);
+  }
   auto et57 = es.EntityId(e.RParenToken());
   b.setVal57(et57);
   b.setVal50(e.IsFailed());

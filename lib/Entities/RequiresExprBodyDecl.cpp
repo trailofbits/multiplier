@@ -85,7 +85,7 @@ bool RequiresExprBodyDecl::contains(const Stmt &stmt) {
 }
 
 RequiresExprBodyDecl RequiresExprBodyDecl::canonical_declaration(void) const {
-  if (auto canon = RequiresExprBodyDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (RequiresExprBodyDecl redecl : redeclarations()) {
@@ -95,12 +95,15 @@ RequiresExprBodyDecl RequiresExprBodyDecl::canonical_declaration(void) const {
 }
 
 std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::definition(void) const {
-  return RequiresExprBodyDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<RequiresExprBodyDecl> dr = RequiresExprBodyDecl::from(r)) {
+    if (std::optional<RequiresExprBodyDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -113,18 +116,30 @@ gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::redeclarations(void) 
 std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return RequiresExprBodyDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kRequiresExprBodyDeclDerivedKinds[] = {
     RequiresExprBodyDecl::static_kind(),
 };
 
-std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case RequiresExprBodyDecl::static_kind():
       return reinterpret_cast<const RequiresExprBodyDecl &>(parent);
@@ -137,7 +152,7 @@ gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kRequiresExprBodyDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<RequiresExprBodyDecl> e = RequiresExprBodyDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<RequiresExprBodyDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -149,7 +164,7 @@ gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kRequiresExprBodyDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<RequiresExprBodyDecl> e = RequiresExprBodyDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<RequiresExprBodyDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -162,7 +177,7 @@ gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kRequiresExprBodyDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<RequiresExprBodyDecl> e = RequiresExprBodyDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<RequiresExprBodyDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -174,8 +189,18 @@ std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const Reference &
   return RequiresExprBodyDecl::from(r.as_declaration());
 }
 
+std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const TokenContext &t) {
-  return RequiresExprBodyDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<Decl> RequiresExprBodyDecl::declarations_in_context(void) const & {

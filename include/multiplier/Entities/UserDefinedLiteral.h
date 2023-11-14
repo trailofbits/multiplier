@@ -55,17 +55,13 @@ class UserDefinedLiteral : public CallExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<UserDefinedLiteral> from(const Stmt &parent);
-
-  inline static std::optional<UserDefinedLiteral> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return UserDefinedLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UserDefinedLiteral> from_base(const Stmt &parent);
+  inline static std::optional<UserDefinedLiteral> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UserDefinedLiteral> from(const std::optional<Stmt> &parent);
   static std::optional<UserDefinedLiteral> from(const Reference &r);
+  static std::optional<UserDefinedLiteral> from(const VariantEntity &e);
   static std::optional<UserDefinedLiteral> from(const TokenContext &t);
 
   Expr cooked_literal(void) const;

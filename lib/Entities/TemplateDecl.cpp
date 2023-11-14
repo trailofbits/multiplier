@@ -94,7 +94,7 @@ bool TemplateDecl::contains(const Stmt &stmt) {
 }
 
 TemplateDecl TemplateDecl::canonical_declaration(void) const {
-  if (auto canon = TemplateDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (TemplateDecl redecl : redeclarations()) {
@@ -104,12 +104,15 @@ TemplateDecl TemplateDecl::canonical_declaration(void) const {
 }
 
 std::optional<TemplateDecl> TemplateDecl::definition(void) const {
-  return TemplateDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<TemplateDecl> TemplateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<TemplateDecl> dr = TemplateDecl::from(r)) {
+    if (std::optional<TemplateDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -122,13 +125,23 @@ gap::generator<TemplateDecl> TemplateDecl::redeclarations(void) const & {
 std::optional<TemplateDecl> TemplateDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return TemplateDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TemplateDecl> TemplateDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kTemplateDeclDerivedKinds[] = {
     TemplateTemplateParmDecl::static_kind(),
     BuiltinTemplateDecl::static_kind(),
@@ -139,7 +152,9 @@ static const DeclKind kTemplateDeclDerivedKinds[] = {
     FunctionTemplateDecl::static_kind(),
 };
 
-std::optional<TemplateDecl> TemplateDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<TemplateDecl> TemplateDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case TemplateTemplateParmDecl::static_kind():
     case BuiltinTemplateDecl::static_kind():
@@ -158,7 +173,7 @@ gap::generator<TemplateDecl> TemplateDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<TemplateDecl> e = TemplateDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<TemplateDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -170,7 +185,7 @@ gap::generator<TemplateDecl> TemplateDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<TemplateDecl> e = TemplateDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<TemplateDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -183,7 +198,7 @@ gap::generator<TemplateDecl> TemplateDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kTemplateDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<TemplateDecl> e = TemplateDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<TemplateDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -195,8 +210,18 @@ std::optional<TemplateDecl> TemplateDecl::from(const Reference &r) {
   return TemplateDecl::from(r.as_declaration());
 }
 
+std::optional<TemplateDecl> TemplateDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<TemplateDecl> TemplateDecl::from(const TokenContext &t) {
-  return TemplateDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 TemplateParameterList TemplateDecl::template_parameters(void) const {
@@ -206,7 +231,7 @@ TemplateParameterList TemplateDecl::template_parameters(void) const {
 
 NamedDecl TemplateDecl::templated_declaration(void) const {
   RawEntityId eid = impl->reader.getVal57();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool TemplateDecl::has_associated_constraints(void) const {

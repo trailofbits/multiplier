@@ -89,18 +89,30 @@ bool CXXScalarValueInitExpr::contains(const Stmt &stmt) {
 std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXScalarValueInitExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXScalarValueInitExprDerivedKinds[] = {
     CXXScalarValueInitExpr::static_kind(),
 };
 
-std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXScalarValueInitExpr::static_kind():
       return reinterpret_cast<const CXXScalarValueInitExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::in(const Index &i
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXScalarValueInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXScalarValueInitExpr> e = CXXScalarValueInitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXScalarValueInitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::in(const Fragment
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXScalarValueInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXScalarValueInitExpr> e = CXXScalarValueInitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXScalarValueInitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::in(const File &fi
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXScalarValueInitExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXScalarValueInitExpr> e = CXXScalarValueInitExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXScalarValueInitExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,8 +162,18 @@ std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const Referen
   return CXXScalarValueInitExpr::from(r.as_statement());
 }
 
+std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const TokenContext &t) {
-  return CXXScalarValueInitExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token CXXScalarValueInitExpr::r_paren_token(void) const {

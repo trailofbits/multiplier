@@ -39,18 +39,30 @@ bool WebAssemblyImportNameAttr::contains(const Token &tok) const {
 std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return WebAssemblyImportNameAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kWebAssemblyImportNameAttrDerivedKinds[] = {
     WebAssemblyImportNameAttr::static_kind(),
 };
 
-std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case WebAssemblyImportNameAttr::static_kind():
       return reinterpret_cast<const WebAssemblyImportNameAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::in(const In
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kWebAssemblyImportNameAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<WebAssemblyImportNameAttr> e = WebAssemblyImportNameAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<WebAssemblyImportNameAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::in(const Fr
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kWebAssemblyImportNameAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<WebAssemblyImportNameAttr> e = WebAssemblyImportNameAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<WebAssemblyImportNameAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::in(const Fi
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kWebAssemblyImportNameAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<WebAssemblyImportNameAttr> e = WebAssemblyImportNameAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<WebAssemblyImportNameAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::from(const R
   return WebAssemblyImportNameAttr::from(r.as_attribute());
 }
 
+std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::from(const TokenContext &t) {
-  return WebAssemblyImportNameAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::string_view WebAssemblyImportNameAttr::import_name(void) const {

@@ -90,18 +90,30 @@ bool CXXOperatorCallExpr::contains(const Stmt &stmt) {
 std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXOperatorCallExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXOperatorCallExprDerivedKinds[] = {
     CXXOperatorCallExpr::static_kind(),
 };
 
-std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXOperatorCallExpr::static_kind():
       return reinterpret_cast<const CXXOperatorCallExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<CXXOperatorCallExpr> CXXOperatorCallExpr::in(const Index &index) 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXOperatorCallExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXOperatorCallExpr> e = CXXOperatorCallExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXOperatorCallExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<CXXOperatorCallExpr> CXXOperatorCallExpr::in(const Fragment &frag
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXOperatorCallExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXOperatorCallExpr> e = CXXOperatorCallExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXOperatorCallExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<CXXOperatorCallExpr> CXXOperatorCallExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXOperatorCallExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXOperatorCallExpr> e = CXXOperatorCallExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXOperatorCallExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const Reference &r)
   return CXXOperatorCallExpr::from(r.as_statement());
 }
 
+std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const TokenContext &t) {
-  return CXXOperatorCallExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 OverloadedOperatorKind CXXOperatorCallExpr::operator_(void) const {

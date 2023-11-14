@@ -37,17 +37,13 @@ class BuiltinType : public Type {
     return TypeKind::BUILTIN;
   }
 
-  static std::optional<BuiltinType> from(const Type &parent);
-
-  inline static std::optional<BuiltinType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return BuiltinType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<BuiltinType> from_base(const Type &parent);
+  inline static std::optional<BuiltinType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<BuiltinType> from(const std::optional<Type> &parent);
   static std::optional<BuiltinType> from(const Reference &r);
+  static std::optional<BuiltinType> from(const VariantEntity &e);
   static std::optional<BuiltinType> from(const TokenContext &t);
 
   Type desugar(void) const;

@@ -54,17 +54,13 @@ class CXXDependentScopeMemberExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<CXXDependentScopeMemberExpr> from(const Stmt &parent);
-
-  inline static std::optional<CXXDependentScopeMemberExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return CXXDependentScopeMemberExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CXXDependentScopeMemberExpr> from_base(const Stmt &parent);
+  inline static std::optional<CXXDependentScopeMemberExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CXXDependentScopeMemberExpr> from(const std::optional<Stmt> &parent);
   static std::optional<CXXDependentScopeMemberExpr> from(const Reference &r);
+  static std::optional<CXXDependentScopeMemberExpr> from(const VariantEntity &e);
   static std::optional<CXXDependentScopeMemberExpr> from(const TokenContext &t);
 
   std::optional<Expr> base(void) const;

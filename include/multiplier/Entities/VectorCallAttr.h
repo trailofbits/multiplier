@@ -40,17 +40,13 @@ class VectorCallAttr : public InheritableAttr {
     return AttrKind::VECTOR_CALL;
   }
 
-  static std::optional<VectorCallAttr> from(const Attr &parent);
-
-  inline static std::optional<VectorCallAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return VectorCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<VectorCallAttr> from_base(const Attr &parent);
+  inline static std::optional<VectorCallAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<VectorCallAttr> from(const std::optional<Attr> &parent);
   static std::optional<VectorCallAttr> from(const Reference &r);
+  static std::optional<VectorCallAttr> from(const VariantEntity &e);
   static std::optional<VectorCallAttr> from(const TokenContext &t);
 
 };

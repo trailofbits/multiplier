@@ -39,17 +39,13 @@ class OpenCLAccessAttr : public Attr {
     return AttrKind::OPEN_CL_ACCESS;
   }
 
-  static std::optional<OpenCLAccessAttr> from(const Attr &parent);
-
-  inline static std::optional<OpenCLAccessAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OpenCLAccessAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OpenCLAccessAttr> from_base(const Attr &parent);
+  inline static std::optional<OpenCLAccessAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OpenCLAccessAttr> from(const std::optional<Attr> &parent);
   static std::optional<OpenCLAccessAttr> from(const Reference &r);
+  static std::optional<OpenCLAccessAttr> from(const VariantEntity &e);
   static std::optional<OpenCLAccessAttr> from(const TokenContext &t);
 
   OpenCLAccessAttrSpelling semantic_spelling(void) const;

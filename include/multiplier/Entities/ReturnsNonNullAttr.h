@@ -40,17 +40,13 @@ class ReturnsNonNullAttr : public InheritableAttr {
     return AttrKind::RETURNS_NON_NULL;
   }
 
-  static std::optional<ReturnsNonNullAttr> from(const Attr &parent);
-
-  inline static std::optional<ReturnsNonNullAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ReturnsNonNullAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ReturnsNonNullAttr> from_base(const Attr &parent);
+  inline static std::optional<ReturnsNonNullAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ReturnsNonNullAttr> from(const std::optional<Attr> &parent);
   static std::optional<ReturnsNonNullAttr> from(const Reference &r);
+  static std::optional<ReturnsNonNullAttr> from(const VariantEntity &e);
   static std::optional<ReturnsNonNullAttr> from(const TokenContext &t);
 
 };

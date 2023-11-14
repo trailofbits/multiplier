@@ -39,18 +39,30 @@ bool IBActionAttr::contains(const Token &tok) const {
 std::optional<IBActionAttr> IBActionAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return IBActionAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<IBActionAttr> IBActionAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kIBActionAttrDerivedKinds[] = {
     IBActionAttr::static_kind(),
 };
 
-std::optional<IBActionAttr> IBActionAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<IBActionAttr> IBActionAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case IBActionAttr::static_kind():
       return reinterpret_cast<const IBActionAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<IBActionAttr> IBActionAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kIBActionAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<IBActionAttr> e = IBActionAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<IBActionAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<IBActionAttr> IBActionAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kIBActionAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<IBActionAttr> e = IBActionAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<IBActionAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<IBActionAttr> IBActionAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kIBActionAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<IBActionAttr> e = IBActionAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<IBActionAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<IBActionAttr> IBActionAttr::from(const Reference &r) {
   return IBActionAttr::from(r.as_attribute());
 }
 
+std::optional<IBActionAttr> IBActionAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<IBActionAttr> IBActionAttr::from(const TokenContext &t) {
-  return IBActionAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

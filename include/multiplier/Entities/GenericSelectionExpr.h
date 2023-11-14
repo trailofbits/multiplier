@@ -53,28 +53,24 @@ class GenericSelectionExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<GenericSelectionExpr> from(const Stmt &parent);
-
-  inline static std::optional<GenericSelectionExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return GenericSelectionExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<GenericSelectionExpr> from_base(const Stmt &parent);
+  inline static std::optional<GenericSelectionExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<GenericSelectionExpr> from(const std::optional<Stmt> &parent);
   static std::optional<GenericSelectionExpr> from(const Reference &r);
+  static std::optional<GenericSelectionExpr> from(const VariantEntity &e);
   static std::optional<GenericSelectionExpr> from(const TokenContext &t);
 
   std::optional<Expr> nth_association_expression(unsigned n) const;
   unsigned num_association_expressions(void) const;
   gap::generator<Expr> association_expressions(void) const &;
-  Expr controlling_expression(void) const;
-  Type controlling_type(void) const;
+  std::optional<Expr> controlling_expression(void) const;
+  std::optional<Type> controlling_type(void) const;
   Token default_token(void) const;
   Token generic_token(void) const;
   Token r_paren_token(void) const;
-  Expr result_expression(void) const;
+  std::optional<Expr> result_expression(void) const;
   bool is_expression_predicate(void) const;
   bool is_result_dependent(void) const;
   bool is_type_predicate(void) const;

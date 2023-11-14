@@ -44,17 +44,13 @@ class SwiftErrorResultAttr : public ParameterABIAttr {
     return AttrKind::SWIFT_ERROR_RESULT;
   }
 
-  static std::optional<SwiftErrorResultAttr> from(const Attr &parent);
-
-  inline static std::optional<SwiftErrorResultAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SwiftErrorResultAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SwiftErrorResultAttr> from_base(const Attr &parent);
+  inline static std::optional<SwiftErrorResultAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SwiftErrorResultAttr> from(const std::optional<Attr> &parent);
   static std::optional<SwiftErrorResultAttr> from(const Reference &r);
+  static std::optional<SwiftErrorResultAttr> from(const VariantEntity &e);
   static std::optional<SwiftErrorResultAttr> from(const TokenContext &t);
 
 };

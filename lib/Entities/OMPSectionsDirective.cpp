@@ -89,18 +89,30 @@ bool OMPSectionsDirective::contains(const Stmt &stmt) {
 std::optional<OMPSectionsDirective> OMPSectionsDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPSectionsDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPSectionsDirectiveDerivedKinds[] = {
     OMPSectionsDirective::static_kind(),
 };
 
-std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPSectionsDirective> OMPSectionsDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPSectionsDirective::static_kind():
       return reinterpret_cast<const OMPSectionsDirective &>(parent);
@@ -113,7 +125,7 @@ gap::generator<OMPSectionsDirective> OMPSectionsDirective::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPSectionsDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPSectionsDirective> e = OMPSectionsDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPSectionsDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<OMPSectionsDirective> OMPSectionsDirective::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPSectionsDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPSectionsDirective> e = OMPSectionsDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPSectionsDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<OMPSectionsDirective> OMPSectionsDirective::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPSectionsDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPSectionsDirective> e = OMPSectionsDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPSectionsDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,13 +162,23 @@ std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const Reference &
   return OMPSectionsDirective::from(r.as_statement());
 }
 
+std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const TokenContext &t) {
-  return OMPSectionsDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr OMPSectionsDirective::task_reduction_reference_expression(void) const {
   RawEntityId eid = impl->reader.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool OMPSectionsDirective::has_cancel(void) const {

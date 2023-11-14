@@ -89,18 +89,30 @@ bool ExtVectorElementExpr::contains(const Stmt &stmt) {
 std::optional<ExtVectorElementExpr> ExtVectorElementExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ExtVectorElementExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kExtVectorElementExprDerivedKinds[] = {
     ExtVectorElementExpr::static_kind(),
 };
 
-std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ExtVectorElementExpr::static_kind():
       return reinterpret_cast<const ExtVectorElementExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kExtVectorElementExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ExtVectorElementExpr> e = ExtVectorElementExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ExtVectorElementExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kExtVectorElementExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ExtVectorElementExpr> e = ExtVectorElementExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ExtVectorElementExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kExtVectorElementExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ExtVectorElementExpr> e = ExtVectorElementExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ExtVectorElementExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,8 +162,18 @@ std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const Reference &
   return ExtVectorElementExpr::from(r.as_statement());
 }
 
+std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const TokenContext &t) {
-  return ExtVectorElementExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool ExtVectorElementExpr::contains_duplicate_elements(void) const {
@@ -164,7 +186,7 @@ Token ExtVectorElementExpr::accessor_token(void) const {
 
 Expr ExtVectorElementExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool ExtVectorElementExpr::is_arrow(void) const {

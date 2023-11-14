@@ -52,17 +52,13 @@ class FileScopeAsmDecl : public Decl {
   FileScopeAsmDecl canonical_declaration(void) const;
   std::optional<FileScopeAsmDecl> definition(void) const;
   gap::generator<FileScopeAsmDecl> redeclarations(void) const &;
-  static std::optional<FileScopeAsmDecl> from(const Decl &parent);
-
-  inline static std::optional<FileScopeAsmDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return FileScopeAsmDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<FileScopeAsmDecl> from_base(const Decl &parent);
+  inline static std::optional<FileScopeAsmDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<FileScopeAsmDecl> from(const std::optional<Decl> &parent);
   static std::optional<FileScopeAsmDecl> from(const Reference &r);
+  static std::optional<FileScopeAsmDecl> from(const VariantEntity &e);
   static std::optional<FileScopeAsmDecl> from(const TokenContext &t);
 
   Token assembly_token(void) const;

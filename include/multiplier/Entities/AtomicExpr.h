@@ -54,17 +54,13 @@ class AtomicExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<AtomicExpr> from(const Stmt &parent);
-
-  inline static std::optional<AtomicExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return AtomicExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AtomicExpr> from_base(const Stmt &parent);
+  inline static std::optional<AtomicExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AtomicExpr> from(const std::optional<Stmt> &parent);
   static std::optional<AtomicExpr> from(const Reference &r);
+  static std::optional<AtomicExpr> from(const VariantEntity &e);
   static std::optional<AtomicExpr> from(const TokenContext &t);
 
   Token builtin_token(void) const;

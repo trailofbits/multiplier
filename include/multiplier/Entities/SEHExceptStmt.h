@@ -50,17 +50,13 @@ class SEHExceptStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<SEHExceptStmt> from(const Stmt &parent);
-
-  inline static std::optional<SEHExceptStmt> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return SEHExceptStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SEHExceptStmt> from_base(const Stmt &parent);
+  inline static std::optional<SEHExceptStmt> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SEHExceptStmt> from(const std::optional<Stmt> &parent);
   static std::optional<SEHExceptStmt> from(const Reference &r);
+  static std::optional<SEHExceptStmt> from(const VariantEntity &e);
   static std::optional<SEHExceptStmt> from(const TokenContext &t);
 
   CompoundStmt block(void) const;

@@ -37,17 +37,13 @@ class UsingType : public Type {
     return TypeKind::USING;
   }
 
-  static std::optional<UsingType> from(const Type &parent);
-
-  inline static std::optional<UsingType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return UsingType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UsingType> from_base(const Type &parent);
+  inline static std::optional<UsingType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UsingType> from(const std::optional<Type> &parent);
   static std::optional<UsingType> from(const Reference &r);
+  static std::optional<UsingType> from(const VariantEntity &e);
   static std::optional<UsingType> from(const TokenContext &t);
 
   Type desugar(void) const;

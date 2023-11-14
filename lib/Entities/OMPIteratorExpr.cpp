@@ -89,18 +89,30 @@ bool OMPIteratorExpr::contains(const Stmt &stmt) {
 std::optional<OMPIteratorExpr> OMPIteratorExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPIteratorExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPIteratorExprDerivedKinds[] = {
     OMPIteratorExpr::static_kind(),
 };
 
-std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPIteratorExpr> OMPIteratorExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPIteratorExpr::static_kind():
       return reinterpret_cast<const OMPIteratorExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<OMPIteratorExpr> OMPIteratorExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPIteratorExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPIteratorExpr> e = OMPIteratorExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPIteratorExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<OMPIteratorExpr> OMPIteratorExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPIteratorExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPIteratorExpr> e = OMPIteratorExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPIteratorExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<OMPIteratorExpr> OMPIteratorExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPIteratorExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPIteratorExpr> e = OMPIteratorExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPIteratorExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,8 +162,18 @@ std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const Reference &r) {
   return OMPIteratorExpr::from(r.as_statement());
 }
 
+std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const TokenContext &t) {
-  return OMPIteratorExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token OMPIteratorExpr::iterator_kw_token(void) const {

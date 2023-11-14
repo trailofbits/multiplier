@@ -40,17 +40,13 @@ class TargetClonesAttr : public InheritableAttr {
     return AttrKind::TARGET_CLONES;
   }
 
-  static std::optional<TargetClonesAttr> from(const Attr &parent);
-
-  inline static std::optional<TargetClonesAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return TargetClonesAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TargetClonesAttr> from_base(const Attr &parent);
+  inline static std::optional<TargetClonesAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TargetClonesAttr> from(const std::optional<Attr> &parent);
   static std::optional<TargetClonesAttr> from(const Reference &r);
+  static std::optional<TargetClonesAttr> from(const VariantEntity &e);
   static std::optional<TargetClonesAttr> from(const TokenContext &t);
 
 };

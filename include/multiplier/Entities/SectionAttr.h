@@ -41,17 +41,13 @@ class SectionAttr : public InheritableAttr {
     return AttrKind::SECTION;
   }
 
-  static std::optional<SectionAttr> from(const Attr &parent);
-
-  inline static std::optional<SectionAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SectionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SectionAttr> from_base(const Attr &parent);
+  inline static std::optional<SectionAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SectionAttr> from(const std::optional<Attr> &parent);
   static std::optional<SectionAttr> from(const Reference &r);
+  static std::optional<SectionAttr> from(const VariantEntity &e);
   static std::optional<SectionAttr> from(const TokenContext &t);
 
   std::string_view name(void) const;

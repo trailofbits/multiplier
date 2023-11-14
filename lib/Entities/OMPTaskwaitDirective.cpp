@@ -88,18 +88,30 @@ bool OMPTaskwaitDirective::contains(const Stmt &stmt) {
 std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPTaskwaitDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPTaskwaitDirectiveDerivedKinds[] = {
     OMPTaskwaitDirective::static_kind(),
 };
 
-std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPTaskwaitDirective::static_kind():
       return reinterpret_cast<const OMPTaskwaitDirective &>(parent);
@@ -112,7 +124,7 @@ gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPTaskwaitDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPTaskwaitDirective> e = OMPTaskwaitDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPTaskwaitDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -124,7 +136,7 @@ gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPTaskwaitDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPTaskwaitDirective> e = OMPTaskwaitDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPTaskwaitDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -137,7 +149,7 @@ gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPTaskwaitDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPTaskwaitDirective> e = OMPTaskwaitDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPTaskwaitDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -149,8 +161,18 @@ std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from(const Reference &
   return OMPTaskwaitDirective::from(r.as_statement());
 }
 
+std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from(const TokenContext &t) {
-  return OMPTaskwaitDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

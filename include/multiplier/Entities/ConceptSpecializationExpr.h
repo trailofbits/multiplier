@@ -54,17 +54,13 @@ class ConceptSpecializationExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ConceptSpecializationExpr> from(const Stmt &parent);
-
-  inline static std::optional<ConceptSpecializationExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return ConceptSpecializationExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ConceptSpecializationExpr> from_base(const Stmt &parent);
+  inline static std::optional<ConceptSpecializationExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ConceptSpecializationExpr> from(const std::optional<Stmt> &parent);
   static std::optional<ConceptSpecializationExpr> from(const Reference &r);
+  static std::optional<ConceptSpecializationExpr> from(const VariantEntity &e);
   static std::optional<ConceptSpecializationExpr> from(const TokenContext &t);
 
   ImplicitConceptSpecializationDecl specialization_declaration(void) const;

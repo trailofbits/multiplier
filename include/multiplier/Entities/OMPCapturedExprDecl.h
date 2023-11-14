@@ -59,17 +59,13 @@ class OMPCapturedExprDecl : public VarDecl {
   OMPCapturedExprDecl canonical_declaration(void) const;
   std::optional<OMPCapturedExprDecl> definition(void) const;
   gap::generator<OMPCapturedExprDecl> redeclarations(void) const &;
-  static std::optional<OMPCapturedExprDecl> from(const Decl &parent);
-
-  inline static std::optional<OMPCapturedExprDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return OMPCapturedExprDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPCapturedExprDecl> from_base(const Decl &parent);
+  inline static std::optional<OMPCapturedExprDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPCapturedExprDecl> from(const std::optional<Decl> &parent);
   static std::optional<OMPCapturedExprDecl> from(const Reference &r);
+  static std::optional<OMPCapturedExprDecl> from(const VariantEntity &e);
   static std::optional<OMPCapturedExprDecl> from(const TokenContext &t);
 
 };

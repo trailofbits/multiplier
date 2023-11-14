@@ -41,17 +41,13 @@ class GuardedByAttr : public InheritableAttr {
     return AttrKind::GUARDED_BY;
   }
 
-  static std::optional<GuardedByAttr> from(const Attr &parent);
-
-  inline static std::optional<GuardedByAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return GuardedByAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<GuardedByAttr> from_base(const Attr &parent);
+  inline static std::optional<GuardedByAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<GuardedByAttr> from(const std::optional<Attr> &parent);
   static std::optional<GuardedByAttr> from(const Reference &r);
+  static std::optional<GuardedByAttr> from(const VariantEntity &e);
   static std::optional<GuardedByAttr> from(const TokenContext &t);
 
   Expr argument(void) const;

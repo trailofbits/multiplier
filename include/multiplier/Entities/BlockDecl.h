@@ -54,17 +54,13 @@ class BlockDecl : public Decl {
   BlockDecl canonical_declaration(void) const;
   std::optional<BlockDecl> definition(void) const;
   gap::generator<BlockDecl> redeclarations(void) const &;
-  static std::optional<BlockDecl> from(const Decl &parent);
-
-  inline static std::optional<BlockDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return BlockDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<BlockDecl> from_base(const Decl &parent);
+  inline static std::optional<BlockDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<BlockDecl> from(const std::optional<Decl> &parent);
   static std::optional<BlockDecl> from(const Reference &r);
+  static std::optional<BlockDecl> from(const VariantEntity &e);
   static std::optional<BlockDecl> from(const TokenContext &t);
 
   bool block_missing_return_type(void) const;

@@ -89,7 +89,7 @@ bool ObjCAtDefsFieldDecl::contains(const Stmt &stmt) {
 }
 
 ObjCAtDefsFieldDecl ObjCAtDefsFieldDecl::canonical_declaration(void) const {
-  if (auto canon = ObjCAtDefsFieldDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (ObjCAtDefsFieldDecl redecl : redeclarations()) {
@@ -99,12 +99,15 @@ ObjCAtDefsFieldDecl ObjCAtDefsFieldDecl::canonical_declaration(void) const {
 }
 
 std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::definition(void) const {
-  return ObjCAtDefsFieldDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<ObjCAtDefsFieldDecl> dr = ObjCAtDefsFieldDecl::from(r)) {
+    if (std::optional<ObjCAtDefsFieldDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -117,18 +120,30 @@ gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::redeclarations(void) co
 std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return ObjCAtDefsFieldDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kObjCAtDefsFieldDeclDerivedKinds[] = {
     ObjCAtDefsFieldDecl::static_kind(),
 };
 
-std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case ObjCAtDefsFieldDecl::static_kind():
       return reinterpret_cast<const ObjCAtDefsFieldDecl &>(parent);
@@ -141,7 +156,7 @@ gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::in(const Index &index) 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCAtDefsFieldDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<ObjCAtDefsFieldDecl> e = ObjCAtDefsFieldDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCAtDefsFieldDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -153,7 +168,7 @@ gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::in(const Fragment &frag
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCAtDefsFieldDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCAtDefsFieldDecl> e = ObjCAtDefsFieldDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCAtDefsFieldDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -166,7 +181,7 @@ gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCAtDefsFieldDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCAtDefsFieldDecl> e = ObjCAtDefsFieldDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<ObjCAtDefsFieldDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -178,8 +193,18 @@ std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const Reference &r)
   return ObjCAtDefsFieldDecl::from(r.as_declaration());
 }
 
+std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const TokenContext &t) {
-  return ObjCAtDefsFieldDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

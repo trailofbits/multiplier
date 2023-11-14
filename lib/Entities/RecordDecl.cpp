@@ -92,7 +92,7 @@ bool RecordDecl::contains(const Stmt &stmt) {
 }
 
 RecordDecl RecordDecl::canonical_declaration(void) const {
-  if (auto canon = RecordDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (RecordDecl redecl : redeclarations()) {
@@ -102,12 +102,15 @@ RecordDecl RecordDecl::canonical_declaration(void) const {
 }
 
 std::optional<RecordDecl> RecordDecl::definition(void) const {
-  return RecordDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<RecordDecl> RecordDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<RecordDecl> dr = RecordDecl::from(r)) {
+    if (std::optional<RecordDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -120,13 +123,23 @@ gap::generator<RecordDecl> RecordDecl::redeclarations(void) const & {
 std::optional<RecordDecl> RecordDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return RecordDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<RecordDecl> RecordDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kRecordDeclDerivedKinds[] = {
     RecordDecl::static_kind(),
     CXXRecordDecl::static_kind(),
@@ -134,7 +147,9 @@ static const DeclKind kRecordDeclDerivedKinds[] = {
     ClassTemplatePartialSpecializationDecl::static_kind(),
 };
 
-std::optional<RecordDecl> RecordDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<RecordDecl> RecordDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case RecordDecl::static_kind():
     case CXXRecordDecl::static_kind():
@@ -150,7 +165,7 @@ gap::generator<RecordDecl> RecordDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kRecordDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<RecordDecl> e = RecordDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<RecordDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -162,7 +177,7 @@ gap::generator<RecordDecl> RecordDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kRecordDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<RecordDecl> e = RecordDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<RecordDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -175,7 +190,7 @@ gap::generator<RecordDecl> RecordDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kRecordDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<RecordDecl> e = RecordDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<RecordDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -187,8 +202,18 @@ std::optional<RecordDecl> RecordDecl::from(const Reference &r) {
   return RecordDecl::from(r.as_declaration());
 }
 
+std::optional<RecordDecl> RecordDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<RecordDecl> RecordDecl::from(const TokenContext &t) {
-  return RecordDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool RecordDecl::can_pass_in_registers(void) const {
@@ -210,7 +235,7 @@ std::optional<FieldDecl> RecordDecl::nth_field(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return FieldDecl::from(Decl(std::move(e)));
+  return FieldDecl::from_base(std::move(e));
 }
 
 gap::generator<FieldDecl> RecordDecl::fields(void) const & {
@@ -219,7 +244,7 @@ gap::generator<FieldDecl> RecordDecl::fields(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d62 = ep->DeclFor(ep, v)) {
-      if (auto e = FieldDecl::from(Decl(std::move(d62)))) {
+      if (auto e = FieldDecl::from_base(std::move(d62))) {
         co_yield std::move(*e);
       }
     }

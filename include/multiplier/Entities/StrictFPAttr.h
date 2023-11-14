@@ -40,17 +40,13 @@ class StrictFPAttr : public InheritableAttr {
     return AttrKind::STRICT_FP;
   }
 
-  static std::optional<StrictFPAttr> from(const Attr &parent);
-
-  inline static std::optional<StrictFPAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return StrictFPAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<StrictFPAttr> from_base(const Attr &parent);
+  inline static std::optional<StrictFPAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<StrictFPAttr> from(const std::optional<Attr> &parent);
   static std::optional<StrictFPAttr> from(const Reference &r);
+  static std::optional<StrictFPAttr> from(const VariantEntity &e);
   static std::optional<StrictFPAttr> from(const TokenContext &t);
 
 };

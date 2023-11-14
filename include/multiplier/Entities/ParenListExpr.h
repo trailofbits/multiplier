@@ -52,17 +52,13 @@ class ParenListExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ParenListExpr> from(const Stmt &parent);
-
-  inline static std::optional<ParenListExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return ParenListExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ParenListExpr> from_base(const Stmt &parent);
+  inline static std::optional<ParenListExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ParenListExpr> from(const std::optional<Stmt> &parent);
   static std::optional<ParenListExpr> from(const Reference &r);
+  static std::optional<ParenListExpr> from(const VariantEntity &e);
   static std::optional<ParenListExpr> from(const TokenContext &t);
 
   Token l_paren_token(void) const;

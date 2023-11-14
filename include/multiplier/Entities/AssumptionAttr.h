@@ -40,17 +40,13 @@ class AssumptionAttr : public InheritableAttr {
     return AttrKind::ASSUMPTION;
   }
 
-  static std::optional<AssumptionAttr> from(const Attr &parent);
-
-  inline static std::optional<AssumptionAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AssumptionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AssumptionAttr> from_base(const Attr &parent);
+  inline static std::optional<AssumptionAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AssumptionAttr> from(const std::optional<Attr> &parent);
   static std::optional<AssumptionAttr> from(const Reference &r);
+  static std::optional<AssumptionAttr> from(const VariantEntity &e);
   static std::optional<AssumptionAttr> from(const TokenContext &t);
 
   std::string_view assumption(void) const;

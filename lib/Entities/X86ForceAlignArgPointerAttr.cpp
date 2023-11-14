@@ -39,18 +39,30 @@ bool X86ForceAlignArgPointerAttr::contains(const Token &tok) const {
 std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return X86ForceAlignArgPointerAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kX86ForceAlignArgPointerAttrDerivedKinds[] = {
     X86ForceAlignArgPointerAttr::static_kind(),
 };
 
-std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case X86ForceAlignArgPointerAttr::static_kind():
       return reinterpret_cast<const X86ForceAlignArgPointerAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::in(cons
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kX86ForceAlignArgPointerAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<X86ForceAlignArgPointerAttr> e = X86ForceAlignArgPointerAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<X86ForceAlignArgPointerAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::in(cons
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kX86ForceAlignArgPointerAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<X86ForceAlignArgPointerAttr> e = X86ForceAlignArgPointerAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<X86ForceAlignArgPointerAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::in(cons
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kX86ForceAlignArgPointerAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<X86ForceAlignArgPointerAttr> e = X86ForceAlignArgPointerAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<X86ForceAlignArgPointerAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::from(con
   return X86ForceAlignArgPointerAttr::from(r.as_attribute());
 }
 
+std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::from(const TokenContext &t) {
-  return X86ForceAlignArgPointerAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

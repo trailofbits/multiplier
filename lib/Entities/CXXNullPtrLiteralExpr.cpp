@@ -89,18 +89,30 @@ bool CXXNullPtrLiteralExpr::contains(const Stmt &stmt) {
 std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXNullPtrLiteralExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXNullPtrLiteralExprDerivedKinds[] = {
     CXXNullPtrLiteralExpr::static_kind(),
 };
 
-std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXNullPtrLiteralExpr::static_kind():
       return reinterpret_cast<const CXXNullPtrLiteralExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::in(const Index &ind
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXNullPtrLiteralExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXNullPtrLiteralExpr> e = CXXNullPtrLiteralExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXNullPtrLiteralExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::in(const Fragment &
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXNullPtrLiteralExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXNullPtrLiteralExpr> e = CXXNullPtrLiteralExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXNullPtrLiteralExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::in(const File &file
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXNullPtrLiteralExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXNullPtrLiteralExpr> e = CXXNullPtrLiteralExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXNullPtrLiteralExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,8 +162,18 @@ std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const Reference
   return CXXNullPtrLiteralExpr::from(r.as_statement());
 }
 
+std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const TokenContext &t) {
-  return CXXNullPtrLiteralExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token CXXNullPtrLiteralExpr::token(void) const {

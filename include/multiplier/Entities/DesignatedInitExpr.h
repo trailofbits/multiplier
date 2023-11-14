@@ -54,17 +54,13 @@ class DesignatedInitExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<DesignatedInitExpr> from(const Stmt &parent);
-
-  inline static std::optional<DesignatedInitExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return DesignatedInitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<DesignatedInitExpr> from_base(const Stmt &parent);
+  inline static std::optional<DesignatedInitExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<DesignatedInitExpr> from(const std::optional<Stmt> &parent);
   static std::optional<DesignatedInitExpr> from(const Reference &r);
+  static std::optional<DesignatedInitExpr> from(const VariantEntity &e);
   static std::optional<DesignatedInitExpr> from(const TokenContext &t);
 
   std::optional<Designator> nth_designator(unsigned n) const;

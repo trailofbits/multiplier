@@ -40,17 +40,13 @@ class IntelOclBiccAttr : public InheritableAttr {
     return AttrKind::INTEL_OCL_BICC;
   }
 
-  static std::optional<IntelOclBiccAttr> from(const Attr &parent);
-
-  inline static std::optional<IntelOclBiccAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return IntelOclBiccAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<IntelOclBiccAttr> from_base(const Attr &parent);
+  inline static std::optional<IntelOclBiccAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<IntelOclBiccAttr> from(const std::optional<Attr> &parent);
   static std::optional<IntelOclBiccAttr> from(const Reference &r);
+  static std::optional<IntelOclBiccAttr> from(const VariantEntity &e);
   static std::optional<IntelOclBiccAttr> from(const TokenContext &t);
 
 };

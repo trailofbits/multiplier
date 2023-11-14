@@ -85,7 +85,7 @@ bool TranslationUnitDecl::contains(const Stmt &stmt) {
 }
 
 TranslationUnitDecl TranslationUnitDecl::canonical_declaration(void) const {
-  if (auto canon = TranslationUnitDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (TranslationUnitDecl redecl : redeclarations()) {
@@ -95,12 +95,15 @@ TranslationUnitDecl TranslationUnitDecl::canonical_declaration(void) const {
 }
 
 std::optional<TranslationUnitDecl> TranslationUnitDecl::definition(void) const {
-  return TranslationUnitDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<TranslationUnitDecl> TranslationUnitDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<TranslationUnitDecl> dr = TranslationUnitDecl::from(r)) {
+    if (std::optional<TranslationUnitDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -113,18 +116,30 @@ gap::generator<TranslationUnitDecl> TranslationUnitDecl::redeclarations(void) co
 std::optional<TranslationUnitDecl> TranslationUnitDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return TranslationUnitDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kTranslationUnitDeclDerivedKinds[] = {
     TranslationUnitDecl::static_kind(),
 };
 
-std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<TranslationUnitDecl> TranslationUnitDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case TranslationUnitDecl::static_kind():
       return reinterpret_cast<const TranslationUnitDecl &>(parent);
@@ -137,7 +152,7 @@ gap::generator<TranslationUnitDecl> TranslationUnitDecl::in(const Index &index) 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kTranslationUnitDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<TranslationUnitDecl> e = TranslationUnitDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<TranslationUnitDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -149,7 +164,7 @@ gap::generator<TranslationUnitDecl> TranslationUnitDecl::in(const Fragment &frag
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kTranslationUnitDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<TranslationUnitDecl> e = TranslationUnitDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<TranslationUnitDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -162,7 +177,7 @@ gap::generator<TranslationUnitDecl> TranslationUnitDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kTranslationUnitDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<TranslationUnitDecl> e = TranslationUnitDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<TranslationUnitDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -174,8 +189,18 @@ std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const Reference &r)
   return TranslationUnitDecl::from(r.as_declaration());
 }
 
+std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const TokenContext &t) {
-  return TranslationUnitDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<Decl> TranslationUnitDecl::declarations_in_context(void) const & {

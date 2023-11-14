@@ -39,18 +39,30 @@ bool RecordType::contains(const Token &tok) const {
 std::optional<RecordType> RecordType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return RecordType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<RecordType> RecordType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kRecordTypeDerivedKinds[] = {
     RecordType::static_kind(),
 };
 
-std::optional<RecordType> RecordType::from(const Type &parent) {
+}  // namespace
+
+std::optional<RecordType> RecordType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case RecordType::static_kind():
       return reinterpret_cast<const RecordType &>(parent);
@@ -63,7 +75,7 @@ gap::generator<RecordType> RecordType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kRecordTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<RecordType> e = RecordType::from(Type(std::move(eptr)))) {
+      if (std::optional<RecordType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -74,8 +86,18 @@ std::optional<RecordType> RecordType::from(const Reference &r) {
   return RecordType::from(r.as_type());
 }
 
+std::optional<RecordType> RecordType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<RecordType> RecordType::from(const TokenContext &t) {
-  return RecordType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type RecordType::desugar(void) const {

@@ -40,17 +40,13 @@ class AVRSignalAttr : public InheritableAttr {
     return AttrKind::AVR_SIGNAL;
   }
 
-  static std::optional<AVRSignalAttr> from(const Attr &parent);
-
-  inline static std::optional<AVRSignalAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AVRSignalAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AVRSignalAttr> from_base(const Attr &parent);
+  inline static std::optional<AVRSignalAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AVRSignalAttr> from(const std::optional<Attr> &parent);
   static std::optional<AVRSignalAttr> from(const Reference &r);
+  static std::optional<AVRSignalAttr> from(const VariantEntity &e);
   static std::optional<AVRSignalAttr> from(const TokenContext &t);
 
 };

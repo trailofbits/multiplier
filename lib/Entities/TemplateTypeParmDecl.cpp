@@ -88,7 +88,7 @@ bool TemplateTypeParmDecl::contains(const Stmt &stmt) {
 }
 
 TemplateTypeParmDecl TemplateTypeParmDecl::canonical_declaration(void) const {
-  if (auto canon = TemplateTypeParmDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (TemplateTypeParmDecl redecl : redeclarations()) {
@@ -98,12 +98,15 @@ TemplateTypeParmDecl TemplateTypeParmDecl::canonical_declaration(void) const {
 }
 
 std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::definition(void) const {
-  return TemplateTypeParmDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<TemplateTypeParmDecl> dr = TemplateTypeParmDecl::from(r)) {
+    if (std::optional<TemplateTypeParmDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -116,18 +119,30 @@ gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::redeclarations(void) 
 std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return TemplateTypeParmDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kTemplateTypeParmDeclDerivedKinds[] = {
     TemplateTypeParmDecl::static_kind(),
 };
 
-std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case TemplateTypeParmDecl::static_kind():
       return reinterpret_cast<const TemplateTypeParmDecl &>(parent);
@@ -140,7 +155,7 @@ gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kTemplateTypeParmDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<TemplateTypeParmDecl> e = TemplateTypeParmDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<TemplateTypeParmDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -152,7 +167,7 @@ gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kTemplateTypeParmDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<TemplateTypeParmDecl> e = TemplateTypeParmDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<TemplateTypeParmDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -165,7 +180,7 @@ gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kTemplateTypeParmDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<TemplateTypeParmDecl> e = TemplateTypeParmDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<TemplateTypeParmDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -177,8 +192,18 @@ std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const Reference &
   return TemplateTypeParmDecl::from(r.as_declaration());
 }
 
+std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const TokenContext &t) {
-  return TemplateTypeParmDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool TemplateTypeParmDecl::default_argument_was_inherited(void) const {

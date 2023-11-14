@@ -42,17 +42,13 @@ class HLSLSV_GroupIndexAttr : public HLSLAnnotationAttr {
     return AttrKind::HLSLSV__GROUP_INDEX;
   }
 
-  static std::optional<HLSLSV_GroupIndexAttr> from(const Attr &parent);
-
-  inline static std::optional<HLSLSV_GroupIndexAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return HLSLSV_GroupIndexAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<HLSLSV_GroupIndexAttr> from_base(const Attr &parent);
+  inline static std::optional<HLSLSV_GroupIndexAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<HLSLSV_GroupIndexAttr> from(const std::optional<Attr> &parent);
   static std::optional<HLSLSV_GroupIndexAttr> from(const Reference &r);
+  static std::optional<HLSLSV_GroupIndexAttr> from(const VariantEntity &e);
   static std::optional<HLSLSV_GroupIndexAttr> from(const TokenContext &t);
 
 };

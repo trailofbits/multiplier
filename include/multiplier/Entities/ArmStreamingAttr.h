@@ -40,17 +40,13 @@ class ArmStreamingAttr : public TypeAttr {
     return AttrKind::ARM_STREAMING;
   }
 
-  static std::optional<ArmStreamingAttr> from(const Attr &parent);
-
-  inline static std::optional<ArmStreamingAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ArmStreamingAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ArmStreamingAttr> from_base(const Attr &parent);
+  inline static std::optional<ArmStreamingAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ArmStreamingAttr> from(const std::optional<Attr> &parent);
   static std::optional<ArmStreamingAttr> from(const Reference &r);
+  static std::optional<ArmStreamingAttr> from(const VariantEntity &e);
   static std::optional<ArmStreamingAttr> from(const TokenContext &t);
 
 };

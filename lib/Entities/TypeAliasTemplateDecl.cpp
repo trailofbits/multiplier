@@ -88,7 +88,7 @@ bool TypeAliasTemplateDecl::contains(const Stmt &stmt) {
 }
 
 TypeAliasTemplateDecl TypeAliasTemplateDecl::canonical_declaration(void) const {
-  if (auto canon = TypeAliasTemplateDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (TypeAliasTemplateDecl redecl : redeclarations()) {
@@ -98,12 +98,15 @@ TypeAliasTemplateDecl TypeAliasTemplateDecl::canonical_declaration(void) const {
 }
 
 std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::definition(void) const {
-  return TypeAliasTemplateDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<TypeAliasTemplateDecl> dr = TypeAliasTemplateDecl::from(r)) {
+    if (std::optional<TypeAliasTemplateDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -116,18 +119,30 @@ gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::redeclarations(void
 std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return TypeAliasTemplateDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kTypeAliasTemplateDeclDerivedKinds[] = {
     TypeAliasTemplateDecl::static_kind(),
 };
 
-std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case TypeAliasTemplateDecl::static_kind():
       return reinterpret_cast<const TypeAliasTemplateDecl &>(parent);
@@ -140,7 +155,7 @@ gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::in(const Index &ind
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kTypeAliasTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<TypeAliasTemplateDecl> e = TypeAliasTemplateDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<TypeAliasTemplateDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -152,7 +167,7 @@ gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::in(const Fragment &
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kTypeAliasTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<TypeAliasTemplateDecl> e = TypeAliasTemplateDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<TypeAliasTemplateDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -165,7 +180,7 @@ gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::in(const File &file
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kTypeAliasTemplateDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<TypeAliasTemplateDecl> e = TypeAliasTemplateDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<TypeAliasTemplateDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -177,8 +192,18 @@ std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const Reference
   return TypeAliasTemplateDecl::from(r.as_declaration());
 }
 
+std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const TokenContext &t) {
-  return TypeAliasTemplateDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

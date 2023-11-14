@@ -38,18 +38,30 @@ bool QualifiedType::contains(const Token &tok) const {
 std::optional<QualifiedType> QualifiedType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return QualifiedType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<QualifiedType> QualifiedType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kQualifiedTypeDerivedKinds[] = {
     QualifiedType::static_kind(),
 };
 
-std::optional<QualifiedType> QualifiedType::from(const Type &parent) {
+}  // namespace
+
+std::optional<QualifiedType> QualifiedType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case QualifiedType::static_kind():
       return reinterpret_cast<const QualifiedType &>(parent);
@@ -62,7 +74,7 @@ gap::generator<QualifiedType> QualifiedType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kQualifiedTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<QualifiedType> e = QualifiedType::from(Type(std::move(eptr)))) {
+      if (std::optional<QualifiedType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -73,8 +85,18 @@ std::optional<QualifiedType> QualifiedType::from(const Reference &r) {
   return QualifiedType::from(r.as_type());
 }
 
+std::optional<QualifiedType> QualifiedType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<QualifiedType> QualifiedType::from(const TokenContext &t) {
-  return QualifiedType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 LangAS QualifiedType::address_space(void) const {

@@ -38,17 +38,13 @@ class FunctionNoProtoType : public FunctionType {
     return TypeKind::FUNCTION_NO_PROTO;
   }
 
-  static std::optional<FunctionNoProtoType> from(const Type &parent);
-
-  inline static std::optional<FunctionNoProtoType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return FunctionNoProtoType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<FunctionNoProtoType> from_base(const Type &parent);
+  inline static std::optional<FunctionNoProtoType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<FunctionNoProtoType> from(const std::optional<Type> &parent);
   static std::optional<FunctionNoProtoType> from(const Reference &r);
+  static std::optional<FunctionNoProtoType> from(const VariantEntity &e);
   static std::optional<FunctionNoProtoType> from(const TokenContext &t);
 
   Type desugar(void) const;

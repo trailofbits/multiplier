@@ -38,18 +38,30 @@ bool ComplexType::contains(const Token &tok) const {
 std::optional<ComplexType> ComplexType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return ComplexType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ComplexType> ComplexType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kComplexTypeDerivedKinds[] = {
     ComplexType::static_kind(),
 };
 
-std::optional<ComplexType> ComplexType::from(const Type &parent) {
+}  // namespace
+
+std::optional<ComplexType> ComplexType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case ComplexType::static_kind():
       return reinterpret_cast<const ComplexType &>(parent);
@@ -62,7 +74,7 @@ gap::generator<ComplexType> ComplexType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kComplexTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<ComplexType> e = ComplexType::from(Type(std::move(eptr)))) {
+      if (std::optional<ComplexType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -73,8 +85,18 @@ std::optional<ComplexType> ComplexType::from(const Reference &r) {
   return ComplexType::from(r.as_type());
 }
 
+std::optional<ComplexType> ComplexType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<ComplexType> ComplexType::from(const TokenContext &t) {
-  return ComplexType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type ComplexType::desugar(void) const {

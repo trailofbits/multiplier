@@ -90,18 +90,30 @@ bool OMPTaskLoopDirective::contains(const Stmt &stmt) {
 std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPTaskLoopDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPTaskLoopDirectiveDerivedKinds[] = {
     OMPTaskLoopDirective::static_kind(),
 };
 
-std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPTaskLoopDirective::static_kind():
       return reinterpret_cast<const OMPTaskLoopDirective &>(parent);
@@ -114,7 +126,7 @@ gap::generator<OMPTaskLoopDirective> OMPTaskLoopDirective::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPTaskLoopDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPTaskLoopDirective> e = OMPTaskLoopDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPTaskLoopDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<OMPTaskLoopDirective> OMPTaskLoopDirective::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPTaskLoopDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPTaskLoopDirective> e = OMPTaskLoopDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPTaskLoopDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<OMPTaskLoopDirective> OMPTaskLoopDirective::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPTaskLoopDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPTaskLoopDirective> e = OMPTaskLoopDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPTaskLoopDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const Reference &
   return OMPTaskLoopDirective::from(r.as_statement());
 }
 
+std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const TokenContext &t) {
-  return OMPTaskLoopDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool OMPTaskLoopDirective::has_cancel(void) const {

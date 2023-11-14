@@ -91,7 +91,7 @@ bool CXXDestructorDecl::contains(const Stmt &stmt) {
 }
 
 CXXDestructorDecl CXXDestructorDecl::canonical_declaration(void) const {
-  if (auto canon = CXXDestructorDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (CXXDestructorDecl redecl : redeclarations()) {
@@ -101,12 +101,15 @@ CXXDestructorDecl CXXDestructorDecl::canonical_declaration(void) const {
 }
 
 std::optional<CXXDestructorDecl> CXXDestructorDecl::definition(void) const {
-  return CXXDestructorDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<CXXDestructorDecl> CXXDestructorDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<CXXDestructorDecl> dr = CXXDestructorDecl::from(r)) {
+    if (std::optional<CXXDestructorDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -119,18 +122,30 @@ gap::generator<CXXDestructorDecl> CXXDestructorDecl::redeclarations(void) const 
 std::optional<CXXDestructorDecl> CXXDestructorDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return CXXDestructorDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kCXXDestructorDeclDerivedKinds[] = {
     CXXDestructorDecl::static_kind(),
 };
 
-std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<CXXDestructorDecl> CXXDestructorDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case CXXDestructorDecl::static_kind():
       return reinterpret_cast<const CXXDestructorDecl &>(parent);
@@ -143,7 +158,7 @@ gap::generator<CXXDestructorDecl> CXXDestructorDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kCXXDestructorDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<CXXDestructorDecl> e = CXXDestructorDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<CXXDestructorDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -155,7 +170,7 @@ gap::generator<CXXDestructorDecl> CXXDestructorDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kCXXDestructorDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<CXXDestructorDecl> e = CXXDestructorDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<CXXDestructorDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -168,7 +183,7 @@ gap::generator<CXXDestructorDecl> CXXDestructorDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kCXXDestructorDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<CXXDestructorDecl> e = CXXDestructorDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<CXXDestructorDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -180,8 +195,18 @@ std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const Reference &r) {
   return CXXDestructorDecl::from(r.as_declaration());
 }
 
+std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const TokenContext &t) {
-  return CXXDestructorDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::optional<FunctionDecl> CXXDestructorDecl::operator_delete(void) const {
@@ -191,7 +216,7 @@ std::optional<FunctionDecl> CXXDestructorDecl::operator_delete(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionDecl::from(Decl(std::move(eptr)));
+      return FunctionDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -204,7 +229,7 @@ std::optional<Expr> CXXDestructorDecl::operator_delete_this_argument(void) const
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

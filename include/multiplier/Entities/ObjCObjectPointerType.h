@@ -40,17 +40,13 @@ class ObjCObjectPointerType : public Type {
     return TypeKind::OBJ_C_OBJECT_POINTER;
   }
 
-  static std::optional<ObjCObjectPointerType> from(const Type &parent);
-
-  inline static std::optional<ObjCObjectPointerType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return ObjCObjectPointerType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCObjectPointerType> from_base(const Type &parent);
+  inline static std::optional<ObjCObjectPointerType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCObjectPointerType> from(const std::optional<Type> &parent);
   static std::optional<ObjCObjectPointerType> from(const Reference &r);
+  static std::optional<ObjCObjectPointerType> from(const VariantEntity &e);
   static std::optional<ObjCObjectPointerType> from(const TokenContext &t);
 
   Type desugar(void) const;

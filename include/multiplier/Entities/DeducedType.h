@@ -34,17 +34,13 @@ class DeducedType : public Type {
   bool contains(const Token &tok) const;
   static std::optional<DeducedType> by_id(const Index &, EntityId);
 
-  static std::optional<DeducedType> from(const Type &parent);
-
-  inline static std::optional<DeducedType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return DeducedType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<DeducedType> from_base(const Type &parent);
+  inline static std::optional<DeducedType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<DeducedType> from(const std::optional<Type> &parent);
   static std::optional<DeducedType> from(const Reference &r);
+  static std::optional<DeducedType> from(const VariantEntity &e);
   static std::optional<DeducedType> from(const TokenContext &t);
 
   Type desugar(void) const;

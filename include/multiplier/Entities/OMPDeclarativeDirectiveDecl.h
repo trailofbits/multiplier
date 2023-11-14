@@ -50,17 +50,13 @@ class OMPDeclarativeDirectiveDecl : public Decl {
   OMPDeclarativeDirectiveDecl canonical_declaration(void) const;
   std::optional<OMPDeclarativeDirectiveDecl> definition(void) const;
   gap::generator<OMPDeclarativeDirectiveDecl> redeclarations(void) const &;
-  static std::optional<OMPDeclarativeDirectiveDecl> from(const Decl &parent);
-
-  inline static std::optional<OMPDeclarativeDirectiveDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return OMPDeclarativeDirectiveDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPDeclarativeDirectiveDecl> from_base(const Decl &parent);
+  inline static std::optional<OMPDeclarativeDirectiveDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPDeclarativeDirectiveDecl> from(const std::optional<Decl> &parent);
   static std::optional<OMPDeclarativeDirectiveDecl> from(const Reference &r);
+  static std::optional<OMPDeclarativeDirectiveDecl> from(const VariantEntity &e);
   static std::optional<OMPDeclarativeDirectiveDecl> from(const TokenContext &t);
 
 };

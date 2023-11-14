@@ -41,17 +41,13 @@ class CXX11NoReturnAttr : public InheritableAttr {
     return AttrKind::CXX11_NO_RETURN;
   }
 
-  static std::optional<CXX11NoReturnAttr> from(const Attr &parent);
-
-  inline static std::optional<CXX11NoReturnAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CXX11NoReturnAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CXX11NoReturnAttr> from_base(const Attr &parent);
+  inline static std::optional<CXX11NoReturnAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CXX11NoReturnAttr> from(const std::optional<Attr> &parent);
   static std::optional<CXX11NoReturnAttr> from(const Reference &r);
+  static std::optional<CXX11NoReturnAttr> from(const VariantEntity &e);
   static std::optional<CXX11NoReturnAttr> from(const TokenContext &t);
 
   CXX11NoReturnAttrSpelling semantic_spelling(void) const;

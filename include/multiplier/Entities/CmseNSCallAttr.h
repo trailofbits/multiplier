@@ -40,17 +40,13 @@ class CmseNSCallAttr : public TypeAttr {
     return AttrKind::CMSE_NS_CALL;
   }
 
-  static std::optional<CmseNSCallAttr> from(const Attr &parent);
-
-  inline static std::optional<CmseNSCallAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CmseNSCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CmseNSCallAttr> from_base(const Attr &parent);
+  inline static std::optional<CmseNSCallAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CmseNSCallAttr> from(const std::optional<Attr> &parent);
   static std::optional<CmseNSCallAttr> from(const Reference &r);
+  static std::optional<CmseNSCallAttr> from(const VariantEntity &e);
   static std::optional<CmseNSCallAttr> from(const TokenContext &t);
 
 };

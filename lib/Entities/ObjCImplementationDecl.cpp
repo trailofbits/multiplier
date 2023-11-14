@@ -90,7 +90,7 @@ bool ObjCImplementationDecl::contains(const Stmt &stmt) {
 }
 
 ObjCImplementationDecl ObjCImplementationDecl::canonical_declaration(void) const {
-  if (auto canon = ObjCImplementationDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (ObjCImplementationDecl redecl : redeclarations()) {
@@ -100,12 +100,15 @@ ObjCImplementationDecl ObjCImplementationDecl::canonical_declaration(void) const
 }
 
 std::optional<ObjCImplementationDecl> ObjCImplementationDecl::definition(void) const {
-  return ObjCImplementationDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<ObjCImplementationDecl> dr = ObjCImplementationDecl::from(r)) {
+    if (std::optional<ObjCImplementationDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -118,18 +121,30 @@ gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::redeclarations(vo
 std::optional<ObjCImplementationDecl> ObjCImplementationDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return ObjCImplementationDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kObjCImplementationDeclDerivedKinds[] = {
     ObjCImplementationDecl::static_kind(),
 };
 
-std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case ObjCImplementationDecl::static_kind():
       return reinterpret_cast<const ObjCImplementationDecl &>(parent);
@@ -142,7 +157,7 @@ gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::in(const Index &i
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCImplementationDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<ObjCImplementationDecl> e = ObjCImplementationDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCImplementationDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -154,7 +169,7 @@ gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::in(const Fragment
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCImplementationDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCImplementationDecl> e = ObjCImplementationDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCImplementationDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -167,7 +182,7 @@ gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::in(const File &fi
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCImplementationDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCImplementationDecl> e = ObjCImplementationDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<ObjCImplementationDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -179,8 +194,18 @@ std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const Referen
   return ObjCImplementationDecl::from(r.as_declaration());
 }
 
+std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const TokenContext &t) {
-  return ObjCImplementationDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token ObjCImplementationDecl::instance_variable_l_brace_token(void) const {
@@ -198,7 +223,7 @@ std::string_view ObjCImplementationDecl::obj_c_runtime_name_as_string(void) cons
 
 ObjCInterfaceDecl ObjCImplementationDecl::super_class(void) const {
   RawEntityId eid = impl->reader.getVal78();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token ObjCImplementationDecl::super_class_token(void) const {
@@ -228,7 +253,7 @@ std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsign
   if (!e) {
     return std::nullopt;
   }
-  return ObjCIvarDecl::from(Decl(std::move(e)));
+  return ObjCIvarDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const & {
@@ -237,7 +262,7 @@ gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) co
   for (auto v : list) {
     EntityId id(v);
     if (auto d341 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCIvarDecl::from(Decl(std::move(d341)))) {
+      if (auto e = ObjCIvarDecl::from_base(std::move(d341))) {
         co_yield std::move(*e);
       }
     }

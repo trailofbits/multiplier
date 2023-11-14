@@ -90,18 +90,30 @@ bool OMPTargetTeamsGenericLoopDirective::contains(const Stmt &stmt) {
 std::optional<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPTargetTeamsGenericLoopDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPTargetTeamsGenericLoopDirectiveDerivedKinds[] = {
     OMPTargetTeamsGenericLoopDirective::static_kind(),
 };
 
-std::optional<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPTargetTeamsGenericLoopDirective::static_kind():
       return reinterpret_cast<const OMPTargetTeamsGenericLoopDirective &>(parent);
@@ -114,7 +126,7 @@ gap::generator<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDire
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPTargetTeamsGenericLoopDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPTargetTeamsGenericLoopDirective> e = OMPTargetTeamsGenericLoopDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPTargetTeamsGenericLoopDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDire
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPTargetTeamsGenericLoopDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPTargetTeamsGenericLoopDirective> e = OMPTargetTeamsGenericLoopDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPTargetTeamsGenericLoopDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDire
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPTargetTeamsGenericLoopDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPTargetTeamsGenericLoopDirective> e = OMPTargetTeamsGenericLoopDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPTargetTeamsGenericLoopDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirec
   return OMPTargetTeamsGenericLoopDirective::from(r.as_statement());
 }
 
+std::optional<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirective::from(const TokenContext &t) {
-  return OMPTargetTeamsGenericLoopDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

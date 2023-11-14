@@ -41,17 +41,13 @@ class ErrorAttr : public InheritableAttr {
     return AttrKind::ERROR;
   }
 
-  static std::optional<ErrorAttr> from(const Attr &parent);
-
-  inline static std::optional<ErrorAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ErrorAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ErrorAttr> from_base(const Attr &parent);
+  inline static std::optional<ErrorAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ErrorAttr> from(const std::optional<Attr> &parent);
   static std::optional<ErrorAttr> from(const Reference &r);
+  static std::optional<ErrorAttr> from(const VariantEntity &e);
   static std::optional<ErrorAttr> from(const TokenContext &t);
 
   ErrorAttrSpelling semantic_spelling(void) const;

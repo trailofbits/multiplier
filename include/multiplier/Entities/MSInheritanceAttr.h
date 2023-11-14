@@ -42,17 +42,13 @@ class MSInheritanceAttr : public InheritableAttr {
     return AttrKind::MS_INHERITANCE;
   }
 
-  static std::optional<MSInheritanceAttr> from(const Attr &parent);
-
-  inline static std::optional<MSInheritanceAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MSInheritanceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MSInheritanceAttr> from_base(const Attr &parent);
+  inline static std::optional<MSInheritanceAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MSInheritanceAttr> from(const std::optional<Attr> &parent);
   static std::optional<MSInheritanceAttr> from(const Reference &r);
+  static std::optional<MSInheritanceAttr> from(const VariantEntity &e);
   static std::optional<MSInheritanceAttr> from(const TokenContext &t);
 
   bool best_case(void) const;

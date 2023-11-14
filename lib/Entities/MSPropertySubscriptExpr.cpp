@@ -89,18 +89,30 @@ bool MSPropertySubscriptExpr::contains(const Stmt &stmt) {
 std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return MSPropertySubscriptExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kMSPropertySubscriptExprDerivedKinds[] = {
     MSPropertySubscriptExpr::static_kind(),
 };
 
-std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case MSPropertySubscriptExpr::static_kind():
       return reinterpret_cast<const MSPropertySubscriptExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::in(const Index 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kMSPropertySubscriptExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<MSPropertySubscriptExpr> e = MSPropertySubscriptExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<MSPropertySubscriptExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::in(const Fragme
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kMSPropertySubscriptExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<MSPropertySubscriptExpr> e = MSPropertySubscriptExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<MSPropertySubscriptExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::in(const File &
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kMSPropertySubscriptExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<MSPropertySubscriptExpr> e = MSPropertySubscriptExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<MSPropertySubscriptExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,18 +162,28 @@ std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const Refer
   return MSPropertySubscriptExpr::from(r.as_statement());
 }
 
+std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const TokenContext &t) {
-  return MSPropertySubscriptExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr MSPropertySubscriptExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr MSPropertySubscriptExpr::index(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token MSPropertySubscriptExpr::r_bracket_token(void) const {

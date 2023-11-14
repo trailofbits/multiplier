@@ -41,17 +41,13 @@ class SharedTrylockFunctionAttr : public InheritableAttr {
     return AttrKind::SHARED_TRYLOCK_FUNCTION;
   }
 
-  static std::optional<SharedTrylockFunctionAttr> from(const Attr &parent);
-
-  inline static std::optional<SharedTrylockFunctionAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SharedTrylockFunctionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SharedTrylockFunctionAttr> from_base(const Attr &parent);
+  inline static std::optional<SharedTrylockFunctionAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SharedTrylockFunctionAttr> from(const std::optional<Attr> &parent);
   static std::optional<SharedTrylockFunctionAttr> from(const Reference &r);
+  static std::optional<SharedTrylockFunctionAttr> from(const VariantEntity &e);
   static std::optional<SharedTrylockFunctionAttr> from(const TokenContext &t);
 
   Expr success_value(void) const;

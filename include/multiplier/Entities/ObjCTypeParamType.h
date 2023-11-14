@@ -37,17 +37,13 @@ class ObjCTypeParamType : public Type {
     return TypeKind::OBJ_C_TYPE_PARAM;
   }
 
-  static std::optional<ObjCTypeParamType> from(const Type &parent);
-
-  inline static std::optional<ObjCTypeParamType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return ObjCTypeParamType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCTypeParamType> from_base(const Type &parent);
+  inline static std::optional<ObjCTypeParamType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCTypeParamType> from(const std::optional<Type> &parent);
   static std::optional<ObjCTypeParamType> from(const Reference &r);
+  static std::optional<ObjCTypeParamType> from(const VariantEntity &e);
   static std::optional<ObjCTypeParamType> from(const TokenContext &t);
 
   Type desugar(void) const;

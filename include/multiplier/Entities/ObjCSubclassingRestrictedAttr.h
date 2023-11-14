@@ -40,17 +40,13 @@ class ObjCSubclassingRestrictedAttr : public InheritableAttr {
     return AttrKind::OBJ_C_SUBCLASSING_RESTRICTED;
   }
 
-  static std::optional<ObjCSubclassingRestrictedAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCSubclassingRestrictedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCSubclassingRestrictedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCSubclassingRestrictedAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCSubclassingRestrictedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCSubclassingRestrictedAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCSubclassingRestrictedAttr> from(const Reference &r);
+  static std::optional<ObjCSubclassingRestrictedAttr> from(const VariantEntity &e);
   static std::optional<ObjCSubclassingRestrictedAttr> from(const TokenContext &t);
 
 };

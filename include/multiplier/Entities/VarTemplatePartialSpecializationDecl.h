@@ -62,17 +62,13 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
   VarTemplatePartialSpecializationDecl canonical_declaration(void) const;
   std::optional<VarTemplatePartialSpecializationDecl> definition(void) const;
   gap::generator<VarTemplatePartialSpecializationDecl> redeclarations(void) const &;
-  static std::optional<VarTemplatePartialSpecializationDecl> from(const Decl &parent);
-
-  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return VarTemplatePartialSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<VarTemplatePartialSpecializationDecl> from_base(const Decl &parent);
+  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<Decl> &parent);
   static std::optional<VarTemplatePartialSpecializationDecl> from(const Reference &r);
+  static std::optional<VarTemplatePartialSpecializationDecl> from(const VariantEntity &e);
   static std::optional<VarTemplatePartialSpecializationDecl> from(const TokenContext &t);
 
   VarTemplatePartialSpecializationDecl instantiated_from_member(void) const;

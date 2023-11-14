@@ -91,18 +91,30 @@ bool MaterializeTemporaryExpr::contains(const Stmt &stmt) {
 std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return MaterializeTemporaryExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kMaterializeTemporaryExprDerivedKinds[] = {
     MaterializeTemporaryExpr::static_kind(),
 };
 
-std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case MaterializeTemporaryExpr::static_kind():
       return reinterpret_cast<const MaterializeTemporaryExpr &>(parent);
@@ -115,7 +127,7 @@ gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::in(const Inde
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kMaterializeTemporaryExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<MaterializeTemporaryExpr> e = MaterializeTemporaryExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<MaterializeTemporaryExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -127,7 +139,7 @@ gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::in(const Frag
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kMaterializeTemporaryExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<MaterializeTemporaryExpr> e = MaterializeTemporaryExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<MaterializeTemporaryExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -140,7 +152,7 @@ gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::in(const File
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kMaterializeTemporaryExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<MaterializeTemporaryExpr> e = MaterializeTemporaryExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<MaterializeTemporaryExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -152,8 +164,18 @@ std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const Ref
   return MaterializeTemporaryExpr::from(r.as_statement());
 }
 
+std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const TokenContext &t) {
-  return MaterializeTemporaryExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::optional<ValueDecl> MaterializeTemporaryExpr::extending_declaration(void) const {
@@ -163,7 +185,7 @@ std::optional<ValueDecl> MaterializeTemporaryExpr::extending_declaration(void) c
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return ValueDecl::from(Decl(std::move(eptr)));
+      return ValueDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -176,7 +198,7 @@ std::optional<LifetimeExtendedTemporaryDecl> MaterializeTemporaryExpr::lifetime_
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return LifetimeExtendedTemporaryDecl::from(Decl(std::move(eptr)));
+      return LifetimeExtendedTemporaryDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -188,7 +210,7 @@ StorageDuration MaterializeTemporaryExpr::storage_duration(void) const {
 
 Expr MaterializeTemporaryExpr::sub_expression(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool MaterializeTemporaryExpr::is_bound_to_lvalue_reference(void) const {

@@ -40,17 +40,13 @@ class ObjCRequiresPropertyDefsAttr : public InheritableAttr {
     return AttrKind::OBJ_C_REQUIRES_PROPERTY_DEFS;
   }
 
-  static std::optional<ObjCRequiresPropertyDefsAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCRequiresPropertyDefsAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCRequiresPropertyDefsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCRequiresPropertyDefsAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCRequiresPropertyDefsAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCRequiresPropertyDefsAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCRequiresPropertyDefsAttr> from(const Reference &r);
+  static std::optional<ObjCRequiresPropertyDefsAttr> from(const VariantEntity &e);
   static std::optional<ObjCRequiresPropertyDefsAttr> from(const TokenContext &t);
 
 };

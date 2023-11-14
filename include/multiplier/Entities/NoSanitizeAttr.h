@@ -40,17 +40,13 @@ class NoSanitizeAttr : public InheritableAttr {
     return AttrKind::NO_SANITIZE;
   }
 
-  static std::optional<NoSanitizeAttr> from(const Attr &parent);
-
-  inline static std::optional<NoSanitizeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoSanitizeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoSanitizeAttr> from_base(const Attr &parent);
+  inline static std::optional<NoSanitizeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoSanitizeAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoSanitizeAttr> from(const Reference &r);
+  static std::optional<NoSanitizeAttr> from(const VariantEntity &e);
   static std::optional<NoSanitizeAttr> from(const TokenContext &t);
 
   bool has_coverage(void) const;

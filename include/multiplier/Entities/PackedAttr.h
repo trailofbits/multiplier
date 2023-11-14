@@ -40,17 +40,13 @@ class PackedAttr : public InheritableAttr {
     return AttrKind::PACKED;
   }
 
-  static std::optional<PackedAttr> from(const Attr &parent);
-
-  inline static std::optional<PackedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return PackedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PackedAttr> from_base(const Attr &parent);
+  inline static std::optional<PackedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PackedAttr> from(const std::optional<Attr> &parent);
   static std::optional<PackedAttr> from(const Reference &r);
+  static std::optional<PackedAttr> from(const VariantEntity &e);
   static std::optional<PackedAttr> from(const TokenContext &t);
 
 };

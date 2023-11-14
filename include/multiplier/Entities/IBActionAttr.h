@@ -40,17 +40,13 @@ class IBActionAttr : public InheritableAttr {
     return AttrKind::IB_ACTION;
   }
 
-  static std::optional<IBActionAttr> from(const Attr &parent);
-
-  inline static std::optional<IBActionAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return IBActionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<IBActionAttr> from_base(const Attr &parent);
+  inline static std::optional<IBActionAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<IBActionAttr> from(const std::optional<Attr> &parent);
   static std::optional<IBActionAttr> from(const Reference &r);
+  static std::optional<IBActionAttr> from(const VariantEntity &e);
   static std::optional<IBActionAttr> from(const TokenContext &t);
 
 };

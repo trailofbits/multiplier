@@ -54,17 +54,13 @@ class FriendDecl : public Decl {
   FriendDecl canonical_declaration(void) const;
   std::optional<FriendDecl> definition(void) const;
   gap::generator<FriendDecl> redeclarations(void) const &;
-  static std::optional<FriendDecl> from(const Decl &parent);
-
-  inline static std::optional<FriendDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return FriendDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<FriendDecl> from_base(const Decl &parent);
+  inline static std::optional<FriendDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<FriendDecl> from(const std::optional<Decl> &parent);
   static std::optional<FriendDecl> from(const Reference &r);
+  static std::optional<FriendDecl> from(const VariantEntity &e);
   static std::optional<FriendDecl> from(const TokenContext &t);
 
   std::optional<NamedDecl> friend_declaration(void) const;

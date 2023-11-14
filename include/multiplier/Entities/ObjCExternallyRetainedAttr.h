@@ -40,17 +40,13 @@ class ObjCExternallyRetainedAttr : public InheritableAttr {
     return AttrKind::OBJ_C_EXTERNALLY_RETAINED;
   }
 
-  static std::optional<ObjCExternallyRetainedAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCExternallyRetainedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCExternallyRetainedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCExternallyRetainedAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCExternallyRetainedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCExternallyRetainedAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCExternallyRetainedAttr> from(const Reference &r);
+  static std::optional<ObjCExternallyRetainedAttr> from(const VariantEntity &e);
   static std::optional<ObjCExternallyRetainedAttr> from(const TokenContext &t);
 
 };

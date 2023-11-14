@@ -54,18 +54,30 @@ gap::generator<MacroConcatenate> MacroConcatenate::containing(const Token &token
 std::optional<MacroConcatenate> MacroConcatenate::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<MacroId>(vid)) {
-    return MacroConcatenate::from(index.macro(eid.Pack()));
+    if (auto base = index.macro(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MacroConcatenate> MacroConcatenate::from(const std::optional<Macro> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const MacroKind kMacroConcatenateDerivedKinds[] = {
     MacroConcatenate::static_kind(),
 };
 
-std::optional<MacroConcatenate> MacroConcatenate::from(const Macro &parent) {
+}  // namespace
+
+std::optional<MacroConcatenate> MacroConcatenate::from_base(const Macro &parent) {
   switch (parent.kind()) {
     case MacroConcatenate::static_kind():
       return reinterpret_cast<const MacroConcatenate &>(parent);
@@ -78,7 +90,7 @@ gap::generator<MacroConcatenate> MacroConcatenate::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroKind k : kMacroConcatenateDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
-      if (std::optional<MacroConcatenate> e = MacroConcatenate::from(Macro(std::move(eptr)))) {
+      if (std::optional<MacroConcatenate> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -90,7 +102,7 @@ gap::generator<MacroConcatenate> MacroConcatenate::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (MacroKind k : kMacroConcatenateDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-      if (std::optional<MacroConcatenate> e = MacroConcatenate::from(Macro(std::move(eptr)))) {
+      if (std::optional<MacroConcatenate> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -103,7 +115,7 @@ gap::generator<MacroConcatenate> MacroConcatenate::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (MacroKind k : kMacroConcatenateDerivedKinds) {
       for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-        if (std::optional<MacroConcatenate> e = MacroConcatenate::from(Macro(std::move(eptr)))) {
+        if (std::optional<MacroConcatenate> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -115,8 +127,18 @@ std::optional<MacroConcatenate> MacroConcatenate::from(const Reference &r) {
   return MacroConcatenate::from(r.as_macro());
 }
 
+std::optional<MacroConcatenate> MacroConcatenate::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Macro>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Macro>(e));
+}
+
 std::optional<MacroConcatenate> MacroConcatenate::from(const TokenContext &t) {
-  return MacroConcatenate::from(t.as_macro());
+  if (auto base = t.as_macro()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token MacroConcatenate::pasted_token(void) const {

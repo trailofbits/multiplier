@@ -58,17 +58,13 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
   ObjCCategoryImplDecl canonical_declaration(void) const;
   std::optional<ObjCCategoryImplDecl> definition(void) const;
   gap::generator<ObjCCategoryImplDecl> redeclarations(void) const &;
-  static std::optional<ObjCCategoryImplDecl> from(const Decl &parent);
-
-  inline static std::optional<ObjCCategoryImplDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ObjCCategoryImplDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCCategoryImplDecl> from_base(const Decl &parent);
+  inline static std::optional<ObjCCategoryImplDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCCategoryImplDecl> from(const std::optional<Decl> &parent);
   static std::optional<ObjCCategoryImplDecl> from(const Reference &r);
+  static std::optional<ObjCCategoryImplDecl> from(const VariantEntity &e);
   static std::optional<ObjCCategoryImplDecl> from(const TokenContext &t);
 
   ObjCCategoryDecl category_declaration(void) const;

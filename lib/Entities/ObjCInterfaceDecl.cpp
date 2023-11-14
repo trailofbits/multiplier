@@ -93,7 +93,7 @@ bool ObjCInterfaceDecl::contains(const Stmt &stmt) {
 }
 
 ObjCInterfaceDecl ObjCInterfaceDecl::canonical_declaration(void) const {
-  if (auto canon = ObjCInterfaceDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (ObjCInterfaceDecl redecl : redeclarations()) {
@@ -103,12 +103,15 @@ ObjCInterfaceDecl ObjCInterfaceDecl::canonical_declaration(void) const {
 }
 
 std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::definition(void) const {
-  return ObjCInterfaceDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<ObjCInterfaceDecl> ObjCInterfaceDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<ObjCInterfaceDecl> dr = ObjCInterfaceDecl::from(r)) {
+    if (std::optional<ObjCInterfaceDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -121,18 +124,30 @@ gap::generator<ObjCInterfaceDecl> ObjCInterfaceDecl::redeclarations(void) const 
 std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return ObjCInterfaceDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kObjCInterfaceDeclDerivedKinds[] = {
     ObjCInterfaceDecl::static_kind(),
 };
 
-std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case ObjCInterfaceDecl::static_kind():
       return reinterpret_cast<const ObjCInterfaceDecl &>(parent);
@@ -145,7 +160,7 @@ gap::generator<ObjCInterfaceDecl> ObjCInterfaceDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCInterfaceDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<ObjCInterfaceDecl> e = ObjCInterfaceDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCInterfaceDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -157,7 +172,7 @@ gap::generator<ObjCInterfaceDecl> ObjCInterfaceDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCInterfaceDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCInterfaceDecl> e = ObjCInterfaceDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCInterfaceDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -170,7 +185,7 @@ gap::generator<ObjCInterfaceDecl> ObjCInterfaceDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCInterfaceDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCInterfaceDecl> e = ObjCInterfaceDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<ObjCInterfaceDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -182,8 +197,18 @@ std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const Reference &r) {
   return ObjCInterfaceDecl::from(r.as_declaration());
 }
 
+std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const TokenContext &t) {
-  return ObjCInterfaceDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 unsigned ObjCInterfaceDecl::num_all_referenced_protocols(void) const {
@@ -201,7 +226,7 @@ std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_all_referenced_protocol(u
   if (!e) {
     return std::nullopt;
   }
-  return ObjCProtocolDecl::from(Decl(std::move(e)));
+  return ObjCProtocolDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::all_referenced_protocols(void) const & {
@@ -210,7 +235,7 @@ gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::all_referenced_protocols(voi
   for (auto v : list) {
     EntityId id(v);
     if (auto d315 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d315)))) {
+      if (auto e = ObjCProtocolDecl::from_base(std::move(d315))) {
         co_yield std::move(*e);
       }
     }
@@ -228,7 +253,7 @@ Token ObjCInterfaceDecl::end_of_definition_token(void) const {
 
 ObjCImplementationDecl ObjCInterfaceDecl::implementation(void) const {
   RawEntityId eid = impl->reader.getVal67();
-  return ObjCImplementationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCImplementationDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 std::string_view ObjCInterfaceDecl::obj_c_runtime_name_as_string(void) const {
@@ -243,7 +268,7 @@ std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::super_class(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return ObjCInterfaceDecl::from(Decl(std::move(eptr)));
+      return ObjCInterfaceDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -289,7 +314,7 @@ bool ObjCInterfaceDecl::is_implicit_interface_declaration(void) const {
 
 ObjCInterfaceDecl ObjCInterfaceDecl::is_obj_c_requires_property_definitions(void) const {
   RawEntityId eid = impl->reader.getVal82();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool ObjCInterfaceDecl::is_this_declaration_a_definition(void) const {
@@ -311,7 +336,7 @@ std::optional<ObjCIvarDecl> ObjCInterfaceDecl::nth_instance_variable(unsigned n)
   if (!e) {
     return std::nullopt;
   }
-  return ObjCIvarDecl::from(Decl(std::move(e)));
+  return ObjCIvarDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const & {
@@ -320,7 +345,7 @@ gap::generator<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const &
   for (auto v : list) {
     EntityId id(v);
     if (auto d341 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCIvarDecl::from(Decl(std::move(d341)))) {
+      if (auto e = ObjCIvarDecl::from_base(std::move(d341))) {
         co_yield std::move(*e);
       }
     }
@@ -343,7 +368,7 @@ std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_known_categorie(unsigned 
   if (!e) {
     return std::nullopt;
   }
-  return ObjCCategoryDecl::from(Decl(std::move(e)));
+  return ObjCCategoryDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const & {
@@ -352,7 +377,7 @@ gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const
   for (auto v : list) {
     EntityId id(v);
     if (auto d352 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCCategoryDecl::from(Decl(std::move(d352)))) {
+      if (auto e = ObjCCategoryDecl::from_base(std::move(d352))) {
         co_yield std::move(*e);
       }
     }
@@ -375,7 +400,7 @@ std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_known_extension(unsigned 
   if (!e) {
     return std::nullopt;
   }
-  return ObjCCategoryDecl::from(Decl(std::move(e)));
+  return ObjCCategoryDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const & {
@@ -384,7 +409,7 @@ gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const
   for (auto v : list) {
     EntityId id(v);
     if (auto d353 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCCategoryDecl::from(Decl(std::move(d353)))) {
+      if (auto e = ObjCCategoryDecl::from_base(std::move(d353))) {
         co_yield std::move(*e);
       }
     }
@@ -443,7 +468,7 @@ std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_protocol(unsigned n) cons
   if (!e) {
     return std::nullopt;
   }
-  return ObjCProtocolDecl::from(Decl(std::move(e)));
+  return ObjCProtocolDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const & {
@@ -452,7 +477,7 @@ gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d361 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d361)))) {
+      if (auto e = ObjCProtocolDecl::from_base(std::move(d361))) {
         co_yield std::move(*e);
       }
     }
@@ -475,7 +500,7 @@ std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_categorie(unsigne
   if (!e) {
     return std::nullopt;
   }
-  return ObjCCategoryDecl::from(Decl(std::move(e)));
+  return ObjCCategoryDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) const & {
@@ -484,7 +509,7 @@ gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) con
   for (auto v : list) {
     EntityId id(v);
     if (auto d362 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCCategoryDecl::from(Decl(std::move(d362)))) {
+      if (auto e = ObjCCategoryDecl::from_base(std::move(d362))) {
         co_yield std::move(*e);
       }
     }
@@ -507,7 +532,7 @@ std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_extension(unsigne
   if (!e) {
     return std::nullopt;
   }
-  return ObjCCategoryDecl::from(Decl(std::move(e)));
+  return ObjCCategoryDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::visible_extensions(void) const & {
@@ -516,7 +541,7 @@ gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::visible_extensions(void) con
   for (auto v : list) {
     EntityId id(v);
     if (auto d363 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCCategoryDecl::from(Decl(std::move(d363)))) {
+      if (auto e = ObjCCategoryDecl::from_base(std::move(d363))) {
         co_yield std::move(*e);
       }
     }

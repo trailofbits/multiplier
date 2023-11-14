@@ -87,7 +87,7 @@ bool ObjCCompatibleAliasDecl::contains(const Stmt &stmt) {
 }
 
 ObjCCompatibleAliasDecl ObjCCompatibleAliasDecl::canonical_declaration(void) const {
-  if (auto canon = ObjCCompatibleAliasDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (ObjCCompatibleAliasDecl redecl : redeclarations()) {
@@ -97,12 +97,15 @@ ObjCCompatibleAliasDecl ObjCCompatibleAliasDecl::canonical_declaration(void) con
 }
 
 std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::definition(void) const {
-  return ObjCCompatibleAliasDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<ObjCCompatibleAliasDecl> dr = ObjCCompatibleAliasDecl::from(r)) {
+    if (std::optional<ObjCCompatibleAliasDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -115,18 +118,30 @@ gap::generator<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::redeclarations(
 std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return ObjCCompatibleAliasDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kObjCCompatibleAliasDeclDerivedKinds[] = {
     ObjCCompatibleAliasDecl::static_kind(),
 };
 
-std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case ObjCCompatibleAliasDecl::static_kind():
       return reinterpret_cast<const ObjCCompatibleAliasDecl &>(parent);
@@ -139,7 +154,7 @@ gap::generator<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::in(const Index 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCCompatibleAliasDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<ObjCCompatibleAliasDecl> e = ObjCCompatibleAliasDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCCompatibleAliasDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -151,7 +166,7 @@ gap::generator<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::in(const Fragme
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCCompatibleAliasDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCCompatibleAliasDecl> e = ObjCCompatibleAliasDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCCompatibleAliasDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -164,7 +179,7 @@ gap::generator<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::in(const File &
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCCompatibleAliasDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCCompatibleAliasDecl> e = ObjCCompatibleAliasDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<ObjCCompatibleAliasDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -176,13 +191,23 @@ std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const Refer
   return ObjCCompatibleAliasDecl::from(r.as_declaration());
 }
 
+std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const TokenContext &t) {
-  return ObjCCompatibleAliasDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 ObjCInterfaceDecl ObjCCompatibleAliasDecl::class_interface(void) const {
   RawEntityId eid = impl->reader.getVal56();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

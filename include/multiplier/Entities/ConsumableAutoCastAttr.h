@@ -40,17 +40,13 @@ class ConsumableAutoCastAttr : public InheritableAttr {
     return AttrKind::CONSUMABLE_AUTO_CAST;
   }
 
-  static std::optional<ConsumableAutoCastAttr> from(const Attr &parent);
-
-  inline static std::optional<ConsumableAutoCastAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ConsumableAutoCastAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ConsumableAutoCastAttr> from_base(const Attr &parent);
+  inline static std::optional<ConsumableAutoCastAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ConsumableAutoCastAttr> from(const std::optional<Attr> &parent);
   static std::optional<ConsumableAutoCastAttr> from(const Reference &r);
+  static std::optional<ConsumableAutoCastAttr> from(const VariantEntity &e);
   static std::optional<ConsumableAutoCastAttr> from(const TokenContext &t);
 
 };

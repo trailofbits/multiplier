@@ -40,17 +40,13 @@ class PtGuardedVarAttr : public InheritableAttr {
     return AttrKind::PT_GUARDED_VAR;
   }
 
-  static std::optional<PtGuardedVarAttr> from(const Attr &parent);
-
-  inline static std::optional<PtGuardedVarAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return PtGuardedVarAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PtGuardedVarAttr> from_base(const Attr &parent);
+  inline static std::optional<PtGuardedVarAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PtGuardedVarAttr> from(const std::optional<Attr> &parent);
   static std::optional<PtGuardedVarAttr> from(const Reference &r);
+  static std::optional<PtGuardedVarAttr> from(const VariantEntity &e);
   static std::optional<PtGuardedVarAttr> from(const TokenContext &t);
 
 };

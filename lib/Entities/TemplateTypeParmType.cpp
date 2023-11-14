@@ -39,18 +39,30 @@ bool TemplateTypeParmType::contains(const Token &tok) const {
 std::optional<TemplateTypeParmType> TemplateTypeParmType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return TemplateTypeParmType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TemplateTypeParmType> TemplateTypeParmType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kTemplateTypeParmTypeDerivedKinds[] = {
     TemplateTypeParmType::static_kind(),
 };
 
-std::optional<TemplateTypeParmType> TemplateTypeParmType::from(const Type &parent) {
+}  // namespace
+
+std::optional<TemplateTypeParmType> TemplateTypeParmType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case TemplateTypeParmType::static_kind():
       return reinterpret_cast<const TemplateTypeParmType &>(parent);
@@ -63,7 +75,7 @@ gap::generator<TemplateTypeParmType> TemplateTypeParmType::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kTemplateTypeParmTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<TemplateTypeParmType> e = TemplateTypeParmType::from(Type(std::move(eptr)))) {
+      if (std::optional<TemplateTypeParmType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -74,8 +86,18 @@ std::optional<TemplateTypeParmType> TemplateTypeParmType::from(const Reference &
   return TemplateTypeParmType::from(r.as_type());
 }
 
+std::optional<TemplateTypeParmType> TemplateTypeParmType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<TemplateTypeParmType> TemplateTypeParmType::from(const TokenContext &t) {
-  return TemplateTypeParmType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type TemplateTypeParmType::desugar(void) const {
@@ -90,7 +112,7 @@ std::optional<TemplateTypeParmDecl> TemplateTypeParmType::declaration(void) cons
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return TemplateTypeParmDecl::from(Decl(std::move(eptr)));
+      return TemplateTypeParmDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

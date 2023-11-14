@@ -52,17 +52,13 @@ class ShuffleVectorExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ShuffleVectorExpr> from(const Stmt &parent);
-
-  inline static std::optional<ShuffleVectorExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return ShuffleVectorExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ShuffleVectorExpr> from_base(const Stmt &parent);
+  inline static std::optional<ShuffleVectorExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ShuffleVectorExpr> from(const std::optional<Stmt> &parent);
   static std::optional<ShuffleVectorExpr> from(const Reference &r);
+  static std::optional<ShuffleVectorExpr> from(const VariantEntity &e);
   static std::optional<ShuffleVectorExpr> from(const TokenContext &t);
 
   Token builtin_token(void) const;

@@ -38,17 +38,13 @@ class OMPCaptureKindAttr : public Attr {
     return AttrKind::OMP_CAPTURE_KIND;
   }
 
-  static std::optional<OMPCaptureKindAttr> from(const Attr &parent);
-
-  inline static std::optional<OMPCaptureKindAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OMPCaptureKindAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPCaptureKindAttr> from_base(const Attr &parent);
+  inline static std::optional<OMPCaptureKindAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPCaptureKindAttr> from(const std::optional<Attr> &parent);
   static std::optional<OMPCaptureKindAttr> from(const Reference &r);
+  static std::optional<OMPCaptureKindAttr> from(const VariantEntity &e);
   static std::optional<OMPCaptureKindAttr> from(const TokenContext &t);
 
 };

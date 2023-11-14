@@ -40,17 +40,13 @@ class WebAssemblyImportNameAttr : public InheritableAttr {
     return AttrKind::WEB_ASSEMBLY_IMPORT_NAME;
   }
 
-  static std::optional<WebAssemblyImportNameAttr> from(const Attr &parent);
-
-  inline static std::optional<WebAssemblyImportNameAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return WebAssemblyImportNameAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<WebAssemblyImportNameAttr> from_base(const Attr &parent);
+  inline static std::optional<WebAssemblyImportNameAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<WebAssemblyImportNameAttr> from(const std::optional<Attr> &parent);
   static std::optional<WebAssemblyImportNameAttr> from(const Reference &r);
+  static std::optional<WebAssemblyImportNameAttr> from(const VariantEntity &e);
   static std::optional<WebAssemblyImportNameAttr> from(const TokenContext &t);
 
   std::string_view import_name(void) const;

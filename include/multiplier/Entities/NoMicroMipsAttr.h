@@ -40,17 +40,13 @@ class NoMicroMipsAttr : public InheritableAttr {
     return AttrKind::NO_MICRO_MIPS;
   }
 
-  static std::optional<NoMicroMipsAttr> from(const Attr &parent);
-
-  inline static std::optional<NoMicroMipsAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoMicroMipsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoMicroMipsAttr> from_base(const Attr &parent);
+  inline static std::optional<NoMicroMipsAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoMicroMipsAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoMicroMipsAttr> from(const Reference &r);
+  static std::optional<NoMicroMipsAttr> from(const VariantEntity &e);
   static std::optional<NoMicroMipsAttr> from(const TokenContext &t);
 
 };

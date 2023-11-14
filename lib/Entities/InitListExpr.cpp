@@ -90,18 +90,30 @@ bool InitListExpr::contains(const Stmt &stmt) {
 std::optional<InitListExpr> InitListExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return InitListExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<InitListExpr> InitListExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kInitListExprDerivedKinds[] = {
     InitListExpr::static_kind(),
 };
 
-std::optional<InitListExpr> InitListExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<InitListExpr> InitListExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case InitListExpr::static_kind():
       return reinterpret_cast<const InitListExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<InitListExpr> InitListExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kInitListExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<InitListExpr> e = InitListExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<InitListExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<InitListExpr> InitListExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kInitListExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<InitListExpr> e = InitListExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<InitListExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<InitListExpr> InitListExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kInitListExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<InitListExpr> e = InitListExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<InitListExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<InitListExpr> InitListExpr::from(const Reference &r) {
   return InitListExpr::from(r.as_statement());
 }
 
+std::optional<InitListExpr> InitListExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<InitListExpr> InitListExpr::from(const TokenContext &t) {
-  return InitListExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::optional<Expr> InitListExpr::array_filler(void) const {
@@ -162,7 +184,7 @@ std::optional<Expr> InitListExpr::array_filler(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -175,7 +197,7 @@ std::optional<FieldDecl> InitListExpr::initialized_field_in_union(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FieldDecl::from(Decl(std::move(eptr)));
+      return FieldDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -196,7 +218,7 @@ std::optional<InitListExpr> InitListExpr::semantic_form(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return InitListExpr::from(Stmt(std::move(eptr)));
+      return InitListExpr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -209,7 +231,7 @@ std::optional<InitListExpr> InitListExpr::syntactic_form(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return InitListExpr::from(Stmt(std::move(eptr)));
+      return InitListExpr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -242,7 +264,7 @@ std::optional<Expr> InitListExpr::nth_initializer(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> InitListExpr::initializers(void) const & {
@@ -251,7 +273,7 @@ gap::generator<Expr> InitListExpr::initializers(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+      if (auto e = Expr::from_base(std::move(d15))) {
         co_yield std::move(*e);
       }
     }

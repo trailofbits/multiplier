@@ -62,17 +62,13 @@ class FieldDecl : public DeclaratorDecl {
   FieldDecl canonical_declaration(void) const;
   std::optional<FieldDecl> definition(void) const;
   gap::generator<FieldDecl> redeclarations(void) const &;
-  static std::optional<FieldDecl> from(const Decl &parent);
-
-  inline static std::optional<FieldDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return FieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<FieldDecl> from_base(const Decl &parent);
+  inline static std::optional<FieldDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<FieldDecl> from(const std::optional<Decl> &parent);
   static std::optional<FieldDecl> from(const Reference &r);
+  static std::optional<FieldDecl> from(const VariantEntity &e);
   static std::optional<FieldDecl> from(const TokenContext &t);
 
   std::optional<Expr> bit_width(void) const;

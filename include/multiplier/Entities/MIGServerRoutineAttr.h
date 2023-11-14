@@ -40,17 +40,13 @@ class MIGServerRoutineAttr : public InheritableAttr {
     return AttrKind::MIG_SERVER_ROUTINE_;
   }
 
-  static std::optional<MIGServerRoutineAttr> from(const Attr &parent);
-
-  inline static std::optional<MIGServerRoutineAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MIGServerRoutineAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MIGServerRoutineAttr> from_base(const Attr &parent);
+  inline static std::optional<MIGServerRoutineAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MIGServerRoutineAttr> from(const std::optional<Attr> &parent);
   static std::optional<MIGServerRoutineAttr> from(const Reference &r);
+  static std::optional<MIGServerRoutineAttr> from(const VariantEntity &e);
   static std::optional<MIGServerRoutineAttr> from(const TokenContext &t);
 
 };

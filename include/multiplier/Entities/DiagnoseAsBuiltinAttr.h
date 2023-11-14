@@ -41,17 +41,13 @@ class DiagnoseAsBuiltinAttr : public InheritableAttr {
     return AttrKind::DIAGNOSE_AS_BUILTIN;
   }
 
-  static std::optional<DiagnoseAsBuiltinAttr> from(const Attr &parent);
-
-  inline static std::optional<DiagnoseAsBuiltinAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return DiagnoseAsBuiltinAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<DiagnoseAsBuiltinAttr> from_base(const Attr &parent);
+  inline static std::optional<DiagnoseAsBuiltinAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<DiagnoseAsBuiltinAttr> from(const std::optional<Attr> &parent);
   static std::optional<DiagnoseAsBuiltinAttr> from(const Reference &r);
+  static std::optional<DiagnoseAsBuiltinAttr> from(const VariantEntity &e);
   static std::optional<DiagnoseAsBuiltinAttr> from(const TokenContext &t);
 
   FunctionDecl function(void) const;

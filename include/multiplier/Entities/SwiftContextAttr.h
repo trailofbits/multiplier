@@ -44,17 +44,13 @@ class SwiftContextAttr : public ParameterABIAttr {
     return AttrKind::SWIFT_CONTEXT;
   }
 
-  static std::optional<SwiftContextAttr> from(const Attr &parent);
-
-  inline static std::optional<SwiftContextAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SwiftContextAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SwiftContextAttr> from_base(const Attr &parent);
+  inline static std::optional<SwiftContextAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SwiftContextAttr> from(const std::optional<Attr> &parent);
   static std::optional<SwiftContextAttr> from(const Reference &r);
+  static std::optional<SwiftContextAttr> from(const VariantEntity &e);
   static std::optional<SwiftContextAttr> from(const TokenContext &t);
 
 };

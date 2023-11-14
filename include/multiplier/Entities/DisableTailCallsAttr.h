@@ -40,17 +40,13 @@ class DisableTailCallsAttr : public InheritableAttr {
     return AttrKind::DISABLE_TAIL_CALLS;
   }
 
-  static std::optional<DisableTailCallsAttr> from(const Attr &parent);
-
-  inline static std::optional<DisableTailCallsAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return DisableTailCallsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<DisableTailCallsAttr> from_base(const Attr &parent);
+  inline static std::optional<DisableTailCallsAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<DisableTailCallsAttr> from(const std::optional<Attr> &parent);
   static std::optional<DisableTailCallsAttr> from(const Reference &r);
+  static std::optional<DisableTailCallsAttr> from(const VariantEntity &e);
   static std::optional<DisableTailCallsAttr> from(const TokenContext &t);
 
 };

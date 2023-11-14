@@ -89,7 +89,7 @@ bool BaseUsingDecl::contains(const Stmt &stmt) {
 }
 
 BaseUsingDecl BaseUsingDecl::canonical_declaration(void) const {
-  if (auto canon = BaseUsingDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (BaseUsingDecl redecl : redeclarations()) {
@@ -99,12 +99,15 @@ BaseUsingDecl BaseUsingDecl::canonical_declaration(void) const {
 }
 
 std::optional<BaseUsingDecl> BaseUsingDecl::definition(void) const {
-  return BaseUsingDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<BaseUsingDecl> BaseUsingDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<BaseUsingDecl> dr = BaseUsingDecl::from(r)) {
+    if (std::optional<BaseUsingDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -117,19 +120,31 @@ gap::generator<BaseUsingDecl> BaseUsingDecl::redeclarations(void) const & {
 std::optional<BaseUsingDecl> BaseUsingDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return BaseUsingDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<BaseUsingDecl> BaseUsingDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kBaseUsingDeclDerivedKinds[] = {
     UsingDecl::static_kind(),
     UsingEnumDecl::static_kind(),
 };
 
-std::optional<BaseUsingDecl> BaseUsingDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<BaseUsingDecl> BaseUsingDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case UsingDecl::static_kind():
     case UsingEnumDecl::static_kind():
@@ -143,7 +158,7 @@ gap::generator<BaseUsingDecl> BaseUsingDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kBaseUsingDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<BaseUsingDecl> e = BaseUsingDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<BaseUsingDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -155,7 +170,7 @@ gap::generator<BaseUsingDecl> BaseUsingDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kBaseUsingDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<BaseUsingDecl> e = BaseUsingDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<BaseUsingDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -168,7 +183,7 @@ gap::generator<BaseUsingDecl> BaseUsingDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kBaseUsingDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<BaseUsingDecl> e = BaseUsingDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<BaseUsingDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -180,8 +195,18 @@ std::optional<BaseUsingDecl> BaseUsingDecl::from(const Reference &r) {
   return BaseUsingDecl::from(r.as_declaration());
 }
 
+std::optional<BaseUsingDecl> BaseUsingDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<BaseUsingDecl> BaseUsingDecl::from(const TokenContext &t) {
-  return BaseUsingDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 unsigned BaseUsingDecl::num_shadows(void) const {
@@ -199,7 +224,7 @@ std::optional<UsingShadowDecl> BaseUsingDecl::nth_shadow(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return UsingShadowDecl::from(Decl(std::move(e)));
+  return UsingShadowDecl::from_base(std::move(e));
 }
 
 gap::generator<UsingShadowDecl> BaseUsingDecl::shadows(void) const & {
@@ -208,7 +233,7 @@ gap::generator<UsingShadowDecl> BaseUsingDecl::shadows(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d51 = ep->DeclFor(ep, v)) {
-      if (auto e = UsingShadowDecl::from(Decl(std::move(d51)))) {
+      if (auto e = UsingShadowDecl::from_base(std::move(d51))) {
         co_yield std::move(*e);
       }
     }

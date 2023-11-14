@@ -43,17 +43,13 @@ class PassObjectSizeAttr : public InheritableParamAttr {
     return AttrKind::PASS_OBJECT_SIZE;
   }
 
-  static std::optional<PassObjectSizeAttr> from(const Attr &parent);
-
-  inline static std::optional<PassObjectSizeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return PassObjectSizeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PassObjectSizeAttr> from_base(const Attr &parent);
+  inline static std::optional<PassObjectSizeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PassObjectSizeAttr> from(const std::optional<Attr> &parent);
   static std::optional<PassObjectSizeAttr> from(const Reference &r);
+  static std::optional<PassObjectSizeAttr> from(const VariantEntity &e);
   static std::optional<PassObjectSizeAttr> from(const TokenContext &t);
 
   PassObjectSizeAttrSpelling semantic_spelling(void) const;

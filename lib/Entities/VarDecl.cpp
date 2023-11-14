@@ -96,7 +96,7 @@ bool VarDecl::contains(const Stmt &stmt) {
 }
 
 VarDecl VarDecl::canonical_declaration(void) const {
-  if (auto canon = VarDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (VarDecl redecl : redeclarations()) {
@@ -106,12 +106,15 @@ VarDecl VarDecl::canonical_declaration(void) const {
 }
 
 std::optional<VarDecl> VarDecl::definition(void) const {
-  return VarDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<VarDecl> VarDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<VarDecl> dr = VarDecl::from(r)) {
+    if (std::optional<VarDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -124,13 +127,23 @@ gap::generator<VarDecl> VarDecl::redeclarations(void) const & {
 std::optional<VarDecl> VarDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return VarDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<VarDecl> VarDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kVarDeclDerivedKinds[] = {
     VarDecl::static_kind(),
     VarTemplateSpecializationDecl::static_kind(),
@@ -141,7 +154,9 @@ static const DeclKind kVarDeclDerivedKinds[] = {
     VarTemplatePartialSpecializationDecl::static_kind(),
 };
 
-std::optional<VarDecl> VarDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<VarDecl> VarDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case VarDecl::static_kind():
     case VarTemplateSpecializationDecl::static_kind():
@@ -160,7 +175,7 @@ gap::generator<VarDecl> VarDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kVarDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<VarDecl> e = VarDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<VarDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -172,7 +187,7 @@ gap::generator<VarDecl> VarDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kVarDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<VarDecl> e = VarDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<VarDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -185,7 +200,7 @@ gap::generator<VarDecl> VarDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kVarDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<VarDecl> e = VarDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<VarDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -197,8 +212,18 @@ std::optional<VarDecl> VarDecl::from(const Reference &r) {
   return VarDecl::from(r.as_declaration());
 }
 
+std::optional<VarDecl> VarDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<VarDecl> VarDecl::from(const TokenContext &t) {
-  return VarDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::optional<VarDecl> VarDecl::acting_definition(void) const {
@@ -208,7 +233,7 @@ std::optional<VarDecl> VarDecl::acting_definition(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr)));
+      return VarDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -221,7 +246,7 @@ std::optional<VarTemplateDecl> VarDecl::described_variable_template(void) const 
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarTemplateDecl::from(Decl(std::move(eptr)));
+      return VarTemplateDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -234,7 +259,7 @@ std::optional<Expr> VarDecl::initializer(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -251,7 +276,7 @@ std::optional<VarDecl> VarDecl::initializing_declaration(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr)));
+      return VarDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -264,7 +289,7 @@ std::optional<VarDecl> VarDecl::instantiated_from_static_data_member(void) const
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr)));
+      return VarDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -301,7 +326,7 @@ std::optional<VarDecl> VarDecl::template_instantiation_pattern(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr)));
+      return VarDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

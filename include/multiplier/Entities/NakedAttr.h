@@ -40,17 +40,13 @@ class NakedAttr : public InheritableAttr {
     return AttrKind::NAKED;
   }
 
-  static std::optional<NakedAttr> from(const Attr &parent);
-
-  inline static std::optional<NakedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NakedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NakedAttr> from_base(const Attr &parent);
+  inline static std::optional<NakedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NakedAttr> from(const std::optional<Attr> &parent);
   static std::optional<NakedAttr> from(const Reference &r);
+  static std::optional<NakedAttr> from(const VariantEntity &e);
   static std::optional<NakedAttr> from(const TokenContext &t);
 
 };

@@ -40,17 +40,13 @@ class ArmBuiltinAliasAttr : public InheritableAttr {
     return AttrKind::ARM_BUILTIN_ALIAS;
   }
 
-  static std::optional<ArmBuiltinAliasAttr> from(const Attr &parent);
-
-  inline static std::optional<ArmBuiltinAliasAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ArmBuiltinAliasAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ArmBuiltinAliasAttr> from_base(const Attr &parent);
+  inline static std::optional<ArmBuiltinAliasAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ArmBuiltinAliasAttr> from(const std::optional<Attr> &parent);
   static std::optional<ArmBuiltinAliasAttr> from(const Reference &r);
+  static std::optional<ArmBuiltinAliasAttr> from(const VariantEntity &e);
   static std::optional<ArmBuiltinAliasAttr> from(const TokenContext &t);
 
 };

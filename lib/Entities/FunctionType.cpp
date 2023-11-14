@@ -40,19 +40,31 @@ bool FunctionType::contains(const Token &tok) const {
 std::optional<FunctionType> FunctionType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return FunctionType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<FunctionType> FunctionType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kFunctionTypeDerivedKinds[] = {
     FunctionNoProtoType::static_kind(),
     FunctionProtoType::static_kind(),
 };
 
-std::optional<FunctionType> FunctionType::from(const Type &parent) {
+}  // namespace
+
+std::optional<FunctionType> FunctionType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case FunctionNoProtoType::static_kind():
     case FunctionProtoType::static_kind():
@@ -66,7 +78,7 @@ gap::generator<FunctionType> FunctionType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kFunctionTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<FunctionType> e = FunctionType::from(Type(std::move(eptr)))) {
+      if (std::optional<FunctionType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -77,8 +89,18 @@ std::optional<FunctionType> FunctionType::from(const Reference &r) {
   return FunctionType::from(r.as_type());
 }
 
+std::optional<FunctionType> FunctionType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<FunctionType> FunctionType::from(const TokenContext &t) {
-  return FunctionType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 CallingConv FunctionType::call_conv(void) const {

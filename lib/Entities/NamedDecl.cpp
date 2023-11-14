@@ -148,7 +148,7 @@ bool NamedDecl::contains(const Stmt &stmt) {
 }
 
 NamedDecl NamedDecl::canonical_declaration(void) const {
-  if (auto canon = NamedDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (NamedDecl redecl : redeclarations()) {
@@ -158,12 +158,15 @@ NamedDecl NamedDecl::canonical_declaration(void) const {
 }
 
 std::optional<NamedDecl> NamedDecl::definition(void) const {
-  return NamedDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<NamedDecl> NamedDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<NamedDecl> dr = NamedDecl::from(r)) {
+    if (std::optional<NamedDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -176,13 +179,23 @@ gap::generator<NamedDecl> NamedDecl::redeclarations(void) const & {
 std::optional<NamedDecl> NamedDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return NamedDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<NamedDecl> NamedDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kNamedDeclDerivedKinds[] = {
     NamespaceAliasDecl::static_kind(),
     NamespaceDecl::static_kind(),
@@ -249,7 +262,9 @@ static const DeclKind kNamedDeclDerivedKinds[] = {
     ClassTemplatePartialSpecializationDecl::static_kind(),
 };
 
-std::optional<NamedDecl> NamedDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<NamedDecl> NamedDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case NamespaceAliasDecl::static_kind():
     case NamespaceDecl::static_kind():
@@ -324,7 +339,7 @@ gap::generator<NamedDecl> NamedDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kNamedDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<NamedDecl> e = NamedDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<NamedDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -336,7 +351,7 @@ gap::generator<NamedDecl> NamedDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kNamedDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<NamedDecl> e = NamedDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<NamedDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -349,7 +364,7 @@ gap::generator<NamedDecl> NamedDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kNamedDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<NamedDecl> e = NamedDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<NamedDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -361,8 +376,18 @@ std::optional<NamedDecl> NamedDecl::from(const Reference &r) {
   return NamedDecl::from(r.as_declaration());
 }
 
+std::optional<NamedDecl> NamedDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<NamedDecl> NamedDecl::from(const TokenContext &t) {
-  return NamedDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Linkage NamedDecl::formal_linkage(void) const {
@@ -390,7 +415,7 @@ std::string_view NamedDecl::qualified_name_as_string(void) const {
 
 NamedDecl NamedDecl::underlying_declaration(void) const {
   RawEntityId eid = impl->reader.getVal49();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Visibility NamedDecl::visibility(void) const {

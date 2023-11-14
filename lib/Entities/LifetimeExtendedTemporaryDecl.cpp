@@ -87,7 +87,7 @@ bool LifetimeExtendedTemporaryDecl::contains(const Stmt &stmt) {
 }
 
 LifetimeExtendedTemporaryDecl LifetimeExtendedTemporaryDecl::canonical_declaration(void) const {
-  if (auto canon = LifetimeExtendedTemporaryDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (LifetimeExtendedTemporaryDecl redecl : redeclarations()) {
@@ -97,12 +97,15 @@ LifetimeExtendedTemporaryDecl LifetimeExtendedTemporaryDecl::canonical_declarati
 }
 
 std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::definition(void) const {
-  return LifetimeExtendedTemporaryDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<LifetimeExtendedTemporaryDecl> dr = LifetimeExtendedTemporaryDecl::from(r)) {
+    if (std::optional<LifetimeExtendedTemporaryDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -115,18 +118,30 @@ gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::red
 std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return LifetimeExtendedTemporaryDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kLifetimeExtendedTemporaryDeclDerivedKinds[] = {
     LifetimeExtendedTemporaryDecl::static_kind(),
 };
 
-std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case LifetimeExtendedTemporaryDecl::static_kind():
       return reinterpret_cast<const LifetimeExtendedTemporaryDecl &>(parent);
@@ -139,7 +154,7 @@ gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kLifetimeExtendedTemporaryDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<LifetimeExtendedTemporaryDecl> e = LifetimeExtendedTemporaryDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<LifetimeExtendedTemporaryDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -151,7 +166,7 @@ gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kLifetimeExtendedTemporaryDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<LifetimeExtendedTemporaryDecl> e = LifetimeExtendedTemporaryDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<LifetimeExtendedTemporaryDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -164,7 +179,7 @@ gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kLifetimeExtendedTemporaryDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<LifetimeExtendedTemporaryDecl> e = LifetimeExtendedTemporaryDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<LifetimeExtendedTemporaryDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -176,8 +191,18 @@ std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from
   return LifetimeExtendedTemporaryDecl::from(r.as_declaration());
 }
 
+std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from(const TokenContext &t) {
-  return LifetimeExtendedTemporaryDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<Stmt> LifetimeExtendedTemporaryDecl::children(void) const & {
@@ -194,7 +219,7 @@ gap::generator<Stmt> LifetimeExtendedTemporaryDecl::children(void) const & {
 
 ValueDecl LifetimeExtendedTemporaryDecl::extending_declaration(void) const {
   RawEntityId eid = impl->reader.getVal49();
-  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ValueDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 StorageDuration LifetimeExtendedTemporaryDecl::storage_duration(void) const {
@@ -203,7 +228,7 @@ StorageDuration LifetimeExtendedTemporaryDecl::storage_duration(void) const {
 
 Expr LifetimeExtendedTemporaryDecl::temporary_expression(void) const {
   RawEntityId eid = impl->reader.getVal56();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

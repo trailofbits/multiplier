@@ -66,17 +66,13 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   ClassTemplateSpecializationDecl canonical_declaration(void) const;
   std::optional<ClassTemplateSpecializationDecl> definition(void) const;
   gap::generator<ClassTemplateSpecializationDecl> redeclarations(void) const &;
-  static std::optional<ClassTemplateSpecializationDecl> from(const Decl &parent);
-
-  inline static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ClassTemplateSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ClassTemplateSpecializationDecl> from_base(const Decl &parent);
+  inline static std::optional<ClassTemplateSpecializationDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<Decl> &parent);
   static std::optional<ClassTemplateSpecializationDecl> from(const Reference &r);
+  static std::optional<ClassTemplateSpecializationDecl> from(const VariantEntity &e);
   static std::optional<ClassTemplateSpecializationDecl> from(const TokenContext &t);
 
   Token extern_token(void) const;

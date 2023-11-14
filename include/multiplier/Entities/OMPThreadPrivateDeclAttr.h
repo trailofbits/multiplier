@@ -40,17 +40,13 @@ class OMPThreadPrivateDeclAttr : public InheritableAttr {
     return AttrKind::OMP_THREAD_PRIVATE_DECL;
   }
 
-  static std::optional<OMPThreadPrivateDeclAttr> from(const Attr &parent);
-
-  inline static std::optional<OMPThreadPrivateDeclAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OMPThreadPrivateDeclAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPThreadPrivateDeclAttr> from_base(const Attr &parent);
+  inline static std::optional<OMPThreadPrivateDeclAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPThreadPrivateDeclAttr> from(const std::optional<Attr> &parent);
   static std::optional<OMPThreadPrivateDeclAttr> from(const Reference &r);
+  static std::optional<OMPThreadPrivateDeclAttr> from(const VariantEntity &e);
   static std::optional<OMPThreadPrivateDeclAttr> from(const TokenContext &t);
 
 };

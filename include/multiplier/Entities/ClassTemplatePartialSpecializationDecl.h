@@ -65,17 +65,13 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
   ClassTemplatePartialSpecializationDecl canonical_declaration(void) const;
   std::optional<ClassTemplatePartialSpecializationDecl> definition(void) const;
   gap::generator<ClassTemplatePartialSpecializationDecl> redeclarations(void) const &;
-  static std::optional<ClassTemplatePartialSpecializationDecl> from(const Decl &parent);
-
-  inline static std::optional<ClassTemplatePartialSpecializationDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ClassTemplatePartialSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ClassTemplatePartialSpecializationDecl> from_base(const Decl &parent);
+  inline static std::optional<ClassTemplatePartialSpecializationDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ClassTemplatePartialSpecializationDecl> from(const std::optional<Decl> &parent);
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const Reference &r);
+  static std::optional<ClassTemplatePartialSpecializationDecl> from(const VariantEntity &e);
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const TokenContext &t);
 
   Type injected_specialization_type(void) const;

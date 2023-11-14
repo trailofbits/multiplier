@@ -40,17 +40,13 @@ class NoDestroyAttr : public InheritableAttr {
     return AttrKind::NO_DESTROY;
   }
 
-  static std::optional<NoDestroyAttr> from(const Attr &parent);
-
-  inline static std::optional<NoDestroyAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoDestroyAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoDestroyAttr> from_base(const Attr &parent);
+  inline static std::optional<NoDestroyAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoDestroyAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoDestroyAttr> from(const Reference &r);
+  static std::optional<NoDestroyAttr> from(const VariantEntity &e);
   static std::optional<NoDestroyAttr> from(const TokenContext &t);
 
 };

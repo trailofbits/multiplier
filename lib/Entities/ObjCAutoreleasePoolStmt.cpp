@@ -87,18 +87,30 @@ bool ObjCAutoreleasePoolStmt::contains(const Stmt &stmt) {
 std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ObjCAutoreleasePoolStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kObjCAutoreleasePoolStmtDerivedKinds[] = {
     ObjCAutoreleasePoolStmt::static_kind(),
 };
 
-std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCAutoreleasePoolStmt::static_kind():
       return reinterpret_cast<const ObjCAutoreleasePoolStmt &>(parent);
@@ -111,7 +123,7 @@ gap::generator<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::in(const Index 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCAutoreleasePoolStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ObjCAutoreleasePoolStmt> e = ObjCAutoreleasePoolStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCAutoreleasePoolStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -123,7 +135,7 @@ gap::generator<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::in(const Fragme
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCAutoreleasePoolStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCAutoreleasePoolStmt> e = ObjCAutoreleasePoolStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCAutoreleasePoolStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -136,7 +148,7 @@ gap::generator<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::in(const File &
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCAutoreleasePoolStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCAutoreleasePoolStmt> e = ObjCAutoreleasePoolStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ObjCAutoreleasePoolStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -148,8 +160,18 @@ std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const Refer
   return ObjCAutoreleasePoolStmt::from(r.as_statement());
 }
 
+std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const TokenContext &t) {
-  return ObjCAutoreleasePoolStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token ObjCAutoreleasePoolStmt::at_token(void) const {

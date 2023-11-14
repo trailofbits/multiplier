@@ -38,17 +38,13 @@ class SubstTemplateTypeParmType : public Type {
     return TypeKind::SUBST_TEMPLATE_TYPE_PARM;
   }
 
-  static std::optional<SubstTemplateTypeParmType> from(const Type &parent);
-
-  inline static std::optional<SubstTemplateTypeParmType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return SubstTemplateTypeParmType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SubstTemplateTypeParmType> from_base(const Type &parent);
+  inline static std::optional<SubstTemplateTypeParmType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SubstTemplateTypeParmType> from(const std::optional<Type> &parent);
   static std::optional<SubstTemplateTypeParmType> from(const Reference &r);
+  static std::optional<SubstTemplateTypeParmType> from(const VariantEntity &e);
   static std::optional<SubstTemplateTypeParmType> from(const TokenContext &t);
 
   Type desugar(void) const;

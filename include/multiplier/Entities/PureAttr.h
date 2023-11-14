@@ -40,17 +40,13 @@ class PureAttr : public InheritableAttr {
     return AttrKind::PURE;
   }
 
-  static std::optional<PureAttr> from(const Attr &parent);
-
-  inline static std::optional<PureAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return PureAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PureAttr> from_base(const Attr &parent);
+  inline static std::optional<PureAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PureAttr> from(const std::optional<Attr> &parent);
   static std::optional<PureAttr> from(const Reference &r);
+  static std::optional<PureAttr> from(const VariantEntity &e);
   static std::optional<PureAttr> from(const TokenContext &t);
 
 };

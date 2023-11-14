@@ -38,17 +38,13 @@ class ExtVectorType : public VectorType {
     return TypeKind::EXT_VECTOR;
   }
 
-  static std::optional<ExtVectorType> from(const Type &parent);
-
-  inline static std::optional<ExtVectorType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return ExtVectorType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ExtVectorType> from_base(const Type &parent);
+  inline static std::optional<ExtVectorType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ExtVectorType> from(const std::optional<Type> &parent);
   static std::optional<ExtVectorType> from(const Reference &r);
+  static std::optional<ExtVectorType> from(const VariantEntity &e);
   static std::optional<ExtVectorType> from(const TokenContext &t);
 
 };

@@ -40,17 +40,13 @@ class WebAssemblyImportModuleAttr : public InheritableAttr {
     return AttrKind::WEB_ASSEMBLY_IMPORT_MODULE;
   }
 
-  static std::optional<WebAssemblyImportModuleAttr> from(const Attr &parent);
-
-  inline static std::optional<WebAssemblyImportModuleAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return WebAssemblyImportModuleAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<WebAssemblyImportModuleAttr> from_base(const Attr &parent);
+  inline static std::optional<WebAssemblyImportModuleAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<WebAssemblyImportModuleAttr> from(const std::optional<Attr> &parent);
   static std::optional<WebAssemblyImportModuleAttr> from(const Reference &r);
+  static std::optional<WebAssemblyImportModuleAttr> from(const VariantEntity &e);
   static std::optional<WebAssemblyImportModuleAttr> from(const TokenContext &t);
 
   std::string_view import_module(void) const;

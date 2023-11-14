@@ -40,17 +40,13 @@ class SPtrAttr : public TypeAttr {
     return AttrKind::S_PTR;
   }
 
-  static std::optional<SPtrAttr> from(const Attr &parent);
-
-  inline static std::optional<SPtrAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SPtrAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SPtrAttr> from_base(const Attr &parent);
+  inline static std::optional<SPtrAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SPtrAttr> from(const std::optional<Attr> &parent);
   static std::optional<SPtrAttr> from(const Reference &r);
+  static std::optional<SPtrAttr> from(const VariantEntity &e);
   static std::optional<SPtrAttr> from(const TokenContext &t);
 
 };

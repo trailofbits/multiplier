@@ -41,17 +41,13 @@ class FinalAttr : public InheritableAttr {
     return AttrKind::FINAL;
   }
 
-  static std::optional<FinalAttr> from(const Attr &parent);
-
-  inline static std::optional<FinalAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return FinalAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<FinalAttr> from_base(const Attr &parent);
+  inline static std::optional<FinalAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<FinalAttr> from(const std::optional<Attr> &parent);
   static std::optional<FinalAttr> from(const Reference &r);
+  static std::optional<FinalAttr> from(const VariantEntity &e);
   static std::optional<FinalAttr> from(const TokenContext &t);
 
   FinalAttrSpelling semantic_spelling(void) const;

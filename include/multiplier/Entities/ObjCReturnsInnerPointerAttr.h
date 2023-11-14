@@ -40,17 +40,13 @@ class ObjCReturnsInnerPointerAttr : public InheritableAttr {
     return AttrKind::OBJ_C_RETURNS_INNER_POINTER;
   }
 
-  static std::optional<ObjCReturnsInnerPointerAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCReturnsInnerPointerAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCReturnsInnerPointerAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCReturnsInnerPointerAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCReturnsInnerPointerAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCReturnsInnerPointerAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCReturnsInnerPointerAttr> from(const Reference &r);
+  static std::optional<ObjCReturnsInnerPointerAttr> from(const VariantEntity &e);
   static std::optional<ObjCReturnsInnerPointerAttr> from(const TokenContext &t);
 
 };

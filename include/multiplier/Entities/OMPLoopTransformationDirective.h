@@ -50,17 +50,13 @@ class OMPLoopTransformationDirective : public OMPLoopBasedDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<OMPLoopTransformationDirective> from(const Stmt &parent);
-
-  inline static std::optional<OMPLoopTransformationDirective> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return OMPLoopTransformationDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPLoopTransformationDirective> from_base(const Stmt &parent);
+  inline static std::optional<OMPLoopTransformationDirective> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPLoopTransformationDirective> from(const std::optional<Stmt> &parent);
   static std::optional<OMPLoopTransformationDirective> from(const Reference &r);
+  static std::optional<OMPLoopTransformationDirective> from(const VariantEntity &e);
   static std::optional<OMPLoopTransformationDirective> from(const TokenContext &t);
 
   Stmt pre_initializers(void) const;

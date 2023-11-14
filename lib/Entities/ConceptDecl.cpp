@@ -88,7 +88,7 @@ bool ConceptDecl::contains(const Stmt &stmt) {
 }
 
 ConceptDecl ConceptDecl::canonical_declaration(void) const {
-  if (auto canon = ConceptDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (ConceptDecl redecl : redeclarations()) {
@@ -98,12 +98,15 @@ ConceptDecl ConceptDecl::canonical_declaration(void) const {
 }
 
 std::optional<ConceptDecl> ConceptDecl::definition(void) const {
-  return ConceptDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<ConceptDecl> ConceptDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<ConceptDecl> dr = ConceptDecl::from(r)) {
+    if (std::optional<ConceptDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -116,18 +119,30 @@ gap::generator<ConceptDecl> ConceptDecl::redeclarations(void) const & {
 std::optional<ConceptDecl> ConceptDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return ConceptDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ConceptDecl> ConceptDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kConceptDeclDerivedKinds[] = {
     ConceptDecl::static_kind(),
 };
 
-std::optional<ConceptDecl> ConceptDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<ConceptDecl> ConceptDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case ConceptDecl::static_kind():
       return reinterpret_cast<const ConceptDecl &>(parent);
@@ -140,7 +155,7 @@ gap::generator<ConceptDecl> ConceptDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kConceptDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<ConceptDecl> e = ConceptDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ConceptDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -152,7 +167,7 @@ gap::generator<ConceptDecl> ConceptDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kConceptDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<ConceptDecl> e = ConceptDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ConceptDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -165,7 +180,7 @@ gap::generator<ConceptDecl> ConceptDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kConceptDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<ConceptDecl> e = ConceptDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<ConceptDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -177,13 +192,23 @@ std::optional<ConceptDecl> ConceptDecl::from(const Reference &r) {
   return ConceptDecl::from(r.as_declaration());
 }
 
+std::optional<ConceptDecl> ConceptDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<ConceptDecl> ConceptDecl::from(const TokenContext &t) {
-  return ConceptDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr ConceptDecl::constraint_expression(void) const {
   RawEntityId eid = impl->reader.getVal58();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool ConceptDecl::is_type_concept(void) const {

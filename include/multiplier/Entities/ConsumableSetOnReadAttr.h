@@ -40,17 +40,13 @@ class ConsumableSetOnReadAttr : public InheritableAttr {
     return AttrKind::CONSUMABLE_SET_ON_READ;
   }
 
-  static std::optional<ConsumableSetOnReadAttr> from(const Attr &parent);
-
-  inline static std::optional<ConsumableSetOnReadAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ConsumableSetOnReadAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ConsumableSetOnReadAttr> from_base(const Attr &parent);
+  inline static std::optional<ConsumableSetOnReadAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ConsumableSetOnReadAttr> from(const std::optional<Attr> &parent);
   static std::optional<ConsumableSetOnReadAttr> from(const Reference &r);
+  static std::optional<ConsumableSetOnReadAttr> from(const VariantEntity &e);
   static std::optional<ConsumableSetOnReadAttr> from(const TokenContext &t);
 
 };

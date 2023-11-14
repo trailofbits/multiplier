@@ -37,17 +37,13 @@ class TypeOfType : public Type {
     return TypeKind::TYPE_OF;
   }
 
-  static std::optional<TypeOfType> from(const Type &parent);
-
-  inline static std::optional<TypeOfType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return TypeOfType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TypeOfType> from_base(const Type &parent);
+  inline static std::optional<TypeOfType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TypeOfType> from(const std::optional<Type> &parent);
   static std::optional<TypeOfType> from(const Reference &r);
+  static std::optional<TypeOfType> from(const VariantEntity &e);
   static std::optional<TypeOfType> from(const TokenContext &t);
 
   Type desugar(void) const;

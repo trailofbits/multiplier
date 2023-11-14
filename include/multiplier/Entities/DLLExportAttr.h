@@ -40,17 +40,13 @@ class DLLExportAttr : public InheritableAttr {
     return AttrKind::DLL_EXPORT;
   }
 
-  static std::optional<DLLExportAttr> from(const Attr &parent);
-
-  inline static std::optional<DLLExportAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return DLLExportAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<DLLExportAttr> from_base(const Attr &parent);
+  inline static std::optional<DLLExportAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<DLLExportAttr> from(const std::optional<Attr> &parent);
   static std::optional<DLLExportAttr> from(const Reference &r);
+  static std::optional<DLLExportAttr> from(const VariantEntity &e);
   static std::optional<DLLExportAttr> from(const TokenContext &t);
 
 };

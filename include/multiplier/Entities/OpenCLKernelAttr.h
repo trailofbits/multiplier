@@ -40,17 +40,13 @@ class OpenCLKernelAttr : public InheritableAttr {
     return AttrKind::OPEN_CL_KERNEL;
   }
 
-  static std::optional<OpenCLKernelAttr> from(const Attr &parent);
-
-  inline static std::optional<OpenCLKernelAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OpenCLKernelAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OpenCLKernelAttr> from_base(const Attr &parent);
+  inline static std::optional<OpenCLKernelAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OpenCLKernelAttr> from(const std::optional<Attr> &parent);
   static std::optional<OpenCLKernelAttr> from(const Reference &r);
+  static std::optional<OpenCLKernelAttr> from(const VariantEntity &e);
   static std::optional<OpenCLKernelAttr> from(const TokenContext &t);
 
 };

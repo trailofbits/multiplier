@@ -41,17 +41,13 @@ class TypeTagForDatatypeAttr : public InheritableAttr {
     return AttrKind::TYPE_TAG_FOR_DATATYPE;
   }
 
-  static std::optional<TypeTagForDatatypeAttr> from(const Attr &parent);
-
-  inline static std::optional<TypeTagForDatatypeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return TypeTagForDatatypeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TypeTagForDatatypeAttr> from_base(const Attr &parent);
+  inline static std::optional<TypeTagForDatatypeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TypeTagForDatatypeAttr> from(const std::optional<Attr> &parent);
   static std::optional<TypeTagForDatatypeAttr> from(const Reference &r);
+  static std::optional<TypeTagForDatatypeAttr> from(const VariantEntity &e);
   static std::optional<TypeTagForDatatypeAttr> from(const TokenContext &t);
 
   bool layout_compatible(void) const;

@@ -42,17 +42,13 @@ class NSConsumedAttr : public InheritableParamAttr {
     return AttrKind::NS_CONSUMED;
   }
 
-  static std::optional<NSConsumedAttr> from(const Attr &parent);
-
-  inline static std::optional<NSConsumedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NSConsumedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NSConsumedAttr> from_base(const Attr &parent);
+  inline static std::optional<NSConsumedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NSConsumedAttr> from(const std::optional<Attr> &parent);
   static std::optional<NSConsumedAttr> from(const Reference &r);
+  static std::optional<NSConsumedAttr> from(const VariantEntity &e);
   static std::optional<NSConsumedAttr> from(const TokenContext &t);
 
 };

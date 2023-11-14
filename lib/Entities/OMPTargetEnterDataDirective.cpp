@@ -88,18 +88,30 @@ bool OMPTargetEnterDataDirective::contains(const Stmt &stmt) {
 std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPTargetEnterDataDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPTargetEnterDataDirectiveDerivedKinds[] = {
     OMPTargetEnterDataDirective::static_kind(),
 };
 
-std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPTargetEnterDataDirective::static_kind():
       return reinterpret_cast<const OMPTargetEnterDataDirective &>(parent);
@@ -112,7 +124,7 @@ gap::generator<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::in(cons
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPTargetEnterDataDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPTargetEnterDataDirective> e = OMPTargetEnterDataDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPTargetEnterDataDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -124,7 +136,7 @@ gap::generator<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::in(cons
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPTargetEnterDataDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPTargetEnterDataDirective> e = OMPTargetEnterDataDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPTargetEnterDataDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -137,7 +149,7 @@ gap::generator<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::in(cons
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPTargetEnterDataDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPTargetEnterDataDirective> e = OMPTargetEnterDataDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPTargetEnterDataDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -149,8 +161,18 @@ std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from(con
   return OMPTargetEnterDataDirective::from(r.as_statement());
 }
 
+std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from(const TokenContext &t) {
-  return OMPTargetEnterDataDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

@@ -40,18 +40,30 @@ bool DependentSizedMatrixType::contains(const Token &tok) const {
 std::optional<DependentSizedMatrixType> DependentSizedMatrixType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return DependentSizedMatrixType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kDependentSizedMatrixTypeDerivedKinds[] = {
     DependentSizedMatrixType::static_kind(),
 };
 
-std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const Type &parent) {
+}  // namespace
+
+std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case DependentSizedMatrixType::static_kind():
       return reinterpret_cast<const DependentSizedMatrixType &>(parent);
@@ -64,7 +76,7 @@ gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const Inde
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kDependentSizedMatrixTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<DependentSizedMatrixType> e = DependentSizedMatrixType::from(Type(std::move(eptr)))) {
+      if (std::optional<DependentSizedMatrixType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,8 +87,18 @@ std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const Ref
   return DependentSizedMatrixType::from(r.as_type());
 }
 
+std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const TokenContext &t) {
-  return DependentSizedMatrixType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token DependentSizedMatrixType::attribute_token(void) const {
@@ -85,12 +107,12 @@ Token DependentSizedMatrixType::attribute_token(void) const {
 
 Expr DependentSizedMatrixType::column_expression(void) const {
   RawEntityId eid = impl->reader.getVal26();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr DependentSizedMatrixType::row_expression(void) const {
   RawEntityId eid = impl->reader.getVal59();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

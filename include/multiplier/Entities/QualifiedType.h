@@ -37,17 +37,13 @@ class QualifiedType : public Type {
     return TypeKind::QUALIFIED;
   }
 
-  static std::optional<QualifiedType> from(const Type &parent);
-
-  inline static std::optional<QualifiedType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return QualifiedType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<QualifiedType> from_base(const Type &parent);
+  inline static std::optional<QualifiedType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<QualifiedType> from(const std::optional<Type> &parent);
   static std::optional<QualifiedType> from(const Reference &r);
+  static std::optional<QualifiedType> from(const VariantEntity &e);
   static std::optional<QualifiedType> from(const TokenContext &t);
 
   LangAS address_space(void) const;

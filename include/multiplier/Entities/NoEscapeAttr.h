@@ -38,17 +38,13 @@ class NoEscapeAttr : public Attr {
     return AttrKind::NO_ESCAPE;
   }
 
-  static std::optional<NoEscapeAttr> from(const Attr &parent);
-
-  inline static std::optional<NoEscapeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoEscapeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoEscapeAttr> from_base(const Attr &parent);
+  inline static std::optional<NoEscapeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoEscapeAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoEscapeAttr> from(const Reference &r);
+  static std::optional<NoEscapeAttr> from(const VariantEntity &e);
   static std::optional<NoEscapeAttr> from(const TokenContext &t);
 
 };
