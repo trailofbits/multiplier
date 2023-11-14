@@ -244,7 +244,7 @@ static bool ResolveParents(ParentTrackerVisitor &vis, const void *parent_stmt,
   }
 
   vis.parent_stmt_id = em.ParentStmtId(vis.parent_stmt);
-  vis.parent_decl_id = em.ParentStmtId(vis.parent_decl);
+  vis.parent_decl_id = em.ParentDeclId(vis.parent_decl);
 
   return (vis.parent_stmt && vis.parent_stmt_id != mx::kInvalidEntityId) ||
          (vis.parent_decl && vis.parent_decl_id != mx::kInvalidEntityId);

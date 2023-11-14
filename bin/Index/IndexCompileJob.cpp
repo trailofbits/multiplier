@@ -833,6 +833,8 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
   }
 
   assert(!in_macro || seen_marker);
+  (void) in_macro;
+  (void) seen_marker;
 
   // Expand to trailing semicolon.
   if ((end_tok_index + 1u) < max_tok_index) {
