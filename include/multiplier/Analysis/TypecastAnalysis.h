@@ -5,12 +5,14 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "multiplier/Entities/CastKind.h"
+#include "multiplier/Types.h"
 #include <gap/core/generator.hpp>
 #include <multiplier/Index.h>
 
 #include <multiplier/Entities/CastExpr.h>
 
 #include <vector>
+#include <variant>
 
 namespace mx {
 
@@ -55,7 +57,8 @@ enum class CastBehavior {
   NO_CAST_BEHAVIOR,
 };
 
-// Models a single cast operation in the
+// Models a single generic typecast operation and different useful properties
+// computed from the backing CastExpr.
 class CastState final {
 private:
   const CastExpr &cast_expr;
@@ -76,13 +79,24 @@ public:
   CastSignChange get_sign_change();
 };
 
+using CastStateMap = std::unordered_map<PackedStmtId, CastState>;
+
+// Represents all ordered typecast conversions of a single data source
+// TODO: be more like a std::vector
 class TypecastChain final {
 private:
-  // 
-  Type current_resolved_type;
+  std::vector<CastState> cast_state_transitions;
+  bool is_forward;
+
+  Type *current_resolved_type;
 
 public:
-  TypecastChain();
+  TypecastChain(bool);
+
+  void add_new_transition(CastState&);
+  Type get_current_resolved_type();
+
+  bool is_identity_preserving();
 };
 
 
@@ -94,10 +108,15 @@ public:
   TypecastAnalysis(const Index &);
 
   // Traverse the AST tree of a starting fragment to recover all casting instances.
-  void cast_instances(const Fragment &);
+  // Will not resolve a typecast chain for individual data sources.
+  // Answers the question: "what are all the typecasts happening in this current fragment?"
+  CastStateMap cast_instances(const Fragment &);
+  CastStateMap cast_instances(const Stmt &);
 
-  // At each use of an entity, generate a TypecastChain
-  TypecastChain cast_chain(const EntityId &);
+  // At a specific entity reference point, resolve a forward or backward typecast chain
+  // TODO: MLIR DependencyAnalysis
+  TypecastChain forward_cast_chain(const EntityId &);
+  TypecastChain backward_cast_chain(const EntityId &);
 
 };
-} // namespace mx
+}; // namespace mx

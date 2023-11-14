@@ -9,6 +9,8 @@
 #include <multiplier/AST.h>
 #include <sstream>
 
+#include <multiplier/Analysis/TypecastAnalysis.h>
+
 #include "Index.h"
 
 DEFINE_bool(show_implicit, false, "Show implicit casts?");
@@ -17,68 +19,7 @@ DEFINE_bool(show_sign_changing, false, "Show sign-changing casts?");
 DEFINE_bool(show_sign_down_cast, false, "Show sign down-casts? E.g. int to short.");
 DEFINE_bool(show_sign_changing_down_cast, false, "Show sign-changing downcasts.");
 
-static constexpr mx::BuiltinTypeKind kSketchyKinds[][2] = {
-    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::INT},
-    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::SHORT},
-    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::S_CHAR},
-
-    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::INT},
-    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::SHORT},
-    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::S_CHAR},
-    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::U_CHAR},
-
-    {mx::BuiltinTypeKind::U_INT, mx::BuiltinTypeKind::SHORT},
-    {mx::BuiltinTypeKind::U_INT, mx::BuiltinTypeKind::S_CHAR},
-
-    {mx::BuiltinTypeKind::U_SHORT, mx::BuiltinTypeKind::S_CHAR},
-};
-
-static constexpr mx::BuiltinTypeKind kSignDownCastKinds[][2] = {
-    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::INT},
-    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::SHORT},
-    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::S_CHAR},
-
-    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::INT},
-    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::SHORT},
-    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::S_CHAR},
-
-    {mx::BuiltinTypeKind::INT, mx::BuiltinTypeKind::SHORT},
-    {mx::BuiltinTypeKind::INT, mx::BuiltinTypeKind::S_CHAR},
-
-    {mx::BuiltinTypeKind::SHORT, mx::BuiltinTypeKind::S_CHAR},
-};
-
-static constexpr mx::BuiltinTypeKind kSignChangingKinds[][2] = {
-    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::LONG_LONG},
-    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::U_LONG_LONG},
-    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::LONG},
-    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::U_LONG_LONG},
-    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::LONG_LONG},
-    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::U_LONG},
-    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::LONG},
-    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::U_LONG},
-    {mx::BuiltinTypeKind::U_INT, mx::BuiltinTypeKind::INT},
-    {mx::BuiltinTypeKind::INT, mx::BuiltinTypeKind::U_INT},
-    {mx::BuiltinTypeKind::U_SHORT, mx::BuiltinTypeKind::SHORT},
-    {mx::BuiltinTypeKind::SHORT, mx::BuiltinTypeKind::U_SHORT},
-    {mx::BuiltinTypeKind::U_CHAR, mx::BuiltinTypeKind::S_CHAR},
-    {mx::BuiltinTypeKind::S_CHAR, mx::BuiltinTypeKind::U_CHAR},
-};
-
-enum class CastBehavior {
-  Sketchy,
-  SignDowncast,
-  SignChange,
-  SignChangingDowncast
-};
-
-static const std::map<CastBehavior, std::string> kOuts {
-  {CastBehavior::Sketchy, "Sketchy"},
-  {CastBehavior::SignDowncast, "Sign downcast"},
-  {CastBehavior::SignChange, "Sign change"},
-  {CastBehavior::SignChangingDowncast, "Sign-changing downcast"},
-};
-
+/*
 // Should we skip a result, e.g. froma `sizeof(blah)`.
 static bool IsIgnorableCallArgument(const mx::Expr &expr) {
   if (auto lit = mx::IntegerLiteral::from(expr)) {
@@ -374,6 +315,7 @@ static void FindSketchyReturnValueCasts(const mx::CallExpr &call) {
     }
   }
 }
+*/
 
 int main(int argc, char *argv[]) {
   std::stringstream ss;
@@ -387,14 +329,23 @@ int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
+  /*
   if (!FLAGS_show_implicit && !FLAGS_show_explicit) {
     std::cerr << "One or both of --show_implicit or --show_explicit should be used\n";
     return EXIT_FAILURE;
   }
+  */
 
-  for (mx::CallExpr call : mx::CallExpr::in(InitExample(true))) {
-    FindSketchyArgumentCasts(call);
-    FindSketchyReturnValueCasts(call);
+  mx::Index index = InitExample(true);
+  mx::TypecastAnalysis analyzer(index);
+
+  for (const mx::CallExpr call : mx::CallExpr::in(index)) {
+    mx::CastStateMap instances = analyzer.cast_instances(call);
+    if (instances.empty()) {
+      continue;
+    }
+
+    std::cout << instances.size() << std::endl;
   }
 
   return EXIT_SUCCESS;
