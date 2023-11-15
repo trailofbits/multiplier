@@ -377,14 +377,13 @@ void EntityVisitor::VisitLambdaExpr(const pasta::LambdaExpr &stmt) {
 
 void EntityVisitor::VisitInitListExpr(const pasta::InitListExpr &stmt) {
   if (EnterStmt(stmt)) {
-    if (auto semantic = stmt.SemanticForm()) {
-      Accept(semantic.value());
-    }
-    if (auto syntactic = stmt.SyntacticForm()) {
-      Accept(syntactic.value());
-    }
     if (auto filler = stmt.ArrayFiller()) {
       Accept(filler.value());
+    }
+    if (auto syntactic = stmt.SyntacticForm()) {
+      if (stmt != syntactic.value()) {
+        Accept(syntactic.value());
+      }
     }
   }
 }
