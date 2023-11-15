@@ -334,6 +334,43 @@ static void FindMissingParentageFromAttributeTokens(
   }
 }
 
+
+// `InitListExpr`s can have a semantic/syntactic form, and they logically belong
+// to the same place.
+static void FindMissingParentageFromInitList(
+    ParentTrackerVisitor &vis, PendingFragment &pf) {
+  
+  auto copy_from_other = [&] (const auto &stmt, auto other) {
+    if (!other || other.value() == stmt) {
+      return;
+    }
+
+    if (ResolveParents(vis, RawEntity(other.value()), nullptr)) {
+      vis.Accept(stmt);
+    }
+  };
+
+  auto init_lists_it = pf.stmts_to_serialize.find(mx::StmtKind::INIT_LIST_EXPR);
+  if (init_lists_it == pf.stmts_to_serialize.end()) {
+    return;
+  }
+
+  for (const pasta::Stmt &stmt : init_lists_it->second) {
+    if (stmt.Kind() != pasta::StmtKind::kInitListExpr) {
+      assert(false);
+      continue;
+    }
+
+    if (vis.HasBeenSeen(stmt)) {
+      continue;
+    }
+
+    auto &ile = reinterpret_cast<const pasta::InitListExpr &>(stmt);
+    copy_from_other(stmt, ile.SemanticForm());
+    copy_from_other(stmt, ile.SyntacticForm());
+  }
+}
+
 }  // namespace
 
 // Maps the child-to-parent relationships in the fragment, storing the
@@ -378,6 +415,11 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
 #endif
 
   // We may have expressions inside of types, e.g. `int foo[stmt_here];`.
+  if (!vis.HasUnseen()) {
+    return;
+  }
+
+  FindMissingParentageFromInitList(vis, pf);
   if (!vis.HasUnseen()) {
     return;
   }
