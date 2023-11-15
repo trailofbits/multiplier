@@ -380,11 +380,12 @@ void EntityVisitor::VisitInitListExpr(const pasta::InitListExpr &stmt) {
     if (auto filler = stmt.ArrayFiller()) {
       Accept(filler.value());
     }
-    if (auto syntactic = stmt.SyntacticForm()) {
-      if (stmt != syntactic.value()) {
-        Accept(syntactic.value());
-      }
-    }
+    
+    // NOTE(pag): We don't visit either the `SemanticForm` or the
+    //            `SyntacticForm`. The parent entity visitor requires those
+    //            be visited, but they logically belong "beside" eachother.
+    //            So instead, we let a fallback path figure this out, via
+    //            `FindMissingParentageFromInitList`.
   }
 }
 

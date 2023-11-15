@@ -13,6 +13,8 @@
 
 #include "EntityMapper.h"
 
+#include <glog/logging.h>
+
 namespace indexer {
 namespace {
 
@@ -163,8 +165,19 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
     maybe_parent = em->ParentStmt(ast, stmt);
   }
 
+  std::vector<const void *> seen;
+
   while (maybe_parent) {
     const auto &parent = maybe_parent.value();
+
+    auto raw_parent = RawEntity(parent);
+    if (std::find(seen.begin(), seen.end(), raw_parent) != seen.end()) {
+      LOG(ERROR)
+          << "Infinite loop detected in "
+          << ast.MainFile().Path().generic_string();
+      co_return;
+    }
+    seen.emplace_back(raw_parent);
 
     auto update_record_to_parent = [&] (mx::BuiltinReferenceKind new_kind) {
       record.context_entity_id = em->EntityId(parent);
