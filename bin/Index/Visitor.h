@@ -41,7 +41,7 @@ class EntityVisitor : protected pasta::DeclVisitor,
   bool EnterVarDecl(const pasta::VarDecl &decl);
   bool EnterFunctionDecl(const pasta::FunctionDecl &decl);
 
- private:
+ protected:
   void VisitDeclContext(const pasta::DeclContext &dc);
   void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final;
   void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final;
@@ -78,7 +78,7 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitStaticAssertDecl(const pasta::StaticAssertDecl &decl) final;
   void VisitFileScopeAsmDecl(const pasta::FileScopeAsmDecl &decl) final;
   void VisitLambdaExpr(const pasta::LambdaExpr &stmt) final;
-  void VisitInitListExpr(const pasta::InitListExpr &stmt) final;
+  void VisitInitListExpr(const pasta::InitListExpr &stmt) override;
   void VisitGCCAsmStmt(const pasta::GCCAsmStmt &stmt) final;
   void VisitDesignatedInitExpr(const pasta::DesignatedInitExpr &stmt) final;
   void VisitTypeOfExprType(const pasta::TypeOfExprType &type) final;

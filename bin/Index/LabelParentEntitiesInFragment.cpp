@@ -43,6 +43,13 @@ struct SaveRestoreEntity {
   }
 };
 
+static const void *GetOrNullptr(EntityParentMap &map, const void *key) {
+  if (auto it = map.find(key); it != map.end()) {
+    return it->second;
+  }
+  return nullptr;
+}
+
 class ParentTrackerVisitor : public EntityVisitor {
  public:
   EntityMapper &em;
@@ -80,6 +87,24 @@ class ParentTrackerVisitor : public EntityVisitor {
   template <typename T>
   inline bool HasBeenSeen(const T &entity) const {
     return !not_yet_seen.count(RawEntity(entity));
+  }
+
+  void VisitOtherInitListExprImpl(const pasta::InitListExpr &stmt,
+                                  std::optional<pasta::InitListExpr> other) {
+    if (other.has_value() &&
+        other.value() != stmt &&
+        !HasBeenSeen(other.value()) &&
+        Ascend()) {
+      this->EntityVisitor::VisitInitListExpr(other.value());
+    }
+  }
+
+  // `InitListExpr`s can have a semantic/syntactic form, and they logically
+  // belong to the same parent.
+  void VisitInitListExpr(const pasta::InitListExpr &stmt) {
+    this->EntityVisitor::VisitInitListExpr(stmt);
+    VisitOtherInitListExprImpl(stmt, stmt.SyntacticForm());
+    VisitOtherInitListExprImpl(stmt, stmt.SemanticForm());
   }
 
   void AddToMaps(const void *entity) {
@@ -182,6 +207,47 @@ class ParentTrackerVisitor : public EntityVisitor {
   void Accept(const pasta::CXXBaseSpecifier &entity) final {
     AddToMaps(RawEntity(entity));
   }
+
+  bool ResolveParentIds(void) {
+    parent_stmt_id = em.EntityId(parent_stmt);
+    parent_decl_id = em.EntityId(parent_decl);
+
+    return (parent_stmt && parent_stmt_id != mx::kInvalidEntityId) ||
+           (parent_decl && parent_decl_id != mx::kInvalidEntityId);
+  }
+
+  // Sync up the pointers and IDs for parentage.
+  bool ResolveParents(const void *new_parent_stmt, const void *new_parent_decl) {
+    parent_stmt = new_parent_stmt;
+    parent_decl = new_parent_decl;
+
+    if (!parent_stmt && parent_decl) {
+      parent_stmt = GetOrNullptr(em.parent_stmts, parent_decl);
+    }
+
+    if (!parent_decl && parent_stmt) {
+      parent_decl = GetOrNullptr(em.parent_decls, parent_stmt);
+    }
+
+    return ResolveParentIds();
+  }
+
+  bool Ascend(void) {
+    auto old_stmt = parent_stmt;
+    auto old_decl = parent_decl;
+
+    parent_stmt = GetOrNullptr(em.parent_stmts, old_stmt);
+    if (!parent_stmt) {
+      parent_stmt = GetOrNullptr(em.parent_stmts, old_decl);
+    }
+
+    parent_decl = GetOrNullptr(em.parent_decls, old_decl);
+    if (!parent_decl) {
+      parent_decl = GetOrNullptr(em.parent_decls, old_stmt);
+    }
+
+    return ResolveParentIds();
+  }
 };
 
 struct ScanResult {
@@ -229,35 +295,6 @@ static ScanResult ScanTokenContexts(pasta::PrintedToken tok) {
   return {};
 }
 
-static const void *GetOrNullptr(EntityParentMap &map, const void *key) {
-  if (auto it = map.find(key); it != map.end()) {
-    return it->second;
-  }
-  return nullptr;
-}
-
-// Sync up the pointers and IDs for parentage.
-static bool ResolveParents(ParentTrackerVisitor &vis, const void *parent_stmt,
-                           const void *parent_decl) {
-  EntityMapper &em = vis.em;
-  vis.parent_stmt = parent_stmt;
-  vis.parent_decl = parent_decl;
-
-  if (!vis.parent_stmt && vis.parent_decl) {
-    vis.parent_stmt = GetOrNullptr(em.parent_stmts, vis.parent_decl);
-  }
-
-  if (!vis.parent_decl && vis.parent_stmt) {
-    vis.parent_decl = GetOrNullptr(em.parent_decls, vis.parent_stmt);
-  }
-
-  vis.parent_stmt_id = em.EntityId(vis.parent_stmt);
-  vis.parent_decl_id = em.EntityId(vis.parent_decl);
-
-  return (vis.parent_stmt && vis.parent_stmt_id != mx::kInvalidEntityId) ||
-         (vis.parent_decl && vis.parent_decl_id != mx::kInvalidEntityId);
-}
-
 // Use the token contexts to try to find missing parents.
 static void FindMissingParentageFromTokens(
     ParentTrackerVisitor &vis, PendingFragment &pf) {
@@ -280,7 +317,7 @@ static void FindMissingParentageFromTokens(
       continue;
     }
 
-    if (ResolveParents(vis, parent_stmt, parent_decl)) {
+    if (vis.ResolveParents(parent_stmt, parent_decl)) {
       auto ast = pasta::AST::From(pf.top_level_decls.front());
       vis.Accept(ast.Adopt(reinterpret_cast<const clang::Stmt *>(child_stmt)));
     }
@@ -326,48 +363,11 @@ static void FindMissingParentageFromAttributeTokens(
       auto parent_stmt = GetOrNullptr(pf.em.parent_stmts, attr_it->second);
       auto parent_decl = GetOrNullptr(pf.em.parent_decls, attr_it->second);
 
-      if (ResolveParents(vis, parent_stmt, parent_decl)) {
+      if (vis.ResolveParents(parent_stmt, parent_decl)) {
         vis.Accept(stmt);
         break;
       }
     }
-  }
-}
-
-
-// `InitListExpr`s can have a semantic/syntactic form, and they logically belong
-// to the same place.
-static void FindMissingParentageFromInitList(
-    ParentTrackerVisitor &vis, PendingFragment &pf) {
-  
-  auto copy_from_other = [&] (const auto &stmt, auto other) {
-    if (!other || other.value() == stmt) {
-      return;
-    }
-
-    if (ResolveParents(vis, RawEntity(other.value()), nullptr)) {
-      vis.Accept(stmt);
-    }
-  };
-
-  auto init_lists_it = pf.stmts_to_serialize.find(mx::StmtKind::INIT_LIST_EXPR);
-  if (init_lists_it == pf.stmts_to_serialize.end()) {
-    return;
-  }
-
-  for (const pasta::Stmt &stmt : init_lists_it->second) {
-    if (stmt.Kind() != pasta::StmtKind::kInitListExpr) {
-      assert(false);
-      continue;
-    }
-
-    if (vis.HasBeenSeen(stmt)) {
-      continue;
-    }
-
-    auto &ile = reinterpret_cast<const pasta::InitListExpr &>(stmt);
-    copy_from_other(stmt, ile.SemanticForm());
-    copy_from_other(stmt, ile.SyntacticForm());
   }
 }
 
@@ -415,11 +415,6 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
 #endif
 
   // We may have expressions inside of types, e.g. `int foo[stmt_here];`.
-  if (!vis.HasUnseen()) {
-    return;
-  }
-
-  FindMissingParentageFromInitList(vis, pf);
   if (!vis.HasUnseen()) {
     return;
   }
