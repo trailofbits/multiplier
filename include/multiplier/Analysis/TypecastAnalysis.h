@@ -63,40 +63,45 @@ class CastState final {
 private:
   const CastExpr &cast_expr;
 
-  // where are we casting from/to?
-  EntityId source_entity;
-  EntityId destination_entity;
-
 public:
   CastState(const CastExpr &);
 
+  // where are we casting from/to?
+  EntityId source_entity();
+  EntityId destination_entity();
+
+  // what is the type before/after conversion?
   Type type_before_conversion();
   Type type_after_conversion();
 
+  std::optional<bool> is_implicit_cast();
+  CastSignChange get_sign_change();
   CastBehavior get_cast_behavior();
 
-  bool is_implicit_cast();
-  CastSignChange get_sign_change();
 };
 
 using CastStateMap = std::unordered_map<PackedStmtId, CastState>;
 
 // Represents all ordered typecast conversions of a single data source
-// TODO: be more like a std::vector
 class TypecastChain final {
 private:
   std::vector<CastState> cast_state_transitions;
   bool is_forward;
 
-  Type *current_resolved_type;
+  std::optional<Type> current_resolved_type;
 
 public:
   TypecastChain(bool);
 
   void add_new_transition(CastState&);
-  Type get_current_resolved_type();
+  std::optional<Type> get_current_resolved_type();
 
+  // Does the type at the end of the chain match the one in the beginning?
   bool is_identity_preserving();
+
+  // Prepare a single CastState to represent the resolved type cast
+  CastState& resolved_cast_state();
+
 };
 
 

@@ -4,7 +4,9 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 #include "multiplier/Entities/CastExpr.h"
+#include "multiplier/Entities/CastKind.h"
 #include "multiplier/Entities/CompoundStmt.h"
+#include "multiplier/Entities/ExplicitCastExpr.h"
 #include "multiplier/Token.h"
 #include "multiplier/Types.h"
 #include <_types/_uint64_t.h>
@@ -12,13 +14,17 @@
 
 #include <multiplier/Entities/ImplicitCastExpr.h>
 #include <multiplier/Entities/BuiltinType.h>
+#include <optional>
 #include <unordered_set>
 #include <utility>
 #include <iostream>
 
 namespace mx {
 
-CastState::CastState(const CastExpr &cast_expr) : cast_expr(cast_expr) {}
+CastState::CastState(const CastExpr &cast_expr) : cast_expr(cast_expr) {
+
+
+}
 
 Type CastState::type_before_conversion() {
     return cast_expr.sub_expression().type()->canonical_type();
@@ -73,11 +79,14 @@ CastBehavior CastState::get_cast_behavior() {
     }
 }
 
-bool CastState::is_implicit_cast() {
+std::optional<bool> CastState::is_implicit_cast() {
     if (auto implicit = ImplicitCastExpr::from(cast_expr)) {
         return true;
+    } else if (auto explicit_cast = ExplicitCastExpr::from(cast_expr)) {
+        return false;
+    } else {
+        return {};
     }
-    return false;
 }
 
 CastSignChange CastState::get_sign_change() {
@@ -106,11 +115,20 @@ TypecastChain::TypecastChain(bool is_forward) : is_forward(is_forward) {};
 
 void TypecastChain::add_new_transition(CastState &cast_state) {
     cast_state_transitions.push_back(cast_state);
+    current_resolved_type = cast_state.type_after_conversion();
+}
+
+std::optional<Type> TypecastChain::get_current_resolved_type() {
+    return current_resolved_type;
 }
 
 bool TypecastChain::is_identity_preserving() {
     if (cast_state_transitions.empty())
         return true;
+
+    if (cast_state_transitions.size() == 1) {
+        return cast_state_transitions.at(0).type_before_conversion() == cast_state_transitions.at(0).type_after_conversion();
+    }
     return cast_state_transitions.front().type_after_conversion() == cast_state_transitions.back().type_after_conversion();
 }
 
@@ -134,10 +152,23 @@ CastStateMap TypecastAnalysis::cast_instances(const Fragment &fragment) {
 
 CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
     CastStateMap cast_state_map;
+    std::unordered_set<EntityId> seen_casts;
+
     for (Stmt child_stmt : stmt.children()) {
-        std::cout << child_stmt.id() << std::endl;
         std::cout << child_stmt.tokens().file_tokens() << std::endl;
         if (auto cast_expr = CastExpr::from(child_stmt)) {
+
+            // ignore conversions not happening between values
+            bool skip_this_cast = false;
+            for (const auto &elem : kNoneTypeCasts) {
+                if (cast_expr->cast_kind() == elem) {
+                    skip_this_cast = true;
+                    break;
+                }
+            }
+            if (skip_this_cast)
+                continue;
+
             cast_state_map.insert(std::make_pair(cast_expr->id(), CastState(*cast_expr)));
         }
     }
