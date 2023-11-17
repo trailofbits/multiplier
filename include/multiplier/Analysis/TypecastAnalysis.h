@@ -16,45 +16,70 @@
 
 namespace mx {
 
+class CastState;
+
+using CastStateMap = std::unordered_map<PackedStmtId, CastState>;
+
 // TODO: what else?
+// TODO: interesting: VECTOR_SPLAT, ARRAY_TO_POINTER_DECAY
 
 static constexpr CastKind kCXXObjectCasts[] = {
+  // represents most non-ptr object casting
   CastKind::BASE_TO_DERIVED,
   CastKind::DERIVED_TO_BASE,
   CastKind::UNCHECKED_DERIVED_TO_BASE,
+
+  // explicit pointer up/down casting
   CastKind::REINTERPRET_MEMBER_POINTER,
+  CastKind::DYNAMIC,
+
+  // implicit pointer up/down casting
   CastKind::BASE_TO_DERIVED_MEMBER_POINTER,
   CastKind::DERIVED_TO_BASE_MEMBER_POINTER,
 };
 
+// CastKinds that we are choosing not to be represented as a CastState
 static constexpr CastKind kNoneTypeCasts[] = {
   CastKind::FUNCTION_TO_POINTER_DECAY,
+  CastKind::BUILTIN_FN_TO_FN_POINTER,
   CastKind::ARRAY_TO_POINTER_DECAY,
+  CastKind::MATRIX_CAST,
+
+  // objc casting
+  CastKind::C_POINTER_TO_OBJ_C_POINTER_CAST,
+  CastKind::BLOCK_POINTER_TO_OBJ_C_POINTER_CAST,
+  CastKind::ANY_POINTER_TO_BLOCK_POINTER_CAST,
+  CastKind::OBJ_C_OBJECT_L_VALUE_CAST,
+  CastKind::ARC_PRODUCE_OBJECT,
+  CastKind::ARC_CONSUME_OBJECT,
+  CastKind::ARC_RECLAIM_RETURNED_OBJECT,
+  CastKind::ARC_EXTEND_BLOCK_OBJECT,
+  CastKind::ATOMIC_TO_NON_ATOMIC,
+  CastKind::NON_ATOMIC_TO_ATOMIC,
+  CastKind::COPY_AND_AUTORELEASE_BLOCK_OBJECT,
+  CastKind::ZERO_TO_OCL_OPAQUE_TYPE,
+  CastKind::ADDRESS_SPACE_CONVERSION,
   CastKind::INT_TO_OCL_SAMPLER,
   CastKind::NO_OPERATION,
 };
 
+// Represents sign changes for built-in types
 enum class CastSignChange {
   C_UNSIGNED_TO_SIGNED,
   C_SIGNED_TO_UNSIGNED,
   NO_SIGN_CHANGE,
 };
 
-enum class CastBehavior {
-  // e.g. int -> long, long -> int
-  C_TYPE_WIDTH_DOWNCAST,
-  C_TYPE_WIDTH_UPCAST,
+enum class CastTypeWidth {
+  UPCAST,
+  DOWNCAST,
+  NO_WIDTH_CHANGE,
+};
 
-  // e.g. big_t* -> small_t*, small_t* -> big_t*
-  C_PTR_TYPE_DOWNCAST,
-  C_PTR_TYPE_UPCAST,
-
-  // e.g. Base -> Derived, Derived -> Base
-  CXX_OBJ_UPCAST,
-  CXX_OBJ_DOWNCAST,
-
-  // e.g. int -> int, ptr_t* -> ptr_t*
-  NO_CAST_BEHAVIOR,
+enum class CastCXXObjKind {
+  BASE_TO_DERIVED_DOWNCAST,
+  DERIVED_TO_BASE_UPCAST,
+  NO_CXX_OBJ_CAST,
 };
 
 // Models a single generic typecast operation and different useful properties
@@ -62,6 +87,9 @@ enum class CastBehavior {
 class CastState final {
 private:
   const CastExpr &cast_expr;
+
+  std::optional<CastKind> cxx_object_cast_kind();
+  CastTypeWidth determine_width_cast(Type&, Type&);
 
 public:
   CastState(const CastExpr &);
@@ -74,13 +102,16 @@ public:
   Type type_before_conversion();
   Type type_after_conversion();
 
+  // was this an implicit cast?
   std::optional<bool> is_implicit_cast();
-  CastSignChange get_sign_change();
-  CastBehavior get_cast_behavior();
 
+  CastSignChange sign_change();
+  CastTypeWidth width_cast();
+  CastCXXObjKind cxx_obj_cast();
+
+  bool is_pointer_cast();
+  CastTypeWidth deferenced_width_cast();
 };
-
-using CastStateMap = std::unordered_map<PackedStmtId, CastState>;
 
 // Represents all ordered typecast conversions of a single data source
 class TypecastChain final {
@@ -101,27 +132,24 @@ public:
 
   // Prepare a single CastState to represent the resolved type cast
   CastState& resolved_cast_state();
-
 };
 
 
 class TypecastAnalysis final {
-private:
-  TypecastAnalysis(void) = delete;
-
 public:
-  TypecastAnalysis(const Index &);
+  TypecastAnalysis(void);
 
   // Traverse the AST tree of a starting fragment to recover all casting instances.
   // Will not resolve a typecast chain for individual data sources.
   // Answers the question: "what are all the typecasts happening in this current fragment?"
   CastStateMap cast_instances(const Fragment &);
   CastStateMap cast_instances(const Stmt &);
+  //  CastStateMap cast_instances(const Reference &);
 
   // At a specific entity reference point, resolve a forward or backward typecast chain
   // TODO: MLIR DependencyAnalysis
-  TypecastChain forward_cast_chain(const EntityId &);
-  TypecastChain backward_cast_chain(const EntityId &);
+  TypecastChain forward_cast_chain(const Reference &);
+  TypecastChain backward_cast_chain(const Reference &);
 
 };
 }; // namespace mx

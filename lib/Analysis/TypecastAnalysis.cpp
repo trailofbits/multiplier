@@ -5,11 +5,10 @@
 // the LICENSE file found in the root directory of this source tree.
 #include "multiplier/Entities/CastExpr.h"
 #include "multiplier/Entities/CastKind.h"
-#include "multiplier/Entities/CompoundStmt.h"
 #include "multiplier/Entities/ExplicitCastExpr.h"
+#include "multiplier/Reference.h"
 #include "multiplier/Token.h"
 #include "multiplier/Types.h"
-#include <_types/_uint64_t.h>
 #include <multiplier/Analysis/TypecastAnalysis.h>
 
 #include <multiplier/Entities/ImplicitCastExpr.h>
@@ -21,9 +20,15 @@
 
 namespace mx {
 
-CastState::CastState(const CastExpr &cast_expr) : cast_expr(cast_expr) {
+CastState::CastState(const CastExpr &cast_expr) : cast_expr(cast_expr) {}
 
+EntityId CastState::source_entity() {
+    return cast_expr.sub_expression_as_written().id();
+}
 
+EntityId CastState::destination_entity() {
+    // for CallExprs, the real destination is the Argument, not the lvalue
+    // for CXX casts, the destination is the lvalue
 }
 
 Type CastState::type_before_conversion() {
@@ -38,58 +43,99 @@ Type CastState::type_after_conversion() {
     return maybe_type_after->canonical_type();
 }
 
-CastBehavior CastState::get_cast_behavior() {
-    Type type_before = type_before_conversion();
-    Type type_after = type_after_conversion();
-
-    bool pointer_convert = false;
-
-    // for pointer-to-pointer conversions, do size check on the resolved type
-    if (type_before.can_decay_to_pointer_type() && type_after.can_decay_to_pointer_type()) {
-        type_before = type_before.desugared_type();
-        type_after = type_after.desugared_type();
-        pointer_convert = true;
-    }
-
-    // get width-based changes
-    std::optional<uint64_t> before_size_in_bits = type_before.size_in_bits();
-    if (!before_size_in_bits) {
-        // throw?
-    }
-
-    std::optional<uint64_t> after_size_in_bits = type_after.size_in_bits();
-    if (!after_size_in_bits) {
-        //throw?
+CastTypeWidth CastState::determine_width_cast(Type &source, Type &dest) {
+    std::optional<uint64_t> before_size_in_bits = source.size_in_bits();
+    std::optional<uint64_t> after_size_in_bits = dest.size_in_bits();
+    if (!before_size_in_bits || !after_size_in_bits) {
+        return CastTypeWidth::NO_WIDTH_CHANGE;
     }
 
     if (before_size_in_bits > after_size_in_bits) {
-        if (pointer_convert) {
-            return CastBehavior::C_PTR_TYPE_DOWNCAST;
-        } else {
-            return CastBehavior::C_TYPE_WIDTH_DOWNCAST;
-        }
+        return CastTypeWidth::DOWNCAST;
     } else if (before_size_in_bits < after_size_in_bits) {
-        if (pointer_convert) {
-            return CastBehavior::C_PTR_TYPE_UPCAST;
-        } else {
-            return CastBehavior::C_TYPE_WIDTH_UPCAST;
-        }
+        return CastTypeWidth::UPCAST;
     } else {
-        return CastBehavior::NO_CAST_BEHAVIOR;
+        return CastTypeWidth::NO_WIDTH_CHANGE;
     }
 }
 
+// For the source and destination types' sizes, determine down/upcast.
+// This does not work off of dereferenced pointer type for pointer-to-pointer casting.
+CastTypeWidth CastState::width_cast() {
+    Type type_before = type_before_conversion();
+    Type type_after = type_after_conversion();
+    return determine_width_cast(type_before, type_after);
+}
+
+CastCXXObjKind CastState::cxx_obj_cast() {
+    if (auto cxx_cast_kind = cxx_object_cast_kind()) {
+        switch (*cxx_cast_kind) {
+        case CastKind::BASE_TO_DERIVED:
+        case CastKind::BASE_TO_DERIVED_MEMBER_POINTER:
+            return CastCXXObjKind::BASE_TO_DERIVED_DOWNCAST;
+
+        case CastKind::DERIVED_TO_BASE:
+        case CastKind::UNCHECKED_DERIVED_TO_BASE:
+        case CastKind::DERIVED_TO_BASE_MEMBER_POINTER:
+            return CastCXXObjKind::BASE_TO_DERIVED_DOWNCAST;
+
+        // reinterpret_cast needs special handling
+        case CastKind::REINTERPRET_MEMBER_POINTER:
+            return CastCXXObjKind::NO_CXX_OBJ_CAST;
+
+        // dynamic_cast needs special handling
+        case CastKind::DYNAMIC:
+            return CastCXXObjKind::NO_CXX_OBJ_CAST;
+
+        default:
+            return CastCXXObjKind::NO_CXX_OBJ_CAST;
+        }
+    }
+    return CastCXXObjKind::NO_CXX_OBJ_CAST;
+}
+
+// TODO
+bool CastState::is_pointer_cast() {
+    return false;
+}
+
+// If either source or destination types are pointer types, deference it and determine
+// down/casting from those types instead. If not, behaves like `CastState::width_cast()`.
+CastTypeWidth CastState::deferenced_width_cast() {
+    Type type_before = type_before_conversion();
+    Type type_after = type_after_conversion();
+
+    if (type_before.can_decay_to_pointer_type()) {
+        type_before = type_before.desugared_type();
+    }
+    if (type_after.can_decay_to_pointer_type()) {
+        type_after = type_after.desugared_type();
+    }
+    return determine_width_cast(type_before, type_after);
+}
+
+std::optional<CastKind> CastState::cxx_object_cast_kind() {
+    auto cast_kind = cast_expr.cast_kind();
+    for (const auto& elem : kCXXObjectCasts) {
+        if (cast_kind == elem) {
+            return cast_kind;
+        }
+    }
+    return std::nullopt;
+}
+
+// Checking for a base CastExpr works for CXX-style casts too
 std::optional<bool> CastState::is_implicit_cast() {
     if (auto implicit = ImplicitCastExpr::from(cast_expr)) {
         return true;
     } else if (auto explicit_cast = ExplicitCastExpr::from(cast_expr)) {
         return false;
     } else {
-        return {};
+        return std::nullopt;
     }
 }
 
-CastSignChange CastState::get_sign_change() {
+CastSignChange CastState::sign_change() {
     Type source_type = type_before_conversion();
     Type dest_type = type_after_conversion();
 
@@ -122,6 +168,10 @@ std::optional<Type> TypecastChain::get_current_resolved_type() {
     return current_resolved_type;
 }
 
+CastState& resolved_cast_state() {
+}
+
+
 bool TypecastChain::is_identity_preserving() {
     if (cast_state_transitions.empty())
         return true;
@@ -131,8 +181,6 @@ bool TypecastChain::is_identity_preserving() {
     }
     return cast_state_transitions.front().type_after_conversion() == cast_state_transitions.back().type_after_conversion();
 }
-
-TypecastAnalysis::TypecastAnalysis(const Index &) {}
 
 CastStateMap TypecastAnalysis::cast_instances(const Fragment &fragment) {
     CastStateMap cast_state_map;
@@ -174,4 +222,11 @@ CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
     }
     return cast_state_map;
 }
+
+TypecastChain TypecastAnalysis::forward_cast_chain(const Reference &id) {
+}
+
+TypecastChain TypecastAnalysis::backward_cast_chain(const Reference &id) {
+}
+
 } // namespace mx
