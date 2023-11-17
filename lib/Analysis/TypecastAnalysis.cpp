@@ -25,6 +25,10 @@ namespace mx {
 
 CastState::CastState(const CastExpr &cast_expr) : cast_expr(cast_expr) {}
 
+const CastExpr& CastState::get_cast_expr() {
+    return cast_expr;
+}
+
 // Recovers the entity where the casting operation is performed on.
 // e.g running on `foo((size_t) bar)` would return the entity `bar`.
 EntityId CastState::source_entity() {

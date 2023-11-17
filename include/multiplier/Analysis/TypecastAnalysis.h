@@ -94,6 +94,8 @@ private:
 public:
   CastState(const CastExpr &);
 
+  const CastExpr& get_cast_expr();
+
   // where are we casting from/to?
   EntityId source_entity();
   std::optional<EntityId> destination_entity();

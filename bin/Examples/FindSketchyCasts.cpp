@@ -19,6 +19,20 @@ DEFINE_bool(show_sign_changing, false, "Show sign-changing casts?");
 DEFINE_bool(show_sign_down_cast, false, "Show sign down-casts? E.g. int to short.");
 DEFINE_bool(show_sign_changing_down_cast, false, "Show sign-changing downcasts.");
 
+enum class CastBehavior {
+  Sketchy,
+  SignDowncast,
+  SignChange,
+  SignChangingDowncast
+};
+
+static const std::map<CastBehavior, std::string> kOuts {
+  {CastBehavior::Sketchy, "Sketchy"},
+  {CastBehavior::SignDowncast, "Sign downcast"},
+  {CastBehavior::SignChange, "Sign change"},
+  {CastBehavior::SignChangingDowncast, "Sign-changing downcast"},
+};
+
 // Should we skip a result, e.g. froma `sizeof(blah)`.
 static bool IsIgnorableCallArgument(const mx::Expr &expr) {
   if (auto lit = mx::IntegerLiteral::from(expr)) {
@@ -69,9 +83,8 @@ static mx::Stmt FindLine(mx::Stmt prev_stmt) {
 // Output prettified results for the offending call. Tokens for the originating
 // expression should be generated separately in the appropriate heuristic.
 static void PrettifyCallResults(
-    const mx::CallExpr &call_expr, const mx::Stmt &use,
-    mx::CastBehavior kind, mx::BuiltinTypeKind source_type_kind,
-    mx::BuiltinTypeKind dest_type_kind,
+    const mx::CallExpr &call_expr, mx::CastState &state,
+    CastBehavior kind,
     std::optional<unsigned> arg_index=std::nullopt) {
 
   mx::Fragment fragment = mx::Fragment::containing(call_expr);
@@ -94,13 +107,12 @@ static void PrettifyCallResults(
 
   std::cout
       << "Frag ID: " << fragment.id()
-      << "\nEntity ID: " << use.id()
+      << "\nEntity ID: " << state.get_cast_expr().id()
       << "\nKind: " << kOuts.at(kind) << " ("
-      << mx::EnumeratorName(source_type_kind)
+      << mx::EnumeratorName(state.type_before_conversion().kind())
       << " to "
-      << mx::EnumeratorName(dest_type_kind)
+      << mx::EnumeratorName(state.type_after_conversion().kind())
       << ")\nCall: " << call_expr.tokens().file_tokens().data() << "\n";
-
 
   // Print out a declaration of the function.
   if (std::optional<mx::FunctionDecl> callee = call_expr.direct_callee();
@@ -141,8 +153,8 @@ static void PrettifyCallResults(
   // Try to highlight all tokens but the use.
   auto line_stmt = FindLine(call_expr);
   auto highlight_toks = FileTokenIdsFor(line_stmt.tokens());
-  if (line_stmt.id() != use.id()) {
-    auto unhighlight_toks = FileTokenIdsFor(use.tokens());
+  if (line_stmt.id() != state.get_cast_expr().id()) {
+    auto unhighlight_toks = FileTokenIdsFor(state.get_cast_expr().tokens());
     std::erase_if(highlight_toks, [&unhighlight_toks] (mx::RawEntityId id) {
       return unhighlight_toks.count(id);
     });
@@ -197,7 +209,7 @@ int main(int argc, char *argv[]) {
   }
 
   mx::Index index = InitExample(true);
-  mx::TypecastAnalysis analyzer(index);
+  mx::TypecastAnalysis analyzer;
 
   // Target analysis over all CallExprs, which may have argument CastExprs
   for (const mx::CallExpr call : mx::CallExpr::in(index)) {
@@ -208,11 +220,12 @@ int main(int argc, char *argv[]) {
 
     // Check arguments for any casting before the call
     for (auto iter : instances) {
-      mx::CastBehavior cast_behavior = iter.second.get_cast_behavior();
-      mx::CastSignChange cast_sign_change = iter.second.get_sign_change();
+      CastBehavior behavior;
+      mx::CastState cast_state = iter.second;
+      mx::CastSignChange cast_sign_change = cast_state.sign_change();
 
       // might have some other casting semantic we don't care about
-      auto is_implicit = iter.second.is_implicit_cast();
+      auto is_implicit = cast_state.is_implicit_cast();
       if (!is_implicit) {
         continue;
       }
@@ -236,31 +249,30 @@ int main(int argc, char *argv[]) {
       // This was motivated by the PHP vulnerability described here, and is an
       // attempt to identify more instances of the vulnerable code pattern:
       // https://pwning.systems/posts/php_filter_var_shenanigans/
-      if (cast_behavior == mx::CastBehavior::C_TYPE_WIDTH_DOWNCAST &&
+      if (cast_state.width_cast() == mx::CastTypeWidth::DOWNCAST &&
           cast_sign_change == mx::CastSignChange::C_UNSIGNED_TO_SIGNED) {
-            // sketchy
+            behavior = CastBehavior::Sketchy;
       }
 
       // ie. long long -> int
       if (FLAGS_show_sign_down_cast) {
-        if (cast_behavior == mx::CastBehavior::C_TYPE_WIDTH_DOWNCAST &&
+        if (cast_state.width_cast() == mx::CastTypeWidth::DOWNCAST &&
             cast_sign_change == mx::CastSignChange::NO_SIGN_CHANGE) {
-          // sign downcast
+          behavior = CastBehavior::SignDowncast;
         }
       }
 
       // ie. unsigned long long -> long long
       if (FLAGS_show_sign_changing) {
-        if (cast_behavior == mx::CastBehavior::NO_CAST_BEHAVIOR &&
+        if (cast_state.width_cast() == mx::CastTypeWidth::NO_WIDTH_CHANGE &&
             cast_sign_change != mx::CastSignChange::NO_SIGN_CHANGE) {
-
+              behavior = CastBehavior::SignChange;
         }
       }
 
       // check if return expression
-
-      //PrettifyCallResults(call_expr, *cast_expr, *cast_behavior, source_type_kind,
-      //                dest_type_kind, arg_num - 1u);
+      // TODO is_part_of_call_arg
+      PrettifyCallResults(call, cast_state, behavior);
     }
   }
 
