@@ -3,9 +3,12 @@
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
+#include "multiplier/Entities/BinaryOperator.h"
 #include "multiplier/Entities/CastExpr.h"
 #include "multiplier/Entities/CastKind.h"
 #include "multiplier/Entities/ExplicitCastExpr.h"
+#include "multiplier/Entities/Stmt.h"
+#include "multiplier/Entities/StmtKind.h"
 #include "multiplier/Reference.h"
 #include "multiplier/Token.h"
 #include "multiplier/Types.h"
@@ -22,13 +25,45 @@ namespace mx {
 
 CastState::CastState(const CastExpr &cast_expr) : cast_expr(cast_expr) {}
 
+// Recovers the entity where the casting operation is performed on.
+// e.g running on `foo((size_t) bar)` would return the entity `bar`.
 EntityId CastState::source_entity() {
     return cast_expr.sub_expression_as_written().id();
 }
 
-EntityId CastState::destination_entity() {
-    // for CallExprs, the real destination is the Argument, not the lvalue
-    // for CXX casts, the destination is the lvalue
+// Attempts to recover a destination entity where the casted value is written to.
+// Certain casting behaviors may not result in a destination
+std::optional<EntityId> CastState::destination_entity() {
+    if (auto parent = cast_expr.parent_statement()) {
+
+        // ie. foo((size_t) bar)
+        // CallExprs don't have a real destination entity
+        // TODO: maybe get the FunctionDecl's specific argument?
+        if (parent->kind() == mx::StmtKind::CALL_EXPR) {
+            return std::nullopt;
+        }
+
+        // ie. return (int) bar;
+        // ReturnStmts don't have a "real" destination entity
+        if (parent->kind() == mx::StmtKind::RETURN_STMT) {
+            return std::nullopt;
+        }
+
+        // TODO: what else?
+
+        // ie. foo = (int) bar;
+        if (auto binop = BinaryOperator::from(parent)) {
+            return binop->lhs().id();
+        }
+    }
+
+    // ie. int bar = (int) foo();
+    if (auto parent = cast_expr.parent_declaration()) {
+        if (auto var_decl = NamedDecl::from(parent)) {
+            return var_decl->id();
+        }
+    }
+    return std::nullopt;
 }
 
 Type CastState::type_before_conversion() {
@@ -223,6 +258,7 @@ CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
     return cast_state_map;
 }
 
+// For a reference of a data variable, determine all casting
 TypecastChain TypecastAnalysis::forward_cast_chain(const Reference &id) {
 }
 

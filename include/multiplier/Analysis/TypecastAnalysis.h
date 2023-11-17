@@ -96,7 +96,7 @@ public:
 
   // where are we casting from/to?
   EntityId source_entity();
-  EntityId destination_entity();
+  std::optional<EntityId> destination_entity();
 
   // what is the type before/after conversion?
   Type type_before_conversion();
@@ -112,6 +112,9 @@ public:
   bool is_pointer_cast();
   CastTypeWidth deferenced_width_cast();
 };
+
+// TODO we should have a DAG instead so we're control-flow aware
+// thus a typecast chain will represent one path
 
 // Represents all ordered typecast conversions of a single data source
 class TypecastChain final {
