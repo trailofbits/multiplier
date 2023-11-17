@@ -2009,6 +2009,9 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
       // We've hit the end of our outermost fragment.
       } else if (skip_stop_file_tok_id == file_tok_id) {
         stop_skip_after.reset();
+        
+      } else {
+        assert(false);
       }
       continue;
     }
@@ -2021,7 +2024,12 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
 
       auto frag_it = file_frags.find(max_last_file_tok_id);
       if (frag_it != file_frags.end()) {
-        stop_skip_after.emplace(max_last_file_tok_id);
+
+        // Don't add `stop_skip_after` if this fragment is represented by a
+        // single file token, e.g. the `__BEGIN_DECLS` macro in libc.
+        if (file_tok_id != max_last_file_tok_id) {
+          stop_skip_after.emplace(max_last_file_tok_id);
+        }
 
         // This file token corresponds to a choice among one or more
         // overlapping fragments. Add the fragment to the top-level sequence.
@@ -2043,6 +2051,8 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
   if (!seq) {
     return {};
   }
+
+  assert(!stop_skip_after.has_value());
 
   return seq;
 }

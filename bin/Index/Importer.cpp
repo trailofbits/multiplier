@@ -63,7 +63,7 @@ static const std::string_view kLanguageX = "-x";
 static std::string ToLower(std::string_view view) {
   std::string data(view);
   std::transform(data.begin(), data.end(), data.begin(),
-                 +[](unsigned char c){ return std::tolower(c); });
+                 [](unsigned char c){ return std::tolower(c); });
   return data;
 }
 
@@ -346,8 +346,6 @@ BuildCommandAction::GetCompilerInfo(void) {
       continue;
 
     // Output file, `-o <file>`, `--output <arg>`.
-    //
-    // Also deal with `-c -o blah.c` that we've seen from the Linux kernel.
     } else if (arg == "-o" || arg == "--output") {
       has_output = true;
       skip = true;
@@ -577,17 +575,11 @@ void BuildCommandAction::Run(void) {
 
   LOG(ERROR)
       << "Unable to create command-specific compiler: " << maybe_cc.TakeError()
-      << "; falling back to host compiler for command " << command.vec.Join();
+      << "; skipping command " << command.vec.Join();
 
-  maybe_cc = pasta::Compiler::CreateHostCompiler(fm, command.lang);
-  if (maybe_cc.Succeeded()) {
-    RunWithCompiler(maybe_cmd.TakeValue(), maybe_cc.TakeValue());
-    return;
-  }
-
-  LOG(ERROR)
-      << "Unable to create host compiler " << maybe_cc.TakeError()
-      << " for command " << command.vec.Join();
+  // NOTE(pag): We don't fall back on `pasta::Compiler::CreateHostCompiler`
+  //            because that is based on the host compiler used to compile
+  //            PASTA itself, which may be on a totally different machine.
 }
 
 }  // namespace

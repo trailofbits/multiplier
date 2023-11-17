@@ -152,10 +152,10 @@ class ReferenceKind {
   std::optional<BuiltinReferenceKind> builtin_reference_kind(void) const noexcept;
 
   // The name of this reference kind.
-  std::string_view kind(void) const & noexcept;
+  std::string_view data(void) const & noexcept;
 
   // The name of this reference kind.
-  std::string kind(void) const && noexcept;
+  std::string data(void) const && noexcept;
 };
 
 // A reference is an arbitrarily named/kinded relation between two entities,

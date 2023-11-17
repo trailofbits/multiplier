@@ -930,7 +930,6 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
       case pasta::TokenRole::kBeginOfMacroExpansionMarker: {
         assert(!is_parsed_tok);
         assert(!last_macro_use_token);
-        assert(tok.FileLocation().has_value());
         info.category = TokenInfo::kMarkerToken;
         last_macro_use_token = &info;
         break;
@@ -939,10 +938,12 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
       case pasta::TokenRole::kEndOfMacroExpansionMarker: {
         assert(!is_parsed_tok);
         assert(last_macro_use_token != nullptr);
-        pasta::File file = pasta::File::Containing(
-            last_macro_use_token->file_tok.value());
-        info.file_tok = file.Tokens().At(
-            last_macro_use_token->file_tok->Index() + 1u);
+        if (last_macro_use_token && last_macro_use_token->file_tok) {
+          pasta::File file = pasta::File::Containing(
+              last_macro_use_token->file_tok.value());
+          info.file_tok = file.Tokens().At(
+              last_macro_use_token->file_tok->Index() + 1u);
+        }
         info.category = TokenInfo::kMarkerToken;
         last_macro_use_token = nullptr;
         break;
@@ -951,7 +952,6 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
       case pasta::TokenRole::kInitialMacroUseToken: {
         assert(!is_parsed_tok);
         info.category = TokenInfo::kMacroUseToken;
-        assert(info.file_tok.has_value());
         assert(info.macro_tok.has_value());
         last_macro_use_token = &info;
         break;
@@ -959,7 +959,6 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
 
       case pasta::TokenRole::kIntermediateMacroExpansionToken: {
         assert(!is_parsed_tok);
-        assert(last_macro_use_token != nullptr);
         info.category = TokenInfo::kMacroStepToken;
         assert(info.macro_tok.has_value());
         break;
@@ -974,7 +973,6 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
 
       case pasta::TokenRole::kBeginOfFileMarker:
       case pasta::TokenRole::kEndOfFileMarker: {
-        assert(!last_macro_use_token);
         assert(tok.FileLocation().has_value());
         info.category = TokenInfo::kMarkerToken;
         break;
@@ -2168,10 +2166,13 @@ Substitution *TokenTreeImpl::BuildSubstitutions(
       // Inside of a macro expansion region; this shoudln't happen.
       case TokenInfo::kMacroStepToken:
       case TokenInfo::kMacroExpansionToken:
-        sub->before.has_error = true;
-        Die(this);
-        err << "Macro step/expansion tokens should not be seen here";
-        return nullptr;
+        if (curr->file_tok) {
+          sub->before.has_error = true;
+          Die(this);
+          err << "Macro step/expansion tokens should not be seen here";
+          return nullptr;
+        }
+        [[fallthrough]];
 
       // If we're here then it means we're probably in a directive that's been
       // pulled out of its (parent) fragment.

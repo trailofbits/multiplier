@@ -21,25 +21,6 @@
 #include "Util.h"
 
 namespace indexer {
-
-// // Identify the reference kind and update the records. The function
-// // goes through the AST node of referrer and assigned the reference
-// // kind for the decl. The functions are defined in `References.cpp`
-// extern void DeclReferenceKind(
-//     const pasta::AST &ast, const EntityMapper &em,
-//     const pasta::Stmt &stmt, const pasta::Decl &ref,
-//      mx::ReferenceRecord &record);
-
-// extern void DeclReferenceKind(
-//     const pasta::AST &ast, const EntityMapper &em,
-//     const pasta::Decl &decl, const pasta::Decl &ref,
-//     mx::ReferenceRecord &record);
-
-// extern void DeclReferenceKind(
-//     const pasta::AST &ast, const EntityMapper &em,
-//     const pasta::Designator &designator, const pasta::Decl &ref,
-//     mx::ReferenceRecord &record);
-
 namespace {
 
 template <typename Entity>

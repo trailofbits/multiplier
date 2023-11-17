@@ -172,12 +172,12 @@ ReferenceKind::builtin_reference_kind(void) const noexcept {
 }
 
 // The name of this reference kind.
-std::string_view ReferenceKind::kind(void) const & noexcept {
+std::string_view ReferenceKind::data(void) const & noexcept {
   return impl->kind_data;
 }
 
 // The name of this reference kind.
-std::string ReferenceKind::kind(void) const && noexcept {
+std::string ReferenceKind::data(void) const && noexcept {
   return impl->kind_data;
 }
 

@@ -85,6 +85,63 @@ bool IsParsedToken(const pasta::Token &tok) {
   }
 }
 
+namespace {
+
+// Compute the last token of a macro.
+static std::optional<pasta::MacroToken> EndTokenOfRange(pasta::MacroRange range,
+                                                        const void *parent) {
+  std::optional<pasta::MacroToken> last_tok;
+
+  for (pasta::Macro child_node : range) {
+    auto parent_of_child = child_node.Parent();
+    if (!parent_of_child) {
+      assert(false);
+      break;
+    }
+
+    if (parent_of_child->RawMacro() != parent) {
+      break;
+    }
+
+    if (auto new_end_tok = EndToken(child_node)) {
+      last_tok = new_end_tok;
+    }
+  }
+
+  return last_tok;
+}
+
+}  // namespace
+
+// Compute the last token of a macro.
+std::optional<pasta::MacroToken> EndToken(const pasta::Macro &macro) {
+
+  auto parent = macro.RawMacro();
+
+  if (auto sub = pasta::MacroSubstitution::From(macro)) {
+    if (auto last_repl_tok = EndTokenOfRange(
+            sub->ReplacementChildren(), parent)) {
+      return last_repl_tok;
+    }
+
+    if (auto exp = pasta::MacroExpansion::From(macro)) {
+      if (auto last_body_tok = EndTokenOfRange(
+              exp->IntermediateChildren(), parent)) {
+        return last_body_tok;
+      }
+    }
+  }
+
+  if (auto tok = pasta::MacroToken::From(macro)) {
+    return tok;
+  }
+
+  // NOTE(pag): `pasta::Macro::EndToken` returns the last use token. That
+  //            sometimes ends up being the right-corner of some internal left
+  //            corner.
+  return EndTokenOfRange(macro.Children(), parent);
+}
+
 // Print a declaration; useful for error reporting.
 std::string DeclToString(const pasta::Decl &decl) {
   std::stringstream ss;

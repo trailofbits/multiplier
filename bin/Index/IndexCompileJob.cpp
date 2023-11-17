@@ -364,8 +364,28 @@ static std::string MacroLocation(pasta::Macro macro) {
   return "<unknown-loc>";
 }
 
-// Generate all top-level macro defintions. They can be nested inside of macro
-// expansions.
+// Generate all directives that may be nested inside some top-level thing.
+// For example, the following are allowed.
+//
+//    MACRO(
+//        ...
+//    #define ...
+//        ...
+//        )
+//
+// And:
+//    MACRO(
+//        ...
+//    #if ...
+//        ...
+//    #endif
+//        ...
+//        )
+//
+// If `mn` isn't already a macro directive, then we explore its use tree to
+// find macro directives (e.g. `#define`, `#if`, and `#endif` above). These
+// directives are always in the use sides rather than the intermediate/expansion
+// sides as they are handled in an early phase of pre-processing.
 static gap::generator<pasta::MacroDirective>
 FindDirectivesInMacro(pasta::Macro mn) {
   switch (mn.Kind()) {
@@ -543,60 +563,6 @@ static std::pair<uint64_t, uint64_t> BaselineEntityRange(
   return {begin_tok_index, end_tok_index};
 }
 
-// Compute the last token of a macro.
-static std::optional<pasta::MacroToken> EndToken(pasta::Macro macro);
-
-// Compute the last token of a macro.
-static std::optional<pasta::MacroToken> EndToken(pasta::MacroRange range,
-                                                 const void *parent) {
-  std::optional<pasta::MacroToken> last_tok;
-
-  for (pasta::Macro child_node : range) {
-    auto parent_of_child = child_node.Parent();
-    if (!parent_of_child) {
-      assert(false);
-      break;
-    }
-
-    if (parent_of_child->RawMacro() != parent) {
-      break;
-    }
-
-    if (auto new_end_tok = EndToken(std::move(child_node))) {
-      last_tok = new_end_tok;
-    }
-  }
-
-  return last_tok;
-}
-
-// Compute the last token of a macro.
-std::optional<pasta::MacroToken> EndToken(pasta::Macro macro) {
-
-  auto parent = macro.RawMacro();
-
-  if (auto sub = pasta::MacroSubstitution::From(macro)) {
-    if (auto last_repl_tok = EndToken(sub->ReplacementChildren(), parent)) {
-      return last_repl_tok;
-    }
-
-    if (auto exp = pasta::MacroExpansion::From(macro)) {
-      if (auto last_body_tok = EndToken(exp->IntermediateChildren(), parent)) {
-        return last_body_tok;
-      }
-    }
-  }
-
-  if (auto tok = pasta::MacroToken::From(macro)) {
-    return tok;
-  }
-
-  // NOTE(pag): `pasta::Macro::EndToken` returns the last use token. That
-  //            sometimes ends up being the right-corner of some internal left
-  //            corner.
-  return EndToken(macro.Children(), parent);
-}
-
 static pasta::TokenRange BaselineEntityRange(const pasta::Macro &macro) {
 
   std::optional<pasta::MacroToken> begin_tok = macro.BeginToken();
@@ -611,40 +577,6 @@ static pasta::TokenRange BaselineEntityRange(const pasta::Macro &macro) {
   CHECK(range.has_value());
   return range.value();
 }
-
-//static bool ShouldEndInSemiColon(const pasta::Decl &decl) {
-//  switch (decl.Kind()) {
-//    case pasta::DeclKind::kVar:
-//      if (auto var = pasta::VarDecl::From(decl)) {
-//
-//      }
-//      break;
-//    case pasta::DeclKind::kFriend:
-//    case pasta::DeclKind::kRecord:
-//    case pasta::DeclKind::kCXXRecord:
-//    case pasta::DeclKind::kEnum:
-//    case pasta::DeclKind::kUsing:
-//    case pasta::DeclKind::kUsingDirective:
-//    case pasta::DeclKind::kUsingEnum:
-//    case pasta::DeclKind::kClassTemplate:
-//    case pasta::DeclKind::kClassTemplatePartialSpecialization:
-//    case pasta::DeclKind::kClassTemplateSpecialization:
-//    case pasta::DeclKind::kCXXDeductionGuide:
-//      return true;
-//    case pasta::DeclKind::kFunction:
-//      break;
-//
-//    case pasta::DeclKind::kCXXConstructor:
-//    case pasta::DeclKind::kCXXDestructor:
-//    case pasta::DeclKind::kCXXConversion:
-//    case pasta::DeclKind::kCXXMethod:
-//    case pasta::DeclKind::kCXXConversion:
-//      if () {
-//
-//      }
-//  }
-//  return false;
-//}
 
 static uint64_t PreviousConditionalIndex(
     const std::map<uint64_t, pasta::Macro> &dir_index_to_next_dir,
@@ -1200,41 +1132,32 @@ static std::vector<OrderedMacro> FindTLMs(
       }
     } else {
       for (pasta::MacroDirective md : FindDirectivesInMacro(mn)) {
-        if (auto dmd = pasta::DefineMacroDirective::From(md)) {
+        tlms.emplace_back(md, order++);
 
-          // If this macro definition doesn't have a name, then it's in a
-          // conditionally disabled region.
-          std::optional<pasta::MacroToken> name = dmd->Name();
-          if (!name) {
-            continue;
-          }
-
-          // Builtin or command-line specified macros have no location.
-          //
-          // NOTE(pag): The persistence for macros re-interprets macros with no
-          //            definition site as substitutions instead of macro
-          //            expansions.
-          //
-          // TODO(pag): Find a way to give these file locations.
-          if (!name->FileLocation()) {
-            continue;
-          }
-
-          // We found a nested macro definition.
-          if (md.RawMacro() != mn.RawMacro()) {
-            tlms.emplace_back(md, order++);
-
-          // We found a top-level macro definition.
-          } else {
-            tlms.emplace_back(mn, order++);
-          }
-
-          defs.push_back(std::move(dmd.value()));
-        
-        // We found a nested macro directive.
-        } else if (md.RawMacro() != mn.RawMacro()) {
-          tlms.emplace_back(mn, order++);
+        auto dmd = pasta::DefineMacroDirective::From(md);
+        if (!dmd) {
+          continue;
         }
+
+        // If this macro definition doesn't have a name, then it's in a
+        // conditionally disabled region.
+        std::optional<pasta::MacroToken> name = dmd->Name();
+        if (!name) {
+          continue;
+        }
+
+        // Builtin or command-line specified macros have no location.
+        //
+        // NOTE(pag): The persistence for macros re-interprets macros with no
+        //            definition site as substitutions instead of macro
+        //            expansions.
+        //
+        // TODO(pag): Find a way to give these file locations.
+        if (!name->FileLocation()) {
+          continue;
+        }
+
+        defs.push_back(std::move(dmd.value()));
       }
     }
   }
@@ -1926,8 +1849,7 @@ static void CreateFloatingDirectiveFragment(
   EntityGroup entities;
   entities.emplace_back(macro);
   auto floc = FindFileLocationOfFragment(
-      em.entity_ids, entities, directive_range);;
-  CHECK(floc.has_value());
+      em.entity_ids, entities, directive_range);
 
   pasta::PrintedTokenRange parsed_tokens_in_directive_range =
       pasta::PrintedTokenRange::Adopt(directive_range);

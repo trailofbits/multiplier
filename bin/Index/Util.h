@@ -66,6 +66,9 @@ std::optional<pasta::FileToken> AsTopLevelFileToken(const pasta::Token &tok);
 // NOTE(pag): This logic is similarly reflected in `EntityLabeller::Label`.
 bool IsParsedToken(const pasta::Token &tok);
 
+// Compute the last token of a macro.
+std::optional<pasta::MacroToken> EndToken(const pasta::Macro &macro);
+
 // Print a declaration; useful for error reporting.
 std::string DeclToString(const pasta::Decl &decl);
 

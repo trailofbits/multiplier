@@ -216,34 +216,46 @@ class ParentTrackerVisitor : public EntityVisitor {
            (parent_decl && parent_decl_id != mx::kInvalidEntityId);
   }
 
+  const void *GetParentStmt(const void *decl_or_stmt) const {
+    return GetOrNullptr(em.parent_stmts, decl_or_stmt);
+  }
+
+  const void *GetParentDecl(const void *decl_or_stmt) const {
+    return GetOrNullptr(em.parent_decls, decl_or_stmt);
+  }
+
   // Sync up the pointers and IDs for parentage.
-  bool ResolveParents(const void *new_parent_stmt, const void *new_parent_decl) {
+  bool SetParents(const void *new_parent_stmt, const void *new_parent_decl) {
     parent_stmt = new_parent_stmt;
     parent_decl = new_parent_decl;
 
     if (!parent_stmt && parent_decl) {
-      parent_stmt = GetOrNullptr(em.parent_stmts, parent_decl);
+      parent_stmt = GetParentStmt(parent_decl);
     }
 
     if (!parent_decl && parent_stmt) {
-      parent_decl = GetOrNullptr(em.parent_decls, parent_stmt);
+      parent_decl = GetParentDecl(parent_stmt);
     }
 
     return ResolveParentIds();
+  }
+
+  bool ResolveParents(const void *entity) {
+    return SetParents(GetParentStmt(entity), GetParentDecl(entity));
   }
 
   bool Ascend(void) {
     auto old_stmt = parent_stmt;
     auto old_decl = parent_decl;
 
-    parent_stmt = GetOrNullptr(em.parent_stmts, old_stmt);
+    parent_stmt = GetParentStmt(old_stmt);
     if (!parent_stmt) {
-      parent_stmt = GetOrNullptr(em.parent_stmts, old_decl);
+      parent_stmt = GetParentStmt(old_decl);
     }
 
-    parent_decl = GetOrNullptr(em.parent_decls, old_decl);
+    parent_decl = GetParentDecl(old_decl);
     if (!parent_decl) {
-      parent_decl = GetOrNullptr(em.parent_decls, old_stmt);
+      parent_decl = GetParentDecl(old_stmt);
     }
 
     return ResolveParentIds();
@@ -317,7 +329,7 @@ static void FindMissingParentageFromTokens(
       continue;
     }
 
-    if (vis.ResolveParents(parent_stmt, parent_decl)) {
+    if (vis.SetParents(parent_stmt, parent_decl)) {
       auto ast = pasta::AST::From(pf.top_level_decls.front());
       vis.Accept(ast.Adopt(reinterpret_cast<const clang::Stmt *>(child_stmt)));
     }
@@ -360,10 +372,7 @@ static void FindMissingParentageFromAttributeTokens(
         continue;
       }
 
-      auto parent_stmt = GetOrNullptr(pf.em.parent_stmts, attr_it->second);
-      auto parent_decl = GetOrNullptr(pf.em.parent_decls, attr_it->second);
-
-      if (vis.ResolveParents(parent_stmt, parent_decl)) {
+      if (vis.ResolveParents(attr_it->second)) {
         vis.Accept(stmt);
         break;
       }

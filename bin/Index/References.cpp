@@ -129,6 +129,214 @@ static bool MemberPointerIsMethodPointer(pasta::Expr member_pointer) {
   return mpt->IsMemberFunctionPointer();
 }
 
+// Assuming `parent` is a statement and `child` is an immediate descendent of
+// `parent`, and `decl` is transitively reference by `child`, try to use the
+// kind of `parent` to classify how `child` uses `decl`.
+//
+// Sometimes we can't make a classification, and so we signal to the caller
+// via `keep_ascending = true;` to go up to the grandparent. Sometimes we can
+// make a classification, in which case we `return true`. Finally, sometimes
+// we do both: make a classification and signal that we want to potentially make
+// more classifications.
+//
+// NOTE(pag): Returning `false` without changing `keep_ascending` will break
+//            out of the ascension loop. The last stage of things is still to
+//            try to emit a record, so a `return false` means "emit whatever's
+//            in `record` if we haven't emitted it yet".
+std::optional<mx::BuiltinReferenceKind> ClassifyParentChild(
+    const pasta::Stmt &parent, const pasta::Stmt &child,
+    const pasta::Decl &decl, bool &keep_ascending) {
+
+  switch (auto pk = parent.Kind()) {
+    // Treat sources of casts kind of like taints from the perspective of
+    // trying to find assignments to things, as well as call arguments to
+    // things.
+    case pasta::StmtKind::kBuiltinBitCastExpr:
+    case pasta::StmtKind::kCStyleCastExpr:
+    case pasta::StmtKind::kCXXFunctionalCastExpr:
+    case pasta::StmtKind::kCXXAddrspaceCastExpr:
+    case pasta::StmtKind::kCXXConstCastExpr:
+    case pasta::StmtKind::kCXXDynamicCastExpr:
+    case pasta::StmtKind::kCXXReinterpretCastExpr:
+    case pasta::StmtKind::kCXXStaticCastExpr:
+    case pasta::StmtKind::kObjCBridgedCastExpr:
+    case pasta::StmtKind::kImplicitCastExpr:
+      if (auto cast = pasta::CastExpr::From(parent)) {
+        if (pasta::TypeDecl::From(decl)) {
+          return mx::BuiltinReferenceKind::CASTS_WITH_TYPE;
+
+        } else if (auto conversion_func = cast->ConversionFunction();
+                   conversion_func && conversion_func.value() == decl) {
+          return mx::BuiltinReferenceKind::CALLS;
+        }
+      }
+      [[fallthrough]];
+
+    case pasta::StmtKind::kParenExpr:
+      keep_ascending = true;
+      break;
+
+    case pasta::StmtKind::kSwitchStmt:
+    case pasta::StmtKind::kDoStmt:
+    case pasta::StmtKind::kWhileStmt:
+    case pasta::StmtKind::kForStmt:
+    case pasta::StmtKind::kIfStmt:
+    case pasta::StmtKind::kConditionalOperator:
+      if (auto cond_expr = ConditionExpr(parent)) {
+        if (cond_expr.value() == child) {
+          return mx::BuiltinReferenceKind::TESTS_VALUE;
+        }
+      } else {
+        assert(false);
+      }
+      [[fallthrough]];
+
+    case pasta::StmtKind::kCaseStmt:
+    case pasta::StmtKind::kDefaultStmt:
+    case pasta::StmtKind::kLabelStmt:
+    case pasta::StmtKind::kCompoundStmt:
+    case pasta::StmtKind::kCXXTryStmt:
+    case pasta::StmtKind::kCXXForRangeStmt:
+    case pasta::StmtKind::kCXXCatchStmt:
+    case pasta::StmtKind::kCoroutineBodyStmt:
+      return std::nullopt;
+
+    case pasta::StmtKind::kUnaryOperator:
+      switch (auto uop = pasta::UnaryOperator::From(parent); uop->Opcode()) {
+        case pasta::UnaryOperatorKind::kPostIncrement:
+        case pasta::UnaryOperatorKind::kPostDecrement:
+          return mx::BuiltinReferenceKind::UPDATES_VALUE;
+
+        case pasta::UnaryOperatorKind::kPreIncrement:
+        case pasta::UnaryOperatorKind::kPreDecrement:
+          keep_ascending = true;
+          return mx::BuiltinReferenceKind::UPDATES_VALUE;
+
+        case pasta::UnaryOperatorKind::kPlus:
+        case pasta::UnaryOperatorKind::kMinus:
+        case pasta::UnaryOperatorKind::kNot:
+        case pasta::UnaryOperatorKind::kReal:
+        case pasta::UnaryOperatorKind::kImag:
+          keep_ascending = true;
+          return std::nullopt;
+
+        case pasta::UnaryOperatorKind::kAddressOf:
+          return mx::BuiltinReferenceKind::TAKES_ADDRESS;
+
+        case pasta::UnaryOperatorKind::kDeref:
+          return mx::BuiltinReferenceKind::ACCESSES_VALUE;
+
+        case pasta::UnaryOperatorKind::kLNot:
+          return mx::BuiltinReferenceKind::TESTS_VALUE;
+
+        default:
+          return std::nullopt;
+      }
+
+    case pasta::StmtKind::kCompoundAssignOperator:
+    case pasta::StmtKind::kBinaryOperator:
+      switch (auto bin = pasta::BinaryOperator::From(parent); bin->Opcode()) {
+
+        // `base.*member` and `base->*member`.
+        case pasta::BinaryOperatorKind::kPointerMemoryD:
+        case pasta::BinaryOperatorKind::kPointerMemoryI:
+
+          // This could be a call, e.g. `base->*member()`, and so we want
+          // it to look like a `CALLS` of `member`. But that has to be done
+          // by the next iteration, so we'll update the default.
+          if (bin->RHS() == child && MemberPointerIsMethodPointer(bin->RHS())) {
+            keep_ascending = true;
+          }
+
+          return mx::BuiltinReferenceKind::ACCESSES_VALUE;
+
+        // `lhs = rhs`, or `lhs <op>= *`.
+        case pasta::BinaryOperatorKind::kAssign:
+        case pasta::BinaryOperatorKind::kMulAssign:
+        case pasta::BinaryOperatorKind::kDivAssign:
+        case pasta::BinaryOperatorKind::kRemAssign:
+        case pasta::BinaryOperatorKind::kAddAssign:
+        case pasta::BinaryOperatorKind::kSubAssign:
+        case pasta::BinaryOperatorKind::kShlAssign:
+        case pasta::BinaryOperatorKind::kShrAssign:
+        case pasta::BinaryOperatorKind::kAndAssign:
+        case pasta::BinaryOperatorKind::kXorAssign:
+        case pasta::BinaryOperatorKind::kOrAssign:
+          // Keep ascending. This assignment might be, for example, a
+          // function argument, and so the source/dest is also passed as an
+          // argument. Similarly, it might be inside of a larger assignment,
+          // e.g. `a = b = c`, or inside of a comma operator, e.g.
+          // `..., a = b`.
+          keep_ascending = true;
+          
+          return ClassifyAssignmentOperator(*bin, child);
+
+        // The right-hand side of a comma operator propagates up.
+        case pasta::BinaryOperatorKind::kComma:
+          keep_ascending = bin->RHS() == child;
+          return std::nullopt;
+
+        case pasta::BinaryOperatorKind::kCmp:
+        case pasta::BinaryOperatorKind::kLT:
+        case pasta::BinaryOperatorKind::kGT:
+        case pasta::BinaryOperatorKind::kLE:
+        case pasta::BinaryOperatorKind::kGE:
+        case pasta::BinaryOperatorKind::kEQ:
+        case pasta::BinaryOperatorKind::kNE:
+        case pasta::BinaryOperatorKind::kLAnd:
+        case pasta::BinaryOperatorKind::kLOr:
+          return mx::BuiltinReferenceKind::TESTS_VALUE;
+
+        default:
+          return std::nullopt;
+      }
+      break;
+
+    case pasta::StmtKind::kDeclRefExpr:
+      assert(false);
+      return std::nullopt;
+
+    case pasta::StmtKind::kMemberExpr:
+      if (auto member = pasta::MemberExpr::From(parent)) {
+        assert(member->Base() == child);
+        return mx::BuiltinReferenceKind::ACCESSES_VALUE;
+      }
+
+      assert(false);
+      return std::nullopt;
+
+    case pasta::StmtKind::kArraySubscriptExpr:
+      return ClassifyArraySubscript(parent, child);
+
+    case pasta::StmtKind::kCallExpr:
+    case pasta::StmtKind::kCXXConstructExpr:
+    case pasta::StmtKind::kCXXNewExpr:
+    case pasta::StmtKind::kCXXDeleteExpr:
+      return ClassifyCall(parent, child, decl);
+
+    case pasta::StmtKind::kTypeTraitExpr:
+    case pasta::StmtKind::kUnaryExprOrTypeTraitExpr:
+      return pasta::TypeDecl::From(decl) ?
+             mx::BuiltinReferenceKind::USES_TYPE :
+             mx::BuiltinReferenceKind::TAKES_VALUE;
+
+    case pasta::StmtKind::kDeclStmt:
+    case pasta::StmtKind::kDesignatedInitExpr:
+    case pasta::StmtKind::kDesignatedInitUpdateExpr:
+      for (auto init : parent.Children()) {
+        if (init == child) {
+          return mx::BuiltinReferenceKind::COPIES_VALUE;
+        }
+      }
+      return std::nullopt;
+
+    default:
+      break;
+  }
+
+  return std::nullopt;
+}
+
 }  // namespace
 
 // Generate reference records to functions, variables, fields, enumerators, etc.
@@ -148,8 +356,7 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
       mx::BuiltinReferenceKind::USES_VALUE
   };
 
-  auto is_function_decl = pasta::FunctionDecl::From(to_decl).has_value();
-  if (is_function_decl) {
+  if (pasta::FunctionDecl::From(to_decl).has_value()) {
     record.kind = mx::BuiltinReferenceKind::TAKES_ADDRESS;
   }
 
@@ -157,243 +364,35 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
 
   // If we're referencing a type, then we're probably referencing it from
   // a `CastExpr` or something like that.
-  auto is_type_decl = pasta::TypeDecl::From(to_decl).has_value();
-  if (is_type_decl) {
+  if (pasta::TypeDecl::From(to_decl).has_value()) {
     record.kind = mx::BuiltinReferenceKind::USES_TYPE;
     maybe_parent = stmt;
   } else {
     maybe_parent = em->ParentStmt(ast, stmt);
   }
 
-  while (maybe_parent) {
-    const auto &parent = maybe_parent.value();
+  std::optional<mx::ReferenceRecord> prev_record;
 
-    auto update_record_to_parent = [&] (mx::BuiltinReferenceKind new_kind) {
-      record.context_entity_id = em->EntityId(parent);
-      record.kind = new_kind;
-    };
+  for (auto keep_ascending = true; keep_ascending && maybe_parent; ) {
+    keep_ascending = false;
+    auto classified_kind = ClassifyParentChild(
+        maybe_parent.value(), stmt, to_decl, keep_ascending);
     
-    switch (auto pk = parent.Kind()) {
-      // Treat sources of casts kind of like taints from the perspective of
-      // trying to find assignments to things, as well as call arguments to
-      // things.
-      case pasta::StmtKind::kBuiltinBitCastExpr:
-      case pasta::StmtKind::kCStyleCastExpr:
-      case pasta::StmtKind::kCXXFunctionalCastExpr:
-      case pasta::StmtKind::kCXXAddrspaceCastExpr:
-      case pasta::StmtKind::kCXXConstCastExpr:
-      case pasta::StmtKind::kCXXDynamicCastExpr:
-      case pasta::StmtKind::kCXXReinterpretCastExpr:
-      case pasta::StmtKind::kCXXStaticCastExpr:
-      case pasta::StmtKind::kObjCBridgedCastExpr:
-      case pasta::StmtKind::kImplicitCastExpr:
-        if (is_type_decl) {
-          update_record_to_parent(mx::BuiltinReferenceKind::CASTS_WITH_TYPE);
-          co_yield record;
-          co_return;
-        }
-        [[fallthrough]];
-
-      case pasta::StmtKind::kParenExpr:
-        break;  // Keep ascending.
-
-      case pasta::StmtKind::kSwitchStmt:
-      case pasta::StmtKind::kDoStmt:
-      case pasta::StmtKind::kWhileStmt:
-      case pasta::StmtKind::kForStmt:
-      case pasta::StmtKind::kIfStmt:
-      case pasta::StmtKind::kConditionalOperator:
-        if (auto cond_expr = ConditionExpr(parent)) {
-          if (cond_expr.value() == stmt) {
-            update_record_to_parent(mx::BuiltinReferenceKind::TESTS_VALUE);
-          }
-        } else {
-          assert(false);
-        }
-        [[fallthrough]];
-
-      case pasta::StmtKind::kCaseStmt:
-      case pasta::StmtKind::kDefaultStmt:
-      case pasta::StmtKind::kLabelStmt:
-      case pasta::StmtKind::kCompoundStmt:
-      case pasta::StmtKind::kCXXTryStmt:
-      case pasta::StmtKind::kCXXForRangeStmt:
-      case pasta::StmtKind::kCXXCatchStmt:
-      case pasta::StmtKind::kCoroutineBodyStmt:
-        co_yield record;
-        co_return;
-
-      case pasta::StmtKind::kUnaryOperator:
-        switch (auto uop = pasta::UnaryOperator::From(parent); uop->Opcode()) {
-          case pasta::UnaryOperatorKind::kPostIncrement:
-          case pasta::UnaryOperatorKind::kPostDecrement:
-            update_record_to_parent(mx::BuiltinReferenceKind::UPDATES_VALUE);
-            co_yield record;
-            co_return;
-
-          case pasta::UnaryOperatorKind::kPreIncrement:
-          case pasta::UnaryOperatorKind::kPreDecrement:
-            update_record_to_parent(mx::BuiltinReferenceKind::UPDATES_VALUE);
-            co_yield record;
-            break;  // Keep ascending.
-
-          case pasta::UnaryOperatorKind::kPlus:
-          case pasta::UnaryOperatorKind::kMinus:
-          case pasta::UnaryOperatorKind::kNot:
-          case pasta::UnaryOperatorKind::kReal:
-          case pasta::UnaryOperatorKind::kImag:
-            break;  // Keep ascending.
-
-          case pasta::UnaryOperatorKind::kAddressOf:
-            update_record_to_parent(mx::BuiltinReferenceKind::TAKES_ADDRESS);
-            co_yield record;
-            co_return;
-
-          case pasta::UnaryOperatorKind::kDeref:
-            update_record_to_parent(mx::BuiltinReferenceKind::ACCESSES_VALUE);
-            co_yield record;
-            co_return;
-
-          case pasta::UnaryOperatorKind::kLNot:
-            update_record_to_parent(mx::BuiltinReferenceKind::TESTS_VALUE);
-            co_yield record;
-            co_return;
-
-          default:
-            co_yield record;  // Default.
-            co_return;
-        }
-        break;
-
-      case pasta::StmtKind::kCompoundAssignOperator:
-      case pasta::StmtKind::kBinaryOperator:
-        switch (auto bin = pasta::BinaryOperator::From(parent); bin->Opcode()) {
-
-          // `base.*member` and `base->*member`.
-          case pasta::BinaryOperatorKind::kPointerMemoryD:
-          case pasta::BinaryOperatorKind::kPointerMemoryI:
-            update_record_to_parent(mx::BuiltinReferenceKind::ACCESSES_VALUE);
-
-            if (bin->LHS() == stmt) {
-              co_yield record;
-              co_return;
-            }
-
-            // This could be a call, e.g. `base->*member()`, and so we want
-            // it to look like a `CALLS` of `member`. But that has to be done
-            // by the next iteration, so we'll update the default.
-            if (MemberPointerIsMethodPointer(bin->RHS())) {
-              break;
-            }
-
-            co_return;
-
-          // `lhs = rhs`, or `lhs <op>= *`.
-          case pasta::BinaryOperatorKind::kAssign:
-          case pasta::BinaryOperatorKind::kMulAssign:
-          case pasta::BinaryOperatorKind::kDivAssign:
-          case pasta::BinaryOperatorKind::kRemAssign:
-          case pasta::BinaryOperatorKind::kAddAssign:
-          case pasta::BinaryOperatorKind::kSubAssign:
-          case pasta::BinaryOperatorKind::kShlAssign:
-          case pasta::BinaryOperatorKind::kShrAssign:
-          case pasta::BinaryOperatorKind::kAndAssign:
-          case pasta::BinaryOperatorKind::kXorAssign:
-          case pasta::BinaryOperatorKind::kOrAssign:
-            update_record_to_parent(ClassifyAssignmentOperator(*bin, stmt));
-            co_yield record;
-            
-            // Keep ascending. This assignment might be, for example, a
-            // function argument, and so the source/dest is also passed as an
-            // argument. Similarly, it might be inside of a larger assignment,
-            // e.g. `a = b = c`, or inside of a comma operator, e.g.
-            // `..., a = b`.
-            break;
-
-          // The right-hand side of a comma operator propagates up.
-          case pasta::BinaryOperatorKind::kComma:
-            if (bin->RHS() != stmt) {
-              co_yield record;  // Default.
-              co_return;
-            }
-            break;  // Keep ascending.
-
-          case pasta::BinaryOperatorKind::kCmp:
-          case pasta::BinaryOperatorKind::kLT:
-          case pasta::BinaryOperatorKind::kGT:
-          case pasta::BinaryOperatorKind::kLE:
-          case pasta::BinaryOperatorKind::kGE:
-          case pasta::BinaryOperatorKind::kEQ:
-          case pasta::BinaryOperatorKind::kNE:
-          case pasta::BinaryOperatorKind::kLAnd:
-          case pasta::BinaryOperatorKind::kLOr:
-            update_record_to_parent(mx::BuiltinReferenceKind::TESTS_VALUE);
-            co_yield record;
-            co_return;
-
-          default:
-            co_yield record;  // Default.
-            co_return;
-        }
-        break;
-
-      case pasta::StmtKind::kDeclRefExpr:
-        assert(false);
-        co_return;
-
-      case pasta::StmtKind::kMemberExpr:
-        if (auto member = pasta::MemberExpr::From(parent);
-            member && member->Base() == stmt) {
-
-          update_record_to_parent(mx::BuiltinReferenceKind::ACCESSES_VALUE);
-          co_yield record;
-          co_return;
-
-        } else {
-          assert(false);
-          co_return;
-        }
-
-      case pasta::StmtKind::kArraySubscriptExpr:
-        update_record_to_parent(ClassifyArraySubscript(parent, stmt));
-        co_yield record;
-        co_return;
-
-      case pasta::StmtKind::kCallExpr:
-      case pasta::StmtKind::kCXXConstructExpr:
-      case pasta::StmtKind::kCXXNewExpr:
-      case pasta::StmtKind::kCXXDeleteExpr:
-        update_record_to_parent(ClassifyCall(parent, stmt, to_decl));
-        co_yield record;
-        co_return;
-
-      case pasta::StmtKind::kTypeTraitExpr:
-      case pasta::StmtKind::kUnaryExprOrTypeTraitExpr:
-        update_record_to_parent(
-            is_type_decl ?
-            mx::BuiltinReferenceKind::USES_TYPE :
-            mx::BuiltinReferenceKind::TAKES_VALUE);
-        co_yield record;
-        co_return;
-
-      case pasta::StmtKind::kDeclStmt:
-      case pasta::StmtKind::kDesignatedInitExpr:
-      case pasta::StmtKind::kDesignatedInitUpdateExpr:
-        for (auto init : parent.Children()) {
-          if (init == stmt) {
-            update_record_to_parent(mx::BuiltinReferenceKind::COPIES_VALUE);
-            break;
-          }
-        }
-        co_yield record;
-        co_return;
-
-      default:
-        break;
+    if (classified_kind) {
+      record.context_entity_id = em->EntityId(maybe_parent.value());
+      record.kind = classified_kind.value();
+      co_yield record;
+      prev_record = record;
     }
 
     stmt = std::move(maybe_parent.value());
     maybe_parent = em->ParentStmt(ast, stmt);
+  }
+
+  // Try to prevent redundant records. It's not entirely necessary, as the
+  // database will skip them too.
+  if (prev_record && prev_record.value() == record) {
+    co_return;
   }
 
   // If we got down here, then we didn't emit anything, so fall back on the
@@ -435,45 +434,6 @@ gap::generator<mx::ReferenceRecord> EnumerateDesignatorToDeclReferences(
   }
 
   co_yield record;
-}
-
-// Try to find the `Decl` referenced by a particular `type`.
-std::optional<pasta::Decl> ReferencedDecl(const pasta::Type &type_) {
-  auto type = type_;
-  for (const void *prev_raw = nullptr; prev_raw != type.RawType();
-       prev_raw = type.RawType()) {
-    type = type.UnqualifiedType();
-    if (auto paren = pasta::ParenType::From(type)) {
-      type = paren->InnerType().UnqualifiedType();
-    }
-    if (auto nt = type.PointeeOrArrayElementType()) {
-      type = std::move(nt.value());
-    }
-  }
-
-  if (auto tdt = pasta::TypedefType::From(type)) {
-    return tdt->Declaration();
-
-  } else if (auto ttt = pasta::TagType::From(type)) {
-    return ttt->Declaration();
-
-  } else if (auto tut = pasta::UsingType::From(type)) {
-    if (auto ret = ReferencedDecl(tut->UnderlyingType())) {
-      return ret;
-    } else {
-      return tut->FoundDeclaration();
-    }
-  
-  } else if (auto dtt = pasta::DecltypeType::From(type)) {
-    return ReferencedDecl(dtt->UnderlyingType());  
-  
-  } else if (auto ddt = pasta::DeducedType::From(type)) {
-    if (auto rt = ddt->ResolvedType()) {
-      return ReferencedDecl(std::move(rt.value()));
-    }
-  }
-
-  return std::nullopt;
 }
 
 // Try to find the `Decl` referenced by a particular `decl`.
@@ -537,6 +497,10 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt) {
 
   // If we have `(T *) b` then mark `T` as being referenced in this fragment.
   } else if (auto cast = pasta::CastExpr::From(stmt)) {
+
+    if (auto conversion_func = cast->ConversionFunction()) {
+      co_yield conversion_func.value();
+    }
 
     // TODO(pag): If we want to allow implicit casts, then update
     //            `ReferenceIterator::Advance`.
@@ -849,6 +813,7 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type) {
     }
     case pasta::TypeKind::kUsing: {
       auto &tt = reinterpret_cast<const pasta::UsingType &>(type);
+      GEN(tt.UnderlyingType());
       co_yield tt.FoundDeclaration();
       break;
     }
@@ -870,71 +835,28 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type) {
   }
 }
 
-// Try to identify the declaration referenced by a statement.
-std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt) {
-  
-  // E.g. `a` or `a()` where `a` is a `Decl`. This also covers things like
-  // `a + b` where `+` is a `T::operator+`.
-  if (auto dre = pasta::DeclRefExpr::From(stmt)) {
-    return dre->Declaration();
-
-  // `foo->bar`, mark `bar` as being referenced. `foo` will be handled as
-  // a `DeclRefExpr`.
-  } else if (auto me = pasta::MemberExpr::From(stmt)) {
-    return me->MemberDeclaration();
-  
-  // If we have `a = X()` for class name `X`, then mark the constructor as
-  // used in this fragment.
-  } else if (auto ce = pasta::CXXConstructExpr::From(stmt)) {
-    return ce->Constructor();
-  
-  // If we have `new T`, then mark `T` as being referenced in this fragment.
-  } else if (auto cxx_new = pasta::CXXNewExpr::From(stmt)) {
-    return cxx_new->OperatorNew();
-
-  // If we have `delete x`, then mark `the `operator delete`` as being
-  // referenced in this fragment.
-  } else if (auto cxx_del = pasta::CXXDeleteExpr::From(stmt)) {
-    return cxx_del->OperatorDelete();
-  
-  // If we have `(T *) b` then mark `T` as being referenced in this fragment.
-  } else if (auto cast = pasta::CastExpr::From(stmt)) {
-
-    // TODO(pag): If we want to allow implicit casts, then update
-    //            `ReferenceIterator::Advance`.
-    if (stmt.Kind() != pasta::StmtKind::kImplicitCastExpr) {
-      if (auto casted_type = cast->Type()) {
-        if (auto used_decl = ReferencedDecl(casted_type.value())) {
-          return used_decl.value();
-        }
-      }
-    }
-  
-  // If we have `sizeof(T)` or `alignof(T)` or something like these then
-  // mark `T` as being referenced in this fragment.
-  } else if (auto unary = pasta::UnaryExprOrTypeTraitExpr::From(stmt)) {
-    if (auto arg_type = unary->ArgumentType()) {
-      if (auto used_decl = ReferencedDecl(arg_type.value())) {
-        return used_decl.value();
-      }
-    }
-
-  // XREF(pag): Issue #185. Make sure we record references to labels.
-  } else if (auto goto_ = pasta::GotoStmt::From(stmt)) {
-    return goto_->Label();
-
-  } else if (auto addr_label = pasta::AddrLabelExpr::From(stmt)) {
-    return addr_label->Label();
-  }
-
-  return std::nullopt;
-}
-
 // Try to find the `Decl` referenced by a particular `designator`.
 gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Designator designator) {
   if (auto to_field = designator.Field()) {
     co_yield std::move(to_field.value());
   }
+}
+
+// Try to find the `Decl` referenced by a particular `type`.
+std::optional<pasta::Decl> ReferencedDecl(const pasta::Type &type) {
+  for (auto decl : DeclReferencesFrom(type)) {
+    return decl;
+  }
+  return std::nullopt;
+}
+
+// Try to identify the declaration referenced by a statement.
+std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt) {
+  for (auto decl : DeclReferencesFrom(stmt)) {
+    return decl;
+  }
+
+  return std::nullopt;
 }
 
 } // namespace indexer

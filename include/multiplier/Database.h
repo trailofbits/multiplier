@@ -289,6 +289,8 @@ struct ReferenceRecord {
          to_entity_id, context_id, kind_id)
          VALUES (?1, ?2, ?3, ?4))";
 
+  inline bool operator==(const ReferenceRecord &) const noexcept = default;
+
   // Entity id of the referer
   RawEntityId from_entity_id;
 
