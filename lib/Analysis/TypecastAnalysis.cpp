@@ -75,6 +75,10 @@ Type CastState::type_before_conversion() {
 }
 
 Type CastState::type_after_conversion() {
+    if (auto explicit_expr = ExplicitCastExpr::from(cast_expr)) {
+        return explicit_expr->type_as_written().canonical_type();
+    }
+
     std::optional<mx::Type> maybe_type_after = cast_expr.type();
     if (!maybe_type_after) {
         // throw?
@@ -221,6 +225,8 @@ bool TypecastChain::is_identity_preserving() {
     return cast_state_transitions.front().type_after_conversion() == cast_state_transitions.back().type_after_conversion();
 }
 
+TypecastAnalysis::TypecastAnalysis() {}
+
 CastStateMap TypecastAnalysis::cast_instances(const Fragment &fragment) {
     CastStateMap cast_state_map;
     std::unordered_set<EntityId> seen_casts;
@@ -242,7 +248,6 @@ CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
     std::unordered_set<EntityId> seen_casts;
 
     for (Stmt child_stmt : stmt.children()) {
-        std::cout << child_stmt.tokens().file_tokens() << std::endl;
         if (auto cast_expr = CastExpr::from(child_stmt)) {
 
             // ignore conversions not happening between values

@@ -212,7 +212,15 @@ int main(int argc, char *argv[]) {
   mx::TypecastAnalysis analyzer;
 
   // Target analysis over all CallExprs, which may have argument CastExprs
+  std::unordered_set<mx::PackedStmtId> seen;
   for (const mx::CallExpr call : mx::CallExpr::in(index)) {
+    if (seen.contains(call.id())) {
+      continue;
+    }
+
+    std::cout << call.tokens() << std::endl;
+    seen.insert(call.id());
+
     mx::CastStateMap instances = analyzer.cast_instances(call);
     if (instances.empty()) {
       continue;
