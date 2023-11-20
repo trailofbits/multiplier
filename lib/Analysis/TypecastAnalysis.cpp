@@ -17,6 +17,7 @@
 #include <multiplier/Entities/ImplicitCastExpr.h>
 #include <multiplier/Entities/BuiltinType.h>
 #include <optional>
+#include <stdexcept>
 #include <unordered_set>
 #include <utility>
 #include <iostream>
@@ -89,7 +90,7 @@ Type CastState::type_after_conversion() {
 
     std::optional<mx::Type> maybe_type_after = cast_expr.type();
     if (!maybe_type_after) {
-        // throw?
+        throw std::runtime_error("no destination type for CastExpr");
     }
     return maybe_type_after->canonical_type();
 }

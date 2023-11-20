@@ -12,6 +12,7 @@
 #include <multiplier/Analysis/TypecastAnalysis.h>
 
 #include "Index.h"
+#include "multiplier/Types.h"
 
 DEFINE_bool(show_implicit, false, "Show implicit casts?");
 DEFINE_bool(show_explicit, false, "Show explicit casts?");
@@ -217,8 +218,6 @@ int main(int argc, char *argv[]) {
     if (seen.contains(call.id())) {
       continue;
     }
-
-    std::cout << call.tokens() << std::endl;
     seen.insert(call.id());
 
     mx::CastStateMap instances = analyzer.cast_instances(call);
@@ -229,8 +228,8 @@ int main(int argc, char *argv[]) {
     // Check arguments for any casting before the call
     for (auto iter : instances) {
       CastBehavior behavior;
+      mx::CastSignChange cast_sign_change;
       mx::CastState cast_state = iter.second;
-      mx::CastSignChange cast_sign_change = cast_state.sign_change();
 
       // might have some other casting semantic we don't care about
       auto is_implicit = cast_state.is_implicit_cast();
@@ -247,6 +246,9 @@ int main(int argc, char *argv[]) {
         continue;
       }
 
+      // check if sign change exists
+      cast_sign_change = cast_state.sign_change();
+
       // Checks whether any arguments passed the provided call expression are used
       // as an implicit cast with a signed change, ie. from an unsigned long to a signed int
       // For example, consider:
@@ -259,7 +261,7 @@ int main(int argc, char *argv[]) {
       // https://pwning.systems/posts/php_filter_var_shenanigans/
       if (cast_state.width_cast() == mx::CastTypeWidth::DOWNCAST &&
           cast_sign_change == mx::CastSignChange::C_UNSIGNED_TO_SIGNED) {
-            behavior = CastBehavior::Sketchy;
+        behavior = CastBehavior::Sketchy;
       }
 
       // ie. long long -> int
@@ -274,7 +276,7 @@ int main(int argc, char *argv[]) {
       if (FLAGS_show_sign_changing) {
         if (cast_state.width_cast() == mx::CastTypeWidth::NO_WIDTH_CHANGE &&
             cast_sign_change != mx::CastSignChange::NO_SIGN_CHANGE) {
-              behavior = CastBehavior::SignChange;
+          behavior = CastBehavior::SignChange;
         }
       }
 
