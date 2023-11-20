@@ -9,6 +9,8 @@
 #include <multiplier/AST.h>
 #include <sstream>
 
+#include <multiplier/Analysis/TypecastAnalysis.h>
+
 #include "Index.h"
 
 DEFINE_bool(show_implicit, false, "Show implicit casts?");
@@ -16,54 +18,6 @@ DEFINE_bool(show_explicit, false, "Show explicit casts?");
 DEFINE_bool(show_sign_changing, false, "Show sign-changing casts?");
 DEFINE_bool(show_sign_down_cast, false, "Show sign down-casts? E.g. int to short.");
 DEFINE_bool(show_sign_changing_down_cast, false, "Show sign-changing downcasts.");
-
-static constexpr mx::BuiltinTypeKind kSketchyKinds[][2] = {
-    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::INT},
-    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::SHORT},
-    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::S_CHAR},
-
-    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::INT},
-    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::SHORT},
-    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::S_CHAR},
-    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::U_CHAR},
-
-    {mx::BuiltinTypeKind::U_INT, mx::BuiltinTypeKind::SHORT},
-    {mx::BuiltinTypeKind::U_INT, mx::BuiltinTypeKind::S_CHAR},
-
-    {mx::BuiltinTypeKind::U_SHORT, mx::BuiltinTypeKind::S_CHAR},
-};
-
-static constexpr mx::BuiltinTypeKind kSignDownCastKinds[][2] = {
-    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::INT},
-    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::SHORT},
-    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::S_CHAR},
-
-    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::INT},
-    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::SHORT},
-    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::S_CHAR},
-
-    {mx::BuiltinTypeKind::INT, mx::BuiltinTypeKind::SHORT},
-    {mx::BuiltinTypeKind::INT, mx::BuiltinTypeKind::S_CHAR},
-
-    {mx::BuiltinTypeKind::SHORT, mx::BuiltinTypeKind::S_CHAR},
-};
-
-static constexpr mx::BuiltinTypeKind kSignChangingKinds[][2] = {
-    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::LONG_LONG},
-    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::U_LONG_LONG},
-    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::LONG},
-    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::U_LONG_LONG},
-    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::LONG_LONG},
-    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::U_LONG},
-    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::LONG},
-    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::U_LONG},
-    {mx::BuiltinTypeKind::U_INT, mx::BuiltinTypeKind::INT},
-    {mx::BuiltinTypeKind::INT, mx::BuiltinTypeKind::U_INT},
-    {mx::BuiltinTypeKind::U_SHORT, mx::BuiltinTypeKind::SHORT},
-    {mx::BuiltinTypeKind::SHORT, mx::BuiltinTypeKind::U_SHORT},
-    {mx::BuiltinTypeKind::U_CHAR, mx::BuiltinTypeKind::S_CHAR},
-    {mx::BuiltinTypeKind::S_CHAR, mx::BuiltinTypeKind::U_CHAR},
-};
 
 enum class CastBehavior {
   Sketchy,
@@ -91,60 +45,6 @@ static bool IsIgnorableCallArgument(const mx::Expr &expr) {
   } else {
     return false;
   }
-}
-
-// Helper to test for sketchy type downcasts
-std::optional<CastBehavior> ProfileCastBehavior(
-    mx::BuiltinTypeKind source_type_kind, mx::BuiltinTypeKind dest_type_kind) {
-  for (auto [from_kind, to_kind] : kSketchyKinds) {
-    if (source_type_kind == from_kind && dest_type_kind == to_kind) {
-      return CastBehavior::Sketchy;
-    }
-  }
-
-  if (FLAGS_show_sign_down_cast) {
-    for (auto [from_kind, to_kind] : kSignDownCastKinds) {
-      if (source_type_kind == from_kind && dest_type_kind == to_kind) {
-        return CastBehavior::SignDowncast;
-      }
-    }
-  }
-
-  if (FLAGS_show_sign_changing) {
-    for (auto [from_kind, to_kind] : kSignChangingKinds) {
-      if (source_type_kind == from_kind && dest_type_kind == to_kind) {
-        return CastBehavior::SignChange;
-      }
-    }
-  }
-
-  if (FLAGS_show_sign_changing_down_cast) {
-    auto from_kind_signed = source_type_kind;
-    auto from_kind_unsigned = source_type_kind;
-    auto found = false;
-    for (auto [from_kind, to_kind] : kSignChangingKinds) {
-      if (source_type_kind == from_kind && dest_type_kind == to_kind) {
-        from_kind_signed = from_kind;
-        from_kind_unsigned = to_kind;
-        found = true;
-        break;
-      }
-    }
-
-    if (found) {
-      for (auto [from_kind, to_kind] : kSignDownCastKinds) {
-        if (source_type_kind == from_kind || dest_type_kind != to_kind) {
-          continue;
-        }
-
-        if (from_kind_signed == from_kind || from_kind_unsigned == from_kind) {
-          return CastBehavior::SignChangingDowncast;
-        }
-      }
-    }
-  }
-
-  return std::nullopt;
 }
 
 // Find the statement that value represents the current line of code.
@@ -183,9 +83,8 @@ static mx::Stmt FindLine(mx::Stmt prev_stmt) {
 // Output prettified results for the offending call. Tokens for the originating
 // expression should be generated separately in the appropriate heuristic.
 static void PrettifyCallResults(
-    const mx::CallExpr &call_expr, const mx::Stmt &use,
-    CastBehavior kind, mx::BuiltinTypeKind source_type_kind,
-    mx::BuiltinTypeKind dest_type_kind,
+    const mx::CallExpr &call_expr, mx::CastState &state,
+    CastBehavior kind,
     std::optional<unsigned> arg_index=std::nullopt) {
 
   mx::Fragment fragment = mx::Fragment::containing(call_expr);
@@ -208,13 +107,12 @@ static void PrettifyCallResults(
 
   std::cout
       << "Frag ID: " << fragment.id()
-      << "\nEntity ID: " << use.id()
+      << "\nEntity ID: " << state.get_cast_expr().id()
       << "\nKind: " << kOuts.at(kind) << " ("
-      << mx::EnumeratorName(source_type_kind)
+      << mx::EnumeratorName(state.type_before_conversion().kind())
       << " to "
-      << mx::EnumeratorName(dest_type_kind)
+      << mx::EnumeratorName(state.type_after_conversion().kind())
       << ")\nCall: " << call_expr.tokens().file_tokens().data() << "\n";
-
 
   // Print out a declaration of the function.
   if (std::optional<mx::FunctionDecl> callee = call_expr.direct_callee();
@@ -255,8 +153,8 @@ static void PrettifyCallResults(
   // Try to highlight all tokens but the use.
   auto line_stmt = FindLine(call_expr);
   auto highlight_toks = FileTokenIdsFor(line_stmt.tokens());
-  if (line_stmt.id() != use.id()) {
-    auto unhighlight_toks = FileTokenIdsFor(use.tokens());
+  if (line_stmt.id() != state.get_cast_expr().id()) {
+    auto unhighlight_toks = FileTokenIdsFor(state.get_cast_expr().tokens());
     std::erase_if(highlight_toks, [&unhighlight_toks] (mx::RawEntityId id) {
       return unhighlight_toks.count(id);
     });
@@ -266,83 +164,8 @@ static void PrettifyCallResults(
   std::cout << "\n\n";
 }
 
+/*
 // Filter by implicit/explicit, and only give us back integral casts.
-static bool IsInterestingCast(const std::optional<mx::CastExpr> &cast) {
-  if (!cast || cast->cast_kind() != mx::CastKind::INTEGRAL_CAST) {
-    return false;
-  }
-
-  if (auto implicit = mx::ImplicitCastExpr::from(*cast)) {
-    if (!FLAGS_show_implicit &&
-        !(FLAGS_show_explicit && implicit->is_part_of_explicit_cast())) {
-      return false;
-    }
-  } else if (mx::ExplicitCastExpr::from(*cast)) {
-    if (!FLAGS_show_explicit) {
-      return false;
-    }
-  } else {
-    return false;
-  }
-  return true;
-}
-
-// Checks whether any arguments passed the provided call expression are used
-// as an implicit cast, specifically, from an unsigned long to a signed int
-// (TODO: generalize the casts we care about). For example, consider:
-//
-// foo(int a);
-// bar(size_t b) { foo(b); }
-//
-// CheckCallForImplicitCast will identify that the foo(b) call expression has
-// an implicit cast from an unsigned long to a signed int.
-//
-// This was motivated by the PHP vulnerability described here, and is an
-// attempt to identify more instances of the vulnerable code pattern:
-// https://pwning.systems/posts/php_filter_var_shenanigans/
-static void FindSketchyArgumentCasts(const mx::CallExpr &call_expr) {
-  auto arg_num = 0u;
-  for (mx::Expr argument : call_expr.arguments()) {
-    ++arg_num;
-
-    std::optional<mx::CastExpr> cast_expr = mx::CastExpr::from(argument);
-    if (!IsInterestingCast(cast_expr) ||
-        IsIgnorableCallArgument(cast_expr->ignore_casts())) {
-      continue;
-    }
-
-    mx::Type source_type =
-        cast_expr->sub_expression().type()->canonical_type();
-    std::optional<mx::Type> maybe_dest_type = cast_expr->type();
-
-    if (!maybe_dest_type) {
-      continue;
-    }
-
-    mx::Type dest_type = maybe_dest_type->canonical_type();
-
-    // Make sure the source and dest types are builtins.
-    std::optional<mx::BuiltinType> source_builtin =
-        mx::BuiltinType::from(source_type);
-    std::optional<mx::BuiltinType> dest_builtin =
-        mx::BuiltinType::from(dest_type);
-    if (!source_builtin || !dest_builtin) {
-      continue;
-    }
-
-    mx::BuiltinTypeKind source_type_kind = source_builtin->builtin_kind();
-    mx::BuiltinTypeKind dest_type_kind = dest_builtin->builtin_kind();
-
-    std::optional<CastBehavior> cast_behavior = ProfileCastBehavior(
-        source_type_kind, dest_type_kind);
-    if (!cast_behavior) {
-      continue;
-    }
-
-    PrettifyCallResults(call_expr, *cast_expr, *cast_behavior, source_type_kind,
-                        dest_type_kind, arg_num - 1u);
-  }
-}
 
 // Given a call expression and the parsed type of the parent assignment/declaration statement,
 // perform the same sketchy downcasting check.
@@ -366,14 +189,7 @@ static void CheckCallRetForImplicitCast(const mx::CallExpr &call_expr,
                         source_type_kind, dest_type_kind);
   }
 }
-
-static void FindSketchyReturnValueCasts(const mx::CallExpr &call) {
-  if (auto cast_expr = mx::CastExpr::from(call.parent_statement())) {
-    if (IsInterestingCast(cast_expr)) {
-      CheckCallRetForImplicitCast(call, *cast_expr);
-    }
-  }
-}
+*/
 
 int main(int argc, char *argv[]) {
   std::stringstream ss;
@@ -392,9 +208,80 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  for (mx::CallExpr call : mx::CallExpr::in(InitExample(true))) {
-    FindSketchyArgumentCasts(call);
-    FindSketchyReturnValueCasts(call);
+  mx::Index index = InitExample(true);
+  mx::TypecastAnalysis analyzer;
+
+  // Target analysis over all CallExprs, which may have argument CastExprs
+  std::unordered_set<mx::PackedStmtId> seen;
+  for (const mx::CallExpr call : mx::CallExpr::in(index)) {
+    if (seen.contains(call.id())) {
+      continue;
+    }
+
+    std::cout << call.tokens() << std::endl;
+    seen.insert(call.id());
+
+    mx::CastStateMap instances = analyzer.cast_instances(call);
+    if (instances.empty()) {
+      continue;
+    }
+
+    // Check arguments for any casting before the call
+    for (auto iter : instances) {
+      CastBehavior behavior;
+      mx::CastState cast_state = iter.second;
+      mx::CastSignChange cast_sign_change = cast_state.sign_change();
+
+      // might have some other casting semantic we don't care about
+      auto is_implicit = cast_state.is_implicit_cast();
+      if (!is_implicit) {
+        continue;
+      }
+
+      // TODO: is_part_of_explicit_cast
+      // Filter by implicit/explicit, and only give us back integral casts.
+      if (!FLAGS_show_implicit && *is_implicit) {
+        continue;
+      }
+      if (!FLAGS_show_explicit && !*is_implicit) {
+        continue;
+      }
+
+      // Checks whether any arguments passed the provided call expression are used
+      // as an implicit cast with a signed change, ie. from an unsigned long to a signed int
+      // For example, consider:
+      //
+      // foo(int a);
+      // bar(size_t b) { foo(b); }
+      //
+      // This was motivated by the PHP vulnerability described here, and is an
+      // attempt to identify more instances of the vulnerable code pattern:
+      // https://pwning.systems/posts/php_filter_var_shenanigans/
+      if (cast_state.width_cast() == mx::CastTypeWidth::DOWNCAST &&
+          cast_sign_change == mx::CastSignChange::C_UNSIGNED_TO_SIGNED) {
+            behavior = CastBehavior::Sketchy;
+      }
+
+      // ie. long long -> int
+      if (FLAGS_show_sign_down_cast) {
+        if (cast_state.width_cast() == mx::CastTypeWidth::DOWNCAST &&
+            cast_sign_change == mx::CastSignChange::NO_SIGN_CHANGE) {
+          behavior = CastBehavior::SignDowncast;
+        }
+      }
+
+      // ie. unsigned long long -> long long
+      if (FLAGS_show_sign_changing) {
+        if (cast_state.width_cast() == mx::CastTypeWidth::NO_WIDTH_CHANGE &&
+            cast_sign_change != mx::CastSignChange::NO_SIGN_CHANGE) {
+              behavior = CastBehavior::SignChange;
+        }
+      }
+
+      // check if return expression
+      // TODO is_part_of_call_arg
+      PrettifyCallResults(call, cast_state, behavior);
+    }
   }
 
   return EXIT_SUCCESS;

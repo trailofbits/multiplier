@@ -15,6 +15,7 @@ set(analysis_headers
 add_library("mx-analysis" STATIC
   "${analysis_headers}"
   "Taint.cpp"
+  "TypecastAnalysis.cpp"
 )
 
 target_link_libraries("mx-analysis"
