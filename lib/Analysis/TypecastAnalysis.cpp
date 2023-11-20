@@ -20,6 +20,8 @@
 #include <unordered_set>
 #include <utility>
 #include <iostream>
+#include <stack>
+#include <variant>
 
 namespace mx {
 
@@ -69,6 +71,12 @@ std::optional<EntityId> CastState::destination_entity() {
     }
     return std::nullopt;
 }
+
+// If the casting is performed during a function call
+std::optional<std::pair<PackedStmtId, unsigned>> CastState::is_part_of_call_arg() {
+    return std::nullopt;
+}
+
 
 Type CastState::type_before_conversion() {
     return cast_expr.sub_expression().type()->canonical_type();
@@ -148,6 +156,7 @@ CastTypeWidth CastState::deferenced_width_cast() {
     Type type_before = type_before_conversion();
     Type type_after = type_after_conversion();
 
+    // this is wrong, we need is_pointer_type
     if (type_before.can_decay_to_pointer_type()) {
         type_before = type_before.desugared_type();
     }
@@ -227,28 +236,20 @@ bool TypecastChain::is_identity_preserving() {
 
 TypecastAnalysis::TypecastAnalysis() {}
 
-CastStateMap TypecastAnalysis::cast_instances(const Fragment &fragment) {
-    CastStateMap cast_state_map;
-    std::unordered_set<EntityId> seen_casts;
-    for (CastExpr cast_expr : CastExpr::in(fragment)) {
-
-        // make sure cast_exprs are top level
-
-        if (seen_casts.contains(cast_expr.id())) {
-            continue;
-        }
-
-        // filter on non-typecasting
-    }
-    return cast_state_map;
-}
-
 CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
     CastStateMap cast_state_map;
-    std::unordered_set<EntityId> seen_casts;
 
-    for (Stmt child_stmt : stmt.children()) {
-        if (auto cast_expr = CastExpr::from(child_stmt)) {
+    std::stack<Stmt> seen_stmts;
+    std::unordered_set<PackedStmtId> seen_stmt_ids;
+
+    seen_stmts.push(stmt);
+    seen_stmt_ids.insert(stmt.id());
+
+    while (!seen_stmts.empty()) {
+        Stmt curr_stmt = seen_stmts.top();
+        seen_stmts.pop();
+
+        if (auto cast_expr = CastExpr::from(curr_stmt)) {
 
             // ignore conversions not happening between values
             bool skip_this_cast = false;
@@ -260,18 +261,39 @@ CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
             }
             if (skip_this_cast)
                 continue;
-
             cast_state_map.insert(std::make_pair(cast_expr->id(), CastState(*cast_expr)));
+        }
+
+        for (Stmt child : curr_stmt.children()) {
+            seen_stmts.push(child);
         }
     }
     return cast_state_map;
 }
 
 // For a reference of a data variable, determine all casting
-TypecastChain TypecastAnalysis::forward_cast_chain(const Reference &id) {
+TypecastChain TypecastAnalysis::forward_cast_chain(const VariantEntity &id) {
+    TypecastChain chain(true);
+    for (Reference ref : Reference::to(id)) {
+        if (std::optional<BuiltinReferenceKind> ref_kind = ref.builtin_reference_kind()) {
+            if (ref_kind == BuiltinReferenceKind::TYPE_CASTS) {
+                VariantEntity ref_entity = ref.as_variant();
+
+                // TODO: validate?
+                if (const auto stmt (std::get_if<Stmt>(&ref_entity)); stmt) {
+                    if (auto cast_expr = CastExpr::from(*stmt)) {
+
+                    }
+                }
+            }
+        }
+    }
+    return chain;
 }
 
-TypecastChain TypecastAnalysis::backward_cast_chain(const Reference &id) {
+TypecastChain TypecastAnalysis::backward_cast_chain(const VariantEntity &id) {
+    TypecastChain chain(false);
+    return chain;
 }
 
 } // namespace mx

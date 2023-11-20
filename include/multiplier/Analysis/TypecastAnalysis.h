@@ -100,6 +100,9 @@ public:
   EntityId source_entity();
   std::optional<EntityId> destination_entity();
 
+  // was this cast performed during a CallExpr?
+  std::optional<std::pair<PackedStmtId, unsigned>> is_part_of_call_arg();
+
   // what is the type before/after conversion?
   Type type_before_conversion();
   Type type_after_conversion();
@@ -147,14 +150,13 @@ public:
   // Traverse the AST tree of a starting fragment to recover all casting instances.
   // Will not resolve a typecast chain for individual data sources.
   // Answers the question: "what are all the typecasts happening in this current fragment?"
-  CastStateMap cast_instances(const Fragment &);
   CastStateMap cast_instances(const Stmt &);
   //  CastStateMap cast_instances(const Reference &);
 
   // At a specific entity reference point, resolve a forward or backward typecast chain
   // TODO: MLIR DependencyAnalysis
-  TypecastChain forward_cast_chain(const Reference &);
-  TypecastChain backward_cast_chain(const Reference &);
+  TypecastChain forward_cast_chain(const VariantEntity &);
+  TypecastChain backward_cast_chain(const VariantEntity &);
 
 };
 }; // namespace mx
