@@ -605,18 +605,20 @@ struct Macro @0xf88157fb8bf2eeff{
 }
 
 struct TemplateArgument @0xb5127dad01992f67{
-  val3 @0 :Bool;
-  val4 @1 :Bool;
-  val5 @2 :Bool;
-  val6 @3 :Bool;
-  val7 @4 :Bool;
-  val2 @5 :UInt8;
-  val0 @6 :UInt64;
-  val1 @7 :UInt64;
-  val8 @8 :UInt64;
-  val9 @9 :UInt64;
-  val10 @10 :UInt64;
-  val11 @11 :UInt64;
+  val12 @0 :List(UInt64);
+  val3 @1 :Bool;
+  val4 @2 :Bool;
+  val5 @3 :Bool;
+  val6 @4 :Bool;
+  val7 @5 :Bool;
+  val13 @6 :Bool;
+  val2 @7 :UInt8;
+  val0 @8 :UInt64;
+  val1 @9 :UInt64;
+  val8 @10 :UInt64;
+  val9 @11 :UInt64;
+  val10 @12 :UInt64;
+  val11 @13 :UInt64;
 }
 
 struct TemplateParameterList @0xee0d4e6aba92fdde{

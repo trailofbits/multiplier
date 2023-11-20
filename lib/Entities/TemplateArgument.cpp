@@ -76,7 +76,7 @@ TemplateArgumentKind TemplateArgument::kind(void) const {
   return static_cast<TemplateArgumentKind>(impl->reader.getVal2());
 }
 
-bool TemplateArgument::is_null(void) const {
+bool TemplateArgument::is_empty(void) const {
   return impl->reader.getVal3();
 }
 
@@ -146,6 +146,23 @@ std::optional<Type> TemplateArgument::null_pointer_type(void) const {
     }
   }
   return std::nullopt;
+}
+
+std::optional<std::vector<TemplateArgument>> TemplateArgument::pack_elements(void) const {
+  if (!impl->reader.getVal13()) {
+    return std::nullopt;
+  }
+  auto list = impl->reader.getVal12();
+  std::vector<TemplateArgument> vec;
+  vec.reserve(list.size());
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d12 = ep->TemplateArgumentFor(ep, v)) {
+      vec.emplace_back(std::move(d12));
+    }
+  }
+  return vec;
 }
 
 #pragma GCC diagnostic pop

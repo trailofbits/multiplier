@@ -146,7 +146,7 @@ void SerializeTemplateArgument(const PendingFragment &pf, const EntityMapper &es
   b.setVal0(es.ParentDeclId(e));
   b.setVal1(es.ParentStmtId(e));
   b.setVal2(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
-  b.setVal3(e.IsNull());
+  b.setVal3(e.IsEmpty());
   b.setVal4(e.IsDependent());
   b.setVal5(e.IsInstantiationDependent());
   b.setVal6(e.ContainsUnexpandedParameterPack());
@@ -179,6 +179,21 @@ void SerializeTemplateArgument(const PendingFragment &pf, const EntityMapper &es
   } else {
     b.setVal11(mx::kInvalidEntityId);
   }
+  do {
+    auto ov12 = e.PackElements();
+    if (!ov12) {
+      b.setVal13(false);
+      break;
+    }
+    b.setVal13(true);
+    auto v12 = std::move(*ov12);
+    auto sv12 = b.initVal12(static_cast<unsigned>(v12.size()));
+    auto i12 = 0u;
+    for (const auto &e12 : v12) {
+      sv12.set(i12, es.EntityId(e12));
+      ++i12;
+    }
+  } while (false);
 }
 
 void SerializeMacro(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::Macro &e, const TokenTree *tt) {
