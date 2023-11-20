@@ -96,7 +96,7 @@ class TemplateArgument {
   static std::optional<TemplateArgument> from(const TokenContext &t);
 
   TemplateArgumentKind kind(void) const;
-  bool is_null(void) const;
+  bool is_empty(void) const;
   bool is_dependent(void) const;
   bool is_instantiation_dependent(void) const;
   bool contains_unexpanded_parameter_pack(void) const;
@@ -105,6 +105,7 @@ class TemplateArgument {
   std::optional<Type> as_type(void) const;
   std::optional<Type> parameter_type_for_declaration(void) const;
   std::optional<Type> null_pointer_type(void) const;
+  std::optional<std::vector<TemplateArgument>> pack_elements(void) const;
 };
 
 #endif
