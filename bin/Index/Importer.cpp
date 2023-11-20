@@ -315,8 +315,10 @@ BuildCommandAction::GetCompilerInfo(void) {
                arg.starts_with("-fpatchable-function-entry=") ||
                arg.starts_with("-fpatchable-function-entry-offset=") ||
                arg.starts_with("-fstrict-flex-arrays=") ||
+               arg.starts_with("-mfunction-return=") ||
                arg == "-pic-is-pie" ||
-               arg == "-mindirect-branch-cs-prefix") {
+               arg == "-mindirect-branch-cs-prefix" ||
+               arg == "-Wno-cast-function-type-strict") {
       continue;  // Skip the argument.
 
     } else if (arg == "-mllvm" ||
