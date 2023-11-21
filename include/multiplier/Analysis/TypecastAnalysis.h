@@ -109,11 +109,8 @@ public:
   // Is this cast performed as an argument in a CallExpr?
   std::optional<std::pair<PackedStmtId, unsigned>> is_part_of_call_arg();
 
-  // What is the type before conversion?
-  Type type_before_conversion();
-
-  // What is the type after conversion?
-  Type type_after_conversion();
+  // What is the type before/after conversion?
+  std::pair<Type, Type> types_before_after_conversion();
 
   // Is this an implicit cast?
   std::optional<bool> is_implicit_cast();
@@ -159,7 +156,7 @@ public:
 // Main interface for dispatching typecast analyses.
 class TypecastAnalysis final {
 public:
-  TypecastAnalysis(void);
+  TypecastAnalysis(void) = default;
 
   // Traverse the AST tree of a starting fragment to recover all casting instances and the associated CastExpr's ID.
   // Will not resolve a typecast chain for individual data sources.

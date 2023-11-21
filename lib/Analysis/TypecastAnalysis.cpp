@@ -94,26 +94,26 @@ std::optional<std::pair<PackedStmtId, unsigned>> CastState::is_part_of_call_arg(
     return std::nullopt;
 }
 
+std::pair<Type, Type> CastState::types_before_after_conversion() {
+    auto type_before = cast_expr.sub_expression().type()->canonical_type();
+    auto type_after = [&](auto cast_expr){
+        if (auto explicit_expr = ExplicitCastExpr::from(cast_expr)) {
+            return explicit_expr->type_as_written().canonical_type();
+        }
 
-Type CastState::type_before_conversion() {
-    return cast_expr.sub_expression().type()->canonical_type();
-}
+        auto maybe_type_after = cast_expr.type();
+        if (!maybe_type_after) {
+            throw std::runtime_error("no destination type for CastExpr, this should be unreachable");
+        }
+        return maybe_type_after->canonical_type();
+    }(cast_expr);
 
-Type CastState::type_after_conversion() {
-    if (auto explicit_expr = ExplicitCastExpr::from(cast_expr)) {
-        return explicit_expr->type_as_written().canonical_type();
-    }
-
-    std::optional<mx::Type> maybe_type_after = cast_expr.type();
-    if (!maybe_type_after) {
-        throw std::runtime_error("no destination type for CastExpr, this should be unreachable");
-    }
-    return maybe_type_after->canonical_type();
+    return std::make_pair(type_before, type_after);
 }
 
 CastTypeWidth CastState::determine_width_cast(Type &source, Type &dest) {
-    std::optional<uint64_t> before_size_in_bits = source.size_in_bits();
-    std::optional<uint64_t> after_size_in_bits = dest.size_in_bits();
+    auto before_size_in_bits = source.size_in_bits();
+    auto after_size_in_bits = dest.size_in_bits();
     if (!before_size_in_bits || !after_size_in_bits) {
         return CastTypeWidth::NO_WIDTH_CHANGE;
     }
@@ -130,8 +130,7 @@ CastTypeWidth CastState::determine_width_cast(Type &source, Type &dest) {
 // For the source and destination types' sizes, determine down/upcast.
 // This does not work off of dereferenced pointer type for pointer-to-pointer casting.
 CastTypeWidth CastState::width_cast() {
-    Type type_before = type_before_conversion();
-    Type type_after = type_after_conversion();
+    auto [type_before, type_after] = types_before_after_conversion();
     return determine_width_cast(type_before, type_after);
 }
 
@@ -151,8 +150,7 @@ CastCXXObjKind CastState::cxx_obj_cast() {
         // reinterpret_cast and dynamic needs special handling
         case CastKind::REINTERPRET_MEMBER_POINTER:
         case CastKind::DYNAMIC: {
-            Type type_before = type_before_conversion();
-            Type type_after = type_after_conversion();
+            auto [type_before, type_after] = types_before_after_conversion();
 
             // TODO need to retrieve the CXXRecordDecl associated
             // enrich PASTA first with .cxx_record_decl()
@@ -193,9 +191,7 @@ CastCXXObjKind CastState::cxx_obj_cast() {
 }
 
 bool CastState::is_pointer_cast() {
-    Type type_before = type_before_conversion();
-    Type type_after = type_after_conversion();
-
+    auto [type_before, type_after] = types_before_after_conversion();
     if (auto pointee = PointerType::from(type_before)) {
         return true;
     }
@@ -208,8 +204,7 @@ bool CastState::is_pointer_cast() {
 // If either source or destination types are pointer types, deference it and determine
 // down/casting from those types instead. If not, behaves like `CastState::width_cast()`.
 CastTypeWidth CastState::deferenced_width_cast() {
-    Type type_before = type_before_conversion();
-    Type type_after = type_after_conversion();
+    auto [type_before, type_after] = types_before_after_conversion();
 
     if (auto pointee = PointerType::from(type_before)) {
         type_before = pointee->pointee_type();
@@ -244,14 +239,13 @@ std::optional<bool> CastState::is_implicit_cast() {
 }
 
 CastSignChange CastState::sign_change() {
-    Type source_type = type_before_conversion();
-    Type dest_type = type_after_conversion();
+    auto [type_before, type_after] = types_before_after_conversion();
 
     // TODO: do sign changes only happen on built-ins?
-    std::optional<BuiltinType> source_builtin =
-        BuiltinType::from(source_type);
-    std::optional<BuiltinType> dest_builtin =
-        BuiltinType::from(dest_type);
+    auto source_builtin =
+        BuiltinType::from(type_before);
+    auto dest_builtin =
+        BuiltinType::from(type_after);
     if (!source_builtin || !dest_builtin) {
         return CastSignChange::NO_SIGN_CHANGE;
     }
@@ -268,13 +262,18 @@ CastSignChange CastState::sign_change() {
 TypecastChain::TypecastChain(bool is_forward) : is_forward(is_forward) {};
 
 void TypecastChain::add_new_transition(CastState &cast_state) {
-    CastState& last_cast_state = cast_state_transitions.back();
+    auto [curr_type_before, curr_type_after ] = cast_state.types_before_after_conversion();
 
-    // TODO: error if otherwise?
-    if (last_cast_state.type_after_conversion() == cast_state.type_before_conversion()) {
-        cast_state_transitions.push_back(cast_state);
-        current_resolved_type = cast_state.type_after_conversion();
+    // make sure the last transition's type matches up to this state's in order to remain valid.
+    if (!cast_state_transitions.empty()) {
+        CastState& last_cast_state = cast_state_transitions.back();
+        auto [_x, last_type] = last_cast_state.types_before_after_conversion();
+        if (last_type != curr_type_before) {
+            throw std::runtime_error("last type in chain does not match with current state's first type.");
+        }
     }
+    cast_state_transitions.push_back(cast_state);
+    current_resolved_type = curr_type_after;
 }
 
 std::optional<Type> TypecastChain::get_current_resolved_type() {
@@ -285,13 +284,14 @@ bool TypecastChain::is_identity_preserving() {
     if (cast_state_transitions.empty())
         return true;
 
+    auto [before, after] = cast_state_transitions.front().types_before_after_conversion();
     if (cast_state_transitions.size() == 1) {
-        return cast_state_transitions.at(0).type_before_conversion() == cast_state_transitions.at(0).type_after_conversion();
+        return before == after;
     }
-    return cast_state_transitions.front().type_after_conversion() == cast_state_transitions.back().type_after_conversion();
-}
 
-TypecastAnalysis::TypecastAnalysis() {}
+    auto [_, final_type] = cast_state_transitions.back().types_before_after_conversion();
+    return before == final_type;
+}
 
 CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
     CastStateMap cast_state_map;
@@ -302,25 +302,26 @@ CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
     seen_stmts.push(stmt);
     seen_stmt_ids.insert(stmt.id());
 
+    // ignore conversions not happening between values
+    auto skip_cast = [&](const auto &cast_expr) {
+        for (const auto &elem : kNoneTypeCasts) {
+            if (cast_expr->cast_kind() == elem) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     while (!seen_stmts.empty()) {
         Stmt curr_stmt = seen_stmts.top();
         seen_stmts.pop();
 
         if (auto cast_expr = CastExpr::from(curr_stmt)) {
-
-            // ignore conversions not happening between values
-            bool skip_this_cast = false;
-            for (const auto &elem : kNoneTypeCasts) {
-                if (cast_expr->cast_kind() == elem) {
-                    skip_this_cast = true;
-                    break;
-                }
-            }
-            if (skip_this_cast)
+            if (skip_cast(cast_expr)) {
                 continue;
-
+            }
             CastState state(*cast_expr);
-            cast_state_map.insert(std::make_pair(cast_expr->id(), state));
+            cast_state_map.emplace(cast_expr->id(), state);
         }
 
         for (Stmt child : curr_stmt.children()) {

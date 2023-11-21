@@ -231,10 +231,7 @@ int main(int argc, char *argv[]) {
 
     // Check arguments for any casting before the call
     for (auto iter : instances) {
-      mx::CastSignChange cast_sign_change;
-      mx::PackedStmtId cast_id = iter.first;
-      mx::CastState cast_state = iter.second;
-      CastBehavior behavior = CastBehavior::NoBehavior;
+      auto [cast_id, cast_state] = iter;
 
       // sanity-check to make sure we're doing casts in calls
       auto is_in_call = cast_state.is_part_of_call_arg();
@@ -257,7 +254,7 @@ int main(int argc, char *argv[]) {
       }
 
       // check if sign change exists
-      cast_sign_change = cast_state.sign_change();
+      auto cast_sign_change = cast_state.sign_change();
 
       // Checks whether any arguments passed the provided call expression are used
       // as an implicit cast with a signed change, ie. from an unsigned long to a signed int
@@ -269,26 +266,29 @@ int main(int argc, char *argv[]) {
       // This was motivated by the PHP vulnerability described here, and is an
       // attempt to identify more instances of the vulnerable code pattern:
       // https://pwning.systems/posts/php_filter_var_shenanigans/
-      if (cast_state.width_cast() == mx::CastTypeWidth::DOWNCAST &&
-          cast_sign_change == mx::CastSignChange::C_UNSIGNED_TO_SIGNED) {
-        behavior = CastBehavior::Sketchy;
-      }
-
-      // ie. long long -> int
-      if (FLAGS_show_sign_down_cast) {
+      CastBehavior behavior = [&](auto cast_state) {
         if (cast_state.width_cast() == mx::CastTypeWidth::DOWNCAST &&
-            cast_sign_change == mx::CastSignChange::NO_SIGN_CHANGE) {
-          behavior = CastBehavior::SignDowncast;
+            cast_sign_change == mx::CastSignChange::C_UNSIGNED_TO_SIGNED) {
+          return CastBehavior::Sketchy;
         }
-      }
 
-      // ie. unsigned long long -> long long
-      if (FLAGS_show_sign_changing) {
-        if (cast_state.width_cast() == mx::CastTypeWidth::NO_WIDTH_CHANGE &&
-            cast_sign_change != mx::CastSignChange::NO_SIGN_CHANGE) {
-          behavior = CastBehavior::SignChange;
+        // ie. long long -> int
+        if (FLAGS_show_sign_down_cast) {
+          if (cast_state.width_cast() == mx::CastTypeWidth::DOWNCAST &&
+              cast_sign_change == mx::CastSignChange::NO_SIGN_CHANGE) {
+            return CastBehavior::SignDowncast;
+          }
         }
-      }
+
+        // ie. unsigned long long -> long long
+        if (FLAGS_show_sign_changing) {
+          if (cast_state.width_cast() == mx::CastTypeWidth::NO_WIDTH_CHANGE &&
+              cast_sign_change != mx::CastSignChange::NO_SIGN_CHANGE) {
+            return CastBehavior::SignChange;
+          }
+        }
+        return CastBehavior::NoBehavior;
+      }(cast_state);
 
       if (behavior != CastBehavior::NoBehavior) {
         if (auto cast_expr = mx::CastExpr::by_id(index, cast_id)) {
