@@ -109,13 +109,14 @@ static void PrettifyCallResults(
         << "File ID: " << file->id() << '\n';
   }
 
+  auto [type_before, type_after] = state.types_before_after_conversion();
   std::cout
       << "Frag ID: " << fragment.id()
       << "\nEntity ID: " << cast_expr.id()
       << "\nKind: " << kOuts.at(kind) << " ("
-      << mx::EnumeratorName(state.type_before_conversion().kind())
+      << mx::EnumeratorName(type_before.kind())
       << " to "
-      << mx::EnumeratorName(state.type_after_conversion().kind())
+      << mx::EnumeratorName(type_after.kind())
       << ")\nCall: " << call_expr.tokens().file_tokens().data() << "\n";
 
   // Print out a declaration of the function.

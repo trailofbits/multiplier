@@ -106,11 +106,13 @@ public:
   // Can return `std::nullopt` if the cast happens during a call or return.
   std::optional<EntityId> destination_entity();
 
+  // What is the explicit type alias if any?
+
   // Is this cast performed as an argument in a CallExpr?
   std::optional<std::pair<PackedStmtId, unsigned>> is_part_of_call_arg();
 
   // What is the type before/after conversion?
-  std::pair<Type, Type> types_before_after_conversion();
+  std::pair<Type, Type> types_before_after_conversion() const;
 
   // Is this an implicit cast?
   std::optional<bool> is_implicit_cast();
@@ -146,7 +148,7 @@ private:
 public:
   TypecastChain(bool);
 
-  void add_new_transition(CastState&);
+  void add_new_transition(const CastState&);
   std::optional<Type> get_current_resolved_type();
 
   // Does the type at the end of the chain match the one in the beginning?

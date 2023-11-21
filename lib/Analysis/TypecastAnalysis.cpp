@@ -94,7 +94,7 @@ std::optional<std::pair<PackedStmtId, unsigned>> CastState::is_part_of_call_arg(
     return std::nullopt;
 }
 
-std::pair<Type, Type> CastState::types_before_after_conversion() {
+std::pair<Type, Type> CastState::types_before_after_conversion() const {
     auto type_before = cast_expr.sub_expression().type()->canonical_type();
     auto type_after = [&](auto cast_expr){
         if (auto explicit_expr = ExplicitCastExpr::from(cast_expr)) {
@@ -227,15 +227,13 @@ std::optional<CastKind> CastState::cxx_object_cast_kind() {
 
 std::optional<bool> CastState::is_implicit_cast() {
     if (auto implicit = ImplicitCastExpr::from(cast_expr)) {
+        // Might be a part of a parent ExplicitCastExpr
         if (implicit->is_part_of_explicit_cast()) {
             return false;
         }
         return true;
-    } else if (auto explicit_cast = ExplicitCastExpr::from(cast_expr)) {
-        return false;
-    } else {
-        return false;
     }
+    return false;
 }
 
 CastSignChange CastState::sign_change() {
@@ -261,7 +259,7 @@ CastSignChange CastState::sign_change() {
 
 TypecastChain::TypecastChain(bool is_forward) : is_forward(is_forward) {};
 
-void TypecastChain::add_new_transition(CastState &cast_state) {
+void TypecastChain::add_new_transition(const CastState &cast_state) {
     auto [curr_type_before, curr_type_after ] = cast_state.types_before_after_conversion();
 
     // make sure the last transition's type matches up to this state's in order to remain valid.
@@ -347,12 +345,12 @@ TypecastChain TypecastAnalysis::forward_cast_chain(const VariantEntity &id) {
             }
         }
     }
-    return chain;
+    return { chain };
 }
 
 TypecastChain TypecastAnalysis::backward_cast_chain(const VariantEntity &id) {
     TypecastChain chain(false);
-    return chain;
+    return { chain };
 }
 
 } // namespace mx
