@@ -77,10 +77,9 @@ jobs:
             -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
             -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
             -DCMAKE_C_COMPILER="$(which clang-${LLVM_VER})" \
-            -DCMAKE_CXX_COMPILER="$(which clang++-${LLVM_VER})" \
-            -DClang_DIR=${RELEASE_DIR}/lib/cmake/clang) \
+            -DCMAKE_CXX_COMPILER=$(which clang++-${LLVM_VER}) \
+            -DClang_DIR=${RELEASE_DIR}/lib/cmake/clang \
             -DLLVM_DIR=${RELEASE_DIR}/lib/cmake/llvm \
-            -DLLVM_ENABLE_LLD:BOOL=TRUE \
             -DMX_USE_VENDORED_CLANG=OFF \
             -DMX_USE_VENDORED_PASTA=OFF \
             -GNinja \
