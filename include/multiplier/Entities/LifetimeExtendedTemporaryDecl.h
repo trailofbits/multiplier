@@ -54,17 +54,13 @@ class LifetimeExtendedTemporaryDecl : public Decl {
   LifetimeExtendedTemporaryDecl canonical_declaration(void) const;
   std::optional<LifetimeExtendedTemporaryDecl> definition(void) const;
   gap::generator<LifetimeExtendedTemporaryDecl> redeclarations(void) const &;
-  static std::optional<LifetimeExtendedTemporaryDecl> from(const Decl &parent);
-
-  inline static std::optional<LifetimeExtendedTemporaryDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return LifetimeExtendedTemporaryDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<LifetimeExtendedTemporaryDecl> from_base(const Decl &parent);
+  inline static std::optional<LifetimeExtendedTemporaryDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<LifetimeExtendedTemporaryDecl> from(const std::optional<Decl> &parent);
   static std::optional<LifetimeExtendedTemporaryDecl> from(const Reference &r);
+  static std::optional<LifetimeExtendedTemporaryDecl> from(const VariantEntity &e);
   static std::optional<LifetimeExtendedTemporaryDecl> from(const TokenContext &t);
 
   gap::generator<Stmt> children(void) const &;

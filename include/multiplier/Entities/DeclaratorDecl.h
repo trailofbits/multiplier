@@ -71,17 +71,13 @@ class DeclaratorDecl : public ValueDecl {
   DeclaratorDecl canonical_declaration(void) const;
   std::optional<DeclaratorDecl> definition(void) const;
   gap::generator<DeclaratorDecl> redeclarations(void) const &;
-  static std::optional<DeclaratorDecl> from(const Decl &parent);
-
-  inline static std::optional<DeclaratorDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return DeclaratorDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<DeclaratorDecl> from_base(const Decl &parent);
+  inline static std::optional<DeclaratorDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<DeclaratorDecl> from(const std::optional<Decl> &parent);
   static std::optional<DeclaratorDecl> from(const Reference &r);
+  static std::optional<DeclaratorDecl> from(const VariantEntity &e);
   static std::optional<DeclaratorDecl> from(const TokenContext &t);
 
   Token first_inner_token(void) const;

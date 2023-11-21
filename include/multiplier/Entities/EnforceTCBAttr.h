@@ -40,17 +40,13 @@ class EnforceTCBAttr : public InheritableAttr {
     return AttrKind::ENFORCE_TCB;
   }
 
-  static std::optional<EnforceTCBAttr> from(const Attr &parent);
-
-  inline static std::optional<EnforceTCBAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return EnforceTCBAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<EnforceTCBAttr> from_base(const Attr &parent);
+  inline static std::optional<EnforceTCBAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<EnforceTCBAttr> from(const std::optional<Attr> &parent);
   static std::optional<EnforceTCBAttr> from(const Reference &r);
+  static std::optional<EnforceTCBAttr> from(const VariantEntity &e);
   static std::optional<EnforceTCBAttr> from(const TokenContext &t);
 
   std::string_view tcb_name(void) const;

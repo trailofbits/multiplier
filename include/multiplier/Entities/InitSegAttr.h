@@ -38,17 +38,13 @@ class InitSegAttr : public Attr {
     return AttrKind::INIT_SEG;
   }
 
-  static std::optional<InitSegAttr> from(const Attr &parent);
-
-  inline static std::optional<InitSegAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return InitSegAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<InitSegAttr> from_base(const Attr &parent);
+  inline static std::optional<InitSegAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<InitSegAttr> from(const std::optional<Attr> &parent);
   static std::optional<InitSegAttr> from(const Reference &r);
+  static std::optional<InitSegAttr> from(const VariantEntity &e);
   static std::optional<InitSegAttr> from(const TokenContext &t);
 
   std::string_view section(void) const;

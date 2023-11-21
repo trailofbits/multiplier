@@ -43,17 +43,13 @@ class MacroParameter : public Macro {
   static gap::generator<MacroParameter> containing(const Token &token);
   bool contains(const Token &token);
 
-  static std::optional<MacroParameter> from(const Macro &parent);
-
-  inline static std::optional<MacroParameter> from(const std::optional<Macro> &parent) {
-    if (parent) {
-      return MacroParameter::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MacroParameter> from_base(const Macro &parent);
+  inline static std::optional<MacroParameter> from(const Macro &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MacroParameter> from(const std::optional<Macro> &parent);
   static std::optional<MacroParameter> from(const Reference &r);
+  static std::optional<MacroParameter> from(const VariantEntity &e);
   static std::optional<MacroParameter> from(const TokenContext &t);
 
   Token variadic_dots(void) const;

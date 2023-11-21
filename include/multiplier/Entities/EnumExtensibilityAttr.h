@@ -41,17 +41,13 @@ class EnumExtensibilityAttr : public InheritableAttr {
     return AttrKind::ENUM_EXTENSIBILITY;
   }
 
-  static std::optional<EnumExtensibilityAttr> from(const Attr &parent);
-
-  inline static std::optional<EnumExtensibilityAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return EnumExtensibilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<EnumExtensibilityAttr> from_base(const Attr &parent);
+  inline static std::optional<EnumExtensibilityAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<EnumExtensibilityAttr> from(const std::optional<Attr> &parent);
   static std::optional<EnumExtensibilityAttr> from(const Reference &r);
+  static std::optional<EnumExtensibilityAttr> from(const VariantEntity &e);
   static std::optional<EnumExtensibilityAttr> from(const TokenContext &t);
 
   EnumExtensibilityAttrKind extensibility(void) const;

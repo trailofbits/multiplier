@@ -60,6 +60,13 @@ std::optional<Designator> Designator::from(const Reference &r) {
   return r.as_designator();
 }
 
+std::optional<Designator> Designator::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Designator>(e)) {
+    return std::nullopt;
+  }
+  return std::get<Designator>(e);
+}
+
 std::optional<Designator> Designator::from(const TokenContext &t) {
   return t.as_designator();
 }
@@ -83,7 +90,7 @@ std::optional<FieldDecl> Designator::field(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FieldDecl::from(Decl(std::move(eptr)));
+      return FieldDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

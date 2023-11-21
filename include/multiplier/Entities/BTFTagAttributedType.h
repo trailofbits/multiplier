@@ -37,17 +37,13 @@ class BTFTagAttributedType : public Type {
     return TypeKind::BTF_TAG_ATTRIBUTED;
   }
 
-  static std::optional<BTFTagAttributedType> from(const Type &parent);
-
-  inline static std::optional<BTFTagAttributedType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return BTFTagAttributedType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<BTFTagAttributedType> from_base(const Type &parent);
+  inline static std::optional<BTFTagAttributedType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<BTFTagAttributedType> from(const std::optional<Type> &parent);
   static std::optional<BTFTagAttributedType> from(const Reference &r);
+  static std::optional<BTFTagAttributedType> from(const VariantEntity &e);
   static std::optional<BTFTagAttributedType> from(const TokenContext &t);
 
   Type desugar(void) const;

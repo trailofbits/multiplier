@@ -39,18 +39,30 @@ bool C11NoReturnAttr::contains(const Token &tok) const {
 std::optional<C11NoReturnAttr> C11NoReturnAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return C11NoReturnAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<C11NoReturnAttr> C11NoReturnAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kC11NoReturnAttrDerivedKinds[] = {
     C11NoReturnAttr::static_kind(),
 };
 
-std::optional<C11NoReturnAttr> C11NoReturnAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<C11NoReturnAttr> C11NoReturnAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case C11NoReturnAttr::static_kind():
       return reinterpret_cast<const C11NoReturnAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<C11NoReturnAttr> C11NoReturnAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kC11NoReturnAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<C11NoReturnAttr> e = C11NoReturnAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<C11NoReturnAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<C11NoReturnAttr> C11NoReturnAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kC11NoReturnAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<C11NoReturnAttr> e = C11NoReturnAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<C11NoReturnAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<C11NoReturnAttr> C11NoReturnAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kC11NoReturnAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<C11NoReturnAttr> e = C11NoReturnAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<C11NoReturnAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<C11NoReturnAttr> C11NoReturnAttr::from(const Reference &r) {
   return C11NoReturnAttr::from(r.as_attribute());
 }
 
+std::optional<C11NoReturnAttr> C11NoReturnAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<C11NoReturnAttr> C11NoReturnAttr::from(const TokenContext &t) {
-  return C11NoReturnAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

@@ -53,17 +53,13 @@ class StmtExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<StmtExpr> from(const Stmt &parent);
-
-  inline static std::optional<StmtExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return StmtExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<StmtExpr> from_base(const Stmt &parent);
+  inline static std::optional<StmtExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<StmtExpr> from(const std::optional<Stmt> &parent);
   static std::optional<StmtExpr> from(const Reference &r);
+  static std::optional<StmtExpr> from(const VariantEntity &e);
   static std::optional<StmtExpr> from(const TokenContext &t);
 
   Token l_paren_token(void) const;

@@ -42,17 +42,13 @@ class OMPAllocateDeclAttr : public InheritableAttr {
     return AttrKind::OMP_ALLOCATE_DECL;
   }
 
-  static std::optional<OMPAllocateDeclAttr> from(const Attr &parent);
-
-  inline static std::optional<OMPAllocateDeclAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OMPAllocateDeclAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPAllocateDeclAttr> from_base(const Attr &parent);
+  inline static std::optional<OMPAllocateDeclAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPAllocateDeclAttr> from(const std::optional<Attr> &parent);
   static std::optional<OMPAllocateDeclAttr> from(const Reference &r);
+  static std::optional<OMPAllocateDeclAttr> from(const VariantEntity &e);
   static std::optional<OMPAllocateDeclAttr> from(const TokenContext &t);
 
   Expr alignment(void) const;

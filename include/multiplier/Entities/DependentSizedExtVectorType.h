@@ -37,17 +37,13 @@ class DependentSizedExtVectorType : public Type {
     return TypeKind::DEPENDENT_SIZED_EXT_VECTOR;
   }
 
-  static std::optional<DependentSizedExtVectorType> from(const Type &parent);
-
-  inline static std::optional<DependentSizedExtVectorType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return DependentSizedExtVectorType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<DependentSizedExtVectorType> from_base(const Type &parent);
+  inline static std::optional<DependentSizedExtVectorType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<DependentSizedExtVectorType> from(const std::optional<Type> &parent);
   static std::optional<DependentSizedExtVectorType> from(const Reference &r);
+  static std::optional<DependentSizedExtVectorType> from(const VariantEntity &e);
   static std::optional<DependentSizedExtVectorType> from(const TokenContext &t);
 
   Type desugar(void) const;

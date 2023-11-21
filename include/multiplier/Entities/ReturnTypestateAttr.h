@@ -41,17 +41,13 @@ class ReturnTypestateAttr : public InheritableAttr {
     return AttrKind::RETURN_TYPESTATE;
   }
 
-  static std::optional<ReturnTypestateAttr> from(const Attr &parent);
-
-  inline static std::optional<ReturnTypestateAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ReturnTypestateAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ReturnTypestateAttr> from_base(const Attr &parent);
+  inline static std::optional<ReturnTypestateAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ReturnTypestateAttr> from(const std::optional<Attr> &parent);
   static std::optional<ReturnTypestateAttr> from(const Reference &r);
+  static std::optional<ReturnTypestateAttr> from(const VariantEntity &e);
   static std::optional<ReturnTypestateAttr> from(const TokenContext &t);
 
   ReturnTypestateAttrConsumedState state(void) const;

@@ -58,17 +58,13 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   OMPDeclareMapperDecl canonical_declaration(void) const;
   std::optional<OMPDeclareMapperDecl> definition(void) const;
   gap::generator<OMPDeclareMapperDecl> redeclarations(void) const &;
-  static std::optional<OMPDeclareMapperDecl> from(const Decl &parent);
-
-  inline static std::optional<OMPDeclareMapperDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return OMPDeclareMapperDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPDeclareMapperDecl> from_base(const Decl &parent);
+  inline static std::optional<OMPDeclareMapperDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPDeclareMapperDecl> from(const std::optional<Decl> &parent);
   static std::optional<OMPDeclareMapperDecl> from(const Reference &r);
+  static std::optional<OMPDeclareMapperDecl> from(const VariantEntity &e);
   static std::optional<OMPDeclareMapperDecl> from(const TokenContext &t);
 
   Expr mapper_variable_reference(void) const;

@@ -55,17 +55,13 @@ class UnnamedGlobalConstantDecl : public ValueDecl {
   UnnamedGlobalConstantDecl canonical_declaration(void) const;
   std::optional<UnnamedGlobalConstantDecl> definition(void) const;
   gap::generator<UnnamedGlobalConstantDecl> redeclarations(void) const &;
-  static std::optional<UnnamedGlobalConstantDecl> from(const Decl &parent);
-
-  inline static std::optional<UnnamedGlobalConstantDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return UnnamedGlobalConstantDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UnnamedGlobalConstantDecl> from_base(const Decl &parent);
+  inline static std::optional<UnnamedGlobalConstantDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UnnamedGlobalConstantDecl> from(const std::optional<Decl> &parent);
   static std::optional<UnnamedGlobalConstantDecl> from(const Reference &r);
+  static std::optional<UnnamedGlobalConstantDecl> from(const VariantEntity &e);
   static std::optional<UnnamedGlobalConstantDecl> from(const TokenContext &t);
 
 };

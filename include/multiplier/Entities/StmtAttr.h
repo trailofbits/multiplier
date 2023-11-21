@@ -40,17 +40,13 @@ class StmtAttr : public Attr {
   static gap::generator<StmtAttr> in(const Fragment &frag);
   static gap::generator<StmtAttr> in(const File &file);
 
-  static std::optional<StmtAttr> from(const Attr &parent);
-
-  inline static std::optional<StmtAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return StmtAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<StmtAttr> from_base(const Attr &parent);
+  inline static std::optional<StmtAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<StmtAttr> from(const std::optional<Attr> &parent);
   static std::optional<StmtAttr> from(const Reference &r);
+  static std::optional<StmtAttr> from(const VariantEntity &e);
   static std::optional<StmtAttr> from(const TokenContext &t);
 
 };

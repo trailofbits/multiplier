@@ -251,6 +251,12 @@ struct ReferenceRecord {
                         kind_id)
           ) WITHOUT ROWID)",
 
+       R"(CREATE INDEX IF NOT EXISTS reference_to
+          ON reference(to_entity_id ASC, from_entity_id ASC))",
+
+       R"(CREATE INDEX IF NOT EXISTS reference_from
+          ON reference(from_entity_id ASC, to_entity_id ASC))",
+
        R"(CREATE TABLE IF NOT EXISTS reference_kind (
             kind BLOB NOT NULL PRIMARY KEY
           ))",
@@ -260,22 +266,19 @@ struct ReferenceRecord {
        // The reference_kind table is used to convert the reference kind
        // into string that appears in the info browser.
        R"(INSERT OR IGNORE INTO reference_kind (rowid, kind)
-          VALUES (0, "Use"),
-                 (1, "Address of"),
-                 (2, "Assigned To"),
-                 (3, "Assignment"),
-                 (4, "Called By"),
-                 (5, "Call Argument"),
-                 (6, "Used By"),
-                 (7, "Dereference"),
-                 (8, "Enumeration"),
-                 (9, "Expansion"),
-                 (10, "Included By"),
-                 (11, "Initialization"),
-                 (12, "Influencing Condition"),
-                 (13, "Type Cast"),
-                 (14, "Statement Use"),
-                 (15, "Type Trait Use")
+          VALUES (0, "USES_VALUE"),
+                 (1, "USES_TYPE"),
+                 (2, "CASTS_WITH_TYPE"),
+                 (3, "COPIES_VALUE"),
+                 (4, "TESTS_VALUE"),
+                 (5, "WRITES_VALUE"),
+                 (6, "UPDATES_VALUE"),
+                 (7, "ACCESSES_VALUE"),
+                 (8, "TAKES_VALUE"),
+                 (9, "CALLS"),
+                 (10, "TAKES_ADDRESS"),
+                 (11, "INCLUDES_FILE"),
+                 (12, "EXPANSION_OF")
           )"};
 
   static constexpr const char *kExitStatements[] = {nullptr};
@@ -286,6 +289,8 @@ struct ReferenceRecord {
          to_entity_id, context_id, kind_id)
          VALUES (?1, ?2, ?3, ?4))";
 
+  inline bool operator==(const ReferenceRecord &) const noexcept = default;
+
   // Entity id of the referer
   RawEntityId from_entity_id;
 
@@ -294,7 +299,9 @@ struct ReferenceRecord {
 
   // Entity id of the context in which reference has happened. It will
   // be either same as `from_entity_id` or ancestor of `from_entity_id`.
-  RawEntityId context_id;
+  RawEntityId context_entity_id;
+
+  // Kind of this reference.
   mx::BuiltinReferenceKind kind;
 };
 

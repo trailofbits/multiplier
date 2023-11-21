@@ -36,17 +36,13 @@ class BitIntType : public Type {
     return TypeKind::BIT_INT;
   }
 
-  static std::optional<BitIntType> from(const Type &parent);
-
-  inline static std::optional<BitIntType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return BitIntType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<BitIntType> from_base(const Type &parent);
+  inline static std::optional<BitIntType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<BitIntType> from(const std::optional<Type> &parent);
   static std::optional<BitIntType> from(const Reference &r);
+  static std::optional<BitIntType> from(const VariantEntity &e);
   static std::optional<BitIntType> from(const TokenContext &t);
 
   Type desugar(void) const;

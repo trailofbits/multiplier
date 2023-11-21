@@ -94,7 +94,7 @@ bool ObjCContainerDecl::contains(const Stmt &stmt) {
 }
 
 ObjCContainerDecl ObjCContainerDecl::canonical_declaration(void) const {
-  if (auto canon = ObjCContainerDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (ObjCContainerDecl redecl : redeclarations()) {
@@ -104,12 +104,15 @@ ObjCContainerDecl ObjCContainerDecl::canonical_declaration(void) const {
 }
 
 std::optional<ObjCContainerDecl> ObjCContainerDecl::definition(void) const {
-  return ObjCContainerDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<ObjCContainerDecl> ObjCContainerDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<ObjCContainerDecl> dr = ObjCContainerDecl::from(r)) {
+    if (std::optional<ObjCContainerDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -122,13 +125,23 @@ gap::generator<ObjCContainerDecl> ObjCContainerDecl::redeclarations(void) const 
 std::optional<ObjCContainerDecl> ObjCContainerDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return ObjCContainerDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kObjCContainerDeclDerivedKinds[] = {
     ObjCInterfaceDecl::static_kind(),
     ObjCProtocolDecl::static_kind(),
@@ -137,7 +150,9 @@ static const DeclKind kObjCContainerDeclDerivedKinds[] = {
     ObjCCategoryImplDecl::static_kind(),
 };
 
-std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<ObjCContainerDecl> ObjCContainerDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case ObjCInterfaceDecl::static_kind():
     case ObjCProtocolDecl::static_kind():
@@ -154,7 +169,7 @@ gap::generator<ObjCContainerDecl> ObjCContainerDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCContainerDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<ObjCContainerDecl> e = ObjCContainerDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCContainerDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -166,7 +181,7 @@ gap::generator<ObjCContainerDecl> ObjCContainerDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCContainerDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCContainerDecl> e = ObjCContainerDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ObjCContainerDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -179,7 +194,7 @@ gap::generator<ObjCContainerDecl> ObjCContainerDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCContainerDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCContainerDecl> e = ObjCContainerDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<ObjCContainerDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -191,8 +206,18 @@ std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const Reference &r) {
   return ObjCContainerDecl::from(r.as_declaration());
 }
 
+std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const TokenContext &t) {
-  return ObjCContainerDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 unsigned ObjCContainerDecl::num_class_methods(void) const {
@@ -210,7 +235,7 @@ std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_class_method(unsigned n) co
   if (!e) {
     return std::nullopt;
   }
-  return ObjCMethodDecl::from(Decl(std::move(e)));
+  return ObjCMethodDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const & {
@@ -219,7 +244,7 @@ gap::generator<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d51 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCMethodDecl::from(Decl(std::move(d51)))) {
+      if (auto e = ObjCMethodDecl::from_base(std::move(d51))) {
         co_yield std::move(*e);
       }
     }
@@ -242,7 +267,7 @@ std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_class_propertie(unsigned 
   if (!e) {
     return std::nullopt;
   }
-  return ObjCPropertyDecl::from(Decl(std::move(e)));
+  return ObjCPropertyDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const & {
@@ -251,7 +276,7 @@ gap::generator<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const
   for (auto v : list) {
     EntityId id(v);
     if (auto d52 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCPropertyDecl::from(Decl(std::move(d52)))) {
+      if (auto e = ObjCPropertyDecl::from_base(std::move(d52))) {
         co_yield std::move(*e);
       }
     }
@@ -282,7 +307,7 @@ std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_instance_method(unsigned n)
   if (!e) {
     return std::nullopt;
   }
-  return ObjCMethodDecl::from(Decl(std::move(e)));
+  return ObjCMethodDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const & {
@@ -291,7 +316,7 @@ gap::generator<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const &
   for (auto v : list) {
     EntityId id(v);
     if (auto d62 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCMethodDecl::from(Decl(std::move(d62)))) {
+      if (auto e = ObjCMethodDecl::from_base(std::move(d62))) {
         co_yield std::move(*e);
       }
     }
@@ -314,7 +339,7 @@ std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_instance_propertie(unsign
   if (!e) {
     return std::nullopt;
   }
-  return ObjCPropertyDecl::from(Decl(std::move(e)));
+  return ObjCPropertyDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) const & {
@@ -323,7 +348,7 @@ gap::generator<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) co
   for (auto v : list) {
     EntityId id(v);
     if (auto d179 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCPropertyDecl::from(Decl(std::move(d179)))) {
+      if (auto e = ObjCPropertyDecl::from_base(std::move(d179))) {
         co_yield std::move(*e);
       }
     }
@@ -346,7 +371,7 @@ std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_method(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return ObjCMethodDecl::from(Decl(std::move(e)));
+  return ObjCMethodDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCMethodDecl> ObjCContainerDecl::methods(void) const & {
@@ -355,7 +380,7 @@ gap::generator<ObjCMethodDecl> ObjCContainerDecl::methods(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d187 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCMethodDecl::from(Decl(std::move(d187)))) {
+      if (auto e = ObjCMethodDecl::from_base(std::move(d187))) {
         co_yield std::move(*e);
       }
     }
@@ -378,7 +403,7 @@ std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_propertie(unsigned n) con
   if (!e) {
     return std::nullopt;
   }
-  return ObjCPropertyDecl::from(Decl(std::move(e)));
+  return ObjCPropertyDecl::from_base(std::move(e));
 }
 
 gap::generator<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const & {
@@ -387,7 +412,7 @@ gap::generator<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d188 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCPropertyDecl::from(Decl(std::move(d188)))) {
+      if (auto e = ObjCPropertyDecl::from_base(std::move(d188))) {
         co_yield std::move(*e);
       }
     }

@@ -89,18 +89,30 @@ bool IndirectGotoStmt::contains(const Stmt &stmt) {
 std::optional<IndirectGotoStmt> IndirectGotoStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return IndirectGotoStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kIndirectGotoStmtDerivedKinds[] = {
     IndirectGotoStmt::static_kind(),
 };
 
-std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<IndirectGotoStmt> IndirectGotoStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case IndirectGotoStmt::static_kind():
       return reinterpret_cast<const IndirectGotoStmt &>(parent);
@@ -113,7 +125,7 @@ gap::generator<IndirectGotoStmt> IndirectGotoStmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kIndirectGotoStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<IndirectGotoStmt> e = IndirectGotoStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<IndirectGotoStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<IndirectGotoStmt> IndirectGotoStmt::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kIndirectGotoStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<IndirectGotoStmt> e = IndirectGotoStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<IndirectGotoStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<IndirectGotoStmt> IndirectGotoStmt::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kIndirectGotoStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<IndirectGotoStmt> e = IndirectGotoStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<IndirectGotoStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,8 +162,18 @@ std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const Reference &r) {
   return IndirectGotoStmt::from(r.as_statement());
 }
 
+std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const TokenContext &t) {
-  return IndirectGotoStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::optional<LabelDecl> IndirectGotoStmt::constant_target(void) const {
@@ -161,7 +183,7 @@ std::optional<LabelDecl> IndirectGotoStmt::constant_target(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return LabelDecl::from(Decl(std::move(eptr)));
+      return LabelDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -177,7 +199,7 @@ Token IndirectGotoStmt::star_token(void) const {
 
 Expr IndirectGotoStmt::target(void) const {
   RawEntityId eid = impl->reader.getVal13();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

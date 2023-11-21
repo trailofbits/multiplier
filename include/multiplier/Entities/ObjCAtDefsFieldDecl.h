@@ -59,17 +59,13 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
   ObjCAtDefsFieldDecl canonical_declaration(void) const;
   std::optional<ObjCAtDefsFieldDecl> definition(void) const;
   gap::generator<ObjCAtDefsFieldDecl> redeclarations(void) const &;
-  static std::optional<ObjCAtDefsFieldDecl> from(const Decl &parent);
-
-  inline static std::optional<ObjCAtDefsFieldDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ObjCAtDefsFieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCAtDefsFieldDecl> from_base(const Decl &parent);
+  inline static std::optional<ObjCAtDefsFieldDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCAtDefsFieldDecl> from(const std::optional<Decl> &parent);
   static std::optional<ObjCAtDefsFieldDecl> from(const Reference &r);
+  static std::optional<ObjCAtDefsFieldDecl> from(const VariantEntity &e);
   static std::optional<ObjCAtDefsFieldDecl> from(const TokenContext &t);
 
 };

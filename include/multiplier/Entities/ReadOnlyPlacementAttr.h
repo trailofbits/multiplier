@@ -40,17 +40,13 @@ class ReadOnlyPlacementAttr : public InheritableAttr {
     return AttrKind::READ_ONLY_PLACEMENT;
   }
 
-  static std::optional<ReadOnlyPlacementAttr> from(const Attr &parent);
-
-  inline static std::optional<ReadOnlyPlacementAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ReadOnlyPlacementAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ReadOnlyPlacementAttr> from_base(const Attr &parent);
+  inline static std::optional<ReadOnlyPlacementAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ReadOnlyPlacementAttr> from(const std::optional<Attr> &parent);
   static std::optional<ReadOnlyPlacementAttr> from(const Reference &r);
+  static std::optional<ReadOnlyPlacementAttr> from(const VariantEntity &e);
   static std::optional<ReadOnlyPlacementAttr> from(const TokenContext &t);
 
 };

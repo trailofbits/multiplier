@@ -42,17 +42,13 @@ class HLSLSV_DispatchThreadIDAttr : public HLSLAnnotationAttr {
     return AttrKind::HLSLSV__DISPATCH_THREAD_ID;
   }
 
-  static std::optional<HLSLSV_DispatchThreadIDAttr> from(const Attr &parent);
-
-  inline static std::optional<HLSLSV_DispatchThreadIDAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return HLSLSV_DispatchThreadIDAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<HLSLSV_DispatchThreadIDAttr> from_base(const Attr &parent);
+  inline static std::optional<HLSLSV_DispatchThreadIDAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<HLSLSV_DispatchThreadIDAttr> from(const std::optional<Attr> &parent);
   static std::optional<HLSLSV_DispatchThreadIDAttr> from(const Reference &r);
+  static std::optional<HLSLSV_DispatchThreadIDAttr> from(const VariantEntity &e);
   static std::optional<HLSLSV_DispatchThreadIDAttr> from(const TokenContext &t);
 
 };

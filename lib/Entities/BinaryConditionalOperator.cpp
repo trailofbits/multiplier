@@ -91,18 +91,30 @@ bool BinaryConditionalOperator::contains(const Stmt &stmt) {
 std::optional<BinaryConditionalOperator> BinaryConditionalOperator::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return BinaryConditionalOperator::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kBinaryConditionalOperatorDerivedKinds[] = {
     BinaryConditionalOperator::static_kind(),
 };
 
-std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case BinaryConditionalOperator::static_kind():
       return reinterpret_cast<const BinaryConditionalOperator &>(parent);
@@ -115,7 +127,7 @@ gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::in(const In
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kBinaryConditionalOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<BinaryConditionalOperator> e = BinaryConditionalOperator::from(Stmt(std::move(eptr)))) {
+      if (std::optional<BinaryConditionalOperator> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -127,7 +139,7 @@ gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::in(const Fr
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kBinaryConditionalOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<BinaryConditionalOperator> e = BinaryConditionalOperator::from(Stmt(std::move(eptr)))) {
+      if (std::optional<BinaryConditionalOperator> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -140,7 +152,7 @@ gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::in(const Fi
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kBinaryConditionalOperatorDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<BinaryConditionalOperator> e = BinaryConditionalOperator::from(Stmt(std::move(eptr)))) {
+        if (std::optional<BinaryConditionalOperator> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -152,18 +164,28 @@ std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const R
   return BinaryConditionalOperator::from(r.as_statement());
 }
 
+std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const TokenContext &t) {
-  return BinaryConditionalOperator::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr BinaryConditionalOperator::common(void) const {
   RawEntityId eid = impl->reader.getVal42();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 OpaqueValueExpr BinaryConditionalOperator::opaque_value(void) const {
   RawEntityId eid = impl->reader.getVal43();
-  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return OpaqueValueExpr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

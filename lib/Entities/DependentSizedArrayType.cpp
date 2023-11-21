@@ -41,18 +41,30 @@ bool DependentSizedArrayType::contains(const Token &tok) const {
 std::optional<DependentSizedArrayType> DependentSizedArrayType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return DependentSizedArrayType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<DependentSizedArrayType> DependentSizedArrayType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kDependentSizedArrayTypeDerivedKinds[] = {
     DependentSizedArrayType::static_kind(),
 };
 
-std::optional<DependentSizedArrayType> DependentSizedArrayType::from(const Type &parent) {
+}  // namespace
+
+std::optional<DependentSizedArrayType> DependentSizedArrayType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case DependentSizedArrayType::static_kind():
       return reinterpret_cast<const DependentSizedArrayType &>(parent);
@@ -65,7 +77,7 @@ gap::generator<DependentSizedArrayType> DependentSizedArrayType::in(const Index 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kDependentSizedArrayTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<DependentSizedArrayType> e = DependentSizedArrayType::from(Type(std::move(eptr)))) {
+      if (std::optional<DependentSizedArrayType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -76,8 +88,18 @@ std::optional<DependentSizedArrayType> DependentSizedArrayType::from(const Refer
   return DependentSizedArrayType::from(r.as_type());
 }
 
+std::optional<DependentSizedArrayType> DependentSizedArrayType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<DependentSizedArrayType> DependentSizedArrayType::from(const TokenContext &t) {
-  return DependentSizedArrayType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type DependentSizedArrayType::desugar(void) const {
@@ -99,7 +121,7 @@ Token DependentSizedArrayType::r_bracket_token(void) const {
 
 Expr DependentSizedArrayType::size_expression(void) const {
   RawEntityId eid = impl->reader.getVal62();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool DependentSizedArrayType::is_sugared(void) const {

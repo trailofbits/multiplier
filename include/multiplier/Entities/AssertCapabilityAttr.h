@@ -41,17 +41,13 @@ class AssertCapabilityAttr : public InheritableAttr {
     return AttrKind::ASSERT_CAPABILITY;
   }
 
-  static std::optional<AssertCapabilityAttr> from(const Attr &parent);
-
-  inline static std::optional<AssertCapabilityAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AssertCapabilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AssertCapabilityAttr> from_base(const Attr &parent);
+  inline static std::optional<AssertCapabilityAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AssertCapabilityAttr> from(const std::optional<Attr> &parent);
   static std::optional<AssertCapabilityAttr> from(const Reference &r);
+  static std::optional<AssertCapabilityAttr> from(const VariantEntity &e);
   static std::optional<AssertCapabilityAttr> from(const TokenContext &t);
 
   AssertCapabilityAttrSpelling semantic_spelling(void) const;

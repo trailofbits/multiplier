@@ -77,17 +77,13 @@ class ValueDecl : public NamedDecl {
   ValueDecl canonical_declaration(void) const;
   std::optional<ValueDecl> definition(void) const;
   gap::generator<ValueDecl> redeclarations(void) const &;
-  static std::optional<ValueDecl> from(const Decl &parent);
-
-  inline static std::optional<ValueDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ValueDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ValueDecl> from_base(const Decl &parent);
+  inline static std::optional<ValueDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ValueDecl> from(const std::optional<Decl> &parent);
   static std::optional<ValueDecl> from(const Reference &r);
+  static std::optional<ValueDecl> from(const VariantEntity &e);
   static std::optional<ValueDecl> from(const TokenContext &t);
 
   std::optional<VarDecl> potentially_decomposed_variable_declaration(void) const;

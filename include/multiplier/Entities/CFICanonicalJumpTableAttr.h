@@ -40,17 +40,13 @@ class CFICanonicalJumpTableAttr : public InheritableAttr {
     return AttrKind::CFI_CANONICAL_JUMP_TABLE;
   }
 
-  static std::optional<CFICanonicalJumpTableAttr> from(const Attr &parent);
-
-  inline static std::optional<CFICanonicalJumpTableAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CFICanonicalJumpTableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CFICanonicalJumpTableAttr> from_base(const Attr &parent);
+  inline static std::optional<CFICanonicalJumpTableAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CFICanonicalJumpTableAttr> from(const std::optional<Attr> &parent);
   static std::optional<CFICanonicalJumpTableAttr> from(const Reference &r);
+  static std::optional<CFICanonicalJumpTableAttr> from(const VariantEntity &e);
   static std::optional<CFICanonicalJumpTableAttr> from(const TokenContext &t);
 
 };

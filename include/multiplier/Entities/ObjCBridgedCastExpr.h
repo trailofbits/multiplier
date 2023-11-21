@@ -57,17 +57,13 @@ class ObjCBridgedCastExpr : public ExplicitCastExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ObjCBridgedCastExpr> from(const Stmt &parent);
-
-  inline static std::optional<ObjCBridgedCastExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return ObjCBridgedCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCBridgedCastExpr> from_base(const Stmt &parent);
+  inline static std::optional<ObjCBridgedCastExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCBridgedCastExpr> from(const std::optional<Stmt> &parent);
   static std::optional<ObjCBridgedCastExpr> from(const Reference &r);
+  static std::optional<ObjCBridgedCastExpr> from(const VariantEntity &e);
   static std::optional<ObjCBridgedCastExpr> from(const TokenContext &t);
 
   Token bridge_keyword_token(void) const;

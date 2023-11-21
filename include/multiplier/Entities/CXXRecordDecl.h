@@ -74,17 +74,13 @@ class CXXRecordDecl : public RecordDecl {
   CXXRecordDecl canonical_declaration(void) const;
   std::optional<CXXRecordDecl> definition(void) const;
   gap::generator<CXXRecordDecl> redeclarations(void) const &;
-  static std::optional<CXXRecordDecl> from(const Decl &parent);
-
-  inline static std::optional<CXXRecordDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return CXXRecordDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CXXRecordDecl> from_base(const Decl &parent);
+  inline static std::optional<CXXRecordDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CXXRecordDecl> from(const std::optional<Decl> &parent);
   static std::optional<CXXRecordDecl> from(const Reference &r);
+  static std::optional<CXXRecordDecl> from(const VariantEntity &e);
   static std::optional<CXXRecordDecl> from(const TokenContext &t);
 
   std::optional<bool> allow_const_default_initializer(void) const;

@@ -85,6 +85,63 @@ bool IsParsedToken(const pasta::Token &tok) {
   }
 }
 
+namespace {
+
+// Compute the last token of a macro.
+static std::optional<pasta::MacroToken> EndTokenOfRange(pasta::MacroRange range,
+                                                        const void *parent) {
+  std::optional<pasta::MacroToken> last_tok;
+
+  for (pasta::Macro child_node : range) {
+    auto parent_of_child = child_node.Parent();
+    if (!parent_of_child) {
+      assert(false);
+      break;
+    }
+
+    if (parent_of_child->RawMacro() != parent) {
+      break;
+    }
+
+    if (auto new_end_tok = EndToken(child_node)) {
+      last_tok = new_end_tok;
+    }
+  }
+
+  return last_tok;
+}
+
+}  // namespace
+
+// Compute the last token of a macro.
+std::optional<pasta::MacroToken> EndToken(const pasta::Macro &macro) {
+
+  auto parent = macro.RawMacro();
+
+  if (auto sub = pasta::MacroSubstitution::From(macro)) {
+    if (auto last_repl_tok = EndTokenOfRange(
+            sub->ReplacementChildren(), parent)) {
+      return last_repl_tok;
+    }
+
+    if (auto exp = pasta::MacroExpansion::From(macro)) {
+      if (auto last_body_tok = EndTokenOfRange(
+              exp->IntermediateChildren(), parent)) {
+        return last_body_tok;
+      }
+    }
+  }
+
+  if (auto tok = pasta::MacroToken::From(macro)) {
+    return tok;
+  }
+
+  // NOTE(pag): `pasta::Macro::EndToken` returns the last use token. That
+  //            sometimes ends up being the right-corner of some internal left
+  //            corner.
+  return EndTokenOfRange(macro.Children(), parent);
+}
+
 // Print a declaration; useful for error reporting.
 std::string DeclToString(const pasta::Decl &decl) {
   std::stringstream ss;
@@ -439,499 +496,6 @@ bool IsDefinition(const pasta::Decl &decl_) {
   } else {
     return false;
   }
-}
-
-// Try to find the `Decl` referenced by a particular `type`.
-std::optional<pasta::Decl> ReferencedDecl(const pasta::Type &type_) {
-  auto type = type_;
-  for (const void *prev_raw = nullptr; prev_raw != type.RawType();
-       prev_raw = type.RawType()) {
-    type = type.UnqualifiedType();
-    if (auto paren = pasta::ParenType::From(type)) {
-      type = paren->InnerType().UnqualifiedType();
-    }
-    if (auto nt = type.PointeeOrArrayElementType()) {
-      type = std::move(nt.value());
-    }
-  }
-
-  if (auto tdt = pasta::TypedefType::From(type)) {
-    return tdt->Declaration();
-
-  } else if (auto ttt = pasta::TagType::From(type)) {
-    return ttt->Declaration();
-
-  } else if (auto tut = pasta::UsingType::From(type)) {
-    if (auto ret = ReferencedDecl(tut->UnderlyingType())) {
-      return ret;
-    } else {
-      return tut->FoundDeclaration();
-    }
-  
-  } else if (auto dtt = pasta::DecltypeType::From(type)) {
-    return ReferencedDecl(dtt->UnderlyingType());  
-  
-  } else if (auto ddt = pasta::DeducedType::From(type)) {
-    if (auto rt = ddt->ResolvedType()) {
-      return ReferencedDecl(std::move(rt.value()));
-    }
-  }
-
-  return std::nullopt;
-}
-
-// Try to find the `Decl` referenced by a particular `decl`.
-gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Decl decl) {
-
-  // NOTE(pag): We'll get the parameter type references through visiting the
-  //            `ParmVarDecl`s.
-  if (auto func = pasta::FunctionDecl::From(decl)) {
-    for (auto ref : DeclReferencesFrom(func->ReturnType())) {
-      co_yield ref;
-    }
-  } else if (auto field = pasta::FieldDecl::From(decl)) {
-    for (auto ref : DeclReferencesFrom(field->Type())) {
-      co_yield ref;
-    }
-  } else if (auto var = pasta::VarDecl::From(decl)) {
-    for (auto ref : DeclReferencesFrom(var->Type())) {
-      co_yield ref;
-    }
-  } else if (auto enum_ = pasta::EnumDecl::From(decl)) {
-    if (auto base_type = enum_->IntegerType()) {
-      for (auto ref : DeclReferencesFrom(base_type.value())) {
-        co_yield ref;
-      }
-    }
-  } else if (auto td_ = pasta::TypedefNameDecl::From(decl)) {
-    for (auto ref : DeclReferencesFrom(td_->UnderlyingType())) {
-      co_yield ref;
-    }
-  }
-}
-
-// Try to find the `Decl` referenced by a particular `stmt`.
-gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt) {
-  // E.g. `a` or `a()` where `a` is a `Decl`. This also covers things like
-  // `a + b` where `+` is a `T::operator+`.
-  if (auto dre = pasta::DeclRefExpr::From(stmt)) {
-    co_yield dre->Declaration();
-
-  // `foo->bar`, mark `bar` as being referenced. `foo` will be handled as
-  // a `DeclRefExpr`.
-  } else if (auto me = pasta::MemberExpr::From(stmt)) {
-    co_yield me->MemberDeclaration();
-
-  // If we have `a = X()` for class name `X`, then mark the constructor as
-  // used in this fragment.
-  } else if (auto ce = pasta::CXXConstructExpr::From(stmt)) {
-    co_yield ce->Constructor();
-
-  // If we have `new T`, then mark `T` as being referenced in this fragment.
-  } else if (auto cxx_new = pasta::CXXNewExpr::From(stmt)) {
-    for (auto ref : DeclReferencesFrom(cxx_new->AllocatedType())) {
-      co_yield ref;
-    }
-
-    co_yield cxx_new->OperatorNew();
-
-  // If we have `delete x`, then mark `` as being referenced in this fragment.
-  } else if (auto cxx_del = pasta::CXXDeleteExpr::From(stmt)) {
-    co_yield cxx_del->OperatorDelete();
-
-  // If we have `(T *) b` then mark `T` as being referenced in this fragment.
-  } else if (auto cast = pasta::CastExpr::From(stmt)) {
-
-    // TODO(pag): If we want to allow implicit casts, then update
-    //            `ReferenceIterator::Advance`.
-    if (stmt.Kind() != pasta::StmtKind::kImplicitCastExpr) {
-      if (auto tt = cast->Type()) {
-        for (auto ref : DeclReferencesFrom(tt.value())) {
-          co_yield ref;
-        }
-      }
-    }
-
-  // If we have `sizeof(T)` or `alignof(T)` or something like these then
-  // mark `T` as being referenced in this fragment.
-  } else if (auto unary = pasta::UnaryExprOrTypeTraitExpr::From(stmt)) {
-    if (auto arg_type = unary->ArgumentType()) {
-      for (auto ref : DeclReferencesFrom(arg_type.value())) {
-        co_yield ref;
-      }
-    }
-
-  // XREF(pag): Issue #185. Make sure we record references to labels.
-  } else if (auto goto_ = pasta::GotoStmt::From(stmt)) {
-    co_yield goto_->Label();
-
-  } else if (auto addr_label = pasta::AddrLabelExpr::From(stmt)) {
-    co_yield addr_label->Label();
-  }
-}
-
-#define GEN(x) for (auto ref : DeclReferencesFrom(x)) { co_yield ref; }
-
-// Try to find the `Decl` referenced by a particular `type`.
-gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type) {
-  switch (type.Kind()) {
-    case pasta::TypeKind::kAdjusted:
-    case pasta::TypeKind::kDecayed: {
-      auto &tt = reinterpret_cast<const pasta::AdjustedType &>(type);
-      GEN(tt.OriginalType());
-      break;
-    }
-    case pasta::TypeKind::kConstantArray: {
-      auto &tt = reinterpret_cast<const pasta::ConstantArrayType &>(type);
-      if (auto expr = tt.SizeExpression()) {
-        GEN(expr.value());
-      }
-      GEN(tt.ElementType());
-      break;
-    }
-    case pasta::TypeKind::kDependentSizedArray: {
-      auto &tt = reinterpret_cast<const pasta::DependentSizedArrayType &>(type);
-      GEN(tt.SizeExpression());
-      GEN(tt.ElementType());
-      break;
-    }
-    case pasta::TypeKind::kIncompleteArray:
-    case pasta::TypeKind::kVariableArray: {
-      auto &tt = reinterpret_cast<const pasta::ArrayType &>(type);
-      GEN(tt.ElementType());
-      break;
-    }
-    case pasta::TypeKind::kAtomic: {
-      auto &tt = reinterpret_cast<const pasta::AtomicType &>(type);
-      GEN(tt.ValueType());
-      break;
-    }
-    case pasta::TypeKind::kAttributed: {
-      auto &tt = reinterpret_cast<const pasta::AttributedType &>(type);
-      GEN(tt.EquivalentType());
-      break;
-    }
-    case pasta::TypeKind::kBTFTagAttributed: {
-      auto &tt = reinterpret_cast<const pasta::BTFTagAttributedType &>(type);
-      GEN(tt.WrappedType());
-      break;
-    }
-    case pasta::TypeKind::kBitInt: {
-      break;
-    }
-    case pasta::TypeKind::kBlockPointer: {
-      auto &tt = reinterpret_cast<const pasta::BlockPointerType &>(type);
-      GEN(tt.PointeeType());
-      break;
-    }
-    case pasta::TypeKind::kBuiltin: {
-      break;
-    }
-    case pasta::TypeKind::kComplex: {
-      auto &tt = reinterpret_cast<const pasta::ComplexType &>(type);
-      GEN(tt.ElementType());
-      break;
-    }
-    case pasta::TypeKind::kDecltype: {
-      auto &tt = reinterpret_cast<const pasta::DecltypeType &>(type);
-      GEN(tt.UnderlyingType());
-      GEN(tt.UnderlyingExpression());
-      break;
-    }
-    case pasta::TypeKind::kAuto:
-    case pasta::TypeKind::kDeducedTemplateSpecialization: {
-      auto &tt = reinterpret_cast<const pasta::DeducedType &>(type);
-      if (auto dt = tt.ResolvedType()) {
-        GEN(dt.value());
-      }
-      break;
-    }
-    case pasta::TypeKind::kDependentAddressSpace: {
-      auto &tt = reinterpret_cast<const pasta::DependentAddressSpaceType &>(type);
-      GEN(tt.AddressSpaceExpression());
-      GEN(tt.PointeeType());
-      break;
-    }
-    case pasta::TypeKind::kDependentBitInt: {
-      auto &tt = reinterpret_cast<const pasta::DependentBitIntType &>(type);
-      GEN(tt.NumBitsExpression());
-      break;
-    }
-    case pasta::TypeKind::kDependentName: {
-      break;
-    }
-    case pasta::TypeKind::kDependentSizedExtVector: {
-      auto &tt = reinterpret_cast<const pasta::DependentSizedExtVectorType &>(type);
-      GEN(tt.SizeExpression());
-      GEN(tt.ElementType());
-      break;
-    }
-
-    // TODO(pag): Reference template arguments?
-    case pasta::TypeKind::kDependentTemplateSpecialization: {
-      break;
-    }
-    case pasta::TypeKind::kDependentVector: {
-      auto &tt = reinterpret_cast<const pasta::DependentVectorType &>(type);
-      GEN(tt.SizeExpression());
-      GEN(tt.ElementType());
-      break;
-    }
-    case pasta::TypeKind::kElaborated: {
-      auto &tt = reinterpret_cast<const pasta::ElaboratedType &>(type);
-      GEN(tt.NamedType());
-      break;
-    }
-    case pasta::TypeKind::kFunctionNoProto: {
-      auto &tt = reinterpret_cast<const pasta::FunctionNoProtoType &>(type);
-      GEN(tt.ReturnType());
-      break;
-    }
-    case pasta::TypeKind::kFunctionProto: {
-      auto &tt = reinterpret_cast<const pasta::FunctionProtoType &>(type);
-      GEN(tt.ReturnType());
-      if (auto esd = tt.ExceptionSpecDeclaration()) {
-        co_yield esd.value();
-      }
-      if (auto est = tt.ExceptionSpecTemplate()) {
-        co_yield est.value();
-      }
-      if (auto nee = tt.NoexceptExpression()) {
-        GEN(nee.value());
-      }
-      for (auto pt : tt.ParameterTypes()) {
-        GEN(pt);
-      }
-      for (auto et : tt.ExceptionTypes()) {
-        GEN(et);
-      }
-      break;
-    }
-    // TODO(pag): Think more about these.
-    case pasta::TypeKind::kInjectedClassName: {
-      auto &tt = reinterpret_cast<const pasta::InjectedClassNameType &>(type);
-      co_yield tt.Declaration();
-      break;
-    }
-    case pasta::TypeKind::kMacroQualified: {
-      auto &tt = reinterpret_cast<const pasta::MacroQualifiedType &>(type);
-      GEN(tt.UnderlyingType());
-      break;
-    }
-    case pasta::TypeKind::kConstantMatrix: {
-      break;
-    }
-    case pasta::TypeKind::kDependentSizedMatrix: {
-      auto &tt = reinterpret_cast<const pasta::DependentSizedMatrixType &>(type);
-      GEN(tt.ColumnExpression());
-      GEN(tt.RowExpression());
-      break;
-    }
-    case pasta::TypeKind::kMemberPointer: {
-      auto &tt = reinterpret_cast<const pasta::MemberPointerType &>(type);
-      GEN(tt.Class());
-      GEN(tt.PointeeType());
-      break;
-    }
-    case pasta::TypeKind::kObjCObjectPointer: {
-      auto &tt = reinterpret_cast<const pasta::ObjCObjectPointerType &>(type);
-      GEN(tt.ObjectType());
-      GEN(tt.PointeeType());
-      for (auto arg : tt.TypeArgumentsAsWritten()) {
-        GEN(arg);
-      }
-
-      // TODO(pag): Include these?
-      for (auto arg : tt.Qualifiers()) {
-        GEN(arg);
-      }
-      for (auto arg : tt.Protocols()) {
-        GEN(arg);
-      }
-      break;
-    }
-    case pasta::TypeKind::kObjCObject: {
-      auto &tt = reinterpret_cast<const pasta::ObjCObjectType &>(type);
-      co_yield tt.Interface();
-      if (auto sct = tt.SuperClassType()) {
-        GEN(sct.value());  // TODO(pag): Include this?
-      }
-      for (auto arg : tt.TypeArgumentsAsWritten()) {
-        GEN(arg);
-      }
-      // TODO(pag): Other methods?
-      break;
-    }
-    case pasta::TypeKind::kObjCInterface: {
-      auto &tt = reinterpret_cast<const pasta::ObjCInterfaceType &>(type);
-      co_yield tt.Declaration();
-      break;
-    }
-    case pasta::TypeKind::kObjCTypeParam: {
-      auto &tt = reinterpret_cast<const pasta::ObjCTypeParamType &>(type);
-      co_yield tt.Declaration();
-      break;
-    }
-    case pasta::TypeKind::kPackExpansion: {
-      // TODO(pag): Investigate this.
-      break;
-    }
-    case pasta::TypeKind::kParen: {
-      auto &tt = reinterpret_cast<const pasta::ParenType &>(type);
-      GEN(tt.InnerType());
-      break;
-    }
-    case pasta::TypeKind::kPipe: {
-      auto &tt = reinterpret_cast<const pasta::PipeType &>(type);
-      GEN(tt.ElementType());
-      break;
-    }
-    case pasta::TypeKind::kPointer: {
-      auto &tt = reinterpret_cast<const pasta::PointerType &>(type);
-      GEN(tt.PointeeType());
-      break;
-    }
-    case pasta::TypeKind::kLValueReference:
-    case pasta::TypeKind::kRValueReference: {
-      auto &tt = reinterpret_cast<const pasta::ReferenceType &>(type);
-      GEN(tt.PointeeTypeAsWritten());
-      break;
-    }
-    case pasta::TypeKind::kSubstTemplateTypeParmPack: {
-      // TODO(pag): Investigate this.
-      break;
-    }
-    case pasta::TypeKind::kSubstTemplateTypeParm: {
-      // TODO(pag): Investigate this.
-      break;
-    }
-    case pasta::TypeKind::kEnum: {
-      auto &tt = reinterpret_cast<const pasta::EnumType &>(type);
-      co_yield tt.Declaration();
-      break;
-    }
-    case pasta::TypeKind::kRecord: {
-      auto &tt = reinterpret_cast<const pasta::RecordType &>(type);
-      co_yield tt.Declaration();
-      break;
-    }
-    case pasta::TypeKind::kTemplateSpecialization: {
-      // TODO(pag): Investigate this.
-      break;
-    }
-    case pasta::TypeKind::kTemplateTypeParm: {
-      auto &tt = reinterpret_cast<const pasta::TemplateTypeParmType &>(type);
-      if (auto d = tt.Declaration()) {
-        co_yield d.value();
-      }
-      break;
-    }
-    case pasta::TypeKind::kTypeOfExpr: {
-      auto &tt = reinterpret_cast<const pasta::TypeOfExprType &>(type);
-      GEN(tt.UnderlyingExpression());
-      break;
-    }
-    case pasta::TypeKind::kTypeOf: {
-      auto &tt = reinterpret_cast<const pasta::TypeOfType &>(type);
-      GEN(tt.UnmodifiedType());
-      break;
-    }
-    case pasta::TypeKind::kTypedef: {
-      auto &tt = reinterpret_cast<const pasta::TypedefType &>(type);
-      co_yield tt.Declaration();
-      break;
-    }
-    case pasta::TypeKind::kUnaryTransform: {
-      auto &tt = reinterpret_cast<const pasta::UnaryTransformType &>(type);
-      GEN(tt.UnderlyingType());
-      break;
-    }
-    case pasta::TypeKind::kUnresolvedUsing: {
-      auto &tt = reinterpret_cast<const pasta::UnresolvedUsingType &>(type);
-      co_yield tt.Declaration();
-      break;
-    }
-    case pasta::TypeKind::kUsing: {
-      auto &tt = reinterpret_cast<const pasta::UsingType &>(type);
-      co_yield tt.FoundDeclaration();
-      break;
-    }
-    case pasta::TypeKind::kVector: {
-      auto &tt = reinterpret_cast<const pasta::VectorType &>(type);
-      GEN(tt.ElementType());
-      break;
-    }
-    case pasta::TypeKind::kExtVector: {
-      auto &tt = reinterpret_cast<const pasta::ExtVectorType &>(type);
-      GEN(tt.ElementType());
-      break;
-    }
-    case pasta::TypeKind::kQualified: {
-      auto &tt = reinterpret_cast<const pasta::QualifiedType &>(type);
-      GEN(tt.UnqualifiedType());
-      break;
-    }
-  }
-}
-
-// Try to identify the declaration referenced by a statement.
-std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt) {
-  
-  // E.g. `a` or `a()` where `a` is a `Decl`. This also covers things like
-  // `a + b` where `+` is a `T::operator+`.
-  if (auto dre = pasta::DeclRefExpr::From(stmt)) {
-    return dre->Declaration();
-
-  // `foo->bar`, mark `bar` as being referenced. `foo` will be handled as
-  // a `DeclRefExpr`.
-  } else if (auto me = pasta::MemberExpr::From(stmt)) {
-    return me->MemberDeclaration();
-  
-  // If we have `a = X()` for class name `X`, then mark the constructor as
-  // used in this fragment.
-  } else if (auto ce = pasta::CXXConstructExpr::From(stmt)) {
-    return ce->Constructor();
-  
-  // If we have `new T`, then mark `T` as being referenced in this fragment.
-  } else if (auto cxx_new = pasta::CXXNewExpr::From(stmt)) {
-    return cxx_new->OperatorNew();
-
-  // If we have `delete x`, then mark `the `operator delete`` as being
-  // referenced in this fragment.
-  } else if (auto cxx_del = pasta::CXXDeleteExpr::From(stmt)) {
-    return cxx_del->OperatorDelete();
-  
-  // If we have `(T *) b` then mark `T` as being referenced in this fragment.
-  } else if (auto cast = pasta::CastExpr::From(stmt)) {
-
-    // TODO(pag): If we want to allow implicit casts, then update
-    //            `ReferenceIterator::Advance`.
-    if (stmt.Kind() != pasta::StmtKind::kImplicitCastExpr) {
-      if (auto casted_type = cast->Type()) {
-        if (auto used_decl = ReferencedDecl(casted_type.value())) {
-          return used_decl.value();
-        }
-      }
-    }
-  
-  // If we have `sizeof(T)` or `alignof(T)` or something like these then
-  // mark `T` as being referenced in this fragment.
-  } else if (auto unary = pasta::UnaryExprOrTypeTraitExpr::From(stmt)) {
-    if (auto arg_type = unary->ArgumentType()) {
-      if (auto used_decl = ReferencedDecl(arg_type.value())) {
-        return used_decl.value();
-      }
-    }
-
-  // XREF(pag): Issue #185. Make sure we record references to labels.
-  } else if (auto goto_ = pasta::GotoStmt::From(stmt)) {
-    return goto_->Label();
-
-  } else if (auto addr_label = pasta::AddrLabelExpr::From(stmt)) {
-    return addr_label->Label();
-  }
-
-  return std::nullopt;
 }
 
 // Checks if the declaration is valid and serializable

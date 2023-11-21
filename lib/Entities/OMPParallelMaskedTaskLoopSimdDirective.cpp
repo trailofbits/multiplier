@@ -90,18 +90,30 @@ bool OMPParallelMaskedTaskLoopSimdDirective::contains(const Stmt &stmt) {
 std::optional<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoopSimdDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPParallelMaskedTaskLoopSimdDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoopSimdDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPParallelMaskedTaskLoopSimdDirectiveDerivedKinds[] = {
     OMPParallelMaskedTaskLoopSimdDirective::static_kind(),
 };
 
-std::optional<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoopSimdDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoopSimdDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPParallelMaskedTaskLoopSimdDirective::static_kind():
       return reinterpret_cast<const OMPParallelMaskedTaskLoopSimdDirective &>(parent);
@@ -114,7 +126,7 @@ gap::generator<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoop
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPParallelMaskedTaskLoopSimdDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPParallelMaskedTaskLoopSimdDirective> e = OMPParallelMaskedTaskLoopSimdDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPParallelMaskedTaskLoopSimdDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoop
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPParallelMaskedTaskLoopSimdDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPParallelMaskedTaskLoopSimdDirective> e = OMPParallelMaskedTaskLoopSimdDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPParallelMaskedTaskLoopSimdDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoop
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPParallelMaskedTaskLoopSimdDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPParallelMaskedTaskLoopSimdDirective> e = OMPParallelMaskedTaskLoopSimdDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPParallelMaskedTaskLoopSimdDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoopS
   return OMPParallelMaskedTaskLoopSimdDirective::from(r.as_statement());
 }
 
+std::optional<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoopSimdDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoopSimdDirective::from(const TokenContext &t) {
-  return OMPParallelMaskedTaskLoopSimdDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

@@ -57,17 +57,13 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
   VarTemplateDecl canonical_declaration(void) const;
   std::optional<VarTemplateDecl> definition(void) const;
   gap::generator<VarTemplateDecl> redeclarations(void) const &;
-  static std::optional<VarTemplateDecl> from(const Decl &parent);
-
-  inline static std::optional<VarTemplateDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return VarTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<VarTemplateDecl> from_base(const Decl &parent);
+  inline static std::optional<VarTemplateDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<VarTemplateDecl> from(const std::optional<Decl> &parent);
   static std::optional<VarTemplateDecl> from(const Reference &r);
+  static std::optional<VarTemplateDecl> from(const VariantEntity &e);
   static std::optional<VarTemplateDecl> from(const TokenContext &t);
 
   bool is_this_declaration_a_definition(void) const;

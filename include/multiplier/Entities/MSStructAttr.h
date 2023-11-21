@@ -40,17 +40,13 @@ class MSStructAttr : public InheritableAttr {
     return AttrKind::MS_STRUCT;
   }
 
-  static std::optional<MSStructAttr> from(const Attr &parent);
-
-  inline static std::optional<MSStructAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MSStructAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MSStructAttr> from_base(const Attr &parent);
+  inline static std::optional<MSStructAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MSStructAttr> from(const std::optional<Attr> &parent);
   static std::optional<MSStructAttr> from(const Reference &r);
+  static std::optional<MSStructAttr> from(const VariantEntity &e);
   static std::optional<MSStructAttr> from(const TokenContext &t);
 
 };

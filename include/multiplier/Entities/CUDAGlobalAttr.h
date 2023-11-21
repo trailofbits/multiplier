@@ -40,17 +40,13 @@ class CUDAGlobalAttr : public InheritableAttr {
     return AttrKind::CUDA_GLOBAL;
   }
 
-  static std::optional<CUDAGlobalAttr> from(const Attr &parent);
-
-  inline static std::optional<CUDAGlobalAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CUDAGlobalAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CUDAGlobalAttr> from_base(const Attr &parent);
+  inline static std::optional<CUDAGlobalAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CUDAGlobalAttr> from(const std::optional<Attr> &parent);
   static std::optional<CUDAGlobalAttr> from(const Reference &r);
+  static std::optional<CUDAGlobalAttr> from(const VariantEntity &e);
   static std::optional<CUDAGlobalAttr> from(const TokenContext &t);
 
 };

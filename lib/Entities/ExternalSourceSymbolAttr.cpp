@@ -39,18 +39,30 @@ bool ExternalSourceSymbolAttr::contains(const Token &tok) const {
 std::optional<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return ExternalSourceSymbolAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kExternalSourceSymbolAttrDerivedKinds[] = {
     ExternalSourceSymbolAttr::static_kind(),
 };
 
-std::optional<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case ExternalSourceSymbolAttr::static_kind():
       return reinterpret_cast<const ExternalSourceSymbolAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::in(const Inde
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kExternalSourceSymbolAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<ExternalSourceSymbolAttr> e = ExternalSourceSymbolAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<ExternalSourceSymbolAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::in(const Frag
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kExternalSourceSymbolAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<ExternalSourceSymbolAttr> e = ExternalSourceSymbolAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<ExternalSourceSymbolAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::in(const File
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kExternalSourceSymbolAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<ExternalSourceSymbolAttr> e = ExternalSourceSymbolAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<ExternalSourceSymbolAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::from(const Ref
   return ExternalSourceSymbolAttr::from(r.as_attribute());
 }
 
+std::optional<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::from(const TokenContext &t) {
-  return ExternalSourceSymbolAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::string_view ExternalSourceSymbolAttr::defined_in(void) const {

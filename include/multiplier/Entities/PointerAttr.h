@@ -41,17 +41,13 @@ class PointerAttr : public InheritableAttr {
     return AttrKind::POINTER;
   }
 
-  static std::optional<PointerAttr> from(const Attr &parent);
-
-  inline static std::optional<PointerAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return PointerAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PointerAttr> from_base(const Attr &parent);
+  inline static std::optional<PointerAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PointerAttr> from(const std::optional<Attr> &parent);
   static std::optional<PointerAttr> from(const Reference &r);
+  static std::optional<PointerAttr> from(const VariantEntity &e);
   static std::optional<PointerAttr> from(const TokenContext &t);
 
   Type deref_type(void) const;

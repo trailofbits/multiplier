@@ -40,17 +40,13 @@ class UnsafeBufferUsageAttr : public InheritableAttr {
     return AttrKind::UNSAFE_BUFFER_USAGE;
   }
 
-  static std::optional<UnsafeBufferUsageAttr> from(const Attr &parent);
-
-  inline static std::optional<UnsafeBufferUsageAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return UnsafeBufferUsageAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UnsafeBufferUsageAttr> from_base(const Attr &parent);
+  inline static std::optional<UnsafeBufferUsageAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UnsafeBufferUsageAttr> from(const std::optional<Attr> &parent);
   static std::optional<UnsafeBufferUsageAttr> from(const Reference &r);
+  static std::optional<UnsafeBufferUsageAttr> from(const VariantEntity &e);
   static std::optional<UnsafeBufferUsageAttr> from(const TokenContext &t);
 
 };

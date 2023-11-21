@@ -89,18 +89,30 @@ bool OMPArrayShapingExpr::contains(const Stmt &stmt) {
 std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPArrayShapingExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPArrayShapingExprDerivedKinds[] = {
     OMPArrayShapingExpr::static_kind(),
 };
 
-std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPArrayShapingExpr::static_kind():
       return reinterpret_cast<const OMPArrayShapingExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<OMPArrayShapingExpr> OMPArrayShapingExpr::in(const Index &index) 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPArrayShapingExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPArrayShapingExpr> e = OMPArrayShapingExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPArrayShapingExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<OMPArrayShapingExpr> OMPArrayShapingExpr::in(const Fragment &frag
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPArrayShapingExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPArrayShapingExpr> e = OMPArrayShapingExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPArrayShapingExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<OMPArrayShapingExpr> OMPArrayShapingExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPArrayShapingExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPArrayShapingExpr> e = OMPArrayShapingExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPArrayShapingExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,13 +162,23 @@ std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const Reference &r)
   return OMPArrayShapingExpr::from(r.as_statement());
 }
 
+std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const TokenContext &t) {
-  return OMPArrayShapingExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr OMPArrayShapingExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 unsigned OMPArrayShapingExpr::num_dimensions(void) const {
@@ -174,7 +196,7 @@ std::optional<Expr> OMPArrayShapingExpr::nth_dimension(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> OMPArrayShapingExpr::dimensions(void) const & {
@@ -183,7 +205,7 @@ gap::generator<Expr> OMPArrayShapingExpr::dimensions(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+      if (auto e = Expr::from_base(std::move(d15))) {
         co_yield std::move(*e);
       }
     }

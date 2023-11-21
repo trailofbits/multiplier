@@ -39,17 +39,13 @@ class AttributedType : public Type {
     return TypeKind::ATTRIBUTED;
   }
 
-  static std::optional<AttributedType> from(const Type &parent);
-
-  inline static std::optional<AttributedType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return AttributedType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AttributedType> from_base(const Type &parent);
+  inline static std::optional<AttributedType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AttributedType> from(const std::optional<Type> &parent);
   static std::optional<AttributedType> from(const Reference &r);
+  static std::optional<AttributedType> from(const VariantEntity &e);
   static std::optional<AttributedType> from(const TokenContext &t);
 
   Type desugar(void) const;

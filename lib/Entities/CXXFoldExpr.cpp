@@ -90,18 +90,30 @@ bool CXXFoldExpr::contains(const Stmt &stmt) {
 std::optional<CXXFoldExpr> CXXFoldExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXFoldExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXFoldExpr> CXXFoldExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXFoldExprDerivedKinds[] = {
     CXXFoldExpr::static_kind(),
 };
 
-std::optional<CXXFoldExpr> CXXFoldExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXFoldExpr> CXXFoldExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXFoldExpr::static_kind():
       return reinterpret_cast<const CXXFoldExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<CXXFoldExpr> CXXFoldExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXFoldExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXFoldExpr> e = CXXFoldExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXFoldExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<CXXFoldExpr> CXXFoldExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXFoldExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXFoldExpr> e = CXXFoldExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXFoldExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<CXXFoldExpr> CXXFoldExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXFoldExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXFoldExpr> e = CXXFoldExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXFoldExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,13 +163,23 @@ std::optional<CXXFoldExpr> CXXFoldExpr::from(const Reference &r) {
   return CXXFoldExpr::from(r.as_statement());
 }
 
+std::optional<CXXFoldExpr> CXXFoldExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXFoldExpr> CXXFoldExpr::from(const TokenContext &t) {
-  return CXXFoldExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 UnresolvedLookupExpr CXXFoldExpr::callee(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return UnresolvedLookupExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return UnresolvedLookupExpr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token CXXFoldExpr::ellipsis_token(void) const {
@@ -166,12 +188,12 @@ Token CXXFoldExpr::ellipsis_token(void) const {
 
 Expr CXXFoldExpr::initializer(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr CXXFoldExpr::lhs(void) const {
   RawEntityId eid = impl->reader.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token CXXFoldExpr::l_paren_token(void) const {
@@ -184,12 +206,12 @@ BinaryOperatorKind CXXFoldExpr::operator_(void) const {
 
 Expr CXXFoldExpr::pattern(void) const {
   RawEntityId eid = impl->reader.getVal42();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr CXXFoldExpr::rhs(void) const {
   RawEntityId eid = impl->reader.getVal43();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token CXXFoldExpr::r_paren_token(void) const {

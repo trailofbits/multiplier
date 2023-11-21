@@ -89,18 +89,30 @@ bool ArraySubscriptExpr::contains(const Stmt &stmt) {
 std::optional<ArraySubscriptExpr> ArraySubscriptExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ArraySubscriptExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kArraySubscriptExprDerivedKinds[] = {
     ArraySubscriptExpr::static_kind(),
 };
 
-std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ArraySubscriptExpr::static_kind():
       return reinterpret_cast<const ArraySubscriptExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<ArraySubscriptExpr> ArraySubscriptExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kArraySubscriptExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ArraySubscriptExpr> e = ArraySubscriptExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ArraySubscriptExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<ArraySubscriptExpr> ArraySubscriptExpr::in(const Fragment &frag) 
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kArraySubscriptExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ArraySubscriptExpr> e = ArraySubscriptExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ArraySubscriptExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<ArraySubscriptExpr> ArraySubscriptExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kArraySubscriptExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ArraySubscriptExpr> e = ArraySubscriptExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ArraySubscriptExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,23 +162,33 @@ std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const Reference &r) {
   return ArraySubscriptExpr::from(r.as_statement());
 }
 
+std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const TokenContext &t) {
-  return ArraySubscriptExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr ArraySubscriptExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr ArraySubscriptExpr::index(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr ArraySubscriptExpr::lhs(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token ArraySubscriptExpr::r_bracket_token(void) const {
@@ -175,7 +197,7 @@ Token ArraySubscriptExpr::r_bracket_token(void) const {
 
 Expr ArraySubscriptExpr::rhs(void) const {
   RawEntityId eid = impl->reader.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

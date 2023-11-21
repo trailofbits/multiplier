@@ -41,17 +41,13 @@ class ExclusiveTrylockFunctionAttr : public InheritableAttr {
     return AttrKind::EXCLUSIVE_TRYLOCK_FUNCTION;
   }
 
-  static std::optional<ExclusiveTrylockFunctionAttr> from(const Attr &parent);
-
-  inline static std::optional<ExclusiveTrylockFunctionAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ExclusiveTrylockFunctionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ExclusiveTrylockFunctionAttr> from_base(const Attr &parent);
+  inline static std::optional<ExclusiveTrylockFunctionAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ExclusiveTrylockFunctionAttr> from(const std::optional<Attr> &parent);
   static std::optional<ExclusiveTrylockFunctionAttr> from(const Reference &r);
+  static std::optional<ExclusiveTrylockFunctionAttr> from(const VariantEntity &e);
   static std::optional<ExclusiveTrylockFunctionAttr> from(const TokenContext &t);
 
   Expr success_value(void) const;

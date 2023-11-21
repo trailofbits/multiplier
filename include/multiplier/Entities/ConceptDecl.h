@@ -56,17 +56,13 @@ class ConceptDecl : public TemplateDecl {
   ConceptDecl canonical_declaration(void) const;
   std::optional<ConceptDecl> definition(void) const;
   gap::generator<ConceptDecl> redeclarations(void) const &;
-  static std::optional<ConceptDecl> from(const Decl &parent);
-
-  inline static std::optional<ConceptDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ConceptDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ConceptDecl> from_base(const Decl &parent);
+  inline static std::optional<ConceptDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ConceptDecl> from(const std::optional<Decl> &parent);
   static std::optional<ConceptDecl> from(const Reference &r);
+  static std::optional<ConceptDecl> from(const VariantEntity &e);
   static std::optional<ConceptDecl> from(const TokenContext &t);
 
   Expr constraint_expression(void) const;

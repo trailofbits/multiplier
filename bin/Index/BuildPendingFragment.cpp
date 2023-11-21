@@ -8,6 +8,7 @@
 
 #include "EntityMapper.h"
 #include "PASTA.h"
+#include "References.h"
 #include "TypeMapper.h"
 #include "Util.h"
 
@@ -253,8 +254,7 @@ bool PendingFragment::DoTryAdd(const Entity &entity, EntityIdMap &entity_ids,
   }
 
   auto &entity_list = EntityListFor(entity);
-  auto id = make_id(fragment_index,
-                    static_cast<mx::EntityOffset>(entity_list.size()));
+  auto id = make_id(static_cast<mx::EntityOffset>(entity_list.size()));
   entity_ids.emplace(locator, id);
   entity_list.emplace_back(entity);  // New entity found.
   return true;
@@ -264,7 +264,7 @@ bool PendingFragment::TryAdd(const pasta::Decl &entity) {
   return DoTryAdd(
       entity,
       em.entity_ids,
-      [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
+      [&, this] (mx::EntityOffset offset) {
         mx::DeclId id;
         id.fragment_id = fragment_index;
         id.offset = offset;
@@ -278,7 +278,7 @@ bool PendingFragment::TryAdd(const pasta::Stmt &entity) {
   return DoTryAdd(
       entity,
       em.token_tree_ids,
-      [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
+      [&, this] (mx::EntityOffset offset) {
         mx::StmtId id;
         id.fragment_id = fragment_index;
         id.offset = offset;
@@ -291,7 +291,7 @@ bool PendingFragment::TryAdd(const pasta::TemplateArgument &entity) {
   return DoTryAdd(
       entity,
       em.token_tree_ids,
-      [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
+      [&, this] (mx::EntityOffset offset) {
         mx::TemplateArgumentId id;
         id.fragment_id = fragment_index;
         id.offset = offset;
@@ -303,7 +303,7 @@ bool PendingFragment::TryAdd(const pasta::TemplateParameterList &entity) {
   return DoTryAdd(
       entity,
       em.token_tree_ids,
-      [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
+      [&, this] (mx::EntityOffset offset) {
         mx::TemplateParameterListId id;
         id.fragment_id = fragment_index;
         id.offset = offset;
@@ -315,7 +315,7 @@ bool PendingFragment::TryAdd(const pasta::CXXBaseSpecifier &entity) {
   return DoTryAdd(
       entity,
       em.token_tree_ids,
-      [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
+      [&, this] (mx::EntityOffset offset) {
         mx::CXXBaseSpecifierId id;
         id.fragment_id = fragment_index;
         id.offset = offset;
@@ -327,7 +327,7 @@ bool PendingFragment::TryAdd(const pasta::Designator &entity) {
   return DoTryAdd(
       entity,
       em.token_tree_ids,
-      [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
+      [&, this] (mx::EntityOffset offset) {
         mx::DesignatorId id;
         id.fragment_id = fragment_index;
         id.offset = offset;

@@ -40,17 +40,13 @@ class C11NoReturnAttr : public InheritableAttr {
     return AttrKind::C11_NO_RETURN;
   }
 
-  static std::optional<C11NoReturnAttr> from(const Attr &parent);
-
-  inline static std::optional<C11NoReturnAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return C11NoReturnAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<C11NoReturnAttr> from_base(const Attr &parent);
+  inline static std::optional<C11NoReturnAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<C11NoReturnAttr> from(const std::optional<Attr> &parent);
   static std::optional<C11NoReturnAttr> from(const Reference &r);
+  static std::optional<C11NoReturnAttr> from(const VariantEntity &e);
   static std::optional<C11NoReturnAttr> from(const TokenContext &t);
 
 };

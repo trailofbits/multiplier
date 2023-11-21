@@ -41,18 +41,30 @@ bool FunctionProtoType::contains(const Token &tok) const {
 std::optional<FunctionProtoType> FunctionProtoType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return FunctionProtoType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<FunctionProtoType> FunctionProtoType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kFunctionProtoTypeDerivedKinds[] = {
     FunctionProtoType::static_kind(),
 };
 
-std::optional<FunctionProtoType> FunctionProtoType::from(const Type &parent) {
+}  // namespace
+
+std::optional<FunctionProtoType> FunctionProtoType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case FunctionProtoType::static_kind():
       return reinterpret_cast<const FunctionProtoType &>(parent);
@@ -65,7 +77,7 @@ gap::generator<FunctionProtoType> FunctionProtoType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kFunctionProtoTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<FunctionProtoType> e = FunctionProtoType::from(Type(std::move(eptr)))) {
+      if (std::optional<FunctionProtoType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -76,8 +88,18 @@ std::optional<FunctionProtoType> FunctionProtoType::from(const Reference &r) {
   return FunctionProtoType::from(r.as_type());
 }
 
+std::optional<FunctionProtoType> FunctionProtoType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<FunctionProtoType> FunctionProtoType::from(const TokenContext &t) {
-  return FunctionProtoType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::optional<CanThrowResult> FunctionProtoType::can_throw(void) const {
@@ -105,7 +127,7 @@ std::optional<FunctionDecl> FunctionProtoType::exception_spec_declaration(void) 
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionDecl::from(Decl(std::move(eptr)));
+      return FunctionDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -118,7 +140,7 @@ std::optional<FunctionDecl> FunctionProtoType::exception_spec_template(void) con
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionDecl::from(Decl(std::move(eptr)));
+      return FunctionDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -135,7 +157,7 @@ std::optional<Expr> FunctionProtoType::noexcept_expression(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

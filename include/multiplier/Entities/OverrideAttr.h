@@ -40,17 +40,13 @@ class OverrideAttr : public InheritableAttr {
     return AttrKind::OVERRIDE;
   }
 
-  static std::optional<OverrideAttr> from(const Attr &parent);
-
-  inline static std::optional<OverrideAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OverrideAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OverrideAttr> from_base(const Attr &parent);
+  inline static std::optional<OverrideAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OverrideAttr> from(const std::optional<Attr> &parent);
   static std::optional<OverrideAttr> from(const Reference &r);
+  static std::optional<OverrideAttr> from(const VariantEntity &e);
   static std::optional<OverrideAttr> from(const TokenContext &t);
 
 };

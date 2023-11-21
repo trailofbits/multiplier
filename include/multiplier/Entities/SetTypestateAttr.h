@@ -41,17 +41,13 @@ class SetTypestateAttr : public InheritableAttr {
     return AttrKind::SET_TYPESTATE;
   }
 
-  static std::optional<SetTypestateAttr> from(const Attr &parent);
-
-  inline static std::optional<SetTypestateAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SetTypestateAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SetTypestateAttr> from_base(const Attr &parent);
+  inline static std::optional<SetTypestateAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SetTypestateAttr> from(const std::optional<Attr> &parent);
   static std::optional<SetTypestateAttr> from(const Reference &r);
+  static std::optional<SetTypestateAttr> from(const VariantEntity &e);
   static std::optional<SetTypestateAttr> from(const TokenContext &t);
 
   SetTypestateAttrConsumedState new_state(void) const;

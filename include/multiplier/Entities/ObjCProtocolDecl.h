@@ -56,17 +56,13 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   ObjCProtocolDecl canonical_declaration(void) const;
   std::optional<ObjCProtocolDecl> definition(void) const;
   gap::generator<ObjCProtocolDecl> redeclarations(void) const &;
-  static std::optional<ObjCProtocolDecl> from(const Decl &parent);
-
-  inline static std::optional<ObjCProtocolDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ObjCProtocolDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCProtocolDecl> from_base(const Decl &parent);
+  inline static std::optional<ObjCProtocolDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCProtocolDecl> from(const std::optional<Decl> &parent);
   static std::optional<ObjCProtocolDecl> from(const Reference &r);
+  static std::optional<ObjCProtocolDecl> from(const VariantEntity &e);
   static std::optional<ObjCProtocolDecl> from(const TokenContext &t);
 
   std::string_view obj_c_runtime_name_as_string(void) const;

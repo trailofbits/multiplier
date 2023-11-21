@@ -41,17 +41,13 @@ class FunctionReturnThunksAttr : public InheritableAttr {
     return AttrKind::FUNCTION_RETURN_THUNKS;
   }
 
-  static std::optional<FunctionReturnThunksAttr> from(const Attr &parent);
-
-  inline static std::optional<FunctionReturnThunksAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return FunctionReturnThunksAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<FunctionReturnThunksAttr> from_base(const Attr &parent);
+  inline static std::optional<FunctionReturnThunksAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<FunctionReturnThunksAttr> from(const std::optional<Attr> &parent);
   static std::optional<FunctionReturnThunksAttr> from(const Reference &r);
+  static std::optional<FunctionReturnThunksAttr> from(const VariantEntity &e);
   static std::optional<FunctionReturnThunksAttr> from(const TokenContext &t);
 
   FunctionReturnThunksAttrKind thunk_type(void) const;

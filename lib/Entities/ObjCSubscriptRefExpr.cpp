@@ -90,18 +90,30 @@ bool ObjCSubscriptRefExpr::contains(const Stmt &stmt) {
 std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ObjCSubscriptRefExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kObjCSubscriptRefExprDerivedKinds[] = {
     ObjCSubscriptRefExpr::static_kind(),
 };
 
-std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCSubscriptRefExpr::static_kind():
       return reinterpret_cast<const ObjCSubscriptRefExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCSubscriptRefExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ObjCSubscriptRefExpr> e = ObjCSubscriptRefExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCSubscriptRefExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCSubscriptRefExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCSubscriptRefExpr> e = ObjCSubscriptRefExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCSubscriptRefExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCSubscriptRefExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCSubscriptRefExpr> e = ObjCSubscriptRefExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ObjCSubscriptRefExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,23 +163,33 @@ std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const Reference &
   return ObjCSubscriptRefExpr::from(r.as_statement());
 }
 
+std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const TokenContext &t) {
-  return ObjCSubscriptRefExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 ObjCMethodDecl ObjCSubscriptRefExpr::at_index_method_declaration(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCMethodDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Expr ObjCSubscriptRefExpr::base_expression(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr ObjCSubscriptRefExpr::key_expression(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token ObjCSubscriptRefExpr::r_bracket_token(void) const {

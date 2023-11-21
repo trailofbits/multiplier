@@ -88,18 +88,30 @@ bool OMPDispatchDirective::contains(const Stmt &stmt) {
 std::optional<OMPDispatchDirective> OMPDispatchDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPDispatchDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPDispatchDirectiveDerivedKinds[] = {
     OMPDispatchDirective::static_kind(),
 };
 
-std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPDispatchDirective> OMPDispatchDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPDispatchDirective::static_kind():
       return reinterpret_cast<const OMPDispatchDirective &>(parent);
@@ -112,7 +124,7 @@ gap::generator<OMPDispatchDirective> OMPDispatchDirective::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPDispatchDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPDispatchDirective> e = OMPDispatchDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPDispatchDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -124,7 +136,7 @@ gap::generator<OMPDispatchDirective> OMPDispatchDirective::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPDispatchDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPDispatchDirective> e = OMPDispatchDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPDispatchDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -137,7 +149,7 @@ gap::generator<OMPDispatchDirective> OMPDispatchDirective::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPDispatchDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPDispatchDirective> e = OMPDispatchDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPDispatchDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -149,8 +161,18 @@ std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const Reference &
   return OMPDispatchDirective::from(r.as_statement());
 }
 
+std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const TokenContext &t) {
-  return OMPDispatchDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token OMPDispatchDirective::target_call_token(void) const {

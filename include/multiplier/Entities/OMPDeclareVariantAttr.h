@@ -41,17 +41,13 @@ class OMPDeclareVariantAttr : public InheritableAttr {
     return AttrKind::OMP_DECLARE_VARIANT;
   }
 
-  static std::optional<OMPDeclareVariantAttr> from(const Attr &parent);
-
-  inline static std::optional<OMPDeclareVariantAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OMPDeclareVariantAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPDeclareVariantAttr> from_base(const Attr &parent);
+  inline static std::optional<OMPDeclareVariantAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPDeclareVariantAttr> from(const std::optional<Attr> &parent);
   static std::optional<OMPDeclareVariantAttr> from(const Reference &r);
+  static std::optional<OMPDeclareVariantAttr> from(const VariantEntity &e);
   static std::optional<OMPDeclareVariantAttr> from(const TokenContext &t);
 
   Expr variant_func_reference(void) const;

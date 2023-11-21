@@ -6,6 +6,8 @@
 
 #include "Importer.h"
 
+#include <algorithm>
+#include <cctype>
 #include <cstring>
 #include <fcntl.h>
 #include <filesystem>
@@ -53,6 +55,17 @@
 
 namespace indexer {
 namespace {
+
+static const std::string_view kLanguage = "--language";
+static const std::string_view kLanguageEQ = "--language=";
+static const std::string_view kLanguageX = "-x";
+
+static std::string ToLower(std::string_view view) {
+  std::string data(view);
+  std::transform(data.begin(), data.end(), data.begin(),
+                 [](unsigned char c){ return std::tolower(c); });
+  return data;
+}
 
 struct Command {
  public:
@@ -229,8 +242,7 @@ class BuildCommandAction final : public Action {
 
   bool CanRunCompileJob(const pasta::CompileJob &job) const;
 
-  std::variant<CompilerPathInfo, std::string> GetCompilerInfo(
-      const Command &command);
+  std::variant<CompilerPathInfo, std::string> GetCompilerInfo(void);
 
  public:
   virtual ~BuildCommandAction(void) = default;
@@ -249,12 +261,37 @@ class BuildCommandAction final : public Action {
 // If we are using something like CMake commands, then pull in the relevant
 // information by trying to execute the compiler directly.
 std::variant<CompilerPathInfo, std::string>
-BuildCommandAction::GetCompilerInfo(const Command &command) {
+BuildCommandAction::GetCompilerInfo(void) {
   std::vector<std::string> new_args;
   bool skip = false;
+  bool has_output = false;
+  auto inferred_lang = "c";
+  bool specifies_language = false;
   for (const char *arg_ : command.vec) {
 
     std::string_view arg(arg_);
+
+    // Try to detect C++ code.
+    if (!specifies_language && cxx_support) {
+      if (arg.find("++") != std::string_view::npos) {
+        inferred_lang = "c++";
+
+      } else if (arg.find('.') != std::string_view::npos) {
+        std::string arg_str = ToLower(arg);
+        if (arg_str.ends_with(".cc") ||
+            arg_str.ends_with(".cpp") ||
+            arg_str.ends_with(".cxx") ||
+            arg_str.ends_with(".hpp")) {
+          inferred_lang = "c++";
+
+        } else if (arg_str.ends_with(".c")) {
+          inferred_lang = "c";
+
+        } else if (arg_str.ends_with(".s")) {
+          inferred_lang = "asm";
+        }
+      }
+    }
 
     if (skip) {
       skip = false;
@@ -274,7 +311,14 @@ BuildCommandAction::GetCompilerInfo(const Command &command) {
     // Drop things like `-Wall`, `-Werror, `-fsanitize=..`, etc.
     } else if (arg.starts_with("-W") ||
                arg.starts_with("-pedantic") ||
-               arg == "-pic-is-pie") {
+               arg.starts_with("-ftrivial-auto-var-init=") ||
+               arg.starts_with("-fpatchable-function-entry=") ||
+               arg.starts_with("-fpatchable-function-entry-offset=") ||
+               arg.starts_with("-fstrict-flex-arrays=") ||
+               arg.starts_with("-mfunction-return=") ||
+               arg == "-pic-is-pie" ||
+               arg == "-mindirect-branch-cs-prefix" ||
+               arg == "-Wno-cast-function-type-strict") {
       continue;  // Skip the argument.
 
     } else if (arg == "-mllvm" ||
@@ -303,12 +347,33 @@ BuildCommandAction::GetCompilerInfo(const Command &command) {
                arg.starts_with("-treat")) {
       continue;
 
-    // Output file.
-    } else if (arg == "-o") {
+    // Output file, `-o <file>`, `--output <arg>`.
+    } else if (arg == "-o" || arg == "--output") {
+      has_output = true;
       skip = true;
-      new_args.emplace_back(arg);
-      new_args.emplace_back("/dev/null");
       continue;
+
+    // `--output=<arg>`
+    } else if (arg.starts_with("--output=")) {
+      has_output = true;
+      continue;
+
+    // `-o<file>`, or maybe another option like `-object-file-name=...`.
+    } else if (arg.starts_with("-o") &&
+               !arg.starts_with("-output") &&
+               !arg.starts_with("-obj") &&
+               arg.find('=') == std::string_view::npos) {
+      has_output = true;
+      continue;
+
+    // Turns on the x87 FPU.
+    } else if (arg == "-x87") {
+
+    // `-x c`, `-xc`, `--language c`, `--language=c`, etc.
+    } else if (arg == kLanguageX || arg == kLanguage ||
+               arg.starts_with(kLanguageX) ||
+               arg.starts_with(kLanguageEQ)) {
+      specifies_language = true;
 
     // Something like `"-DFOO=bar"` or `'-DFOO=bar'`.
     } else if ((arg.front() == '\'' || arg.front() == '"') && arg[1] == '-' &&
@@ -323,13 +388,24 @@ BuildCommandAction::GetCompilerInfo(const Command &command) {
   new_args.emplace_back("-Wno-everything");  // Disable all warnings (Clang).
   new_args.emplace_back("-P");  // Disable preprocessor line markers.
   new_args.emplace_back("-v");
-//  new_args.emplace_back("-dD");  // Print macro definitions in -E mode.
-//  new_args.emplace_back("-E");  // Only run the preprocessor.
+
+  // Disable color diagnostics so that we can match on things like `error:`.
+  new_args.emplace_back("-fdiagnostics-color=never");
+
+  if (!specifies_language) {
+    new_args.push_back("-x");
+    new_args.push_back(inferred_lang);   
+  }
 
   // Include a non-existent file. This guarantees a fatal error in all cases,
   // which prevents any compilation jobs from proceeding.
   new_args.emplace_back("-include");
   new_args.emplace_back("/trail/of/bits");
+
+  if (has_output) {
+    new_args.emplace_back("-o");
+    new_args.emplace_back("/dev/null");
+  }
 
   CompilerPathInfo output;
   auto ret = Subprocess::Execute(
@@ -344,11 +420,13 @@ BuildCommandAction::GetCompilerInfo(const Command &command) {
       it == std::string::npos) {
     if (std::holds_alternative<std::error_code>(ret)) {
       return std::get<std::error_code>(ret).message();
+    
     } else if (it = output.sysroot.find("error: "); it != std::string::npos) {
       while (!output.sysroot.empty() && output.sysroot.back() == '\n') {
         output.sysroot.pop_back();
       }
       return output.sysroot.substr(it + 7);
+
     } else {
       return "Unknown error: " + output.sysroot;
     }
@@ -379,22 +457,36 @@ BuildCommandAction::GetCompilerInfo(const Command &command) {
 }
 
 bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) const {
+
   const auto &args = job.Arguments();
   for (auto it = args.begin(); it != args.end(); ++it) {
     std::string_view arg = *it;
-    if (arg != "-x") {
+    
+    // `-x c`, `-x c++`, `--language c`, `--language c++`, etc.
+    if (arg == kLanguageX || arg == kLanguage) {
+      // Skip to the value after `-x`.
+      ++it;
+      if (it == args.end()) {
+        break;  // No language specified?
+      }
+      
+      // Next argument after opt_x flag will be lang value; Compare
+      // it with the supported language i.e. C.
+      arg = *it;
+
+    // `--language=c`, `--language=c++`, etc.
+    } else if (arg.starts_with(kLanguageEQ)) {
+      arg = arg.substr(kLanguageEQ.size());
+
+    // `-xc`, `-xc++`, etc.
+    } else if (arg.starts_with(kLanguageX) && arg != "-x87") {
+      arg = arg.substr(kLanguageX.size());
+
+    // Skip.
+    } else {
       continue;
     }
-    
-    // Skip to the value after `-x`.
-    ++it;
-    if (it == args.end()) {
-      break;  // No language specified?
-    }
-    
-    // Next argument after opt_x flag will be lang value; Compare
-    // it with the supported language i.e. C.
-    arg = *it;
+
     if (arg == "c" || (arg == "c++" && cxx_support)) {
 
     } else {
@@ -418,7 +510,8 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
   auto maybe_jobs = cc.CreateJobsForCommand(cmd);
   if (!maybe_jobs.Succeeded()) {
     LOG(ERROR)
-        << "Unable to create compile jobs: " << maybe_jobs.TakeError();
+        << "Unable to create compile jobs: " << maybe_jobs.TakeError()
+        << "; command was: " << cmd.Arguments().Join();
     return;
   }
 
@@ -461,7 +554,7 @@ void BuildCommandAction::Run(void) {
     return;
   }
 
-  auto maybe_cc_info = GetCompilerInfo(command);
+  auto maybe_cc_info = GetCompilerInfo();
   if (!std::holds_alternative<CompilerPathInfo>(maybe_cc_info)) {
     LOG(ERROR)
         << "Error invoking original compiler to find version information: "
@@ -484,17 +577,11 @@ void BuildCommandAction::Run(void) {
 
   LOG(ERROR)
       << "Unable to create command-specific compiler: " << maybe_cc.TakeError()
-      << "; falling back to host compiler for command " << command.vec.Join();
+      << "; skipping command " << command.vec.Join();
 
-  maybe_cc = pasta::Compiler::CreateHostCompiler(fm, command.lang);
-  if (maybe_cc.Succeeded()) {
-    RunWithCompiler(maybe_cmd.TakeValue(), maybe_cc.TakeValue());
-    return;
-  }
-
-  LOG(ERROR)
-      << "Unable to create host compiler " << maybe_cc.TakeError()
-      << " for command " << command.vec.Join();
+  // NOTE(pag): We don't fall back on `pasta::Compiler::CreateHostCompiler`
+  //            because that is based on the host compiler used to compile
+  //            PASTA itself, which may be on a totally different machine.
 }
 
 }  // namespace

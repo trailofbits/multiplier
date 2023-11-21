@@ -37,17 +37,13 @@ class TypedefType : public Type {
     return TypeKind::TYPEDEF;
   }
 
-  static std::optional<TypedefType> from(const Type &parent);
-
-  inline static std::optional<TypedefType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return TypedefType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TypedefType> from_base(const Type &parent);
+  inline static std::optional<TypedefType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TypedefType> from(const std::optional<Type> &parent);
   static std::optional<TypedefType> from(const Reference &r);
+  static std::optional<TypedefType> from(const VariantEntity &e);
   static std::optional<TypedefType> from(const TokenContext &t);
 
   Type desugar(void) const;

@@ -36,17 +36,13 @@ class PackExpansionType : public Type {
     return TypeKind::PACK_EXPANSION;
   }
 
-  static std::optional<PackExpansionType> from(const Type &parent);
-
-  inline static std::optional<PackExpansionType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return PackExpansionType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PackExpansionType> from_base(const Type &parent);
+  inline static std::optional<PackExpansionType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PackExpansionType> from(const std::optional<Type> &parent);
   static std::optional<PackExpansionType> from(const Reference &r);
+  static std::optional<PackExpansionType> from(const VariantEntity &e);
   static std::optional<PackExpansionType> from(const TokenContext &t);
 
   Type desugar(void) const;

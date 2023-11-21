@@ -41,17 +41,13 @@ class SwiftErrorAttr : public InheritableAttr {
     return AttrKind::SWIFT_ERROR;
   }
 
-  static std::optional<SwiftErrorAttr> from(const Attr &parent);
-
-  inline static std::optional<SwiftErrorAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SwiftErrorAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SwiftErrorAttr> from_base(const Attr &parent);
+  inline static std::optional<SwiftErrorAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SwiftErrorAttr> from(const std::optional<Attr> &parent);
   static std::optional<SwiftErrorAttr> from(const Reference &r);
+  static std::optional<SwiftErrorAttr> from(const VariantEntity &e);
   static std::optional<SwiftErrorAttr> from(const TokenContext &t);
 
   SwiftErrorAttrConventionKind convention(void) const;

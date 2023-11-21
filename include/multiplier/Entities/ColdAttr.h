@@ -40,17 +40,13 @@ class ColdAttr : public InheritableAttr {
     return AttrKind::COLD;
   }
 
-  static std::optional<ColdAttr> from(const Attr &parent);
-
-  inline static std::optional<ColdAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ColdAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ColdAttr> from_base(const Attr &parent);
+  inline static std::optional<ColdAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ColdAttr> from(const std::optional<Attr> &parent);
   static std::optional<ColdAttr> from(const Reference &r);
+  static std::optional<ColdAttr> from(const VariantEntity &e);
   static std::optional<ColdAttr> from(const TokenContext &t);
 
 };

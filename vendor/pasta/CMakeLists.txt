@@ -53,6 +53,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DPASTA_ENABLE_TESTING:BOOL=OFF
                         -DPASTA_ENABLE_PY_BINDINGS:BOOL=OFF
                         -DPASTA_USE_VENDORED_CLANG:BOOL=OFF
+                        -DPASTA_DISABLE_HOST_COMPILER:BOOL=ON
                         -DPASTA_ENABLE_INSTALL:BOOL=ON
                         "-DLLVM_DIR=${LLVM_DIR}"
                         "-DClang_DIR=${Clang_DIR}"

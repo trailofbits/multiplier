@@ -25,10 +25,6 @@ namespace mx {
       id.fragment_id = impl->fragment_id.Unpack().fragment_id; \
       id.offset = impl->offset; \
       return id; \
-    } \
-    \
-    gap::generator<Reference> name::references(void) const & { \
-      return References(impl->ep, id().Pack()); \
     }
 
 MX_FOR_EACH_PSEUDO(MX_DEFINE_PSEUDO)

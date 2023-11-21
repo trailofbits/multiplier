@@ -41,17 +41,13 @@ class ReleaseCapabilityAttr : public InheritableAttr {
     return AttrKind::RELEASE_CAPABILITY;
   }
 
-  static std::optional<ReleaseCapabilityAttr> from(const Attr &parent);
-
-  inline static std::optional<ReleaseCapabilityAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ReleaseCapabilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ReleaseCapabilityAttr> from_base(const Attr &parent);
+  inline static std::optional<ReleaseCapabilityAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ReleaseCapabilityAttr> from(const std::optional<Attr> &parent);
   static std::optional<ReleaseCapabilityAttr> from(const Reference &r);
+  static std::optional<ReleaseCapabilityAttr> from(const VariantEntity &e);
   static std::optional<ReleaseCapabilityAttr> from(const TokenContext &t);
 
   ReleaseCapabilityAttrSpelling semantic_spelling(void) const;

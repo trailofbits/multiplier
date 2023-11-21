@@ -42,20 +42,22 @@ static mx::PackedDeclId CanonicalId(mx::ValueDecl vd) {
 }
 
 void TaintTrack(mx::FunctionDecl &func, TaintMap &map) {
-  for (mx::CallExpr call : func.callers()) {
-    std::optional<mx::Expr> haystack_arg =
-        call.nth_argument(FLAGS_argument_index);
-    if (!haystack_arg) {
-      continue;
-    }
+  for (mx::Stmt stmt : func.callers()) {
+    if (auto call = mx::CallExpr::from(stmt)) {
+      std::optional<mx::Expr> haystack_arg =
+          call->nth_argument(FLAGS_argument_index);
+      if (!haystack_arg) {
+        continue;
+      }
 
-    std::optional<mx::DeclRefExpr> ptr_arg =
-        mx::DeclRefExpr::from(haystack_arg->ignore_casts());
-    if (!ptr_arg) {
-      continue;
-    }
+      std::optional<mx::DeclRefExpr> ptr_arg =
+          mx::DeclRefExpr::from(haystack_arg->ignore_casts());
+      if (!ptr_arg) {
+        continue;
+      }
 
-    map[CanonicalId(ptr_arg->declaration())].push_back(call);
+      map[CanonicalId(ptr_arg->declaration())].push_back(call.value());
+    }
   }
 }
 

@@ -40,17 +40,13 @@ class NoThrowAttr : public InheritableAttr {
     return AttrKind::NO_THROW;
   }
 
-  static std::optional<NoThrowAttr> from(const Attr &parent);
-
-  inline static std::optional<NoThrowAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoThrowAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoThrowAttr> from_base(const Attr &parent);
+  inline static std::optional<NoThrowAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoThrowAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoThrowAttr> from(const Reference &r);
+  static std::optional<NoThrowAttr> from(const VariantEntity &e);
   static std::optional<NoThrowAttr> from(const TokenContext &t);
 
 };

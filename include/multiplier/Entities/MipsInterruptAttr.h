@@ -41,17 +41,13 @@ class MipsInterruptAttr : public InheritableAttr {
     return AttrKind::MIPS_INTERRUPT;
   }
 
-  static std::optional<MipsInterruptAttr> from(const Attr &parent);
-
-  inline static std::optional<MipsInterruptAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MipsInterruptAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MipsInterruptAttr> from_base(const Attr &parent);
+  inline static std::optional<MipsInterruptAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MipsInterruptAttr> from(const std::optional<Attr> &parent);
   static std::optional<MipsInterruptAttr> from(const Reference &r);
+  static std::optional<MipsInterruptAttr> from(const VariantEntity &e);
   static std::optional<MipsInterruptAttr> from(const TokenContext &t);
 
   MipsInterruptAttrInterruptType interrupt(void) const;

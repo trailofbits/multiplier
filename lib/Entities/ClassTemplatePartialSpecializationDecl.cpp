@@ -93,7 +93,7 @@ bool ClassTemplatePartialSpecializationDecl::contains(const Stmt &stmt) {
 }
 
 ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::canonical_declaration(void) const {
-  if (auto canon = ClassTemplatePartialSpecializationDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (ClassTemplatePartialSpecializationDecl redecl : redeclarations()) {
@@ -103,12 +103,15 @@ ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::c
 }
 
 std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::definition(void) const {
-  return ClassTemplatePartialSpecializationDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<ClassTemplatePartialSpecializationDecl> dr = ClassTemplatePartialSpecializationDecl::from(r)) {
+    if (std::optional<ClassTemplatePartialSpecializationDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -121,18 +124,30 @@ gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpeci
 std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return ClassTemplatePartialSpecializationDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kClassTemplatePartialSpecializationDeclDerivedKinds[] = {
     ClassTemplatePartialSpecializationDecl::static_kind(),
 };
 
-std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case ClassTemplatePartialSpecializationDecl::static_kind():
       return reinterpret_cast<const ClassTemplatePartialSpecializationDecl &>(parent);
@@ -145,7 +160,7 @@ gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpeci
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kClassTemplatePartialSpecializationDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<ClassTemplatePartialSpecializationDecl> e = ClassTemplatePartialSpecializationDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ClassTemplatePartialSpecializationDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -157,7 +172,7 @@ gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpeci
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kClassTemplatePartialSpecializationDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<ClassTemplatePartialSpecializationDecl> e = ClassTemplatePartialSpecializationDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ClassTemplatePartialSpecializationDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -170,7 +185,7 @@ gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpeci
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kClassTemplatePartialSpecializationDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<ClassTemplatePartialSpecializationDecl> e = ClassTemplatePartialSpecializationDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<ClassTemplatePartialSpecializationDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -182,8 +197,18 @@ std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecia
   return ClassTemplatePartialSpecializationDecl::from(r.as_declaration());
 }
 
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const TokenContext &t) {
-  return ClassTemplatePartialSpecializationDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type ClassTemplatePartialSpecializationDecl::injected_specialization_type(void) const {
@@ -193,12 +218,12 @@ Type ClassTemplatePartialSpecializationDecl::injected_specialization_type(void) 
 
 ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
   RawEntityId eid = impl->reader.getVal181();
-  return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ClassTemplatePartialSpecializationDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member_template(void) const {
   RawEntityId eid = impl->reader.getVal357();
-  return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ClassTemplatePartialSpecializationDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 TemplateParameterList ClassTemplatePartialSpecializationDecl::template_parameters(void) const {

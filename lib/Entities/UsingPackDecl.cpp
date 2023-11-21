@@ -86,7 +86,7 @@ bool UsingPackDecl::contains(const Stmt &stmt) {
 }
 
 UsingPackDecl UsingPackDecl::canonical_declaration(void) const {
-  if (auto canon = UsingPackDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (UsingPackDecl redecl : redeclarations()) {
@@ -96,12 +96,15 @@ UsingPackDecl UsingPackDecl::canonical_declaration(void) const {
 }
 
 std::optional<UsingPackDecl> UsingPackDecl::definition(void) const {
-  return UsingPackDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<UsingPackDecl> UsingPackDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<UsingPackDecl> dr = UsingPackDecl::from(r)) {
+    if (std::optional<UsingPackDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -114,18 +117,30 @@ gap::generator<UsingPackDecl> UsingPackDecl::redeclarations(void) const & {
 std::optional<UsingPackDecl> UsingPackDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return UsingPackDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<UsingPackDecl> UsingPackDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kUsingPackDeclDerivedKinds[] = {
     UsingPackDecl::static_kind(),
 };
 
-std::optional<UsingPackDecl> UsingPackDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<UsingPackDecl> UsingPackDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case UsingPackDecl::static_kind():
       return reinterpret_cast<const UsingPackDecl &>(parent);
@@ -138,7 +153,7 @@ gap::generator<UsingPackDecl> UsingPackDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kUsingPackDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<UsingPackDecl> e = UsingPackDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<UsingPackDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -150,7 +165,7 @@ gap::generator<UsingPackDecl> UsingPackDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kUsingPackDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<UsingPackDecl> e = UsingPackDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<UsingPackDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -163,7 +178,7 @@ gap::generator<UsingPackDecl> UsingPackDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kUsingPackDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<UsingPackDecl> e = UsingPackDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<UsingPackDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -175,8 +190,18 @@ std::optional<UsingPackDecl> UsingPackDecl::from(const Reference &r) {
   return UsingPackDecl::from(r.as_declaration());
 }
 
+std::optional<UsingPackDecl> UsingPackDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<UsingPackDecl> UsingPackDecl::from(const TokenContext &t) {
-  return UsingPackDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 unsigned UsingPackDecl::num_expansions(void) const {
@@ -194,7 +219,7 @@ std::optional<NamedDecl> UsingPackDecl::nth_expansion(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return NamedDecl::from(Decl(std::move(e)));
+  return NamedDecl::from_base(std::move(e));
 }
 
 gap::generator<NamedDecl> UsingPackDecl::expansions(void) const & {
@@ -203,7 +228,7 @@ gap::generator<NamedDecl> UsingPackDecl::expansions(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d51 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from(Decl(std::move(d51)))) {
+      if (auto e = NamedDecl::from_base(std::move(d51))) {
         co_yield std::move(*e);
       }
     }
@@ -213,7 +238,7 @@ gap::generator<NamedDecl> UsingPackDecl::expansions(void) const & {
 
 NamedDecl UsingPackDecl::instantiated_from_using_declaration(void) const {
   RawEntityId eid = impl->reader.getVal56();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

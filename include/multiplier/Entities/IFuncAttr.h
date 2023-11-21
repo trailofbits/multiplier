@@ -38,17 +38,13 @@ class IFuncAttr : public Attr {
     return AttrKind::I_FUNC;
   }
 
-  static std::optional<IFuncAttr> from(const Attr &parent);
-
-  inline static std::optional<IFuncAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return IFuncAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<IFuncAttr> from_base(const Attr &parent);
+  inline static std::optional<IFuncAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<IFuncAttr> from(const std::optional<Attr> &parent);
   static std::optional<IFuncAttr> from(const Reference &r);
+  static std::optional<IFuncAttr> from(const VariantEntity &e);
   static std::optional<IFuncAttr> from(const TokenContext &t);
 
   std::string_view resolver(void) const;

@@ -89,7 +89,7 @@ bool OMPDeclareMapperDecl::contains(const Stmt &stmt) {
 }
 
 OMPDeclareMapperDecl OMPDeclareMapperDecl::canonical_declaration(void) const {
-  if (auto canon = OMPDeclareMapperDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (OMPDeclareMapperDecl redecl : redeclarations()) {
@@ -99,12 +99,15 @@ OMPDeclareMapperDecl OMPDeclareMapperDecl::canonical_declaration(void) const {
 }
 
 std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::definition(void) const {
-  return OMPDeclareMapperDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<OMPDeclareMapperDecl> dr = OMPDeclareMapperDecl::from(r)) {
+    if (std::optional<OMPDeclareMapperDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -117,18 +120,30 @@ gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::redeclarations(void) 
 std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return OMPDeclareMapperDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kOMPDeclareMapperDeclDerivedKinds[] = {
     OMPDeclareMapperDecl::static_kind(),
 };
 
-std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case OMPDeclareMapperDecl::static_kind():
       return reinterpret_cast<const OMPDeclareMapperDecl &>(parent);
@@ -141,7 +156,7 @@ gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kOMPDeclareMapperDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<OMPDeclareMapperDecl> e = OMPDeclareMapperDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<OMPDeclareMapperDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -153,7 +168,7 @@ gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kOMPDeclareMapperDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<OMPDeclareMapperDecl> e = OMPDeclareMapperDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<OMPDeclareMapperDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -166,7 +181,7 @@ gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kOMPDeclareMapperDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<OMPDeclareMapperDecl> e = OMPDeclareMapperDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<OMPDeclareMapperDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -178,13 +193,23 @@ std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const Reference &
   return OMPDeclareMapperDecl::from(r.as_declaration());
 }
 
+std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const TokenContext &t) {
-  return OMPDeclareMapperDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr OMPDeclareMapperDecl::mapper_variable_reference(void) const {
   RawEntityId eid = impl->reader.getVal58();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 gap::generator<Decl> OMPDeclareMapperDecl::declarations_in_context(void) const & {

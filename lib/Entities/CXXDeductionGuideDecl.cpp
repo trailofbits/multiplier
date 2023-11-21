@@ -91,7 +91,7 @@ bool CXXDeductionGuideDecl::contains(const Stmt &stmt) {
 }
 
 CXXDeductionGuideDecl CXXDeductionGuideDecl::canonical_declaration(void) const {
-  if (auto canon = CXXDeductionGuideDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (CXXDeductionGuideDecl redecl : redeclarations()) {
@@ -101,12 +101,15 @@ CXXDeductionGuideDecl CXXDeductionGuideDecl::canonical_declaration(void) const {
 }
 
 std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::definition(void) const {
-  return CXXDeductionGuideDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<CXXDeductionGuideDecl> dr = CXXDeductionGuideDecl::from(r)) {
+    if (std::optional<CXXDeductionGuideDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -119,18 +122,30 @@ gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::redeclarations(void
 std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return CXXDeductionGuideDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kCXXDeductionGuideDeclDerivedKinds[] = {
     CXXDeductionGuideDecl::static_kind(),
 };
 
-std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case CXXDeductionGuideDecl::static_kind():
       return reinterpret_cast<const CXXDeductionGuideDecl &>(parent);
@@ -143,7 +158,7 @@ gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::in(const Index &ind
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kCXXDeductionGuideDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<CXXDeductionGuideDecl> e = CXXDeductionGuideDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<CXXDeductionGuideDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -155,7 +170,7 @@ gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::in(const Fragment &
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kCXXDeductionGuideDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<CXXDeductionGuideDecl> e = CXXDeductionGuideDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<CXXDeductionGuideDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -168,7 +183,7 @@ gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::in(const File &file
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kCXXDeductionGuideDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<CXXDeductionGuideDecl> e = CXXDeductionGuideDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<CXXDeductionGuideDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -180,18 +195,28 @@ std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const Reference
   return CXXDeductionGuideDecl::from(r.as_declaration());
 }
 
+std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const TokenContext &t) {
-  return CXXDeductionGuideDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 CXXConstructorDecl CXXDeductionGuideDecl::corresponding_constructor(void) const {
   RawEntityId eid = impl->reader.getVal169();
-  return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return CXXConstructorDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 TemplateDecl CXXDeductionGuideDecl::deduced_template(void) const {
   RawEntityId eid = impl->reader.getVal170();
-  return TemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return TemplateDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 DeductionCandidate CXXDeductionGuideDecl::deduction_candidate_kind(void) const {

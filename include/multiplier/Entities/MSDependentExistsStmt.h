@@ -49,17 +49,13 @@ class MSDependentExistsStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<MSDependentExistsStmt> from(const Stmt &parent);
-
-  inline static std::optional<MSDependentExistsStmt> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return MSDependentExistsStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MSDependentExistsStmt> from_base(const Stmt &parent);
+  inline static std::optional<MSDependentExistsStmt> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MSDependentExistsStmt> from(const std::optional<Stmt> &parent);
   static std::optional<MSDependentExistsStmt> from(const Reference &r);
+  static std::optional<MSDependentExistsStmt> from(const VariantEntity &e);
   static std::optional<MSDependentExistsStmt> from(const TokenContext &t);
 
   Token keyword_token(void) const;

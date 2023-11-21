@@ -40,17 +40,13 @@ class ScopedLockableAttr : public InheritableAttr {
     return AttrKind::SCOPED_LOCKABLE;
   }
 
-  static std::optional<ScopedLockableAttr> from(const Attr &parent);
-
-  inline static std::optional<ScopedLockableAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ScopedLockableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ScopedLockableAttr> from_base(const Attr &parent);
+  inline static std::optional<ScopedLockableAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ScopedLockableAttr> from(const std::optional<Attr> &parent);
   static std::optional<ScopedLockableAttr> from(const Reference &r);
+  static std::optional<ScopedLockableAttr> from(const VariantEntity &e);
   static std::optional<ScopedLockableAttr> from(const TokenContext &t);
 
 };

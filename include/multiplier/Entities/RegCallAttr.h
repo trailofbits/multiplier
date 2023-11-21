@@ -40,17 +40,13 @@ class RegCallAttr : public InheritableAttr {
     return AttrKind::REG_CALL;
   }
 
-  static std::optional<RegCallAttr> from(const Attr &parent);
-
-  inline static std::optional<RegCallAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return RegCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<RegCallAttr> from_base(const Attr &parent);
+  inline static std::optional<RegCallAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<RegCallAttr> from(const std::optional<Attr> &parent);
   static std::optional<RegCallAttr> from(const Reference &r);
+  static std::optional<RegCallAttr> from(const VariantEntity &e);
   static std::optional<RegCallAttr> from(const TokenContext &t);
 
 };

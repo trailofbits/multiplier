@@ -91,18 +91,30 @@ bool RequiresExpr::contains(const Stmt &stmt) {
 std::optional<RequiresExpr> RequiresExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return RequiresExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<RequiresExpr> RequiresExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kRequiresExprDerivedKinds[] = {
     RequiresExpr::static_kind(),
 };
 
-std::optional<RequiresExpr> RequiresExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<RequiresExpr> RequiresExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case RequiresExpr::static_kind():
       return reinterpret_cast<const RequiresExpr &>(parent);
@@ -115,7 +127,7 @@ gap::generator<RequiresExpr> RequiresExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kRequiresExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<RequiresExpr> e = RequiresExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<RequiresExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -127,7 +139,7 @@ gap::generator<RequiresExpr> RequiresExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kRequiresExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<RequiresExpr> e = RequiresExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<RequiresExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -140,7 +152,7 @@ gap::generator<RequiresExpr> RequiresExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kRequiresExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<RequiresExpr> e = RequiresExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<RequiresExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -152,13 +164,23 @@ std::optional<RequiresExpr> RequiresExpr::from(const Reference &r) {
   return RequiresExpr::from(r.as_statement());
 }
 
+std::optional<RequiresExpr> RequiresExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<RequiresExpr> RequiresExpr::from(const TokenContext &t) {
-  return RequiresExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 RequiresExprBodyDecl RequiresExpr::body(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return RequiresExprBodyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return RequiresExprBodyDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 unsigned RequiresExpr::num_local_parameters(void) const {
@@ -176,7 +198,7 @@ std::optional<ParmVarDecl> RequiresExpr::nth_local_parameter(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return ParmVarDecl::from(Decl(std::move(e)));
+  return ParmVarDecl::from_base(std::move(e));
 }
 
 gap::generator<ParmVarDecl> RequiresExpr::local_parameters(void) const & {
@@ -185,7 +207,7 @@ gap::generator<ParmVarDecl> RequiresExpr::local_parameters(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->DeclFor(ep, v)) {
-      if (auto e = ParmVarDecl::from(Decl(std::move(d15)))) {
+      if (auto e = ParmVarDecl::from_base(std::move(d15))) {
         co_yield std::move(*e);
       }
     }

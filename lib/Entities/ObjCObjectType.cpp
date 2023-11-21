@@ -40,19 +40,31 @@ bool ObjCObjectType::contains(const Token &tok) const {
 std::optional<ObjCObjectType> ObjCObjectType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return ObjCObjectType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCObjectType> ObjCObjectType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kObjCObjectTypeDerivedKinds[] = {
     ObjCObjectType::static_kind(),
     ObjCInterfaceType::static_kind(),
 };
 
-std::optional<ObjCObjectType> ObjCObjectType::from(const Type &parent) {
+}  // namespace
+
+std::optional<ObjCObjectType> ObjCObjectType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case ObjCObjectType::static_kind():
     case ObjCInterfaceType::static_kind():
@@ -66,7 +78,7 @@ gap::generator<ObjCObjectType> ObjCObjectType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kObjCObjectTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<ObjCObjectType> e = ObjCObjectType::from(Type(std::move(eptr)))) {
+      if (std::optional<ObjCObjectType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -77,8 +89,18 @@ std::optional<ObjCObjectType> ObjCObjectType::from(const Reference &r) {
   return ObjCObjectType::from(r.as_type());
 }
 
+std::optional<ObjCObjectType> ObjCObjectType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<ObjCObjectType> ObjCObjectType::from(const TokenContext &t) {
-  return ObjCObjectType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type ObjCObjectType::desugar(void) const {
@@ -93,7 +115,7 @@ Type ObjCObjectType::base_type(void) const {
 
 ObjCInterfaceDecl ObjCObjectType::interface(void) const {
   RawEntityId eid = impl->reader.getVal25();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 std::optional<Type> ObjCObjectType::super_class_type(void) const {

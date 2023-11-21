@@ -42,17 +42,13 @@ class MacroVAOpt : public Macro {
   static gap::generator<MacroVAOpt> containing(const Token &token);
   bool contains(const Token &token);
 
-  static std::optional<MacroVAOpt> from(const Macro &parent);
-
-  inline static std::optional<MacroVAOpt> from(const std::optional<Macro> &parent) {
-    if (parent) {
-      return MacroVAOpt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MacroVAOpt> from_base(const Macro &parent);
+  inline static std::optional<MacroVAOpt> from(const Macro &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MacroVAOpt> from(const std::optional<Macro> &parent);
   static std::optional<MacroVAOpt> from(const Reference &r);
+  static std::optional<MacroVAOpt> from(const VariantEntity &e);
   static std::optional<MacroVAOpt> from(const TokenContext &t);
 
   bool contents_are_elided(void) const;

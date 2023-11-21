@@ -40,17 +40,13 @@ class WebAssemblyFuncrefAttr : public TypeAttr {
     return AttrKind::WEB_ASSEMBLY_FUNCREF;
   }
 
-  static std::optional<WebAssemblyFuncrefAttr> from(const Attr &parent);
-
-  inline static std::optional<WebAssemblyFuncrefAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return WebAssemblyFuncrefAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<WebAssemblyFuncrefAttr> from_base(const Attr &parent);
+  inline static std::optional<WebAssemblyFuncrefAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<WebAssemblyFuncrefAttr> from(const std::optional<Attr> &parent);
   static std::optional<WebAssemblyFuncrefAttr> from(const Reference &r);
+  static std::optional<WebAssemblyFuncrefAttr> from(const VariantEntity &e);
   static std::optional<WebAssemblyFuncrefAttr> from(const TokenContext &t);
 
 };

@@ -40,17 +40,13 @@ class AMDGPUNumSGPRAttr : public InheritableAttr {
     return AttrKind::AMDGPU_NUM_SGPR;
   }
 
-  static std::optional<AMDGPUNumSGPRAttr> from(const Attr &parent);
-
-  inline static std::optional<AMDGPUNumSGPRAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AMDGPUNumSGPRAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AMDGPUNumSGPRAttr> from_base(const Attr &parent);
+  inline static std::optional<AMDGPUNumSGPRAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AMDGPUNumSGPRAttr> from(const std::optional<Attr> &parent);
   static std::optional<AMDGPUNumSGPRAttr> from(const Reference &r);
+  static std::optional<AMDGPUNumSGPRAttr> from(const VariantEntity &e);
   static std::optional<AMDGPUNumSGPRAttr> from(const TokenContext &t);
 
 };

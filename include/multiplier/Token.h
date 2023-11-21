@@ -44,7 +44,32 @@ enum class TokenCategory : unsigned char;
 class SimpleToken;  // Defined in Index.h due to `VariantEntity`.
 using CustomToken = std::variant<SimpleToken, Token>;
 
-// A single token, e.g. from a file or from a macro expansion.
+// A single token, e.g. from a file or from a macro expansion. There are several
+// types of tokens, and they can be distinguished by way of the token ID, when
+// it is unpacked to a `VariantId`.
+//
+//    1)  File tokens: these are derived from the token stream when Clang lexed
+//        a file. File tokens might not have the "most resolved" kinds. For
+//        example, a file token might present itself as being a keyword, but
+//        when it is pre-processed, it ends up being interpreted as an
+//        identifier because a macro is defined with the same name. These tokens
+//        are never referenced directly by AST nodes. These tokens are
+//        identified by `FileTokenId`s.
+//
+//    2)  Macro tokens: these are how the C preprocessor sees the tokens. These
+//        tokens are never referenced directly by AST nodes. These tokens are
+//        identified by `MacroTokenId`s.
+//        
+//    3)  Parsed tokens: these tokens are the final result of pre-processing,
+//        and thus there is a 1:1 mapping between each parsed token and a macro
+//        token. These tokens are the only ones referenced by non-`Type` AST
+//        nodes, i.e. `Decl`, `Stmt`, etc. These tokens are identified by
+//        `ParsedTokenId`s.
+//
+//    4)  Type tokens: these tokens are used to visually represent `Type` AST
+//        nodes. They should be the only tokens referenced by `Type`-related
+//        AST nodes, and no other AST nodes should ever reference `Type` tokens.
+//        These tokens are identified by `TypeTokenId`s.
 class Token final {
  private:
   friend class Compilation;
@@ -93,9 +118,6 @@ class Token final {
   inline bool operator==(const Token &that) const noexcept {
     return id().Pack() == that.id().Pack();
   }
-
-  // References to this token.
-  gap::generator<Reference> references(void) const &;
 
   // Return the context node that identifies how this token relates to the AST.
   //

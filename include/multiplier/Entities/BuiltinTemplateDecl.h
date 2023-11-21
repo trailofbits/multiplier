@@ -55,17 +55,13 @@ class BuiltinTemplateDecl : public TemplateDecl {
   BuiltinTemplateDecl canonical_declaration(void) const;
   std::optional<BuiltinTemplateDecl> definition(void) const;
   gap::generator<BuiltinTemplateDecl> redeclarations(void) const &;
-  static std::optional<BuiltinTemplateDecl> from(const Decl &parent);
-
-  inline static std::optional<BuiltinTemplateDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return BuiltinTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<BuiltinTemplateDecl> from_base(const Decl &parent);
+  inline static std::optional<BuiltinTemplateDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<BuiltinTemplateDecl> from(const std::optional<Decl> &parent);
   static std::optional<BuiltinTemplateDecl> from(const Reference &r);
+  static std::optional<BuiltinTemplateDecl> from(const VariantEntity &e);
   static std::optional<BuiltinTemplateDecl> from(const TokenContext &t);
 
 };

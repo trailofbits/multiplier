@@ -87,7 +87,7 @@ bool OMPAllocateDecl::contains(const Stmt &stmt) {
 }
 
 OMPAllocateDecl OMPAllocateDecl::canonical_declaration(void) const {
-  if (auto canon = OMPAllocateDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (OMPAllocateDecl redecl : redeclarations()) {
@@ -97,12 +97,15 @@ OMPAllocateDecl OMPAllocateDecl::canonical_declaration(void) const {
 }
 
 std::optional<OMPAllocateDecl> OMPAllocateDecl::definition(void) const {
-  return OMPAllocateDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<OMPAllocateDecl> OMPAllocateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<OMPAllocateDecl> dr = OMPAllocateDecl::from(r)) {
+    if (std::optional<OMPAllocateDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -115,18 +118,30 @@ gap::generator<OMPAllocateDecl> OMPAllocateDecl::redeclarations(void) const & {
 std::optional<OMPAllocateDecl> OMPAllocateDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return OMPAllocateDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kOMPAllocateDeclDerivedKinds[] = {
     OMPAllocateDecl::static_kind(),
 };
 
-std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<OMPAllocateDecl> OMPAllocateDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case OMPAllocateDecl::static_kind():
       return reinterpret_cast<const OMPAllocateDecl &>(parent);
@@ -139,7 +154,7 @@ gap::generator<OMPAllocateDecl> OMPAllocateDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kOMPAllocateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<OMPAllocateDecl> e = OMPAllocateDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<OMPAllocateDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -151,7 +166,7 @@ gap::generator<OMPAllocateDecl> OMPAllocateDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kOMPAllocateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<OMPAllocateDecl> e = OMPAllocateDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<OMPAllocateDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -164,7 +179,7 @@ gap::generator<OMPAllocateDecl> OMPAllocateDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kOMPAllocateDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<OMPAllocateDecl> e = OMPAllocateDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<OMPAllocateDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -176,8 +191,18 @@ std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const Reference &r) {
   return OMPAllocateDecl::from(r.as_declaration());
 }
 
+std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const TokenContext &t) {
-  return OMPAllocateDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 unsigned OMPAllocateDecl::num_varlists(void) const {
@@ -195,7 +220,7 @@ std::optional<Expr> OMPAllocateDecl::nth_varlist(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> OMPAllocateDecl::varlists(void) const & {
@@ -204,7 +229,7 @@ gap::generator<Expr> OMPAllocateDecl::varlists(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d51 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d51)))) {
+      if (auto e = Expr::from_base(std::move(d51))) {
         co_yield std::move(*e);
       }
     }

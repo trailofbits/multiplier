@@ -214,13 +214,23 @@ bool Expr::contains(const Stmt &stmt) {
 std::optional<Expr> Expr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return Expr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<Expr> Expr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kExprDerivedKinds[] = {
     ExpressionTraitExpr::static_kind(),
     ExtVectorElementExpr::static_kind(),
@@ -348,7 +358,9 @@ static const StmtKind kExprDerivedKinds[] = {
     CXXDynamicCastExpr::static_kind(),
 };
 
-std::optional<Expr> Expr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<Expr> Expr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ExpressionTraitExpr::static_kind():
     case ExtVectorElementExpr::static_kind():
@@ -484,7 +496,7 @@ gap::generator<Expr> Expr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<Expr> e = Expr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<Expr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -496,7 +508,7 @@ gap::generator<Expr> Expr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<Expr> e = Expr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<Expr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -509,7 +521,7 @@ gap::generator<Expr> Expr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<Expr> e = Expr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<Expr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -521,8 +533,18 @@ std::optional<Expr> Expr::from(const Reference &r) {
   return Expr::from(r.as_statement());
 }
 
+std::optional<Expr> Expr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<Expr> Expr::from(const TokenContext &t) {
-  return Expr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool Expr::has_side_effects(void) const {
@@ -531,62 +553,62 @@ bool Expr::has_side_effects(void) const {
 
 Expr Expr::ignore_casts(void) const {
   RawEntityId eid = impl->reader.getVal10();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr Expr::ignore_conversion_operator_single_step(void) const {
   RawEntityId eid = impl->reader.getVal11();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr Expr::ignore_implicit_casts(void) const {
   RawEntityId eid = impl->reader.getVal13();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr Expr::ignore_implicit(void) const {
   RawEntityId eid = impl->reader.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr Expr::ignore_implicit_as_written(void) const {
   RawEntityId eid = impl->reader.getVal17();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr Expr::ignore_parenthesis_base_casts(void) const {
   RawEntityId eid = impl->reader.getVal18();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr Expr::ignore_parenthesis_casts(void) const {
   RawEntityId eid = impl->reader.getVal19();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr Expr::ignore_parenthesis_implicit_casts(void) const {
   RawEntityId eid = impl->reader.getVal20();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr Expr::ignore_parenthesis_l_value_casts(void) const {
   RawEntityId eid = impl->reader.getVal21();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr Expr::ignore_parenthesis_noop_casts(void) const {
   RawEntityId eid = impl->reader.getVal22();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr Expr::ignore_parentheses(void) const {
   RawEntityId eid = impl->reader.getVal30();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr Expr::ignore_unless_spelled_in_source(void) const {
   RawEntityId eid = impl->reader.getVal31();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool Expr::contains_errors(void) const {
@@ -612,7 +634,7 @@ std::optional<ObjCPropertyRefExpr> Expr::obj_c_property(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return ObjCPropertyRefExpr::from(Stmt(std::move(eptr)));
+      return ObjCPropertyRefExpr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -642,7 +664,7 @@ std::optional<FieldDecl> Expr::source_bit_field(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FieldDecl::from(Decl(std::move(eptr)));
+      return FieldDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

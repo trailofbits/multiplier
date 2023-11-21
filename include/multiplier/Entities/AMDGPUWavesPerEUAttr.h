@@ -41,17 +41,13 @@ class AMDGPUWavesPerEUAttr : public InheritableAttr {
     return AttrKind::AMDGPU_WAVES_PER_EU;
   }
 
-  static std::optional<AMDGPUWavesPerEUAttr> from(const Attr &parent);
-
-  inline static std::optional<AMDGPUWavesPerEUAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AMDGPUWavesPerEUAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AMDGPUWavesPerEUAttr> from_base(const Attr &parent);
+  inline static std::optional<AMDGPUWavesPerEUAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AMDGPUWavesPerEUAttr> from(const std::optional<Attr> &parent);
   static std::optional<AMDGPUWavesPerEUAttr> from(const Reference &r);
+  static std::optional<AMDGPUWavesPerEUAttr> from(const VariantEntity &e);
   static std::optional<AMDGPUWavesPerEUAttr> from(const TokenContext &t);
 
   Expr max(void) const;

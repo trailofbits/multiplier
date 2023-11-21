@@ -39,18 +39,30 @@ bool TypeOfExprType::contains(const Token &tok) const {
 std::optional<TypeOfExprType> TypeOfExprType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return TypeOfExprType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TypeOfExprType> TypeOfExprType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kTypeOfExprTypeDerivedKinds[] = {
     TypeOfExprType::static_kind(),
 };
 
-std::optional<TypeOfExprType> TypeOfExprType::from(const Type &parent) {
+}  // namespace
+
+std::optional<TypeOfExprType> TypeOfExprType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case TypeOfExprType::static_kind():
       return reinterpret_cast<const TypeOfExprType &>(parent);
@@ -63,7 +75,7 @@ gap::generator<TypeOfExprType> TypeOfExprType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kTypeOfExprTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<TypeOfExprType> e = TypeOfExprType::from(Type(std::move(eptr)))) {
+      if (std::optional<TypeOfExprType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -74,8 +86,18 @@ std::optional<TypeOfExprType> TypeOfExprType::from(const Reference &r) {
   return TypeOfExprType::from(r.as_type());
 }
 
+std::optional<TypeOfExprType> TypeOfExprType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<TypeOfExprType> TypeOfExprType::from(const TokenContext &t) {
-  return TypeOfExprType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type TypeOfExprType::desugar(void) const {
@@ -89,7 +111,7 @@ TypeOfKind TypeOfExprType::type_kind(void) const {
 
 Expr TypeOfExprType::underlying_expression(void) const {
   RawEntityId eid = impl->reader.getVal19();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool TypeOfExprType::is_sugared(void) const {

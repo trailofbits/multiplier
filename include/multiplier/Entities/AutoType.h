@@ -41,17 +41,13 @@ class AutoType : public DeducedType {
     return TypeKind::AUTO;
   }
 
-  static std::optional<AutoType> from(const Type &parent);
-
-  inline static std::optional<AutoType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return AutoType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AutoType> from_base(const Type &parent);
+  inline static std::optional<AutoType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AutoType> from(const std::optional<Type> &parent);
   static std::optional<AutoType> from(const Reference &r);
+  static std::optional<AutoType> from(const VariantEntity &e);
   static std::optional<AutoType> from(const TokenContext &t);
 
   AutoTypeKeyword keyword(void) const;

@@ -40,18 +40,30 @@ bool ConstantArrayType::contains(const Token &tok) const {
 std::optional<ConstantArrayType> ConstantArrayType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return ConstantArrayType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ConstantArrayType> ConstantArrayType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kConstantArrayTypeDerivedKinds[] = {
     ConstantArrayType::static_kind(),
 };
 
-std::optional<ConstantArrayType> ConstantArrayType::from(const Type &parent) {
+}  // namespace
+
+std::optional<ConstantArrayType> ConstantArrayType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case ConstantArrayType::static_kind():
       return reinterpret_cast<const ConstantArrayType &>(parent);
@@ -64,7 +76,7 @@ gap::generator<ConstantArrayType> ConstantArrayType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kConstantArrayTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<ConstantArrayType> e = ConstantArrayType::from(Type(std::move(eptr)))) {
+      if (std::optional<ConstantArrayType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,8 +87,18 @@ std::optional<ConstantArrayType> ConstantArrayType::from(const Reference &r) {
   return ConstantArrayType::from(r.as_type());
 }
 
+std::optional<ConstantArrayType> ConstantArrayType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<ConstantArrayType> ConstantArrayType::from(const TokenContext &t) {
-  return ConstantArrayType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type ConstantArrayType::desugar(void) const {
@@ -91,7 +113,7 @@ std::optional<Expr> ConstantArrayType::size_expression(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

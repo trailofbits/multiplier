@@ -38,18 +38,30 @@ bool PipeType::contains(const Token &tok) const {
 std::optional<PipeType> PipeType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return PipeType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<PipeType> PipeType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kPipeTypeDerivedKinds[] = {
     PipeType::static_kind(),
 };
 
-std::optional<PipeType> PipeType::from(const Type &parent) {
+}  // namespace
+
+std::optional<PipeType> PipeType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case PipeType::static_kind():
       return reinterpret_cast<const PipeType &>(parent);
@@ -62,7 +74,7 @@ gap::generator<PipeType> PipeType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kPipeTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<PipeType> e = PipeType::from(Type(std::move(eptr)))) {
+      if (std::optional<PipeType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -73,8 +85,18 @@ std::optional<PipeType> PipeType::from(const Reference &r) {
   return PipeType::from(r.as_type());
 }
 
+std::optional<PipeType> PipeType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<PipeType> PipeType::from(const TokenContext &t) {
-  return PipeType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type PipeType::desugar(void) const {

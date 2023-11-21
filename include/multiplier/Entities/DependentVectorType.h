@@ -38,17 +38,13 @@ class DependentVectorType : public Type {
     return TypeKind::DEPENDENT_VECTOR;
   }
 
-  static std::optional<DependentVectorType> from(const Type &parent);
-
-  inline static std::optional<DependentVectorType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return DependentVectorType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<DependentVectorType> from_base(const Type &parent);
+  inline static std::optional<DependentVectorType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<DependentVectorType> from(const std::optional<Type> &parent);
   static std::optional<DependentVectorType> from(const Reference &r);
+  static std::optional<DependentVectorType> from(const VariantEntity &e);
   static std::optional<DependentVectorType> from(const TokenContext &t);
 
   Type desugar(void) const;

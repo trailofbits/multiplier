@@ -86,7 +86,7 @@ bool OMPRequiresDecl::contains(const Stmt &stmt) {
 }
 
 OMPRequiresDecl OMPRequiresDecl::canonical_declaration(void) const {
-  if (auto canon = OMPRequiresDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (OMPRequiresDecl redecl : redeclarations()) {
@@ -96,12 +96,15 @@ OMPRequiresDecl OMPRequiresDecl::canonical_declaration(void) const {
 }
 
 std::optional<OMPRequiresDecl> OMPRequiresDecl::definition(void) const {
-  return OMPRequiresDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<OMPRequiresDecl> OMPRequiresDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<OMPRequiresDecl> dr = OMPRequiresDecl::from(r)) {
+    if (std::optional<OMPRequiresDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -114,18 +117,30 @@ gap::generator<OMPRequiresDecl> OMPRequiresDecl::redeclarations(void) const & {
 std::optional<OMPRequiresDecl> OMPRequiresDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return OMPRequiresDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPRequiresDecl> OMPRequiresDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kOMPRequiresDeclDerivedKinds[] = {
     OMPRequiresDecl::static_kind(),
 };
 
-std::optional<OMPRequiresDecl> OMPRequiresDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<OMPRequiresDecl> OMPRequiresDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case OMPRequiresDecl::static_kind():
       return reinterpret_cast<const OMPRequiresDecl &>(parent);
@@ -138,7 +153,7 @@ gap::generator<OMPRequiresDecl> OMPRequiresDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kOMPRequiresDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<OMPRequiresDecl> e = OMPRequiresDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<OMPRequiresDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -150,7 +165,7 @@ gap::generator<OMPRequiresDecl> OMPRequiresDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kOMPRequiresDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<OMPRequiresDecl> e = OMPRequiresDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<OMPRequiresDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -163,7 +178,7 @@ gap::generator<OMPRequiresDecl> OMPRequiresDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kOMPRequiresDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<OMPRequiresDecl> e = OMPRequiresDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<OMPRequiresDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -175,8 +190,18 @@ std::optional<OMPRequiresDecl> OMPRequiresDecl::from(const Reference &r) {
   return OMPRequiresDecl::from(r.as_declaration());
 }
 
+std::optional<OMPRequiresDecl> OMPRequiresDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<OMPRequiresDecl> OMPRequiresDecl::from(const TokenContext &t) {
-  return OMPRequiresDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

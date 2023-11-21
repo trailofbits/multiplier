@@ -40,18 +40,30 @@ bool CleanupAttr::contains(const Token &tok) const {
 std::optional<CleanupAttr> CleanupAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return CleanupAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CleanupAttr> CleanupAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kCleanupAttrDerivedKinds[] = {
     CleanupAttr::static_kind(),
 };
 
-std::optional<CleanupAttr> CleanupAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<CleanupAttr> CleanupAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case CleanupAttr::static_kind():
       return reinterpret_cast<const CleanupAttr &>(parent);
@@ -64,7 +76,7 @@ gap::generator<CleanupAttr> CleanupAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kCleanupAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<CleanupAttr> e = CleanupAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<CleanupAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -76,7 +88,7 @@ gap::generator<CleanupAttr> CleanupAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kCleanupAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<CleanupAttr> e = CleanupAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<CleanupAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -89,7 +101,7 @@ gap::generator<CleanupAttr> CleanupAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kCleanupAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<CleanupAttr> e = CleanupAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<CleanupAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -101,13 +113,23 @@ std::optional<CleanupAttr> CleanupAttr::from(const Reference &r) {
   return CleanupAttr::from(r.as_attribute());
 }
 
+std::optional<CleanupAttr> CleanupAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<CleanupAttr> CleanupAttr::from(const TokenContext &t) {
-  return CleanupAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 FunctionDecl CleanupAttr::function_declaration(void) const {
   RawEntityId eid = impl->reader.getVal8();
-  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return FunctionDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

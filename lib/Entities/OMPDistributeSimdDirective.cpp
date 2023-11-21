@@ -90,18 +90,30 @@ bool OMPDistributeSimdDirective::contains(const Stmt &stmt) {
 std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPDistributeSimdDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPDistributeSimdDirectiveDerivedKinds[] = {
     OMPDistributeSimdDirective::static_kind(),
 };
 
-std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPDistributeSimdDirective::static_kind():
       return reinterpret_cast<const OMPDistributeSimdDirective &>(parent);
@@ -114,7 +126,7 @@ gap::generator<OMPDistributeSimdDirective> OMPDistributeSimdDirective::in(const 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPDistributeSimdDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPDistributeSimdDirective> e = OMPDistributeSimdDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPDistributeSimdDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<OMPDistributeSimdDirective> OMPDistributeSimdDirective::in(const 
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPDistributeSimdDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPDistributeSimdDirective> e = OMPDistributeSimdDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPDistributeSimdDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<OMPDistributeSimdDirective> OMPDistributeSimdDirective::in(const 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPDistributeSimdDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPDistributeSimdDirective> e = OMPDistributeSimdDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPDistributeSimdDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::from(const
   return OMPDistributeSimdDirective::from(r.as_statement());
 }
 
+std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::from(const TokenContext &t) {
-  return OMPDistributeSimdDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

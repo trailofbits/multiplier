@@ -40,17 +40,13 @@ class TypeNullUnspecifiedAttr : public TypeAttr {
     return AttrKind::TYPE_NULL_UNSPECIFIED;
   }
 
-  static std::optional<TypeNullUnspecifiedAttr> from(const Attr &parent);
-
-  inline static std::optional<TypeNullUnspecifiedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return TypeNullUnspecifiedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TypeNullUnspecifiedAttr> from_base(const Attr &parent);
+  inline static std::optional<TypeNullUnspecifiedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TypeNullUnspecifiedAttr> from(const std::optional<Attr> &parent);
   static std::optional<TypeNullUnspecifiedAttr> from(const Reference &r);
+  static std::optional<TypeNullUnspecifiedAttr> from(const VariantEntity &e);
   static std::optional<TypeNullUnspecifiedAttr> from(const TokenContext &t);
 
 };

@@ -39,18 +39,30 @@ bool NSReturnsNotRetainedAttr::contains(const Token &tok) const {
 std::optional<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return NSReturnsNotRetainedAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kNSReturnsNotRetainedAttrDerivedKinds[] = {
     NSReturnsNotRetainedAttr::static_kind(),
 };
 
-std::optional<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case NSReturnsNotRetainedAttr::static_kind():
       return reinterpret_cast<const NSReturnsNotRetainedAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::in(const Inde
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kNSReturnsNotRetainedAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<NSReturnsNotRetainedAttr> e = NSReturnsNotRetainedAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<NSReturnsNotRetainedAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::in(const Frag
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kNSReturnsNotRetainedAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<NSReturnsNotRetainedAttr> e = NSReturnsNotRetainedAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<NSReturnsNotRetainedAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::in(const File
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kNSReturnsNotRetainedAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<NSReturnsNotRetainedAttr> e = NSReturnsNotRetainedAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<NSReturnsNotRetainedAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::from(const Ref
   return NSReturnsNotRetainedAttr::from(r.as_attribute());
 }
 
+std::optional<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::from(const TokenContext &t) {
-  return NSReturnsNotRetainedAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

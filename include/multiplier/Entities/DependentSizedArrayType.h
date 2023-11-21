@@ -40,17 +40,13 @@ class DependentSizedArrayType : public ArrayType {
     return TypeKind::DEPENDENT_SIZED_ARRAY;
   }
 
-  static std::optional<DependentSizedArrayType> from(const Type &parent);
-
-  inline static std::optional<DependentSizedArrayType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return DependentSizedArrayType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<DependentSizedArrayType> from_base(const Type &parent);
+  inline static std::optional<DependentSizedArrayType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<DependentSizedArrayType> from(const std::optional<Type> &parent);
   static std::optional<DependentSizedArrayType> from(const Reference &r);
+  static std::optional<DependentSizedArrayType> from(const VariantEntity &e);
   static std::optional<DependentSizedArrayType> from(const TokenContext &t);
 
   Type desugar(void) const;

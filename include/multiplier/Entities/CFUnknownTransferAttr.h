@@ -40,17 +40,13 @@ class CFUnknownTransferAttr : public InheritableAttr {
     return AttrKind::CF_UNKNOWN_TRANSFER;
   }
 
-  static std::optional<CFUnknownTransferAttr> from(const Attr &parent);
-
-  inline static std::optional<CFUnknownTransferAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CFUnknownTransferAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CFUnknownTransferAttr> from_base(const Attr &parent);
+  inline static std::optional<CFUnknownTransferAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CFUnknownTransferAttr> from(const std::optional<Attr> &parent);
   static std::optional<CFUnknownTransferAttr> from(const Reference &r);
+  static std::optional<CFUnknownTransferAttr> from(const VariantEntity &e);
   static std::optional<CFUnknownTransferAttr> from(const TokenContext &t);
 
 };

@@ -59,17 +59,13 @@ class ObjCPropertyDecl : public NamedDecl {
   ObjCPropertyDecl canonical_declaration(void) const;
   std::optional<ObjCPropertyDecl> definition(void) const;
   gap::generator<ObjCPropertyDecl> redeclarations(void) const &;
-  static std::optional<ObjCPropertyDecl> from(const Decl &parent);
-
-  inline static std::optional<ObjCPropertyDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ObjCPropertyDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCPropertyDecl> from_base(const Decl &parent);
+  inline static std::optional<ObjCPropertyDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCPropertyDecl> from(const std::optional<Decl> &parent);
   static std::optional<ObjCPropertyDecl> from(const Reference &r);
+  static std::optional<ObjCPropertyDecl> from(const VariantEntity &e);
   static std::optional<ObjCPropertyDecl> from(const TokenContext &t);
 
   Token at_token(void) const;

@@ -41,17 +41,13 @@ class RISCVInterruptAttr : public InheritableAttr {
     return AttrKind::RISCV_INTERRUPT;
   }
 
-  static std::optional<RISCVInterruptAttr> from(const Attr &parent);
-
-  inline static std::optional<RISCVInterruptAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return RISCVInterruptAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<RISCVInterruptAttr> from_base(const Attr &parent);
+  inline static std::optional<RISCVInterruptAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<RISCVInterruptAttr> from(const std::optional<Attr> &parent);
   static std::optional<RISCVInterruptAttr> from(const Reference &r);
+  static std::optional<RISCVInterruptAttr> from(const VariantEntity &e);
   static std::optional<RISCVInterruptAttr> from(const TokenContext &t);
 
   RISCVInterruptAttrInterruptType interrupt(void) const;

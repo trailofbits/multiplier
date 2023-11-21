@@ -43,17 +43,13 @@ class FunctionProtoType : public FunctionType {
     return TypeKind::FUNCTION_PROTO;
   }
 
-  static std::optional<FunctionProtoType> from(const Type &parent);
-
-  inline static std::optional<FunctionProtoType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return FunctionProtoType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<FunctionProtoType> from_base(const Type &parent);
+  inline static std::optional<FunctionProtoType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<FunctionProtoType> from(const std::optional<Type> &parent);
   static std::optional<FunctionProtoType> from(const Reference &r);
+  static std::optional<FunctionProtoType> from(const VariantEntity &e);
   static std::optional<FunctionProtoType> from(const TokenContext &t);
 
   std::optional<CanThrowResult> can_throw(void) const;

@@ -171,6 +171,21 @@ void EntityVisitor::VisitTypedefNameDecl(const pasta::TypedefNameDecl &decl) {
   }
 }
 
+void EntityVisitor::VisitStaticAssertDecl(const pasta::StaticAssertDecl &decl) {
+  if (EnterDecl(decl)) {
+    Accept(decl.AssertExpression());
+    if (auto message = decl.Message()) {
+      Accept(message.value());
+    }
+  }
+}
+
+void EntityVisitor::VisitFileScopeAsmDecl(const pasta::FileScopeAsmDecl &decl) {
+  if (EnterDecl(decl)) {
+    Accept(decl.AssemblyString());
+  }
+}
+
 void EntityVisitor::VisitDeclStmt(const pasta::DeclStmt &stmt) {
   if (EnterStmt(stmt)) {
     for (const pasta::Decl &child : stmt.Declarations()) {
@@ -362,12 +377,15 @@ void EntityVisitor::VisitLambdaExpr(const pasta::LambdaExpr &stmt) {
 
 void EntityVisitor::VisitInitListExpr(const pasta::InitListExpr &stmt) {
   if (EnterStmt(stmt)) {
-    if (auto sf = stmt.SyntacticForm()) {
-      Accept(sf.value());
-    }
     if (auto filler = stmt.ArrayFiller()) {
       Accept(filler.value());
     }
+    
+    // NOTE(pag): We don't visit either the `SemanticForm` or the
+    //            `SyntacticForm`. The parent entity visitor requires those
+    //            be visited, but they logically belong "beside" eachother.
+    //            So instead, we let a fallback path figure this out, via
+    //            `FindMissingParentageFromInitList`.
   }
 }
 
@@ -571,12 +589,12 @@ void EntityVisitor::Accept(const pasta::TemplateArgument &entity) {
   }
 }
 
-void EntityVisitor::Accept(const pasta::Designator &entity) {
+void EntityVisitor::Accept(const pasta::Designator &) {
   // NOTE(pag): Don't need to enter the fields of the designators; they're
   //            likely defined elsewhere.
 }
 
-void EntityVisitor::Accept(const pasta::CXXBaseSpecifier &entity) {
+void EntityVisitor::Accept(const pasta::CXXBaseSpecifier &) {
   // NOTE(pag): Don't need to enter the bases; they're likely top-level
   //            declarations.
 }

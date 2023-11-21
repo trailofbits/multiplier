@@ -51,17 +51,13 @@ class PragmaDetectMismatchDecl : public Decl {
   PragmaDetectMismatchDecl canonical_declaration(void) const;
   std::optional<PragmaDetectMismatchDecl> definition(void) const;
   gap::generator<PragmaDetectMismatchDecl> redeclarations(void) const &;
-  static std::optional<PragmaDetectMismatchDecl> from(const Decl &parent);
-
-  inline static std::optional<PragmaDetectMismatchDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return PragmaDetectMismatchDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PragmaDetectMismatchDecl> from_base(const Decl &parent);
+  inline static std::optional<PragmaDetectMismatchDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PragmaDetectMismatchDecl> from(const std::optional<Decl> &parent);
   static std::optional<PragmaDetectMismatchDecl> from(const Reference &r);
+  static std::optional<PragmaDetectMismatchDecl> from(const VariantEntity &e);
   static std::optional<PragmaDetectMismatchDecl> from(const TokenContext &t);
 
   std::string_view name(void) const;

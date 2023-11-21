@@ -37,17 +37,13 @@ class AdjustedType : public Type {
     return TypeKind::ADJUSTED;
   }
 
-  static std::optional<AdjustedType> from(const Type &parent);
-
-  inline static std::optional<AdjustedType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return AdjustedType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AdjustedType> from_base(const Type &parent);
+  inline static std::optional<AdjustedType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AdjustedType> from(const std::optional<Type> &parent);
   static std::optional<AdjustedType> from(const Reference &r);
+  static std::optional<AdjustedType> from(const VariantEntity &e);
   static std::optional<AdjustedType> from(const TokenContext &t);
 
   Type desugar(void) const;

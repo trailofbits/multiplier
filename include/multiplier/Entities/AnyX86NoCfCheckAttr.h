@@ -40,17 +40,13 @@ class AnyX86NoCfCheckAttr : public InheritableAttr {
     return AttrKind::ANY_X86_NO_CF_CHECK;
   }
 
-  static std::optional<AnyX86NoCfCheckAttr> from(const Attr &parent);
-
-  inline static std::optional<AnyX86NoCfCheckAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AnyX86NoCfCheckAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AnyX86NoCfCheckAttr> from_base(const Attr &parent);
+  inline static std::optional<AnyX86NoCfCheckAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AnyX86NoCfCheckAttr> from(const std::optional<Attr> &parent);
   static std::optional<AnyX86NoCfCheckAttr> from(const Reference &r);
+  static std::optional<AnyX86NoCfCheckAttr> from(const VariantEntity &e);
   static std::optional<AnyX86NoCfCheckAttr> from(const TokenContext &t);
 
 };

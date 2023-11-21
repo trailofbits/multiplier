@@ -40,18 +40,30 @@ bool ElaboratedType::contains(const Token &tok) const {
 std::optional<ElaboratedType> ElaboratedType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return ElaboratedType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ElaboratedType> ElaboratedType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kElaboratedTypeDerivedKinds[] = {
     ElaboratedType::static_kind(),
 };
 
-std::optional<ElaboratedType> ElaboratedType::from(const Type &parent) {
+}  // namespace
+
+std::optional<ElaboratedType> ElaboratedType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case ElaboratedType::static_kind():
       return reinterpret_cast<const ElaboratedType &>(parent);
@@ -64,7 +76,7 @@ gap::generator<ElaboratedType> ElaboratedType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kElaboratedTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<ElaboratedType> e = ElaboratedType::from(Type(std::move(eptr)))) {
+      if (std::optional<ElaboratedType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,8 +87,18 @@ std::optional<ElaboratedType> ElaboratedType::from(const Reference &r) {
   return ElaboratedType::from(r.as_type());
 }
 
+std::optional<ElaboratedType> ElaboratedType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<ElaboratedType> ElaboratedType::from(const TokenContext &t) {
-  return ElaboratedType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type ElaboratedType::desugar(void) const {
@@ -96,7 +118,7 @@ std::optional<TagDecl> ElaboratedType::owned_tag_declaration(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return TagDecl::from(Decl(std::move(eptr)));
+      return TagDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

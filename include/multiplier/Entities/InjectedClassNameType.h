@@ -38,17 +38,13 @@ class InjectedClassNameType : public Type {
     return TypeKind::INJECTED_CLASS_NAME;
   }
 
-  static std::optional<InjectedClassNameType> from(const Type &parent);
-
-  inline static std::optional<InjectedClassNameType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return InjectedClassNameType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<InjectedClassNameType> from_base(const Type &parent);
+  inline static std::optional<InjectedClassNameType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<InjectedClassNameType> from(const std::optional<Type> &parent);
   static std::optional<InjectedClassNameType> from(const Reference &r);
+  static std::optional<InjectedClassNameType> from(const VariantEntity &e);
   static std::optional<InjectedClassNameType> from(const TokenContext &t);
 
   Type desugar(void) const;

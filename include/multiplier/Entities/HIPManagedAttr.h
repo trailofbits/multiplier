@@ -40,17 +40,13 @@ class HIPManagedAttr : public InheritableAttr {
     return AttrKind::HIP_MANAGED;
   }
 
-  static std::optional<HIPManagedAttr> from(const Attr &parent);
-
-  inline static std::optional<HIPManagedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return HIPManagedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<HIPManagedAttr> from_base(const Attr &parent);
+  inline static std::optional<HIPManagedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<HIPManagedAttr> from(const std::optional<Attr> &parent);
   static std::optional<HIPManagedAttr> from(const Reference &r);
+  static std::optional<HIPManagedAttr> from(const VariantEntity &e);
   static std::optional<HIPManagedAttr> from(const TokenContext &t);
 
 };

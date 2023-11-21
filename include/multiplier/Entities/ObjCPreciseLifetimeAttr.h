@@ -40,17 +40,13 @@ class ObjCPreciseLifetimeAttr : public InheritableAttr {
     return AttrKind::OBJ_C_PRECISE_LIFETIME;
   }
 
-  static std::optional<ObjCPreciseLifetimeAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCPreciseLifetimeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCPreciseLifetimeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCPreciseLifetimeAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCPreciseLifetimeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCPreciseLifetimeAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCPreciseLifetimeAttr> from(const Reference &r);
+  static std::optional<ObjCPreciseLifetimeAttr> from(const VariantEntity &e);
   static std::optional<ObjCPreciseLifetimeAttr> from(const TokenContext &t);
 
 };

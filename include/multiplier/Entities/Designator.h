@@ -17,8 +17,8 @@
 #include <span>
 #include <vector>
 
+#include "../Entity.h"
 #include "../Iterator.h"
-#include "../Types.h"
 
 #include "PseudoKind.h"
 
@@ -81,7 +81,6 @@ class Designator {
   }
 
   PackedDesignatorId id(void) const;
-  gap::generator<Reference> references(void) const &;
 
   inline static std::optional<Designator> from(const Designator &self) {
     return self;
@@ -92,7 +91,7 @@ class Designator {
   }
 
   static std::optional<Designator> from(const Reference &r);
-
+  static std::optional<Designator> from(const VariantEntity &e);
   static std::optional<Designator> from(const TokenContext &t);
 
   bool is_field_designator(void) const;

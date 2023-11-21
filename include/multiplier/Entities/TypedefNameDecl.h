@@ -56,17 +56,13 @@ class TypedefNameDecl : public TypeDecl {
   TypedefNameDecl canonical_declaration(void) const;
   std::optional<TypedefNameDecl> definition(void) const;
   gap::generator<TypedefNameDecl> redeclarations(void) const &;
-  static std::optional<TypedefNameDecl> from(const Decl &parent);
-
-  inline static std::optional<TypedefNameDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return TypedefNameDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TypedefNameDecl> from_base(const Decl &parent);
+  inline static std::optional<TypedefNameDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TypedefNameDecl> from(const std::optional<Decl> &parent);
   static std::optional<TypedefNameDecl> from(const Reference &r);
+  static std::optional<TypedefNameDecl> from(const VariantEntity &e);
   static std::optional<TypedefNameDecl> from(const TokenContext &t);
 
   std::optional<TagDecl> anonymous_declaration_with_typedef_name(void) const;

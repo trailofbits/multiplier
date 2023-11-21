@@ -17,8 +17,8 @@
 #include <span>
 #include <vector>
 
+#include "../Entity.h"
 #include "../Iterator.h"
-#include "../Types.h"
 
 #include "PseudoKind.h"
 
@@ -80,7 +80,6 @@ class TemplateParameterList {
   }
 
   PackedTemplateParameterListId id(void) const;
-  gap::generator<Reference> references(void) const &;
 
   inline static std::optional<TemplateParameterList> from(const TemplateParameterList &self) {
     return self;
@@ -91,7 +90,7 @@ class TemplateParameterList {
   }
 
   static std::optional<TemplateParameterList> from(const Reference &r);
-
+  static std::optional<TemplateParameterList> from(const VariantEntity &e);
   static std::optional<TemplateParameterList> from(const TokenContext &t);
 
   uint32_t depth(void) const;

@@ -90,18 +90,30 @@ bool ObjCProtocolExpr::contains(const Stmt &stmt) {
 std::optional<ObjCProtocolExpr> ObjCProtocolExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ObjCProtocolExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kObjCProtocolExprDerivedKinds[] = {
     ObjCProtocolExpr::static_kind(),
 };
 
-std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCProtocolExpr::static_kind():
       return reinterpret_cast<const ObjCProtocolExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<ObjCProtocolExpr> ObjCProtocolExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCProtocolExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ObjCProtocolExpr> e = ObjCProtocolExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCProtocolExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<ObjCProtocolExpr> ObjCProtocolExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCProtocolExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCProtocolExpr> e = ObjCProtocolExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCProtocolExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<ObjCProtocolExpr> ObjCProtocolExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCProtocolExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCProtocolExpr> e = ObjCProtocolExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ObjCProtocolExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const Reference &r) {
   return ObjCProtocolExpr::from(r.as_statement());
 }
 
+std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const TokenContext &t) {
-  return ObjCProtocolExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token ObjCProtocolExpr::at_token(void) const {
@@ -161,7 +183,7 @@ Token ObjCProtocolExpr::at_token(void) const {
 
 ObjCProtocolDecl ObjCProtocolExpr::protocol(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return ObjCProtocolDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCProtocolDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token ObjCProtocolExpr::protocol_id_token(void) const {

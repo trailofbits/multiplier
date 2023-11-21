@@ -40,17 +40,13 @@ class AcquiredBeforeAttr : public InheritableAttr {
     return AttrKind::ACQUIRED_BEFORE;
   }
 
-  static std::optional<AcquiredBeforeAttr> from(const Attr &parent);
-
-  inline static std::optional<AcquiredBeforeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AcquiredBeforeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AcquiredBeforeAttr> from_base(const Attr &parent);
+  inline static std::optional<AcquiredBeforeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AcquiredBeforeAttr> from(const std::optional<Attr> &parent);
   static std::optional<AcquiredBeforeAttr> from(const Reference &r);
+  static std::optional<AcquiredBeforeAttr> from(const VariantEntity &e);
   static std::optional<AcquiredBeforeAttr> from(const TokenContext &t);
 
 };

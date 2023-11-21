@@ -39,19 +39,31 @@ bool AdjustedType::contains(const Token &tok) const {
 std::optional<AdjustedType> AdjustedType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return AdjustedType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<AdjustedType> AdjustedType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kAdjustedTypeDerivedKinds[] = {
     AdjustedType::static_kind(),
     DecayedType::static_kind(),
 };
 
-std::optional<AdjustedType> AdjustedType::from(const Type &parent) {
+}  // namespace
+
+std::optional<AdjustedType> AdjustedType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case AdjustedType::static_kind():
     case DecayedType::static_kind():
@@ -65,7 +77,7 @@ gap::generator<AdjustedType> AdjustedType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kAdjustedTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<AdjustedType> e = AdjustedType::from(Type(std::move(eptr)))) {
+      if (std::optional<AdjustedType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -76,8 +88,18 @@ std::optional<AdjustedType> AdjustedType::from(const Reference &r) {
   return AdjustedType::from(r.as_type());
 }
 
+std::optional<AdjustedType> AdjustedType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<AdjustedType> AdjustedType::from(const TokenContext &t) {
-  return AdjustedType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type AdjustedType::desugar(void) const {

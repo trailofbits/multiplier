@@ -40,17 +40,13 @@ class SwiftBridgedTypedefAttr : public InheritableAttr {
     return AttrKind::SWIFT_BRIDGED_TYPEDEF;
   }
 
-  static std::optional<SwiftBridgedTypedefAttr> from(const Attr &parent);
-
-  inline static std::optional<SwiftBridgedTypedefAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SwiftBridgedTypedefAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SwiftBridgedTypedefAttr> from_base(const Attr &parent);
+  inline static std::optional<SwiftBridgedTypedefAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SwiftBridgedTypedefAttr> from(const std::optional<Attr> &parent);
   static std::optional<SwiftBridgedTypedefAttr> from(const Reference &r);
+  static std::optional<SwiftBridgedTypedefAttr> from(const VariantEntity &e);
   static std::optional<SwiftBridgedTypedefAttr> from(const TokenContext &t);
 
 };

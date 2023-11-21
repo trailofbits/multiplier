@@ -89,18 +89,30 @@ bool UnaryOperator::contains(const Stmt &stmt) {
 std::optional<UnaryOperator> UnaryOperator::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return UnaryOperator::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<UnaryOperator> UnaryOperator::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kUnaryOperatorDerivedKinds[] = {
     UnaryOperator::static_kind(),
 };
 
-std::optional<UnaryOperator> UnaryOperator::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<UnaryOperator> UnaryOperator::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case UnaryOperator::static_kind():
       return reinterpret_cast<const UnaryOperator &>(parent);
@@ -113,7 +125,7 @@ gap::generator<UnaryOperator> UnaryOperator::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kUnaryOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<UnaryOperator> e = UnaryOperator::from(Stmt(std::move(eptr)))) {
+      if (std::optional<UnaryOperator> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<UnaryOperator> UnaryOperator::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kUnaryOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<UnaryOperator> e = UnaryOperator::from(Stmt(std::move(eptr)))) {
+      if (std::optional<UnaryOperator> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<UnaryOperator> UnaryOperator::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kUnaryOperatorDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<UnaryOperator> e = UnaryOperator::from(Stmt(std::move(eptr)))) {
+        if (std::optional<UnaryOperator> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,8 +162,18 @@ std::optional<UnaryOperator> UnaryOperator::from(const Reference &r) {
   return UnaryOperator::from(r.as_statement());
 }
 
+std::optional<UnaryOperator> UnaryOperator::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<UnaryOperator> UnaryOperator::from(const TokenContext &t) {
-  return UnaryOperator::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool UnaryOperator::can_overflow(void) const {
@@ -168,7 +190,7 @@ Token UnaryOperator::operator_token(void) const {
 
 Expr UnaryOperator::sub_expression(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool UnaryOperator::has_stored_fp_features(void) const {

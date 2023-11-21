@@ -40,17 +40,13 @@ class StrictGuardStackCheckAttr : public InheritableAttr {
     return AttrKind::STRICT_GUARD_STACK_CHECK;
   }
 
-  static std::optional<StrictGuardStackCheckAttr> from(const Attr &parent);
-
-  inline static std::optional<StrictGuardStackCheckAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return StrictGuardStackCheckAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<StrictGuardStackCheckAttr> from_base(const Attr &parent);
+  inline static std::optional<StrictGuardStackCheckAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<StrictGuardStackCheckAttr> from(const std::optional<Attr> &parent);
   static std::optional<StrictGuardStackCheckAttr> from(const Reference &r);
+  static std::optional<StrictGuardStackCheckAttr> from(const VariantEntity &e);
   static std::optional<StrictGuardStackCheckAttr> from(const TokenContext &t);
 
 };

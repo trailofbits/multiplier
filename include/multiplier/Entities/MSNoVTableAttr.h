@@ -40,17 +40,13 @@ class MSNoVTableAttr : public InheritableAttr {
     return AttrKind::MS_NO_V_TABLE;
   }
 
-  static std::optional<MSNoVTableAttr> from(const Attr &parent);
-
-  inline static std::optional<MSNoVTableAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MSNoVTableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MSNoVTableAttr> from_base(const Attr &parent);
+  inline static std::optional<MSNoVTableAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MSNoVTableAttr> from(const std::optional<Attr> &parent);
   static std::optional<MSNoVTableAttr> from(const Reference &r);
+  static std::optional<MSNoVTableAttr> from(const VariantEntity &e);
   static std::optional<MSNoVTableAttr> from(const TokenContext &t);
 
 };

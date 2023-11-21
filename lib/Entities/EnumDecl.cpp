@@ -91,7 +91,7 @@ bool EnumDecl::contains(const Stmt &stmt) {
 }
 
 EnumDecl EnumDecl::canonical_declaration(void) const {
-  if (auto canon = EnumDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (EnumDecl redecl : redeclarations()) {
@@ -101,12 +101,15 @@ EnumDecl EnumDecl::canonical_declaration(void) const {
 }
 
 std::optional<EnumDecl> EnumDecl::definition(void) const {
-  return EnumDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<EnumDecl> EnumDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<EnumDecl> dr = EnumDecl::from(r)) {
+    if (std::optional<EnumDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -119,18 +122,30 @@ gap::generator<EnumDecl> EnumDecl::redeclarations(void) const & {
 std::optional<EnumDecl> EnumDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return EnumDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<EnumDecl> EnumDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kEnumDeclDerivedKinds[] = {
     EnumDecl::static_kind(),
 };
 
-std::optional<EnumDecl> EnumDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<EnumDecl> EnumDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case EnumDecl::static_kind():
       return reinterpret_cast<const EnumDecl &>(parent);
@@ -143,7 +158,7 @@ gap::generator<EnumDecl> EnumDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kEnumDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<EnumDecl> e = EnumDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<EnumDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -155,7 +170,7 @@ gap::generator<EnumDecl> EnumDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kEnumDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<EnumDecl> e = EnumDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<EnumDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -168,7 +183,7 @@ gap::generator<EnumDecl> EnumDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kEnumDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<EnumDecl> e = EnumDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<EnumDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -180,8 +195,18 @@ std::optional<EnumDecl> EnumDecl::from(const Reference &r) {
   return EnumDecl::from(r.as_declaration());
 }
 
+std::optional<EnumDecl> EnumDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<EnumDecl> EnumDecl::from(const TokenContext &t) {
-  return EnumDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 unsigned EnumDecl::num_enumerators(void) const {
@@ -199,7 +224,7 @@ std::optional<EnumConstantDecl> EnumDecl::nth_enumerator(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return EnumConstantDecl::from(Decl(std::move(e)));
+  return EnumConstantDecl::from_base(std::move(e));
 }
 
 gap::generator<EnumConstantDecl> EnumDecl::enumerators(void) const & {
@@ -208,7 +233,7 @@ gap::generator<EnumConstantDecl> EnumDecl::enumerators(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d62 = ep->DeclFor(ep, v)) {
-      if (auto e = EnumConstantDecl::from(Decl(std::move(d62)))) {
+      if (auto e = EnumConstantDecl::from_base(std::move(d62))) {
         co_yield std::move(*e);
       }
     }
@@ -223,7 +248,7 @@ std::optional<EnumDecl> EnumDecl::instantiated_from_member_enum(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return EnumDecl::from(Decl(std::move(eptr)));
+      return EnumDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -275,7 +300,7 @@ std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return EnumDecl::from(Decl(std::move(eptr)));
+      return EnumDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

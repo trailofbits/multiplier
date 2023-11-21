@@ -89,18 +89,30 @@ bool CXXRewrittenBinaryOperator::contains(const Stmt &stmt) {
 std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXRewrittenBinaryOperator::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXRewrittenBinaryOperatorDerivedKinds[] = {
     CXXRewrittenBinaryOperator::static_kind(),
 };
 
-std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXRewrittenBinaryOperator::static_kind():
       return reinterpret_cast<const CXXRewrittenBinaryOperator &>(parent);
@@ -113,7 +125,7 @@ gap::generator<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::in(const 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXRewrittenBinaryOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXRewrittenBinaryOperator> e = CXXRewrittenBinaryOperator::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXRewrittenBinaryOperator> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::in(const 
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXRewrittenBinaryOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXRewrittenBinaryOperator> e = CXXRewrittenBinaryOperator::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXRewrittenBinaryOperator> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::in(const 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXRewrittenBinaryOperatorDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXRewrittenBinaryOperator> e = CXXRewrittenBinaryOperator::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXRewrittenBinaryOperator> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,13 +162,23 @@ std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const
   return CXXRewrittenBinaryOperator::from(r.as_statement());
 }
 
+std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const TokenContext &t) {
-  return CXXRewrittenBinaryOperator::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr CXXRewrittenBinaryOperator::lhs(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::opcode(void) const {
@@ -178,12 +200,12 @@ Token CXXRewrittenBinaryOperator::operator_token(void) const {
 
 Expr CXXRewrittenBinaryOperator::rhs(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr CXXRewrittenBinaryOperator::semantic_form(void) const {
   RawEntityId eid = impl->reader.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool CXXRewrittenBinaryOperator::is_assignment_operation(void) const {

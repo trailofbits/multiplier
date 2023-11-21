@@ -40,17 +40,13 @@ class NoDebugAttr : public InheritableAttr {
     return AttrKind::NO_DEBUG;
   }
 
-  static std::optional<NoDebugAttr> from(const Attr &parent);
-
-  inline static std::optional<NoDebugAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoDebugAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoDebugAttr> from_base(const Attr &parent);
+  inline static std::optional<NoDebugAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoDebugAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoDebugAttr> from(const Reference &r);
+  static std::optional<NoDebugAttr> from(const VariantEntity &e);
   static std::optional<NoDebugAttr> from(const TokenContext &t);
 
 };

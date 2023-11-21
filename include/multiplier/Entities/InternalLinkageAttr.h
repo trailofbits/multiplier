@@ -40,17 +40,13 @@ class InternalLinkageAttr : public InheritableAttr {
     return AttrKind::INTERNAL_LINKAGE;
   }
 
-  static std::optional<InternalLinkageAttr> from(const Attr &parent);
-
-  inline static std::optional<InternalLinkageAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return InternalLinkageAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<InternalLinkageAttr> from_base(const Attr &parent);
+  inline static std::optional<InternalLinkageAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<InternalLinkageAttr> from(const std::optional<Attr> &parent);
   static std::optional<InternalLinkageAttr> from(const Reference &r);
+  static std::optional<InternalLinkageAttr> from(const VariantEntity &e);
   static std::optional<InternalLinkageAttr> from(const TokenContext &t);
 
 };

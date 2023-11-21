@@ -38,17 +38,13 @@ class TypeOfExprType : public Type {
     return TypeKind::TYPE_OF_EXPR;
   }
 
-  static std::optional<TypeOfExprType> from(const Type &parent);
-
-  inline static std::optional<TypeOfExprType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return TypeOfExprType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TypeOfExprType> from_base(const Type &parent);
+  inline static std::optional<TypeOfExprType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TypeOfExprType> from(const std::optional<Type> &parent);
   static std::optional<TypeOfExprType> from(const Reference &r);
+  static std::optional<TypeOfExprType> from(const VariantEntity &e);
   static std::optional<TypeOfExprType> from(const TokenContext &t);
 
   Type desugar(void) const;

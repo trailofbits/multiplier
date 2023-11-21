@@ -49,17 +49,13 @@ class ObjCForCollectionStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ObjCForCollectionStmt> from(const Stmt &parent);
-
-  inline static std::optional<ObjCForCollectionStmt> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return ObjCForCollectionStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCForCollectionStmt> from_base(const Stmt &parent);
+  inline static std::optional<ObjCForCollectionStmt> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCForCollectionStmt> from(const std::optional<Stmt> &parent);
   static std::optional<ObjCForCollectionStmt> from(const Reference &r);
+  static std::optional<ObjCForCollectionStmt> from(const VariantEntity &e);
   static std::optional<ObjCForCollectionStmt> from(const TokenContext &t);
 
   Stmt body(void) const;

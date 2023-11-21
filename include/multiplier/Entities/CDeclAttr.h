@@ -40,17 +40,13 @@ class CDeclAttr : public InheritableAttr {
     return AttrKind::C_DECL;
   }
 
-  static std::optional<CDeclAttr> from(const Attr &parent);
-
-  inline static std::optional<CDeclAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CDeclAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CDeclAttr> from_base(const Attr &parent);
+  inline static std::optional<CDeclAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CDeclAttr> from(const std::optional<Attr> &parent);
   static std::optional<CDeclAttr> from(const Reference &r);
+  static std::optional<CDeclAttr> from(const VariantEntity &e);
   static std::optional<CDeclAttr> from(const TokenContext &t);
 
 };

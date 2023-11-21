@@ -40,17 +40,13 @@ class VariableArrayType : public ArrayType {
     return TypeKind::VARIABLE_ARRAY;
   }
 
-  static std::optional<VariableArrayType> from(const Type &parent);
-
-  inline static std::optional<VariableArrayType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return VariableArrayType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<VariableArrayType> from_base(const Type &parent);
+  inline static std::optional<VariableArrayType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<VariableArrayType> from(const std::optional<Type> &parent);
   static std::optional<VariableArrayType> from(const Reference &r);
+  static std::optional<VariableArrayType> from(const VariantEntity &e);
   static std::optional<VariableArrayType> from(const TokenContext &t);
 
   Type desugar(void) const;

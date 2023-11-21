@@ -54,18 +54,30 @@ gap::generator<MacroStringify> MacroStringify::containing(const Token &token) {
 std::optional<MacroStringify> MacroStringify::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<MacroId>(vid)) {
-    return MacroStringify::from(index.macro(eid.Pack()));
+    if (auto base = index.macro(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MacroStringify> MacroStringify::from(const std::optional<Macro> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const MacroKind kMacroStringifyDerivedKinds[] = {
     MacroStringify::static_kind(),
 };
 
-std::optional<MacroStringify> MacroStringify::from(const Macro &parent) {
+}  // namespace
+
+std::optional<MacroStringify> MacroStringify::from_base(const Macro &parent) {
   switch (parent.kind()) {
     case MacroStringify::static_kind():
       return reinterpret_cast<const MacroStringify &>(parent);
@@ -78,7 +90,7 @@ gap::generator<MacroStringify> MacroStringify::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroKind k : kMacroStringifyDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
-      if (std::optional<MacroStringify> e = MacroStringify::from(Macro(std::move(eptr)))) {
+      if (std::optional<MacroStringify> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -90,7 +102,7 @@ gap::generator<MacroStringify> MacroStringify::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (MacroKind k : kMacroStringifyDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-      if (std::optional<MacroStringify> e = MacroStringify::from(Macro(std::move(eptr)))) {
+      if (std::optional<MacroStringify> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -103,7 +115,7 @@ gap::generator<MacroStringify> MacroStringify::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (MacroKind k : kMacroStringifyDerivedKinds) {
       for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-        if (std::optional<MacroStringify> e = MacroStringify::from(Macro(std::move(eptr)))) {
+        if (std::optional<MacroStringify> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -115,8 +127,18 @@ std::optional<MacroStringify> MacroStringify::from(const Reference &r) {
   return MacroStringify::from(r.as_macro());
 }
 
+std::optional<MacroStringify> MacroStringify::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Macro>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Macro>(e));
+}
+
 std::optional<MacroStringify> MacroStringify::from(const TokenContext &t) {
-  return MacroStringify::from(t.as_macro());
+  if (auto base = t.as_macro()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token MacroStringify::stringified_token(void) const {

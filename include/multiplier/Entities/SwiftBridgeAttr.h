@@ -40,17 +40,13 @@ class SwiftBridgeAttr : public InheritableAttr {
     return AttrKind::SWIFT_BRIDGE;
   }
 
-  static std::optional<SwiftBridgeAttr> from(const Attr &parent);
-
-  inline static std::optional<SwiftBridgeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return SwiftBridgeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SwiftBridgeAttr> from_base(const Attr &parent);
+  inline static std::optional<SwiftBridgeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SwiftBridgeAttr> from(const std::optional<Attr> &parent);
   static std::optional<SwiftBridgeAttr> from(const Reference &r);
+  static std::optional<SwiftBridgeAttr> from(const VariantEntity &e);
   static std::optional<SwiftBridgeAttr> from(const TokenContext &t);
 
   std::string_view swift_type(void) const;

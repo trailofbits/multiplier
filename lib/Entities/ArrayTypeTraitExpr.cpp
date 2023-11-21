@@ -90,18 +90,30 @@ bool ArrayTypeTraitExpr::contains(const Stmt &stmt) {
 std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ArrayTypeTraitExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kArrayTypeTraitExprDerivedKinds[] = {
     ArrayTypeTraitExpr::static_kind(),
 };
 
-std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ArrayTypeTraitExpr::static_kind():
       return reinterpret_cast<const ArrayTypeTraitExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<ArrayTypeTraitExpr> ArrayTypeTraitExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kArrayTypeTraitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ArrayTypeTraitExpr> e = ArrayTypeTraitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ArrayTypeTraitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<ArrayTypeTraitExpr> ArrayTypeTraitExpr::in(const Fragment &frag) 
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kArrayTypeTraitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ArrayTypeTraitExpr> e = ArrayTypeTraitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ArrayTypeTraitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<ArrayTypeTraitExpr> ArrayTypeTraitExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kArrayTypeTraitExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ArrayTypeTraitExpr> e = ArrayTypeTraitExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ArrayTypeTraitExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,13 +163,23 @@ std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const Reference &r) {
   return ArrayTypeTraitExpr::from(r.as_statement());
 }
 
+std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const TokenContext &t) {
-  return ArrayTypeTraitExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr ArrayTypeTraitExpr::dimension_expression(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Type ArrayTypeTraitExpr::queried_type(void) const {

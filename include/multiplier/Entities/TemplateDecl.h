@@ -57,17 +57,13 @@ class TemplateDecl : public NamedDecl {
   TemplateDecl canonical_declaration(void) const;
   std::optional<TemplateDecl> definition(void) const;
   gap::generator<TemplateDecl> redeclarations(void) const &;
-  static std::optional<TemplateDecl> from(const Decl &parent);
-
-  inline static std::optional<TemplateDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return TemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TemplateDecl> from_base(const Decl &parent);
+  inline static std::optional<TemplateDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TemplateDecl> from(const std::optional<Decl> &parent);
   static std::optional<TemplateDecl> from(const Reference &r);
+  static std::optional<TemplateDecl> from(const VariantEntity &e);
   static std::optional<TemplateDecl> from(const TokenContext &t);
 
   TemplateParameterList template_parameters(void) const;

@@ -38,18 +38,30 @@ bool BuiltinAliasAttr::contains(const Token &tok) const {
 std::optional<BuiltinAliasAttr> BuiltinAliasAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return BuiltinAliasAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kBuiltinAliasAttrDerivedKinds[] = {
     BuiltinAliasAttr::static_kind(),
 };
 
-std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case BuiltinAliasAttr::static_kind():
       return reinterpret_cast<const BuiltinAliasAttr &>(parent);
@@ -62,7 +74,7 @@ gap::generator<BuiltinAliasAttr> BuiltinAliasAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kBuiltinAliasAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<BuiltinAliasAttr> e = BuiltinAliasAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<BuiltinAliasAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -74,7 +86,7 @@ gap::generator<BuiltinAliasAttr> BuiltinAliasAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kBuiltinAliasAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<BuiltinAliasAttr> e = BuiltinAliasAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<BuiltinAliasAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -87,7 +99,7 @@ gap::generator<BuiltinAliasAttr> BuiltinAliasAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kBuiltinAliasAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<BuiltinAliasAttr> e = BuiltinAliasAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<BuiltinAliasAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -99,8 +111,18 @@ std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from(const Reference &r) {
   return BuiltinAliasAttr::from(r.as_attribute());
 }
 
+std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from(const TokenContext &t) {
-  return BuiltinAliasAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 BuiltinAliasAttrSpelling BuiltinAliasAttr::semantic_spelling(void) const {

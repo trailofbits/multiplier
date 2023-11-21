@@ -40,17 +40,13 @@ class ReturnsTwiceAttr : public InheritableAttr {
     return AttrKind::RETURNS_TWICE;
   }
 
-  static std::optional<ReturnsTwiceAttr> from(const Attr &parent);
-
-  inline static std::optional<ReturnsTwiceAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ReturnsTwiceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ReturnsTwiceAttr> from_base(const Attr &parent);
+  inline static std::optional<ReturnsTwiceAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ReturnsTwiceAttr> from(const std::optional<Attr> &parent);
   static std::optional<ReturnsTwiceAttr> from(const Reference &r);
+  static std::optional<ReturnsTwiceAttr> from(const VariantEntity &e);
   static std::optional<ReturnsTwiceAttr> from(const TokenContext &t);
 
 };

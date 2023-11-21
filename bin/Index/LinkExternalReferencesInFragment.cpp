@@ -16,36 +16,18 @@
 #include "EntityMapper.h"
 #include "PASTA.h"
 #include "PendingFragment.h"
+#include "References.h"
 #include "TokenTree.h"
 #include "Util.h"
 
 namespace indexer {
-
-// Identify the reference kind and update the records. The function
-// goes through the AST node of referrer and assigned the reference
-// kind for the decl. The functions are defined in `References.cpp`
-extern void DeclReferenceKind(
-    const pasta::AST &ast, const EntityMapper &em,
-    const pasta::Stmt &stmt, const pasta::Decl &ref,
-     mx::ReferenceRecord &record);
-
-extern void DeclReferenceKind(
-    const pasta::AST &ast, const EntityMapper &em,
-    const pasta::Decl &decl, const pasta::Decl &ref,
-    mx::ReferenceRecord &record);
-
-extern void DeclReferenceKind(
-    const pasta::AST &ast, const EntityMapper &em,
-    const pasta::Designator &designator, const pasta::Decl &ref,
-    mx::ReferenceRecord &record);
-
 namespace {
 
 template <typename Entity>
 static void AddDeclReferenceFrom(
     const pasta::AST &ast, mx::DatabaseWriter &database, const EntityMapper &em,
     const Entity &from_entity, mx::RawEntityId from_id,
-    const pasta::Decl &to_entity) {
+    const pasta::Decl &to_entity, mx::BuiltinReferenceKind default_kind) {
 
   auto to_id = em.EntityId(to_entity);
   if (!mx::EntityId(to_id).Extract<mx::DeclId>()) {
@@ -56,22 +38,22 @@ static void AddDeclReferenceFrom(
   // The referer context id will be same as `from_id` by default. The
   // DeclReferenceKind function updates it based on the AST analysis
   // of the context in which declaration is referred.
-  mx::ReferenceRecord record{
-      from_id, to_id, from_id, mx::BuiltinReferenceKind::USE};
+  mx::ReferenceRecord record{from_id, to_id, from_id, default_kind};
   DeclReferenceKind(ast, em, from_entity, to_entity, record);
   database.AddAsync(record);
 }
 
-template <typename EntityId, typename EntityKindListMap>
+template <typename EntityId, typename EntityKindListMap,
+          typename ReferenceEnumerator>
 static void AddDeclReferencesFrom(
     const pasta::AST &ast, mx::DatabaseWriter &database,
     const PendingFragment &pf,
-    const EntityKindListMap &entities) {
+    const EntityKindListMap &entities,
+    ReferenceEnumerator enumerate_records) {
 
-  for (auto from_entity : Entities(entities)) {
+  for (const auto &from_entity : Entities(entities)) {
     mx::RawEntityId from_id = pf.em.EntityId(from_entity);
     auto from_eid = mx::EntityId(from_id).Extract<EntityId>();
-
     if (!from_eid) {
       assert(false);
       continue;
@@ -82,8 +64,11 @@ static void AddDeclReferencesFrom(
       continue;  // This is weird?
     }
 
-    for (pasta::Decl to_entity : DeclReferencesFrom(from_entity)) {
-      AddDeclReferenceFrom(ast, database, pf.em, from_entity, from_id, to_entity);
+    for (auto to_entity : DeclReferencesFrom(from_entity)) {
+      for (auto record : enumerate_records(ast, &(pf.em), from_entity,
+                                           to_entity)) {
+        database.AddAsync(record);
+      }
     }
   }
 }
@@ -102,32 +87,20 @@ void LinkExternalReferencesInFragment(
   //            expressed in types. In PASTA, we don't present Clang's
   //            `TypeLoc`s, so we need to instead go through the types to find
   //            which ones are explicitly referenced.
-  AddDeclReferencesFrom<mx::DeclId>(ast, database, pf, pf.decls_to_serialize);
-  AddDeclReferencesFrom<mx::StmtId>(ast, database, pf, pf.stmts_to_serialize);
+  AddDeclReferencesFrom<mx::DeclId>(ast, database, pf, pf.decls_to_serialize,
+                                    EnumerateDeclToTypeReferences);
+
+  AddDeclReferencesFrom<mx::StmtId>(ast, database, pf, pf.stmts_to_serialize,
+                                    EnumerateStmtToDeclReferences);
 
   // XREF(pag): Issue #192. Make sure we record references from designators
   //            to fields.
-  for (pasta::Designator from_entity : Entities(pf.designators_to_serialize)) {
-    mx::RawEntityId from_id = em.EntityId(from_entity);
-    auto from_eid = mx::EntityId(from_id).Extract<mx::DesignatorId>();
-    if (!from_eid) {
-      assert(false);
-      continue;
-    }
+  AddDeclReferencesFrom<mx::DesignatorId>(
+      ast, database, pf, pf.designators_to_serialize,
+      EnumerateDesignatorToDeclReferences);
 
-    if (from_eid->fragment_id != pf.fragment_index) {
-      assert(false);
-      continue;
-    }
-
-    auto to_field = from_entity.Field();
-    if (!to_field) {
-      continue;
-    }
-
-    AddDeclReferenceFrom(ast, database, pf.em,
-                         from_entity, from_id, to_field.value());
-  }
+  // TODO(pag): Issue #464. Add support for `CXXBaseSpecifier`s to the
+  //            references.
 
   for (auto maybe_tt : Entities(pf.macros_to_serialize)) {
     if (!maybe_tt) {
@@ -197,7 +170,8 @@ void LinkExternalReferencesInFragment(
           // The referrer context id will be same as `macro_id` by default
           // and assigned the same.
           database.AddAsync(mx::ReferenceRecord{
-              macro_id, def_id, macro_id, mx::BuiltinReferenceKind::EXPANSION_OF});
+              macro_id, def_id, macro_id,
+              mx::BuiltinReferenceKind::EXPANSION_OF});
         }
         break;
 
@@ -221,7 +195,8 @@ void LinkExternalReferencesInFragment(
           // The referrer context id will be same as `macro_id` by default
           // and assigned the same.
           database.AddAsync(mx::ReferenceRecord{
-              macro_id, file_id, macro_id, mx::BuiltinReferenceKind::INCLUSION});
+              macro_id, file_id, macro_id,
+              mx::BuiltinReferenceKind::INCLUDES_FILE});
         }
         break;
     }

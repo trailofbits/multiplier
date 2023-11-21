@@ -52,17 +52,13 @@ class OMPArraySectionExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<OMPArraySectionExpr> from(const Stmt &parent);
-
-  inline static std::optional<OMPArraySectionExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return OMPArraySectionExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPArraySectionExpr> from_base(const Stmt &parent);
+  inline static std::optional<OMPArraySectionExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPArraySectionExpr> from(const std::optional<Stmt> &parent);
   static std::optional<OMPArraySectionExpr> from(const Reference &r);
+  static std::optional<OMPArraySectionExpr> from(const VariantEntity &e);
   static std::optional<OMPArraySectionExpr> from(const TokenContext &t);
 
   Expr base(void) const;

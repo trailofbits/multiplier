@@ -39,18 +39,30 @@ bool EnforceTCBLeafAttr::contains(const Token &tok) const {
 std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return EnforceTCBLeafAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kEnforceTCBLeafAttrDerivedKinds[] = {
     EnforceTCBLeafAttr::static_kind(),
 };
 
-std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case EnforceTCBLeafAttr::static_kind():
       return reinterpret_cast<const EnforceTCBLeafAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<EnforceTCBLeafAttr> EnforceTCBLeafAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kEnforceTCBLeafAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<EnforceTCBLeafAttr> e = EnforceTCBLeafAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<EnforceTCBLeafAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<EnforceTCBLeafAttr> EnforceTCBLeafAttr::in(const Fragment &frag) 
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kEnforceTCBLeafAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<EnforceTCBLeafAttr> e = EnforceTCBLeafAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<EnforceTCBLeafAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<EnforceTCBLeafAttr> EnforceTCBLeafAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kEnforceTCBLeafAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<EnforceTCBLeafAttr> e = EnforceTCBLeafAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<EnforceTCBLeafAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::from(const Reference &r) {
   return EnforceTCBLeafAttr::from(r.as_attribute());
 }
 
+std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::from(const TokenContext &t) {
-  return EnforceTCBLeafAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::string_view EnforceTCBLeafAttr::tcb_name(void) const {

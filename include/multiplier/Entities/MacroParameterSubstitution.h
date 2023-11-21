@@ -45,17 +45,13 @@ class MacroParameterSubstitution : public MacroSubstitution {
   static gap::generator<MacroParameterSubstitution> containing(const Token &token);
   bool contains(const Token &token);
 
-  static std::optional<MacroParameterSubstitution> from(const Macro &parent);
-
-  inline static std::optional<MacroParameterSubstitution> from(const std::optional<Macro> &parent) {
-    if (parent) {
-      return MacroParameterSubstitution::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MacroParameterSubstitution> from_base(const Macro &parent);
+  inline static std::optional<MacroParameterSubstitution> from(const Macro &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MacroParameterSubstitution> from(const std::optional<Macro> &parent);
   static std::optional<MacroParameterSubstitution> from(const Reference &r);
+  static std::optional<MacroParameterSubstitution> from(const VariantEntity &e);
   static std::optional<MacroParameterSubstitution> from(const TokenContext &t);
 
   MacroParameter parameter(void) const;

@@ -93,18 +93,30 @@ bool CXXMemberCallExpr::contains(const Stmt &stmt) {
 std::optional<CXXMemberCallExpr> CXXMemberCallExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXMemberCallExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXMemberCallExprDerivedKinds[] = {
     CXXMemberCallExpr::static_kind(),
 };
 
-std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXMemberCallExpr::static_kind():
       return reinterpret_cast<const CXXMemberCallExpr &>(parent);
@@ -117,7 +129,7 @@ gap::generator<CXXMemberCallExpr> CXXMemberCallExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXMemberCallExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXMemberCallExpr> e = CXXMemberCallExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXMemberCallExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -129,7 +141,7 @@ gap::generator<CXXMemberCallExpr> CXXMemberCallExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXMemberCallExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXMemberCallExpr> e = CXXMemberCallExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXMemberCallExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -142,7 +154,7 @@ gap::generator<CXXMemberCallExpr> CXXMemberCallExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXMemberCallExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXMemberCallExpr> e = CXXMemberCallExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXMemberCallExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -154,13 +166,23 @@ std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const Reference &r) {
   return CXXMemberCallExpr::from(r.as_statement());
 }
 
+std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const TokenContext &t) {
-  return CXXMemberCallExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr CXXMemberCallExpr::implicit_object_argument(void) const {
   RawEntityId eid = impl->reader.getVal42();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 std::optional<CXXMethodDecl> CXXMemberCallExpr::method_declaration(void) const {
@@ -170,7 +192,7 @@ std::optional<CXXMethodDecl> CXXMemberCallExpr::method_declaration(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXMethodDecl::from(Decl(std::move(eptr)));
+      return CXXMethodDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -183,7 +205,7 @@ Type CXXMemberCallExpr::object_type(void) const {
 
 CXXRecordDecl CXXMemberCallExpr::record_declaration(void) const {
   RawEntityId eid = impl->reader.getVal45();
-  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return CXXRecordDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

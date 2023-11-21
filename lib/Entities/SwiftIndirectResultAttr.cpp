@@ -41,18 +41,30 @@ bool SwiftIndirectResultAttr::contains(const Token &tok) const {
 std::optional<SwiftIndirectResultAttr> SwiftIndirectResultAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return SwiftIndirectResultAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<SwiftIndirectResultAttr> SwiftIndirectResultAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kSwiftIndirectResultAttrDerivedKinds[] = {
     SwiftIndirectResultAttr::static_kind(),
 };
 
-std::optional<SwiftIndirectResultAttr> SwiftIndirectResultAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<SwiftIndirectResultAttr> SwiftIndirectResultAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case SwiftIndirectResultAttr::static_kind():
       return reinterpret_cast<const SwiftIndirectResultAttr &>(parent);
@@ -65,7 +77,7 @@ gap::generator<SwiftIndirectResultAttr> SwiftIndirectResultAttr::in(const Index 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kSwiftIndirectResultAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<SwiftIndirectResultAttr> e = SwiftIndirectResultAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<SwiftIndirectResultAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -77,7 +89,7 @@ gap::generator<SwiftIndirectResultAttr> SwiftIndirectResultAttr::in(const Fragme
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kSwiftIndirectResultAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<SwiftIndirectResultAttr> e = SwiftIndirectResultAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<SwiftIndirectResultAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -90,7 +102,7 @@ gap::generator<SwiftIndirectResultAttr> SwiftIndirectResultAttr::in(const File &
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kSwiftIndirectResultAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<SwiftIndirectResultAttr> e = SwiftIndirectResultAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<SwiftIndirectResultAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -102,8 +114,18 @@ std::optional<SwiftIndirectResultAttr> SwiftIndirectResultAttr::from(const Refer
   return SwiftIndirectResultAttr::from(r.as_attribute());
 }
 
+std::optional<SwiftIndirectResultAttr> SwiftIndirectResultAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<SwiftIndirectResultAttr> SwiftIndirectResultAttr::from(const TokenContext &t) {
-  return SwiftIndirectResultAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

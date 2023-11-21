@@ -57,17 +57,13 @@ class BindingDecl : public ValueDecl {
   BindingDecl canonical_declaration(void) const;
   std::optional<BindingDecl> definition(void) const;
   gap::generator<BindingDecl> redeclarations(void) const &;
-  static std::optional<BindingDecl> from(const Decl &parent);
-
-  inline static std::optional<BindingDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return BindingDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<BindingDecl> from_base(const Decl &parent);
+  inline static std::optional<BindingDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<BindingDecl> from(const std::optional<Decl> &parent);
   static std::optional<BindingDecl> from(const Reference &r);
+  static std::optional<BindingDecl> from(const VariantEntity &e);
   static std::optional<BindingDecl> from(const TokenContext &t);
 
   Expr binding(void) const;

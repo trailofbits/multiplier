@@ -90,18 +90,30 @@ bool CXXUnresolvedConstructExpr::contains(const Stmt &stmt) {
 std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXUnresolvedConstructExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXUnresolvedConstructExprDerivedKinds[] = {
     CXXUnresolvedConstructExpr::static_kind(),
 };
 
-std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXUnresolvedConstructExpr::static_kind():
       return reinterpret_cast<const CXXUnresolvedConstructExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::in(const 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXUnresolvedConstructExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXUnresolvedConstructExpr> e = CXXUnresolvedConstructExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXUnresolvedConstructExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::in(const 
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXUnresolvedConstructExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXUnresolvedConstructExpr> e = CXXUnresolvedConstructExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXUnresolvedConstructExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::in(const 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXUnresolvedConstructExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXUnresolvedConstructExpr> e = CXXUnresolvedConstructExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXUnresolvedConstructExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const
   return CXXUnresolvedConstructExpr::from(r.as_statement());
 }
 
+std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const TokenContext &t) {
-  return CXXUnresolvedConstructExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 unsigned CXXUnresolvedConstructExpr::num_arguments(void) const {
@@ -170,7 +192,7 @@ std::optional<Expr> CXXUnresolvedConstructExpr::nth_argument(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> CXXUnresolvedConstructExpr::arguments(void) const & {
@@ -179,7 +201,7 @@ gap::generator<Expr> CXXUnresolvedConstructExpr::arguments(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+      if (auto e = Expr::from_base(std::move(d15))) {
         co_yield std::move(*e);
       }
     }

@@ -38,18 +38,30 @@ bool MacroQualifiedType::contains(const Token &tok) const {
 std::optional<MacroQualifiedType> MacroQualifiedType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return MacroQualifiedType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MacroQualifiedType> MacroQualifiedType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kMacroQualifiedTypeDerivedKinds[] = {
     MacroQualifiedType::static_kind(),
 };
 
-std::optional<MacroQualifiedType> MacroQualifiedType::from(const Type &parent) {
+}  // namespace
+
+std::optional<MacroQualifiedType> MacroQualifiedType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case MacroQualifiedType::static_kind():
       return reinterpret_cast<const MacroQualifiedType &>(parent);
@@ -62,7 +74,7 @@ gap::generator<MacroQualifiedType> MacroQualifiedType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kMacroQualifiedTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<MacroQualifiedType> e = MacroQualifiedType::from(Type(std::move(eptr)))) {
+      if (std::optional<MacroQualifiedType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -73,8 +85,18 @@ std::optional<MacroQualifiedType> MacroQualifiedType::from(const Reference &r) {
   return MacroQualifiedType::from(r.as_type());
 }
 
+std::optional<MacroQualifiedType> MacroQualifiedType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<MacroQualifiedType> MacroQualifiedType::from(const TokenContext &t) {
-  return MacroQualifiedType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type MacroQualifiedType::desugar(void) const {

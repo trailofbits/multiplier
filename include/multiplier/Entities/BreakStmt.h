@@ -48,17 +48,13 @@ class BreakStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<BreakStmt> from(const Stmt &parent);
-
-  inline static std::optional<BreakStmt> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return BreakStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<BreakStmt> from_base(const Stmt &parent);
+  inline static std::optional<BreakStmt> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<BreakStmt> from(const std::optional<Stmt> &parent);
   static std::optional<BreakStmt> from(const Reference &r);
+  static std::optional<BreakStmt> from(const VariantEntity &e);
   static std::optional<BreakStmt> from(const TokenContext &t);
 
   Token break_token(void) const;

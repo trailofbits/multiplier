@@ -34,17 +34,13 @@ class MatrixType : public Type {
   bool contains(const Token &tok) const;
   static std::optional<MatrixType> by_id(const Index &, EntityId);
 
-  static std::optional<MatrixType> from(const Type &parent);
-
-  inline static std::optional<MatrixType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return MatrixType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MatrixType> from_base(const Type &parent);
+  inline static std::optional<MatrixType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MatrixType> from(const std::optional<Type> &parent);
   static std::optional<MatrixType> from(const Reference &r);
+  static std::optional<MatrixType> from(const VariantEntity &e);
   static std::optional<MatrixType> from(const TokenContext &t);
 
   Type desugar(void) const;

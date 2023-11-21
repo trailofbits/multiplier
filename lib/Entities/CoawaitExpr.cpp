@@ -90,18 +90,30 @@ bool CoawaitExpr::contains(const Stmt &stmt) {
 std::optional<CoawaitExpr> CoawaitExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CoawaitExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CoawaitExpr> CoawaitExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCoawaitExprDerivedKinds[] = {
     CoawaitExpr::static_kind(),
 };
 
-std::optional<CoawaitExpr> CoawaitExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CoawaitExpr> CoawaitExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CoawaitExpr::static_kind():
       return reinterpret_cast<const CoawaitExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<CoawaitExpr> CoawaitExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCoawaitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CoawaitExpr> e = CoawaitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CoawaitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<CoawaitExpr> CoawaitExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCoawaitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CoawaitExpr> e = CoawaitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CoawaitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<CoawaitExpr> CoawaitExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCoawaitExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CoawaitExpr> e = CoawaitExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CoawaitExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<CoawaitExpr> CoawaitExpr::from(const Reference &r) {
   return CoawaitExpr::from(r.as_statement());
 }
 
+std::optional<CoawaitExpr> CoawaitExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CoawaitExpr> CoawaitExpr::from(const TokenContext &t) {
-  return CoawaitExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool CoawaitExpr::is_implicit(void) const {

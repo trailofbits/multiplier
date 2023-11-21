@@ -54,17 +54,13 @@ class OMPParallelForSimdDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<OMPParallelForSimdDirective> from(const Stmt &parent);
-
-  inline static std::optional<OMPParallelForSimdDirective> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return OMPParallelForSimdDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPParallelForSimdDirective> from_base(const Stmt &parent);
+  inline static std::optional<OMPParallelForSimdDirective> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPParallelForSimdDirective> from(const std::optional<Stmt> &parent);
   static std::optional<OMPParallelForSimdDirective> from(const Reference &r);
+  static std::optional<OMPParallelForSimdDirective> from(const VariantEntity &e);
   static std::optional<OMPParallelForSimdDirective> from(const TokenContext &t);
 
 };

@@ -40,17 +40,13 @@ class TargetVersionAttr : public InheritableAttr {
     return AttrKind::TARGET_VERSION;
   }
 
-  static std::optional<TargetVersionAttr> from(const Attr &parent);
-
-  inline static std::optional<TargetVersionAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return TargetVersionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TargetVersionAttr> from_base(const Attr &parent);
+  inline static std::optional<TargetVersionAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TargetVersionAttr> from(const std::optional<Attr> &parent);
   static std::optional<TargetVersionAttr> from(const Reference &r);
+  static std::optional<TargetVersionAttr> from(const VariantEntity &e);
   static std::optional<TargetVersionAttr> from(const TokenContext &t);
 
   std::string_view name(void) const;

@@ -90,19 +90,31 @@ bool AsmStmt::contains(const Stmt &stmt) {
 std::optional<AsmStmt> AsmStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return AsmStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<AsmStmt> AsmStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kAsmStmtDerivedKinds[] = {
     GCCAsmStmt::static_kind(),
     MSAsmStmt::static_kind(),
 };
 
-std::optional<AsmStmt> AsmStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<AsmStmt> AsmStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case GCCAsmStmt::static_kind():
     case MSAsmStmt::static_kind():
@@ -116,7 +128,7 @@ gap::generator<AsmStmt> AsmStmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kAsmStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<AsmStmt> e = AsmStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<AsmStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -128,7 +140,7 @@ gap::generator<AsmStmt> AsmStmt::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kAsmStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<AsmStmt> e = AsmStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<AsmStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -141,7 +153,7 @@ gap::generator<AsmStmt> AsmStmt::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kAsmStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<AsmStmt> e = AsmStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<AsmStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -153,8 +165,18 @@ std::optional<AsmStmt> AsmStmt::from(const Reference &r) {
   return AsmStmt::from(r.as_statement());
 }
 
+std::optional<AsmStmt> AsmStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<AsmStmt> AsmStmt::from(const TokenContext &t) {
-  return AsmStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::string_view AsmStmt::generate_assembly_string(void) const {
@@ -181,7 +203,7 @@ std::optional<Expr> AsmStmt::nth_input(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> AsmStmt::inputs(void) const & {
@@ -190,7 +212,7 @@ gap::generator<Expr> AsmStmt::inputs(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+      if (auto e = Expr::from_base(std::move(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -221,7 +243,7 @@ std::optional<Expr> AsmStmt::nth_output(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> AsmStmt::outputs(void) const & {
@@ -230,7 +252,7 @@ gap::generator<Expr> AsmStmt::outputs(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d26 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d26)))) {
+      if (auto e = Expr::from_base(std::move(d26))) {
         co_yield std::move(*e);
       }
     }
@@ -262,7 +284,7 @@ std::optional<Expr> AsmStmt::nth_output_expression(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> AsmStmt::output_expressions(void) const & {
@@ -271,7 +293,7 @@ gap::generator<Expr> AsmStmt::output_expressions(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d27 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d27)))) {
+      if (auto e = Expr::from_base(std::move(d27))) {
         co_yield std::move(*e);
       }
     }
@@ -303,7 +325,7 @@ std::optional<Expr> AsmStmt::nth_input_expression(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> AsmStmt::input_expressions(void) const & {
@@ -312,7 +334,7 @@ gap::generator<Expr> AsmStmt::input_expressions(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d28 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d28)))) {
+      if (auto e = Expr::from_base(std::move(d28))) {
         co_yield std::move(*e);
       }
     }

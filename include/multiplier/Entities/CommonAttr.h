@@ -40,17 +40,13 @@ class CommonAttr : public InheritableAttr {
     return AttrKind::COMMON;
   }
 
-  static std::optional<CommonAttr> from(const Attr &parent);
-
-  inline static std::optional<CommonAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CommonAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CommonAttr> from_base(const Attr &parent);
+  inline static std::optional<CommonAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CommonAttr> from(const std::optional<Attr> &parent);
   static std::optional<CommonAttr> from(const Reference &r);
+  static std::optional<CommonAttr> from(const VariantEntity &e);
   static std::optional<CommonAttr> from(const TokenContext &t);
 
 };

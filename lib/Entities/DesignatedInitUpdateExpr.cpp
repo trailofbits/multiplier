@@ -90,18 +90,30 @@ bool DesignatedInitUpdateExpr::contains(const Stmt &stmt) {
 std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return DesignatedInitUpdateExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kDesignatedInitUpdateExprDerivedKinds[] = {
     DesignatedInitUpdateExpr::static_kind(),
 };
 
-std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case DesignatedInitUpdateExpr::static_kind():
       return reinterpret_cast<const DesignatedInitUpdateExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::in(const Inde
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kDesignatedInitUpdateExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<DesignatedInitUpdateExpr> e = DesignatedInitUpdateExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<DesignatedInitUpdateExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::in(const Frag
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kDesignatedInitUpdateExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<DesignatedInitUpdateExpr> e = DesignatedInitUpdateExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<DesignatedInitUpdateExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::in(const File
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kDesignatedInitUpdateExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<DesignatedInitUpdateExpr> e = DesignatedInitUpdateExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<DesignatedInitUpdateExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,18 +163,28 @@ std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const Ref
   return DesignatedInitUpdateExpr::from(r.as_statement());
 }
 
+std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const TokenContext &t) {
-  return DesignatedInitUpdateExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr DesignatedInitUpdateExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 InitListExpr DesignatedInitUpdateExpr::updater(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return InitListExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return InitListExpr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

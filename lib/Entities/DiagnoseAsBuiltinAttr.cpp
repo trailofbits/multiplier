@@ -40,18 +40,30 @@ bool DiagnoseAsBuiltinAttr::contains(const Token &tok) const {
 std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return DiagnoseAsBuiltinAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kDiagnoseAsBuiltinAttrDerivedKinds[] = {
     DiagnoseAsBuiltinAttr::static_kind(),
 };
 
-std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case DiagnoseAsBuiltinAttr::static_kind():
       return reinterpret_cast<const DiagnoseAsBuiltinAttr &>(parent);
@@ -64,7 +76,7 @@ gap::generator<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::in(const Index &ind
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kDiagnoseAsBuiltinAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<DiagnoseAsBuiltinAttr> e = DiagnoseAsBuiltinAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<DiagnoseAsBuiltinAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -76,7 +88,7 @@ gap::generator<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::in(const Fragment &
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kDiagnoseAsBuiltinAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<DiagnoseAsBuiltinAttr> e = DiagnoseAsBuiltinAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<DiagnoseAsBuiltinAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -89,7 +101,7 @@ gap::generator<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::in(const File &file
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kDiagnoseAsBuiltinAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<DiagnoseAsBuiltinAttr> e = DiagnoseAsBuiltinAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<DiagnoseAsBuiltinAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -101,13 +113,23 @@ std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::from(const Reference
   return DiagnoseAsBuiltinAttr::from(r.as_attribute());
 }
 
+std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::from(const TokenContext &t) {
-  return DiagnoseAsBuiltinAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 FunctionDecl DiagnoseAsBuiltinAttr::function(void) const {
   RawEntityId eid = impl->reader.getVal8();
-  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return FunctionDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

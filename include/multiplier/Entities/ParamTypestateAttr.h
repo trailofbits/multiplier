@@ -41,17 +41,13 @@ class ParamTypestateAttr : public InheritableAttr {
     return AttrKind::PARAM_TYPESTATE;
   }
 
-  static std::optional<ParamTypestateAttr> from(const Attr &parent);
-
-  inline static std::optional<ParamTypestateAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ParamTypestateAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ParamTypestateAttr> from_base(const Attr &parent);
+  inline static std::optional<ParamTypestateAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ParamTypestateAttr> from(const std::optional<Attr> &parent);
   static std::optional<ParamTypestateAttr> from(const Reference &r);
+  static std::optional<ParamTypestateAttr> from(const VariantEntity &e);
   static std::optional<ParamTypestateAttr> from(const TokenContext &t);
 
   ParamTypestateAttrConsumedState parameter_state(void) const;

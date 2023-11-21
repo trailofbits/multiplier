@@ -24,23 +24,96 @@ using OpaqueImplPtr = std::shared_ptr<const void>;
 using ReferenceKindImplPtr = std::shared_ptr<const ReferenceKindImpl>;
 using WeakReferenceKindImplPtr = std::weak_ptr<const ReferenceKindImpl>;
 
+// Multiplier's builtin reference kinds are slightly odd. In practice, an
+// automatically added reference always has the referenced entity as a
+// `Decl`, and the referencing entity as a `Stmt`, specifically one of
+// `DeclRefExpr`, `MemberExpr`, `AddrLabelExpr`, `CXXConstructExpr`,
+// `DesignatedInitExpr`, or `InitListExpr`. And yet, the builtin reference kind
+// presents higher level "verbs" that describe the context of the reference.
+//
+// This can be understood in terms of our reference representation, specifically
+// the `context` field:
+//
+//      from:     Entity which refers to `to`.
+//      kind:     The kind of the reference.
+//      to:       Entity referenced by `from`.
+//      context:  For builtin reference kinds, this is either `from`, or it is
+//                a parent of `from`.
+//
+// Thus, with builtin reference kinds, one is to understand the `kind` as a verb
+// of the form "`from` is or is in `context`, and `kind` `to`". For example,
+// "`DeclRefExpr` is or is in `CallExpr`, and `CALLS` `FunctionDecl`".
+//
+// This is a bit of a funny representation, but it provides useful baseline
+// classification of the reference, while maintaining the precision of `from`,
+// i.e. via the `from` entity, we should always be able to find the `to` entity
+// (or a redeclaration thereof), e.g. via a method call.
 enum class BuiltinReferenceKind {
-  USE,  // Default value as some kind of uses.
-  ADDRESS_OF,
-  ASSIGNED_TO,
-  ASSIGNEMENT,
+
+  // Default kind when the `to` entity is a `ValueDecl`.
+  USES_VALUE,
+
+  // Default kind when the `to` entity is a `TypeDecl`. Generally, this
+  // corresponds to a use of type in a declarator.
+  USES_TYPE,
+
+  // Used in a cast expression.
+  CASTS_WITH_TYPE,
+
+  // Corresponds to an assignment. E.g. if `... = b`, then we say that the
+  // expression `... = ...` copies the value of `b`.
+  COPIES_VALUE,
+
+  // If we have something like `while (a) ...` or `do ... while (a);` or
+  // `switch(a) ...` or `for(; a; ) ...` or `if (a) ...` or `a ? ... : ...`
+  // then we say that the expression, e.g. `while (...) ...`, tests the value
+  // `a`. This is a special form of `READS_VALUE`.
+  TESTS_VALUE,
+
+  // If we have `a = ...` then we say that the expression `... = ...` writes
+  // to the value `a`.
+  WRITES_VALUE,
+
+  // If an expression mutates something in place, e.g. `++a`, then we say that
+  // the expression `++...` updates `a`.
+  UPDATES_VALUE,
+
+  // If we have something like `*a`, `a. ...`, `a->...`, or `a[...]` then we say
+  // that the exression `*...`, `... . ...`, `...->...`, or `...[...]` accesses
+  // the value `a`, respectively.
+  ACCESSES_VALUE,
+
+  // If we have `...(a)`, or `...[a]`, then we say that the expression
+  // `...(...)` and `...[...]` takes the value `a`, respectively. This is
+  // similar to `COPIES_VALUE`.
+  TAKES_VALUE,
+
+  // If we have `a(...)` then we say that the expression `...(...)` calls `a`.
   CALLS,
-  CALL_ARGUMENT,
-  USED_BY,
-  DEREFERENCE,
-  ENUMERATIONS,
-  EXPANSION_OF,
-  INCLUSION,
-  INITIALZATION,
-  CONDITIONAL_TEST,
-  TYPE_CASTS,
-  STATEMENT_USES,
-  TYPE_TRAIT_USES,
+
+  // In the case of variables, this corresponds to `&var`. We say that the
+  // expression `&...` takes the address of `var`.
+  //
+  // In the case of fields, this corresponds to `&....field` or
+  // `&...->field`, and we say that the expression `&...` takes the address
+  // of `field`. This also applies through reference casts and paren
+  // expressions.
+  //
+  // In the case of functions, this corresponds to raw uses of function/method
+  // pointers, and the `&` unary operation. For example, if we have `... = func`,
+  // or `&func`, or `...(func)` then we say the expression `... = ...`,
+  // `&...`, or `...(...)` takes the address of `func`, respectively.
+  // `func`.
+  TAKES_ADDRESS,
+
+  // If there is a `#include "a"`, `#include <a>`, `#include_next ...`,
+  // `#import ...`, then we say the macro `#include ...` includes the
+  // entity `a`.
+  INCLUDES_FILE,
+
+  // If there is a use of a macro like `a` or `a(...)` then we say the macro
+  // `...` or `...(...)` is an expansion of `a`.
+  EXPANSION_OF 
 };
 
 inline static const char *EnumerationName(BuiltinReferenceKind) {
@@ -50,7 +123,7 @@ inline static const char *EnumerationName(BuiltinReferenceKind) {
 const char *EnumeratorName(BuiltinReferenceKind);
 
 inline static constexpr unsigned NumEnumerators(BuiltinReferenceKind) {
-  return 16;
+  return 13;
 }
 
 class ReferenceKind {
@@ -65,7 +138,12 @@ class ReferenceKind {
   /* implicit */ inline ReferenceKind(ReferenceKindImplPtr impl_)
       : impl(std::move(impl_)) {}
 
+  RawEntityId id(void) const noexcept;
+
  public:
+
+  // Get a reference kind for a builtin kind.
+  static ReferenceKind get(const Index &, BuiltinReferenceKind kind);
 
   // Get or create a reference kind.
   static ReferenceKind get(const Index &, std::string_view name);
@@ -74,19 +152,37 @@ class ReferenceKind {
   std::optional<BuiltinReferenceKind> builtin_reference_kind(void) const noexcept;
 
   // The name of this reference kind.
-  const std::string &kind(void) const & noexcept;
+  std::string_view data(void) const & noexcept;
 
   // The name of this reference kind.
-  std::string kind(void) const && noexcept;
+  std::string data(void) const && noexcept;
 };
 
+// A reference is an arbitrarily named/kinded relation between two entities,
+// inducing a directed graph. Normally, the edges between entities are via
+// built-in method calls on entity objects. These methods are generally derived
+// from the PASTA API / Clang API, by way of the indexer serializing
+// ASTs. References, however, enable more semantic relationships between
+// entities to be expressed. By default, the indexer fills in several built-in
+// references, e.g. between callers and callees. Most of these correspond to
+// explicit references that appear in the code itself. Users, however, can
+// use the reference API to augment the built-in graph, e.g. expressing patterns
+// such as function pointer de-virtualization, by introducing their own
+// reference edges using built-in kinds, or by creating entirely custom
+// reference kinds for the sake of analysis result persistence.
+//
+// Although references are logically a `(from, kind, to)` triple, we store an
+// additional `context` field. By default, `context` matches `from`. However,
+// sometimes it differs. When it does, it's good to think about it as providing
+// *visual* context for `from`, and thus is should be an entity that is a
+// parent of `from`.
 class Reference {
  private:
   OpaqueImplPtr impl;
-  // The reference context will have entity id of referrer
-  // that references the entity of interest.
+  // The reference context will have entity id of referrer that references the
+  // entity of interest.
   RawEntityId context_id;
-  RawEntityId from_id;
+  RawEntityId entity_id;
   RawEntityId kind_id;
 
 #define MX_FRIEND(type_name, lower_name, enum_name, category) \
@@ -103,27 +199,31 @@ class Reference {
 
   Reference(void) = delete;
 
-  // Add a reference between two entities.
-  static bool add(const ReferenceKind &kind, RawEntityId from_id,
-                  RawEntityId to_id, RawEntityId context_id, int);
+  inline static RawEntityId reference_kind_id(RawEntityId kind_id) noexcept {
+    return kind_id;
+  }
+
+  inline static RawEntityId reference_kind_id(
+      const ReferenceKind &kind) noexcept {
+    return kind.id();
+  }
 
  public:
 
   inline explicit Reference(OpaqueImplPtr impl_,
                             RawEntityId context_id_,
-                            RawEntityId from_id_,
+                            RawEntityId entity_id_,
                             RawEntityId kind_id_)
       : impl(std::move(impl_)),
         context_id(context_id_),
-        from_id(from_id_),
+        entity_id(entity_id_),
         kind_id(kind_id_) {}
 
-  // The context id will be same or ancestor of `from_id`. The default
-  // value will be same as `from_id`.
-  inline static bool add(const ReferenceKind &kind, EntityId from_id_,
-                         EntityId to_id_, EntityId context_id_) {
-    return add(kind, from_id_.Pack(), to_id_.Pack(), context_id_.Pack(), 0);
-  }
+  static bool add(const ReferenceKind &kind, const VariantEntity &from,
+                  const VariantEntity &to);
+
+  static bool add(const ReferenceKind &kind, const VariantEntity &from,
+                  const VariantEntity &to, const VariantEntity &context);
 
   EntityCategory category(void) const noexcept;
 
@@ -138,7 +238,7 @@ class Reference {
 
   // The ID of the referenced entity.
   inline EntityId referenced_entity_id(void) const noexcept {
-    return from_id;
+    return entity_id;
   }
 
   // Return the kind of this reference.
@@ -146,6 +246,9 @@ class Reference {
 
   // The contextual entity associated with this reference.
   VariantEntity context(void) const noexcept;
+
+  // Generate all references from some kind of entity.
+  static gap::generator<Reference> from(const VariantEntity &entity);
 
   // Generate all references to some kind of entity.
   static gap::generator<Reference> to(const VariantEntity &entity);

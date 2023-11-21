@@ -40,17 +40,13 @@ class ObjCInertUnsafeUnretainedAttr : public TypeAttr {
     return AttrKind::OBJ_C_INERT_UNSAFE_UNRETAINED;
   }
 
-  static std::optional<ObjCInertUnsafeUnretainedAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCInertUnsafeUnretainedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCInertUnsafeUnretainedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCInertUnsafeUnretainedAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCInertUnsafeUnretainedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCInertUnsafeUnretainedAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCInertUnsafeUnretainedAttr> from(const Reference &r);
+  static std::optional<ObjCInertUnsafeUnretainedAttr> from(const VariantEntity &e);
   static std::optional<ObjCInertUnsafeUnretainedAttr> from(const TokenContext &t);
 
 };

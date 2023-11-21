@@ -41,17 +41,13 @@ class IBOutletCollectionAttr : public InheritableAttr {
     return AttrKind::IB_OUTLET_COLLECTION;
   }
 
-  static std::optional<IBOutletCollectionAttr> from(const Attr &parent);
-
-  inline static std::optional<IBOutletCollectionAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return IBOutletCollectionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<IBOutletCollectionAttr> from_base(const Attr &parent);
+  inline static std::optional<IBOutletCollectionAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<IBOutletCollectionAttr> from(const std::optional<Attr> &parent);
   static std::optional<IBOutletCollectionAttr> from(const Reference &r);
+  static std::optional<IBOutletCollectionAttr> from(const VariantEntity &e);
   static std::optional<IBOutletCollectionAttr> from(const TokenContext &t);
 
   Type interface(void) const;

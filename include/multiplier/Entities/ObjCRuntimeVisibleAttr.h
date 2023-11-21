@@ -38,17 +38,13 @@ class ObjCRuntimeVisibleAttr : public Attr {
     return AttrKind::OBJ_C_RUNTIME_VISIBLE;
   }
 
-  static std::optional<ObjCRuntimeVisibleAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCRuntimeVisibleAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCRuntimeVisibleAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCRuntimeVisibleAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCRuntimeVisibleAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCRuntimeVisibleAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCRuntimeVisibleAttr> from(const Reference &r);
+  static std::optional<ObjCRuntimeVisibleAttr> from(const VariantEntity &e);
   static std::optional<ObjCRuntimeVisibleAttr> from(const TokenContext &t);
 
 };

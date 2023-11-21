@@ -42,17 +42,13 @@ class NonNullAttr : public InheritableParamAttr {
     return AttrKind::NON_NULL;
   }
 
-  static std::optional<NonNullAttr> from(const Attr &parent);
-
-  inline static std::optional<NonNullAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NonNullAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NonNullAttr> from_base(const Attr &parent);
+  inline static std::optional<NonNullAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NonNullAttr> from(const std::optional<Attr> &parent);
   static std::optional<NonNullAttr> from(const Reference &r);
+  static std::optional<NonNullAttr> from(const VariantEntity &e);
   static std::optional<NonNullAttr> from(const TokenContext &t);
 
 };

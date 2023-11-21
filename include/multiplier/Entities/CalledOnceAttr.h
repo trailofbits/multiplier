@@ -38,17 +38,13 @@ class CalledOnceAttr : public Attr {
     return AttrKind::CALLED_ONCE;
   }
 
-  static std::optional<CalledOnceAttr> from(const Attr &parent);
-
-  inline static std::optional<CalledOnceAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CalledOnceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CalledOnceAttr> from_base(const Attr &parent);
+  inline static std::optional<CalledOnceAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CalledOnceAttr> from(const std::optional<Attr> &parent);
   static std::optional<CalledOnceAttr> from(const Reference &r);
+  static std::optional<CalledOnceAttr> from(const VariantEntity &e);
   static std::optional<CalledOnceAttr> from(const TokenContext &t);
 
 };

@@ -56,18 +56,30 @@ gap::generator<MacroExpansion> MacroExpansion::containing(const Token &token) {
 std::optional<MacroExpansion> MacroExpansion::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<MacroId>(vid)) {
-    return MacroExpansion::from(index.macro(eid.Pack()));
+    if (auto base = index.macro(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MacroExpansion> MacroExpansion::from(const std::optional<Macro> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const MacroKind kMacroExpansionDerivedKinds[] = {
     MacroExpansion::static_kind(),
 };
 
-std::optional<MacroExpansion> MacroExpansion::from(const Macro &parent) {
+}  // namespace
+
+std::optional<MacroExpansion> MacroExpansion::from_base(const Macro &parent) {
   switch (parent.kind()) {
     case MacroExpansion::static_kind():
       return reinterpret_cast<const MacroExpansion &>(parent);
@@ -80,7 +92,7 @@ gap::generator<MacroExpansion> MacroExpansion::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroKind k : kMacroExpansionDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
-      if (std::optional<MacroExpansion> e = MacroExpansion::from(Macro(std::move(eptr)))) {
+      if (std::optional<MacroExpansion> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -92,7 +104,7 @@ gap::generator<MacroExpansion> MacroExpansion::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (MacroKind k : kMacroExpansionDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-      if (std::optional<MacroExpansion> e = MacroExpansion::from(Macro(std::move(eptr)))) {
+      if (std::optional<MacroExpansion> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -105,7 +117,7 @@ gap::generator<MacroExpansion> MacroExpansion::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (MacroKind k : kMacroExpansionDerivedKinds) {
       for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-        if (std::optional<MacroExpansion> e = MacroExpansion::from(Macro(std::move(eptr)))) {
+        if (std::optional<MacroExpansion> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -117,8 +129,18 @@ std::optional<MacroExpansion> MacroExpansion::from(const Reference &r) {
   return MacroExpansion::from(r.as_macro());
 }
 
+std::optional<MacroExpansion> MacroExpansion::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Macro>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Macro>(e));
+}
+
 std::optional<MacroExpansion> MacroExpansion::from(const TokenContext &t) {
-  return MacroExpansion::from(t.as_macro());
+  if (auto base = t.as_macro()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<MacroOrToken> MacroExpansion::intermediate_children(void) const & {
@@ -143,7 +165,7 @@ std::optional<DefineMacroDirective> MacroExpansion::definition(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->MacroFor(impl->ep, eid)) {
-      return DefineMacroDirective::from(Macro(std::move(eptr)));
+      return DefineMacroDirective::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -164,7 +186,7 @@ std::optional<MacroArgument> MacroExpansion::nth_argument(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return MacroArgument::from(Macro(std::move(e)));
+  return MacroArgument::from_base(std::move(e));
 }
 
 gap::generator<MacroArgument> MacroExpansion::arguments(void) const & {
@@ -173,7 +195,7 @@ gap::generator<MacroArgument> MacroExpansion::arguments(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d10 = ep->MacroFor(ep, v)) {
-      if (auto e = MacroArgument::from(Macro(std::move(d10)))) {
+      if (auto e = MacroArgument::from_base(std::move(d10))) {
         co_yield std::move(*e);
       }
     }

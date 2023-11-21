@@ -40,17 +40,13 @@ class BTFTypeTagAttr : public TypeAttr {
     return AttrKind::BTF_TYPE_TAG;
   }
 
-  static std::optional<BTFTypeTagAttr> from(const Attr &parent);
-
-  inline static std::optional<BTFTypeTagAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return BTFTypeTagAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<BTFTypeTagAttr> from_base(const Attr &parent);
+  inline static std::optional<BTFTypeTagAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<BTFTypeTagAttr> from(const std::optional<Attr> &parent);
   static std::optional<BTFTypeTagAttr> from(const Reference &r);
+  static std::optional<BTFTypeTagAttr> from(const VariantEntity &e);
   static std::optional<BTFTypeTagAttr> from(const TokenContext &t);
 
   std::string_view btf_type_tag(void) const;

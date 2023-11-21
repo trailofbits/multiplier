@@ -39,18 +39,30 @@ bool CFUnknownTransferAttr::contains(const Token &tok) const {
 std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return CFUnknownTransferAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kCFUnknownTransferAttrDerivedKinds[] = {
     CFUnknownTransferAttr::static_kind(),
 };
 
-std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case CFUnknownTransferAttr::static_kind():
       return reinterpret_cast<const CFUnknownTransferAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<CFUnknownTransferAttr> CFUnknownTransferAttr::in(const Index &ind
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kCFUnknownTransferAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<CFUnknownTransferAttr> e = CFUnknownTransferAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<CFUnknownTransferAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<CFUnknownTransferAttr> CFUnknownTransferAttr::in(const Fragment &
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kCFUnknownTransferAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<CFUnknownTransferAttr> e = CFUnknownTransferAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<CFUnknownTransferAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<CFUnknownTransferAttr> CFUnknownTransferAttr::in(const File &file
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kCFUnknownTransferAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<CFUnknownTransferAttr> e = CFUnknownTransferAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<CFUnknownTransferAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::from(const Reference
   return CFUnknownTransferAttr::from(r.as_attribute());
 }
 
+std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::from(const TokenContext &t) {
-  return CFUnknownTransferAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

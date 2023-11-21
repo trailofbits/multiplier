@@ -17,8 +17,8 @@
 #include <span>
 #include <vector>
 
+#include "../Entity.h"
 #include "../Iterator.h"
-#include "../Types.h"
 
 #include "AttrKind.h"
 
@@ -78,7 +78,6 @@ class Attr {
   }
 
   PackedAttrId id(void) const;
-  gap::generator<Reference> references(void) const &;
 
  public:
   static gap::generator<Attr> in(const Index &index, std::span<AttrKind> kinds);
@@ -100,7 +99,7 @@ class Attr {
   }
 
   static std::optional<Attr> from(const Reference &r);
-
+  static std::optional<Attr> from(const VariantEntity &e);
   static std::optional<Attr> from(const TokenContext &t);
 
   Token token(void) const;

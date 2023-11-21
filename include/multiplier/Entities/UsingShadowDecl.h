@@ -55,17 +55,13 @@ class UsingShadowDecl : public NamedDecl {
   UsingShadowDecl canonical_declaration(void) const;
   std::optional<UsingShadowDecl> definition(void) const;
   gap::generator<UsingShadowDecl> redeclarations(void) const &;
-  static std::optional<UsingShadowDecl> from(const Decl &parent);
-
-  inline static std::optional<UsingShadowDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return UsingShadowDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UsingShadowDecl> from_base(const Decl &parent);
+  inline static std::optional<UsingShadowDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UsingShadowDecl> from(const std::optional<Decl> &parent);
   static std::optional<UsingShadowDecl> from(const Reference &r);
+  static std::optional<UsingShadowDecl> from(const VariantEntity &e);
   static std::optional<UsingShadowDecl> from(const TokenContext &t);
 
   BaseUsingDecl introducer(void) const;

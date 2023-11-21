@@ -53,17 +53,13 @@ class UsingPackDecl : public NamedDecl {
   UsingPackDecl canonical_declaration(void) const;
   std::optional<UsingPackDecl> definition(void) const;
   gap::generator<UsingPackDecl> redeclarations(void) const &;
-  static std::optional<UsingPackDecl> from(const Decl &parent);
-
-  inline static std::optional<UsingPackDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return UsingPackDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UsingPackDecl> from_base(const Decl &parent);
+  inline static std::optional<UsingPackDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UsingPackDecl> from(const std::optional<Decl> &parent);
   static std::optional<UsingPackDecl> from(const Reference &r);
+  static std::optional<UsingPackDecl> from(const VariantEntity &e);
   static std::optional<UsingPackDecl> from(const TokenContext &t);
 
   std::optional<NamedDecl> nth_expansion(unsigned n) const;

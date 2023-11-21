@@ -52,17 +52,13 @@ class ClassScopeFunctionSpecializationDecl : public Decl {
   ClassScopeFunctionSpecializationDecl canonical_declaration(void) const;
   std::optional<ClassScopeFunctionSpecializationDecl> definition(void) const;
   gap::generator<ClassScopeFunctionSpecializationDecl> redeclarations(void) const &;
-  static std::optional<ClassScopeFunctionSpecializationDecl> from(const Decl &parent);
-
-  inline static std::optional<ClassScopeFunctionSpecializationDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ClassScopeFunctionSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ClassScopeFunctionSpecializationDecl> from_base(const Decl &parent);
+  inline static std::optional<ClassScopeFunctionSpecializationDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ClassScopeFunctionSpecializationDecl> from(const std::optional<Decl> &parent);
   static std::optional<ClassScopeFunctionSpecializationDecl> from(const Reference &r);
+  static std::optional<ClassScopeFunctionSpecializationDecl> from(const VariantEntity &e);
   static std::optional<ClassScopeFunctionSpecializationDecl> from(const TokenContext &t);
 
   CXXMethodDecl specialization(void) const;

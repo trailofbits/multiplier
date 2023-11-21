@@ -40,17 +40,13 @@ class Ptr32Attr : public TypeAttr {
     return AttrKind::PTR32;
   }
 
-  static std::optional<Ptr32Attr> from(const Attr &parent);
-
-  inline static std::optional<Ptr32Attr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return Ptr32Attr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<Ptr32Attr> from_base(const Attr &parent);
+  inline static std::optional<Ptr32Attr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<Ptr32Attr> from(const std::optional<Attr> &parent);
   static std::optional<Ptr32Attr> from(const Reference &r);
+  static std::optional<Ptr32Attr> from(const VariantEntity &e);
   static std::optional<Ptr32Attr> from(const TokenContext &t);
 
 };

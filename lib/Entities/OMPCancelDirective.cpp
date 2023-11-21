@@ -88,18 +88,30 @@ bool OMPCancelDirective::contains(const Stmt &stmt) {
 std::optional<OMPCancelDirective> OMPCancelDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPCancelDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPCancelDirective> OMPCancelDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPCancelDirectiveDerivedKinds[] = {
     OMPCancelDirective::static_kind(),
 };
 
-std::optional<OMPCancelDirective> OMPCancelDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPCancelDirective> OMPCancelDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPCancelDirective::static_kind():
       return reinterpret_cast<const OMPCancelDirective &>(parent);
@@ -112,7 +124,7 @@ gap::generator<OMPCancelDirective> OMPCancelDirective::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPCancelDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPCancelDirective> e = OMPCancelDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPCancelDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -124,7 +136,7 @@ gap::generator<OMPCancelDirective> OMPCancelDirective::in(const Fragment &frag) 
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPCancelDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPCancelDirective> e = OMPCancelDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPCancelDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -137,7 +149,7 @@ gap::generator<OMPCancelDirective> OMPCancelDirective::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPCancelDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPCancelDirective> e = OMPCancelDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPCancelDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -149,8 +161,18 @@ std::optional<OMPCancelDirective> OMPCancelDirective::from(const Reference &r) {
   return OMPCancelDirective::from(r.as_statement());
 }
 
+std::optional<OMPCancelDirective> OMPCancelDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPCancelDirective> OMPCancelDirective::from(const TokenContext &t) {
-  return OMPCancelDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

@@ -93,18 +93,30 @@ bool CXXNewExpr::contains(const Stmt &stmt) {
 std::optional<CXXNewExpr> CXXNewExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXNewExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXNewExpr> CXXNewExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXNewExprDerivedKinds[] = {
     CXXNewExpr::static_kind(),
 };
 
-std::optional<CXXNewExpr> CXXNewExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXNewExpr> CXXNewExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXNewExpr::static_kind():
       return reinterpret_cast<const CXXNewExpr &>(parent);
@@ -117,7 +129,7 @@ gap::generator<CXXNewExpr> CXXNewExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXNewExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXNewExpr> e = CXXNewExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXNewExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -129,7 +141,7 @@ gap::generator<CXXNewExpr> CXXNewExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXNewExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXNewExpr> e = CXXNewExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXNewExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -142,7 +154,7 @@ gap::generator<CXXNewExpr> CXXNewExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXNewExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXNewExpr> e = CXXNewExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXNewExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -154,8 +166,18 @@ std::optional<CXXNewExpr> CXXNewExpr::from(const Reference &r) {
   return CXXNewExpr::from(r.as_statement());
 }
 
+std::optional<CXXNewExpr> CXXNewExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXNewExpr> CXXNewExpr::from(const TokenContext &t) {
-  return CXXNewExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool CXXNewExpr::does_usual_array_delete_want_size(void) const {
@@ -174,7 +196,7 @@ std::optional<Expr> CXXNewExpr::array_size(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -187,7 +209,7 @@ std::optional<CXXConstructExpr> CXXNewExpr::construct_expression(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return CXXConstructExpr::from(Stmt(std::move(eptr)));
+      return CXXConstructExpr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -208,7 +230,7 @@ std::optional<Expr> CXXNewExpr::initializer(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -216,12 +238,12 @@ std::optional<Expr> CXXNewExpr::initializer(void) const {
 
 FunctionDecl CXXNewExpr::operator_delete(void) const {
   RawEntityId eid = impl->reader.getVal43();
-  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return FunctionDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 FunctionDecl CXXNewExpr::operator_new(void) const {
   RawEntityId eid = impl->reader.getVal44();
-  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return FunctionDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 TokenRange CXXNewExpr::type_id_parentheses(void) const {
@@ -263,7 +285,7 @@ std::optional<Expr> CXXNewExpr::nth_placement_argument(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> CXXNewExpr::placement_arguments(void) const & {
@@ -272,7 +294,7 @@ gap::generator<Expr> CXXNewExpr::placement_arguments(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+      if (auto e = Expr::from_base(std::move(d15))) {
         co_yield std::move(*e);
       }
     }

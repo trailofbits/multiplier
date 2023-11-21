@@ -43,8 +43,6 @@ elseif(PLATFORM_LINUX)
 endif()
 
 add_subdirectory("vendor")
-include("cmake/mlir.cmake")
-include("cmake/vast.cmake")
 
 if(MX_ENABLE_RE2)
   find_package(re2 CONFIG REQUIRED)
@@ -88,6 +86,9 @@ if(MX_ENABLE_VAST)
   find_package(LLVM CONFIG REQUIRED)
   find_package(MLIR CONFIG REQUIRED)
   find_package(VAST CONFIG REQUIRED)
+
+  include("cmake/mlir.cmake")
+  include("cmake/vast.cmake")
 endif()
 
 if(MX_ENABLE_INSTALL)

@@ -88,7 +88,7 @@ bool VarTemplateDecl::contains(const Stmt &stmt) {
 }
 
 VarTemplateDecl VarTemplateDecl::canonical_declaration(void) const {
-  if (auto canon = VarTemplateDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (VarTemplateDecl redecl : redeclarations()) {
@@ -98,12 +98,15 @@ VarTemplateDecl VarTemplateDecl::canonical_declaration(void) const {
 }
 
 std::optional<VarTemplateDecl> VarTemplateDecl::definition(void) const {
-  return VarTemplateDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<VarTemplateDecl> VarTemplateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<VarTemplateDecl> dr = VarTemplateDecl::from(r)) {
+    if (std::optional<VarTemplateDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -116,18 +119,30 @@ gap::generator<VarTemplateDecl> VarTemplateDecl::redeclarations(void) const & {
 std::optional<VarTemplateDecl> VarTemplateDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return VarTemplateDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<VarTemplateDecl> VarTemplateDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kVarTemplateDeclDerivedKinds[] = {
     VarTemplateDecl::static_kind(),
 };
 
-std::optional<VarTemplateDecl> VarTemplateDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<VarTemplateDecl> VarTemplateDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case VarTemplateDecl::static_kind():
       return reinterpret_cast<const VarTemplateDecl &>(parent);
@@ -140,7 +155,7 @@ gap::generator<VarTemplateDecl> VarTemplateDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kVarTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<VarTemplateDecl> e = VarTemplateDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<VarTemplateDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -152,7 +167,7 @@ gap::generator<VarTemplateDecl> VarTemplateDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kVarTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<VarTemplateDecl> e = VarTemplateDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<VarTemplateDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -165,7 +180,7 @@ gap::generator<VarTemplateDecl> VarTemplateDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kVarTemplateDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<VarTemplateDecl> e = VarTemplateDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<VarTemplateDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -177,8 +192,18 @@ std::optional<VarTemplateDecl> VarTemplateDecl::from(const Reference &r) {
   return VarTemplateDecl::from(r.as_declaration());
 }
 
+std::optional<VarTemplateDecl> VarTemplateDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<VarTemplateDecl> VarTemplateDecl::from(const TokenContext &t) {
-  return VarTemplateDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool VarTemplateDecl::is_this_declaration_a_definition(void) const {

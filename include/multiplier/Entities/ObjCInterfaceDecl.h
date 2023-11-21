@@ -61,17 +61,13 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   ObjCInterfaceDecl canonical_declaration(void) const;
   std::optional<ObjCInterfaceDecl> definition(void) const;
   gap::generator<ObjCInterfaceDecl> redeclarations(void) const &;
-  static std::optional<ObjCInterfaceDecl> from(const Decl &parent);
-
-  inline static std::optional<ObjCInterfaceDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ObjCInterfaceDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCInterfaceDecl> from_base(const Decl &parent);
+  inline static std::optional<ObjCInterfaceDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCInterfaceDecl> from(const std::optional<Decl> &parent);
   static std::optional<ObjCInterfaceDecl> from(const Reference &r);
+  static std::optional<ObjCInterfaceDecl> from(const VariantEntity &e);
   static std::optional<ObjCInterfaceDecl> from(const TokenContext &t);
 
   std::optional<ObjCProtocolDecl> nth_all_referenced_protocol(unsigned n) const;

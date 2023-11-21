@@ -40,17 +40,13 @@ class ArcWeakrefUnavailableAttr : public InheritableAttr {
     return AttrKind::ARC_WEAKREF_UNAVAILABLE;
   }
 
-  static std::optional<ArcWeakrefUnavailableAttr> from(const Attr &parent);
-
-  inline static std::optional<ArcWeakrefUnavailableAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ArcWeakrefUnavailableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ArcWeakrefUnavailableAttr> from_base(const Attr &parent);
+  inline static std::optional<ArcWeakrefUnavailableAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ArcWeakrefUnavailableAttr> from(const std::optional<Attr> &parent);
   static std::optional<ArcWeakrefUnavailableAttr> from(const Reference &r);
+  static std::optional<ArcWeakrefUnavailableAttr> from(const VariantEntity &e);
   static std::optional<ArcWeakrefUnavailableAttr> from(const TokenContext &t);
 
 };

@@ -62,17 +62,13 @@ class RecordDecl : public TagDecl {
   RecordDecl canonical_declaration(void) const;
   std::optional<RecordDecl> definition(void) const;
   gap::generator<RecordDecl> redeclarations(void) const &;
-  static std::optional<RecordDecl> from(const Decl &parent);
-
-  inline static std::optional<RecordDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return RecordDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<RecordDecl> from_base(const Decl &parent);
+  inline static std::optional<RecordDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<RecordDecl> from(const std::optional<Decl> &parent);
   static std::optional<RecordDecl> from(const Reference &r);
+  static std::optional<RecordDecl> from(const VariantEntity &e);
   static std::optional<RecordDecl> from(const TokenContext &t);
 
   bool can_pass_in_registers(void) const;

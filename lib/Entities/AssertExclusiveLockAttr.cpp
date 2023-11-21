@@ -39,18 +39,30 @@ bool AssertExclusiveLockAttr::contains(const Token &tok) const {
 std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return AssertExclusiveLockAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kAssertExclusiveLockAttrDerivedKinds[] = {
     AssertExclusiveLockAttr::static_kind(),
 };
 
-std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case AssertExclusiveLockAttr::static_kind():
       return reinterpret_cast<const AssertExclusiveLockAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<AssertExclusiveLockAttr> AssertExclusiveLockAttr::in(const Index 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kAssertExclusiveLockAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<AssertExclusiveLockAttr> e = AssertExclusiveLockAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<AssertExclusiveLockAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<AssertExclusiveLockAttr> AssertExclusiveLockAttr::in(const Fragme
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kAssertExclusiveLockAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<AssertExclusiveLockAttr> e = AssertExclusiveLockAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<AssertExclusiveLockAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<AssertExclusiveLockAttr> AssertExclusiveLockAttr::in(const File &
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kAssertExclusiveLockAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<AssertExclusiveLockAttr> e = AssertExclusiveLockAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<AssertExclusiveLockAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::from(const Refer
   return AssertExclusiveLockAttr::from(r.as_attribute());
 }
 
+std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::from(const TokenContext &t) {
-  return AssertExclusiveLockAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

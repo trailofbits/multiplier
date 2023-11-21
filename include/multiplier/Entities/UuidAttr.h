@@ -41,17 +41,13 @@ class UuidAttr : public InheritableAttr {
     return AttrKind::UUID;
   }
 
-  static std::optional<UuidAttr> from(const Attr &parent);
-
-  inline static std::optional<UuidAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return UuidAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UuidAttr> from_base(const Attr &parent);
+  inline static std::optional<UuidAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UuidAttr> from(const std::optional<Attr> &parent);
   static std::optional<UuidAttr> from(const Reference &r);
+  static std::optional<UuidAttr> from(const VariantEntity &e);
   static std::optional<UuidAttr> from(const TokenContext &t);
 
   std::string_view guid(void) const;

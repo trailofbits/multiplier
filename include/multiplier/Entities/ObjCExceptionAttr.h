@@ -40,17 +40,13 @@ class ObjCExceptionAttr : public InheritableAttr {
     return AttrKind::OBJ_C_EXCEPTION;
   }
 
-  static std::optional<ObjCExceptionAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCExceptionAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCExceptionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCExceptionAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCExceptionAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCExceptionAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCExceptionAttr> from(const Reference &r);
+  static std::optional<ObjCExceptionAttr> from(const VariantEntity &e);
   static std::optional<ObjCExceptionAttr> from(const TokenContext &t);
 
 };

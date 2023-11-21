@@ -51,17 +51,13 @@ class AccessSpecDecl : public Decl {
   AccessSpecDecl canonical_declaration(void) const;
   std::optional<AccessSpecDecl> definition(void) const;
   gap::generator<AccessSpecDecl> redeclarations(void) const &;
-  static std::optional<AccessSpecDecl> from(const Decl &parent);
-
-  inline static std::optional<AccessSpecDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return AccessSpecDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AccessSpecDecl> from_base(const Decl &parent);
+  inline static std::optional<AccessSpecDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AccessSpecDecl> from(const std::optional<Decl> &parent);
   static std::optional<AccessSpecDecl> from(const Reference &r);
+  static std::optional<AccessSpecDecl> from(const VariantEntity &e);
   static std::optional<AccessSpecDecl> from(const TokenContext &t);
 
   Token access_specifier_token(void) const;

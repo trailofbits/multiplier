@@ -38,17 +38,13 @@ class ThreadAttr : public Attr {
     return AttrKind::THREAD;
   }
 
-  static std::optional<ThreadAttr> from(const Attr &parent);
-
-  inline static std::optional<ThreadAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ThreadAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ThreadAttr> from_base(const Attr &parent);
+  inline static std::optional<ThreadAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ThreadAttr> from(const std::optional<Attr> &parent);
   static std::optional<ThreadAttr> from(const Reference &r);
+  static std::optional<ThreadAttr> from(const VariantEntity &e);
   static std::optional<ThreadAttr> from(const TokenContext &t);
 
 };

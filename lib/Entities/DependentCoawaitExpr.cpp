@@ -90,18 +90,30 @@ bool DependentCoawaitExpr::contains(const Stmt &stmt) {
 std::optional<DependentCoawaitExpr> DependentCoawaitExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return DependentCoawaitExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kDependentCoawaitExprDerivedKinds[] = {
     DependentCoawaitExpr::static_kind(),
 };
 
-std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case DependentCoawaitExpr::static_kind():
       return reinterpret_cast<const DependentCoawaitExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<DependentCoawaitExpr> DependentCoawaitExpr::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kDependentCoawaitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<DependentCoawaitExpr> e = DependentCoawaitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<DependentCoawaitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<DependentCoawaitExpr> DependentCoawaitExpr::in(const Fragment &fr
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kDependentCoawaitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<DependentCoawaitExpr> e = DependentCoawaitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<DependentCoawaitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<DependentCoawaitExpr> DependentCoawaitExpr::in(const File &file) 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kDependentCoawaitExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<DependentCoawaitExpr> e = DependentCoawaitExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<DependentCoawaitExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const Reference &
   return DependentCoawaitExpr::from(r.as_statement());
 }
 
+std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const TokenContext &t) {
-  return DependentCoawaitExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token DependentCoawaitExpr::keyword_token(void) const {
@@ -161,12 +183,12 @@ Token DependentCoawaitExpr::keyword_token(void) const {
 
 Expr DependentCoawaitExpr::operand(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 UnresolvedLookupExpr DependentCoawaitExpr::operator_coawait_lookup(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return UnresolvedLookupExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return UnresolvedLookupExpr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

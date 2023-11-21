@@ -48,17 +48,13 @@ class SEHLeaveStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<SEHLeaveStmt> from(const Stmt &parent);
-
-  inline static std::optional<SEHLeaveStmt> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return SEHLeaveStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SEHLeaveStmt> from_base(const Stmt &parent);
+  inline static std::optional<SEHLeaveStmt> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SEHLeaveStmt> from(const std::optional<Stmt> &parent);
   static std::optional<SEHLeaveStmt> from(const Reference &r);
+  static std::optional<SEHLeaveStmt> from(const VariantEntity &e);
   static std::optional<SEHLeaveStmt> from(const TokenContext &t);
 
   Token leave_token(void) const;

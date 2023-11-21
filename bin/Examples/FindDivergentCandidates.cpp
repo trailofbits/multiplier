@@ -37,8 +37,8 @@ static void FindDivergentCandidates(mx::Index index) {
       if (auto unary_op = mx::UnaryOperator::from(child)) {
         mx::UnaryOperatorKind operator_kind = unary_op->opcode();
         switch (operator_kind) {
-          case mx::UnaryOperatorKind::POST_DEC:
-          case mx::UnaryOperatorKind::PRE_DEC:
+          case mx::UnaryOperatorKind::POST_DECREMENT:
+          case mx::UnaryOperatorKind::PRE_DECREMENT:
           case mx::UnaryOperatorKind::POST_INCREMENT:
           case mx::UnaryOperatorKind::PRE_INCREMENT:
             break;
@@ -71,7 +71,7 @@ static void FindDivergentCandidates(mx::Index index) {
           std::vector<mx::ArraySubscriptExpr> mem_accesses;
           std::vector<mx::Stmt> outside_uses;
 
-          for (mx::Reference ref : decl.references()) {
+          for (mx::Reference ref : mx::Reference::to(decl)) {
             auto ref_stmt = ref.as_statement();
             if (!ref_stmt) {
               continue;

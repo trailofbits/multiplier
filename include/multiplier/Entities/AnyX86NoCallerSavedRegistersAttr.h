@@ -40,17 +40,13 @@ class AnyX86NoCallerSavedRegistersAttr : public InheritableAttr {
     return AttrKind::ANY_X86_NO_CALLER_SAVED_REGISTERS;
   }
 
-  static std::optional<AnyX86NoCallerSavedRegistersAttr> from(const Attr &parent);
-
-  inline static std::optional<AnyX86NoCallerSavedRegistersAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AnyX86NoCallerSavedRegistersAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AnyX86NoCallerSavedRegistersAttr> from_base(const Attr &parent);
+  inline static std::optional<AnyX86NoCallerSavedRegistersAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AnyX86NoCallerSavedRegistersAttr> from(const std::optional<Attr> &parent);
   static std::optional<AnyX86NoCallerSavedRegistersAttr> from(const Reference &r);
+  static std::optional<AnyX86NoCallerSavedRegistersAttr> from(const VariantEntity &e);
   static std::optional<AnyX86NoCallerSavedRegistersAttr> from(const TokenContext &t);
 
 };

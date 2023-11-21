@@ -41,17 +41,13 @@ class VisibilityAttr : public InheritableAttr {
     return AttrKind::VISIBILITY;
   }
 
-  static std::optional<VisibilityAttr> from(const Attr &parent);
-
-  inline static std::optional<VisibilityAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return VisibilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<VisibilityAttr> from_base(const Attr &parent);
+  inline static std::optional<VisibilityAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<VisibilityAttr> from(const std::optional<Attr> &parent);
   static std::optional<VisibilityAttr> from(const Reference &r);
+  static std::optional<VisibilityAttr> from(const VariantEntity &e);
   static std::optional<VisibilityAttr> from(const TokenContext &t);
 
   VisibilityAttrVisibilityType visibility(void) const;

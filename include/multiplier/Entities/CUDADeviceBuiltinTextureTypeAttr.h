@@ -40,17 +40,13 @@ class CUDADeviceBuiltinTextureTypeAttr : public InheritableAttr {
     return AttrKind::CUDA_DEVICE_BUILTIN_TEXTURE_TYPE;
   }
 
-  static std::optional<CUDADeviceBuiltinTextureTypeAttr> from(const Attr &parent);
-
-  inline static std::optional<CUDADeviceBuiltinTextureTypeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CUDADeviceBuiltinTextureTypeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CUDADeviceBuiltinTextureTypeAttr> from_base(const Attr &parent);
+  inline static std::optional<CUDADeviceBuiltinTextureTypeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CUDADeviceBuiltinTextureTypeAttr> from(const std::optional<Attr> &parent);
   static std::optional<CUDADeviceBuiltinTextureTypeAttr> from(const Reference &r);
+  static std::optional<CUDADeviceBuiltinTextureTypeAttr> from(const VariantEntity &e);
   static std::optional<CUDADeviceBuiltinTextureTypeAttr> from(const TokenContext &t);
 
 };

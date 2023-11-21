@@ -40,17 +40,13 @@ class Mips16Attr : public InheritableAttr {
     return AttrKind::MIPS16;
   }
 
-  static std::optional<Mips16Attr> from(const Attr &parent);
-
-  inline static std::optional<Mips16Attr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return Mips16Attr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<Mips16Attr> from_base(const Attr &parent);
+  inline static std::optional<Mips16Attr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<Mips16Attr> from(const std::optional<Attr> &parent);
   static std::optional<Mips16Attr> from(const Reference &r);
+  static std::optional<Mips16Attr> from(const VariantEntity &e);
   static std::optional<Mips16Attr> from(const TokenContext &t);
 
 };

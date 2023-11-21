@@ -234,11 +234,6 @@ SpecificEntityId<TypeId> Type::id(void) const {
   return TypeId(type_id, kind());
 }
 
-// References to this type.
-gap::generator<Reference> Type::references(void) const & {
-  return References(impl->ep, id().Pack());
-}
-
 // TokenRange for the type
 TokenRange Type::tokens(void) const {
   return impl->TokenRangeFor(impl, impl->BeginToken(), impl->EndToken());

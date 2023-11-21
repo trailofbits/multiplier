@@ -38,17 +38,13 @@ class ObjCRuntimeNameAttr : public Attr {
     return AttrKind::OBJ_C_RUNTIME_NAME;
   }
 
-  static std::optional<ObjCRuntimeNameAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCRuntimeNameAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCRuntimeNameAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCRuntimeNameAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCRuntimeNameAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCRuntimeNameAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCRuntimeNameAttr> from(const Reference &r);
+  static std::optional<ObjCRuntimeNameAttr> from(const VariantEntity &e);
   static std::optional<ObjCRuntimeNameAttr> from(const TokenContext &t);
 
   std::string_view metadata_name(void) const;

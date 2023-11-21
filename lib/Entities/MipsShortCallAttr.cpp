@@ -39,18 +39,30 @@ bool MipsShortCallAttr::contains(const Token &tok) const {
 std::optional<MipsShortCallAttr> MipsShortCallAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return MipsShortCallAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MipsShortCallAttr> MipsShortCallAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kMipsShortCallAttrDerivedKinds[] = {
     MipsShortCallAttr::static_kind(),
 };
 
-std::optional<MipsShortCallAttr> MipsShortCallAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<MipsShortCallAttr> MipsShortCallAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case MipsShortCallAttr::static_kind():
       return reinterpret_cast<const MipsShortCallAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<MipsShortCallAttr> MipsShortCallAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kMipsShortCallAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<MipsShortCallAttr> e = MipsShortCallAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<MipsShortCallAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<MipsShortCallAttr> MipsShortCallAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kMipsShortCallAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<MipsShortCallAttr> e = MipsShortCallAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<MipsShortCallAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<MipsShortCallAttr> MipsShortCallAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kMipsShortCallAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<MipsShortCallAttr> e = MipsShortCallAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<MipsShortCallAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<MipsShortCallAttr> MipsShortCallAttr::from(const Reference &r) {
   return MipsShortCallAttr::from(r.as_attribute());
 }
 
+std::optional<MipsShortCallAttr> MipsShortCallAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<MipsShortCallAttr> MipsShortCallAttr::from(const TokenContext &t) {
-  return MipsShortCallAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 MipsShortCallAttrSpelling MipsShortCallAttr::semantic_spelling(void) const {

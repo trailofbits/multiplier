@@ -39,18 +39,30 @@ bool LValueReferenceType::contains(const Token &tok) const {
 std::optional<LValueReferenceType> LValueReferenceType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return LValueReferenceType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<LValueReferenceType> LValueReferenceType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kLValueReferenceTypeDerivedKinds[] = {
     LValueReferenceType::static_kind(),
 };
 
-std::optional<LValueReferenceType> LValueReferenceType::from(const Type &parent) {
+}  // namespace
+
+std::optional<LValueReferenceType> LValueReferenceType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case LValueReferenceType::static_kind():
       return reinterpret_cast<const LValueReferenceType &>(parent);
@@ -63,7 +75,7 @@ gap::generator<LValueReferenceType> LValueReferenceType::in(const Index &index) 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kLValueReferenceTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<LValueReferenceType> e = LValueReferenceType::from(Type(std::move(eptr)))) {
+      if (std::optional<LValueReferenceType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -74,8 +86,18 @@ std::optional<LValueReferenceType> LValueReferenceType::from(const Reference &r)
   return LValueReferenceType::from(r.as_type());
 }
 
+std::optional<LValueReferenceType> LValueReferenceType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<LValueReferenceType> LValueReferenceType::from(const TokenContext &t) {
-  return LValueReferenceType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type LValueReferenceType::desugar(void) const {

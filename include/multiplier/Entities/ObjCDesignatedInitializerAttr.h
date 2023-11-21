@@ -38,17 +38,13 @@ class ObjCDesignatedInitializerAttr : public Attr {
     return AttrKind::OBJ_C_DESIGNATED_INITIALIZER;
   }
 
-  static std::optional<ObjCDesignatedInitializerAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCDesignatedInitializerAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCDesignatedInitializerAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCDesignatedInitializerAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCDesignatedInitializerAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCDesignatedInitializerAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCDesignatedInitializerAttr> from(const Reference &r);
+  static std::optional<ObjCDesignatedInitializerAttr> from(const VariantEntity &e);
   static std::optional<ObjCDesignatedInitializerAttr> from(const TokenContext &t);
 
 };

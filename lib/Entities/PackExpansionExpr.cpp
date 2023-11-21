@@ -89,18 +89,30 @@ bool PackExpansionExpr::contains(const Stmt &stmt) {
 std::optional<PackExpansionExpr> PackExpansionExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return PackExpansionExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<PackExpansionExpr> PackExpansionExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kPackExpansionExprDerivedKinds[] = {
     PackExpansionExpr::static_kind(),
 };
 
-std::optional<PackExpansionExpr> PackExpansionExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<PackExpansionExpr> PackExpansionExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case PackExpansionExpr::static_kind():
       return reinterpret_cast<const PackExpansionExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<PackExpansionExpr> PackExpansionExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kPackExpansionExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<PackExpansionExpr> e = PackExpansionExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<PackExpansionExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<PackExpansionExpr> PackExpansionExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kPackExpansionExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<PackExpansionExpr> e = PackExpansionExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<PackExpansionExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<PackExpansionExpr> PackExpansionExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kPackExpansionExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<PackExpansionExpr> e = PackExpansionExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<PackExpansionExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,8 +162,18 @@ std::optional<PackExpansionExpr> PackExpansionExpr::from(const Reference &r) {
   return PackExpansionExpr::from(r.as_statement());
 }
 
+std::optional<PackExpansionExpr> PackExpansionExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<PackExpansionExpr> PackExpansionExpr::from(const TokenContext &t) {
-  return PackExpansionExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token PackExpansionExpr::ellipsis_token(void) const {
@@ -160,7 +182,7 @@ Token PackExpansionExpr::ellipsis_token(void) const {
 
 Expr PackExpansionExpr::pattern(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

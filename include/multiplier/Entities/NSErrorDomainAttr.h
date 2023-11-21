@@ -41,17 +41,13 @@ class NSErrorDomainAttr : public InheritableAttr {
     return AttrKind::NS_ERROR_DOMAIN;
   }
 
-  static std::optional<NSErrorDomainAttr> from(const Attr &parent);
-
-  inline static std::optional<NSErrorDomainAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NSErrorDomainAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NSErrorDomainAttr> from_base(const Attr &parent);
+  inline static std::optional<NSErrorDomainAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NSErrorDomainAttr> from(const std::optional<Attr> &parent);
   static std::optional<NSErrorDomainAttr> from(const Reference &r);
+  static std::optional<NSErrorDomainAttr> from(const VariantEntity &e);
   static std::optional<NSErrorDomainAttr> from(const TokenContext &t);
 
   VarDecl error_domain(void) const;

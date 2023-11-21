@@ -90,18 +90,30 @@ bool ObjCIvarRefExpr::contains(const Stmt &stmt) {
 std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ObjCIvarRefExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kObjCIvarRefExprDerivedKinds[] = {
     ObjCIvarRefExpr::static_kind(),
 };
 
-std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCIvarRefExpr::static_kind():
       return reinterpret_cast<const ObjCIvarRefExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<ObjCIvarRefExpr> ObjCIvarRefExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCIvarRefExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ObjCIvarRefExpr> e = ObjCIvarRefExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCIvarRefExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<ObjCIvarRefExpr> ObjCIvarRefExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCIvarRefExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCIvarRefExpr> e = ObjCIvarRefExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCIvarRefExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<ObjCIvarRefExpr> ObjCIvarRefExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCIvarRefExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCIvarRefExpr> e = ObjCIvarRefExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ObjCIvarRefExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,18 +163,28 @@ std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const Reference &r) {
   return ObjCIvarRefExpr::from(r.as_statement());
 }
 
+std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const TokenContext &t) {
-  return ObjCIvarRefExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr ObjCIvarRefExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 ObjCIvarDecl ObjCIvarRefExpr::declaration(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCIvarDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token ObjCIvarRefExpr::token(void) const {

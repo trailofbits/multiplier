@@ -89,18 +89,30 @@ bool OMPParallelSectionsDirective::contains(const Stmt &stmt) {
 std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPParallelSectionsDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPParallelSectionsDirectiveDerivedKinds[] = {
     OMPParallelSectionsDirective::static_kind(),
 };
 
-std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPParallelSectionsDirective::static_kind():
       return reinterpret_cast<const OMPParallelSectionsDirective &>(parent);
@@ -113,7 +125,7 @@ gap::generator<OMPParallelSectionsDirective> OMPParallelSectionsDirective::in(co
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPParallelSectionsDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPParallelSectionsDirective> e = OMPParallelSectionsDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPParallelSectionsDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<OMPParallelSectionsDirective> OMPParallelSectionsDirective::in(co
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPParallelSectionsDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPParallelSectionsDirective> e = OMPParallelSectionsDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPParallelSectionsDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<OMPParallelSectionsDirective> OMPParallelSectionsDirective::in(co
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPParallelSectionsDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPParallelSectionsDirective> e = OMPParallelSectionsDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPParallelSectionsDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,13 +162,23 @@ std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(c
   return OMPParallelSectionsDirective::from(r.as_statement());
 }
 
+std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(const TokenContext &t) {
-  return OMPParallelSectionsDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr OMPParallelSectionsDirective::task_reduction_reference_expression(void) const {
   RawEntityId eid = impl->reader.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool OMPParallelSectionsDirective::has_cancel(void) const {

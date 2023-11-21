@@ -56,17 +56,13 @@ class TemplateTypeParmDecl : public TypeDecl {
   TemplateTypeParmDecl canonical_declaration(void) const;
   std::optional<TemplateTypeParmDecl> definition(void) const;
   gap::generator<TemplateTypeParmDecl> redeclarations(void) const &;
-  static std::optional<TemplateTypeParmDecl> from(const Decl &parent);
-
-  inline static std::optional<TemplateTypeParmDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return TemplateTypeParmDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TemplateTypeParmDecl> from_base(const Decl &parent);
+  inline static std::optional<TemplateTypeParmDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TemplateTypeParmDecl> from(const std::optional<Decl> &parent);
   static std::optional<TemplateTypeParmDecl> from(const Reference &r);
+  static std::optional<TemplateTypeParmDecl> from(const VariantEntity &e);
   static std::optional<TemplateTypeParmDecl> from(const TokenContext &t);
 
   bool default_argument_was_inherited(void) const;

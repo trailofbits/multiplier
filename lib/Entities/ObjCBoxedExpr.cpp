@@ -90,18 +90,30 @@ bool ObjCBoxedExpr::contains(const Stmt &stmt) {
 std::optional<ObjCBoxedExpr> ObjCBoxedExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ObjCBoxedExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kObjCBoxedExprDerivedKinds[] = {
     ObjCBoxedExpr::static_kind(),
 };
 
-std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCBoxedExpr::static_kind():
       return reinterpret_cast<const ObjCBoxedExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<ObjCBoxedExpr> ObjCBoxedExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCBoxedExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ObjCBoxedExpr> e = ObjCBoxedExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCBoxedExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<ObjCBoxedExpr> ObjCBoxedExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCBoxedExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCBoxedExpr> e = ObjCBoxedExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCBoxedExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<ObjCBoxedExpr> ObjCBoxedExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCBoxedExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCBoxedExpr> e = ObjCBoxedExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ObjCBoxedExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const Reference &r) {
   return ObjCBoxedExpr::from(r.as_statement());
 }
 
+std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const TokenContext &t) {
-  return ObjCBoxedExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token ObjCBoxedExpr::at_token(void) const {
@@ -161,12 +183,12 @@ Token ObjCBoxedExpr::at_token(void) const {
 
 ObjCMethodDecl ObjCBoxedExpr::boxing_method(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCMethodDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Expr ObjCBoxedExpr::sub_expression(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool ObjCBoxedExpr::is_expressible_as_constant_initializer(void) const {

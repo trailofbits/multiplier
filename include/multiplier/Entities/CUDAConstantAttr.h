@@ -40,17 +40,13 @@ class CUDAConstantAttr : public InheritableAttr {
     return AttrKind::CUDA_CONSTANT;
   }
 
-  static std::optional<CUDAConstantAttr> from(const Attr &parent);
-
-  inline static std::optional<CUDAConstantAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CUDAConstantAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CUDAConstantAttr> from_base(const Attr &parent);
+  inline static std::optional<CUDAConstantAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CUDAConstantAttr> from(const std::optional<Attr> &parent);
   static std::optional<CUDAConstantAttr> from(const Reference &r);
+  static std::optional<CUDAConstantAttr> from(const VariantEntity &e);
   static std::optional<CUDAConstantAttr> from(const TokenContext &t);
 
 };

@@ -56,17 +56,13 @@ class ObjCPropertyImplDecl : public Decl {
   ObjCPropertyImplDecl canonical_declaration(void) const;
   std::optional<ObjCPropertyImplDecl> definition(void) const;
   gap::generator<ObjCPropertyImplDecl> redeclarations(void) const &;
-  static std::optional<ObjCPropertyImplDecl> from(const Decl &parent);
-
-  inline static std::optional<ObjCPropertyImplDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ObjCPropertyImplDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCPropertyImplDecl> from_base(const Decl &parent);
+  inline static std::optional<ObjCPropertyImplDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCPropertyImplDecl> from(const std::optional<Decl> &parent);
   static std::optional<ObjCPropertyImplDecl> from(const Reference &r);
+  static std::optional<ObjCPropertyImplDecl> from(const VariantEntity &e);
   static std::optional<ObjCPropertyImplDecl> from(const TokenContext &t);
 
   Expr getter_cxx_constructor(void) const;

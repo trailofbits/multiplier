@@ -39,18 +39,30 @@ bool DependentAddressSpaceType::contains(const Token &tok) const {
 std::optional<DependentAddressSpaceType> DependentAddressSpaceType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return DependentAddressSpaceType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kDependentAddressSpaceTypeDerivedKinds[] = {
     DependentAddressSpaceType::static_kind(),
 };
 
-std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const Type &parent) {
+}  // namespace
+
+std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case DependentAddressSpaceType::static_kind():
       return reinterpret_cast<const DependentAddressSpaceType &>(parent);
@@ -63,7 +75,7 @@ gap::generator<DependentAddressSpaceType> DependentAddressSpaceType::in(const In
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kDependentAddressSpaceTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<DependentAddressSpaceType> e = DependentAddressSpaceType::from(Type(std::move(eptr)))) {
+      if (std::optional<DependentAddressSpaceType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -74,8 +86,18 @@ std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const R
   return DependentAddressSpaceType::from(r.as_type());
 }
 
+std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const TokenContext &t) {
-  return DependentAddressSpaceType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type DependentAddressSpaceType::desugar(void) const {
@@ -85,7 +107,7 @@ Type DependentAddressSpaceType::desugar(void) const {
 
 Expr DependentAddressSpaceType::address_space_expression(void) const {
   RawEntityId eid = impl->reader.getVal19();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token DependentAddressSpaceType::attribute_token(void) const {

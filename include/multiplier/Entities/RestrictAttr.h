@@ -41,17 +41,13 @@ class RestrictAttr : public InheritableAttr {
     return AttrKind::RESTRICT;
   }
 
-  static std::optional<RestrictAttr> from(const Attr &parent);
-
-  inline static std::optional<RestrictAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return RestrictAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<RestrictAttr> from_base(const Attr &parent);
+  inline static std::optional<RestrictAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<RestrictAttr> from(const std::optional<Attr> &parent);
   static std::optional<RestrictAttr> from(const Reference &r);
+  static std::optional<RestrictAttr> from(const VariantEntity &e);
   static std::optional<RestrictAttr> from(const TokenContext &t);
 
   RestrictAttrSpelling semantic_spelling(void) const;

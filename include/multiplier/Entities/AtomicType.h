@@ -36,17 +36,13 @@ class AtomicType : public Type {
     return TypeKind::ATOMIC;
   }
 
-  static std::optional<AtomicType> from(const Type &parent);
-
-  inline static std::optional<AtomicType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return AtomicType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AtomicType> from_base(const Type &parent);
+  inline static std::optional<AtomicType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AtomicType> from(const std::optional<Type> &parent);
   static std::optional<AtomicType> from(const Reference &r);
+  static std::optional<AtomicType> from(const VariantEntity &e);
   static std::optional<AtomicType> from(const TokenContext &t);
 
   Type desugar(void) const;

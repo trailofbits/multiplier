@@ -29,7 +29,7 @@
 #include "PASTA.h"
 #include "Util.h"
 
-//#define D(...) __VA_ARGS__
+// #define D(...) __VA_ARGS__
 #ifndef D
 # define D(...)
 #endif
@@ -923,13 +923,13 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
     switch (tok.Role()) {
       default:
       case pasta::TokenRole::kInvalid:
+        assert(false);
         err << "Invalid or unexpected token in range";
         return nullptr;
 
       case pasta::TokenRole::kBeginOfMacroExpansionMarker: {
         assert(!is_parsed_tok);
         assert(!last_macro_use_token);
-        assert(tok.FileLocation().has_value());
         info.category = TokenInfo::kMarkerToken;
         last_macro_use_token = &info;
         break;
@@ -938,10 +938,12 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
       case pasta::TokenRole::kEndOfMacroExpansionMarker: {
         assert(!is_parsed_tok);
         assert(last_macro_use_token != nullptr);
-        pasta::File file = pasta::File::Containing(
-            last_macro_use_token->file_tok.value());
-        info.file_tok = file.Tokens().At(
-            last_macro_use_token->file_tok->Index() + 1u);
+        if (last_macro_use_token && last_macro_use_token->file_tok) {
+          pasta::File file = pasta::File::Containing(
+              last_macro_use_token->file_tok.value());
+          info.file_tok = file.Tokens().At(
+              last_macro_use_token->file_tok->Index() + 1u);
+        }
         info.category = TokenInfo::kMarkerToken;
         last_macro_use_token = nullptr;
         break;
@@ -950,7 +952,6 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
       case pasta::TokenRole::kInitialMacroUseToken: {
         assert(!is_parsed_tok);
         info.category = TokenInfo::kMacroUseToken;
-        assert(info.file_tok.has_value());
         assert(info.macro_tok.has_value());
         last_macro_use_token = &info;
         break;
@@ -958,7 +959,6 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
 
       case pasta::TokenRole::kIntermediateMacroExpansionToken: {
         assert(!is_parsed_tok);
-        assert(last_macro_use_token != nullptr);
         info.category = TokenInfo::kMacroStepToken;
         assert(info.macro_tok.has_value());
         break;
@@ -973,7 +973,6 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
 
       case pasta::TokenRole::kBeginOfFileMarker:
       case pasta::TokenRole::kEndOfFileMarker: {
-        assert(!last_macro_use_token);
         assert(tok.FileLocation().has_value());
         info.category = TokenInfo::kMarkerToken;
         break;
@@ -1105,6 +1104,11 @@ Substitution *TokenTreeImpl::MergeArguments(
   D( std::cerr << indent << "Merge pre expansion argument "
                << orig_arg->Index() << '\n'; )
 
+  if (pre_exp->before.empty()) {
+    D( std::cerr << indent << "  Trivial merge\n"; )
+    return sub;
+  }
+
   // Check if all original argument nodes are tokens.
   bool orig_is_simple = true;
   for (Substitution::Node &orig_node : sub->before) {
@@ -1157,7 +1161,13 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
                                          Substitution *pre_exp,
                                          std::ostream &err) {
 
-  D( std::cerr << indent << "Merge pre expansion\n"; )
+  D( std::cerr << indent << "Merge pre expansion";
+     if (sub->macro) {
+       if (auto bt = sub->macro->BeginToken()) {
+         std::cerr << ' ' << bt->Data();
+       }
+     }
+     std::cerr << '\n';)
   D( indent += "  "; )
 
   // Make sure we calculate the pre-expansion correctly.
@@ -1348,19 +1358,24 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
 Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
                                           std::ostream &err) {
 
-  TokenInfo *prev = nullptr;
-  Substitution *&body = macro_body[def.RawMacro()];
-  if (body) {
-    return body;
-  }
-
-  D( indent += "  "; )
-
   auto maybe_name = def.Name();
   if (!maybe_name) {
     err << "Macro has no name";
+    D( std::cerr << indent << "Failed to get body\n"; )
     return nullptr;
   }
+
+  TokenInfo *prev = nullptr;
+  Substitution *&body = macro_body[def.RawMacro()];
+  if (body) {
+    D( std::cerr << indent << "Already have body for " << maybe_name->Data()
+                 << '\n'; )
+    return body;
+  }
+
+  D( std::cerr << indent << "Getting body for " << maybe_name->Data()
+               << '\n'; )
+  D( indent += "  "; )
 
   pasta::MacroToken name = std::move(maybe_name.value());
   body = CreateSubstitution(mx::MacroKind::DEFINE_DIRECTIVE);
@@ -1369,6 +1384,8 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
   for (pasta::Macro node : def.Body()) {
     std::optional<pasta::MacroToken> tok = pasta::MacroToken::From(node);
     if (!tok) {
+      D( std::cerr << indent << "skipping non-token body node: "
+                   << node.BeginToken()->Data() << '\n'; )
       continue;
     }
 
@@ -1552,18 +1569,29 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   // We may have filled in missing file tokens between macro use tokens, which
   // have file location information.
   for (; curr; prev = curr, curr = curr->next) {
-    if (curr->category == TokenInfo::kMissingFileToken) {
-      nodes.emplace_back(curr);
 
-    } else if (curr->category == TokenInfo::kMarkerToken &&
+    if (curr->category == TokenInfo::kMarkerToken &&
                (curr->parsed_tok->Role() ==
                    pasta::TokenRole::kEndOfInternalMacroEventMarker)) {
+      D( std::cerr << indent << "-- Skipping kEndOfInternalMacroEventMarker token\n"; )
       prev = curr;
       curr = curr->next;
       return sub;
 
     } else if (curr->macro_tok) {
+      if (curr->macro_tok->RawMacro() == node.RawMacro()) {
+        D( std::cerr << indent << "-- Consuming matched token: "
+                     << curr->macro_tok->Data() << '\n'; )
+        break;
+      }
+
+      assert(false);
       break;
+
+    } else if (curr->category == TokenInfo::kMissingFileToken) {
+      D( std::cerr << indent << "-- Consuming missing token: "
+                   << curr->macro_tok->Data() << '\n'; )
+      nodes.emplace_back(curr);
 
     } else {
       assert(false);
@@ -1606,6 +1634,8 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
     Substitution::NodeList &nodes, const pasta::MacroArgument &node,
     std::ostream &err) {
+
+  assert(!nodes.empty());
 
   Substitution *arg_sub = CreateSubstitution(mx::FromPasta(node.Kind()));
   arg_sub->parent = sub;
@@ -1735,6 +1765,8 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     Substitution::NodeList &nodes, const pasta::MacroExpansion &node,
     std::ostream &err) {
 
+  assert(curr);
+
   Substitution *exp = CreateSubstitution(mx::FromPasta(node.Kind()));
   assert(exp->kind == mx::MacroKind::EXPANSION);
 
@@ -1743,9 +1775,11 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   nodes.emplace_back(exp);
 
   Substitution *sub_exp = exp;
+  std::vector<pasta::Macro> seen_nodes;
   for (pasta::Macro use_node : node.Children()) {
     sub_exp = BuildMacroSubstitutions(
         prev, curr, exp, exp->before, use_node, err);
+    seen_nodes.emplace_back(std::move(use_node));
     if (!sub_exp) {
       return nullptr;
     }
@@ -1766,7 +1800,6 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     }
     assert(sub_body == exp);
   }
-
 
   for (pasta::Macro sub_node : node.ReplacementChildren()) {
     sub_exp = BuildMacroSubstitutions(
@@ -2133,10 +2166,13 @@ Substitution *TokenTreeImpl::BuildSubstitutions(
       // Inside of a macro expansion region; this shoudln't happen.
       case TokenInfo::kMacroStepToken:
       case TokenInfo::kMacroExpansionToken:
-        sub->before.has_error = true;
-        Die(this);
-        err << "Macro step/expansion tokens should not be seen here";
-        return nullptr;
+        if (curr->file_tok) {
+          sub->before.has_error = true;
+          Die(this);
+          err << "Macro step/expansion tokens should not be seen here";
+          return nullptr;
+        }
+        [[fallthrough]];
 
       // If we're here then it means we're probably in a directive that's been
       // pulled out of its (parent) fragment.

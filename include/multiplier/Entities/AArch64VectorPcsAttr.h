@@ -40,17 +40,13 @@ class AArch64VectorPcsAttr : public InheritableAttr {
     return AttrKind::A_ARCH64_VECTOR_PCS;
   }
 
-  static std::optional<AArch64VectorPcsAttr> from(const Attr &parent);
-
-  inline static std::optional<AArch64VectorPcsAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AArch64VectorPcsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AArch64VectorPcsAttr> from_base(const Attr &parent);
+  inline static std::optional<AArch64VectorPcsAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AArch64VectorPcsAttr> from(const std::optional<Attr> &parent);
   static std::optional<AArch64VectorPcsAttr> from(const Reference &r);
+  static std::optional<AArch64VectorPcsAttr> from(const VariantEntity &e);
   static std::optional<AArch64VectorPcsAttr> from(const TokenContext &t);
 
 };

@@ -17,8 +17,8 @@
 #include <span>
 #include <vector>
 
+#include "../Entity.h"
 #include "../Iterator.h"
-#include "../Types.h"
 
 #include "StmtKind.h"
 
@@ -81,7 +81,6 @@ class Stmt {
   }
 
   PackedStmtId id(void) const;
-  gap::generator<Reference> references(void) const &;
 
   std::optional<PackedDeclId> referenced_declaration_id(void) const;
   std::optional<Decl> referenced_declaration(void) const;
@@ -114,7 +113,7 @@ class Stmt {
   }
 
   static std::optional<Stmt> from(const Reference &r);
-
+  static std::optional<Stmt> from(const VariantEntity &e);
   static std::optional<Stmt> from(const TokenContext &t);
 
   Stmt ignore_containers(void) const;

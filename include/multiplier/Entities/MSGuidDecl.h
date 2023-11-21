@@ -55,17 +55,13 @@ class MSGuidDecl : public ValueDecl {
   MSGuidDecl canonical_declaration(void) const;
   std::optional<MSGuidDecl> definition(void) const;
   gap::generator<MSGuidDecl> redeclarations(void) const &;
-  static std::optional<MSGuidDecl> from(const Decl &parent);
-
-  inline static std::optional<MSGuidDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return MSGuidDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MSGuidDecl> from_base(const Decl &parent);
+  inline static std::optional<MSGuidDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MSGuidDecl> from(const std::optional<Decl> &parent);
   static std::optional<MSGuidDecl> from(const Reference &r);
+  static std::optional<MSGuidDecl> from(const VariantEntity &e);
   static std::optional<MSGuidDecl> from(const TokenContext &t);
 
 };

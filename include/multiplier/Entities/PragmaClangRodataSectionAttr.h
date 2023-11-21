@@ -40,17 +40,13 @@ class PragmaClangRodataSectionAttr : public InheritableAttr {
     return AttrKind::PRAGMA_CLANG_RODATA_SECTION;
   }
 
-  static std::optional<PragmaClangRodataSectionAttr> from(const Attr &parent);
-
-  inline static std::optional<PragmaClangRodataSectionAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return PragmaClangRodataSectionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PragmaClangRodataSectionAttr> from_base(const Attr &parent);
+  inline static std::optional<PragmaClangRodataSectionAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PragmaClangRodataSectionAttr> from(const std::optional<Attr> &parent);
   static std::optional<PragmaClangRodataSectionAttr> from(const Reference &r);
+  static std::optional<PragmaClangRodataSectionAttr> from(const VariantEntity &e);
   static std::optional<PragmaClangRodataSectionAttr> from(const TokenContext &t);
 
   std::string_view name(void) const;
