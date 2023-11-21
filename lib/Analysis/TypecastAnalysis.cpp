@@ -4,11 +4,12 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 #include "multiplier/Entities/BinaryOperator.h"
-#include "multiplier/Entities/CXXReinterpretCastExpr.h"
+#include "multiplier/Entities/CXXRecordDecl.h"
 #include "multiplier/Entities/CastExpr.h"
 #include "multiplier/Entities/CastKind.h"
 #include "multiplier/Entities/CallExpr.h"
 #include "multiplier/Entities/ExplicitCastExpr.h"
+#include "multiplier/Entities/PointerType.h"
 #include "multiplier/Entities/Stmt.h"
 #include "multiplier/Entities/StmtKind.h"
 #include "multiplier/Reference.h"
@@ -148,11 +149,42 @@ CastCXXObjKind CastState::cxx_obj_cast() {
             return CastCXXObjKind::BASE_TO_DERIVED_DOWNCAST;
 
         // reinterpret_cast and dynamic needs special handling
-        // TODO: we need to enrich Type some more
         case CastKind::REINTERPRET_MEMBER_POINTER:
-        case CastKind::DYNAMIC:
-            return CastCXXObjKind::NO_CXX_OBJ_CAST;
+        case CastKind::DYNAMIC: {
+            Type type_before = type_before_conversion();
+            Type type_after = type_after_conversion();
 
+            // TODO need to retrieve the CXXRecordDecl associated
+            // enrich PASTA first with .cxx_record_decl()
+            /*
+            auto before_decl = type_before.cxx_record_decl();
+            auto after_decl = type_before.cxx_record_decl();
+            if (!before_decl || !after_decl) {
+                return CastCXXObjKind::NO_CXX_OBJ_CAST;
+            }
+
+            // check if we're downcasting by looking to see if the type after is a base class
+            // of the source type
+            for (auto base : before_decl.bases()) {
+                if (auto base_decl = base->type().cxx_record_decl()) {
+                    if (base_decl.canonical_decl() == before_decl.canonical_decl()) {
+                        return CastCXXObjKind::BASE_TO_DERIVED_DOWNCAST;
+                    }
+                }
+            }
+            for (auto base : after_decl.bases()) {
+                if (auto base_decl = base->type().cxx_record_decl()) {
+                    if (base_decl.canonical_decl() == after_decl.canonical_decl()) {
+                        return CastCXXObjKind::DERIVED_TO_BASE_UPCAST;
+                    }
+                }
+            }
+            */
+
+            // NOTE: do we care about CXX-style casting on builtins?
+            // ie. char* p = reinterpret_cast<char*>(i);
+            return CastCXXObjKind::NO_CXX_OBJ_CAST;
+        }
         default:
             return CastCXXObjKind::NO_CXX_OBJ_CAST;
         }
@@ -160,8 +192,16 @@ CastCXXObjKind CastState::cxx_obj_cast() {
     return CastCXXObjKind::NO_CXX_OBJ_CAST;
 }
 
-// TODO
 bool CastState::is_pointer_cast() {
+    Type type_before = type_before_conversion();
+    Type type_after = type_after_conversion();
+
+    if (auto pointee = PointerType::from(type_before)) {
+        return true;
+    }
+    if (auto pointee = PointerType::from(type_after)) {
+        return true;
+    }
     return false;
 }
 
@@ -171,12 +211,11 @@ CastTypeWidth CastState::deferenced_width_cast() {
     Type type_before = type_before_conversion();
     Type type_after = type_after_conversion();
 
-    // this is wrong, we need is_pointer_type
-    if (type_before.can_decay_to_pointer_type()) {
-        type_before = type_before.desugared_type();
+    if (auto pointee = PointerType::from(type_before)) {
+        type_before = pointee->pointee_type();
     }
-    if (type_after.can_decay_to_pointer_type()) {
-        type_after = type_after.desugared_type();
+    if (auto pointee = PointerType::from(type_after)) {
+        type_after = pointee->pointee_type();
     }
     return determine_width_cast(type_before, type_after);
 }
