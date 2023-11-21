@@ -9,11 +9,11 @@
 #include "EntityProvider.h"
 
 #include <deque>
-#include <multiplier/Entities/DefineMacroDirective.h>
-#include <multiplier/Entities/MacroExpansion.h>
-#include <multiplier/Entities/MacroParameterSubstitution.h>
-#include <multiplier/Entities/MacroSubstitution.h>
-#include <multiplier/Entities/MacroVAOpt.h>
+#include <multiplier/AST/DefineMacroDirective.h>
+#include <multiplier/AST/MacroExpansion.h>
+#include <multiplier/AST/MacroParameterSubstitution.h>
+#include <multiplier/AST/MacroSubstitution.h>
+#include <multiplier/AST/MacroVAOpt.h>
 #include <mutex>
 
 namespace mx {

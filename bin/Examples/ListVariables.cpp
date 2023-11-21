@@ -8,7 +8,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
-#include <multiplier/Entities/VarDecl.h>
+#include <multiplier/AST/VarDecl.h>
 #include <sstream>
 #include <unordered_map>
 

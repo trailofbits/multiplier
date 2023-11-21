@@ -7,7 +7,7 @@
 #pragma once
 
 #include <multiplier/AST.capnp.h>
-#include <multiplier/Entities/Type.h>
+#include <multiplier/AST/Type.h>
 
 #include "Entity.h"
 #include "Token.h"

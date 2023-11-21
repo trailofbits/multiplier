@@ -7,20 +7,20 @@
 #include "Token.h"
 
 #include <cassert>
-#include <multiplier/Entities/ClassScopeFunctionSpecializationDecl.h>
-#include <multiplier/Entities/CXXMethodDecl.h>
-#include <multiplier/Entities/DeclCategory.h>
-#include <multiplier/Entities/DeclKind.h>
-#include <multiplier/Entities/ImplicitParamDecl.h>
-#include <multiplier/Entities/MacroKind.h>
-#include <multiplier/Entities/MacroSubstitution.h>
-#include <multiplier/Entities/ObjCMethodDecl.h>
-#include <multiplier/Entities/TagDecl.h>
-#include <multiplier/Entities/TagTypeKind.h>
-#include <multiplier/Entities/TemplateDecl.h>
-#include <multiplier/Entities/TokenCategory.h>
-#include <multiplier/Entities/TokenKind.h>
-#include <multiplier/Entities/VarDecl.h>
+#include <multiplier/AST/ClassScopeFunctionSpecializationDecl.h>
+#include <multiplier/AST/CXXMethodDecl.h>
+#include <multiplier/AST/DeclCategory.h>
+#include <multiplier/AST/DeclKind.h>
+#include <multiplier/AST/ImplicitParamDecl.h>
+#include <multiplier/AST/MacroKind.h>
+#include <multiplier/AST/MacroSubstitution.h>
+#include <multiplier/AST/ObjCMethodDecl.h>
+#include <multiplier/AST/TagDecl.h>
+#include <multiplier/AST/TagTypeKind.h>
+#include <multiplier/AST/TemplateDecl.h>
+#include <multiplier/AST/TokenCategory.h>
+#include <multiplier/AST/TokenKind.h>
+#include <multiplier/AST/VarDecl.h>
 
 #include "File.h"
 #include "Fragment.h"

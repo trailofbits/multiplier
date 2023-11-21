@@ -697,8 +697,8 @@ using MethodListPtr = std::shared_ptr<MethodList>;
 
 class CodeGenerator {
  private:
-  std::filesystem::path entities_lib_dir; // `lib/Entities/`
-  std::filesystem::path entities_include_dir; // `include/multiplier/Entities`
+  std::filesystem::path entities_lib_dir; // `lib/AST/`
+  std::filesystem::path entities_include_dir; // `include/multiplier/AST`
   std::vector<ClassHierarchy *> roots;
 
   std::unordered_set<std::string> enum_names;
@@ -789,7 +789,7 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << "#pragma once\n\n"
       << "#include <cstdint>\n\n"
       << "namespace mx {\n";
-  include_h_os << "#include \"Entities/" << enum_name << ".h\"\n";
+  include_h_os << "#include \"AST/" << enum_name << ".h\"\n";
 
   auto enumerators = enum_decl.Enumerators();
   auto num_enumerators = enumerators.size();
@@ -1896,7 +1896,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "#include \"../Iterator.h\"\n\n";
   }
 
-  include_h_os << "#include \"Entities/" << class_name << ".h\"\n";
+  include_h_os << "#include \"AST/" << class_name << ".h\"\n";
 
   std::string nth_entity_reader;
   const char *end_serializer = nullptr;
@@ -3971,7 +3971,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
         << "// Auto-generated file; do not modify!\n\n"
-        << "#include <multiplier/Entities/" << name << ".h>\n\n";
+        << "#include <multiplier/AST/" << name << ".h>\n\n";
 
     auto needs_fragment = is_root;
     for (const std::string &other_name : forward_decls) {
@@ -3979,7 +3979,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
         needs_fragment = true;
       } else if (name != other_name && !other_name.ends_with("Impl")) {
         fs
-            << "#include <multiplier/Entities/" << other_name << ".h>\n";
+            << "#include <multiplier/AST/" << other_name << ".h>\n";
       }
     }
 

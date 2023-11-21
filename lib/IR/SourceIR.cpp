@@ -10,13 +10,13 @@
 #include <iostream>
 #include <unordered_map>
 
-#include <multiplier/Entities/Attr.h>
-#include <multiplier/Entities/Decl.h>
-#include <multiplier/Entities/Designator.h>
-#include <multiplier/Entities/Macro.h>
-#include <multiplier/Entities/PseudoKind.h>
-#include <multiplier/Entities/Stmt.h>
-#include <multiplier/Entities/Type.h>
+#include <multiplier/AST/Attr.h>
+#include <multiplier/AST/Decl.h>
+#include <multiplier/AST/Designator.h>
+#include <multiplier/AST/Macro.h>
+#include <multiplier/AST/PseudoKind.h>
+#include <multiplier/AST/Stmt.h>
+#include <multiplier/AST/Type.h>
 #include <multiplier/IR/Operation.h>
 
 #include <llvm/ADT/DenseMap.h>

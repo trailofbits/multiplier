@@ -8,9 +8,9 @@
 
 #include <atomic>
 #include <multiplier/AST.capnp.h>
-#include <multiplier/Entities/CallExpr.h>
-#include <multiplier/Entities/FunctionDecl.h>
-#include <multiplier/Entities/Decl.h>
+#include <multiplier/AST/CallExpr.h>
+#include <multiplier/AST/FunctionDecl.h>
+#include <multiplier/AST/Decl.h>
 
 #include "FragmentEntity.h"
 

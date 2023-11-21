@@ -6,7 +6,7 @@
 
 #include "Macro.h"
 
-#include <multiplier/Entities/MacroSubstitution.h>
+#include <multiplier/AST/MacroSubstitution.h>
 #include <multiplier/Index.h>
 
 #include "Fragment.h"

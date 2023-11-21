@@ -7,7 +7,7 @@
 #include "File.h"
 
 #include <cassert>
-#include <multiplier/Entities/TokenKind.h>
+#include <multiplier/AST/TokenKind.h>
 
 namespace mx {
 
