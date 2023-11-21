@@ -16,6 +16,7 @@ concurrency:
 
 env:
   LLVM_PASTA_VER: beeda8d
+  LLVM_VER: 17
 
 jobs:
   build:
@@ -40,7 +41,10 @@ jobs:
           curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
           chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-          apt-get update; apt-get install gh -y
+          curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+          echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VER} main" | tee -a /etc/apt/sources.list > /dev/null
+          echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VER} main" | tee -a /etc/apt/sources.list > /dev/null
+          apt-get update; apt-get install gh clang-${LLVM_VER} lld-${LLVM_VER} -y
 
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v1.13
@@ -69,16 +73,14 @@ jobs:
           cmake \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=${RELEASE_DIR} \
-            -DCMAKE_C_COMPILER=/usr/bin/clang \
-            -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
-            -DClang_DIR=${RELEASE_DIR}/lib/cmake/clang \
+            -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
+            -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
+            -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
+            -DCMAKE_C_COMPILER="$(which clang-${LLVM_VER})" \
+            -DCMAKE_CXX_COMPILER="$(which clang++-${LLVM_VER})" \
+            -DClang_DIR=${RELEASE_DIR}/lib/cmake/clang) \
             -DLLVM_DIR=${RELEASE_DIR}/lib/cmake/llvm \
-            -DMX_ENABLE_BOOTSTRAP=OFF \
-            -DMX_BOOTSTRAP_VAST=OFF \
-            -DMX_BOOTSTRAP_PASTA=OFF \
-            -DMX_ENABLE_RE2=ON \
-            -DMX_ENABLE_VAST=ON \
-            -DMX_ENABLE_INSTALL=ON \
+            -DLLVM_ENABLE_LLD:BOOL=TRUE \
             -DMX_USE_VENDORED_CLANG=OFF \
             -DMX_USE_VENDORED_PASTA=OFF \
             -GNinja \
