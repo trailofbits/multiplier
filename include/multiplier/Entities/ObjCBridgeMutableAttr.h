@@ -40,17 +40,13 @@ class ObjCBridgeMutableAttr : public InheritableAttr {
     return AttrKind::OBJ_C_BRIDGE_MUTABLE;
   }
 
-  static std::optional<ObjCBridgeMutableAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCBridgeMutableAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCBridgeMutableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCBridgeMutableAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCBridgeMutableAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCBridgeMutableAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCBridgeMutableAttr> from(const Reference &r);
+  static std::optional<ObjCBridgeMutableAttr> from(const VariantEntity &e);
   static std::optional<ObjCBridgeMutableAttr> from(const TokenContext &t);
 
 };

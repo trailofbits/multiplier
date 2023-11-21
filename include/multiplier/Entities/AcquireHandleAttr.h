@@ -40,17 +40,13 @@ class AcquireHandleAttr : public InheritableAttr {
     return AttrKind::ACQUIRE_HANDLE;
   }
 
-  static std::optional<AcquireHandleAttr> from(const Attr &parent);
-
-  inline static std::optional<AcquireHandleAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AcquireHandleAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AcquireHandleAttr> from_base(const Attr &parent);
+  inline static std::optional<AcquireHandleAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AcquireHandleAttr> from(const std::optional<Attr> &parent);
   static std::optional<AcquireHandleAttr> from(const Reference &r);
+  static std::optional<AcquireHandleAttr> from(const VariantEntity &e);
   static std::optional<AcquireHandleAttr> from(const TokenContext &t);
 
   std::string_view handle_type(void) const;

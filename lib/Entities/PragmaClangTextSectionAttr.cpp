@@ -39,18 +39,30 @@ bool PragmaClangTextSectionAttr::contains(const Token &tok) const {
 std::optional<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return PragmaClangTextSectionAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kPragmaClangTextSectionAttrDerivedKinds[] = {
     PragmaClangTextSectionAttr::static_kind(),
 };
 
-std::optional<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case PragmaClangTextSectionAttr::static_kind():
       return reinterpret_cast<const PragmaClangTextSectionAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::in(const 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kPragmaClangTextSectionAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<PragmaClangTextSectionAttr> e = PragmaClangTextSectionAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<PragmaClangTextSectionAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::in(const 
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kPragmaClangTextSectionAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<PragmaClangTextSectionAttr> e = PragmaClangTextSectionAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<PragmaClangTextSectionAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::in(const 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kPragmaClangTextSectionAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<PragmaClangTextSectionAttr> e = PragmaClangTextSectionAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<PragmaClangTextSectionAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::from(const
   return PragmaClangTextSectionAttr::from(r.as_attribute());
 }
 
+std::optional<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::from(const TokenContext &t) {
-  return PragmaClangTextSectionAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::string_view PragmaClangTextSectionAttr::name(void) const {

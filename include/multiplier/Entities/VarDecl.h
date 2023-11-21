@@ -72,17 +72,13 @@ class VarDecl : public DeclaratorDecl {
   VarDecl canonical_declaration(void) const;
   std::optional<VarDecl> definition(void) const;
   gap::generator<VarDecl> redeclarations(void) const &;
-  static std::optional<VarDecl> from(const Decl &parent);
-
-  inline static std::optional<VarDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return VarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<VarDecl> from_base(const Decl &parent);
+  inline static std::optional<VarDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<VarDecl> from(const std::optional<Decl> &parent);
   static std::optional<VarDecl> from(const Reference &r);
+  static std::optional<VarDecl> from(const VariantEntity &e);
   static std::optional<VarDecl> from(const TokenContext &t);
 
   std::optional<VarDecl> acting_definition(void) const;

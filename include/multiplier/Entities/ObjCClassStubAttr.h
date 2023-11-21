@@ -38,17 +38,13 @@ class ObjCClassStubAttr : public Attr {
     return AttrKind::OBJ_C_CLASS_STUB;
   }
 
-  static std::optional<ObjCClassStubAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCClassStubAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCClassStubAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCClassStubAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCClassStubAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCClassStubAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCClassStubAttr> from(const Reference &r);
+  static std::optional<ObjCClassStubAttr> from(const VariantEntity &e);
   static std::optional<ObjCClassStubAttr> from(const TokenContext &t);
 
 };

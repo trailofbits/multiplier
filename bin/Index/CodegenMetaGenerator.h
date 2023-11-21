@@ -26,7 +26,7 @@ class MLIRContext;
 
 namespace indexer {
 
-class MetaGenerator {
+class MetaGenerator final : public vast::cg::meta_generator {
  private:
 
   // Pasta AST context
@@ -48,11 +48,15 @@ class MetaGenerator {
         mctx(&mctx_),
         unknown_location(mlir::UnknownLoc::get(mctx)) {}
 
-  mlir::Location location(const clang::Decl *decl) const {
+  mlir::Location location(const clang::Decl *decl) const final {
     return {Location(decl)};
   }
 
-  mlir::Location location(const clang::Stmt *stmt) const {
+  mlir::Location location(const clang::Expr *expr) const final {
+    return {Location(expr)};
+  }
+
+  mlir::Location location(const clang::Stmt *stmt) const final {
     return {Location(stmt)};
   }
 

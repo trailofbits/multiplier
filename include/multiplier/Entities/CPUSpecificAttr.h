@@ -40,17 +40,13 @@ class CPUSpecificAttr : public InheritableAttr {
     return AttrKind::CPU_SPECIFIC;
   }
 
-  static std::optional<CPUSpecificAttr> from(const Attr &parent);
-
-  inline static std::optional<CPUSpecificAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CPUSpecificAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CPUSpecificAttr> from_base(const Attr &parent);
+  inline static std::optional<CPUSpecificAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CPUSpecificAttr> from(const std::optional<Attr> &parent);
   static std::optional<CPUSpecificAttr> from(const Reference &r);
+  static std::optional<CPUSpecificAttr> from(const VariantEntity &e);
   static std::optional<CPUSpecificAttr> from(const TokenContext &t);
 
 };

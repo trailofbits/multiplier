@@ -51,17 +51,13 @@ class TranslationUnitDecl : public Decl {
   TranslationUnitDecl canonical_declaration(void) const;
   std::optional<TranslationUnitDecl> definition(void) const;
   gap::generator<TranslationUnitDecl> redeclarations(void) const &;
-  static std::optional<TranslationUnitDecl> from(const Decl &parent);
-
-  inline static std::optional<TranslationUnitDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return TranslationUnitDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TranslationUnitDecl> from_base(const Decl &parent);
+  inline static std::optional<TranslationUnitDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TranslationUnitDecl> from(const std::optional<Decl> &parent);
   static std::optional<TranslationUnitDecl> from(const Reference &r);
+  static std::optional<TranslationUnitDecl> from(const VariantEntity &e);
   static std::optional<TranslationUnitDecl> from(const TokenContext &t);
 
   gap::generator<Decl> declarations_in_context(void) const &;

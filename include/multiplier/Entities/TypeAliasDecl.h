@@ -58,17 +58,13 @@ class TypeAliasDecl : public TypedefNameDecl {
   TypeAliasDecl canonical_declaration(void) const;
   std::optional<TypeAliasDecl> definition(void) const;
   gap::generator<TypeAliasDecl> redeclarations(void) const &;
-  static std::optional<TypeAliasDecl> from(const Decl &parent);
-
-  inline static std::optional<TypeAliasDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return TypeAliasDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TypeAliasDecl> from_base(const Decl &parent);
+  inline static std::optional<TypeAliasDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TypeAliasDecl> from(const std::optional<Decl> &parent);
   static std::optional<TypeAliasDecl> from(const Reference &r);
+  static std::optional<TypeAliasDecl> from(const VariantEntity &e);
   static std::optional<TypeAliasDecl> from(const TokenContext &t);
 
   std::optional<TypeAliasTemplateDecl> described_alias_template(void) const;

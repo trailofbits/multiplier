@@ -55,18 +55,30 @@ gap::generator<MacroParameterSubstitution> MacroParameterSubstitution::containin
 std::optional<MacroParameterSubstitution> MacroParameterSubstitution::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<MacroId>(vid)) {
-    return MacroParameterSubstitution::from(index.macro(eid.Pack()));
+    if (auto base = index.macro(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MacroParameterSubstitution> MacroParameterSubstitution::from(const std::optional<Macro> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const MacroKind kMacroParameterSubstitutionDerivedKinds[] = {
     MacroParameterSubstitution::static_kind(),
 };
 
-std::optional<MacroParameterSubstitution> MacroParameterSubstitution::from(const Macro &parent) {
+}  // namespace
+
+std::optional<MacroParameterSubstitution> MacroParameterSubstitution::from_base(const Macro &parent) {
   switch (parent.kind()) {
     case MacroParameterSubstitution::static_kind():
       return reinterpret_cast<const MacroParameterSubstitution &>(parent);
@@ -79,7 +91,7 @@ gap::generator<MacroParameterSubstitution> MacroParameterSubstitution::in(const 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroKind k : kMacroParameterSubstitutionDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
-      if (std::optional<MacroParameterSubstitution> e = MacroParameterSubstitution::from(Macro(std::move(eptr)))) {
+      if (std::optional<MacroParameterSubstitution> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -91,7 +103,7 @@ gap::generator<MacroParameterSubstitution> MacroParameterSubstitution::in(const 
   PackedFragmentId frag_id = frag.id();
   for (MacroKind k : kMacroParameterSubstitutionDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-      if (std::optional<MacroParameterSubstitution> e = MacroParameterSubstitution::from(Macro(std::move(eptr)))) {
+      if (std::optional<MacroParameterSubstitution> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -104,7 +116,7 @@ gap::generator<MacroParameterSubstitution> MacroParameterSubstitution::in(const 
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (MacroKind k : kMacroParameterSubstitutionDerivedKinds) {
       for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-        if (std::optional<MacroParameterSubstitution> e = MacroParameterSubstitution::from(Macro(std::move(eptr)))) {
+        if (std::optional<MacroParameterSubstitution> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -116,13 +128,23 @@ std::optional<MacroParameterSubstitution> MacroParameterSubstitution::from(const
   return MacroParameterSubstitution::from(r.as_macro());
 }
 
+std::optional<MacroParameterSubstitution> MacroParameterSubstitution::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Macro>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Macro>(e));
+}
+
 std::optional<MacroParameterSubstitution> MacroParameterSubstitution::from(const TokenContext &t) {
-  return MacroParameterSubstitution::from(t.as_macro());
+  if (auto base = t.as_macro()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 MacroParameter MacroParameterSubstitution::parameter(void) const {
   RawEntityId eid = impl->reader.getVal8();
-  return MacroParameter::from(Macro(impl->ep->MacroFor(impl->ep, eid))).value();
+  return MacroParameter::from_base(impl->ep->MacroFor(impl->ep, eid)).value();
 }
 
 Token MacroParameterSubstitution::parameter_use(void) const {

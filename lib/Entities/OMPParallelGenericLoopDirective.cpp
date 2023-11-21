@@ -90,18 +90,30 @@ bool OMPParallelGenericLoopDirective::contains(const Stmt &stmt) {
 std::optional<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPParallelGenericLoopDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPParallelGenericLoopDirectiveDerivedKinds[] = {
     OMPParallelGenericLoopDirective::static_kind(),
 };
 
-std::optional<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPParallelGenericLoopDirective::static_kind():
       return reinterpret_cast<const OMPParallelGenericLoopDirective &>(parent);
@@ -114,7 +126,7 @@ gap::generator<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective:
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPParallelGenericLoopDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPParallelGenericLoopDirective> e = OMPParallelGenericLoopDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPParallelGenericLoopDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective:
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPParallelGenericLoopDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPParallelGenericLoopDirective> e = OMPParallelGenericLoopDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPParallelGenericLoopDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective:
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPParallelGenericLoopDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPParallelGenericLoopDirective> e = OMPParallelGenericLoopDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPParallelGenericLoopDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::
   return OMPParallelGenericLoopDirective::from(r.as_statement());
 }
 
+std::optional<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::from(const TokenContext &t) {
-  return OMPParallelGenericLoopDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

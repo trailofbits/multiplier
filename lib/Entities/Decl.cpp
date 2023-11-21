@@ -142,9 +142,7 @@ std::optional<Decl> Decl::by_id(const Index &index, EntityId eid) {
 gap::generator<Decl> Decl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclImplPtr eptr : ep->DeclsFor(ep)) {
-    if (std::optional<Decl> e = Decl::from(Decl(std::move(eptr)))) {
-      co_yield std::move(e.value());
-    }
+    co_yield Decl(std::move(eptr));
   }
 }
 
@@ -162,9 +160,7 @@ gap::generator<Decl> Decl::in(const File &file) {
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, frag_id)) {
-      if (std::optional<Decl> e = Decl::from(Decl(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
+      co_yield Decl(std::move(eptr));
     }
   }
 }
@@ -173,9 +169,7 @@ gap::generator<Decl> Decl::in(const Fragment &frag) {
   const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclImplPtr eptr : ep->DeclsFor(ep, frag_id)) {
-    if (std::optional<Decl> e = Decl::from(Decl(std::move(eptr)))) {
-      co_yield std::move(e.value());
-    }
+    co_yield Decl(std::move(eptr));
   }
 }
 
@@ -203,6 +197,13 @@ gap::generator<Decl> Decl::in(const File &file, std::span<DeclKind> kinds) {
 
 std::optional<Decl> Decl::from(const Reference &r) {
   return r.as_declaration();
+}
+
+std::optional<Decl> Decl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return std::get<Decl>(e);
 }
 
 std::optional<Decl> Decl::from(const TokenContext &t) {
@@ -267,7 +268,7 @@ std::optional<TemplateDecl> Decl::described_template(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return TemplateDecl::from(Decl(std::move(eptr)));
+      return TemplateDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -293,7 +294,7 @@ std::optional<ExternalSourceSymbolAttr> Decl::external_source_symbol_attribute(v
       return std::nullopt;
     }
     if (auto eptr = impl->ep->AttrFor(impl->ep, eid)) {
-      return ExternalSourceSymbolAttr::from(Attr(std::move(eptr)));
+      return ExternalSourceSymbolAttr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

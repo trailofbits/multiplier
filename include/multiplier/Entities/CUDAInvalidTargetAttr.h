@@ -40,17 +40,13 @@ class CUDAInvalidTargetAttr : public InheritableAttr {
     return AttrKind::CUDA_INVALID_TARGET;
   }
 
-  static std::optional<CUDAInvalidTargetAttr> from(const Attr &parent);
-
-  inline static std::optional<CUDAInvalidTargetAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CUDAInvalidTargetAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CUDAInvalidTargetAttr> from_base(const Attr &parent);
+  inline static std::optional<CUDAInvalidTargetAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CUDAInvalidTargetAttr> from(const std::optional<Attr> &parent);
   static std::optional<CUDAInvalidTargetAttr> from(const Reference &r);
+  static std::optional<CUDAInvalidTargetAttr> from(const VariantEntity &e);
   static std::optional<CUDAInvalidTargetAttr> from(const TokenContext &t);
 
 };

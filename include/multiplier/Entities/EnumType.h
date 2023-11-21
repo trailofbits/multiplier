@@ -38,17 +38,13 @@ class EnumType : public TagType {
     return TypeKind::ENUM;
   }
 
-  static std::optional<EnumType> from(const Type &parent);
-
-  inline static std::optional<EnumType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return EnumType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<EnumType> from_base(const Type &parent);
+  inline static std::optional<EnumType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<EnumType> from(const std::optional<Type> &parent);
   static std::optional<EnumType> from(const Reference &r);
+  static std::optional<EnumType> from(const VariantEntity &e);
   static std::optional<EnumType> from(const TokenContext &t);
 
   Type desugar(void) const;

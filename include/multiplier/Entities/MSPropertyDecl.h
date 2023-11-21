@@ -57,17 +57,13 @@ class MSPropertyDecl : public DeclaratorDecl {
   MSPropertyDecl canonical_declaration(void) const;
   std::optional<MSPropertyDecl> definition(void) const;
   gap::generator<MSPropertyDecl> redeclarations(void) const &;
-  static std::optional<MSPropertyDecl> from(const Decl &parent);
-
-  inline static std::optional<MSPropertyDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return MSPropertyDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MSPropertyDecl> from_base(const Decl &parent);
+  inline static std::optional<MSPropertyDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MSPropertyDecl> from(const std::optional<Decl> &parent);
   static std::optional<MSPropertyDecl> from(const Reference &r);
+  static std::optional<MSPropertyDecl> from(const VariantEntity &e);
   static std::optional<MSPropertyDecl> from(const TokenContext &t);
 
   bool has_getter(void) const;

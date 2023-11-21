@@ -39,17 +39,13 @@ class OMPReferencedVarAttr : public Attr {
     return AttrKind::OMP_REFERENCED_VAR;
   }
 
-  static std::optional<OMPReferencedVarAttr> from(const Attr &parent);
-
-  inline static std::optional<OMPReferencedVarAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OMPReferencedVarAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPReferencedVarAttr> from_base(const Attr &parent);
+  inline static std::optional<OMPReferencedVarAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPReferencedVarAttr> from(const std::optional<Attr> &parent);
   static std::optional<OMPReferencedVarAttr> from(const Reference &r);
+  static std::optional<OMPReferencedVarAttr> from(const VariantEntity &e);
   static std::optional<OMPReferencedVarAttr> from(const TokenContext &t);
 
   Expr reference(void) const;

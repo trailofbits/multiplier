@@ -40,17 +40,13 @@ class AnalyzerNoReturnAttr : public InheritableAttr {
     return AttrKind::ANALYZER_NO_RETURN;
   }
 
-  static std::optional<AnalyzerNoReturnAttr> from(const Attr &parent);
-
-  inline static std::optional<AnalyzerNoReturnAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AnalyzerNoReturnAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AnalyzerNoReturnAttr> from_base(const Attr &parent);
+  inline static std::optional<AnalyzerNoReturnAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AnalyzerNoReturnAttr> from(const std::optional<Attr> &parent);
   static std::optional<AnalyzerNoReturnAttr> from(const Reference &r);
+  static std::optional<AnalyzerNoReturnAttr> from(const VariantEntity &e);
   static std::optional<AnalyzerNoReturnAttr> from(const TokenContext &t);
 
 };

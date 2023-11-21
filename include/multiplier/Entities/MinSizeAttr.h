@@ -40,17 +40,13 @@ class MinSizeAttr : public InheritableAttr {
     return AttrKind::MIN_SIZE;
   }
 
-  static std::optional<MinSizeAttr> from(const Attr &parent);
-
-  inline static std::optional<MinSizeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MinSizeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MinSizeAttr> from_base(const Attr &parent);
+  inline static std::optional<MinSizeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MinSizeAttr> from(const std::optional<Attr> &parent);
   static std::optional<MinSizeAttr> from(const Reference &r);
+  static std::optional<MinSizeAttr> from(const VariantEntity &e);
   static std::optional<MinSizeAttr> from(const TokenContext &t);
 
 };

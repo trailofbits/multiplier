@@ -40,17 +40,13 @@ class ObjCNSObjectAttr : public InheritableAttr {
     return AttrKind::OBJ_CNS_OBJECT;
   }
 
-  static std::optional<ObjCNSObjectAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCNSObjectAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCNSObjectAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCNSObjectAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCNSObjectAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCNSObjectAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCNSObjectAttr> from(const Reference &r);
+  static std::optional<ObjCNSObjectAttr> from(const VariantEntity &e);
   static std::optional<ObjCNSObjectAttr> from(const TokenContext &t);
 
 };

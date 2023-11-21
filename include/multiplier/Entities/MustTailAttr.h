@@ -40,17 +40,13 @@ class MustTailAttr : public StmtAttr {
     return AttrKind::MUST_TAIL;
   }
 
-  static std::optional<MustTailAttr> from(const Attr &parent);
-
-  inline static std::optional<MustTailAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MustTailAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MustTailAttr> from_base(const Attr &parent);
+  inline static std::optional<MustTailAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MustTailAttr> from(const std::optional<Attr> &parent);
   static std::optional<MustTailAttr> from(const Reference &r);
+  static std::optional<MustTailAttr> from(const VariantEntity &e);
   static std::optional<MustTailAttr> from(const TokenContext &t);
 
 };

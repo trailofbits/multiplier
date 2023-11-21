@@ -40,17 +40,13 @@ class CFReturnsRetainedAttr : public InheritableAttr {
     return AttrKind::CF_RETURNS_RETAINED;
   }
 
-  static std::optional<CFReturnsRetainedAttr> from(const Attr &parent);
-
-  inline static std::optional<CFReturnsRetainedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CFReturnsRetainedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CFReturnsRetainedAttr> from_base(const Attr &parent);
+  inline static std::optional<CFReturnsRetainedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CFReturnsRetainedAttr> from(const std::optional<Attr> &parent);
   static std::optional<CFReturnsRetainedAttr> from(const Reference &r);
+  static std::optional<CFReturnsRetainedAttr> from(const VariantEntity &e);
   static std::optional<CFReturnsRetainedAttr> from(const TokenContext &t);
 
 };

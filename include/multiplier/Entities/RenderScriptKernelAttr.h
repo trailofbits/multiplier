@@ -38,17 +38,13 @@ class RenderScriptKernelAttr : public Attr {
     return AttrKind::RENDER_SCRIPT_KERNEL;
   }
 
-  static std::optional<RenderScriptKernelAttr> from(const Attr &parent);
-
-  inline static std::optional<RenderScriptKernelAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return RenderScriptKernelAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<RenderScriptKernelAttr> from_base(const Attr &parent);
+  inline static std::optional<RenderScriptKernelAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<RenderScriptKernelAttr> from(const std::optional<Attr> &parent);
   static std::optional<RenderScriptKernelAttr> from(const Reference &r);
+  static std::optional<RenderScriptKernelAttr> from(const VariantEntity &e);
   static std::optional<RenderScriptKernelAttr> from(const TokenContext &t);
 
 };

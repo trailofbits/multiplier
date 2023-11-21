@@ -89,18 +89,30 @@ bool ObjCAvailabilityCheckExpr::contains(const Stmt &stmt) {
 std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ObjCAvailabilityCheckExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kObjCAvailabilityCheckExprDerivedKinds[] = {
     ObjCAvailabilityCheckExpr::static_kind(),
 };
 
-std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCAvailabilityCheckExpr::static_kind():
       return reinterpret_cast<const ObjCAvailabilityCheckExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::in(const In
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCAvailabilityCheckExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ObjCAvailabilityCheckExpr> e = ObjCAvailabilityCheckExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCAvailabilityCheckExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::in(const Fr
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCAvailabilityCheckExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCAvailabilityCheckExpr> e = ObjCAvailabilityCheckExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCAvailabilityCheckExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::in(const Fi
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCAvailabilityCheckExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCAvailabilityCheckExpr> e = ObjCAvailabilityCheckExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ObjCAvailabilityCheckExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,8 +162,18 @@ std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const R
   return ObjCAvailabilityCheckExpr::from(r.as_statement());
 }
 
+std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const TokenContext &t) {
-  return ObjCAvailabilityCheckExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool ObjCAvailabilityCheckExpr::has_version(void) const {

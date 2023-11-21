@@ -39,18 +39,30 @@ bool InitPriorityAttr::contains(const Token &tok) const {
 std::optional<InitPriorityAttr> InitPriorityAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return InitPriorityAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<InitPriorityAttr> InitPriorityAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kInitPriorityAttrDerivedKinds[] = {
     InitPriorityAttr::static_kind(),
 };
 
-std::optional<InitPriorityAttr> InitPriorityAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<InitPriorityAttr> InitPriorityAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case InitPriorityAttr::static_kind():
       return reinterpret_cast<const InitPriorityAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<InitPriorityAttr> InitPriorityAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kInitPriorityAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<InitPriorityAttr> e = InitPriorityAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<InitPriorityAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<InitPriorityAttr> InitPriorityAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kInitPriorityAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<InitPriorityAttr> e = InitPriorityAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<InitPriorityAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<InitPriorityAttr> InitPriorityAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kInitPriorityAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<InitPriorityAttr> e = InitPriorityAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<InitPriorityAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<InitPriorityAttr> InitPriorityAttr::from(const Reference &r) {
   return InitPriorityAttr::from(r.as_attribute());
 }
 
+std::optional<InitPriorityAttr> InitPriorityAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<InitPriorityAttr> InitPriorityAttr::from(const TokenContext &t) {
-  return InitPriorityAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

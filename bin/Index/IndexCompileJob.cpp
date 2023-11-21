@@ -306,7 +306,7 @@ static uint64_t ParsedIndexOfMacroDirective(const pasta::Macro &macro) {
   return macro.BeginToken()->ParsedLocation().Index();
 }
 
-static bool IsOpeningConditionalDirective(const pasta::Macro &macro) {
+static bool IsOpeningConditionalDirective(const pasta::MacroDirective &macro) {
   switch (macro.Kind()) {
     case pasta::MacroKind::kIfDirective:
     case pasta::MacroKind::kIfDefinedDirective:
@@ -331,6 +331,80 @@ static bool IsContinuingConditionalDirective(const pasta::Macro &macro) {
 
 static bool IsClosingConditionalDirective(const pasta::Macro &macro) {
   return macro.Kind() == pasta::MacroKind::kEndIfDirective;
+}
+
+static pasta::Macro RootMacroFrom(pasta::Macro node) {
+  if (auto parent = node.Parent()) {
+    return RootMacroFrom(parent.value());
+  } else {
+    return node;
+  }
+}
+
+static std::optional<pasta::MacroToken> BeginToken(pasta::Macro macro) {
+  auto tok = pasta::MacroToken::From(macro);
+  if (tok) {
+    return tok;
+  }
+
+  return macro.BeginToken();
+}
+
+static std::string MacroLocation(pasta::Macro macro) {
+  if (auto tok = BeginToken(RootMacroFrom(macro))) {
+    if (auto ftok = tok->ParsedLocation().FileLocation()) {
+      auto file = pasta::File::Containing(ftok.value());
+      std::stringstream ss;
+      ss << file.Path().generic_string() << ':' << ftok->Line()
+         << ':' << ftok->Column();
+      return ss.str();
+    }
+  }
+
+  return "<unknown-loc>";
+}
+
+// Generate all directives that may be nested inside some top-level thing.
+// For example, the following are allowed.
+//
+//    MACRO(
+//        ...
+//    #define ...
+//        ...
+//        )
+//
+// And:
+//    MACRO(
+//        ...
+//    #if ...
+//        ...
+//    #endif
+//        ...
+//        )
+//
+// If `mn` isn't already a macro directive, then we explore its use tree to
+// find macro directives (e.g. `#define`, `#if`, and `#endif` above). These
+// directives are always in the use sides rather than the intermediate/expansion
+// sides as they are handled in an early phase of pre-processing.
+static gap::generator<pasta::MacroDirective>
+FindDirectivesInMacro(pasta::Macro mn) {
+  switch (mn.Kind()) {
+    case pasta::MacroKind::kArgument:
+    case pasta::MacroKind::kExpansion:
+    case pasta::MacroKind::kSubstitution:
+      for (pasta::Macro child : mn.Children()) {
+        for (auto def : FindDirectivesInMacro(child)) {
+          co_yield def;
+        }
+      }
+      break;
+
+    default:
+      if (auto dir = pasta::MacroDirective::From(mn)) {
+        co_yield std::move(dir.value());
+      }
+      break;
+  }
 }
 
 // Map `#if` to `#endif` or `#if` to `#else` and then `#else` to `#elif` or
@@ -358,13 +432,16 @@ static bool IsClosingConditionalDirective(const pasta::Macro &macro) {
 //
 // XREF(pag): https://github.com/trailofbits/multiplier/issues/457
 static std::map<uint64_t, pasta::Macro> FindNextPrevConditionalMacros(
-    const pasta::AST &ast) {
+    const pasta::AST &ast, std::string_view main_file_path) {
 
   std::vector<pasta::Macro> prev;
   std::map<uint64_t, pasta::Macro> next;
 
-  auto add_to_prev = [&] (const pasta::Macro &macro) {
-    CHECK(!prev.empty());
+  auto add_to_prev = [&] (const pasta::Macro &macro, const char *what) {
+    CHECK(!prev.empty())
+        << "Failed to add " << what << " when indexing " << main_file_path
+        << " near " << MacroLocation(macro);
+
     auto prev_index = ParsedIndexOfMacroDirective(prev.back());
     auto index = ParsedIndexOfMacroDirective(macro);
     next.emplace(prev_index, macro);
@@ -372,16 +449,18 @@ static std::map<uint64_t, pasta::Macro> FindNextPrevConditionalMacros(
   };
 
   for (pasta::Macro macro : ast.Macros()) {
-    if (IsOpeningConditionalDirective(macro)) {
-      prev.emplace_back(macro);
+    for (auto dir : FindDirectivesInMacro(macro)) {
+      if (IsOpeningConditionalDirective(dir)) {
+        prev.emplace_back(std::move(dir));
 
-    } else if (IsContinuingConditionalDirective(macro)) {
-      add_to_prev(macro);
-      prev.back() = macro;
+      } else if (IsContinuingConditionalDirective(dir)) {
+        add_to_prev(dir, "continuing conditional directive");
+        prev.back() = std::move(dir);
 
-    } else if (IsClosingConditionalDirective(macro)) {
-      add_to_prev(macro);
-      prev.pop_back();
+      } else if (IsClosingConditionalDirective(dir)) {
+        add_to_prev(dir, "closing conditional directive");
+        prev.pop_back();
+      }
     }
   }
   return next;
@@ -487,7 +566,7 @@ static std::pair<uint64_t, uint64_t> BaselineEntityRange(
 static pasta::TokenRange BaselineEntityRange(const pasta::Macro &macro) {
 
   std::optional<pasta::MacroToken> begin_tok = macro.BeginToken();
-  std::optional<pasta::MacroToken> end_tok = macro.EndToken();
+  std::optional<pasta::MacroToken> end_tok = EndToken(macro);
 
   CHECK(begin_tok.has_value());
   CHECK(end_tok.has_value());
@@ -498,40 +577,6 @@ static pasta::TokenRange BaselineEntityRange(const pasta::Macro &macro) {
   CHECK(range.has_value());
   return range.value();
 }
-
-//static bool ShouldEndInSemiColon(const pasta::Decl &decl) {
-//  switch (decl.Kind()) {
-//    case pasta::DeclKind::kVar:
-//      if (auto var = pasta::VarDecl::From(decl)) {
-//
-//      }
-//      break;
-//    case pasta::DeclKind::kFriend:
-//    case pasta::DeclKind::kRecord:
-//    case pasta::DeclKind::kCXXRecord:
-//    case pasta::DeclKind::kEnum:
-//    case pasta::DeclKind::kUsing:
-//    case pasta::DeclKind::kUsingDirective:
-//    case pasta::DeclKind::kUsingEnum:
-//    case pasta::DeclKind::kClassTemplate:
-//    case pasta::DeclKind::kClassTemplatePartialSpecialization:
-//    case pasta::DeclKind::kClassTemplateSpecialization:
-//    case pasta::DeclKind::kCXXDeductionGuide:
-//      return true;
-//    case pasta::DeclKind::kFunction:
-//      break;
-//
-//    case pasta::DeclKind::kCXXConstructor:
-//    case pasta::DeclKind::kCXXDestructor:
-//    case pasta::DeclKind::kCXXConversion:
-//    case pasta::DeclKind::kCXXMethod:
-//    case pasta::DeclKind::kCXXConversion:
-//      if () {
-//
-//      }
-//  }
-//  return false;
-//}
 
 static uint64_t PreviousConditionalIndex(
     const std::map<uint64_t, pasta::Macro> &dir_index_to_next_dir,
@@ -637,6 +682,9 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
   // We should always at least hit the end of file marker token first.
   CHECK_LT(end_tok_index, max_tok_index);
 
+  auto in_macro = false;
+  auto seen_marker = false;
+
   // Now adjust for macros at the beginning and ending. If we find macro
   // expansion ranges, then the expand until we find the beginning of the
   // range.
@@ -657,6 +705,7 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
         }
         break;
       case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+        seen_marker = true;
         done = true;
         break;
       case pasta::TokenRole::kBeginOfFileMarker:
@@ -670,9 +719,14 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
       case pasta::TokenRole::kFinalMacroExpansionToken:
       case pasta::TokenRole::kEndOfInternalMacroEventMarker:
         --begin_tok_index;  // Include it.
+        in_macro = true;
         break;
     }
   }
+
+  assert(!in_macro || seen_marker);
+  in_macro = false;
+  seen_marker = false;
 
   done = false;
   while (!done && 0u < end_tok_index && end_tok_index < max_tok_index) {
@@ -691,6 +745,7 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
         }
         break;
       case pasta::TokenRole::kEndOfMacroExpansionMarker:
+        seen_marker = true;
         done = true;
         break;
       case pasta::TokenRole::kBeginOfFileMarker:
@@ -704,9 +759,14 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
       case pasta::TokenRole::kFinalMacroExpansionToken:
       case pasta::TokenRole::kEndOfInternalMacroEventMarker:
         ++end_tok_index;  // Include it.
+        in_macro = true;
         break;
     }
   }
+
+  assert(!in_macro || seen_marker);
+  (void) in_macro;
+  (void) seen_marker;
 
   // Expand to trailing semicolon.
   if ((end_tok_index + 1u) < max_tok_index) {
@@ -1006,38 +1066,6 @@ static void AddDeclRangeToEntityListFor(
   entity_ranges.emplace_back(std::move(decl), begin_index, end_index);
 }
 
-static pasta::Macro RootMacroFrom(pasta::Macro node) {
-  if (auto parent = node.Parent()) {
-    return RootMacroFrom(parent.value());
-  } else {
-    return node;
-  }
-}
-
-// Generate all top-level macro defintions. They can be nested inside of macro
-// expansions.
-static gap::generator<pasta::DefineMacroDirective>
-FindDefinesInMacro(pasta::Macro mn) {
-  switch (mn.Kind()) {
-    case pasta::MacroKind::kArgument:
-    case pasta::MacroKind::kExpansion:
-    case pasta::MacroKind::kSubstitution:
-      for (pasta::Macro child : mn.Children()) {
-        for (auto def : FindDefinesInMacro(child)) {
-          co_yield def;
-        }
-      }
-      break;
-
-    case pasta::MacroKind::kDefineDirective:
-      co_yield reinterpret_cast<pasta::DefineMacroDirective &>(mn);
-      break;
-
-    default:
-      break;
-  }
-}
-
 // Go find the macro definitions, and for each definition, find the uses, then
 // find the "root" of that use.
 static std::vector<OrderedMacro> FindTLMs(
@@ -1103,11 +1131,17 @@ static std::vector<OrderedMacro> FindTLMs(
         break;
       }
     } else {
-      for (pasta::DefineMacroDirective md : FindDefinesInMacro(mn)) {
+      for (pasta::MacroDirective md : FindDirectivesInMacro(mn)) {
+        tlms.emplace_back(md, order++);
+
+        auto dmd = pasta::DefineMacroDirective::From(md);
+        if (!dmd) {
+          continue;
+        }
 
         // If this macro definition doesn't have a name, then it's in a
         // conditionally disabled region.
-        std::optional<pasta::MacroToken> name = md.Name();
+        std::optional<pasta::MacroToken> name = dmd->Name();
         if (!name) {
           continue;
         }
@@ -1123,16 +1157,7 @@ static std::vector<OrderedMacro> FindTLMs(
           continue;
         }
 
-        // We found a nested macro definition.
-        if (md.RawMacro() != mn.RawMacro()) {
-          tlms.emplace_back(md, order++);
-
-        // We found a top-level macro definition.
-        } else {
-          tlms.emplace_back(mn, order++);
-        }
-
-        defs.push_back(std::move(md));
+        defs.push_back(std::move(dmd.value()));
       }
     }
   }
@@ -1278,7 +1303,9 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
                                  std::move(ordered_entry.first), entity_ranges);
   }
 
-  auto dir_index_to_next_dir = FindNextPrevConditionalMacros(ast);
+  auto dir_index_to_next_dir = FindNextPrevConditionalMacros(
+      ast, main_file_path);
+
   for (OrderedDecl ordered_entry : FindTLDs(ast)) {
     AddDeclRangeToEntityListFor(tokens, eof_index_to_include, bof_to_eof,
                                 dir_index_to_next_dir, main_file_path, 
@@ -1822,8 +1849,7 @@ static void CreateFloatingDirectiveFragment(
   EntityGroup entities;
   entities.emplace_back(macro);
   auto floc = FindFileLocationOfFragment(
-      em.entity_ids, entities, directive_range);;
-  CHECK(floc.has_value());
+      em.entity_ids, entities, directive_range);
 
   pasta::PrintedTokenRange parsed_tokens_in_directive_range =
       pasta::PrintedTokenRange::Adopt(directive_range);

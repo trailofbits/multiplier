@@ -53,17 +53,13 @@ class ObjCEncodeExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ObjCEncodeExpr> from(const Stmt &parent);
-
-  inline static std::optional<ObjCEncodeExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return ObjCEncodeExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCEncodeExpr> from_base(const Stmt &parent);
+  inline static std::optional<ObjCEncodeExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCEncodeExpr> from(const std::optional<Stmt> &parent);
   static std::optional<ObjCEncodeExpr> from(const Reference &r);
+  static std::optional<ObjCEncodeExpr> from(const VariantEntity &e);
   static std::optional<ObjCEncodeExpr> from(const TokenContext &t);
 
   Token at_token(void) const;

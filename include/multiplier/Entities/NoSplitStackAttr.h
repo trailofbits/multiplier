@@ -40,17 +40,13 @@ class NoSplitStackAttr : public InheritableAttr {
     return AttrKind::NO_SPLIT_STACK;
   }
 
-  static std::optional<NoSplitStackAttr> from(const Attr &parent);
-
-  inline static std::optional<NoSplitStackAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoSplitStackAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoSplitStackAttr> from_base(const Attr &parent);
+  inline static std::optional<NoSplitStackAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoSplitStackAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoSplitStackAttr> from(const Reference &r);
+  static std::optional<NoSplitStackAttr> from(const VariantEntity &e);
   static std::optional<NoSplitStackAttr> from(const TokenContext &t);
 
 };

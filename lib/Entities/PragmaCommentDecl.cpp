@@ -85,7 +85,7 @@ bool PragmaCommentDecl::contains(const Stmt &stmt) {
 }
 
 PragmaCommentDecl PragmaCommentDecl::canonical_declaration(void) const {
-  if (auto canon = PragmaCommentDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (PragmaCommentDecl redecl : redeclarations()) {
@@ -95,12 +95,15 @@ PragmaCommentDecl PragmaCommentDecl::canonical_declaration(void) const {
 }
 
 std::optional<PragmaCommentDecl> PragmaCommentDecl::definition(void) const {
-  return PragmaCommentDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<PragmaCommentDecl> PragmaCommentDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<PragmaCommentDecl> dr = PragmaCommentDecl::from(r)) {
+    if (std::optional<PragmaCommentDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -113,18 +116,30 @@ gap::generator<PragmaCommentDecl> PragmaCommentDecl::redeclarations(void) const 
 std::optional<PragmaCommentDecl> PragmaCommentDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return PragmaCommentDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kPragmaCommentDeclDerivedKinds[] = {
     PragmaCommentDecl::static_kind(),
 };
 
-std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<PragmaCommentDecl> PragmaCommentDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case PragmaCommentDecl::static_kind():
       return reinterpret_cast<const PragmaCommentDecl &>(parent);
@@ -137,7 +152,7 @@ gap::generator<PragmaCommentDecl> PragmaCommentDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kPragmaCommentDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<PragmaCommentDecl> e = PragmaCommentDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<PragmaCommentDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -149,7 +164,7 @@ gap::generator<PragmaCommentDecl> PragmaCommentDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kPragmaCommentDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<PragmaCommentDecl> e = PragmaCommentDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<PragmaCommentDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -162,7 +177,7 @@ gap::generator<PragmaCommentDecl> PragmaCommentDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kPragmaCommentDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<PragmaCommentDecl> e = PragmaCommentDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<PragmaCommentDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -174,8 +189,18 @@ std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const Reference &r) {
   return PragmaCommentDecl::from(r.as_declaration());
 }
 
+std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const TokenContext &t) {
-  return PragmaCommentDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::string_view PragmaCommentDecl::argument(void) const {

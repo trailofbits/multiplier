@@ -50,17 +50,13 @@ class OMPDispatchDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<OMPDispatchDirective> from(const Stmt &parent);
-
-  inline static std::optional<OMPDispatchDirective> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return OMPDispatchDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPDispatchDirective> from_base(const Stmt &parent);
+  inline static std::optional<OMPDispatchDirective> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPDispatchDirective> from(const std::optional<Stmt> &parent);
   static std::optional<OMPDispatchDirective> from(const Reference &r);
+  static std::optional<OMPDispatchDirective> from(const VariantEntity &e);
   static std::optional<OMPDispatchDirective> from(const TokenContext &t);
 
   Token target_call_token(void) const;

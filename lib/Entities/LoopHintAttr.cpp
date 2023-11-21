@@ -39,18 +39,30 @@ bool LoopHintAttr::contains(const Token &tok) const {
 std::optional<LoopHintAttr> LoopHintAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return LoopHintAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<LoopHintAttr> LoopHintAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kLoopHintAttrDerivedKinds[] = {
     LoopHintAttr::static_kind(),
 };
 
-std::optional<LoopHintAttr> LoopHintAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<LoopHintAttr> LoopHintAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case LoopHintAttr::static_kind():
       return reinterpret_cast<const LoopHintAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<LoopHintAttr> LoopHintAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kLoopHintAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<LoopHintAttr> e = LoopHintAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<LoopHintAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<LoopHintAttr> LoopHintAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kLoopHintAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<LoopHintAttr> e = LoopHintAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<LoopHintAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<LoopHintAttr> LoopHintAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kLoopHintAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<LoopHintAttr> e = LoopHintAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<LoopHintAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<LoopHintAttr> LoopHintAttr::from(const Reference &r) {
   return LoopHintAttr::from(r.as_attribute());
 }
 
+std::optional<LoopHintAttr> LoopHintAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<LoopHintAttr> LoopHintAttr::from(const TokenContext &t) {
-  return LoopHintAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 LoopHintAttrOptionType LoopHintAttr::option(void) const {
@@ -123,7 +145,7 @@ std::optional<Expr> LoopHintAttr::value(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

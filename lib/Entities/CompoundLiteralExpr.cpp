@@ -89,18 +89,30 @@ bool CompoundLiteralExpr::contains(const Stmt &stmt) {
 std::optional<CompoundLiteralExpr> CompoundLiteralExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CompoundLiteralExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCompoundLiteralExprDerivedKinds[] = {
     CompoundLiteralExpr::static_kind(),
 };
 
-std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CompoundLiteralExpr::static_kind():
       return reinterpret_cast<const CompoundLiteralExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::in(const Index &index) 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCompoundLiteralExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CompoundLiteralExpr> e = CompoundLiteralExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CompoundLiteralExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::in(const Fragment &frag
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCompoundLiteralExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CompoundLiteralExpr> e = CompoundLiteralExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CompoundLiteralExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCompoundLiteralExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CompoundLiteralExpr> e = CompoundLiteralExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CompoundLiteralExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,13 +162,23 @@ std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const Reference &r)
   return CompoundLiteralExpr::from(r.as_statement());
 }
 
+std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const TokenContext &t) {
-  return CompoundLiteralExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr CompoundLiteralExpr::initializer(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token CompoundLiteralExpr::l_paren_token(void) const {

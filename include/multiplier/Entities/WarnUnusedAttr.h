@@ -40,17 +40,13 @@ class WarnUnusedAttr : public InheritableAttr {
     return AttrKind::WARN_UNUSED;
   }
 
-  static std::optional<WarnUnusedAttr> from(const Attr &parent);
-
-  inline static std::optional<WarnUnusedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return WarnUnusedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<WarnUnusedAttr> from_base(const Attr &parent);
+  inline static std::optional<WarnUnusedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<WarnUnusedAttr> from(const std::optional<Attr> &parent);
   static std::optional<WarnUnusedAttr> from(const Reference &r);
+  static std::optional<WarnUnusedAttr> from(const VariantEntity &e);
   static std::optional<WarnUnusedAttr> from(const TokenContext &t);
 
 };

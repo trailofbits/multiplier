@@ -42,17 +42,13 @@ class NoInlineAttr : public DeclOrStmtAttr {
     return AttrKind::NO_INLINE;
   }
 
-  static std::optional<NoInlineAttr> from(const Attr &parent);
-
-  inline static std::optional<NoInlineAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoInlineAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoInlineAttr> from_base(const Attr &parent);
+  inline static std::optional<NoInlineAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoInlineAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoInlineAttr> from(const Reference &r);
+  static std::optional<NoInlineAttr> from(const VariantEntity &e);
   static std::optional<NoInlineAttr> from(const TokenContext &t);
 
   bool is_clang_no_inline(void) const;

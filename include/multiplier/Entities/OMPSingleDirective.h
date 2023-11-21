@@ -50,17 +50,13 @@ class OMPSingleDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<OMPSingleDirective> from(const Stmt &parent);
-
-  inline static std::optional<OMPSingleDirective> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return OMPSingleDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPSingleDirective> from_base(const Stmt &parent);
+  inline static std::optional<OMPSingleDirective> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPSingleDirective> from(const std::optional<Stmt> &parent);
   static std::optional<OMPSingleDirective> from(const Reference &r);
+  static std::optional<OMPSingleDirective> from(const VariantEntity &e);
   static std::optional<OMPSingleDirective> from(const TokenContext &t);
 
 };

@@ -23,6 +23,7 @@
 #include "Entity.h"
 #include "EntityMapper.h"
 #include "PASTA.h"
+#include "References.h"
 #include "PendingFragment.h"
 #include "TokenTree.h"
 #include "Util.h"
@@ -145,7 +146,7 @@ void SerializeTemplateArgument(const PendingFragment &pf, const EntityMapper &es
   b.setVal0(es.ParentDeclId(e));
   b.setVal1(es.ParentStmtId(e));
   b.setVal2(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
-  b.setVal3(e.IsNull());
+  b.setVal3(e.IsEmpty());
   b.setVal4(e.IsDependent());
   b.setVal5(e.IsInstantiationDependent());
   b.setVal6(e.ContainsUnexpandedParameterPack());
@@ -178,6 +179,21 @@ void SerializeTemplateArgument(const PendingFragment &pf, const EntityMapper &es
   } else {
     b.setVal11(mx::kInvalidEntityId);
   }
+  do {
+    auto ov12 = e.PackElements();
+    if (!ov12) {
+      b.setVal13(false);
+      break;
+    }
+    b.setVal13(true);
+    auto v12 = std::move(*ov12);
+    auto sv12 = b.initVal12(static_cast<unsigned>(v12.size()));
+    auto i12 = 0u;
+    for (const auto &e12 : v12) {
+      sv12.set(i12, es.EntityId(e12));
+      ++i12;
+    }
+  } while (false);
 }
 
 void SerializeMacro(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::Macro &e, const TokenTree *tt) {
@@ -8229,15 +8245,33 @@ void SerializeGenericSelectionExpr(const PendingFragment &pf, const EntityMapper
       ++i15;
     }
   } while (false);
-  b.setVal37(es.EntityId(e.ControllingExpression()));
-  b.setVal38(es.EntityId(e.ControllingType()));
+  auto v37 = e.ControllingExpression();
+  if (v37) {
+    auto id37 = es.EntityId(v37.value());
+    b.setVal37(id37);
+  } else {
+    b.setVal37(mx::kInvalidEntityId);
+  }
+  auto v38 = e.ControllingType();
+  if (v38) {
+    auto id38 = es.EntityId(v38.value());
+    b.setVal38(id38);
+  } else {
+    b.setVal38(mx::kInvalidEntityId);
+  }
   auto et39 = es.EntityId(e.DefaultToken());
   b.setVal39(et39);
   auto et40 = es.EntityId(e.GenericToken());
   b.setVal40(et40);
   auto et41 = es.EntityId(e.RParenToken());
   b.setVal41(et41);
-  b.setVal42(es.EntityId(e.ResultExpression()));
+  auto v42 = e.ResultExpression();
+  if (v42) {
+    auto id42 = es.EntityId(v42.value());
+    b.setVal42(id42);
+  } else {
+    b.setVal42(mx::kInvalidEntityId);
+  }
   b.setVal89(e.IsExpressionPredicate());
   b.setVal90(e.IsResultDependent());
   b.setVal91(e.IsTypePredicate());
@@ -8719,7 +8753,13 @@ void SerializeStaticAssertDecl(const PendingFragment &pf, const EntityMapper &es
   (void) e;
   SerializeDecl(pf, es, b, e, nullptr);
   b.setVal49(es.EntityId(e.AssertExpression()));
-  b.setVal56(es.EntityId(e.Message()));
+  auto v56 = e.Message();
+  if (v56) {
+    auto id56 = es.EntityId(v56.value());
+    b.setVal56(id56);
+  } else {
+    b.setVal56(mx::kInvalidEntityId);
+  }
   auto et57 = es.EntityId(e.RParenToken());
   b.setVal57(et57);
   b.setVal50(e.IsFailed());

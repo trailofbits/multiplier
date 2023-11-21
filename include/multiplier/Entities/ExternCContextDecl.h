@@ -51,17 +51,13 @@ class ExternCContextDecl : public Decl {
   ExternCContextDecl canonical_declaration(void) const;
   std::optional<ExternCContextDecl> definition(void) const;
   gap::generator<ExternCContextDecl> redeclarations(void) const &;
-  static std::optional<ExternCContextDecl> from(const Decl &parent);
-
-  inline static std::optional<ExternCContextDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ExternCContextDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ExternCContextDecl> from_base(const Decl &parent);
+  inline static std::optional<ExternCContextDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ExternCContextDecl> from(const std::optional<Decl> &parent);
   static std::optional<ExternCContextDecl> from(const Reference &r);
+  static std::optional<ExternCContextDecl> from(const VariantEntity &e);
   static std::optional<ExternCContextDecl> from(const TokenContext &t);
 
   gap::generator<Decl> declarations_in_context(void) const &;

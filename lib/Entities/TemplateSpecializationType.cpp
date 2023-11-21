@@ -39,18 +39,30 @@ bool TemplateSpecializationType::contains(const Token &tok) const {
 std::optional<TemplateSpecializationType> TemplateSpecializationType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return TemplateSpecializationType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TemplateSpecializationType> TemplateSpecializationType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kTemplateSpecializationTypeDerivedKinds[] = {
     TemplateSpecializationType::static_kind(),
 };
 
-std::optional<TemplateSpecializationType> TemplateSpecializationType::from(const Type &parent) {
+}  // namespace
+
+std::optional<TemplateSpecializationType> TemplateSpecializationType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case TemplateSpecializationType::static_kind():
       return reinterpret_cast<const TemplateSpecializationType &>(parent);
@@ -63,7 +75,7 @@ gap::generator<TemplateSpecializationType> TemplateSpecializationType::in(const 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kTemplateSpecializationTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<TemplateSpecializationType> e = TemplateSpecializationType::from(Type(std::move(eptr)))) {
+      if (std::optional<TemplateSpecializationType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -74,8 +86,18 @@ std::optional<TemplateSpecializationType> TemplateSpecializationType::from(const
   return TemplateSpecializationType::from(r.as_type());
 }
 
+std::optional<TemplateSpecializationType> TemplateSpecializationType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<TemplateSpecializationType> TemplateSpecializationType::from(const TokenContext &t) {
-  return TemplateSpecializationType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type TemplateSpecializationType::desugar(void) const {

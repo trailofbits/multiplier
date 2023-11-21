@@ -40,18 +40,30 @@ bool GuardedByAttr::contains(const Token &tok) const {
 std::optional<GuardedByAttr> GuardedByAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return GuardedByAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<GuardedByAttr> GuardedByAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kGuardedByAttrDerivedKinds[] = {
     GuardedByAttr::static_kind(),
 };
 
-std::optional<GuardedByAttr> GuardedByAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<GuardedByAttr> GuardedByAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case GuardedByAttr::static_kind():
       return reinterpret_cast<const GuardedByAttr &>(parent);
@@ -64,7 +76,7 @@ gap::generator<GuardedByAttr> GuardedByAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kGuardedByAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<GuardedByAttr> e = GuardedByAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<GuardedByAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -76,7 +88,7 @@ gap::generator<GuardedByAttr> GuardedByAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kGuardedByAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<GuardedByAttr> e = GuardedByAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<GuardedByAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -89,7 +101,7 @@ gap::generator<GuardedByAttr> GuardedByAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kGuardedByAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<GuardedByAttr> e = GuardedByAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<GuardedByAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -101,13 +113,23 @@ std::optional<GuardedByAttr> GuardedByAttr::from(const Reference &r) {
   return GuardedByAttr::from(r.as_attribute());
 }
 
+std::optional<GuardedByAttr> GuardedByAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<GuardedByAttr> GuardedByAttr::from(const TokenContext &t) {
-  return GuardedByAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr GuardedByAttr::argument(void) const {
   RawEntityId eid = impl->reader.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

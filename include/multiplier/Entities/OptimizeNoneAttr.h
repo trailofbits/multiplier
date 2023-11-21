@@ -40,17 +40,13 @@ class OptimizeNoneAttr : public InheritableAttr {
     return AttrKind::OPTIMIZE_NONE;
   }
 
-  static std::optional<OptimizeNoneAttr> from(const Attr &parent);
-
-  inline static std::optional<OptimizeNoneAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OptimizeNoneAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OptimizeNoneAttr> from_base(const Attr &parent);
+  inline static std::optional<OptimizeNoneAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OptimizeNoneAttr> from(const std::optional<Attr> &parent);
   static std::optional<OptimizeNoneAttr> from(const Reference &r);
+  static std::optional<OptimizeNoneAttr> from(const VariantEntity &e);
   static std::optional<OptimizeNoneAttr> from(const TokenContext &t);
 
 };

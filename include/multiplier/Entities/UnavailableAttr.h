@@ -41,17 +41,13 @@ class UnavailableAttr : public InheritableAttr {
     return AttrKind::UNAVAILABLE;
   }
 
-  static std::optional<UnavailableAttr> from(const Attr &parent);
-
-  inline static std::optional<UnavailableAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return UnavailableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UnavailableAttr> from_base(const Attr &parent);
+  inline static std::optional<UnavailableAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UnavailableAttr> from(const std::optional<Attr> &parent);
   static std::optional<UnavailableAttr> from(const Reference &r);
+  static std::optional<UnavailableAttr> from(const VariantEntity &e);
   static std::optional<UnavailableAttr> from(const TokenContext &t);
 
   UnavailableAttrImplicitReason implicit_reason(void) const;

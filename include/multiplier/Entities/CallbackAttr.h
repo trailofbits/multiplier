@@ -40,17 +40,13 @@ class CallbackAttr : public InheritableAttr {
     return AttrKind::CALLBACK;
   }
 
-  static std::optional<CallbackAttr> from(const Attr &parent);
-
-  inline static std::optional<CallbackAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CallbackAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CallbackAttr> from_base(const Attr &parent);
+  inline static std::optional<CallbackAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CallbackAttr> from(const std::optional<Attr> &parent);
   static std::optional<CallbackAttr> from(const Reference &r);
+  static std::optional<CallbackAttr> from(const VariantEntity &e);
   static std::optional<CallbackAttr> from(const TokenContext &t);
 
 };

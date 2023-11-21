@@ -90,18 +90,30 @@ bool AtomicExpr::contains(const Stmt &stmt) {
 std::optional<AtomicExpr> AtomicExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return AtomicExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<AtomicExpr> AtomicExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kAtomicExprDerivedKinds[] = {
     AtomicExpr::static_kind(),
 };
 
-std::optional<AtomicExpr> AtomicExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<AtomicExpr> AtomicExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case AtomicExpr::static_kind():
       return reinterpret_cast<const AtomicExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<AtomicExpr> AtomicExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kAtomicExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<AtomicExpr> e = AtomicExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<AtomicExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<AtomicExpr> AtomicExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kAtomicExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<AtomicExpr> e = AtomicExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<AtomicExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<AtomicExpr> AtomicExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kAtomicExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<AtomicExpr> e = AtomicExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<AtomicExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<AtomicExpr> AtomicExpr::from(const Reference &r) {
   return AtomicExpr::from(r.as_statement());
 }
 
+std::optional<AtomicExpr> AtomicExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<AtomicExpr> AtomicExpr::from(const TokenContext &t) {
-  return AtomicExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token AtomicExpr::builtin_token(void) const {
@@ -165,7 +187,7 @@ AtomicExprAtomicOp AtomicExpr::operation(void) const {
 
 Expr AtomicExpr::order(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 std::optional<Expr> AtomicExpr::order_fail(void) const {
@@ -175,7 +197,7 @@ std::optional<Expr> AtomicExpr::order_fail(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -183,7 +205,7 @@ std::optional<Expr> AtomicExpr::order_fail(void) const {
 
 Expr AtomicExpr::pointer(void) const {
   RawEntityId eid = impl->reader.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token AtomicExpr::r_paren_token(void) const {
@@ -197,7 +219,7 @@ std::optional<Expr> AtomicExpr::scope(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -210,7 +232,7 @@ std::optional<Expr> AtomicExpr::value1(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -223,7 +245,7 @@ std::optional<Expr> AtomicExpr::value2(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -241,7 +263,7 @@ std::optional<Expr> AtomicExpr::weak(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -274,7 +296,7 @@ std::optional<Expr> AtomicExpr::nth_sub_expression(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Expr::from(Stmt(std::move(e)));
+  return Expr::from_base(std::move(e));
 }
 
 gap::generator<Expr> AtomicExpr::sub_expressions(void) const & {
@@ -283,7 +305,7 @@ gap::generator<Expr> AtomicExpr::sub_expressions(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+      if (auto e = Expr::from_base(std::move(d15))) {
         co_yield std::move(*e);
       }
     }

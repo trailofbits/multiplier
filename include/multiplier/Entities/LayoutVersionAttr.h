@@ -40,17 +40,13 @@ class LayoutVersionAttr : public InheritableAttr {
     return AttrKind::LAYOUT_VERSION;
   }
 
-  static std::optional<LayoutVersionAttr> from(const Attr &parent);
-
-  inline static std::optional<LayoutVersionAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return LayoutVersionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<LayoutVersionAttr> from_base(const Attr &parent);
+  inline static std::optional<LayoutVersionAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<LayoutVersionAttr> from(const std::optional<Attr> &parent);
   static std::optional<LayoutVersionAttr> from(const Reference &r);
+  static std::optional<LayoutVersionAttr> from(const VariantEntity &e);
   static std::optional<LayoutVersionAttr> from(const TokenContext &t);
 
 };

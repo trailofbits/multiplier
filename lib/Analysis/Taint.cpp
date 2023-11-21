@@ -38,6 +38,7 @@
 #include <unordered_set>
 
 #include "../Types.h"
+#include "../Util.h"
 
 namespace mx {
 
@@ -135,7 +136,7 @@ TaintTrackingResults TaintTracker::add_source(
 TaintTrackingResults TaintTracker::add_source(
     DefineMacroDirective def) & {
 
-  for (Reference ref : def.references()) {
+  for (Reference ref : mx::Reference::to(def)) {
     std::optional<MacroExpansion> exp = MacroExpansion::from(ref.as_macro());
     if (!exp) {
       continue;
@@ -188,27 +189,6 @@ TaintTrackingResults TaintTrackerImpl::AcceptDecl(Decl decl) {
     for (TaintTrackingResult res : TaintValue(std::move(val.value()))) {
       co_yield res;
     }
-  }
-}
-
-static bool IsNonValueStatement(StmtKind kind) {
-  switch (kind) {
-    case StmtKind::CASE_STMT:
-    case StmtKind::DEFAULT_STMT:
-    case StmtKind::LABEL_STMT:
-    case StmtKind::COMPOUND_STMT:
-    case StmtKind::SWITCH_STMT:
-    case StmtKind::DO_STMT:
-    case StmtKind::WHILE_STMT:
-    case StmtKind::FOR_STMT:
-    case StmtKind::IF_STMT:
-    case StmtKind::CXX_TRY_STMT:
-    case StmtKind::CXX_FOR_RANGE_STMT:
-    case StmtKind::CXX_CATCH_STMT:
-    case StmtKind::COROUTINE_BODY_STMT:  // Not sure what this is.
-      return true;
-    default:
-      return false;
   }
 }
 
@@ -439,7 +419,7 @@ static gap::generator<FunctionDecl> FindAssignedFunctionsTD(
       break;
     case StmtKind::MEMBER_EXPR:
       for (Reference ref :
-               MemberExpr::from(stmt)->member_declaration().references()) {
+               mx::Reference::to(MemberExpr::from(stmt)->member_declaration())) {
         for (FunctionDecl func : FindAssignedFunctionsBU(
                                      std::move(ref), seen)) {
           co_yield func;
@@ -505,7 +485,7 @@ static gap::generator<FunctionDecl> CalledFunctions(
     co_return;
   }
 
-  for (Reference ref : callee->references()) {
+  for (Reference ref : mx::Reference::to(callee.value())) {
     for (FunctionDecl func : FindAssignedFunctionsBU(std::move(ref), seen)) {
       co_yield func;
     }
@@ -704,7 +684,7 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
 // taint those.
 TaintTrackingResults TaintTrackerImpl::TaintValue(ValueDecl val) {
   auto is_func = FunctionDecl::from(val).has_value();
-  for (Reference ref : val.references()) {
+  for (Reference ref : mx::Reference::to(val)) {
     if (std::optional<Stmt> stmt = ref.as_statement()) {
       TaintTrackingStepKind kind = TaintTrackingStepKind::NORMAL;
       if (is_func) {

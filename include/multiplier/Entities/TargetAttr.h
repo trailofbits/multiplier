@@ -40,17 +40,13 @@ class TargetAttr : public InheritableAttr {
     return AttrKind::TARGET;
   }
 
-  static std::optional<TargetAttr> from(const Attr &parent);
-
-  inline static std::optional<TargetAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return TargetAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TargetAttr> from_base(const Attr &parent);
+  inline static std::optional<TargetAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TargetAttr> from(const std::optional<Attr> &parent);
   static std::optional<TargetAttr> from(const Reference &r);
+  static std::optional<TargetAttr> from(const VariantEntity &e);
   static std::optional<TargetAttr> from(const TokenContext &t);
 
   std::string_view architecture(void) const;

@@ -40,17 +40,13 @@ class TypeNonNullAttr : public TypeAttr {
     return AttrKind::TYPE_NON_NULL;
   }
 
-  static std::optional<TypeNonNullAttr> from(const Attr &parent);
-
-  inline static std::optional<TypeNonNullAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return TypeNonNullAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TypeNonNullAttr> from_base(const Attr &parent);
+  inline static std::optional<TypeNonNullAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TypeNonNullAttr> from(const std::optional<Attr> &parent);
   static std::optional<TypeNonNullAttr> from(const Reference &r);
+  static std::optional<TypeNonNullAttr> from(const VariantEntity &e);
   static std::optional<TypeNonNullAttr> from(const TokenContext &t);
 
 };

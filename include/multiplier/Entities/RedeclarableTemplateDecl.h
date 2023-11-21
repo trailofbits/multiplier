@@ -55,17 +55,13 @@ class RedeclarableTemplateDecl : public TemplateDecl {
   RedeclarableTemplateDecl canonical_declaration(void) const;
   std::optional<RedeclarableTemplateDecl> definition(void) const;
   gap::generator<RedeclarableTemplateDecl> redeclarations(void) const &;
-  static std::optional<RedeclarableTemplateDecl> from(const Decl &parent);
-
-  inline static std::optional<RedeclarableTemplateDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return RedeclarableTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<RedeclarableTemplateDecl> from_base(const Decl &parent);
+  inline static std::optional<RedeclarableTemplateDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<RedeclarableTemplateDecl> from(const std::optional<Decl> &parent);
   static std::optional<RedeclarableTemplateDecl> from(const Reference &r);
+  static std::optional<RedeclarableTemplateDecl> from(const VariantEntity &e);
   static std::optional<RedeclarableTemplateDecl> from(const TokenContext &t);
 
   RedeclarableTemplateDecl instantiated_from_member_template(void) const;

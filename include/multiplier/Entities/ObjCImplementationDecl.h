@@ -59,17 +59,13 @@ class ObjCImplementationDecl : public ObjCImplDecl {
   ObjCImplementationDecl canonical_declaration(void) const;
   std::optional<ObjCImplementationDecl> definition(void) const;
   gap::generator<ObjCImplementationDecl> redeclarations(void) const &;
-  static std::optional<ObjCImplementationDecl> from(const Decl &parent);
-
-  inline static std::optional<ObjCImplementationDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ObjCImplementationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCImplementationDecl> from_base(const Decl &parent);
+  inline static std::optional<ObjCImplementationDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCImplementationDecl> from(const std::optional<Decl> &parent);
   static std::optional<ObjCImplementationDecl> from(const Reference &r);
+  static std::optional<ObjCImplementationDecl> from(const VariantEntity &e);
   static std::optional<ObjCImplementationDecl> from(const TokenContext &t);
 
   Token instance_variable_l_brace_token(void) const;

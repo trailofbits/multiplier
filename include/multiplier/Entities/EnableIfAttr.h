@@ -41,17 +41,13 @@ class EnableIfAttr : public InheritableAttr {
     return AttrKind::ENABLE_IF;
   }
 
-  static std::optional<EnableIfAttr> from(const Attr &parent);
-
-  inline static std::optional<EnableIfAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return EnableIfAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<EnableIfAttr> from_base(const Attr &parent);
+  inline static std::optional<EnableIfAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<EnableIfAttr> from(const std::optional<Attr> &parent);
   static std::optional<EnableIfAttr> from(const Reference &r);
+  static std::optional<EnableIfAttr> from(const VariantEntity &e);
   static std::optional<EnableIfAttr> from(const TokenContext &t);
 
   Expr condition(void) const;

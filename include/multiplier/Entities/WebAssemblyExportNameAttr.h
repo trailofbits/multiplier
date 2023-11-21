@@ -40,17 +40,13 @@ class WebAssemblyExportNameAttr : public InheritableAttr {
     return AttrKind::WEB_ASSEMBLY_EXPORT_NAME;
   }
 
-  static std::optional<WebAssemblyExportNameAttr> from(const Attr &parent);
-
-  inline static std::optional<WebAssemblyExportNameAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return WebAssemblyExportNameAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<WebAssemblyExportNameAttr> from_base(const Attr &parent);
+  inline static std::optional<WebAssemblyExportNameAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<WebAssemblyExportNameAttr> from(const std::optional<Attr> &parent);
   static std::optional<WebAssemblyExportNameAttr> from(const Reference &r);
+  static std::optional<WebAssemblyExportNameAttr> from(const VariantEntity &e);
   static std::optional<WebAssemblyExportNameAttr> from(const TokenContext &t);
 
   std::string_view export_name(void) const;

@@ -90,18 +90,30 @@ bool MSPropertyRefExpr::contains(const Stmt &stmt) {
 std::optional<MSPropertyRefExpr> MSPropertyRefExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return MSPropertyRefExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kMSPropertyRefExprDerivedKinds[] = {
     MSPropertyRefExpr::static_kind(),
 };
 
-std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case MSPropertyRefExpr::static_kind():
       return reinterpret_cast<const MSPropertyRefExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<MSPropertyRefExpr> MSPropertyRefExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kMSPropertyRefExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<MSPropertyRefExpr> e = MSPropertyRefExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<MSPropertyRefExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<MSPropertyRefExpr> MSPropertyRefExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kMSPropertyRefExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<MSPropertyRefExpr> e = MSPropertyRefExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<MSPropertyRefExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<MSPropertyRefExpr> MSPropertyRefExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kMSPropertyRefExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<MSPropertyRefExpr> e = MSPropertyRefExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<MSPropertyRefExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,13 +163,23 @@ std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const Reference &r) {
   return MSPropertyRefExpr::from(r.as_statement());
 }
 
+std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const TokenContext &t) {
-  return MSPropertyRefExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr MSPropertyRefExpr::base_expression(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token MSPropertyRefExpr::member_token(void) const {
@@ -166,7 +188,7 @@ Token MSPropertyRefExpr::member_token(void) const {
 
 MSPropertyDecl MSPropertyRefExpr::property_declaration(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return MSPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return MSPropertyDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool MSPropertyRefExpr::is_arrow(void) const {

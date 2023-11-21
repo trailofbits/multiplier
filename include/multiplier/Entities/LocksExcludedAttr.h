@@ -40,17 +40,13 @@ class LocksExcludedAttr : public InheritableAttr {
     return AttrKind::LOCKS_EXCLUDED;
   }
 
-  static std::optional<LocksExcludedAttr> from(const Attr &parent);
-
-  inline static std::optional<LocksExcludedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return LocksExcludedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<LocksExcludedAttr> from_base(const Attr &parent);
+  inline static std::optional<LocksExcludedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<LocksExcludedAttr> from(const std::optional<Attr> &parent);
   static std::optional<LocksExcludedAttr> from(const Reference &r);
+  static std::optional<LocksExcludedAttr> from(const VariantEntity &e);
   static std::optional<LocksExcludedAttr> from(const TokenContext &t);
 
 };

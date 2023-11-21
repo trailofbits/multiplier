@@ -40,17 +40,13 @@ class NotTailCalledAttr : public InheritableAttr {
     return AttrKind::NOT_TAIL_CALLED;
   }
 
-  static std::optional<NotTailCalledAttr> from(const Attr &parent);
-
-  inline static std::optional<NotTailCalledAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NotTailCalledAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NotTailCalledAttr> from_base(const Attr &parent);
+  inline static std::optional<NotTailCalledAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NotTailCalledAttr> from(const std::optional<Attr> &parent);
   static std::optional<NotTailCalledAttr> from(const Reference &r);
+  static std::optional<NotTailCalledAttr> from(const VariantEntity &e);
   static std::optional<NotTailCalledAttr> from(const TokenContext &t);
 
 };

@@ -90,18 +90,30 @@ bool CXXDefaultInitExpr::contains(const Stmt &stmt) {
 std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXDefaultInitExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXDefaultInitExprDerivedKinds[] = {
     CXXDefaultInitExpr::static_kind(),
 };
 
-std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXDefaultInitExpr::static_kind():
       return reinterpret_cast<const CXXDefaultInitExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<CXXDefaultInitExpr> CXXDefaultInitExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXDefaultInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXDefaultInitExpr> e = CXXDefaultInitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXDefaultInitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<CXXDefaultInitExpr> CXXDefaultInitExpr::in(const Fragment &frag) 
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXDefaultInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXDefaultInitExpr> e = CXXDefaultInitExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXDefaultInitExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<CXXDefaultInitExpr> CXXDefaultInitExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXDefaultInitExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXDefaultInitExpr> e = CXXDefaultInitExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXDefaultInitExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,8 +163,18 @@ std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const Reference &r) {
   return CXXDefaultInitExpr::from(r.as_statement());
 }
 
+std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const TokenContext &t) {
-  return CXXDefaultInitExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::optional<Expr> CXXDefaultInitExpr::expression(void) const {
@@ -162,7 +184,7 @@ std::optional<Expr> CXXDefaultInitExpr::expression(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -170,12 +192,12 @@ std::optional<Expr> CXXDefaultInitExpr::expression(void) const {
 
 FieldDecl CXXDefaultInitExpr::field(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return FieldDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return FieldDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Expr CXXDefaultInitExpr::rewritten_expression(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token CXXDefaultInitExpr::used_token(void) const {

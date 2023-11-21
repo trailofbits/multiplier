@@ -17,8 +17,8 @@
 #include <span>
 #include <vector>
 
+#include "../Entity.h"
 #include "../Iterator.h"
-#include "../Types.h"
 
 #include "PseudoKind.h"
 #include "TemplateArgumentKind.h"
@@ -82,7 +82,6 @@ class TemplateArgument {
   }
 
   PackedTemplateArgumentId id(void) const;
-  gap::generator<Reference> references(void) const &;
 
   inline static std::optional<TemplateArgument> from(const TemplateArgument &self) {
     return self;
@@ -93,11 +92,11 @@ class TemplateArgument {
   }
 
   static std::optional<TemplateArgument> from(const Reference &r);
-
+  static std::optional<TemplateArgument> from(const VariantEntity &e);
   static std::optional<TemplateArgument> from(const TokenContext &t);
 
   TemplateArgumentKind kind(void) const;
-  bool is_null(void) const;
+  bool is_empty(void) const;
   bool is_dependent(void) const;
   bool is_instantiation_dependent(void) const;
   bool contains_unexpanded_parameter_pack(void) const;
@@ -106,6 +105,7 @@ class TemplateArgument {
   std::optional<Type> as_type(void) const;
   std::optional<Type> parameter_type_for_declaration(void) const;
   std::optional<Type> null_pointer_type(void) const;
+  std::optional<std::vector<TemplateArgument>> pack_elements(void) const;
 };
 
 #endif

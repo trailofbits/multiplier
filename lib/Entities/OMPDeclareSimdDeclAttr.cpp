@@ -39,18 +39,30 @@ bool OMPDeclareSimdDeclAttr::contains(const Token &tok) const {
 std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return OMPDeclareSimdDeclAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kOMPDeclareSimdDeclAttrDerivedKinds[] = {
     OMPDeclareSimdDeclAttr::static_kind(),
 };
 
-std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case OMPDeclareSimdDeclAttr::static_kind():
       return reinterpret_cast<const OMPDeclareSimdDeclAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::in(const Index &i
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kOMPDeclareSimdDeclAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<OMPDeclareSimdDeclAttr> e = OMPDeclareSimdDeclAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<OMPDeclareSimdDeclAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::in(const Fragment
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kOMPDeclareSimdDeclAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<OMPDeclareSimdDeclAttr> e = OMPDeclareSimdDeclAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<OMPDeclareSimdDeclAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::in(const File &fi
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kOMPDeclareSimdDeclAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<OMPDeclareSimdDeclAttr> e = OMPDeclareSimdDeclAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<OMPDeclareSimdDeclAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from(const Referen
   return OMPDeclareSimdDeclAttr::from(r.as_attribute());
 }
 
+std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from(const TokenContext &t) {
-  return OMPDeclareSimdDeclAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 OMPDeclareSimdDeclAttrBranchStateTy OMPDeclareSimdDeclAttr::branch_state(void) const {
@@ -110,7 +132,7 @@ OMPDeclareSimdDeclAttrBranchStateTy OMPDeclareSimdDeclAttr::branch_state(void) c
 
 Expr OMPDeclareSimdDeclAttr::simdlen(void) const {
   RawEntityId eid = impl->reader.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

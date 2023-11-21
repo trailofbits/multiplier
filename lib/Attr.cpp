@@ -34,9 +34,4 @@ SpecificEntityId<AttrId> Attr::id(void) const {
   return eid;
 }
 
-// Return references to this attribute.
-gap::generator<Reference> Attr::references(void) const & {
-  return References(impl->ep, id().Pack());
-}
-
 }  // namespace mx

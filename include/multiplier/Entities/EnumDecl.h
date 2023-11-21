@@ -61,17 +61,13 @@ class EnumDecl : public TagDecl {
   EnumDecl canonical_declaration(void) const;
   std::optional<EnumDecl> definition(void) const;
   gap::generator<EnumDecl> redeclarations(void) const &;
-  static std::optional<EnumDecl> from(const Decl &parent);
-
-  inline static std::optional<EnumDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return EnumDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<EnumDecl> from_base(const Decl &parent);
+  inline static std::optional<EnumDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<EnumDecl> from(const std::optional<Decl> &parent);
   static std::optional<EnumDecl> from(const Reference &r);
+  static std::optional<EnumDecl> from(const VariantEntity &e);
   static std::optional<EnumDecl> from(const TokenContext &t);
 
   std::optional<EnumConstantDecl> nth_enumerator(unsigned n) const;

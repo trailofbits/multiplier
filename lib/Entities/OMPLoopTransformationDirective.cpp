@@ -91,19 +91,31 @@ bool OMPLoopTransformationDirective::contains(const Stmt &stmt) {
 std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPLoopTransformationDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPLoopTransformationDirectiveDerivedKinds[] = {
     OMPTileDirective::static_kind(),
     OMPUnrollDirective::static_kind(),
 };
 
-std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPTileDirective::static_kind():
     case OMPUnrollDirective::static_kind():
@@ -117,7 +129,7 @@ gap::generator<OMPLoopTransformationDirective> OMPLoopTransformationDirective::i
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPLoopTransformationDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPLoopTransformationDirective> e = OMPLoopTransformationDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPLoopTransformationDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -129,7 +141,7 @@ gap::generator<OMPLoopTransformationDirective> OMPLoopTransformationDirective::i
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPLoopTransformationDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPLoopTransformationDirective> e = OMPLoopTransformationDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPLoopTransformationDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -142,7 +154,7 @@ gap::generator<OMPLoopTransformationDirective> OMPLoopTransformationDirective::i
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPLoopTransformationDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPLoopTransformationDirective> e = OMPLoopTransformationDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPLoopTransformationDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -154,8 +166,18 @@ std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::fr
   return OMPLoopTransformationDirective::from(r.as_statement());
 }
 
+std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::from(const TokenContext &t) {
-  return OMPLoopTransformationDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Stmt OMPLoopTransformationDirective::pre_initializers(void) const {

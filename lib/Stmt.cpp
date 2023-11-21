@@ -29,11 +29,6 @@ SpecificEntityId<StmtId> Stmt::id(void) const {
   return eid;
 }
 
-// References to this statement.
-gap::generator<Reference> Stmt::references(void) const & {
-  return References(impl->ep, id().Pack());
-}
-
 // Public methods for derived classes
 
 // Included to make sure to distinguish from `call_return_type`

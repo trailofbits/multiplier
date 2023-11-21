@@ -49,17 +49,13 @@ class InheritableParamAttr : public InheritableAttr {
   static gap::generator<InheritableParamAttr> in(const Fragment &frag);
   static gap::generator<InheritableParamAttr> in(const File &file);
 
-  static std::optional<InheritableParamAttr> from(const Attr &parent);
-
-  inline static std::optional<InheritableParamAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return InheritableParamAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<InheritableParamAttr> from_base(const Attr &parent);
+  inline static std::optional<InheritableParamAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<InheritableParamAttr> from(const std::optional<Attr> &parent);
   static std::optional<InheritableParamAttr> from(const Reference &r);
+  static std::optional<InheritableParamAttr> from(const VariantEntity &e);
   static std::optional<InheritableParamAttr> from(const TokenContext &t);
 
 };

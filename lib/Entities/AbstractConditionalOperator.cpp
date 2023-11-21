@@ -91,19 +91,31 @@ bool AbstractConditionalOperator::contains(const Stmt &stmt) {
 std::optional<AbstractConditionalOperator> AbstractConditionalOperator::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return AbstractConditionalOperator::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kAbstractConditionalOperatorDerivedKinds[] = {
     BinaryConditionalOperator::static_kind(),
     ConditionalOperator::static_kind(),
 };
 
-std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case BinaryConditionalOperator::static_kind():
     case ConditionalOperator::static_kind():
@@ -117,7 +129,7 @@ gap::generator<AbstractConditionalOperator> AbstractConditionalOperator::in(cons
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kAbstractConditionalOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<AbstractConditionalOperator> e = AbstractConditionalOperator::from(Stmt(std::move(eptr)))) {
+      if (std::optional<AbstractConditionalOperator> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -129,7 +141,7 @@ gap::generator<AbstractConditionalOperator> AbstractConditionalOperator::in(cons
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kAbstractConditionalOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<AbstractConditionalOperator> e = AbstractConditionalOperator::from(Stmt(std::move(eptr)))) {
+      if (std::optional<AbstractConditionalOperator> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -142,7 +154,7 @@ gap::generator<AbstractConditionalOperator> AbstractConditionalOperator::in(cons
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kAbstractConditionalOperatorDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<AbstractConditionalOperator> e = AbstractConditionalOperator::from(Stmt(std::move(eptr)))) {
+        if (std::optional<AbstractConditionalOperator> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -154,8 +166,18 @@ std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(con
   return AbstractConditionalOperator::from(r.as_statement());
 }
 
+std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const TokenContext &t) {
-  return AbstractConditionalOperator::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Token AbstractConditionalOperator::colon_token(void) const {
@@ -164,12 +186,12 @@ Token AbstractConditionalOperator::colon_token(void) const {
 
 Expr AbstractConditionalOperator::condition(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr AbstractConditionalOperator::false_expression(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token AbstractConditionalOperator::question_token(void) const {
@@ -178,7 +200,7 @@ Token AbstractConditionalOperator::question_token(void) const {
 
 Expr AbstractConditionalOperator::true_expression(void) const {
   RawEntityId eid = impl->reader.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

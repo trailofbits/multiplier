@@ -100,7 +100,7 @@ bool CXXRecordDecl::contains(const Stmt &stmt) {
 }
 
 CXXRecordDecl CXXRecordDecl::canonical_declaration(void) const {
-  if (auto canon = CXXRecordDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (CXXRecordDecl redecl : redeclarations()) {
@@ -110,12 +110,15 @@ CXXRecordDecl CXXRecordDecl::canonical_declaration(void) const {
 }
 
 std::optional<CXXRecordDecl> CXXRecordDecl::definition(void) const {
-  return CXXRecordDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<CXXRecordDecl> dr = CXXRecordDecl::from(r)) {
+    if (std::optional<CXXRecordDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -128,20 +131,32 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::redeclarations(void) const & {
 std::optional<CXXRecordDecl> CXXRecordDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return CXXRecordDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXRecordDecl> CXXRecordDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kCXXRecordDeclDerivedKinds[] = {
     CXXRecordDecl::static_kind(),
     ClassTemplateSpecializationDecl::static_kind(),
     ClassTemplatePartialSpecializationDecl::static_kind(),
 };
 
-std::optional<CXXRecordDecl> CXXRecordDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<CXXRecordDecl> CXXRecordDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case CXXRecordDecl::static_kind():
     case ClassTemplateSpecializationDecl::static_kind():
@@ -156,7 +171,7 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kCXXRecordDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<CXXRecordDecl> e = CXXRecordDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<CXXRecordDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -168,7 +183,7 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kCXXRecordDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<CXXRecordDecl> e = CXXRecordDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<CXXRecordDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -181,7 +196,7 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kCXXRecordDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<CXXRecordDecl> e = CXXRecordDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<CXXRecordDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -193,8 +208,18 @@ std::optional<CXXRecordDecl> CXXRecordDecl::from(const Reference &r) {
   return CXXRecordDecl::from(r.as_declaration());
 }
 
+std::optional<CXXRecordDecl> CXXRecordDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<CXXRecordDecl> CXXRecordDecl::from(const TokenContext &t) {
-  return CXXRecordDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::allow_const_default_initializer(void) const {
@@ -247,7 +272,7 @@ std::optional<CXXConstructorDecl> CXXRecordDecl::nth_constructor(unsigned n) con
   if (!e) {
     return std::nullopt;
   }
-  return CXXConstructorDecl::from(Decl(std::move(e)));
+  return CXXConstructorDecl::from_base(std::move(e));
 }
 
 gap::generator<CXXConstructorDecl> CXXRecordDecl::constructors(void) const & {
@@ -256,7 +281,7 @@ gap::generator<CXXConstructorDecl> CXXRecordDecl::constructors(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d187 = ep->DeclFor(ep, v)) {
-      if (auto e = CXXConstructorDecl::from(Decl(std::move(d187)))) {
+      if (auto e = CXXConstructorDecl::from_base(std::move(d187))) {
         co_yield std::move(*e);
       }
     }
@@ -275,7 +300,7 @@ std::optional<std::vector<FriendDecl>> CXXRecordDecl::friends(void) const {
   for (auto v : list) {
     EntityId id(v);
     if (auto d188 = ep->DeclFor(ep, v)) {
-      if (auto e = FriendDecl::from(Decl(std::move(d188)))) {
+      if (auto e = FriendDecl::from_base(std::move(d188))) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -290,7 +315,7 @@ std::optional<FunctionTemplateDecl> CXXRecordDecl::dependent_lambda_call_operato
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionTemplateDecl::from(Decl(std::move(eptr)));
+      return FunctionTemplateDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -303,7 +328,7 @@ std::optional<ClassTemplateDecl> CXXRecordDecl::described_class_template(void) c
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return ClassTemplateDecl::from(Decl(std::move(eptr)));
+      return ClassTemplateDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -316,7 +341,7 @@ std::optional<CXXDestructorDecl> CXXRecordDecl::destructor(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXDestructorDecl::from(Decl(std::move(eptr)));
+      return CXXDestructorDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -342,7 +367,7 @@ std::optional<CXXRecordDecl> CXXRecordDecl::instantiated_from_member_class(void)
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXRecordDecl::from(Decl(std::move(eptr)));
+      return CXXRecordDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -355,7 +380,7 @@ std::optional<CXXMethodDecl> CXXRecordDecl::lambda_call_operator(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXMethodDecl::from(Decl(std::move(eptr)));
+      return CXXMethodDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -394,7 +419,7 @@ std::optional<std::vector<NamedDecl>> CXXRecordDecl::lambda_explicit_template_pa
   for (auto v : list) {
     EntityId id(v);
     if (auto d189 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from(Decl(std::move(d189)))) {
+      if (auto e = NamedDecl::from_base(std::move(d189))) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -440,7 +465,7 @@ std::optional<CXXRecordDecl> CXXRecordDecl::template_instantiation_pattern(void)
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXRecordDecl::from(Decl(std::move(eptr)));
+      return CXXRecordDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -1068,7 +1093,7 @@ std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionDecl::from(Decl(std::move(eptr)));
+      return FunctionDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -1179,7 +1204,7 @@ std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
   for (auto v : list) {
     EntityId id(v);
     if (auto d315 = ep->DeclFor(ep, v)) {
-      if (auto e = CXXMethodDecl::from(Decl(std::move(d315)))) {
+      if (auto e = CXXMethodDecl::from_base(std::move(d315))) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -1328,7 +1353,7 @@ std::optional<CXXRecordDecl> CXXRecordDecl::primary_base(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXRecordDecl::from(Decl(std::move(eptr)));
+      return CXXRecordDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

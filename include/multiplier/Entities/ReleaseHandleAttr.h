@@ -42,17 +42,13 @@ class ReleaseHandleAttr : public InheritableParamAttr {
     return AttrKind::RELEASE_HANDLE;
   }
 
-  static std::optional<ReleaseHandleAttr> from(const Attr &parent);
-
-  inline static std::optional<ReleaseHandleAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ReleaseHandleAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ReleaseHandleAttr> from_base(const Attr &parent);
+  inline static std::optional<ReleaseHandleAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ReleaseHandleAttr> from(const std::optional<Attr> &parent);
   static std::optional<ReleaseHandleAttr> from(const Reference &r);
+  static std::optional<ReleaseHandleAttr> from(const VariantEntity &e);
   static std::optional<ReleaseHandleAttr> from(const TokenContext &t);
 
   std::string_view handle_type(void) const;

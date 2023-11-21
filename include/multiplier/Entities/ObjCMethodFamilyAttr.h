@@ -41,17 +41,13 @@ class ObjCMethodFamilyAttr : public InheritableAttr {
     return AttrKind::OBJ_C_METHOD_FAMILY;
   }
 
-  static std::optional<ObjCMethodFamilyAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCMethodFamilyAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCMethodFamilyAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCMethodFamilyAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCMethodFamilyAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCMethodFamilyAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCMethodFamilyAttr> from(const Reference &r);
+  static std::optional<ObjCMethodFamilyAttr> from(const VariantEntity &e);
   static std::optional<ObjCMethodFamilyAttr> from(const TokenContext &t);
 
   ObjCMethodFamilyAttrFamilyKind family(void) const;

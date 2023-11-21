@@ -40,17 +40,13 @@ class NoDuplicateAttr : public InheritableAttr {
     return AttrKind::NO_DUPLICATE;
   }
 
-  static std::optional<NoDuplicateAttr> from(const Attr &parent);
-
-  inline static std::optional<NoDuplicateAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoDuplicateAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoDuplicateAttr> from_base(const Attr &parent);
+  inline static std::optional<NoDuplicateAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoDuplicateAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoDuplicateAttr> from(const Reference &r);
+  static std::optional<NoDuplicateAttr> from(const VariantEntity &e);
   static std::optional<NoDuplicateAttr> from(const TokenContext &t);
 
 };

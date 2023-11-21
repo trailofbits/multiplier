@@ -40,17 +40,13 @@ class NoThreadSafetyAnalysisAttr : public InheritableAttr {
     return AttrKind::NO_THREAD_SAFETY_ANALYSIS;
   }
 
-  static std::optional<NoThreadSafetyAnalysisAttr> from(const Attr &parent);
-
-  inline static std::optional<NoThreadSafetyAnalysisAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoThreadSafetyAnalysisAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoThreadSafetyAnalysisAttr> from_base(const Attr &parent);
+  inline static std::optional<NoThreadSafetyAnalysisAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoThreadSafetyAnalysisAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoThreadSafetyAnalysisAttr> from(const Reference &r);
+  static std::optional<NoThreadSafetyAnalysisAttr> from(const VariantEntity &e);
   static std::optional<NoThreadSafetyAnalysisAttr> from(const TokenContext &t);
 
 };

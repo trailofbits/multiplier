@@ -40,17 +40,13 @@ class BTFDeclTagAttr : public InheritableAttr {
     return AttrKind::BTF_DECL_TAG;
   }
 
-  static std::optional<BTFDeclTagAttr> from(const Attr &parent);
-
-  inline static std::optional<BTFDeclTagAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return BTFDeclTagAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<BTFDeclTagAttr> from_base(const Attr &parent);
+  inline static std::optional<BTFDeclTagAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<BTFDeclTagAttr> from(const std::optional<Attr> &parent);
   static std::optional<BTFDeclTagAttr> from(const Reference &r);
+  static std::optional<BTFDeclTagAttr> from(const VariantEntity &e);
   static std::optional<BTFDeclTagAttr> from(const TokenContext &t);
 
   std::string_view btf_decl_tag(void) const;

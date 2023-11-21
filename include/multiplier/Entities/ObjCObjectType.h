@@ -38,17 +38,13 @@ class ObjCObjectType : public Type {
     return TypeKind::OBJ_C_OBJECT;
   }
 
-  static std::optional<ObjCObjectType> from(const Type &parent);
-
-  inline static std::optional<ObjCObjectType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return ObjCObjectType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCObjectType> from_base(const Type &parent);
+  inline static std::optional<ObjCObjectType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCObjectType> from(const std::optional<Type> &parent);
   static std::optional<ObjCObjectType> from(const Reference &r);
+  static std::optional<ObjCObjectType> from(const VariantEntity &e);
   static std::optional<ObjCObjectType> from(const TokenContext &t);
 
   Type desugar(void) const;

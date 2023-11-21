@@ -62,17 +62,13 @@ class CXXDestructorDecl : public CXXMethodDecl {
   CXXDestructorDecl canonical_declaration(void) const;
   std::optional<CXXDestructorDecl> definition(void) const;
   gap::generator<CXXDestructorDecl> redeclarations(void) const &;
-  static std::optional<CXXDestructorDecl> from(const Decl &parent);
-
-  inline static std::optional<CXXDestructorDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return CXXDestructorDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CXXDestructorDecl> from_base(const Decl &parent);
+  inline static std::optional<CXXDestructorDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CXXDestructorDecl> from(const std::optional<Decl> &parent);
   static std::optional<CXXDestructorDecl> from(const Reference &r);
+  static std::optional<CXXDestructorDecl> from(const VariantEntity &e);
   static std::optional<CXXDestructorDecl> from(const TokenContext &t);
 
   std::optional<FunctionDecl> operator_delete(void) const;

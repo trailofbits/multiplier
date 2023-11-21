@@ -40,17 +40,13 @@ class AddressSpaceAttr : public TypeAttr {
     return AttrKind::ADDRESS_SPACE;
   }
 
-  static std::optional<AddressSpaceAttr> from(const Attr &parent);
-
-  inline static std::optional<AddressSpaceAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AddressSpaceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AddressSpaceAttr> from_base(const Attr &parent);
+  inline static std::optional<AddressSpaceAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AddressSpaceAttr> from(const std::optional<Attr> &parent);
   static std::optional<AddressSpaceAttr> from(const Reference &r);
+  static std::optional<AddressSpaceAttr> from(const VariantEntity &e);
   static std::optional<AddressSpaceAttr> from(const TokenContext &t);
 
 };

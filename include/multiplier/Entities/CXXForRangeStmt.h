@@ -51,17 +51,13 @@ class CXXForRangeStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<CXXForRangeStmt> from(const Stmt &parent);
-
-  inline static std::optional<CXXForRangeStmt> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return CXXForRangeStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CXXForRangeStmt> from_base(const Stmt &parent);
+  inline static std::optional<CXXForRangeStmt> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CXXForRangeStmt> from(const std::optional<Stmt> &parent);
   static std::optional<CXXForRangeStmt> from(const Reference &r);
+  static std::optional<CXXForRangeStmt> from(const VariantEntity &e);
   static std::optional<CXXForRangeStmt> from(const TokenContext &t);
 
   DeclStmt begin_statement(void) const;

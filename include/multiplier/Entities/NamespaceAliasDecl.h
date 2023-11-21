@@ -53,17 +53,13 @@ class NamespaceAliasDecl : public NamedDecl {
   NamespaceAliasDecl canonical_declaration(void) const;
   std::optional<NamespaceAliasDecl> definition(void) const;
   gap::generator<NamespaceAliasDecl> redeclarations(void) const &;
-  static std::optional<NamespaceAliasDecl> from(const Decl &parent);
-
-  inline static std::optional<NamespaceAliasDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return NamespaceAliasDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NamespaceAliasDecl> from_base(const Decl &parent);
+  inline static std::optional<NamespaceAliasDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NamespaceAliasDecl> from(const std::optional<Decl> &parent);
   static std::optional<NamespaceAliasDecl> from(const Reference &r);
+  static std::optional<NamespaceAliasDecl> from(const VariantEntity &e);
   static std::optional<NamespaceAliasDecl> from(const TokenContext &t);
 
   Token alias_token(void) const;

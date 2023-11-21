@@ -40,17 +40,13 @@ class RetainAttr : public InheritableAttr {
     return AttrKind::RETAIN;
   }
 
-  static std::optional<RetainAttr> from(const Attr &parent);
-
-  inline static std::optional<RetainAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return RetainAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<RetainAttr> from_base(const Attr &parent);
+  inline static std::optional<RetainAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<RetainAttr> from(const std::optional<Attr> &parent);
   static std::optional<RetainAttr> from(const Reference &r);
+  static std::optional<RetainAttr> from(const VariantEntity &e);
   static std::optional<RetainAttr> from(const TokenContext &t);
 
 };

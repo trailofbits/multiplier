@@ -41,17 +41,13 @@ class MipsLongCallAttr : public InheritableAttr {
     return AttrKind::MIPS_LONG_CALL;
   }
 
-  static std::optional<MipsLongCallAttr> from(const Attr &parent);
-
-  inline static std::optional<MipsLongCallAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MipsLongCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MipsLongCallAttr> from_base(const Attr &parent);
+  inline static std::optional<MipsLongCallAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MipsLongCallAttr> from(const std::optional<Attr> &parent);
   static std::optional<MipsLongCallAttr> from(const Reference &r);
+  static std::optional<MipsLongCallAttr> from(const VariantEntity &e);
   static std::optional<MipsLongCallAttr> from(const TokenContext &t);
 
   MipsLongCallAttrSpelling semantic_spelling(void) const;

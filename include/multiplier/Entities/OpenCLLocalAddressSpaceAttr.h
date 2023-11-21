@@ -41,17 +41,13 @@ class OpenCLLocalAddressSpaceAttr : public TypeAttr {
     return AttrKind::OPEN_CL_LOCAL_ADDRESS_SPACE;
   }
 
-  static std::optional<OpenCLLocalAddressSpaceAttr> from(const Attr &parent);
-
-  inline static std::optional<OpenCLLocalAddressSpaceAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OpenCLLocalAddressSpaceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OpenCLLocalAddressSpaceAttr> from_base(const Attr &parent);
+  inline static std::optional<OpenCLLocalAddressSpaceAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OpenCLLocalAddressSpaceAttr> from(const std::optional<Attr> &parent);
   static std::optional<OpenCLLocalAddressSpaceAttr> from(const Reference &r);
+  static std::optional<OpenCLLocalAddressSpaceAttr> from(const VariantEntity &e);
   static std::optional<OpenCLLocalAddressSpaceAttr> from(const TokenContext &t);
 
   OpenCLLocalAddressSpaceAttrSpelling semantic_spelling(void) const;

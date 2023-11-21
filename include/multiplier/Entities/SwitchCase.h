@@ -46,17 +46,13 @@ class SwitchCase : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<SwitchCase> from(const Stmt &parent);
-
-  inline static std::optional<SwitchCase> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return SwitchCase::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<SwitchCase> from_base(const Stmt &parent);
+  inline static std::optional<SwitchCase> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<SwitchCase> from(const std::optional<Stmt> &parent);
   static std::optional<SwitchCase> from(const Reference &r);
+  static std::optional<SwitchCase> from(const VariantEntity &e);
   static std::optional<SwitchCase> from(const TokenContext &t);
 
   Token colon_token(void) const;

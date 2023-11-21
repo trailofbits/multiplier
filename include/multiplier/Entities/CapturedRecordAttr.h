@@ -40,17 +40,13 @@ class CapturedRecordAttr : public InheritableAttr {
     return AttrKind::CAPTURED_RECORD;
   }
 
-  static std::optional<CapturedRecordAttr> from(const Attr &parent);
-
-  inline static std::optional<CapturedRecordAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CapturedRecordAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CapturedRecordAttr> from_base(const Attr &parent);
+  inline static std::optional<CapturedRecordAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CapturedRecordAttr> from(const std::optional<Attr> &parent);
   static std::optional<CapturedRecordAttr> from(const Reference &r);
+  static std::optional<CapturedRecordAttr> from(const VariantEntity &e);
   static std::optional<CapturedRecordAttr> from(const TokenContext &t);
 
 };

@@ -40,17 +40,13 @@ class HLSLGroupSharedAddressSpaceAttr : public TypeAttr {
     return AttrKind::HLSL_GROUP_SHARED_ADDRESS_SPACE;
   }
 
-  static std::optional<HLSLGroupSharedAddressSpaceAttr> from(const Attr &parent);
-
-  inline static std::optional<HLSLGroupSharedAddressSpaceAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return HLSLGroupSharedAddressSpaceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<HLSLGroupSharedAddressSpaceAttr> from_base(const Attr &parent);
+  inline static std::optional<HLSLGroupSharedAddressSpaceAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<HLSLGroupSharedAddressSpaceAttr> from(const std::optional<Attr> &parent);
   static std::optional<HLSLGroupSharedAddressSpaceAttr> from(const Reference &r);
+  static std::optional<HLSLGroupSharedAddressSpaceAttr> from(const VariantEntity &e);
   static std::optional<HLSLGroupSharedAddressSpaceAttr> from(const TokenContext &t);
 
 };

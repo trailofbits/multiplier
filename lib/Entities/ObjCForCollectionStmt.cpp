@@ -88,18 +88,30 @@ bool ObjCForCollectionStmt::contains(const Stmt &stmt) {
 std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ObjCForCollectionStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kObjCForCollectionStmtDerivedKinds[] = {
     ObjCForCollectionStmt::static_kind(),
 };
 
-std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCForCollectionStmt::static_kind():
       return reinterpret_cast<const ObjCForCollectionStmt &>(parent);
@@ -112,7 +124,7 @@ gap::generator<ObjCForCollectionStmt> ObjCForCollectionStmt::in(const Index &ind
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCForCollectionStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ObjCForCollectionStmt> e = ObjCForCollectionStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCForCollectionStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -124,7 +136,7 @@ gap::generator<ObjCForCollectionStmt> ObjCForCollectionStmt::in(const Fragment &
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCForCollectionStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCForCollectionStmt> e = ObjCForCollectionStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCForCollectionStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -137,7 +149,7 @@ gap::generator<ObjCForCollectionStmt> ObjCForCollectionStmt::in(const File &file
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCForCollectionStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCForCollectionStmt> e = ObjCForCollectionStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ObjCForCollectionStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -149,8 +161,18 @@ std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const Reference
   return ObjCForCollectionStmt::from(r.as_statement());
 }
 
+std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const TokenContext &t) {
-  return ObjCForCollectionStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Stmt ObjCForCollectionStmt::body(void) const {
@@ -160,7 +182,7 @@ Stmt ObjCForCollectionStmt::body(void) const {
 
 Expr ObjCForCollectionStmt::collection(void) const {
   RawEntityId eid = impl->reader.getVal10();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Stmt ObjCForCollectionStmt::element(void) const {

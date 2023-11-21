@@ -87,18 +87,30 @@ bool DeclStmt::contains(const Stmt &stmt) {
 std::optional<DeclStmt> DeclStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return DeclStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<DeclStmt> DeclStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kDeclStmtDerivedKinds[] = {
     DeclStmt::static_kind(),
 };
 
-std::optional<DeclStmt> DeclStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<DeclStmt> DeclStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case DeclStmt::static_kind():
       return reinterpret_cast<const DeclStmt &>(parent);
@@ -111,7 +123,7 @@ gap::generator<DeclStmt> DeclStmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kDeclStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<DeclStmt> e = DeclStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<DeclStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -123,7 +135,7 @@ gap::generator<DeclStmt> DeclStmt::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kDeclStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<DeclStmt> e = DeclStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<DeclStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -136,7 +148,7 @@ gap::generator<DeclStmt> DeclStmt::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kDeclStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<DeclStmt> e = DeclStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<DeclStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -148,8 +160,18 @@ std::optional<DeclStmt> DeclStmt::from(const Reference &r) {
   return DeclStmt::from(r.as_statement());
 }
 
+std::optional<DeclStmt> DeclStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<DeclStmt> DeclStmt::from(const TokenContext &t) {
-  return DeclStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 unsigned DeclStmt::num_declarations(void) const {

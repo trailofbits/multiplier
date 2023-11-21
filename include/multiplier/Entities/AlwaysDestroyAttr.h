@@ -40,17 +40,13 @@ class AlwaysDestroyAttr : public InheritableAttr {
     return AttrKind::ALWAYS_DESTROY;
   }
 
-  static std::optional<AlwaysDestroyAttr> from(const Attr &parent);
-
-  inline static std::optional<AlwaysDestroyAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AlwaysDestroyAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AlwaysDestroyAttr> from_base(const Attr &parent);
+  inline static std::optional<AlwaysDestroyAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AlwaysDestroyAttr> from(const std::optional<Attr> &parent);
   static std::optional<AlwaysDestroyAttr> from(const Reference &r);
+  static std::optional<AlwaysDestroyAttr> from(const VariantEntity &e);
   static std::optional<AlwaysDestroyAttr> from(const TokenContext &t);
 
 };

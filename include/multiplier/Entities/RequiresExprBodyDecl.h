@@ -51,17 +51,13 @@ class RequiresExprBodyDecl : public Decl {
   RequiresExprBodyDecl canonical_declaration(void) const;
   std::optional<RequiresExprBodyDecl> definition(void) const;
   gap::generator<RequiresExprBodyDecl> redeclarations(void) const &;
-  static std::optional<RequiresExprBodyDecl> from(const Decl &parent);
-
-  inline static std::optional<RequiresExprBodyDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return RequiresExprBodyDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<RequiresExprBodyDecl> from_base(const Decl &parent);
+  inline static std::optional<RequiresExprBodyDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<RequiresExprBodyDecl> from(const std::optional<Decl> &parent);
   static std::optional<RequiresExprBodyDecl> from(const Reference &r);
+  static std::optional<RequiresExprBodyDecl> from(const VariantEntity &e);
   static std::optional<RequiresExprBodyDecl> from(const TokenContext &t);
 
   gap::generator<Decl> declarations_in_context(void) const &;

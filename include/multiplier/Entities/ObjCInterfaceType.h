@@ -39,17 +39,13 @@ class ObjCInterfaceType : public ObjCObjectType {
     return TypeKind::OBJ_C_INTERFACE;
   }
 
-  static std::optional<ObjCInterfaceType> from(const Type &parent);
-
-  inline static std::optional<ObjCInterfaceType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return ObjCInterfaceType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCInterfaceType> from_base(const Type &parent);
+  inline static std::optional<ObjCInterfaceType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCInterfaceType> from(const std::optional<Type> &parent);
   static std::optional<ObjCInterfaceType> from(const Reference &r);
+  static std::optional<ObjCInterfaceType> from(const VariantEntity &e);
   static std::optional<ObjCInterfaceType> from(const TokenContext &t);
 
   ObjCInterfaceDecl declaration(void) const;

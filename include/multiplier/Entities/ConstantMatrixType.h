@@ -38,17 +38,13 @@ class ConstantMatrixType : public MatrixType {
     return TypeKind::CONSTANT_MATRIX;
   }
 
-  static std::optional<ConstantMatrixType> from(const Type &parent);
-
-  inline static std::optional<ConstantMatrixType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return ConstantMatrixType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ConstantMatrixType> from_base(const Type &parent);
+  inline static std::optional<ConstantMatrixType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ConstantMatrixType> from(const std::optional<Type> &parent);
   static std::optional<ConstantMatrixType> from(const Reference &r);
+  static std::optional<ConstantMatrixType> from(const VariantEntity &e);
   static std::optional<ConstantMatrixType> from(const TokenContext &t);
 
 };

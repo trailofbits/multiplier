@@ -61,6 +61,13 @@ std::optional<TemplateArgument> TemplateArgument::from(const Reference &r) {
   return r.as_template_argument();
 }
 
+std::optional<TemplateArgument> TemplateArgument::from(const VariantEntity &e) {
+  if (!std::holds_alternative<TemplateArgument>(e)) {
+    return std::nullopt;
+  }
+  return std::get<TemplateArgument>(e);
+}
+
 std::optional<TemplateArgument> TemplateArgument::from(const TokenContext &t) {
   return t.as_template_argument();
 }
@@ -69,7 +76,7 @@ TemplateArgumentKind TemplateArgument::kind(void) const {
   return static_cast<TemplateArgumentKind>(impl->reader.getVal2());
 }
 
-bool TemplateArgument::is_null(void) const {
+bool TemplateArgument::is_empty(void) const {
   return impl->reader.getVal3();
 }
 
@@ -96,7 +103,7 @@ std::optional<ValueDecl> TemplateArgument::as_declaration(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return ValueDecl::from(Decl(std::move(eptr)));
+      return ValueDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -139,6 +146,23 @@ std::optional<Type> TemplateArgument::null_pointer_type(void) const {
     }
   }
   return std::nullopt;
+}
+
+std::optional<std::vector<TemplateArgument>> TemplateArgument::pack_elements(void) const {
+  if (!impl->reader.getVal13()) {
+    return std::nullopt;
+  }
+  auto list = impl->reader.getVal12();
+  std::vector<TemplateArgument> vec;
+  vec.reserve(list.size());
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d12 = ep->TemplateArgumentFor(ep, v)) {
+      vec.emplace_back(std::move(d12));
+    }
+  }
+  return vec;
 }
 
 #pragma GCC diagnostic pop

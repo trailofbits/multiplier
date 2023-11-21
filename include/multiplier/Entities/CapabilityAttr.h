@@ -41,17 +41,13 @@ class CapabilityAttr : public InheritableAttr {
     return AttrKind::CAPABILITY;
   }
 
-  static std::optional<CapabilityAttr> from(const Attr &parent);
-
-  inline static std::optional<CapabilityAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CapabilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CapabilityAttr> from_base(const Attr &parent);
+  inline static std::optional<CapabilityAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CapabilityAttr> from(const std::optional<Attr> &parent);
   static std::optional<CapabilityAttr> from(const Reference &r);
+  static std::optional<CapabilityAttr> from(const VariantEntity &e);
   static std::optional<CapabilityAttr> from(const TokenContext &t);
 
   std::string_view name(void) const;

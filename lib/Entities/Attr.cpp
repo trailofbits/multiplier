@@ -65,9 +65,7 @@ std::optional<Attr> Attr::by_id(const Index &index, EntityId eid) {
 gap::generator<Attr> Attr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrImplPtr eptr : ep->AttrsFor(ep)) {
-    if (std::optional<Attr> e = Attr::from(Attr(std::move(eptr)))) {
-      co_yield std::move(e.value());
-    }
+    co_yield Attr(std::move(eptr));
   }
 }
 
@@ -85,9 +83,7 @@ gap::generator<Attr> Attr::in(const File &file) {
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, frag_id)) {
-      if (std::optional<Attr> e = Attr::from(Attr(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
+      co_yield Attr(std::move(eptr));
     }
   }
 }
@@ -96,9 +92,7 @@ gap::generator<Attr> Attr::in(const Fragment &frag) {
   const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (AttrImplPtr eptr : ep->AttrsFor(ep, frag_id)) {
-    if (std::optional<Attr> e = Attr::from(Attr(std::move(eptr)))) {
-      co_yield std::move(e.value());
-    }
+    co_yield Attr(std::move(eptr));
   }
 }
 
@@ -126,6 +120,13 @@ gap::generator<Attr> Attr::in(const File &file, std::span<AttrKind> kinds) {
 
 std::optional<Attr> Attr::from(const Reference &r) {
   return r.as_attribute();
+}
+
+std::optional<Attr> Attr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return std::get<Attr>(e);
 }
 
 std::optional<Attr> Attr::from(const TokenContext &t) {

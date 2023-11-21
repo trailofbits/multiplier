@@ -40,17 +40,13 @@ class LifetimeBoundAttr : public InheritableAttr {
     return AttrKind::LIFETIME_BOUND;
   }
 
-  static std::optional<LifetimeBoundAttr> from(const Attr &parent);
-
-  inline static std::optional<LifetimeBoundAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return LifetimeBoundAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<LifetimeBoundAttr> from_base(const Attr &parent);
+  inline static std::optional<LifetimeBoundAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<LifetimeBoundAttr> from(const std::optional<Attr> &parent);
   static std::optional<LifetimeBoundAttr> from(const Reference &r);
+  static std::optional<LifetimeBoundAttr> from(const VariantEntity &e);
   static std::optional<LifetimeBoundAttr> from(const TokenContext &t);
 
 };

@@ -60,17 +60,13 @@ class DecompositionDecl : public VarDecl {
   DecompositionDecl canonical_declaration(void) const;
   std::optional<DecompositionDecl> definition(void) const;
   gap::generator<DecompositionDecl> redeclarations(void) const &;
-  static std::optional<DecompositionDecl> from(const Decl &parent);
-
-  inline static std::optional<DecompositionDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return DecompositionDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<DecompositionDecl> from_base(const Decl &parent);
+  inline static std::optional<DecompositionDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<DecompositionDecl> from(const std::optional<Decl> &parent);
   static std::optional<DecompositionDecl> from(const Reference &r);
+  static std::optional<DecompositionDecl> from(const VariantEntity &e);
   static std::optional<DecompositionDecl> from(const TokenContext &t);
 
   std::optional<BindingDecl> nth_binding(unsigned n) const;

@@ -93,18 +93,30 @@ bool ObjCPropertyRefExpr::contains(const Stmt &stmt) {
 std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ObjCPropertyRefExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kObjCPropertyRefExprDerivedKinds[] = {
     ObjCPropertyRefExpr::static_kind(),
 };
 
-std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCPropertyRefExpr::static_kind():
       return reinterpret_cast<const ObjCPropertyRefExpr &>(parent);
@@ -117,7 +129,7 @@ gap::generator<ObjCPropertyRefExpr> ObjCPropertyRefExpr::in(const Index &index) 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCPropertyRefExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ObjCPropertyRefExpr> e = ObjCPropertyRefExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCPropertyRefExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -129,7 +141,7 @@ gap::generator<ObjCPropertyRefExpr> ObjCPropertyRefExpr::in(const Fragment &frag
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCPropertyRefExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCPropertyRefExpr> e = ObjCPropertyRefExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCPropertyRefExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -142,7 +154,7 @@ gap::generator<ObjCPropertyRefExpr> ObjCPropertyRefExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCPropertyRefExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCPropertyRefExpr> e = ObjCPropertyRefExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ObjCPropertyRefExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -154,33 +166,43 @@ std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const Reference &r)
   return ObjCPropertyRefExpr::from(r.as_statement());
 }
 
+std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const TokenContext &t) {
-  return ObjCPropertyRefExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr ObjCPropertyRefExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 ObjCInterfaceDecl ObjCPropertyRefExpr::class_receiver(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ObjCPropertyDecl ObjCPropertyRefExpr::explicit_property(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCPropertyDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ObjCMethodDecl ObjCPropertyRefExpr::implicit_property_getter(void) const {
   RawEntityId eid = impl->reader.getVal40();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCMethodDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ObjCMethodDecl ObjCPropertyRefExpr::implicit_property_setter(void) const {
   RawEntityId eid = impl->reader.getVal41();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCMethodDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token ObjCPropertyRefExpr::token(void) const {

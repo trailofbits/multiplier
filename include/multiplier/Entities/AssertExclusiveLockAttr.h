@@ -40,17 +40,13 @@ class AssertExclusiveLockAttr : public InheritableAttr {
     return AttrKind::ASSERT_EXCLUSIVE_LOCK;
   }
 
-  static std::optional<AssertExclusiveLockAttr> from(const Attr &parent);
-
-  inline static std::optional<AssertExclusiveLockAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AssertExclusiveLockAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AssertExclusiveLockAttr> from_base(const Attr &parent);
+  inline static std::optional<AssertExclusiveLockAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AssertExclusiveLockAttr> from(const std::optional<Attr> &parent);
   static std::optional<AssertExclusiveLockAttr> from(const Reference &r);
+  static std::optional<AssertExclusiveLockAttr> from(const VariantEntity &e);
   static std::optional<AssertExclusiveLockAttr> from(const TokenContext &t);
 
 };

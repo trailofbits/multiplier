@@ -38,18 +38,30 @@ bool TypeOfType::contains(const Token &tok) const {
 std::optional<TypeOfType> TypeOfType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return TypeOfType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TypeOfType> TypeOfType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kTypeOfTypeDerivedKinds[] = {
     TypeOfType::static_kind(),
 };
 
-std::optional<TypeOfType> TypeOfType::from(const Type &parent) {
+}  // namespace
+
+std::optional<TypeOfType> TypeOfType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case TypeOfType::static_kind():
       return reinterpret_cast<const TypeOfType &>(parent);
@@ -62,7 +74,7 @@ gap::generator<TypeOfType> TypeOfType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kTypeOfTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<TypeOfType> e = TypeOfType::from(Type(std::move(eptr)))) {
+      if (std::optional<TypeOfType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -73,8 +85,18 @@ std::optional<TypeOfType> TypeOfType::from(const Reference &r) {
   return TypeOfType::from(r.as_type());
 }
 
+std::optional<TypeOfType> TypeOfType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<TypeOfType> TypeOfType::from(const TokenContext &t) {
-  return TypeOfType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type TypeOfType::desugar(void) const {

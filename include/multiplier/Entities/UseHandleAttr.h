@@ -42,17 +42,13 @@ class UseHandleAttr : public InheritableParamAttr {
     return AttrKind::USE_HANDLE;
   }
 
-  static std::optional<UseHandleAttr> from(const Attr &parent);
-
-  inline static std::optional<UseHandleAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return UseHandleAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UseHandleAttr> from_base(const Attr &parent);
+  inline static std::optional<UseHandleAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UseHandleAttr> from(const std::optional<Attr> &parent);
   static std::optional<UseHandleAttr> from(const Reference &r);
+  static std::optional<UseHandleAttr> from(const VariantEntity &e);
   static std::optional<UseHandleAttr> from(const TokenContext &t);
 
   std::string_view handle_type(void) const;

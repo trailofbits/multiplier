@@ -65,11 +65,6 @@ gap::generator<Macro> Macro::containing_internal(const Token &token) {
   }
 }
 
-// References to this macro definition.
-gap::generator<Reference> Macro::references(void) const & {
-  return References(impl->ep, id().Pack());
-}
-
 namespace {
 
 static gap::generator<Token> GenerateUseTokens(Macro macro) {

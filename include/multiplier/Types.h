@@ -524,7 +524,7 @@ class EntityId final {
   }
 
   template<typename T>
-  std::optional<T> Extract() {
+  std::optional<T> Extract() const noexcept {
     auto unpacked = Unpack();
     if(!std::holds_alternative<T>(unpacked)) {
       return std::nullopt;

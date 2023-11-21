@@ -42,17 +42,13 @@ class OSConsumedAttr : public InheritableParamAttr {
     return AttrKind::OS_CONSUMED;
   }
 
-  static std::optional<OSConsumedAttr> from(const Attr &parent);
-
-  inline static std::optional<OSConsumedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OSConsumedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OSConsumedAttr> from_base(const Attr &parent);
+  inline static std::optional<OSConsumedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OSConsumedAttr> from(const std::optional<Attr> &parent);
   static std::optional<OSConsumedAttr> from(const Reference &r);
+  static std::optional<OSConsumedAttr> from(const VariantEntity &e);
   static std::optional<OSConsumedAttr> from(const TokenContext &t);
 
 };

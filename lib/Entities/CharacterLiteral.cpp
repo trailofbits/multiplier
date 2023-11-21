@@ -89,18 +89,30 @@ bool CharacterLiteral::contains(const Stmt &stmt) {
 std::optional<CharacterLiteral> CharacterLiteral::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CharacterLiteral::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CharacterLiteral> CharacterLiteral::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCharacterLiteralDerivedKinds[] = {
     CharacterLiteral::static_kind(),
 };
 
-std::optional<CharacterLiteral> CharacterLiteral::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CharacterLiteral> CharacterLiteral::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CharacterLiteral::static_kind():
       return reinterpret_cast<const CharacterLiteral &>(parent);
@@ -113,7 +125,7 @@ gap::generator<CharacterLiteral> CharacterLiteral::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCharacterLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CharacterLiteral> e = CharacterLiteral::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CharacterLiteral> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<CharacterLiteral> CharacterLiteral::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCharacterLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CharacterLiteral> e = CharacterLiteral::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CharacterLiteral> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<CharacterLiteral> CharacterLiteral::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCharacterLiteralDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CharacterLiteral> e = CharacterLiteral::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CharacterLiteral> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,8 +162,18 @@ std::optional<CharacterLiteral> CharacterLiteral::from(const Reference &r) {
   return CharacterLiteral::from(r.as_statement());
 }
 
+std::optional<CharacterLiteral> CharacterLiteral::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CharacterLiteral> CharacterLiteral::from(const TokenContext &t) {
-  return CharacterLiteral::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 CharacterLiteralCharacterKind CharacterLiteral::literal_kind(void) const {

@@ -40,17 +40,13 @@ class AllocSizeAttr : public InheritableAttr {
     return AttrKind::ALLOC_SIZE;
   }
 
-  static std::optional<AllocSizeAttr> from(const Attr &parent);
-
-  inline static std::optional<AllocSizeAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AllocSizeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AllocSizeAttr> from_base(const Attr &parent);
+  inline static std::optional<AllocSizeAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AllocSizeAttr> from(const std::optional<Attr> &parent);
   static std::optional<AllocSizeAttr> from(const Reference &r);
+  static std::optional<AllocSizeAttr> from(const VariantEntity &e);
   static std::optional<AllocSizeAttr> from(const TokenContext &t);
 
 };

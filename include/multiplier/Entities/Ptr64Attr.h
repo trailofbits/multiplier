@@ -40,17 +40,13 @@ class Ptr64Attr : public TypeAttr {
     return AttrKind::PTR64;
   }
 
-  static std::optional<Ptr64Attr> from(const Attr &parent);
-
-  inline static std::optional<Ptr64Attr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return Ptr64Attr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<Ptr64Attr> from_base(const Attr &parent);
+  inline static std::optional<Ptr64Attr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<Ptr64Attr> from(const std::optional<Attr> &parent);
   static std::optional<Ptr64Attr> from(const Reference &r);
+  static std::optional<Ptr64Attr> from(const VariantEntity &e);
   static std::optional<Ptr64Attr> from(const TokenContext &t);
 
 };

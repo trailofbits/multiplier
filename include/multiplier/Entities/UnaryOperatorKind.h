@@ -13,9 +13,9 @@
 namespace mx {
 enum class UnaryOperatorKind : unsigned char {
   POST_INCREMENT,
-  POST_DEC,
+  POST_DECREMENT,
   PRE_INCREMENT,
-  PRE_DEC,
+  PRE_DECREMENT,
   ADDRESS_OF,
   DEREF,
   PLUS,

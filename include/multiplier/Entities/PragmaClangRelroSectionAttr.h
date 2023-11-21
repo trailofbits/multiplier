@@ -40,17 +40,13 @@ class PragmaClangRelroSectionAttr : public InheritableAttr {
     return AttrKind::PRAGMA_CLANG_RELRO_SECTION;
   }
 
-  static std::optional<PragmaClangRelroSectionAttr> from(const Attr &parent);
-
-  inline static std::optional<PragmaClangRelroSectionAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return PragmaClangRelroSectionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PragmaClangRelroSectionAttr> from_base(const Attr &parent);
+  inline static std::optional<PragmaClangRelroSectionAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PragmaClangRelroSectionAttr> from(const std::optional<Attr> &parent);
   static std::optional<PragmaClangRelroSectionAttr> from(const Reference &r);
+  static std::optional<PragmaClangRelroSectionAttr> from(const VariantEntity &e);
   static std::optional<PragmaClangRelroSectionAttr> from(const TokenContext &t);
 
   std::string_view name(void) const;

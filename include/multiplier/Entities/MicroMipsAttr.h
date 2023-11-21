@@ -40,17 +40,13 @@ class MicroMipsAttr : public InheritableAttr {
     return AttrKind::MICRO_MIPS;
   }
 
-  static std::optional<MicroMipsAttr> from(const Attr &parent);
-
-  inline static std::optional<MicroMipsAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MicroMipsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MicroMipsAttr> from_base(const Attr &parent);
+  inline static std::optional<MicroMipsAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MicroMipsAttr> from(const std::optional<Attr> &parent);
   static std::optional<MicroMipsAttr> from(const Reference &r);
+  static std::optional<MicroMipsAttr> from(const VariantEntity &e);
   static std::optional<MicroMipsAttr> from(const TokenContext &t);
 
 };

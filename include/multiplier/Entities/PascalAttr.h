@@ -40,17 +40,13 @@ class PascalAttr : public InheritableAttr {
     return AttrKind::PASCAL;
   }
 
-  static std::optional<PascalAttr> from(const Attr &parent);
-
-  inline static std::optional<PascalAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return PascalAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PascalAttr> from_base(const Attr &parent);
+  inline static std::optional<PascalAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PascalAttr> from(const std::optional<Attr> &parent);
   static std::optional<PascalAttr> from(const Reference &r);
+  static std::optional<PascalAttr> from(const VariantEntity &e);
   static std::optional<PascalAttr> from(const TokenContext &t);
 
 };

@@ -54,18 +54,30 @@ gap::generator<OtherMacroDirective> OtherMacroDirective::containing(const Token 
 std::optional<OtherMacroDirective> OtherMacroDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<MacroId>(vid)) {
-    return OtherMacroDirective::from(index.macro(eid.Pack()));
+    if (auto base = index.macro(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OtherMacroDirective> OtherMacroDirective::from(const std::optional<Macro> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const MacroKind kOtherMacroDirectiveDerivedKinds[] = {
     OtherMacroDirective::static_kind(),
 };
 
-std::optional<OtherMacroDirective> OtherMacroDirective::from(const Macro &parent) {
+}  // namespace
+
+std::optional<OtherMacroDirective> OtherMacroDirective::from_base(const Macro &parent) {
   switch (parent.kind()) {
     case OtherMacroDirective::static_kind():
       return reinterpret_cast<const OtherMacroDirective &>(parent);
@@ -78,7 +90,7 @@ gap::generator<OtherMacroDirective> OtherMacroDirective::in(const Index &index) 
   const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroKind k : kOtherMacroDirectiveDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
-      if (std::optional<OtherMacroDirective> e = OtherMacroDirective::from(Macro(std::move(eptr)))) {
+      if (std::optional<OtherMacroDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -90,7 +102,7 @@ gap::generator<OtherMacroDirective> OtherMacroDirective::in(const Fragment &frag
   PackedFragmentId frag_id = frag.id();
   for (MacroKind k : kOtherMacroDirectiveDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-      if (std::optional<OtherMacroDirective> e = OtherMacroDirective::from(Macro(std::move(eptr)))) {
+      if (std::optional<OtherMacroDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -103,7 +115,7 @@ gap::generator<OtherMacroDirective> OtherMacroDirective::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (MacroKind k : kOtherMacroDirectiveDerivedKinds) {
       for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-        if (std::optional<OtherMacroDirective> e = OtherMacroDirective::from(Macro(std::move(eptr)))) {
+        if (std::optional<OtherMacroDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -115,8 +127,18 @@ std::optional<OtherMacroDirective> OtherMacroDirective::from(const Reference &r)
   return OtherMacroDirective::from(r.as_macro());
 }
 
+std::optional<OtherMacroDirective> OtherMacroDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Macro>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Macro>(e));
+}
+
 std::optional<OtherMacroDirective> OtherMacroDirective::from(const TokenContext &t) {
-  return OtherMacroDirective::from(t.as_macro());
+  if (auto base = t.as_macro()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

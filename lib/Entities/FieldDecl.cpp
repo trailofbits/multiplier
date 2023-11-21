@@ -92,7 +92,7 @@ bool FieldDecl::contains(const Stmt &stmt) {
 }
 
 FieldDecl FieldDecl::canonical_declaration(void) const {
-  if (auto canon = FieldDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (FieldDecl redecl : redeclarations()) {
@@ -102,12 +102,15 @@ FieldDecl FieldDecl::canonical_declaration(void) const {
 }
 
 std::optional<FieldDecl> FieldDecl::definition(void) const {
-  return FieldDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<FieldDecl> FieldDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<FieldDecl> dr = FieldDecl::from(r)) {
+    if (std::optional<FieldDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -120,20 +123,32 @@ gap::generator<FieldDecl> FieldDecl::redeclarations(void) const & {
 std::optional<FieldDecl> FieldDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return FieldDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<FieldDecl> FieldDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kFieldDeclDerivedKinds[] = {
     FieldDecl::static_kind(),
     ObjCAtDefsFieldDecl::static_kind(),
     ObjCIvarDecl::static_kind(),
 };
 
-std::optional<FieldDecl> FieldDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<FieldDecl> FieldDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case FieldDecl::static_kind():
     case ObjCAtDefsFieldDecl::static_kind():
@@ -148,7 +163,7 @@ gap::generator<FieldDecl> FieldDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kFieldDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<FieldDecl> e = FieldDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<FieldDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -160,7 +175,7 @@ gap::generator<FieldDecl> FieldDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kFieldDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<FieldDecl> e = FieldDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<FieldDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -173,7 +188,7 @@ gap::generator<FieldDecl> FieldDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kFieldDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<FieldDecl> e = FieldDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<FieldDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -185,8 +200,18 @@ std::optional<FieldDecl> FieldDecl::from(const Reference &r) {
   return FieldDecl::from(r.as_declaration());
 }
 
+std::optional<FieldDecl> FieldDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<FieldDecl> FieldDecl::from(const TokenContext &t) {
-  return FieldDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::optional<Expr> FieldDecl::bit_width(void) const {
@@ -196,7 +221,7 @@ std::optional<Expr> FieldDecl::bit_width(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -209,7 +234,7 @@ std::optional<VariableArrayType> FieldDecl::captured_vla_type(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return VariableArrayType::from(Type(std::move(eptr)));
+      return VariableArrayType::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -226,7 +251,7 @@ std::optional<Expr> FieldDecl::in_class_initializer(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

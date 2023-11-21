@@ -40,17 +40,13 @@ class NSReturnsRetainedAttr : public InheritableAttr {
     return AttrKind::NS_RETURNS_RETAINED;
   }
 
-  static std::optional<NSReturnsRetainedAttr> from(const Attr &parent);
-
-  inline static std::optional<NSReturnsRetainedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NSReturnsRetainedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NSReturnsRetainedAttr> from_base(const Attr &parent);
+  inline static std::optional<NSReturnsRetainedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NSReturnsRetainedAttr> from(const std::optional<Attr> &parent);
   static std::optional<NSReturnsRetainedAttr> from(const Reference &r);
+  static std::optional<NSReturnsRetainedAttr> from(const VariantEntity &e);
   static std::optional<NSReturnsRetainedAttr> from(const TokenContext &t);
 
 };

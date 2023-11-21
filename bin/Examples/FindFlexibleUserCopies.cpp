@@ -112,12 +112,17 @@ static std::optional<mx::RecordType> CopiedRecord(
 }
 
 static void WithCopyToUser(mx::FunctionDecl copy_from_user) {
-  for (mx::CallExpr call_expr : copy_from_user.callers()) {
-    if (call_expr.num_arguments() != 3u) {
+  for (mx::Stmt stmt : copy_from_user.callers()) {
+    auto call_expr = mx::CallExpr::from(stmt);
+    if (!call_expr) {
       continue;
     }
 
-    auto size_arg = call_expr.nth_argument(2u);
+    if (call_expr->num_arguments() != 3u) {
+      continue;
+    }
+
+    auto size_arg = call_expr->nth_argument(2u);
     if (!size_arg) {
       continue;
     }
@@ -150,7 +155,7 @@ static void WithCopyToUser(mx::FunctionDecl copy_from_user) {
         continue;
       }
 
-      RenderCopyResults(call_expr, record_decl.value(), field_decl,
+      RenderCopyResults(call_expr.value(), record_decl.value(), field_decl,
                         record_size.value());
     }
   }

@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
         << "f" << fid << " [label=\"" << file_paths[fid].generic_string()
         << "\"];\n";
 
-    for (mx::Reference ref : file.references()) {
+    for (mx::Reference ref : mx::Reference::to(file)) {
       auto ref_macro = ref.as_macro();
       if (!ref_macro) {
         continue;

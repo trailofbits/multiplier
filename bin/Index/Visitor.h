@@ -27,12 +27,12 @@ class EntityVisitor : protected pasta::DeclVisitor,
                       protected pasta::StmtVisitor,
                       protected pasta::TypeVisitor,
                       protected pasta::AttrVisitor {
- private:
+ public:
   bool EnterDecl(const pasta::Decl &decl);
   bool EnterStmt(const pasta::Stmt &stmt);
   bool EnterType(const pasta::Type &type);
   bool EnterAttr(const pasta::Attr &attr);
-
+ 
   bool EnterTagDecl(const pasta::TagDecl &decl);
   bool EnterRecordDecl(const pasta::RecordDecl &decl);
   bool EnterCXXRecordDecl(const pasta::CXXRecordDecl &decl);
@@ -41,6 +41,7 @@ class EntityVisitor : protected pasta::DeclVisitor,
   bool EnterVarDecl(const pasta::VarDecl &decl);
   bool EnterFunctionDecl(const pasta::FunctionDecl &decl);
 
+ protected:
   void VisitDeclContext(const pasta::DeclContext &dc);
   void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final;
   void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final;
@@ -74,8 +75,10 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitTagDecl(const pasta::TagDecl &decl) final;
   void VisitClassTemplateSpecializationDecl(const pasta::ClassTemplateSpecializationDecl &decl) final;
   void VisitDeclaratorDecl(const pasta::DeclaratorDecl &decl) final;
+  void VisitStaticAssertDecl(const pasta::StaticAssertDecl &decl) final;
+  void VisitFileScopeAsmDecl(const pasta::FileScopeAsmDecl &decl) final;
   void VisitLambdaExpr(const pasta::LambdaExpr &stmt) final;
-  void VisitInitListExpr(const pasta::InitListExpr &stmt) final;
+  void VisitInitListExpr(const pasta::InitListExpr &stmt) override;
   void VisitGCCAsmStmt(const pasta::GCCAsmStmt &stmt) final;
   void VisitDesignatedInitExpr(const pasta::DesignatedInitExpr &stmt) final;
   void VisitTypeOfExprType(const pasta::TypeOfExprType &type) final;
@@ -92,7 +95,7 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitCXXNewExpr(const pasta::CXXNewExpr &expr) final;
   void VisitCXXTypeidExpr(const pasta::CXXTypeidExpr &expr) final;
   void VisitCXXUuidofExpr(const pasta::CXXUuidofExpr &expr) final;
-  void VisitAlignedAttr(const pasta::AlignedAttr &attr);
+  void VisitAlignedAttr(const pasta::AlignedAttr &attr) final;
   void VisitDecl(const pasta::Decl &decl) final;
   void VisitStmt(const pasta::Stmt &stmt) final;
   void VisitType(const pasta::Type &type) final;

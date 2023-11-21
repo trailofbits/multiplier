@@ -57,17 +57,13 @@ class CXXNewExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<CXXNewExpr> from(const Stmt &parent);
-
-  inline static std::optional<CXXNewExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return CXXNewExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CXXNewExpr> from_base(const Stmt &parent);
+  inline static std::optional<CXXNewExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CXXNewExpr> from(const std::optional<Stmt> &parent);
   static std::optional<CXXNewExpr> from(const Reference &r);
+  static std::optional<CXXNewExpr> from(const VariantEntity &e);
   static std::optional<CXXNewExpr> from(const TokenContext &t);
 
   bool does_usual_array_delete_want_size(void) const;

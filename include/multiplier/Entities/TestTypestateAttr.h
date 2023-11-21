@@ -41,17 +41,13 @@ class TestTypestateAttr : public InheritableAttr {
     return AttrKind::TEST_TYPESTATE;
   }
 
-  static std::optional<TestTypestateAttr> from(const Attr &parent);
-
-  inline static std::optional<TestTypestateAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return TestTypestateAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TestTypestateAttr> from_base(const Attr &parent);
+  inline static std::optional<TestTypestateAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TestTypestateAttr> from(const std::optional<Attr> &parent);
   static std::optional<TestTypestateAttr> from(const Reference &r);
+  static std::optional<TestTypestateAttr> from(const VariantEntity &e);
   static std::optional<TestTypestateAttr> from(const TokenContext &t);
 
   TestTypestateAttrConsumedState test_state(void) const;

@@ -52,17 +52,13 @@ class GNUNullExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<GNUNullExpr> from(const Stmt &parent);
-
-  inline static std::optional<GNUNullExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return GNUNullExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<GNUNullExpr> from_base(const Stmt &parent);
+  inline static std::optional<GNUNullExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<GNUNullExpr> from(const std::optional<Stmt> &parent);
   static std::optional<GNUNullExpr> from(const Reference &r);
+  static std::optional<GNUNullExpr> from(const VariantEntity &e);
   static std::optional<GNUNullExpr> from(const TokenContext &t);
 
   Token token_token(void) const;

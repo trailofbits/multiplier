@@ -46,17 +46,13 @@ class ElseMacroDirective : public ConditionalMacroDirective {
   static gap::generator<ElseMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  static std::optional<ElseMacroDirective> from(const Macro &parent);
-
-  inline static std::optional<ElseMacroDirective> from(const std::optional<Macro> &parent) {
-    if (parent) {
-      return ElseMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ElseMacroDirective> from_base(const Macro &parent);
+  inline static std::optional<ElseMacroDirective> from(const Macro &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ElseMacroDirective> from(const std::optional<Macro> &parent);
   static std::optional<ElseMacroDirective> from(const Reference &r);
+  static std::optional<ElseMacroDirective> from(const VariantEntity &e);
   static std::optional<ElseMacroDirective> from(const TokenContext &t);
 
 };

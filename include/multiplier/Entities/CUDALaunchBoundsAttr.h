@@ -41,17 +41,13 @@ class CUDALaunchBoundsAttr : public InheritableAttr {
     return AttrKind::CUDA_LAUNCH_BOUNDS;
   }
 
-  static std::optional<CUDALaunchBoundsAttr> from(const Attr &parent);
-
-  inline static std::optional<CUDALaunchBoundsAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return CUDALaunchBoundsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CUDALaunchBoundsAttr> from_base(const Attr &parent);
+  inline static std::optional<CUDALaunchBoundsAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CUDALaunchBoundsAttr> from(const std::optional<Attr> &parent);
   static std::optional<CUDALaunchBoundsAttr> from(const Reference &r);
+  static std::optional<CUDALaunchBoundsAttr> from(const VariantEntity &e);
   static std::optional<CUDALaunchBoundsAttr> from(const TokenContext &t);
 
   Expr max_threads(void) const;

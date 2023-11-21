@@ -51,17 +51,13 @@ class LinkageSpecDecl : public Decl {
   LinkageSpecDecl canonical_declaration(void) const;
   std::optional<LinkageSpecDecl> definition(void) const;
   gap::generator<LinkageSpecDecl> redeclarations(void) const &;
-  static std::optional<LinkageSpecDecl> from(const Decl &parent);
-
-  inline static std::optional<LinkageSpecDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return LinkageSpecDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<LinkageSpecDecl> from_base(const Decl &parent);
+  inline static std::optional<LinkageSpecDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<LinkageSpecDecl> from(const std::optional<Decl> &parent);
   static std::optional<LinkageSpecDecl> from(const Reference &r);
+  static std::optional<LinkageSpecDecl> from(const VariantEntity &e);
   static std::optional<LinkageSpecDecl> from(const TokenContext &t);
 
   gap::generator<Decl> declarations_in_context(void) const &;

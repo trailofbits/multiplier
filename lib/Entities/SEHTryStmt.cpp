@@ -90,18 +90,30 @@ bool SEHTryStmt::contains(const Stmt &stmt) {
 std::optional<SEHTryStmt> SEHTryStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return SEHTryStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<SEHTryStmt> SEHTryStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kSEHTryStmtDerivedKinds[] = {
     SEHTryStmt::static_kind(),
 };
 
-std::optional<SEHTryStmt> SEHTryStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<SEHTryStmt> SEHTryStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case SEHTryStmt::static_kind():
       return reinterpret_cast<const SEHTryStmt &>(parent);
@@ -114,7 +126,7 @@ gap::generator<SEHTryStmt> SEHTryStmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kSEHTryStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<SEHTryStmt> e = SEHTryStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<SEHTryStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<SEHTryStmt> SEHTryStmt::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kSEHTryStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<SEHTryStmt> e = SEHTryStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<SEHTryStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<SEHTryStmt> SEHTryStmt::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kSEHTryStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<SEHTryStmt> e = SEHTryStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<SEHTryStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,18 +163,28 @@ std::optional<SEHTryStmt> SEHTryStmt::from(const Reference &r) {
   return SEHTryStmt::from(r.as_statement());
 }
 
+std::optional<SEHTryStmt> SEHTryStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<SEHTryStmt> SEHTryStmt::from(const TokenContext &t) {
-  return SEHTryStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 SEHExceptStmt SEHTryStmt::except_handler(void) const {
   RawEntityId eid = impl->reader.getVal9();
-  return SEHExceptStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return SEHExceptStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 SEHFinallyStmt SEHTryStmt::finally_handler(void) const {
   RawEntityId eid = impl->reader.getVal10();
-  return SEHFinallyStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return SEHFinallyStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Stmt SEHTryStmt::handler(void) const {
@@ -176,7 +198,7 @@ bool SEHTryStmt::is_cxx_try(void) const {
 
 CompoundStmt SEHTryStmt::try_block(void) const {
   RawEntityId eid = impl->reader.getVal13();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return CompoundStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token SEHTryStmt::try_token(void) const {

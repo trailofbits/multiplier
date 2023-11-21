@@ -54,17 +54,13 @@ class OMPSimdDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<OMPSimdDirective> from(const Stmt &parent);
-
-  inline static std::optional<OMPSimdDirective> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return OMPSimdDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPSimdDirective> from_base(const Stmt &parent);
+  inline static std::optional<OMPSimdDirective> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPSimdDirective> from(const std::optional<Stmt> &parent);
   static std::optional<OMPSimdDirective> from(const Reference &r);
+  static std::optional<OMPSimdDirective> from(const VariantEntity &e);
   static std::optional<OMPSimdDirective> from(const TokenContext &t);
 
 };

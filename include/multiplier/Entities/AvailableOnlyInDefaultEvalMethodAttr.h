@@ -40,17 +40,13 @@ class AvailableOnlyInDefaultEvalMethodAttr : public InheritableAttr {
     return AttrKind::AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD;
   }
 
-  static std::optional<AvailableOnlyInDefaultEvalMethodAttr> from(const Attr &parent);
-
-  inline static std::optional<AvailableOnlyInDefaultEvalMethodAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AvailableOnlyInDefaultEvalMethodAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AvailableOnlyInDefaultEvalMethodAttr> from_base(const Attr &parent);
+  inline static std::optional<AvailableOnlyInDefaultEvalMethodAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AvailableOnlyInDefaultEvalMethodAttr> from(const std::optional<Attr> &parent);
   static std::optional<AvailableOnlyInDefaultEvalMethodAttr> from(const Reference &r);
+  static std::optional<AvailableOnlyInDefaultEvalMethodAttr> from(const VariantEntity &e);
   static std::optional<AvailableOnlyInDefaultEvalMethodAttr> from(const TokenContext &t);
 
 };

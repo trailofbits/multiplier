@@ -38,17 +38,13 @@ class ObjCBoxableAttr : public Attr {
     return AttrKind::OBJ_C_BOXABLE;
   }
 
-  static std::optional<ObjCBoxableAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCBoxableAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCBoxableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCBoxableAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCBoxableAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCBoxableAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCBoxableAttr> from(const Reference &r);
+  static std::optional<ObjCBoxableAttr> from(const VariantEntity &e);
   static std::optional<ObjCBoxableAttr> from(const TokenContext &t);
 
 };

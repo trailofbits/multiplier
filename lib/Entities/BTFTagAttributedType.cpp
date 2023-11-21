@@ -39,18 +39,30 @@ bool BTFTagAttributedType::contains(const Token &tok) const {
 std::optional<BTFTagAttributedType> BTFTagAttributedType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return BTFTagAttributedType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<BTFTagAttributedType> BTFTagAttributedType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kBTFTagAttributedTypeDerivedKinds[] = {
     BTFTagAttributedType::static_kind(),
 };
 
-std::optional<BTFTagAttributedType> BTFTagAttributedType::from(const Type &parent) {
+}  // namespace
+
+std::optional<BTFTagAttributedType> BTFTagAttributedType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case BTFTagAttributedType::static_kind():
       return reinterpret_cast<const BTFTagAttributedType &>(parent);
@@ -63,7 +75,7 @@ gap::generator<BTFTagAttributedType> BTFTagAttributedType::in(const Index &index
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kBTFTagAttributedTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<BTFTagAttributedType> e = BTFTagAttributedType::from(Type(std::move(eptr)))) {
+      if (std::optional<BTFTagAttributedType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -74,8 +86,18 @@ std::optional<BTFTagAttributedType> BTFTagAttributedType::from(const Reference &
   return BTFTagAttributedType::from(r.as_type());
 }
 
+std::optional<BTFTagAttributedType> BTFTagAttributedType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<BTFTagAttributedType> BTFTagAttributedType::from(const TokenContext &t) {
-  return BTFTagAttributedType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type BTFTagAttributedType::desugar(void) const {
@@ -85,7 +107,7 @@ Type BTFTagAttributedType::desugar(void) const {
 
 BTFTypeTagAttr BTFTagAttributedType::attribute(void) const {
   RawEntityId eid = impl->reader.getVal19();
-  return BTFTypeTagAttr::from(Attr(impl->ep->AttrFor(impl->ep, eid))).value();
+  return BTFTypeTagAttr::from_base(impl->ep->AttrFor(impl->ep, eid)).value();
 }
 
 Type BTFTagAttributedType::wrapped_type(void) const {

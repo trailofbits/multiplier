@@ -54,17 +54,13 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
   OMPAllocateDecl canonical_declaration(void) const;
   std::optional<OMPAllocateDecl> definition(void) const;
   gap::generator<OMPAllocateDecl> redeclarations(void) const &;
-  static std::optional<OMPAllocateDecl> from(const Decl &parent);
-
-  inline static std::optional<OMPAllocateDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return OMPAllocateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPAllocateDecl> from_base(const Decl &parent);
+  inline static std::optional<OMPAllocateDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPAllocateDecl> from(const std::optional<Decl> &parent);
   static std::optional<OMPAllocateDecl> from(const Reference &r);
+  static std::optional<OMPAllocateDecl> from(const VariantEntity &e);
   static std::optional<OMPAllocateDecl> from(const TokenContext &t);
 
   std::optional<Expr> nth_varlist(unsigned n) const;

@@ -40,17 +40,13 @@ class AArch64SVEPcsAttr : public InheritableAttr {
     return AttrKind::A_ARCH64_SVE_PCS;
   }
 
-  static std::optional<AArch64SVEPcsAttr> from(const Attr &parent);
-
-  inline static std::optional<AArch64SVEPcsAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AArch64SVEPcsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AArch64SVEPcsAttr> from_base(const Attr &parent);
+  inline static std::optional<AArch64SVEPcsAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AArch64SVEPcsAttr> from(const std::optional<Attr> &parent);
   static std::optional<AArch64SVEPcsAttr> from(const Reference &r);
+  static std::optional<AArch64SVEPcsAttr> from(const VariantEntity &e);
   static std::optional<AArch64SVEPcsAttr> from(const TokenContext &t);
 
 };

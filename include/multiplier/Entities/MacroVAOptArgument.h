@@ -42,17 +42,13 @@ class MacroVAOptArgument : public Macro {
   static gap::generator<MacroVAOptArgument> containing(const Token &token);
   bool contains(const Token &token);
 
-  static std::optional<MacroVAOptArgument> from(const Macro &parent);
-
-  inline static std::optional<MacroVAOptArgument> from(const std::optional<Macro> &parent) {
-    if (parent) {
-      return MacroVAOptArgument::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MacroVAOptArgument> from_base(const Macro &parent);
+  inline static std::optional<MacroVAOptArgument> from(const Macro &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MacroVAOptArgument> from(const std::optional<Macro> &parent);
   static std::optional<MacroVAOptArgument> from(const Reference &r);
+  static std::optional<MacroVAOptArgument> from(const VariantEntity &e);
   static std::optional<MacroVAOptArgument> from(const TokenContext &t);
 
 };

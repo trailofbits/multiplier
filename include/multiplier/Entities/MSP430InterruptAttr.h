@@ -40,17 +40,13 @@ class MSP430InterruptAttr : public InheritableAttr {
     return AttrKind::MSP430_INTERRUPT;
   }
 
-  static std::optional<MSP430InterruptAttr> from(const Attr &parent);
-
-  inline static std::optional<MSP430InterruptAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MSP430InterruptAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MSP430InterruptAttr> from_base(const Attr &parent);
+  inline static std::optional<MSP430InterruptAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MSP430InterruptAttr> from(const std::optional<Attr> &parent);
   static std::optional<MSP430InterruptAttr> from(const Reference &r);
+  static std::optional<MSP430InterruptAttr> from(const VariantEntity &e);
   static std::optional<MSP430InterruptAttr> from(const TokenContext &t);
 
 };

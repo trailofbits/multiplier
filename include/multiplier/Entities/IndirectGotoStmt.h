@@ -50,17 +50,13 @@ class IndirectGotoStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<IndirectGotoStmt> from(const Stmt &parent);
-
-  inline static std::optional<IndirectGotoStmt> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return IndirectGotoStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<IndirectGotoStmt> from_base(const Stmt &parent);
+  inline static std::optional<IndirectGotoStmt> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<IndirectGotoStmt> from(const std::optional<Stmt> &parent);
   static std::optional<IndirectGotoStmt> from(const Reference &r);
+  static std::optional<IndirectGotoStmt> from(const VariantEntity &e);
   static std::optional<IndirectGotoStmt> from(const TokenContext &t);
 
   std::optional<LabelDecl> constant_target(void) const;

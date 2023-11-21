@@ -46,17 +46,13 @@ class IncludeMacrosMacroDirective : public IncludeLikeMacroDirective {
   static gap::generator<IncludeMacrosMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  static std::optional<IncludeMacrosMacroDirective> from(const Macro &parent);
-
-  inline static std::optional<IncludeMacrosMacroDirective> from(const std::optional<Macro> &parent) {
-    if (parent) {
-      return IncludeMacrosMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<IncludeMacrosMacroDirective> from_base(const Macro &parent);
+  inline static std::optional<IncludeMacrosMacroDirective> from(const Macro &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<IncludeMacrosMacroDirective> from(const std::optional<Macro> &parent);
   static std::optional<IncludeMacrosMacroDirective> from(const Reference &r);
+  static std::optional<IncludeMacrosMacroDirective> from(const VariantEntity &e);
   static std::optional<IncludeMacrosMacroDirective> from(const TokenContext &t);
 
 };

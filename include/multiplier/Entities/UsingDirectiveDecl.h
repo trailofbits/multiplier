@@ -53,17 +53,13 @@ class UsingDirectiveDecl : public NamedDecl {
   UsingDirectiveDecl canonical_declaration(void) const;
   std::optional<UsingDirectiveDecl> definition(void) const;
   gap::generator<UsingDirectiveDecl> redeclarations(void) const &;
-  static std::optional<UsingDirectiveDecl> from(const Decl &parent);
-
-  inline static std::optional<UsingDirectiveDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return UsingDirectiveDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UsingDirectiveDecl> from_base(const Decl &parent);
+  inline static std::optional<UsingDirectiveDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UsingDirectiveDecl> from(const std::optional<Decl> &parent);
   static std::optional<UsingDirectiveDecl> from(const Reference &r);
+  static std::optional<UsingDirectiveDecl> from(const VariantEntity &e);
   static std::optional<UsingDirectiveDecl> from(const TokenContext &t);
 
   Token identifier_token(void) const;

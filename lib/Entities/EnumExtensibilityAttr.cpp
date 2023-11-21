@@ -39,18 +39,30 @@ bool EnumExtensibilityAttr::contains(const Token &tok) const {
 std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return EnumExtensibilityAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kEnumExtensibilityAttrDerivedKinds[] = {
     EnumExtensibilityAttr::static_kind(),
 };
 
-std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case EnumExtensibilityAttr::static_kind():
       return reinterpret_cast<const EnumExtensibilityAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<EnumExtensibilityAttr> EnumExtensibilityAttr::in(const Index &ind
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kEnumExtensibilityAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<EnumExtensibilityAttr> e = EnumExtensibilityAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<EnumExtensibilityAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<EnumExtensibilityAttr> EnumExtensibilityAttr::in(const Fragment &
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kEnumExtensibilityAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<EnumExtensibilityAttr> e = EnumExtensibilityAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<EnumExtensibilityAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<EnumExtensibilityAttr> EnumExtensibilityAttr::in(const File &file
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kEnumExtensibilityAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<EnumExtensibilityAttr> e = EnumExtensibilityAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<EnumExtensibilityAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::from(const Reference
   return EnumExtensibilityAttr::from(r.as_attribute());
 }
 
+std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::from(const TokenContext &t) {
-  return EnumExtensibilityAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 EnumExtensibilityAttrKind EnumExtensibilityAttr::extensibility(void) const {

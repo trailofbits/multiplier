@@ -40,17 +40,13 @@ class FormatArgAttr : public InheritableAttr {
     return AttrKind::FORMAT_ARG;
   }
 
-  static std::optional<FormatArgAttr> from(const Attr &parent);
-
-  inline static std::optional<FormatArgAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return FormatArgAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<FormatArgAttr> from_base(const Attr &parent);
+  inline static std::optional<FormatArgAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<FormatArgAttr> from(const std::optional<Attr> &parent);
   static std::optional<FormatArgAttr> from(const Reference &r);
+  static std::optional<FormatArgAttr> from(const VariantEntity &e);
   static std::optional<FormatArgAttr> from(const TokenContext &t);
 
 };

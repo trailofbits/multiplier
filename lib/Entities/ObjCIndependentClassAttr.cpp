@@ -39,18 +39,30 @@ bool ObjCIndependentClassAttr::contains(const Token &tok) const {
 std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return ObjCIndependentClassAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kObjCIndependentClassAttrDerivedKinds[] = {
     ObjCIndependentClassAttr::static_kind(),
 };
 
-std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case ObjCIndependentClassAttr::static_kind():
       return reinterpret_cast<const ObjCIndependentClassAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<ObjCIndependentClassAttr> ObjCIndependentClassAttr::in(const Inde
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kObjCIndependentClassAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<ObjCIndependentClassAttr> e = ObjCIndependentClassAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<ObjCIndependentClassAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<ObjCIndependentClassAttr> ObjCIndependentClassAttr::in(const Frag
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kObjCIndependentClassAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCIndependentClassAttr> e = ObjCIndependentClassAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<ObjCIndependentClassAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<ObjCIndependentClassAttr> ObjCIndependentClassAttr::in(const File
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kObjCIndependentClassAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCIndependentClassAttr> e = ObjCIndependentClassAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<ObjCIndependentClassAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::from(const Ref
   return ObjCIndependentClassAttr::from(r.as_attribute());
 }
 
+std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::from(const TokenContext &t) {
-  return ObjCIndependentClassAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

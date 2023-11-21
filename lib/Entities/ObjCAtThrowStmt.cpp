@@ -88,18 +88,30 @@ bool ObjCAtThrowStmt::contains(const Stmt &stmt) {
 std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ObjCAtThrowStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kObjCAtThrowStmtDerivedKinds[] = {
     ObjCAtThrowStmt::static_kind(),
 };
 
-std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCAtThrowStmt::static_kind():
       return reinterpret_cast<const ObjCAtThrowStmt &>(parent);
@@ -112,7 +124,7 @@ gap::generator<ObjCAtThrowStmt> ObjCAtThrowStmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCAtThrowStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ObjCAtThrowStmt> e = ObjCAtThrowStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCAtThrowStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -124,7 +136,7 @@ gap::generator<ObjCAtThrowStmt> ObjCAtThrowStmt::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCAtThrowStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCAtThrowStmt> e = ObjCAtThrowStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCAtThrowStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -137,7 +149,7 @@ gap::generator<ObjCAtThrowStmt> ObjCAtThrowStmt::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCAtThrowStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCAtThrowStmt> e = ObjCAtThrowStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ObjCAtThrowStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -149,13 +161,23 @@ std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const Reference &r) {
   return ObjCAtThrowStmt::from(r.as_statement());
 }
 
+std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const TokenContext &t) {
-  return ObjCAtThrowStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr ObjCAtThrowStmt::throw_expression(void) const {
   RawEntityId eid = impl->reader.getVal9();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token ObjCAtThrowStmt::throw_token(void) const {

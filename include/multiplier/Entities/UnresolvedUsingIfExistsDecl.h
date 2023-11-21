@@ -53,17 +53,13 @@ class UnresolvedUsingIfExistsDecl : public NamedDecl {
   UnresolvedUsingIfExistsDecl canonical_declaration(void) const;
   std::optional<UnresolvedUsingIfExistsDecl> definition(void) const;
   gap::generator<UnresolvedUsingIfExistsDecl> redeclarations(void) const &;
-  static std::optional<UnresolvedUsingIfExistsDecl> from(const Decl &parent);
-
-  inline static std::optional<UnresolvedUsingIfExistsDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return UnresolvedUsingIfExistsDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UnresolvedUsingIfExistsDecl> from_base(const Decl &parent);
+  inline static std::optional<UnresolvedUsingIfExistsDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UnresolvedUsingIfExistsDecl> from(const std::optional<Decl> &parent);
   static std::optional<UnresolvedUsingIfExistsDecl> from(const Reference &r);
+  static std::optional<UnresolvedUsingIfExistsDecl> from(const VariantEntity &e);
   static std::optional<UnresolvedUsingIfExistsDecl> from(const TokenContext &t);
 
 };

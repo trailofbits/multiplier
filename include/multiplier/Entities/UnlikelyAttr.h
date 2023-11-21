@@ -40,17 +40,13 @@ class UnlikelyAttr : public StmtAttr {
     return AttrKind::UNLIKELY;
   }
 
-  static std::optional<UnlikelyAttr> from(const Attr &parent);
-
-  inline static std::optional<UnlikelyAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return UnlikelyAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<UnlikelyAttr> from_base(const Attr &parent);
+  inline static std::optional<UnlikelyAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<UnlikelyAttr> from(const std::optional<Attr> &parent);
   static std::optional<UnlikelyAttr> from(const Reference &r);
+  static std::optional<UnlikelyAttr> from(const VariantEntity &e);
   static std::optional<UnlikelyAttr> from(const TokenContext &t);
 
 };

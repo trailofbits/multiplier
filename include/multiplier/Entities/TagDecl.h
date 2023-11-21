@@ -60,17 +60,13 @@ class TagDecl : public TypeDecl {
   TagDecl canonical_declaration(void) const;
   std::optional<TagDecl> definition(void) const;
   gap::generator<TagDecl> redeclarations(void) const &;
-  static std::optional<TagDecl> from(const Decl &parent);
-
-  inline static std::optional<TagDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return TagDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TagDecl> from_base(const Decl &parent);
+  inline static std::optional<TagDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TagDecl> from(const std::optional<Decl> &parent);
   static std::optional<TagDecl> from(const Reference &r);
+  static std::optional<TagDecl> from(const VariantEntity &e);
   static std::optional<TagDecl> from(const TokenContext &t);
 
   TokenRange brace_range(void) const;

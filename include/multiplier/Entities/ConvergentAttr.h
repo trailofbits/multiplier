@@ -40,17 +40,13 @@ class ConvergentAttr : public InheritableAttr {
     return AttrKind::CONVERGENT;
   }
 
-  static std::optional<ConvergentAttr> from(const Attr &parent);
-
-  inline static std::optional<ConvergentAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ConvergentAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ConvergentAttr> from_base(const Attr &parent);
+  inline static std::optional<ConvergentAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ConvergentAttr> from(const std::optional<Attr> &parent);
   static std::optional<ConvergentAttr> from(const Reference &r);
+  static std::optional<ConvergentAttr> from(const VariantEntity &e);
   static std::optional<ConvergentAttr> from(const TokenContext &t);
 
 };

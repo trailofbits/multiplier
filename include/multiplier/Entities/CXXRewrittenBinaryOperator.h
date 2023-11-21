@@ -53,17 +53,13 @@ class CXXRewrittenBinaryOperator : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<CXXRewrittenBinaryOperator> from(const Stmt &parent);
-
-  inline static std::optional<CXXRewrittenBinaryOperator> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return CXXRewrittenBinaryOperator::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<CXXRewrittenBinaryOperator> from_base(const Stmt &parent);
+  inline static std::optional<CXXRewrittenBinaryOperator> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<CXXRewrittenBinaryOperator> from(const std::optional<Stmt> &parent);
   static std::optional<CXXRewrittenBinaryOperator> from(const Reference &r);
+  static std::optional<CXXRewrittenBinaryOperator> from(const VariantEntity &e);
   static std::optional<CXXRewrittenBinaryOperator> from(const TokenContext &t);
 
   Expr lhs(void) const;

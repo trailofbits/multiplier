@@ -38,17 +38,13 @@ class HLSLAnnotationAttr : public InheritableAttr {
   static gap::generator<HLSLAnnotationAttr> in(const Fragment &frag);
   static gap::generator<HLSLAnnotationAttr> in(const File &file);
 
-  static std::optional<HLSLAnnotationAttr> from(const Attr &parent);
-
-  inline static std::optional<HLSLAnnotationAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return HLSLAnnotationAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<HLSLAnnotationAttr> from_base(const Attr &parent);
+  inline static std::optional<HLSLAnnotationAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<HLSLAnnotationAttr> from(const std::optional<Attr> &parent);
   static std::optional<HLSLAnnotationAttr> from(const Reference &r);
+  static std::optional<HLSLAnnotationAttr> from(const VariantEntity &e);
   static std::optional<HLSLAnnotationAttr> from(const TokenContext &t);
 
 };

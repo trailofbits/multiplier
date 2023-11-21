@@ -89,18 +89,30 @@ bool ObjCIsaExpr::contains(const Stmt &stmt) {
 std::optional<ObjCIsaExpr> ObjCIsaExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ObjCIsaExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kObjCIsaExprDerivedKinds[] = {
     ObjCIsaExpr::static_kind(),
 };
 
-std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ObjCIsaExpr> ObjCIsaExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ObjCIsaExpr::static_kind():
       return reinterpret_cast<const ObjCIsaExpr &>(parent);
@@ -113,7 +125,7 @@ gap::generator<ObjCIsaExpr> ObjCIsaExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCIsaExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ObjCIsaExpr> e = ObjCIsaExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCIsaExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<ObjCIsaExpr> ObjCIsaExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCIsaExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCIsaExpr> e = ObjCIsaExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ObjCIsaExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<ObjCIsaExpr> ObjCIsaExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCIsaExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCIsaExpr> e = ObjCIsaExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ObjCIsaExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,13 +162,23 @@ std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const Reference &r) {
   return ObjCIsaExpr::from(r.as_statement());
 }
 
+std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const TokenContext &t) {
-  return ObjCIsaExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr ObjCIsaExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token ObjCIsaExpr::base_token_end(void) const {

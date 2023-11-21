@@ -41,8 +41,6 @@ VAST_UNRELAX_WARNINGS
 namespace indexer {
 namespace {
 
-using MXCodeGenContext = vast::cg::codegen_context;
-
 template <typename Derived>
 struct TypeCompressingGenVisitor : vast::cg::type_visitor_with_dl< Derived > {
  public:
@@ -105,11 +103,7 @@ using MXVisitorConfig = vast::cg::fallback_visitor< Derived,
     vast::cg::unreach_visitor
 >;
 
-using MXCodeGenVisitor = vast::cg::visitor_instance<
-    vast::cg::codegen_context, MXVisitorConfig, MetaGenerator
-    >;
-
-using MXCodeGenerator = vast::cg::codegen_base<MXCodeGenVisitor, MXCodeGenContext>;
+using MXCodeGenerator = vast::cg::codegen_instance<MXVisitorConfig>;
 
 static vast::cg::source_language GetSourceLanguage(
     const vast::cc::language_options &opts) {
@@ -137,13 +131,9 @@ class CodeGeneratorImpl {
  public:
   bool disabled{false};
 
+  // NOTE(pag): The first use of the VAST code generator will load in all
+  //            the necessary dialects.
   mlir::DialectRegistry registry;
-
-  CodeGeneratorImpl(void) {
-    registry.insert<vast::hl::HighLevelDialect,
-                    vast::meta::MetaDialect,
-                    vast::core::CoreDialect>();
-  }
 };
 
 CodeGenerator::CodeGenerator(void)
@@ -181,8 +171,10 @@ std::string CodeGenerator::GenerateSourceIR(
   llvm::raw_string_ostream os(ret);
 
   try {
-    codegen.emit_module(const_cast<clang::TranslationUnitDecl *>(
+    codegen.emit_data_layout();
+    codegen.Visit(const_cast<clang::TranslationUnitDecl *>(
         ast.TranslationUnit().RawDecl()));
+    codegen.verify_module();
     cgctx.mod->print(os, flags);
 
   } catch (std::exception &e) {

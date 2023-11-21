@@ -39,18 +39,30 @@ bool EnumType::contains(const Token &tok) const {
 std::optional<EnumType> EnumType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return EnumType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<EnumType> EnumType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kEnumTypeDerivedKinds[] = {
     EnumType::static_kind(),
 };
 
-std::optional<EnumType> EnumType::from(const Type &parent) {
+}  // namespace
+
+std::optional<EnumType> EnumType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case EnumType::static_kind():
       return reinterpret_cast<const EnumType &>(parent);
@@ -63,7 +75,7 @@ gap::generator<EnumType> EnumType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kEnumTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<EnumType> e = EnumType::from(Type(std::move(eptr)))) {
+      if (std::optional<EnumType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -74,8 +86,18 @@ std::optional<EnumType> EnumType::from(const Reference &r) {
   return EnumType::from(r.as_type());
 }
 
+std::optional<EnumType> EnumType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<EnumType> EnumType::from(const TokenContext &t) {
-  return EnumType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type EnumType::desugar(void) const {

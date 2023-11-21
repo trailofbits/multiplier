@@ -41,17 +41,13 @@ class AcquireCapabilityAttr : public InheritableAttr {
     return AttrKind::ACQUIRE_CAPABILITY;
   }
 
-  static std::optional<AcquireCapabilityAttr> from(const Attr &parent);
-
-  inline static std::optional<AcquireCapabilityAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AcquireCapabilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AcquireCapabilityAttr> from_base(const Attr &parent);
+  inline static std::optional<AcquireCapabilityAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AcquireCapabilityAttr> from(const std::optional<Attr> &parent);
   static std::optional<AcquireCapabilityAttr> from(const Reference &r);
+  static std::optional<AcquireCapabilityAttr> from(const VariantEntity &e);
   static std::optional<AcquireCapabilityAttr> from(const TokenContext &t);
 
   AcquireCapabilityAttrSpelling semantic_spelling(void) const;

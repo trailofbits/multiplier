@@ -40,17 +40,13 @@ class OpenCLGlobalDeviceAddressSpaceAttr : public TypeAttr {
     return AttrKind::OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE;
   }
 
-  static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const Attr &parent);
-
-  inline static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OpenCLGlobalDeviceAddressSpaceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from_base(const Attr &parent);
+  inline static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const std::optional<Attr> &parent);
   static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const Reference &r);
+  static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const VariantEntity &e);
   static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const TokenContext &t);
 
 };

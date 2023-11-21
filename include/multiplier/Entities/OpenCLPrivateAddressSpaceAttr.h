@@ -41,17 +41,13 @@ class OpenCLPrivateAddressSpaceAttr : public TypeAttr {
     return AttrKind::OPEN_CL_PRIVATE_ADDRESS_SPACE;
   }
 
-  static std::optional<OpenCLPrivateAddressSpaceAttr> from(const Attr &parent);
-
-  inline static std::optional<OpenCLPrivateAddressSpaceAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OpenCLPrivateAddressSpaceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OpenCLPrivateAddressSpaceAttr> from_base(const Attr &parent);
+  inline static std::optional<OpenCLPrivateAddressSpaceAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OpenCLPrivateAddressSpaceAttr> from(const std::optional<Attr> &parent);
   static std::optional<OpenCLPrivateAddressSpaceAttr> from(const Reference &r);
+  static std::optional<OpenCLPrivateAddressSpaceAttr> from(const VariantEntity &e);
   static std::optional<OpenCLPrivateAddressSpaceAttr> from(const TokenContext &t);
 
   OpenCLPrivateAddressSpaceAttrSpelling semantic_spelling(void) const;

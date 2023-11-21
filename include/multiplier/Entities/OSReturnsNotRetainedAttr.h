@@ -40,17 +40,13 @@ class OSReturnsNotRetainedAttr : public InheritableAttr {
     return AttrKind::OS_RETURNS_NOT_RETAINED;
   }
 
-  static std::optional<OSReturnsNotRetainedAttr> from(const Attr &parent);
-
-  inline static std::optional<OSReturnsNotRetainedAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return OSReturnsNotRetainedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OSReturnsNotRetainedAttr> from_base(const Attr &parent);
+  inline static std::optional<OSReturnsNotRetainedAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OSReturnsNotRetainedAttr> from(const std::optional<Attr> &parent);
   static std::optional<OSReturnsNotRetainedAttr> from(const Reference &r);
+  static std::optional<OSReturnsNotRetainedAttr> from(const VariantEntity &e);
   static std::optional<OSReturnsNotRetainedAttr> from(const TokenContext &t);
 
 };

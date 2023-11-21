@@ -40,17 +40,13 @@ class AsmLabelAttr : public InheritableAttr {
     return AttrKind::ASM_LABEL;
   }
 
-  static std::optional<AsmLabelAttr> from(const Attr &parent);
-
-  inline static std::optional<AsmLabelAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AsmLabelAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AsmLabelAttr> from_base(const Attr &parent);
+  inline static std::optional<AsmLabelAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AsmLabelAttr> from(const std::optional<Attr> &parent);
   static std::optional<AsmLabelAttr> from(const Reference &r);
+  static std::optional<AsmLabelAttr> from(const VariantEntity &e);
   static std::optional<AsmLabelAttr> from(const TokenContext &t);
 
   bool is_literal_label(void) const;

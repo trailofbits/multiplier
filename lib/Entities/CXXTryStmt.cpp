@@ -89,18 +89,30 @@ bool CXXTryStmt::contains(const Stmt &stmt) {
 std::optional<CXXTryStmt> CXXTryStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXTryStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXTryStmt> CXXTryStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXTryStmtDerivedKinds[] = {
     CXXTryStmt::static_kind(),
 };
 
-std::optional<CXXTryStmt> CXXTryStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXTryStmt> CXXTryStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXTryStmt::static_kind():
       return reinterpret_cast<const CXXTryStmt &>(parent);
@@ -113,7 +125,7 @@ gap::generator<CXXTryStmt> CXXTryStmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXTryStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXTryStmt> e = CXXTryStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXTryStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<CXXTryStmt> CXXTryStmt::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXTryStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXTryStmt> e = CXXTryStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXTryStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<CXXTryStmt> CXXTryStmt::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXTryStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXTryStmt> e = CXXTryStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXTryStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,13 +162,23 @@ std::optional<CXXTryStmt> CXXTryStmt::from(const Reference &r) {
   return CXXTryStmt::from(r.as_statement());
 }
 
+std::optional<CXXTryStmt> CXXTryStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXTryStmt> CXXTryStmt::from(const TokenContext &t) {
-  return CXXTryStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 CompoundStmt CXXTryStmt::try_block(void) const {
   RawEntityId eid = impl->reader.getVal9();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return CompoundStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token CXXTryStmt::try_token(void) const {
@@ -178,7 +200,7 @@ std::optional<CXXCatchStmt> CXXTryStmt::nth_handler(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return CXXCatchStmt::from(Stmt(std::move(e)));
+  return CXXCatchStmt::from_base(std::move(e));
 }
 
 gap::generator<CXXCatchStmt> CXXTryStmt::handlers(void) const & {
@@ -187,7 +209,7 @@ gap::generator<CXXCatchStmt> CXXTryStmt::handlers(void) const & {
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = CXXCatchStmt::from(Stmt(std::move(d15)))) {
+      if (auto e = CXXCatchStmt::from_base(std::move(d15))) {
         co_yield std::move(*e);
       }
     }

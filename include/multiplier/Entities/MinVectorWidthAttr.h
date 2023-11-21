@@ -40,17 +40,13 @@ class MinVectorWidthAttr : public InheritableAttr {
     return AttrKind::MIN_VECTOR_WIDTH;
   }
 
-  static std::optional<MinVectorWidthAttr> from(const Attr &parent);
-
-  inline static std::optional<MinVectorWidthAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MinVectorWidthAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MinVectorWidthAttr> from_base(const Attr &parent);
+  inline static std::optional<MinVectorWidthAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MinVectorWidthAttr> from(const std::optional<Attr> &parent);
   static std::optional<MinVectorWidthAttr> from(const Reference &r);
+  static std::optional<MinVectorWidthAttr> from(const VariantEntity &e);
   static std::optional<MinVectorWidthAttr> from(const TokenContext &t);
 
 };

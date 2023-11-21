@@ -11,6 +11,7 @@
 #include "Fragment.h"
 #include "Reference.h"
 #include "Types.h"
+#include "Util.h"
 
 namespace mx {
 namespace {
@@ -175,24 +176,48 @@ gap::generator<Decl> Decl::redeclarations(void) const & {
   }
 }
 
-// Return references to this declaration.
-gap::generator<Reference> Decl::references(void) const & {
-  return References(impl->ep, id().Pack());
-}
-
-// Grab all call expressions of this FunctionDecl
-gap::generator<CallExpr> FunctionDecl::callers() const & {
+// Grab all callers of this function. These are `CallExpr` or
+// `CxxConstructExpr`s.
+//
+// TODO(pag): Handle `CXXNewExpr` that doesn't contain a `CxxConstructExpr`.
+gap::generator<Stmt> FunctionDecl::callers() const & {
   static constexpr auto kCallerKindId =
       static_cast<RawEntityId>(BuiltinReferenceKind::CALLS);
 
   auto ep = impl->ep;
-  for (auto [from_id, context_id, kind_id] : ep->References(ep, id().Pack())) {
+  auto is_constructor = kind() == DeclKind::CXX_CONSTRUCTOR;
+
+  for (auto [from_id, context_id, kind_id] :
+        ep->References(ep, id().Pack(), EntityProvider::kReferenceTo)) {
+
     if (kCallerKindId != kind_id) {
       continue;
     }
 
+    // The `context_id` should point to a `CallExpr`.
+    if (auto context_stmt_id = EntityId(context_id).Extract<StmtId>()) {
+      if (context_stmt_id->kind == StmtKind::CALL_EXPR ||
+          context_stmt_id->kind == StmtKind::CXX_NEW_EXPR ||
+          context_stmt_id->kind == StmtKind::CXX_DELETE_EXPR) {
+        if (auto eptr = ep->StmtFor(ep, context_id)) {
+          co_yield Stmt(std::move(eptr));
+          continue;
+        }
+      }
+
+      if (context_stmt_id->kind == StmtKind::CXX_CONSTRUCT_EXPR &&
+          is_constructor) {
+        if (auto eptr = ep->StmtFor(ep, context_id)) {
+          co_yield Stmt(std::move(eptr));
+          continue;
+        } 
+      }
+    }
+
+    // If it doesn't, then `from_id` is probably pointing to a `DeclRefExpr`,
+    // so go and search for a `CallExpr` containing the `DeclRefExpr`.
     auto stmt_id = EntityId(from_id).Extract<StmtId>();
-    if (!stmt_id || stmt_id->kind != StmtKind::CALL_EXPR) {
+    if (!stmt_id) {
       continue;
     }
 
@@ -201,14 +226,25 @@ gap::generator<CallExpr> FunctionDecl::callers() const & {
       continue;
     }
 
-    // Don't double check the `CallExpr::direct_callee`. It may be missing, e.g.
-    // because it's an indirect call. It could also be a overridable method, and
-    // thus mislead us to thinking there's not a reference. We'll assume that
-    // users or the indexer has explicitly used the `BuiltinReferenceKind::CALLS`
-    // relation to communicate whatever knowledge they've learned.
-    Stmt stmt(std::move(eptr));
-    if (auto call = CallExpr::from(stmt)) {
-      co_yield call.value();
+    Stmt func_ref(std::move(eptr));
+    for (auto call : Stmt::containing(func_ref)) {
+      auto ck = call.kind();
+
+      if (ck == StmtKind::CXX_CONSTRUCT_EXPR) {
+        if (is_constructor) {
+          co_yield std::move(call);
+        }
+        break;
+      }
+
+      if (ck == StmtKind::CALL_EXPR) {
+        co_yield std::move(call);
+        break;
+      }
+
+      if (IsNonValueStatement(ck)) {
+        break;
+      }
     }
   }
 }

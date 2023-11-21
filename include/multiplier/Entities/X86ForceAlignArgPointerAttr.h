@@ -40,17 +40,13 @@ class X86ForceAlignArgPointerAttr : public InheritableAttr {
     return AttrKind::X86_FORCE_ALIGN_ARG_POINTER;
   }
 
-  static std::optional<X86ForceAlignArgPointerAttr> from(const Attr &parent);
-
-  inline static std::optional<X86ForceAlignArgPointerAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return X86ForceAlignArgPointerAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<X86ForceAlignArgPointerAttr> from_base(const Attr &parent);
+  inline static std::optional<X86ForceAlignArgPointerAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<X86ForceAlignArgPointerAttr> from(const std::optional<Attr> &parent);
   static std::optional<X86ForceAlignArgPointerAttr> from(const Reference &r);
+  static std::optional<X86ForceAlignArgPointerAttr> from(const VariantEntity &e);
   static std::optional<X86ForceAlignArgPointerAttr> from(const TokenContext &t);
 
 };

@@ -41,17 +41,13 @@ class ConsumableAttr : public InheritableAttr {
     return AttrKind::CONSUMABLE;
   }
 
-  static std::optional<ConsumableAttr> from(const Attr &parent);
-
-  inline static std::optional<ConsumableAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ConsumableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ConsumableAttr> from_base(const Attr &parent);
+  inline static std::optional<ConsumableAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ConsumableAttr> from(const std::optional<Attr> &parent);
   static std::optional<ConsumableAttr> from(const Reference &r);
+  static std::optional<ConsumableAttr> from(const VariantEntity &e);
   static std::optional<ConsumableAttr> from(const TokenContext &t);
 
   ConsumableAttrConsumedState default_state(void) const;

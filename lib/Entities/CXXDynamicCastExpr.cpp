@@ -92,18 +92,30 @@ bool CXXDynamicCastExpr::contains(const Stmt &stmt) {
 std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXDynamicCastExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXDynamicCastExprDerivedKinds[] = {
     CXXDynamicCastExpr::static_kind(),
 };
 
-std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXDynamicCastExpr::static_kind():
       return reinterpret_cast<const CXXDynamicCastExpr &>(parent);
@@ -116,7 +128,7 @@ gap::generator<CXXDynamicCastExpr> CXXDynamicCastExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXDynamicCastExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXDynamicCastExpr> e = CXXDynamicCastExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXDynamicCastExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -128,7 +140,7 @@ gap::generator<CXXDynamicCastExpr> CXXDynamicCastExpr::in(const Fragment &frag) 
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXDynamicCastExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXDynamicCastExpr> e = CXXDynamicCastExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXDynamicCastExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -141,7 +153,7 @@ gap::generator<CXXDynamicCastExpr> CXXDynamicCastExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXDynamicCastExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXDynamicCastExpr> e = CXXDynamicCastExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXDynamicCastExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -153,8 +165,18 @@ std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const Reference &r) {
   return CXXDynamicCastExpr::from(r.as_statement());
 }
 
+std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const TokenContext &t) {
-  return CXXDynamicCastExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool CXXDynamicCastExpr::is_always_null(void) const {

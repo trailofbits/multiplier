@@ -41,17 +41,13 @@ class PcsAttr : public InheritableAttr {
     return AttrKind::PCS;
   }
 
-  static std::optional<PcsAttr> from(const Attr &parent);
-
-  inline static std::optional<PcsAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return PcsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PcsAttr> from_base(const Attr &parent);
+  inline static std::optional<PcsAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PcsAttr> from(const std::optional<Attr> &parent);
   static std::optional<PcsAttr> from(const Reference &r);
+  static std::optional<PcsAttr> from(const VariantEntity &e);
   static std::optional<PcsAttr> from(const TokenContext &t);
 
   PcsAttrPCSType pcs(void) const;

@@ -40,17 +40,13 @@ class ExcludeFromExplicitInstantiationAttr : public InheritableAttr {
     return AttrKind::EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
   }
 
-  static std::optional<ExcludeFromExplicitInstantiationAttr> from(const Attr &parent);
-
-  inline static std::optional<ExcludeFromExplicitInstantiationAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ExcludeFromExplicitInstantiationAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ExcludeFromExplicitInstantiationAttr> from_base(const Attr &parent);
+  inline static std::optional<ExcludeFromExplicitInstantiationAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ExcludeFromExplicitInstantiationAttr> from(const std::optional<Attr> &parent);
   static std::optional<ExcludeFromExplicitInstantiationAttr> from(const Reference &r);
+  static std::optional<ExcludeFromExplicitInstantiationAttr> from(const VariantEntity &e);
   static std::optional<ExcludeFromExplicitInstantiationAttr> from(const TokenContext &t);
 
 };

@@ -54,17 +54,13 @@ class LabelDecl : public NamedDecl {
   LabelDecl canonical_declaration(void) const;
   std::optional<LabelDecl> definition(void) const;
   gap::generator<LabelDecl> redeclarations(void) const &;
-  static std::optional<LabelDecl> from(const Decl &parent);
-
-  inline static std::optional<LabelDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return LabelDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<LabelDecl> from_base(const Decl &parent);
+  inline static std::optional<LabelDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<LabelDecl> from(const std::optional<Decl> &parent);
   static std::optional<LabelDecl> from(const Reference &r);
+  static std::optional<LabelDecl> from(const VariantEntity &e);
   static std::optional<LabelDecl> from(const TokenContext &t);
 
   std::string_view ms_assembly_label(void) const;

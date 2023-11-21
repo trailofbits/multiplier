@@ -38,17 +38,13 @@ class DeducedTemplateSpecializationType : public DeducedType {
     return TypeKind::DEDUCED_TEMPLATE_SPECIALIZATION;
   }
 
-  static std::optional<DeducedTemplateSpecializationType> from(const Type &parent);
-
-  inline static std::optional<DeducedTemplateSpecializationType> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return DeducedTemplateSpecializationType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<DeducedTemplateSpecializationType> from_base(const Type &parent);
+  inline static std::optional<DeducedTemplateSpecializationType> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<DeducedTemplateSpecializationType> from(const std::optional<Type> &parent);
   static std::optional<DeducedTemplateSpecializationType> from(const Reference &r);
+  static std::optional<DeducedTemplateSpecializationType> from(const VariantEntity &e);
   static std::optional<DeducedTemplateSpecializationType> from(const TokenContext &t);
 
 };

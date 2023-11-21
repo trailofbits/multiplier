@@ -92,7 +92,7 @@ bool ParmVarDecl::contains(const Stmt &stmt) {
 }
 
 ParmVarDecl ParmVarDecl::canonical_declaration(void) const {
-  if (auto canon = ParmVarDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (ParmVarDecl redecl : redeclarations()) {
@@ -102,12 +102,15 @@ ParmVarDecl ParmVarDecl::canonical_declaration(void) const {
 }
 
 std::optional<ParmVarDecl> ParmVarDecl::definition(void) const {
-  return ParmVarDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<ParmVarDecl> ParmVarDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<ParmVarDecl> dr = ParmVarDecl::from(r)) {
+    if (std::optional<ParmVarDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -120,18 +123,30 @@ gap::generator<ParmVarDecl> ParmVarDecl::redeclarations(void) const & {
 std::optional<ParmVarDecl> ParmVarDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return ParmVarDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ParmVarDecl> ParmVarDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kParmVarDeclDerivedKinds[] = {
     ParmVarDecl::static_kind(),
 };
 
-std::optional<ParmVarDecl> ParmVarDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<ParmVarDecl> ParmVarDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case ParmVarDecl::static_kind():
       return reinterpret_cast<const ParmVarDecl &>(parent);
@@ -144,7 +159,7 @@ gap::generator<ParmVarDecl> ParmVarDecl::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kParmVarDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<ParmVarDecl> e = ParmVarDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ParmVarDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -156,7 +171,7 @@ gap::generator<ParmVarDecl> ParmVarDecl::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kParmVarDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<ParmVarDecl> e = ParmVarDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<ParmVarDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -169,7 +184,7 @@ gap::generator<ParmVarDecl> ParmVarDecl::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kParmVarDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<ParmVarDecl> e = ParmVarDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<ParmVarDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -181,8 +196,18 @@ std::optional<ParmVarDecl> ParmVarDecl::from(const Reference &r) {
   return ParmVarDecl::from(r.as_declaration());
 }
 
+std::optional<ParmVarDecl> ParmVarDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<ParmVarDecl> ParmVarDecl::from(const TokenContext &t) {
-  return ParmVarDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 std::optional<Expr> ParmVarDecl::default_argument(void) const {
@@ -192,7 +217,7 @@ std::optional<Expr> ParmVarDecl::default_argument(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -218,7 +243,7 @@ std::optional<Expr> ParmVarDecl::uninstantiated_default_argument(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
+      return Expr::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

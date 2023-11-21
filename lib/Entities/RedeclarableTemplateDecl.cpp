@@ -91,7 +91,7 @@ bool RedeclarableTemplateDecl::contains(const Stmt &stmt) {
 }
 
 RedeclarableTemplateDecl RedeclarableTemplateDecl::canonical_declaration(void) const {
-  if (auto canon = RedeclarableTemplateDecl::from(this->Decl::canonical_declaration())) {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
     return std::move(canon.value());
   }
   for (RedeclarableTemplateDecl redecl : redeclarations()) {
@@ -101,12 +101,15 @@ RedeclarableTemplateDecl RedeclarableTemplateDecl::canonical_declaration(void) c
 }
 
 std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::definition(void) const {
-  return RedeclarableTemplateDecl::from(this->Decl::definition());
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
 }
 
 gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
-    if (std::optional<RedeclarableTemplateDecl> dr = RedeclarableTemplateDecl::from(r)) {
+    if (std::optional<RedeclarableTemplateDecl> dr = from_base(r)) {
       co_yield std::move(dr.value());
       continue;
     }
@@ -119,13 +122,23 @@ gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::redeclaration
 std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    return RedeclarableTemplateDecl::from(index.declaration(eid.Pack()));
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const DeclKind kRedeclarableTemplateDeclDerivedKinds[] = {
     TypeAliasTemplateDecl::static_kind(),
     VarTemplateDecl::static_kind(),
@@ -133,7 +146,9 @@ static const DeclKind kRedeclarableTemplateDeclDerivedKinds[] = {
     FunctionTemplateDecl::static_kind(),
 };
 
-std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Decl &parent) {
+}  // namespace
+
+std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {
     case TypeAliasTemplateDecl::static_kind():
     case VarTemplateDecl::static_kind():
@@ -149,7 +164,7 @@ gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::in(const Inde
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kRedeclarableTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<RedeclarableTemplateDecl> e = RedeclarableTemplateDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<RedeclarableTemplateDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -161,7 +176,7 @@ gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::in(const Frag
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kRedeclarableTemplateDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<RedeclarableTemplateDecl> e = RedeclarableTemplateDecl::from(Decl(std::move(eptr)))) {
+      if (std::optional<RedeclarableTemplateDecl> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -174,7 +189,7 @@ gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::in(const File
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kRedeclarableTemplateDeclDerivedKinds) {
       for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<RedeclarableTemplateDecl> e = RedeclarableTemplateDecl::from(Decl(std::move(eptr)))) {
+        if (std::optional<RedeclarableTemplateDecl> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -186,13 +201,23 @@ std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Ref
   return RedeclarableTemplateDecl::from(r.as_declaration());
 }
 
+std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
 std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const TokenContext &t) {
-  return RedeclarableTemplateDecl::from(t.as_declaration());
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 RedeclarableTemplateDecl RedeclarableTemplateDecl::instantiated_from_member_template(void) const {
   RawEntityId eid = impl->reader.getVal58();
-  return RedeclarableTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return RedeclarableTemplateDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool RedeclarableTemplateDecl::is_member_specialization(void) const {

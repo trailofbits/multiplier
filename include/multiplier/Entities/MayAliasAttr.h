@@ -40,17 +40,13 @@ class MayAliasAttr : public InheritableAttr {
     return AttrKind::MAY_ALIAS;
   }
 
-  static std::optional<MayAliasAttr> from(const Attr &parent);
-
-  inline static std::optional<MayAliasAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MayAliasAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MayAliasAttr> from_base(const Attr &parent);
+  inline static std::optional<MayAliasAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MayAliasAttr> from(const std::optional<Attr> &parent);
   static std::optional<MayAliasAttr> from(const Reference &r);
+  static std::optional<MayAliasAttr> from(const VariantEntity &e);
   static std::optional<MayAliasAttr> from(const TokenContext &t);
 
 };

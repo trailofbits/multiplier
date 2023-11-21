@@ -39,18 +39,30 @@ bool TypedefType::contains(const Token &tok) const {
 std::optional<TypedefType> TypedefType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return TypedefType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<TypedefType> TypedefType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kTypedefTypeDerivedKinds[] = {
     TypedefType::static_kind(),
 };
 
-std::optional<TypedefType> TypedefType::from(const Type &parent) {
+}  // namespace
+
+std::optional<TypedefType> TypedefType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case TypedefType::static_kind():
       return reinterpret_cast<const TypedefType &>(parent);
@@ -63,7 +75,7 @@ gap::generator<TypedefType> TypedefType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kTypedefTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<TypedefType> e = TypedefType::from(Type(std::move(eptr)))) {
+      if (std::optional<TypedefType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -74,8 +86,18 @@ std::optional<TypedefType> TypedefType::from(const Reference &r) {
   return TypedefType::from(r.as_type());
 }
 
+std::optional<TypedefType> TypedefType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<TypedefType> TypedefType::from(const TokenContext &t) {
-  return TypedefType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type TypedefType::desugar(void) const {
@@ -85,7 +107,7 @@ Type TypedefType::desugar(void) const {
 
 TypedefNameDecl TypedefType::declaration(void) const {
   RawEntityId eid = impl->reader.getVal19();
-  return TypedefNameDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return TypedefNameDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool TypedefType::is_sugared(void) const {

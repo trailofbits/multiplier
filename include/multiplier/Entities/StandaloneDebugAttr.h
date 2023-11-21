@@ -40,17 +40,13 @@ class StandaloneDebugAttr : public InheritableAttr {
     return AttrKind::STANDALONE_DEBUG;
   }
 
-  static std::optional<StandaloneDebugAttr> from(const Attr &parent);
-
-  inline static std::optional<StandaloneDebugAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return StandaloneDebugAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<StandaloneDebugAttr> from_base(const Attr &parent);
+  inline static std::optional<StandaloneDebugAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<StandaloneDebugAttr> from(const std::optional<Attr> &parent);
   static std::optional<StandaloneDebugAttr> from(const Reference &r);
+  static std::optional<StandaloneDebugAttr> from(const VariantEntity &e);
   static std::optional<StandaloneDebugAttr> from(const TokenContext &t);
 
 };

@@ -40,17 +40,13 @@ class XRayLogArgsAttr : public InheritableAttr {
     return AttrKind::X_RAY_LOG_ARGS;
   }
 
-  static std::optional<XRayLogArgsAttr> from(const Attr &parent);
-
-  inline static std::optional<XRayLogArgsAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return XRayLogArgsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<XRayLogArgsAttr> from_base(const Attr &parent);
+  inline static std::optional<XRayLogArgsAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<XRayLogArgsAttr> from(const std::optional<Attr> &parent);
   static std::optional<XRayLogArgsAttr> from(const Reference &r);
+  static std::optional<XRayLogArgsAttr> from(const VariantEntity &e);
   static std::optional<XRayLogArgsAttr> from(const TokenContext &t);
 
 };

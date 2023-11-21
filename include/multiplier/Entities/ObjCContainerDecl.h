@@ -57,17 +57,13 @@ class ObjCContainerDecl : public NamedDecl {
   ObjCContainerDecl canonical_declaration(void) const;
   std::optional<ObjCContainerDecl> definition(void) const;
   gap::generator<ObjCContainerDecl> redeclarations(void) const &;
-  static std::optional<ObjCContainerDecl> from(const Decl &parent);
-
-  inline static std::optional<ObjCContainerDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ObjCContainerDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCContainerDecl> from_base(const Decl &parent);
+  inline static std::optional<ObjCContainerDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCContainerDecl> from(const std::optional<Decl> &parent);
   static std::optional<ObjCContainerDecl> from(const Reference &r);
+  static std::optional<ObjCContainerDecl> from(const VariantEntity &e);
   static std::optional<ObjCContainerDecl> from(const TokenContext &t);
 
   std::optional<ObjCMethodDecl> nth_class_method(unsigned n) const;

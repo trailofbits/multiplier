@@ -175,17 +175,13 @@ class Expr : public ValueStmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<Expr> from(const Stmt &parent);
-
-  inline static std::optional<Expr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return Expr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<Expr> from_base(const Stmt &parent);
+  inline static std::optional<Expr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<Expr> from(const std::optional<Stmt> &parent);
   static std::optional<Expr> from(const Reference &r);
+  static std::optional<Expr> from(const VariantEntity &e);
   static std::optional<Expr> from(const TokenContext &t);
 
   bool has_side_effects(void) const;

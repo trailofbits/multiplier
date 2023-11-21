@@ -52,21 +52,17 @@ class StaticAssertDecl : public Decl {
   StaticAssertDecl canonical_declaration(void) const;
   std::optional<StaticAssertDecl> definition(void) const;
   gap::generator<StaticAssertDecl> redeclarations(void) const &;
-  static std::optional<StaticAssertDecl> from(const Decl &parent);
-
-  inline static std::optional<StaticAssertDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return StaticAssertDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<StaticAssertDecl> from_base(const Decl &parent);
+  inline static std::optional<StaticAssertDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<StaticAssertDecl> from(const std::optional<Decl> &parent);
   static std::optional<StaticAssertDecl> from(const Reference &r);
+  static std::optional<StaticAssertDecl> from(const VariantEntity &e);
   static std::optional<StaticAssertDecl> from(const TokenContext &t);
 
   Expr assert_expression(void) const;
-  Expr message(void) const;
+  std::optional<Expr> message(void) const;
   Token r_paren_token(void) const;
   bool is_failed(void) const;
 };

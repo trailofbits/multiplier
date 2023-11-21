@@ -40,18 +40,30 @@ bool SubstTemplateTypeParmPackType::contains(const Token &tok) const {
 std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return SubstTemplateTypeParmPackType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kSubstTemplateTypeParmPackTypeDerivedKinds[] = {
     SubstTemplateTypeParmPackType::static_kind(),
 };
 
-std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from(const Type &parent) {
+}  // namespace
+
+std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case SubstTemplateTypeParmPackType::static_kind():
       return reinterpret_cast<const SubstTemplateTypeParmPackType &>(parent);
@@ -64,7 +76,7 @@ gap::generator<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::in(
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kSubstTemplateTypeParmPackTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<SubstTemplateTypeParmPackType> e = SubstTemplateTypeParmPackType::from(Type(std::move(eptr)))) {
+      if (std::optional<SubstTemplateTypeParmPackType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,8 +87,18 @@ std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from
   return SubstTemplateTypeParmPackType::from(r.as_type());
 }
 
+std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from(const TokenContext &t) {
-  return SubstTemplateTypeParmPackType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Type SubstTemplateTypeParmPackType::desugar(void) const {
@@ -95,7 +117,7 @@ bool SubstTemplateTypeParmPackType::final(void) const {
 
 TemplateTypeParmDecl SubstTemplateTypeParmPackType::replaced_parameter(void) const {
   RawEntityId eid = impl->reader.getVal25();
-  return TemplateTypeParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return TemplateTypeParmDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool SubstTemplateTypeParmPackType::is_sugared(void) const {

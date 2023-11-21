@@ -348,13 +348,23 @@ bool InheritableAttr::contains(const Token &tok) const {
 std::optional<InheritableAttr> InheritableAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return InheritableAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<InheritableAttr> InheritableAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kInheritableAttrDerivedKinds[] = {
     InitPriorityAttr::static_kind(),
     IntelOclBiccAttr::static_kind(),
@@ -668,7 +678,9 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     SwiftIndirectResultAttr::static_kind(),
 };
 
-std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<InheritableAttr> InheritableAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case InitPriorityAttr::static_kind():
     case IntelOclBiccAttr::static_kind():
@@ -990,7 +1002,7 @@ gap::generator<InheritableAttr> InheritableAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kInheritableAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<InheritableAttr> e = InheritableAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<InheritableAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -1002,7 +1014,7 @@ gap::generator<InheritableAttr> InheritableAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kInheritableAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<InheritableAttr> e = InheritableAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<InheritableAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -1015,7 +1027,7 @@ gap::generator<InheritableAttr> InheritableAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kInheritableAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<InheritableAttr> e = InheritableAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<InheritableAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -1027,8 +1039,18 @@ std::optional<InheritableAttr> InheritableAttr::from(const Reference &r) {
   return InheritableAttr::from(r.as_attribute());
 }
 
+std::optional<InheritableAttr> InheritableAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<InheritableAttr> InheritableAttr::from(const TokenContext &t) {
-  return InheritableAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 bool InheritableAttr::should_inherit_even_if_already_present(void) const {

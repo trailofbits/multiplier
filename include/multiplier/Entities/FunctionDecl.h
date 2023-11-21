@@ -75,17 +75,13 @@ class FunctionDecl : public DeclaratorDecl {
   FunctionDecl canonical_declaration(void) const;
   std::optional<FunctionDecl> definition(void) const;
   gap::generator<FunctionDecl> redeclarations(void) const &;
-  static std::optional<FunctionDecl> from(const Decl &parent);
-
-  inline static std::optional<FunctionDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return FunctionDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<FunctionDecl> from_base(const Decl &parent);
+  inline static std::optional<FunctionDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<FunctionDecl> from(const std::optional<Decl> &parent);
   static std::optional<FunctionDecl> from(const Reference &r);
+  static std::optional<FunctionDecl> from(const VariantEntity &e);
   static std::optional<FunctionDecl> from(const TokenContext &t);
 
   bool body_contains_immediate_escalating_expressions(void) const;
@@ -176,7 +172,7 @@ class FunctionDecl : public DeclaratorDecl {
   bool will_have_body(void) const;
   std::optional<Stmt> body(void) const;
   gap::generator<Decl> declarations_in_context(void) const &;
-  gap::generator<CallExpr> callers(void) const &;
+  gap::generator<Stmt> callers(void) const &;
 };
 
 static_assert(sizeof(FunctionDecl) == sizeof(DeclaratorDecl));

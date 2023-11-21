@@ -39,18 +39,30 @@ bool MaxFieldAlignmentAttr::contains(const Token &tok) const {
 std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return MaxFieldAlignmentAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kMaxFieldAlignmentAttrDerivedKinds[] = {
     MaxFieldAlignmentAttr::static_kind(),
 };
 
-std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case MaxFieldAlignmentAttr::static_kind():
       return reinterpret_cast<const MaxFieldAlignmentAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::in(const Index &ind
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kMaxFieldAlignmentAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<MaxFieldAlignmentAttr> e = MaxFieldAlignmentAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<MaxFieldAlignmentAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::in(const Fragment &
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kMaxFieldAlignmentAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<MaxFieldAlignmentAttr> e = MaxFieldAlignmentAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<MaxFieldAlignmentAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::in(const File &file
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kMaxFieldAlignmentAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<MaxFieldAlignmentAttr> e = MaxFieldAlignmentAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<MaxFieldAlignmentAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::from(const Reference
   return MaxFieldAlignmentAttr::from(r.as_attribute());
 }
 
+std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::from(const TokenContext &t) {
-  return MaxFieldAlignmentAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

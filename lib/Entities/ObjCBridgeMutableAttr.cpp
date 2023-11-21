@@ -39,18 +39,30 @@ bool ObjCBridgeMutableAttr::contains(const Token &tok) const {
 std::optional<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return ObjCBridgeMutableAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kObjCBridgeMutableAttrDerivedKinds[] = {
     ObjCBridgeMutableAttr::static_kind(),
 };
 
-std::optional<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case ObjCBridgeMutableAttr::static_kind():
       return reinterpret_cast<const ObjCBridgeMutableAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::in(const Index &ind
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kObjCBridgeMutableAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<ObjCBridgeMutableAttr> e = ObjCBridgeMutableAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<ObjCBridgeMutableAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::in(const Fragment &
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kObjCBridgeMutableAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<ObjCBridgeMutableAttr> e = ObjCBridgeMutableAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<ObjCBridgeMutableAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::in(const File &file
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kObjCBridgeMutableAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<ObjCBridgeMutableAttr> e = ObjCBridgeMutableAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<ObjCBridgeMutableAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::from(const Reference
   return ObjCBridgeMutableAttr::from(r.as_attribute());
 }
 
+std::optional<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::from(const TokenContext &t) {
-  return ObjCBridgeMutableAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

@@ -55,17 +55,13 @@ class MaterializeTemporaryExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<MaterializeTemporaryExpr> from(const Stmt &parent);
-
-  inline static std::optional<MaterializeTemporaryExpr> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return MaterializeTemporaryExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MaterializeTemporaryExpr> from_base(const Stmt &parent);
+  inline static std::optional<MaterializeTemporaryExpr> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MaterializeTemporaryExpr> from(const std::optional<Stmt> &parent);
   static std::optional<MaterializeTemporaryExpr> from(const Reference &r);
+  static std::optional<MaterializeTemporaryExpr> from(const VariantEntity &e);
   static std::optional<MaterializeTemporaryExpr> from(const TokenContext &t);
 
   std::optional<ValueDecl> extending_declaration(void) const;

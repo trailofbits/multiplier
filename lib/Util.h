@@ -11,6 +11,8 @@
 
 namespace mx {
 
+enum class StmtKind : unsigned char;
+
 template <typename ForwardIterator, typename T>
 ForwardIterator LowerBound(ForwardIterator first, ForwardIterator last,
                            const T &val) {
@@ -42,5 +44,10 @@ ForwardIterator UpperBound(ForwardIterator first, ForwardIterator last,
   }
   return first;
 }
+
+// Returns `true` if it seems like we've hit something that can't possibly
+// return a value. This is usually a good stopping point to say "this thing
+// isn't a line of code".
+bool IsNonValueStatement(StmtKind kind);
 
 }  // namespace mx

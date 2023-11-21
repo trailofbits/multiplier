@@ -41,17 +41,13 @@ class MSVtorDispAttr : public InheritableAttr {
     return AttrKind::MS_VTOR_DISP;
   }
 
-  static std::optional<MSVtorDispAttr> from(const Attr &parent);
-
-  inline static std::optional<MSVtorDispAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MSVtorDispAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MSVtorDispAttr> from_base(const Attr &parent);
+  inline static std::optional<MSVtorDispAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MSVtorDispAttr> from(const std::optional<Attr> &parent);
   static std::optional<MSVtorDispAttr> from(const Reference &r);
+  static std::optional<MSVtorDispAttr> from(const VariantEntity &e);
   static std::optional<MSVtorDispAttr> from(const TokenContext &t);
 
   MSVtorDispMode vtor_disp_mode(void) const;

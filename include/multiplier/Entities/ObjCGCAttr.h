@@ -40,17 +40,13 @@ class ObjCGCAttr : public TypeAttr {
     return AttrKind::OBJ_CGC;
   }
 
-  static std::optional<ObjCGCAttr> from(const Attr &parent);
-
-  inline static std::optional<ObjCGCAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return ObjCGCAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCGCAttr> from_base(const Attr &parent);
+  inline static std::optional<ObjCGCAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCGCAttr> from(const std::optional<Attr> &parent);
   static std::optional<ObjCGCAttr> from(const Reference &r);
+  static std::optional<ObjCGCAttr> from(const VariantEntity &e);
   static std::optional<ObjCGCAttr> from(const TokenContext &t);
 
 };

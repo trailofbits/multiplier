@@ -54,17 +54,13 @@ class OMPMasterTaskLoopDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<OMPMasterTaskLoopDirective> from(const Stmt &parent);
-
-  inline static std::optional<OMPMasterTaskLoopDirective> from(const std::optional<Stmt> &parent) {
-    if (parent) {
-      return OMPMasterTaskLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPMasterTaskLoopDirective> from_base(const Stmt &parent);
+  inline static std::optional<OMPMasterTaskLoopDirective> from(const Stmt &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPMasterTaskLoopDirective> from(const std::optional<Stmt> &parent);
   static std::optional<OMPMasterTaskLoopDirective> from(const Reference &r);
+  static std::optional<OMPMasterTaskLoopDirective> from(const VariantEntity &e);
   static std::optional<OMPMasterTaskLoopDirective> from(const TokenContext &t);
 
   bool has_cancel(void) const;

@@ -90,18 +90,30 @@ bool MemberExpr::contains(const Stmt &stmt) {
 std::optional<MemberExpr> MemberExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return MemberExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<MemberExpr> MemberExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kMemberExprDerivedKinds[] = {
     MemberExpr::static_kind(),
 };
 
-std::optional<MemberExpr> MemberExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<MemberExpr> MemberExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case MemberExpr::static_kind():
       return reinterpret_cast<const MemberExpr &>(parent);
@@ -114,7 +126,7 @@ gap::generator<MemberExpr> MemberExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kMemberExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<MemberExpr> e = MemberExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<MemberExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<MemberExpr> MemberExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kMemberExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<MemberExpr> e = MemberExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<MemberExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<MemberExpr> MemberExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kMemberExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<MemberExpr> e = MemberExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<MemberExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,13 +163,23 @@ std::optional<MemberExpr> MemberExpr::from(const Reference &r) {
   return MemberExpr::from(r.as_statement());
 }
 
+std::optional<MemberExpr> MemberExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<MemberExpr> MemberExpr::from(const TokenContext &t) {
-  return MemberExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr MemberExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token MemberExpr::l_angle_token(void) const {
@@ -166,7 +188,7 @@ Token MemberExpr::l_angle_token(void) const {
 
 ValueDecl MemberExpr::member_declaration(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ValueDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token MemberExpr::member_token(void) const {

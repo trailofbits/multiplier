@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    for (mx::Reference ref : def.references()) {
+    for (mx::Reference ref : mx::Reference::to(def)) {
       auto m = ref.as_macro();
       if (!m) {
         continue;

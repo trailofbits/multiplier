@@ -89,18 +89,30 @@ bool ImaginaryLiteral::contains(const Stmt &stmt) {
 std::optional<ImaginaryLiteral> ImaginaryLiteral::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return ImaginaryLiteral::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kImaginaryLiteralDerivedKinds[] = {
     ImaginaryLiteral::static_kind(),
 };
 
-std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<ImaginaryLiteral> ImaginaryLiteral::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ImaginaryLiteral::static_kind():
       return reinterpret_cast<const ImaginaryLiteral &>(parent);
@@ -113,7 +125,7 @@ gap::generator<ImaginaryLiteral> ImaginaryLiteral::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kImaginaryLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ImaginaryLiteral> e = ImaginaryLiteral::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ImaginaryLiteral> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -125,7 +137,7 @@ gap::generator<ImaginaryLiteral> ImaginaryLiteral::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kImaginaryLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ImaginaryLiteral> e = ImaginaryLiteral::from(Stmt(std::move(eptr)))) {
+      if (std::optional<ImaginaryLiteral> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -138,7 +150,7 @@ gap::generator<ImaginaryLiteral> ImaginaryLiteral::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kImaginaryLiteralDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ImaginaryLiteral> e = ImaginaryLiteral::from(Stmt(std::move(eptr)))) {
+        if (std::optional<ImaginaryLiteral> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -150,13 +162,23 @@ std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const Reference &r) {
   return ImaginaryLiteral::from(r.as_statement());
 }
 
+std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const TokenContext &t) {
-  return ImaginaryLiteral::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Expr ImaginaryLiteral::sub_expression(void) const {
   RawEntityId eid = impl->reader.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

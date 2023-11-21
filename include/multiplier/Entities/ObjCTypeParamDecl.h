@@ -58,17 +58,13 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
   ObjCTypeParamDecl canonical_declaration(void) const;
   std::optional<ObjCTypeParamDecl> definition(void) const;
   gap::generator<ObjCTypeParamDecl> redeclarations(void) const &;
-  static std::optional<ObjCTypeParamDecl> from(const Decl &parent);
-
-  inline static std::optional<ObjCTypeParamDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ObjCTypeParamDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ObjCTypeParamDecl> from_base(const Decl &parent);
+  inline static std::optional<ObjCTypeParamDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ObjCTypeParamDecl> from(const std::optional<Decl> &parent);
   static std::optional<ObjCTypeParamDecl> from(const Reference &r);
+  static std::optional<ObjCTypeParamDecl> from(const VariantEntity &e);
   static std::optional<ObjCTypeParamDecl> from(const TokenContext &t);
 
   Token colon_token(void) const;

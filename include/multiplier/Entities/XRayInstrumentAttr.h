@@ -41,17 +41,13 @@ class XRayInstrumentAttr : public InheritableAttr {
     return AttrKind::X_RAY_INSTRUMENT;
   }
 
-  static std::optional<XRayInstrumentAttr> from(const Attr &parent);
-
-  inline static std::optional<XRayInstrumentAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return XRayInstrumentAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<XRayInstrumentAttr> from_base(const Attr &parent);
+  inline static std::optional<XRayInstrumentAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<XRayInstrumentAttr> from(const std::optional<Attr> &parent);
   static std::optional<XRayInstrumentAttr> from(const Reference &r);
+  static std::optional<XRayInstrumentAttr> from(const VariantEntity &e);
   static std::optional<XRayInstrumentAttr> from(const TokenContext &t);
 
   bool always_x_ray_instrument(void) const;

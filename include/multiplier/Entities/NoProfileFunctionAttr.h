@@ -40,17 +40,13 @@ class NoProfileFunctionAttr : public InheritableAttr {
     return AttrKind::NO_PROFILE_FUNCTION;
   }
 
-  static std::optional<NoProfileFunctionAttr> from(const Attr &parent);
-
-  inline static std::optional<NoProfileFunctionAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoProfileFunctionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoProfileFunctionAttr> from_base(const Attr &parent);
+  inline static std::optional<NoProfileFunctionAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoProfileFunctionAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoProfileFunctionAttr> from(const Reference &r);
+  static std::optional<NoProfileFunctionAttr> from(const VariantEntity &e);
   static std::optional<NoProfileFunctionAttr> from(const TokenContext &t);
 
 };

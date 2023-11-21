@@ -101,13 +101,23 @@ bool CastExpr::contains(const Stmt &stmt) {
 std::optional<CastExpr> CastExpr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CastExpr::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CastExpr> CastExpr::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCastExprDerivedKinds[] = {
     ImplicitCastExpr::static_kind(),
     ObjCBridgedCastExpr::static_kind(),
@@ -121,7 +131,9 @@ static const StmtKind kCastExprDerivedKinds[] = {
     CXXDynamicCastExpr::static_kind(),
 };
 
-std::optional<CastExpr> CastExpr::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CastExpr> CastExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case ImplicitCastExpr::static_kind():
     case ObjCBridgedCastExpr::static_kind():
@@ -143,7 +155,7 @@ gap::generator<CastExpr> CastExpr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCastExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CastExpr> e = CastExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CastExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -155,7 +167,7 @@ gap::generator<CastExpr> CastExpr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCastExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CastExpr> e = CastExpr::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CastExpr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -168,7 +180,7 @@ gap::generator<CastExpr> CastExpr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCastExprDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CastExpr> e = CastExpr::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CastExpr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -180,8 +192,18 @@ std::optional<CastExpr> CastExpr::from(const Reference &r) {
   return CastExpr::from(r.as_statement());
 }
 
+std::optional<CastExpr> CastExpr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CastExpr> CastExpr::from(const TokenContext &t) {
-  return CastExpr::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 CastKind CastExpr::cast_kind(void) const {
@@ -200,7 +222,7 @@ std::optional<NamedDecl> CastExpr::conversion_function(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return NamedDecl::from(Decl(std::move(eptr)));
+      return NamedDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -208,12 +230,12 @@ std::optional<NamedDecl> CastExpr::conversion_function(void) const {
 
 Expr CastExpr::sub_expression(void) const {
   RawEntityId eid = impl->reader.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr CastExpr::sub_expression_as_written(void) const {
   RawEntityId eid = impl->reader.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 std::optional<FieldDecl> CastExpr::target_union_field(void) const {
@@ -223,7 +245,7 @@ std::optional<FieldDecl> CastExpr::target_union_field(void) const {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FieldDecl::from(Decl(std::move(eptr)));
+      return FieldDecl::from_base(std::move(eptr));
     }
   }
   return std::nullopt;

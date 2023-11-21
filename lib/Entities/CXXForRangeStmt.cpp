@@ -90,18 +90,30 @@ bool CXXForRangeStmt::contains(const Stmt &stmt) {
 std::optional<CXXForRangeStmt> CXXForRangeStmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return CXXForRangeStmt::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kCXXForRangeStmtDerivedKinds[] = {
     CXXForRangeStmt::static_kind(),
 };
 
-std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<CXXForRangeStmt> CXXForRangeStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case CXXForRangeStmt::static_kind():
       return reinterpret_cast<const CXXForRangeStmt &>(parent);
@@ -114,7 +126,7 @@ gap::generator<CXXForRangeStmt> CXXForRangeStmt::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXForRangeStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXForRangeStmt> e = CXXForRangeStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXForRangeStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -126,7 +138,7 @@ gap::generator<CXXForRangeStmt> CXXForRangeStmt::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXForRangeStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXForRangeStmt> e = CXXForRangeStmt::from(Stmt(std::move(eptr)))) {
+      if (std::optional<CXXForRangeStmt> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -139,7 +151,7 @@ gap::generator<CXXForRangeStmt> CXXForRangeStmt::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXForRangeStmtDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXForRangeStmt> e = CXXForRangeStmt::from(Stmt(std::move(eptr)))) {
+        if (std::optional<CXXForRangeStmt> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -151,13 +163,23 @@ std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const Reference &r) {
   return CXXForRangeStmt::from(r.as_statement());
 }
 
+std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const TokenContext &t) {
-  return CXXForRangeStmt::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 DeclStmt CXXForRangeStmt::begin_statement(void) const {
   RawEntityId eid = impl->reader.getVal9();
-  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return DeclStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Stmt CXXForRangeStmt::body(void) const {
@@ -175,12 +197,12 @@ Token CXXForRangeStmt::colon_token(void) const {
 
 Expr CXXForRangeStmt::condition(void) const {
   RawEntityId eid = impl->reader.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 DeclStmt CXXForRangeStmt::end_statement(void) const {
   RawEntityId eid = impl->reader.getVal17();
-  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return DeclStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token CXXForRangeStmt::for_token(void) const {
@@ -189,7 +211,7 @@ Token CXXForRangeStmt::for_token(void) const {
 
 Expr CXXForRangeStmt::increment(void) const {
   RawEntityId eid = impl->reader.getVal19();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 std::optional<Stmt> CXXForRangeStmt::initializer(void) const {
@@ -207,12 +229,12 @@ std::optional<Stmt> CXXForRangeStmt::initializer(void) const {
 
 DeclStmt CXXForRangeStmt::loop_variable_statement(void) const {
   RawEntityId eid = impl->reader.getVal21();
-  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return DeclStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 VarDecl CXXForRangeStmt::loop_variable(void) const {
   RawEntityId eid = impl->reader.getVal22();
-  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return VarDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token CXXForRangeStmt::r_paren_token(void) const {
@@ -221,12 +243,12 @@ Token CXXForRangeStmt::r_paren_token(void) const {
 
 Expr CXXForRangeStmt::range_initializer(void) const {
   RawEntityId eid = impl->reader.getVal31();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 DeclStmt CXXForRangeStmt::range_statement(void) const {
   RawEntityId eid = impl->reader.getVal32();
-  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return DeclStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

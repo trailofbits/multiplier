@@ -40,18 +40,30 @@ bool ObjCInterfaceType::contains(const Token &tok) const {
 std::optional<ObjCInterfaceType> ObjCInterfaceType::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    return ObjCInterfaceType::from(index.type(eid.Pack()));
+    if (auto base = index.type(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const std::optional<Type> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const TypeKind kObjCInterfaceTypeDerivedKinds[] = {
     ObjCInterfaceType::static_kind(),
 };
 
-std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const Type &parent) {
+}  // namespace
+
+std::optional<ObjCInterfaceType> ObjCInterfaceType::from_base(const Type &parent) {
   switch (parent.kind()) {
     case ObjCInterfaceType::static_kind():
       return reinterpret_cast<const ObjCInterfaceType &>(parent);
@@ -64,7 +76,7 @@ gap::generator<ObjCInterfaceType> ObjCInterfaceType::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kObjCInterfaceTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<ObjCInterfaceType> e = ObjCInterfaceType::from(Type(std::move(eptr)))) {
+      if (std::optional<ObjCInterfaceType> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,13 +87,23 @@ std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const Reference &r) {
   return ObjCInterfaceType::from(r.as_type());
 }
 
+std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Type>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Type>(e));
+}
+
 std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const TokenContext &t) {
-  return ObjCInterfaceType::from(t.as_type());
+  if (auto base = t.as_type()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 ObjCInterfaceDecl ObjCInterfaceType::declaration(void) const {
   RawEntityId eid = impl->reader.getVal60();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+  return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

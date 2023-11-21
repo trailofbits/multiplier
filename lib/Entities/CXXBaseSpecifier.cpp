@@ -50,6 +50,13 @@ std::optional<CXXBaseSpecifier> CXXBaseSpecifier::from(const Reference &r) {
   return r.as_cxx_base_specifier();
 }
 
+std::optional<CXXBaseSpecifier> CXXBaseSpecifier::from(const VariantEntity &e) {
+  if (!std::holds_alternative<CXXBaseSpecifier>(e)) {
+    return std::nullopt;
+  }
+  return std::get<CXXBaseSpecifier>(e);
+}
+
 std::optional<CXXBaseSpecifier> CXXBaseSpecifier::from(const TokenContext &t) {
   return t.as_cxx_base_specifier();
 }

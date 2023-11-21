@@ -56,17 +56,13 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
   ConstructorUsingShadowDecl canonical_declaration(void) const;
   std::optional<ConstructorUsingShadowDecl> definition(void) const;
   gap::generator<ConstructorUsingShadowDecl> redeclarations(void) const &;
-  static std::optional<ConstructorUsingShadowDecl> from(const Decl &parent);
-
-  inline static std::optional<ConstructorUsingShadowDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return ConstructorUsingShadowDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<ConstructorUsingShadowDecl> from_base(const Decl &parent);
+  inline static std::optional<ConstructorUsingShadowDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<ConstructorUsingShadowDecl> from(const std::optional<Decl> &parent);
   static std::optional<ConstructorUsingShadowDecl> from(const Reference &r);
+  static std::optional<ConstructorUsingShadowDecl> from(const VariantEntity &e);
   static std::optional<ConstructorUsingShadowDecl> from(const TokenContext &t);
 
   bool constructs_virtual_base(void) const;

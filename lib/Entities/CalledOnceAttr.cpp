@@ -38,18 +38,30 @@ bool CalledOnceAttr::contains(const Token &tok) const {
 std::optional<CalledOnceAttr> CalledOnceAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return CalledOnceAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<CalledOnceAttr> CalledOnceAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kCalledOnceAttrDerivedKinds[] = {
     CalledOnceAttr::static_kind(),
 };
 
-std::optional<CalledOnceAttr> CalledOnceAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<CalledOnceAttr> CalledOnceAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case CalledOnceAttr::static_kind():
       return reinterpret_cast<const CalledOnceAttr &>(parent);
@@ -62,7 +74,7 @@ gap::generator<CalledOnceAttr> CalledOnceAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kCalledOnceAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<CalledOnceAttr> e = CalledOnceAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<CalledOnceAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -74,7 +86,7 @@ gap::generator<CalledOnceAttr> CalledOnceAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kCalledOnceAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<CalledOnceAttr> e = CalledOnceAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<CalledOnceAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -87,7 +99,7 @@ gap::generator<CalledOnceAttr> CalledOnceAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kCalledOnceAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<CalledOnceAttr> e = CalledOnceAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<CalledOnceAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -99,8 +111,18 @@ std::optional<CalledOnceAttr> CalledOnceAttr::from(const Reference &r) {
   return CalledOnceAttr::from(r.as_attribute());
 }
 
+std::optional<CalledOnceAttr> CalledOnceAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<CalledOnceAttr> CalledOnceAttr::from(const TokenContext &t) {
-  return CalledOnceAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

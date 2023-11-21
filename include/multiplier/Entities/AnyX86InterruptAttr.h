@@ -40,17 +40,13 @@ class AnyX86InterruptAttr : public InheritableAttr {
     return AttrKind::ANY_X86_INTERRUPT;
   }
 
-  static std::optional<AnyX86InterruptAttr> from(const Attr &parent);
-
-  inline static std::optional<AnyX86InterruptAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return AnyX86InterruptAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<AnyX86InterruptAttr> from_base(const Attr &parent);
+  inline static std::optional<AnyX86InterruptAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<AnyX86InterruptAttr> from(const std::optional<Attr> &parent);
   static std::optional<AnyX86InterruptAttr> from(const Reference &r);
+  static std::optional<AnyX86InterruptAttr> from(const VariantEntity &e);
   static std::optional<AnyX86InterruptAttr> from(const TokenContext &t);
 
 };

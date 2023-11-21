@@ -39,18 +39,30 @@ bool RegCallAttr::contains(const Token &tok) const {
 std::optional<RegCallAttr> RegCallAttr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    return RegCallAttr::from(index.attribute(eid.Pack()));
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<RegCallAttr> RegCallAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const AttrKind kRegCallAttrDerivedKinds[] = {
     RegCallAttr::static_kind(),
 };
 
-std::optional<RegCallAttr> RegCallAttr::from(const Attr &parent) {
+}  // namespace
+
+std::optional<RegCallAttr> RegCallAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case RegCallAttr::static_kind():
       return reinterpret_cast<const RegCallAttr &>(parent);
@@ -63,7 +75,7 @@ gap::generator<RegCallAttr> RegCallAttr::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kRegCallAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<RegCallAttr> e = RegCallAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<RegCallAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -75,7 +87,7 @@ gap::generator<RegCallAttr> RegCallAttr::in(const Fragment &frag) {
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kRegCallAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<RegCallAttr> e = RegCallAttr::from(Attr(std::move(eptr)))) {
+      if (std::optional<RegCallAttr> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -88,7 +100,7 @@ gap::generator<RegCallAttr> RegCallAttr::in(const File &file) {
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kRegCallAttrDerivedKinds) {
       for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<RegCallAttr> e = RegCallAttr::from(Attr(std::move(eptr)))) {
+        if (std::optional<RegCallAttr> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -100,8 +112,18 @@ std::optional<RegCallAttr> RegCallAttr::from(const Reference &r) {
   return RegCallAttr::from(r.as_attribute());
 }
 
+std::optional<RegCallAttr> RegCallAttr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Attr>(e));
+}
+
 std::optional<RegCallAttr> RegCallAttr::from(const TokenContext &t) {
-  return RegCallAttr::from(t.as_attribute());
+  if (auto base = t.as_attribute()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

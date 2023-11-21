@@ -54,17 +54,13 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
   OMPThreadPrivateDecl canonical_declaration(void) const;
   std::optional<OMPThreadPrivateDecl> definition(void) const;
   gap::generator<OMPThreadPrivateDecl> redeclarations(void) const &;
-  static std::optional<OMPThreadPrivateDecl> from(const Decl &parent);
-
-  inline static std::optional<OMPThreadPrivateDecl> from(const std::optional<Decl> &parent) {
-    if (parent) {
-      return OMPThreadPrivateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<OMPThreadPrivateDecl> from_base(const Decl &parent);
+  inline static std::optional<OMPThreadPrivateDecl> from(const Decl &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<OMPThreadPrivateDecl> from(const std::optional<Decl> &parent);
   static std::optional<OMPThreadPrivateDecl> from(const Reference &r);
+  static std::optional<OMPThreadPrivateDecl> from(const VariantEntity &e);
   static std::optional<OMPThreadPrivateDecl> from(const TokenContext &t);
 
   std::optional<Expr> nth_varlist(unsigned n) const;

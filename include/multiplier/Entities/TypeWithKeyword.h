@@ -36,17 +36,13 @@ class TypeWithKeyword : public Type {
   bool contains(const Token &tok) const;
   static std::optional<TypeWithKeyword> by_id(const Index &, EntityId);
 
-  static std::optional<TypeWithKeyword> from(const Type &parent);
-
-  inline static std::optional<TypeWithKeyword> from(const std::optional<Type> &parent) {
-    if (parent) {
-      return TypeWithKeyword::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<TypeWithKeyword> from_base(const Type &parent);
+  inline static std::optional<TypeWithKeyword> from(const Type &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<TypeWithKeyword> from(const std::optional<Type> &parent);
   static std::optional<TypeWithKeyword> from(const Reference &r);
+  static std::optional<TypeWithKeyword> from(const VariantEntity &e);
   static std::optional<TypeWithKeyword> from(const TokenContext &t);
 
   ElaboratedTypeKeyword keyword(void) const;

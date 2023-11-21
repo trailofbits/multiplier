@@ -41,17 +41,13 @@ class PreferredNameAttr : public InheritableAttr {
     return AttrKind::PREFERRED_NAME;
   }
 
-  static std::optional<PreferredNameAttr> from(const Attr &parent);
-
-  inline static std::optional<PreferredNameAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return PreferredNameAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<PreferredNameAttr> from_base(const Attr &parent);
+  inline static std::optional<PreferredNameAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<PreferredNameAttr> from(const std::optional<Attr> &parent);
   static std::optional<PreferredNameAttr> from(const Reference &r);
+  static std::optional<PreferredNameAttr> from(const VariantEntity &e);
   static std::optional<PreferredNameAttr> from(const TokenContext &t);
 
   Type typedef_type(void) const;

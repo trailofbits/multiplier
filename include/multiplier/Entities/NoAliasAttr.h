@@ -40,17 +40,13 @@ class NoAliasAttr : public InheritableAttr {
     return AttrKind::NO_ALIAS;
   }
 
-  static std::optional<NoAliasAttr> from(const Attr &parent);
-
-  inline static std::optional<NoAliasAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return NoAliasAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<NoAliasAttr> from_base(const Attr &parent);
+  inline static std::optional<NoAliasAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<NoAliasAttr> from(const std::optional<Attr> &parent);
   static std::optional<NoAliasAttr> from(const Reference &r);
+  static std::optional<NoAliasAttr> from(const VariantEntity &e);
   static std::optional<NoAliasAttr> from(const TokenContext &t);
 
 };

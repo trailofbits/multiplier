@@ -40,17 +40,13 @@ class MaybeUndefAttr : public InheritableAttr {
     return AttrKind::MAYBE_UNDEF;
   }
 
-  static std::optional<MaybeUndefAttr> from(const Attr &parent);
-
-  inline static std::optional<MaybeUndefAttr> from(const std::optional<Attr> &parent) {
-    if (parent) {
-      return MaybeUndefAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
+  static std::optional<MaybeUndefAttr> from_base(const Attr &parent);
+  inline static std::optional<MaybeUndefAttr> from(const Attr &parent) {
+    return from_base(parent);
   }
-
+  static std::optional<MaybeUndefAttr> from(const std::optional<Attr> &parent);
   static std::optional<MaybeUndefAttr> from(const Reference &r);
+  static std::optional<MaybeUndefAttr> from(const VariantEntity &e);
   static std::optional<MaybeUndefAttr> from(const TokenContext &t);
 
 };

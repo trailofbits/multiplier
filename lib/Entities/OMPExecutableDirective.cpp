@@ -159,13 +159,23 @@ bool OMPExecutableDirective::contains(const Stmt &stmt) {
 std::optional<OMPExecutableDirective> OMPExecutableDirective::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    return OMPExecutableDirective::from(index.statement(eid.Pack()));
+    if (auto base = index.statement(eid.Pack())) {
+      return from_base(base.value());
+    }
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
 }
 
+std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const std::optional<Stmt> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
 static const StmtKind kOMPExecutableDirectiveDerivedKinds[] = {
     OMPFlushDirective::static_kind(),
     OMPInteropDirective::static_kind(),
@@ -240,7 +250,9 @@ static const StmtKind kOMPExecutableDirectiveDerivedKinds[] = {
     OMPUnrollDirective::static_kind(),
 };
 
-std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const Stmt &parent) {
+}  // namespace
+
+std::optional<OMPExecutableDirective> OMPExecutableDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {
     case OMPFlushDirective::static_kind():
     case OMPInteropDirective::static_kind():
@@ -323,7 +335,7 @@ gap::generator<OMPExecutableDirective> OMPExecutableDirective::in(const Index &i
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPExecutableDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPExecutableDirective> e = OMPExecutableDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPExecutableDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -335,7 +347,7 @@ gap::generator<OMPExecutableDirective> OMPExecutableDirective::in(const Fragment
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPExecutableDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPExecutableDirective> e = OMPExecutableDirective::from(Stmt(std::move(eptr)))) {
+      if (std::optional<OMPExecutableDirective> e = from_base(std::move(eptr))) {
         co_yield std::move(e.value());
       }
     }
@@ -348,7 +360,7 @@ gap::generator<OMPExecutableDirective> OMPExecutableDirective::in(const File &fi
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPExecutableDirectiveDerivedKinds) {
       for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPExecutableDirective> e = OMPExecutableDirective::from(Stmt(std::move(eptr)))) {
+        if (std::optional<OMPExecutableDirective> e = from_base(std::move(eptr))) {
           co_yield std::move(e.value());
         }
       }
@@ -360,8 +372,18 @@ std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const Referen
   return OMPExecutableDirective::from(r.as_statement());
 }
 
+std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Stmt>(e));
+}
+
 std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const TokenContext &t) {
-  return OMPExecutableDirective::from(t.as_statement());
+  if (auto base = t.as_statement()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
 }
 
 Stmt OMPExecutableDirective::associated_statement(void) const {
@@ -371,7 +393,7 @@ Stmt OMPExecutableDirective::associated_statement(void) const {
 
 CapturedStmt OMPExecutableDirective::innermost_captured_statement(void) const {
   RawEntityId eid = impl->reader.getVal10();
-  return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+  return CapturedStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Stmt OMPExecutableDirective::raw_statement(void) const {
