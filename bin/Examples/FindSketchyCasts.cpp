@@ -12,6 +12,7 @@
 #include <multiplier/Analysis/TypecastAnalysis.h>
 
 #include "Index.h"
+#include "multiplier/Entities/CastExpr.h"
 #include "multiplier/Types.h"
 
 DEFINE_bool(show_implicit, false, "Show implicit casts?");
@@ -24,7 +25,8 @@ enum class CastBehavior {
   Sketchy,
   SignDowncast,
   SignChange,
-  SignChangingDowncast
+  SignChangingDowncast,
+  NoBehavior,
 };
 
 static const std::map<CastBehavior, std::string> kOuts {
@@ -84,7 +86,8 @@ static mx::Stmt FindLine(mx::Stmt prev_stmt) {
 // Output prettified results for the offending call. Tokens for the originating
 // expression should be generated separately in the appropriate heuristic.
 static void PrettifyCallResults(
-    const mx::CallExpr &call_expr, mx::CastState &state,
+    const mx::CallExpr &call_expr,
+    mx::CastExpr &cast_expr, mx::CastState &state,
     CastBehavior kind,
     std::optional<unsigned> arg_index=std::nullopt) {
 
@@ -108,7 +111,7 @@ static void PrettifyCallResults(
 
   std::cout
       << "Frag ID: " << fragment.id()
-      << "\nEntity ID: " << state.get_cast_expr().id()
+      << "\nEntity ID: " << cast_expr.id()
       << "\nKind: " << kOuts.at(kind) << " ("
       << mx::EnumeratorName(state.type_before_conversion().kind())
       << " to "
@@ -154,8 +157,8 @@ static void PrettifyCallResults(
   // Try to highlight all tokens but the use.
   auto line_stmt = FindLine(call_expr);
   auto highlight_toks = FileTokenIdsFor(line_stmt.tokens());
-  if (line_stmt.id() != state.get_cast_expr().id()) {
-    auto unhighlight_toks = FileTokenIdsFor(state.get_cast_expr().tokens());
+  if (line_stmt.id() != cast_expr.id()) {
+    auto unhighlight_toks = FileTokenIdsFor(cast_expr.tokens());
     std::erase_if(highlight_toks, [&unhighlight_toks] (mx::RawEntityId id) {
       return unhighlight_toks.count(id);
     });
@@ -220,6 +223,7 @@ int main(int argc, char *argv[]) {
     }
     seen.insert(call.id());
 
+    // for each CallExpr reference point, traverse its tree for any casting behavior
     mx::CastStateMap instances = analyzer.cast_instances(call);
     if (instances.empty()) {
       continue;
@@ -227,9 +231,16 @@ int main(int argc, char *argv[]) {
 
     // Check arguments for any casting before the call
     for (auto iter : instances) {
-      CastBehavior behavior;
       mx::CastSignChange cast_sign_change;
+      mx::PackedStmtId cast_id = iter.first;
       mx::CastState cast_state = iter.second;
+      CastBehavior behavior = CastBehavior::NoBehavior;
+
+      // sanity-check to make sure we're doing casts in calls
+      auto is_in_call = cast_state.is_part_of_call_arg();
+      if (!is_in_call) {
+        continue;
+      }
 
       // might have some other casting semantic we don't care about
       auto is_implicit = cast_state.is_implicit_cast();
@@ -237,7 +248,6 @@ int main(int argc, char *argv[]) {
         continue;
       }
 
-      // TODO: is_part_of_explicit_cast
       // Filter by implicit/explicit, and only give us back integral casts.
       if (!FLAGS_show_implicit && *is_implicit) {
         continue;
@@ -280,10 +290,14 @@ int main(int argc, char *argv[]) {
         }
       }
 
-      // check if return expression
-      // TODO is_part_of_call_arg
-      PrettifyCallResults(call, cast_state, behavior);
+      if (behavior != CastBehavior::NoBehavior) {
+        if (auto cast_expr = mx::CastExpr::by_id(index, cast_id)) {
+          PrettifyCallResults(call, *cast_expr, cast_state, behavior);
+        }
+      }
     }
+
+    // TODO: check if return also has a sketchy downcast
   }
 
   return EXIT_SUCCESS;

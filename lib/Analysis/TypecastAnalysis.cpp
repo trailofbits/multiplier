@@ -4,8 +4,10 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 #include "multiplier/Entities/BinaryOperator.h"
+#include "multiplier/Entities/CXXReinterpretCastExpr.h"
 #include "multiplier/Entities/CastExpr.h"
 #include "multiplier/Entities/CastKind.h"
+#include "multiplier/Entities/CallExpr.h"
 #include "multiplier/Entities/ExplicitCastExpr.h"
 #include "multiplier/Entities/Stmt.h"
 #include "multiplier/Entities/StmtKind.h"
@@ -39,7 +41,7 @@ EntityId CastState::source_entity() {
 }
 
 // Attempts to recover a destination entity where the casted value is written to.
-// Certain casting behaviors may not result in a destination
+// Certain casting behaviors may not result in a destination.
 std::optional<EntityId> CastState::destination_entity() {
     if (auto parent = cast_expr.parent_statement()) {
 
@@ -73,8 +75,21 @@ std::optional<EntityId> CastState::destination_entity() {
     return std::nullopt;
 }
 
-// If the casting is performed during a function call
+// If the casting is performed during a function call's argument conversion, recover the
+// originating CallExpr and the index of the argument where the casting is occuring.
 std::optional<std::pair<PackedStmtId, unsigned>> CastState::is_part_of_call_arg() {
+    if (auto parent = cast_expr.parent_statement()) {
+        if (auto call_expr = CallExpr::from(parent)) {
+
+            // need to figure out specific argument number, can't use `.contains()`
+            for (unsigned int iarg = 0; auto arg : call_expr->arguments()) {
+                if (arg.id() == cast_expr.id()) {
+                    return std::make_pair(call_expr->id(), iarg);
+                }
+                iarg++;
+            }
+        }
+    }
     return std::nullopt;
 }
 
@@ -90,7 +105,7 @@ Type CastState::type_after_conversion() {
 
     std::optional<mx::Type> maybe_type_after = cast_expr.type();
     if (!maybe_type_after) {
-        throw std::runtime_error("no destination type for CastExpr");
+        throw std::runtime_error("no destination type for CastExpr, this should be unreachable");
     }
     return maybe_type_after->canonical_type();
 }
@@ -122,20 +137,19 @@ CastTypeWidth CastState::width_cast() {
 CastCXXObjKind CastState::cxx_obj_cast() {
     if (auto cxx_cast_kind = cxx_object_cast_kind()) {
         switch (*cxx_cast_kind) {
+
+        // these CastKinds give us up/downcast behavior for free
         case CastKind::BASE_TO_DERIVED:
         case CastKind::BASE_TO_DERIVED_MEMBER_POINTER:
             return CastCXXObjKind::BASE_TO_DERIVED_DOWNCAST;
-
         case CastKind::DERIVED_TO_BASE:
         case CastKind::UNCHECKED_DERIVED_TO_BASE:
         case CastKind::DERIVED_TO_BASE_MEMBER_POINTER:
             return CastCXXObjKind::BASE_TO_DERIVED_DOWNCAST;
 
-        // reinterpret_cast needs special handling
+        // reinterpret_cast and dynamic needs special handling
+        // TODO: we need to enrich Type some more
         case CastKind::REINTERPRET_MEMBER_POINTER:
-            return CastCXXObjKind::NO_CXX_OBJ_CAST;
-
-        // dynamic_cast needs special handling
         case CastKind::DYNAMIC:
             return CastCXXObjKind::NO_CXX_OBJ_CAST;
 
@@ -177,14 +191,16 @@ std::optional<CastKind> CastState::cxx_object_cast_kind() {
     return std::nullopt;
 }
 
-// Checking for a base CastExpr works for CXX-style casts too
 std::optional<bool> CastState::is_implicit_cast() {
     if (auto implicit = ImplicitCastExpr::from(cast_expr)) {
+        if (implicit->is_part_of_explicit_cast()) {
+            return false;
+        }
         return true;
     } else if (auto explicit_cast = ExplicitCastExpr::from(cast_expr)) {
         return false;
     } else {
-        return std::nullopt;
+        return false;
     }
 }
 
@@ -262,7 +278,9 @@ CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
             }
             if (skip_this_cast)
                 continue;
-            cast_state_map.insert(std::make_pair(cast_expr->id(), CastState(*cast_expr)));
+
+            CastState state(*cast_expr);
+            cast_state_map.insert(std::make_pair(cast_expr->id(), state));
         }
 
         for (Stmt child : curr_stmt.children()) {
@@ -283,7 +301,7 @@ TypecastChain TypecastAnalysis::forward_cast_chain(const VariantEntity &id) {
                 // TODO: validate?
                 if (const auto stmt (std::get_if<Stmt>(&ref_entity)); stmt) {
                     if (auto cast_expr = CastExpr::from(*stmt)) {
-
+                        // TODO
                     }
                 }
             }

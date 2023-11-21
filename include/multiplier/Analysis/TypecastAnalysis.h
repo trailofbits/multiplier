@@ -43,6 +43,7 @@ static constexpr CastKind kNoneTypeCasts[] = {
   CastKind::FUNCTION_TO_POINTER_DECAY,
   CastKind::BUILTIN_FN_TO_FN_POINTER,
   CastKind::ARRAY_TO_POINTER_DECAY,
+  CastKind::VECTOR_SPLAT,
   CastKind::MATRIX_CAST,
 
   // objc casting
@@ -86,7 +87,7 @@ enum class CastCXXObjKind {
 // computed from the backing CastExpr.
 class CastState final {
 private:
-  const CastExpr &cast_expr;
+  CastExpr cast_expr;
 
   std::optional<CastKind> cxx_object_cast_kind();
   CastTypeWidth determine_width_cast(Type&, Type&);
@@ -94,28 +95,44 @@ private:
 public:
   CastState(const CastExpr &);
 
+  // Grab a reference to the underlying CastExpr
+  // TODO: delete?
   const CastExpr& get_cast_expr();
 
-  // where are we casting from/to?
+  // What is the data entity we're casting from?
   EntityId source_entity();
+
+  // What is the data entity we're casting to?
+  // Can return `std::nullopt` if the cast happens during a call or return.
   std::optional<EntityId> destination_entity();
 
-  // was this cast performed during a CallExpr?
+  // Is this cast performed as an argument in a CallExpr?
   std::optional<std::pair<PackedStmtId, unsigned>> is_part_of_call_arg();
 
-  // what is the type before/after conversion?
+  // What is the type before conversion?
   Type type_before_conversion();
+
+  // What is the type after conversion?
   Type type_after_conversion();
 
-  // was this an implicit cast?
+  // Is this an implicit cast?
   std::optional<bool> is_implicit_cast();
 
-  CastSignChange sign_change();
-  CastTypeWidth width_cast();
-  CastCXXObjKind cxx_obj_cast();
-
+  // Is the source and/or destination type a pointer?
   bool is_pointer_cast();
+
+  // Did the sign change? This applies only to built-in casts.
+  CastSignChange sign_change();
+
+  // Is there a down/upcast in the size of the type?
+  CastTypeWidth width_cast();
+
+  // Is there a down/upcast in the size of the type after dereferencing
+  // any pointers in the source and/or destination type?
   CastTypeWidth deferenced_width_cast();
+
+  // Is there a down/upcast in the C++ class type?
+  CastCXXObjKind cxx_obj_cast();
 };
 
 // TODO we should have a DAG instead so we're control-flow aware
