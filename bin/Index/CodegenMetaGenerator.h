@@ -64,6 +64,10 @@ class MetaGenerator final : public vast::cg::meta_generator {
     return {Location(type)};
   }
 
+  mlir::Location location(const clang::Attr *type) const {
+    return {Location(type)};
+  }
+
   mlir::Location location(const clang::QualType type) const {
     if (auto type_ptr = type.getTypePtrOrNull()) {
       return {Location(type_ptr)};
@@ -109,11 +113,31 @@ class MetaGenerator final : public vast::cg::meta_generator {
     return unknown_location;
   }
 
+  mlir::Location Location(const clang::Expr *expr) const {
+    if (auto raw_entity_id = em.EntityId(expr);
+        raw_entity_id != mx::kInvalidEntityId) {
+      auto attr = vast::meta::IdentifierAttr::get(mctx, raw_entity_id);
+      auto loc = expr->getExprLoc();
+      return mlir::FusedLoc::get({Location(loc)}, attr, mctx);
+    }
+    return unknown_location;
+  }
+
   mlir::Location Location(const clang::Stmt *stmt) const {
     if (auto raw_entity_id = em.EntityId(stmt);
         raw_entity_id != mx::kInvalidEntityId) {
       auto attr = vast::meta::IdentifierAttr::get(mctx, raw_entity_id);
       auto loc = stmt->getBeginLoc();
+      return mlir::FusedLoc::get({Location(loc)}, attr, mctx);
+    }
+    return unknown_location;
+  }
+
+  mlir::Location Location(const clang::Attr *attr_) const {
+    if (auto raw_entity_id = em.EntityId(attr_);
+        raw_entity_id != mx::kInvalidEntityId) {
+      auto attr = vast::meta::IdentifierAttr::get(mctx, raw_entity_id);
+      auto loc = attr_->getLocation();
       return mlir::FusedLoc::get({Location(loc)}, attr, mctx);
     }
     return unknown_location;

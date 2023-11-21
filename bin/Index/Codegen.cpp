@@ -97,13 +97,12 @@ struct MXDefaultCodeGenVisitor
 };
 
 template< typename Derived >
-using MXVisitorConfig = vast::cg::fallback_visitor< Derived,
+using MXVisitorConfig = vast::cg::fallback_visitor<
+    Derived,
     MXDefaultCodeGenVisitor,
     vast::cg::unsup_visitor,
     vast::cg::unreach_visitor
 >;
-
-using MXCodeGenerator = vast::cg::codegen_instance<MXVisitorConfig>;
 
 static vast::cg::source_language GetSourceLanguage(
     const vast::cc::language_options &opts) {
@@ -167,7 +166,7 @@ std::string CodeGenerator::GenerateSourceIR(
   vast::mcontext_t mctx(impl->registry);
   vast::cg::codegen_context cgctx(mctx, actx, GetSourceLanguage(opts));
   MetaGenerator meta(ast, mctx, em);
-  MXCodeGenerator codegen(cgctx, meta);
+  vast::cg::codegen_instance<MXVisitorConfig> codegen(cgctx, meta);
   llvm::raw_string_ostream os(ret);
 
   try {
