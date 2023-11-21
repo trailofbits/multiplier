@@ -15,6 +15,7 @@
 #include <mlir/Dialect/SCF/IR/SCF.h>
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <vast/Dialect/Dialects.hpp>
+#include <vast/Dialect/ABI/ABIOps.hpp>
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 
 namespace mx::ir::hl {

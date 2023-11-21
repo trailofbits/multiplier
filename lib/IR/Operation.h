@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define MX_IR_FOR_EACH_MLIR_OP(_builtin, _llvm, _scf, _memref, _ll, _hl, _core, _meta, _unsup) \
+#define MX_IR_FOR_EACH_MLIR_OP(_builtin, _llvm, _memref, _abi, _ll, _hl, _core, _meta, _unsup) \
    _builtin("builtin.module", OperationKind::BUILTIN_MODULE, mlir::ModuleOp) \
    _builtin("builtin.unrealized_conversion_cast", OperationKind::BUILTIN_UNREALIZED_CONVERSION_CAST, mlir::UnrealizedConversionCastOp) \
    _llvm("llvm.ashr", OperationKind::LLVM_ASHR, mlir::LLVM::AShrOp) \
@@ -255,18 +255,6 @@
    _llvm("llvm.intr.vector.reduce.umin", OperationKind::LLVM_INTR_VECTOR_REDUCE_UMIN, mlir::LLVM::vector_reduce_umin) \
    _llvm("llvm.intr.vector.reduce.xor", OperationKind::LLVM_INTR_VECTOR_REDUCE_XOR, mlir::LLVM::vector_reduce_xor) \
    _llvm("llvm.intr.vscale", OperationKind::LLVM_INTR_VSCALE, mlir::LLVM::vscale) \
-   _scf("scf.condition", OperationKind::SCF_CONDITION, mlir::scf::ConditionOp) \
-   _scf("scf.execute_region", OperationKind::SCF_EXECUTE_REGION, mlir::scf::ExecuteRegionOp) \
-   _scf("scf.for", OperationKind::SCF_FOR, mlir::scf::ForOp) \
-   _scf("scf.forall", OperationKind::SCF_FORALL, mlir::scf::ForallOp) \
-   _scf("scf.if", OperationKind::SCF_IF, mlir::scf::IfOp) \
-   _scf("scf.forall.in_parallel", OperationKind::SCF_FORALL_IN_PARALLEL, mlir::scf::InParallelOp) \
-   _scf("scf.index_switch", OperationKind::SCF_INDEX_SWITCH, mlir::scf::IndexSwitchOp) \
-   _scf("scf.parallel", OperationKind::SCF_PARALLEL, mlir::scf::ParallelOp) \
-   _scf("scf.reduce", OperationKind::SCF_REDUCE, mlir::scf::ReduceOp) \
-   _scf("scf.reduce.return", OperationKind::SCF_REDUCE_RETURN, mlir::scf::ReduceReturnOp) \
-   _scf("scf.while", OperationKind::SCF_WHILE, mlir::scf::WhileOp) \
-   _scf("scf.yield", OperationKind::SCF_YIELD, mlir::scf::YieldOp) \
    _memref("memref.assume_alignment", OperationKind::MEMREF_ASSUME_ALIGNMENT, mlir::memref::AssumeAlignmentOp) \
    _memref("memref.atomic_rmw", OperationKind::MEMREF_ATOMIC_RMW, mlir::memref::AtomicRMWOp) \
    _memref("memref.atomic_yield", OperationKind::MEMREF_ATOMIC_YIELD, mlir::memref::AtomicYieldOp) \
@@ -299,6 +287,18 @@
    _memref("memref.view", OperationKind::MEMREF_VIEW, mlir::memref::ViewOp) \
    _memref("memref.subview", OperationKind::MEMREF_SUBVIEW, mlir::memref::SubViewOp) \
    _memref("memref.tensor_store", OperationKind::MEMREF_TENSOR_STORE, mlir::memref::TensorStoreOp) \
+   _abi("abi.call_args", OperationKind::ABI_CALL_ARGS, vast::abi::CallArgsOp) \
+   _abi("abi.call_exec", OperationKind::ABI_CALL_EXEC, vast::abi::CallExecutionOp) \
+   _abi("abi.call", OperationKind::ABI_CALL, vast::abi::CallOp) \
+   _abi("abi.call_rets", OperationKind::ABI_CALL_RETS, vast::abi::CallRetsOp) \
+   _abi("abi.direct", OperationKind::ABI_DIRECT, vast::abi::DirectOp) \
+   _abi("abi.epilogue", OperationKind::ABI_EPILOGUE, vast::abi::EpilogueOp) \
+   _abi("abi.func", OperationKind::ABI_FUNC, vast::abi::FuncOp) \
+   _abi("abi.prologue", OperationKind::ABI_PROLOGUE, vast::abi::PrologueOp) \
+   _abi("abi.ret_direct", OperationKind::ABI_RET_DIRECT, vast::abi::RetDirectOp) \
+   _abi("abi.todo", OperationKind::ABI_TODO, vast::abi::TodoOp) \
+   _abi("abi.wrap_fn", OperationKind::ABI_WRAP_FN, vast::abi::WrapFuncOp) \
+   _abi("abi.yield", OperationKind::ABI_YIELD, vast::abi::YieldOp) \
    _ll("ll.br", OperationKind::LL_BR, vast::ll::Br) \
    _ll("ll.concat", OperationKind::LL_CONCAT, vast::ll::Concat) \
    _ll("ll.cond_br", OperationKind::LL_COND_BR, vast::ll::CondBr) \

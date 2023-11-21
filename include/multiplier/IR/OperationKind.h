@@ -13,429 +13,429 @@ namespace ir {
 
 enum class OperationKind : unsigned {
   UNKNOWN,
-  BUILTIN_MODULE,
-  BUILTIN_UNREALIZED_CONVERSION_CAST,
-  LLVM_ASHR,
-  LLVM_ADD,
-  LLVM_ADDRSPACECAST,
-  LLVM_MLIR_ADDRESSOF,
-  LLVM_ALLOCA,
-  LLVM_AND,
-  LLVM_CMPXCHG,
-  LLVM_ATOMICRMW,
-  LLVM_BITCAST,
-  LLVM_BR,
-  LLVM_CALL,
-  LLVM_COMDAT,
-  LLVM_COMDAT_SELECTOR,
-  LLVM_COND_BR,
-  LLVM_MLIR_CONSTANT,
-  LLVM_EXTRACTELEMENT,
-  LLVM_EXTRACTVALUE,
-  LLVM_FADD,
-  LLVM_FCMP,
-  LLVM_FDIV,
-  LLVM_FMUL,
-  LLVM_FNEG,
-  LLVM_FPEXT,
-  LLVM_FPTOSI,
-  LLVM_FPTOUI,
-  LLVM_FPTRUNC,
-  LLVM_FREM,
-  LLVM_FSUB,
-  LLVM_FENCE,
-  LLVM_FREEZE,
-  LLVM_GETELEMENTPTR,
-  LLVM_MLIR_GLOBAL_CTORS,
-  LLVM_MLIR_GLOBAL_DTORS,
-  LLVM_MLIR_GLOBAL,
-  LLVM_ICMP,
-  LLVM_INLINE_ASM,
-  LLVM_INSERTELEMENT,
-  LLVM_INSERTVALUE,
-  LLVM_INTTOPTR,
-  LLVM_INVOKE,
-  LLVM_FUNC,
-  LLVM_LSHR,
-  LLVM_LANDINGPAD,
-  LLVM_LOAD,
-  LLVM_METADATA,
-  LLVM_MUL,
-  LLVM_MLIR_NULL,
-  LLVM_OR,
-  LLVM_MLIR_POISON,
-  LLVM_PTRTOINT,
-  LLVM_RESUME,
-  LLVM_RETURN,
-  LLVM_SDIV,
-  LLVM_SEXT,
-  LLVM_SITOFP,
-  LLVM_SREM,
-  LLVM_SELECT,
-  LLVM_SHL,
-  LLVM_SHUFFLEVECTOR,
-  LLVM_STORE,
-  LLVM_SUB,
-  LLVM_SWITCH,
-  LLVM_TRUNC,
-  LLVM_UDIV,
-  LLVM_UITOFP,
-  LLVM_UREM,
-  LLVM_MLIR_UNDEF,
-  LLVM_UNREACHABLE,
-  LLVM_XOR,
-  LLVM_ZEXT,
-  LLVM_INTR_ABS,
-  LLVM_INTR_ANNOTATION,
-  LLVM_INTR_ASSUME,
-  LLVM_INTR_BITREVERSE,
-  LLVM_INTR_BSWAP,
-  LLVM_CALL_INTRINSIC,
-  LLVM_INTR_COPYSIGN,
-  LLVM_INTR_CORO_ALIGN,
-  LLVM_INTR_CORO_BEGIN,
-  LLVM_INTR_CORO_END,
-  LLVM_INTR_CORO_FREE,
-  LLVM_INTR_CORO_ID,
-  LLVM_INTR_CORO_RESUME,
-  LLVM_INTR_CORO_SAVE,
-  LLVM_INTR_CORO_SIZE,
-  LLVM_INTR_CORO_SUSPEND,
-  LLVM_INTR_COS,
-  LLVM_INTR_CTLZ,
-  LLVM_INTR_CTTZ,
-  LLVM_INTR_CTPOP,
-  LLVM_INTR_DBG_DECLARE,
-  LLVM_INTR_DBG_LABEL,
-  LLVM_INTR_DBG_VALUE,
-  LLVM_INTR_DEBUGTRAP,
-  LLVM_INTR_EH_TYPEID_FOR,
-  LLVM_INTR_EXP2,
-  LLVM_INTR_EXP,
-  LLVM_INTR_EXPECT,
-  LLVM_INTR_EXPECT_WITH_PROBABILITY,
-  LLVM_INTR_FABS,
-  LLVM_INTR_CEIL,
-  LLVM_INTR_FLOOR,
-  LLVM_INTR_FMA,
-  LLVM_INTR_FMULADD,
-  LLVM_INTR_TRUNC,
-  LLVM_INTR_FSHL,
-  LLVM_INTR_FSHR,
-  LLVM_INTR_GET_ACTIVE_LANE_MASK,
-  LLVM_INTR_IS_CONSTANT,
-  LLVM_INTR_IS_FPCLASS,
-  LLVM_INTR_LIFETIME_END,
-  LLVM_INTR_LIFETIME_START,
-  LLVM_INTR_LLRINT,
-  LLVM_INTR_LLROUND,
-  LLVM_INTR_LOG10,
-  LLVM_INTR_LOG2,
-  LLVM_INTR_LOG,
-  LLVM_INTR_LRINT,
-  LLVM_INTR_LROUND,
-  LLVM_INTR_MASKED_LOAD,
-  LLVM_INTR_MASKED_STORE,
-  LLVM_INTR_MATRIX_COLUMN_MAJOR_LOAD,
-  LLVM_INTR_MATRIX_COLUMN_MAJOR_STORE,
-  LLVM_INTR_MATRIX_MULTIPLY,
-  LLVM_INTR_MATRIX_TRANSPOSE,
-  LLVM_INTR_MAXNUM,
-  LLVM_INTR_MAXIMUM,
-  LLVM_INTR_MEMCPY_INLINE,
-  LLVM_INTR_MEMCPY,
-  LLVM_INTR_MEMMOVE,
-  LLVM_INTR_MEMSET,
-  LLVM_INTR_MINNUM,
-  LLVM_INTR_MINIMUM,
-  LLVM_INTR_NEARBYINT,
-  LLVM_INTR_EXPERIMENTAL_NOALIAS_SCOPE_DECL,
-  LLVM_INTR_POWI,
-  LLVM_INTR_POW,
-  LLVM_INTR_PREFETCH,
-  LLVM_INTR_PTR_ANNOTATION,
-  LLVM_INTR_RINT,
-  LLVM_INTR_ROUNDEVEN,
-  LLVM_INTR_ROUND,
-  LLVM_INTR_SADD_SAT,
-  LLVM_INTR_SADD_WITH_OVERFLOW,
-  LLVM_INTR_SMAX,
-  LLVM_INTR_SMIN,
-  LLVM_INTR_SMUL_WITH_OVERFLOW,
-  LLVM_INTR_SSA_COPY,
-  LLVM_INTR_SSHL_SAT,
-  LLVM_INTR_SSUB_SAT,
-  LLVM_INTR_SSUB_WITH_OVERFLOW,
-  LLVM_INTR_SIN,
-  LLVM_INTR_SQRT,
-  LLVM_INTR_STACKRESTORE,
-  LLVM_INTR_STACKSAVE,
-  LLVM_INTR_EXPERIMENTAL_STEPVECTOR,
-  LLVM_INTR_THREADLOCAL_ADDRESS,
-  LLVM_INTR_TRAP,
-  LLVM_INTR_UADD_SAT,
-  LLVM_INTR_UADD_WITH_OVERFLOW,
-  LLVM_INTR_UBSANTRAP,
-  LLVM_INTR_UMAX,
-  LLVM_INTR_UMIN,
-  LLVM_INTR_UMUL_WITH_OVERFLOW,
-  LLVM_INTR_USHL_SAT,
-  LLVM_INTR_USUB_SAT,
-  LLVM_INTR_USUB_WITH_OVERFLOW,
-  LLVM_INTR_VP_ASHR,
-  LLVM_INTR_VP_ADD,
-  LLVM_INTR_VP_AND,
-  LLVM_INTR_VP_FADD,
-  LLVM_INTR_VP_FDIV,
-  LLVM_INTR_VP_FMULADD,
-  LLVM_INTR_VP_FMUL,
-  LLVM_INTR_VP_FNEG,
-  LLVM_INTR_VP_FPEXT,
-  LLVM_INTR_VP_FPTOSI,
-  LLVM_INTR_VP_FPTOUI,
-  LLVM_INTR_VP_FPTRUNC,
-  LLVM_INTR_VP_FREM,
-  LLVM_INTR_VP_FSUB,
-  LLVM_INTR_VP_FMA,
-  LLVM_INTR_VP_INTTOPTR,
-  LLVM_INTR_VP_LSHR,
-  LLVM_INTR_VP_LOAD,
-  LLVM_INTR_VP_MERGE,
-  LLVM_INTR_VP_MUL,
-  LLVM_INTR_VP_OR,
-  LLVM_INTR_VP_PTRTOINT,
-  LLVM_INTR_VP_REDUCE_ADD,
-  LLVM_INTR_VP_REDUCE_AND,
-  LLVM_INTR_VP_REDUCE_FADD,
-  LLVM_INTR_VP_REDUCE_FMAX,
-  LLVM_INTR_VP_REDUCE_FMIN,
-  LLVM_INTR_VP_REDUCE_FMUL,
-  LLVM_INTR_VP_REDUCE_MUL,
-  LLVM_INTR_VP_REDUCE_OR,
-  LLVM_INTR_VP_REDUCE_SMAX,
-  LLVM_INTR_VP_REDUCE_SMIN,
-  LLVM_INTR_VP_REDUCE_UMAX,
-  LLVM_INTR_VP_REDUCE_UMIN,
-  LLVM_INTR_VP_REDUCE_XOR,
-  LLVM_INTR_VP_SDIV,
-  LLVM_INTR_VP_SEXT,
-  LLVM_INTR_VP_SITOFP,
-  LLVM_INTR_VP_SREM,
-  LLVM_INTR_VP_SELECT,
-  LLVM_INTR_VP_SHL,
-  LLVM_INTR_VP_STORE,
-  LLVM_INTR_EXPERIMENTAL_VP_STRIDED_LOAD,
-  LLVM_INTR_EXPERIMENTAL_VP_STRIDED_STORE,
-  LLVM_INTR_VP_SUB,
-  LLVM_INTR_VP_TRUNC,
-  LLVM_INTR_VP_UDIV,
-  LLVM_INTR_VP_UITOFP,
-  LLVM_INTR_VP_UREM,
-  LLVM_INTR_VP_XOR,
-  LLVM_INTR_VP_ZEXT,
-  LLVM_INTR_VACOPY,
-  LLVM_INTR_VAEND,
-  LLVM_INTR_VASTART,
-  LLVM_INTR_VAR_ANNOTATION,
-  LLVM_INTR_MASKED_COMPRESSSTORE,
-  LLVM_INTR_MASKED_EXPANDLOAD,
-  LLVM_INTR_MASKED_GATHER,
-  LLVM_INTR_MASKED_SCATTER,
-  LLVM_INTR_VECTOR_EXTRACT,
-  LLVM_INTR_VECTOR_INSERT,
-  LLVM_INTR_VECTOR_REDUCE_ADD,
-  LLVM_INTR_VECTOR_REDUCE_AND,
-  LLVM_INTR_VECTOR_REDUCE_FADD,
-  LLVM_INTR_VECTOR_REDUCE_FMAX,
-  LLVM_INTR_VECTOR_REDUCE_FMAXIMUM,
-  LLVM_INTR_VECTOR_REDUCE_FMIN,
-  LLVM_INTR_VECTOR_REDUCE_FMINIMUM,
-  LLVM_INTR_VECTOR_REDUCE_FMUL,
-  LLVM_INTR_VECTOR_REDUCE_MUL,
-  LLVM_INTR_VECTOR_REDUCE_OR,
-  LLVM_INTR_VECTOR_REDUCE_SMAX,
-  LLVM_INTR_VECTOR_REDUCE_SMIN,
-  LLVM_INTR_VECTOR_REDUCE_UMAX,
-  LLVM_INTR_VECTOR_REDUCE_UMIN,
-  LLVM_INTR_VECTOR_REDUCE_XOR,
-  LLVM_INTR_VSCALE,
-  SCF_CONDITION,
-  SCF_EXECUTE_REGION,
-  SCF_FOR,
-  SCF_FORALL,
-  SCF_IF,
-  SCF_FORALL_IN_PARALLEL,
-  SCF_INDEX_SWITCH,
-  SCF_PARALLEL,
-  SCF_REDUCE,
-  SCF_REDUCE_RETURN,
-  SCF_WHILE,
-  SCF_YIELD,
-  MEMREF_ASSUME_ALIGNMENT,
-  MEMREF_ATOMIC_RMW,
-  MEMREF_ATOMIC_YIELD,
-  MEMREF_COPY,
-  MEMREF_GENERIC_ATOMIC_RMW,
-  MEMREF_LOAD,
-  MEMREF_ALLOC,
-  MEMREF_ALLOCA,
-  MEMREF_ALLOCA_SCOPE,
-  MEMREF_ALLOCA_SCOPE_RETURN,
-  MEMREF_CAST,
-  MEMREF_COLLAPSE_SHAPE,
-  MEMREF_DEALLOC,
-  MEMREF_DIM,
-  MEMREF_DMA_START,
-  MEMREF_DMA_WAIT,
-  MEMREF_EXPAND_SHAPE,
-  MEMREF_EXTRACT_ALIGNED_POINTER_AS_INDEX,
-  MEMREF_EXTRACT_STRIDED_METADATA,
-  MEMREF_GET_GLOBAL,
-  MEMREF_GLOBAL,
-  MEMREF_MEMORY_SPACE_CAST,
-  MEMREF_PREFETCH,
-  MEMREF_RANK,
-  MEMREF_REALLOC,
-  MEMREF_REINTERPRET_CAST,
-  MEMREF_RESHAPE,
-  MEMREF_STORE,
-  MEMREF_TRANSPOSE,
-  MEMREF_VIEW,
-  MEMREF_SUBVIEW,
-  MEMREF_TENSOR_STORE,
-  LL_BR,
-  LL_CONCAT,
-  LL_COND_BR,
-  LL_COND_SCOPE_RET,
-  LL_EXTRACT,
-  LL_INITIALIZE,
-  LL_INLINE_SCOPE,
-  LL_FUNC,
-  LL_GEP,
-  LL_RETURN,
-  LL_SCOPE,
-  LL_SCOPE_RECURSE,
-  LL_SCOPE_RET,
-  LL_UNINITIALIZED_VAR,
-  HL_ACCESS,
-  HL_ASSIGN_FADD,
-  HL_FADD,
-  HL_ASSIGN_ADD,
-  HL_ADD,
-  HL_LABELADDR,
-  HL_ADDRESSOF,
-  HL_ALIGNOF_EXPR,
-  HL_ALIGNOF_TYPE,
-  HL_ASSIGN,
-  HL_ASSIGN_BIN_ASHR,
-  HL_BIN_ASHR,
-  HL_ASSIGN_BIN_AND,
-  HL_BIN_AND,
-  HL_BIN_COMMA,
-  HL_BIN_LAND,
-  HL_BIN_LOR,
-  HL_ASSIGN_BIN_LSHR,
-  HL_BIN_LSHR,
-  HL_ASSIGN_BIN_OR,
-  HL_BIN_OR,
-  HL_ASSIGN_BIN_SHL,
-  HL_BIN_SHL,
-  HL_ASSIGN_BIN_XOR,
-  HL_BIN_XOR,
-  HL_BUILTIN_BITCAST,
-  HL_CSTYLE_CAST,
-  HL_CALL,
-  HL_CLASS,
-  HL_CMP,
-  HL_CONST,
-  HL_BASE,
-  HL_CXXSTRUCT,
-  HL_REF,
-  HL_DEREF,
-  HL_ASSIGN_FDIV,
-  HL_FDIV,
-  HL_ASSIGN_SDIV,
-  HL_SDIV,
-  HL_ASSIGN_UDIV,
-  HL_UDIV,
-  HL_ENUM_CONST,
-  HL_ENUM,
-  HL_ENUMREF,
-  HL_EXPR,
-  HL_GNU_EXTENSION,
-  HL_FCMP,
-  HL_FIELD,
-  HL_FUNCREF,
-  HL_GLOBREF,
-  HL_BREAK,
-  HL_CASE,
-  HL_COND,
-  HL_COND_YIELD,
-  HL_CONTINUE,
-  HL_DEFAULT,
-  HL_DO,
-  HL_EMPTY_DECL,
-  HL_FOR,
-  HL_FUNC,
-  HL_GOTO,
-  HL_IF,
-  HL_LABEL_DECL,
-  HL_LABEL,
-  HL_SKIP,
-  HL_SWITCH,
-  HL_TYPE_YIELD,
-  HL_VALUE_YIELD,
-  HL_VAR,
-  HL_WHILE,
-  HL_IMPLICIT_CAST,
-  HL_INDIRECT_CALL,
-  HL_INITLIST,
-  HL_LNOT,
-  HL_MINUS,
-  HL_ASSIGN_FMUL,
-  HL_FMUL,
-  HL_ASSIGN_MUL,
-  HL_MUL,
-  HL_NOT,
-  HL_PLUS,
-  HL_POST_DEC,
-  HL_POST_INC,
-  HL_PRE_DEC,
-  HL_PRE_INC,
-  HL_PREDEFINED_EXPR,
-  HL_MEMBER,
-  HL_ASSIGN_FREM,
-  HL_FREM,
-  HL_ASSIGN_SREM,
-  HL_SREM,
-  HL_ASSIGN_UREM,
-  HL_UREM,
-  HL_RETURN,
-  HL_SIZEOF_EXPR,
-  HL_SIZEOF_TYPE,
-  HL_STMT_EXPR,
-  HL_STRUCT,
-  HL_ASSIGN_FSUB,
-  HL_FSUB,
-  HL_ASSIGN_SUB,
-  HL_SUB,
-  HL_SUBSCRIPT,
-  HL_THIS,
-  HL_TRANSLATION_UNIT,
-  HL_TYPE,
-  HL_TYPEDEF,
-  HL_TYPEOF_EXPR,
-  HL_TYPEOF_TYPE,
-  HL_UNION,
-  HL_UNREACHABLE,
-  CORE_BIN_LAND,
-  CORE_BIN_LOR,
-  CORE_IMPLICIT_RETURN,
-  CORE_LAZY_OP,
-  CORE_SCOPE,
-  CORE_SELECT,
-  UNSUP_DECL,
-  UNSUP_STMT,
+  BUILTIN_MODULE,  // builtin.module
+  BUILTIN_UNREALIZED_CONVERSION_CAST,  // builtin.unrealized_conversion_cast
+  LLVM_ASHR,  // llvm.ashr
+  LLVM_ADD,  // llvm.add
+  LLVM_ADDRSPACECAST,  // llvm.addrspacecast
+  LLVM_MLIR_ADDRESSOF,  // llvm.mlir.addressof
+  LLVM_ALLOCA,  // llvm.alloca
+  LLVM_AND,  // llvm.and
+  LLVM_CMPXCHG,  // llvm.cmpxchg
+  LLVM_ATOMICRMW,  // llvm.atomicrmw
+  LLVM_BITCAST,  // llvm.bitcast
+  LLVM_BR,  // llvm.br
+  LLVM_CALL,  // llvm.call
+  LLVM_COMDAT,  // llvm.comdat
+  LLVM_COMDAT_SELECTOR,  // llvm.comdat_selector
+  LLVM_COND_BR,  // llvm.cond_br
+  LLVM_MLIR_CONSTANT,  // llvm.mlir.constant
+  LLVM_EXTRACTELEMENT,  // llvm.extractelement
+  LLVM_EXTRACTVALUE,  // llvm.extractvalue
+  LLVM_FADD,  // llvm.fadd
+  LLVM_FCMP,  // llvm.fcmp
+  LLVM_FDIV,  // llvm.fdiv
+  LLVM_FMUL,  // llvm.fmul
+  LLVM_FNEG,  // llvm.fneg
+  LLVM_FPEXT,  // llvm.fpext
+  LLVM_FPTOSI,  // llvm.fptosi
+  LLVM_FPTOUI,  // llvm.fptoui
+  LLVM_FPTRUNC,  // llvm.fptrunc
+  LLVM_FREM,  // llvm.frem
+  LLVM_FSUB,  // llvm.fsub
+  LLVM_FENCE,  // llvm.fence
+  LLVM_FREEZE,  // llvm.freeze
+  LLVM_GETELEMENTPTR,  // llvm.getelementptr
+  LLVM_MLIR_GLOBAL_CTORS,  // llvm.mlir.global_ctors
+  LLVM_MLIR_GLOBAL_DTORS,  // llvm.mlir.global_dtors
+  LLVM_MLIR_GLOBAL,  // llvm.mlir.global
+  LLVM_ICMP,  // llvm.icmp
+  LLVM_INLINE_ASM,  // llvm.inline_asm
+  LLVM_INSERTELEMENT,  // llvm.insertelement
+  LLVM_INSERTVALUE,  // llvm.insertvalue
+  LLVM_INTTOPTR,  // llvm.inttoptr
+  LLVM_INVOKE,  // llvm.invoke
+  LLVM_FUNC,  // llvm.func
+  LLVM_LSHR,  // llvm.lshr
+  LLVM_LANDINGPAD,  // llvm.landingpad
+  LLVM_LOAD,  // llvm.load
+  LLVM_METADATA,  // llvm.metadata
+  LLVM_MUL,  // llvm.mul
+  LLVM_MLIR_NULL,  // llvm.mlir.null
+  LLVM_OR,  // llvm.or
+  LLVM_MLIR_POISON,  // llvm.mlir.poison
+  LLVM_PTRTOINT,  // llvm.ptrtoint
+  LLVM_RESUME,  // llvm.resume
+  LLVM_RETURN,  // llvm.return
+  LLVM_SDIV,  // llvm.sdiv
+  LLVM_SEXT,  // llvm.sext
+  LLVM_SITOFP,  // llvm.sitofp
+  LLVM_SREM,  // llvm.srem
+  LLVM_SELECT,  // llvm.select
+  LLVM_SHL,  // llvm.shl
+  LLVM_SHUFFLEVECTOR,  // llvm.shufflevector
+  LLVM_STORE,  // llvm.store
+  LLVM_SUB,  // llvm.sub
+  LLVM_SWITCH,  // llvm.switch
+  LLVM_TRUNC,  // llvm.trunc
+  LLVM_UDIV,  // llvm.udiv
+  LLVM_UITOFP,  // llvm.uitofp
+  LLVM_UREM,  // llvm.urem
+  LLVM_MLIR_UNDEF,  // llvm.mlir.undef
+  LLVM_UNREACHABLE,  // llvm.unreachable
+  LLVM_XOR,  // llvm.xor
+  LLVM_ZEXT,  // llvm.zext
+  LLVM_INTR_ABS,  // llvm.intr.abs
+  LLVM_INTR_ANNOTATION,  // llvm.intr.annotation
+  LLVM_INTR_ASSUME,  // llvm.intr.assume
+  LLVM_INTR_BITREVERSE,  // llvm.intr.bitreverse
+  LLVM_INTR_BSWAP,  // llvm.intr.bswap
+  LLVM_CALL_INTRINSIC,  // llvm.call_intrinsic
+  LLVM_INTR_COPYSIGN,  // llvm.intr.copysign
+  LLVM_INTR_CORO_ALIGN,  // llvm.intr.coro.align
+  LLVM_INTR_CORO_BEGIN,  // llvm.intr.coro.begin
+  LLVM_INTR_CORO_END,  // llvm.intr.coro.end
+  LLVM_INTR_CORO_FREE,  // llvm.intr.coro.free
+  LLVM_INTR_CORO_ID,  // llvm.intr.coro.id
+  LLVM_INTR_CORO_RESUME,  // llvm.intr.coro.resume
+  LLVM_INTR_CORO_SAVE,  // llvm.intr.coro.save
+  LLVM_INTR_CORO_SIZE,  // llvm.intr.coro.size
+  LLVM_INTR_CORO_SUSPEND,  // llvm.intr.coro.suspend
+  LLVM_INTR_COS,  // llvm.intr.cos
+  LLVM_INTR_CTLZ,  // llvm.intr.ctlz
+  LLVM_INTR_CTTZ,  // llvm.intr.cttz
+  LLVM_INTR_CTPOP,  // llvm.intr.ctpop
+  LLVM_INTR_DBG_DECLARE,  // llvm.intr.dbg.declare
+  LLVM_INTR_DBG_LABEL,  // llvm.intr.dbg.label
+  LLVM_INTR_DBG_VALUE,  // llvm.intr.dbg.value
+  LLVM_INTR_DEBUGTRAP,  // llvm.intr.debugtrap
+  LLVM_INTR_EH_TYPEID_FOR,  // llvm.intr.eh.typeid.for
+  LLVM_INTR_EXP2,  // llvm.intr.exp2
+  LLVM_INTR_EXP,  // llvm.intr.exp
+  LLVM_INTR_EXPECT,  // llvm.intr.expect
+  LLVM_INTR_EXPECT_WITH_PROBABILITY,  // llvm.intr.expect.with.probability
+  LLVM_INTR_FABS,  // llvm.intr.fabs
+  LLVM_INTR_CEIL,  // llvm.intr.ceil
+  LLVM_INTR_FLOOR,  // llvm.intr.floor
+  LLVM_INTR_FMA,  // llvm.intr.fma
+  LLVM_INTR_FMULADD,  // llvm.intr.fmuladd
+  LLVM_INTR_TRUNC,  // llvm.intr.trunc
+  LLVM_INTR_FSHL,  // llvm.intr.fshl
+  LLVM_INTR_FSHR,  // llvm.intr.fshr
+  LLVM_INTR_GET_ACTIVE_LANE_MASK,  // llvm.intr.get.active.lane.mask
+  LLVM_INTR_IS_CONSTANT,  // llvm.intr.is.constant
+  LLVM_INTR_IS_FPCLASS,  // llvm.intr.is.fpclass
+  LLVM_INTR_LIFETIME_END,  // llvm.intr.lifetime.end
+  LLVM_INTR_LIFETIME_START,  // llvm.intr.lifetime.start
+  LLVM_INTR_LLRINT,  // llvm.intr.llrint
+  LLVM_INTR_LLROUND,  // llvm.intr.llround
+  LLVM_INTR_LOG10,  // llvm.intr.log10
+  LLVM_INTR_LOG2,  // llvm.intr.log2
+  LLVM_INTR_LOG,  // llvm.intr.log
+  LLVM_INTR_LRINT,  // llvm.intr.lrint
+  LLVM_INTR_LROUND,  // llvm.intr.lround
+  LLVM_INTR_MASKED_LOAD,  // llvm.intr.masked.load
+  LLVM_INTR_MASKED_STORE,  // llvm.intr.masked.store
+  LLVM_INTR_MATRIX_COLUMN_MAJOR_LOAD,  // llvm.intr.matrix.column.major.load
+  LLVM_INTR_MATRIX_COLUMN_MAJOR_STORE,  // llvm.intr.matrix.column.major.store
+  LLVM_INTR_MATRIX_MULTIPLY,  // llvm.intr.matrix.multiply
+  LLVM_INTR_MATRIX_TRANSPOSE,  // llvm.intr.matrix.transpose
+  LLVM_INTR_MAXNUM,  // llvm.intr.maxnum
+  LLVM_INTR_MAXIMUM,  // llvm.intr.maximum
+  LLVM_INTR_MEMCPY_INLINE,  // llvm.intr.memcpy.inline
+  LLVM_INTR_MEMCPY,  // llvm.intr.memcpy
+  LLVM_INTR_MEMMOVE,  // llvm.intr.memmove
+  LLVM_INTR_MEMSET,  // llvm.intr.memset
+  LLVM_INTR_MINNUM,  // llvm.intr.minnum
+  LLVM_INTR_MINIMUM,  // llvm.intr.minimum
+  LLVM_INTR_NEARBYINT,  // llvm.intr.nearbyint
+  LLVM_INTR_EXPERIMENTAL_NOALIAS_SCOPE_DECL,  // llvm.intr.experimental.noalias.scope.decl
+  LLVM_INTR_POWI,  // llvm.intr.powi
+  LLVM_INTR_POW,  // llvm.intr.pow
+  LLVM_INTR_PREFETCH,  // llvm.intr.prefetch
+  LLVM_INTR_PTR_ANNOTATION,  // llvm.intr.ptr.annotation
+  LLVM_INTR_RINT,  // llvm.intr.rint
+  LLVM_INTR_ROUNDEVEN,  // llvm.intr.roundeven
+  LLVM_INTR_ROUND,  // llvm.intr.round
+  LLVM_INTR_SADD_SAT,  // llvm.intr.sadd.sat
+  LLVM_INTR_SADD_WITH_OVERFLOW,  // llvm.intr.sadd.with.overflow
+  LLVM_INTR_SMAX,  // llvm.intr.smax
+  LLVM_INTR_SMIN,  // llvm.intr.smin
+  LLVM_INTR_SMUL_WITH_OVERFLOW,  // llvm.intr.smul.with.overflow
+  LLVM_INTR_SSA_COPY,  // llvm.intr.ssa.copy
+  LLVM_INTR_SSHL_SAT,  // llvm.intr.sshl.sat
+  LLVM_INTR_SSUB_SAT,  // llvm.intr.ssub.sat
+  LLVM_INTR_SSUB_WITH_OVERFLOW,  // llvm.intr.ssub.with.overflow
+  LLVM_INTR_SIN,  // llvm.intr.sin
+  LLVM_INTR_SQRT,  // llvm.intr.sqrt
+  LLVM_INTR_STACKRESTORE,  // llvm.intr.stackrestore
+  LLVM_INTR_STACKSAVE,  // llvm.intr.stacksave
+  LLVM_INTR_EXPERIMENTAL_STEPVECTOR,  // llvm.intr.experimental.stepvector
+  LLVM_INTR_THREADLOCAL_ADDRESS,  // llvm.intr.threadlocal.address
+  LLVM_INTR_TRAP,  // llvm.intr.trap
+  LLVM_INTR_UADD_SAT,  // llvm.intr.uadd.sat
+  LLVM_INTR_UADD_WITH_OVERFLOW,  // llvm.intr.uadd.with.overflow
+  LLVM_INTR_UBSANTRAP,  // llvm.intr.ubsantrap
+  LLVM_INTR_UMAX,  // llvm.intr.umax
+  LLVM_INTR_UMIN,  // llvm.intr.umin
+  LLVM_INTR_UMUL_WITH_OVERFLOW,  // llvm.intr.umul.with.overflow
+  LLVM_INTR_USHL_SAT,  // llvm.intr.ushl.sat
+  LLVM_INTR_USUB_SAT,  // llvm.intr.usub.sat
+  LLVM_INTR_USUB_WITH_OVERFLOW,  // llvm.intr.usub.with.overflow
+  LLVM_INTR_VP_ASHR,  // llvm.intr.vp.ashr
+  LLVM_INTR_VP_ADD,  // llvm.intr.vp.add
+  LLVM_INTR_VP_AND,  // llvm.intr.vp.and
+  LLVM_INTR_VP_FADD,  // llvm.intr.vp.fadd
+  LLVM_INTR_VP_FDIV,  // llvm.intr.vp.fdiv
+  LLVM_INTR_VP_FMULADD,  // llvm.intr.vp.fmuladd
+  LLVM_INTR_VP_FMUL,  // llvm.intr.vp.fmul
+  LLVM_INTR_VP_FNEG,  // llvm.intr.vp.fneg
+  LLVM_INTR_VP_FPEXT,  // llvm.intr.vp.fpext
+  LLVM_INTR_VP_FPTOSI,  // llvm.intr.vp.fptosi
+  LLVM_INTR_VP_FPTOUI,  // llvm.intr.vp.fptoui
+  LLVM_INTR_VP_FPTRUNC,  // llvm.intr.vp.fptrunc
+  LLVM_INTR_VP_FREM,  // llvm.intr.vp.frem
+  LLVM_INTR_VP_FSUB,  // llvm.intr.vp.fsub
+  LLVM_INTR_VP_FMA,  // llvm.intr.vp.fma
+  LLVM_INTR_VP_INTTOPTR,  // llvm.intr.vp.inttoptr
+  LLVM_INTR_VP_LSHR,  // llvm.intr.vp.lshr
+  LLVM_INTR_VP_LOAD,  // llvm.intr.vp.load
+  LLVM_INTR_VP_MERGE,  // llvm.intr.vp.merge
+  LLVM_INTR_VP_MUL,  // llvm.intr.vp.mul
+  LLVM_INTR_VP_OR,  // llvm.intr.vp.or
+  LLVM_INTR_VP_PTRTOINT,  // llvm.intr.vp.ptrtoint
+  LLVM_INTR_VP_REDUCE_ADD,  // llvm.intr.vp.reduce.add
+  LLVM_INTR_VP_REDUCE_AND,  // llvm.intr.vp.reduce.and
+  LLVM_INTR_VP_REDUCE_FADD,  // llvm.intr.vp.reduce.fadd
+  LLVM_INTR_VP_REDUCE_FMAX,  // llvm.intr.vp.reduce.fmax
+  LLVM_INTR_VP_REDUCE_FMIN,  // llvm.intr.vp.reduce.fmin
+  LLVM_INTR_VP_REDUCE_FMUL,  // llvm.intr.vp.reduce.fmul
+  LLVM_INTR_VP_REDUCE_MUL,  // llvm.intr.vp.reduce.mul
+  LLVM_INTR_VP_REDUCE_OR,  // llvm.intr.vp.reduce.or
+  LLVM_INTR_VP_REDUCE_SMAX,  // llvm.intr.vp.reduce.smax
+  LLVM_INTR_VP_REDUCE_SMIN,  // llvm.intr.vp.reduce.smin
+  LLVM_INTR_VP_REDUCE_UMAX,  // llvm.intr.vp.reduce.umax
+  LLVM_INTR_VP_REDUCE_UMIN,  // llvm.intr.vp.reduce.umin
+  LLVM_INTR_VP_REDUCE_XOR,  // llvm.intr.vp.reduce.xor
+  LLVM_INTR_VP_SDIV,  // llvm.intr.vp.sdiv
+  LLVM_INTR_VP_SEXT,  // llvm.intr.vp.sext
+  LLVM_INTR_VP_SITOFP,  // llvm.intr.vp.sitofp
+  LLVM_INTR_VP_SREM,  // llvm.intr.vp.srem
+  LLVM_INTR_VP_SELECT,  // llvm.intr.vp.select
+  LLVM_INTR_VP_SHL,  // llvm.intr.vp.shl
+  LLVM_INTR_VP_STORE,  // llvm.intr.vp.store
+  LLVM_INTR_EXPERIMENTAL_VP_STRIDED_LOAD,  // llvm.intr.experimental.vp.strided.load
+  LLVM_INTR_EXPERIMENTAL_VP_STRIDED_STORE,  // llvm.intr.experimental.vp.strided.store
+  LLVM_INTR_VP_SUB,  // llvm.intr.vp.sub
+  LLVM_INTR_VP_TRUNC,  // llvm.intr.vp.trunc
+  LLVM_INTR_VP_UDIV,  // llvm.intr.vp.udiv
+  LLVM_INTR_VP_UITOFP,  // llvm.intr.vp.uitofp
+  LLVM_INTR_VP_UREM,  // llvm.intr.vp.urem
+  LLVM_INTR_VP_XOR,  // llvm.intr.vp.xor
+  LLVM_INTR_VP_ZEXT,  // llvm.intr.vp.zext
+  LLVM_INTR_VACOPY,  // llvm.intr.vacopy
+  LLVM_INTR_VAEND,  // llvm.intr.vaend
+  LLVM_INTR_VASTART,  // llvm.intr.vastart
+  LLVM_INTR_VAR_ANNOTATION,  // llvm.intr.var.annotation
+  LLVM_INTR_MASKED_COMPRESSSTORE,  // llvm.intr.masked.compressstore
+  LLVM_INTR_MASKED_EXPANDLOAD,  // llvm.intr.masked.expandload
+  LLVM_INTR_MASKED_GATHER,  // llvm.intr.masked.gather
+  LLVM_INTR_MASKED_SCATTER,  // llvm.intr.masked.scatter
+  LLVM_INTR_VECTOR_EXTRACT,  // llvm.intr.vector.extract
+  LLVM_INTR_VECTOR_INSERT,  // llvm.intr.vector.insert
+  LLVM_INTR_VECTOR_REDUCE_ADD,  // llvm.intr.vector.reduce.add
+  LLVM_INTR_VECTOR_REDUCE_AND,  // llvm.intr.vector.reduce.and
+  LLVM_INTR_VECTOR_REDUCE_FADD,  // llvm.intr.vector.reduce.fadd
+  LLVM_INTR_VECTOR_REDUCE_FMAX,  // llvm.intr.vector.reduce.fmax
+  LLVM_INTR_VECTOR_REDUCE_FMAXIMUM,  // llvm.intr.vector.reduce.fmaximum
+  LLVM_INTR_VECTOR_REDUCE_FMIN,  // llvm.intr.vector.reduce.fmin
+  LLVM_INTR_VECTOR_REDUCE_FMINIMUM,  // llvm.intr.vector.reduce.fminimum
+  LLVM_INTR_VECTOR_REDUCE_FMUL,  // llvm.intr.vector.reduce.fmul
+  LLVM_INTR_VECTOR_REDUCE_MUL,  // llvm.intr.vector.reduce.mul
+  LLVM_INTR_VECTOR_REDUCE_OR,  // llvm.intr.vector.reduce.or
+  LLVM_INTR_VECTOR_REDUCE_SMAX,  // llvm.intr.vector.reduce.smax
+  LLVM_INTR_VECTOR_REDUCE_SMIN,  // llvm.intr.vector.reduce.smin
+  LLVM_INTR_VECTOR_REDUCE_UMAX,  // llvm.intr.vector.reduce.umax
+  LLVM_INTR_VECTOR_REDUCE_UMIN,  // llvm.intr.vector.reduce.umin
+  LLVM_INTR_VECTOR_REDUCE_XOR,  // llvm.intr.vector.reduce.xor
+  LLVM_INTR_VSCALE,  // llvm.intr.vscale
+  MEMREF_ASSUME_ALIGNMENT,  // memref.assume_alignment
+  MEMREF_ATOMIC_RMW,  // memref.atomic_rmw
+  MEMREF_ATOMIC_YIELD,  // memref.atomic_yield
+  MEMREF_COPY,  // memref.copy
+  MEMREF_GENERIC_ATOMIC_RMW,  // memref.generic_atomic_rmw
+  MEMREF_LOAD,  // memref.load
+  MEMREF_ALLOC,  // memref.alloc
+  MEMREF_ALLOCA,  // memref.alloca
+  MEMREF_ALLOCA_SCOPE,  // memref.alloca_scope
+  MEMREF_ALLOCA_SCOPE_RETURN,  // memref.alloca_scope.return
+  MEMREF_CAST,  // memref.cast
+  MEMREF_COLLAPSE_SHAPE,  // memref.collapse_shape
+  MEMREF_DEALLOC,  // memref.dealloc
+  MEMREF_DIM,  // memref.dim
+  MEMREF_DMA_START,  // memref.dma_start
+  MEMREF_DMA_WAIT,  // memref.dma_wait
+  MEMREF_EXPAND_SHAPE,  // memref.expand_shape
+  MEMREF_EXTRACT_ALIGNED_POINTER_AS_INDEX,  // memref.extract_aligned_pointer_as_index
+  MEMREF_EXTRACT_STRIDED_METADATA,  // memref.extract_strided_metadata
+  MEMREF_GET_GLOBAL,  // memref.get_global
+  MEMREF_GLOBAL,  // memref.global
+  MEMREF_MEMORY_SPACE_CAST,  // memref.memory_space_cast
+  MEMREF_PREFETCH,  // memref.prefetch
+  MEMREF_RANK,  // memref.rank
+  MEMREF_REALLOC,  // memref.realloc
+  MEMREF_REINTERPRET_CAST,  // memref.reinterpret_cast
+  MEMREF_RESHAPE,  // memref.reshape
+  MEMREF_STORE,  // memref.store
+  MEMREF_TRANSPOSE,  // memref.transpose
+  MEMREF_VIEW,  // memref.view
+  MEMREF_SUBVIEW,  // memref.subview
+  MEMREF_TENSOR_STORE,  // memref.tensor_store
+  ABI_CALL_ARGS,  // abi.call_args
+  ABI_CALL_EXEC,  // abi.call_exec
+  ABI_CALL,  // abi.call
+  ABI_CALL_RETS,  // abi.call_rets
+  ABI_DIRECT,  // abi.direct
+  ABI_EPILOGUE,  // abi.epilogue
+  ABI_FUNC,  // abi.func
+  ABI_PROLOGUE,  // abi.prologue
+  ABI_RET_DIRECT,  // abi.ret_direct
+  ABI_TODO,  // abi.todo
+  ABI_WRAP_FN,  // abi.wrap_fn
+  ABI_YIELD,  // abi.yield
+  LL_BR,  // ll.br
+  LL_CONCAT,  // ll.concat
+  LL_COND_BR,  // ll.cond_br
+  LL_COND_SCOPE_RET,  // ll.cond_scope_ret
+  LL_EXTRACT,  // ll.extract
+  LL_INITIALIZE,  // ll.initialize
+  LL_INLINE_SCOPE,  // ll.inline_scope
+  LL_FUNC,  // ll.func
+  LL_GEP,  // ll.gep
+  LL_RETURN,  // ll.return
+  LL_SCOPE,  // ll.scope
+  LL_SCOPE_RECURSE,  // ll.scope_recurse
+  LL_SCOPE_RET,  // ll.scope_ret
+  LL_UNINITIALIZED_VAR,  // ll.uninitialized_var
+  HL_ACCESS,  // hl.access
+  HL_ASSIGN_FADD,  // hl.assign.fadd
+  HL_FADD,  // hl.fadd
+  HL_ASSIGN_ADD,  // hl.assign.add
+  HL_ADD,  // hl.add
+  HL_LABELADDR,  // hl.labeladdr
+  HL_ADDRESSOF,  // hl.addressof
+  HL_ALIGNOF_EXPR,  // hl.alignof.expr
+  HL_ALIGNOF_TYPE,  // hl.alignof.type
+  HL_ASSIGN,  // hl.assign
+  HL_ASSIGN_BIN_ASHR,  // hl.assign.bin.ashr
+  HL_BIN_ASHR,  // hl.bin.ashr
+  HL_ASSIGN_BIN_AND,  // hl.assign.bin.and
+  HL_BIN_AND,  // hl.bin.and
+  HL_BIN_COMMA,  // hl.bin.comma
+  HL_BIN_LAND,  // hl.bin.land
+  HL_BIN_LOR,  // hl.bin.lor
+  HL_ASSIGN_BIN_LSHR,  // hl.assign.bin.lshr
+  HL_BIN_LSHR,  // hl.bin.lshr
+  HL_ASSIGN_BIN_OR,  // hl.assign.bin.or
+  HL_BIN_OR,  // hl.bin.or
+  HL_ASSIGN_BIN_SHL,  // hl.assign.bin.shl
+  HL_BIN_SHL,  // hl.bin.shl
+  HL_ASSIGN_BIN_XOR,  // hl.assign.bin.xor
+  HL_BIN_XOR,  // hl.bin.xor
+  HL_BUILTIN_BITCAST,  // hl.builtin_bitcast
+  HL_CSTYLE_CAST,  // hl.cstyle_cast
+  HL_CALL,  // hl.call
+  HL_CLASS,  // hl.class
+  HL_CMP,  // hl.cmp
+  HL_CONST,  // hl.const
+  HL_BASE,  // hl.base
+  HL_CXXSTRUCT,  // hl.cxxstruct
+  HL_REF,  // hl.ref
+  HL_DEREF,  // hl.deref
+  HL_ASSIGN_FDIV,  // hl.assign.fdiv
+  HL_FDIV,  // hl.fdiv
+  HL_ASSIGN_SDIV,  // hl.assign.sdiv
+  HL_SDIV,  // hl.sdiv
+  HL_ASSIGN_UDIV,  // hl.assign.udiv
+  HL_UDIV,  // hl.udiv
+  HL_ENUM_CONST,  // hl.enum.const
+  HL_ENUM,  // hl.enum
+  HL_ENUMREF,  // hl.enumref
+  HL_EXPR,  // hl.expr
+  HL_GNU_EXTENSION,  // hl.gnu.extension
+  HL_FCMP,  // hl.fcmp
+  HL_FIELD,  // hl.field
+  HL_FUNCREF,  // hl.funcref
+  HL_GLOBREF,  // hl.globref
+  HL_BREAK,  // hl.break
+  HL_CASE,  // hl.case
+  HL_COND,  // hl.cond
+  HL_COND_YIELD,  // hl.cond.yield
+  HL_CONTINUE,  // hl.continue
+  HL_DEFAULT,  // hl.default
+  HL_DO,  // hl.do
+  HL_EMPTY_DECL,  // hl.empty.decl
+  HL_FOR,  // hl.for
+  HL_FUNC,  // hl.func
+  HL_GOTO,  // hl.goto
+  HL_IF,  // hl.if
+  HL_LABEL_DECL,  // hl.label.decl
+  HL_LABEL,  // hl.label
+  HL_SKIP,  // hl.skip
+  HL_SWITCH,  // hl.switch
+  HL_TYPE_YIELD,  // hl.type.yield
+  HL_VALUE_YIELD,  // hl.value.yield
+  HL_VAR,  // hl.var
+  HL_WHILE,  // hl.while
+  HL_IMPLICIT_CAST,  // hl.implicit_cast
+  HL_INDIRECT_CALL,  // hl.indirect_call
+  HL_INITLIST,  // hl.initlist
+  HL_LNOT,  // hl.lnot
+  HL_MINUS,  // hl.minus
+  HL_ASSIGN_FMUL,  // hl.assign.fmul
+  HL_FMUL,  // hl.fmul
+  HL_ASSIGN_MUL,  // hl.assign.mul
+  HL_MUL,  // hl.mul
+  HL_NOT,  // hl.not
+  HL_PLUS,  // hl.plus
+  HL_POST_DEC,  // hl.post.dec
+  HL_POST_INC,  // hl.post.inc
+  HL_PRE_DEC,  // hl.pre.dec
+  HL_PRE_INC,  // hl.pre.inc
+  HL_PREDEFINED_EXPR,  // hl.predefined.expr
+  HL_MEMBER,  // hl.member
+  HL_ASSIGN_FREM,  // hl.assign.frem
+  HL_FREM,  // hl.frem
+  HL_ASSIGN_SREM,  // hl.assign.srem
+  HL_SREM,  // hl.srem
+  HL_ASSIGN_UREM,  // hl.assign.urem
+  HL_UREM,  // hl.urem
+  HL_RETURN,  // hl.return
+  HL_SIZEOF_EXPR,  // hl.sizeof.expr
+  HL_SIZEOF_TYPE,  // hl.sizeof.type
+  HL_STMT_EXPR,  // hl.stmt.expr
+  HL_STRUCT,  // hl.struct
+  HL_ASSIGN_FSUB,  // hl.assign.fsub
+  HL_FSUB,  // hl.fsub
+  HL_ASSIGN_SUB,  // hl.assign.sub
+  HL_SUB,  // hl.sub
+  HL_SUBSCRIPT,  // hl.subscript
+  HL_THIS,  // hl.this
+  HL_TRANSLATION_UNIT,  // hl.translation_unit
+  HL_TYPE,  // hl.type
+  HL_TYPEDEF,  // hl.typedef
+  HL_TYPEOF_EXPR,  // hl.typeof.expr
+  HL_TYPEOF_TYPE,  // hl.typeof.type
+  HL_UNION,  // hl.union
+  HL_UNREACHABLE,  // hl.unreachable
+  CORE_BIN_LAND,  // core.bin.land
+  CORE_BIN_LOR,  // core.bin.lor
+  CORE_IMPLICIT_RETURN,  // core.implicit.return
+  CORE_LAZY_OP,  // core.lazy.op
+  CORE_SCOPE,  // core.scope
+  CORE_SELECT,  // core.select
+  UNSUP_DECL,  // unsup.decl
+  UNSUP_STMT,  // unsup.stmt
 };
 
 }  // namespace ir

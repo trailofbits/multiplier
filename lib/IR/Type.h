@@ -8,20 +8,13 @@
 
 #pragma once
 
-#define MX_IR_FOR_EACH_MLIR_TYPE(_builtin, _llvm, _scf, _memref, _ll, _hl, _core, _meta, _unsup) \
+#define MX_IR_FOR_EACH_MLIR_TYPE(_builtin, _llvm, _memref, _abi, _ll, _hl, _core, _meta, _unsup) \
    _llvm(LLVMArrayType, TypeKind::LLVMARRAYTYPE, mlir::LLVM::LLVMArrayType) \
    _llvm(LLVMFixedVectorType, TypeKind::LLVMFIXEDVECTORTYPE, mlir::LLVM::LLVMFixedVectorType) \
    _llvm(LLVMFunctionType, TypeKind::LLVMFUNCTIONTYPE, mlir::LLVM::LLVMFunctionType) \
    _llvm(LLVMPointerType, TypeKind::LLVMPOINTERTYPE, mlir::LLVM::LLVMPointerType) \
    _llvm(LLVMScalableVectorType, TypeKind::LLVMSCALABLEVECTORTYPE, mlir::LLVM::LLVMScalableVectorType) \
    _llvm(LLVMTargetExtType, TypeKind::LLVMTARGETEXTTYPE, mlir::LLVM::LLVMTargetExtType) \
-   _llvm(LLVMVoidType, TypeKind::LLVMVOIDTYPE, mlir::LLVM::LLVMVoidType) \
-   _llvm(LLVMPPCFP128Type, TypeKind::LLVMPPCFP128TYPE, mlir::LLVM::LLVMPPCFP128Type) \
-   _llvm(LLVMX86MMXType, TypeKind::LLVMX86MMXTYPE, mlir::LLVM::LLVMX86MMXType) \
-   _llvm(LLVMTokenType, TypeKind::LLVMTOKENTYPE, mlir::LLVM::LLVMTokenType) \
-   _llvm(LLVMLabelType, TypeKind::LLVMLABELTYPE, mlir::LLVM::LLVMLabelType) \
-   _llvm(LLVMMetadataType, TypeKind::LLVMMETADATATYPE, mlir::LLVM::LLVMMetadataType) \
-   _llvm(LLVMStructType, TypeKind::LLVMSTRUCTTYPE, mlir::LLVM::LLVMStructType) \
    _hl(AdjustedType, TypeKind::ADJUSTEDTYPE, vast::hl::AdjustedType) \
    _hl(ArrayType, TypeKind::ARRAYTYPE, vast::hl::ArrayType) \
    _hl(AttributedType, TypeKind::ATTRIBUTEDTYPE, vast::hl::AttributedType) \
@@ -55,5 +48,5 @@
    _core(FunctionType, TypeKind::FUNCTIONTYPE, vast::core::FunctionType) \
    _unsup(UnsupportedType, TypeKind::UNSUPPORTEDTYPE, vast::unsup::UnsupportedType)
 
-#define MX_IR_NUM_MLIR_TYPES 45
+#define MX_IR_NUM_MLIR_TYPES 38
 

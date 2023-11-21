@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define MX_IR_FOR_EACH_MLIR_ATTRIBUTE(_builtin, _llvm, _scf, _memref, _ll, _hl, _core, _meta, _unsup) \
+#define MX_IR_FOR_EACH_MLIR_ATTRIBUTE(_builtin, _llvm, _memref, _abi, _ll, _hl, _core, _meta, _unsup) \
    _llvm(CConvAttr, AttributeKind::CCONVATTR, mlir::LLVM::CConvAttr) \
    _llvm(ComdatAttr, AttributeKind::COMDATATTR, mlir::LLVM::ComdatAttr) \
    _llvm(AccessGroupAttr, AttributeKind::ACCESSGROUPATTR, mlir::LLVM::AccessGroupAttr) \
@@ -65,7 +65,13 @@
    _hl(SectionAttr, AttributeKind::SECTIONATTR, vast::hl::SectionAttr) \
    _hl(UCVQualifiersAttr, AttributeKind::UCVQUALIFIERSATTR, vast::hl::UCVQualifiersAttr) \
    _hl(WarnUnusedResultAttr, AttributeKind::WARNUNUSEDRESULTATTR, vast::hl::WarnUnusedResultAttr) \
+   _core(BooleanAttr, AttributeKind::BOOLEANATTR, vast::core::BooleanAttr) \
+   _core(FloatAttr, AttributeKind::FLOATATTR, vast::core::FloatAttr) \
+   _core(IntegerAttr, AttributeKind::INTEGERATTR, vast::core::IntegerAttr) \
+   _core(SourceLanguageAttr, AttributeKind::SOURCELANGUAGEATTR, vast::core::SourceLanguageAttr) \
+   _core(StringLiteralAttr, AttributeKind::STRINGLITERALATTR, vast::core::StringLiteralAttr) \
+   _core(VoidAttr, AttributeKind::VOIDATTR, vast::core::VoidAttr) \
    _meta(IdentifierAttr, AttributeKind::IDENTIFIERATTR, vast::meta::IdentifierAttr)
 
-#define MX_IR_NUM_MLIR_ATTRIBUTES 57
+#define MX_IR_NUM_MLIR_ATTRIBUTES 63
 

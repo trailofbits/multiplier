@@ -19,13 +19,6 @@ const char *EnumeratorName(ir::TypeKind kind) {
     case ir::TypeKind::LLVMPOINTERTYPE: return "LLVMPOINTERTYPE";
     case ir::TypeKind::LLVMSCALABLEVECTORTYPE: return "LLVMSCALABLEVECTORTYPE";
     case ir::TypeKind::LLVMTARGETEXTTYPE: return "LLVMTARGETEXTTYPE";
-    case ir::TypeKind::LLVMVOIDTYPE: return "LLVMVOIDTYPE";
-    case ir::TypeKind::LLVMPPCFP128TYPE: return "LLVMPPCFP128TYPE";
-    case ir::TypeKind::LLVMX86MMXTYPE: return "LLVMX86MMXTYPE";
-    case ir::TypeKind::LLVMTOKENTYPE: return "LLVMTOKENTYPE";
-    case ir::TypeKind::LLVMLABELTYPE: return "LLVMLABELTYPE";
-    case ir::TypeKind::LLVMMETADATATYPE: return "LLVMMETADATATYPE";
-    case ir::TypeKind::LLVMSTRUCTTYPE: return "LLVMSTRUCTTYPE";
     case ir::TypeKind::ADJUSTEDTYPE: return "ADJUSTEDTYPE";
     case ir::TypeKind::ARRAYTYPE: return "ARRAYTYPE";
     case ir::TypeKind::ATTRIBUTEDTYPE: return "ATTRIBUTEDTYPE";
