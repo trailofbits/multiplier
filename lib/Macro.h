@@ -7,7 +7,7 @@
 #pragma once
 
 #include <multiplier/AST.capnp.h>
-#include <multiplier/Entities/Macro.h>
+#include <multiplier/AST/Macro.h>
 
 #include "FragmentEntity.h"
 

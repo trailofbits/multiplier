@@ -6,7 +6,7 @@
 
 #include <glog/logging.h>
 
-#include <multiplier/Entities/MacroKind.h>
+#include <multiplier/AST/MacroKind.h>
 
 #include "Context.h"
 #include "EntityMapper.h"

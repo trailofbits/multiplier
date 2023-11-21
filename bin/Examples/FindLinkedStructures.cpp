@@ -8,10 +8,10 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
-#include <multiplier/Entities/FieldDecl.h>
-#include <multiplier/Entities/PointerType.h>
-#include <multiplier/Entities/RecordDecl.h>
-#include <multiplier/Entities/RecordType.h>
+#include <multiplier/AST/FieldDecl.h>
+#include <multiplier/AST/PointerType.h>
+#include <multiplier/AST/RecordDecl.h>
+#include <multiplier/AST/RecordType.h>
 #include <sstream>
 #include <unordered_set>
 

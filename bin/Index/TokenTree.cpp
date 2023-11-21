@@ -10,7 +10,7 @@
 #include <deque>
 #include <glog/logging.h>
 #include <map>
-#include <multiplier/Entities/MacroKind.h>
+#include <multiplier/AST/MacroKind.h>
 #include <multiplier/Types.h>
 #include <mutex>
 #include <optional>

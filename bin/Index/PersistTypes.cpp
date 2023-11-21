@@ -18,7 +18,7 @@
 #include <multiplier/Database.h>
 #include <multiplier/RPC.capnp.h>
 #include <multiplier/Types.h>
-#include <multiplier/Entities/TokenKind.h>
+#include <multiplier/AST/TokenKind.h>
 
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Printer.h>

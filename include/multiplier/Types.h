@@ -11,7 +11,7 @@
 #include <cstdint>
 #include <functional>
 #include <iosfwd>
-#include <multiplier/Entities/PseudoKind.h>
+#include <multiplier/AST/PseudoKind.h>
 #include <utility>
 #include <optional>
 #include <variant>

@@ -11,11 +11,11 @@
 #include <vector>
 
 #include <multiplier/Analysis/Taint.h>
-#include <multiplier/Entities/BuiltinType.h>
-#include <multiplier/Entities/CallExpr.h>
-#include <multiplier/Entities/CastKind.h>
-#include <multiplier/Entities/ImplicitCastExpr.h>
-#include <multiplier/Entities/StmtKind.h>
+#include <multiplier/AST/BuiltinType.h>
+#include <multiplier/AST/CallExpr.h>
+#include <multiplier/AST/CastKind.h>
+#include <multiplier/AST/ImplicitCastExpr.h>
+#include <multiplier/AST/StmtKind.h>
 
 #include "Index.h"
 

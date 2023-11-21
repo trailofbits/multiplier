@@ -4,7 +4,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <multiplier/Entities/StmtKind.h>
+#include <multiplier/AST/StmtKind.h>
 
 namespace mx {
 

@@ -5,7 +5,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <multiplier/Database.h>
-#include <multiplier/Entities/DeclKind.h>
+#include <multiplier/AST/DeclKind.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Macro.h>
 #include <type_traits>

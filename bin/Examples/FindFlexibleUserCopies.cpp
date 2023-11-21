@@ -8,16 +8,16 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
-#include <multiplier/Entities/CallExpr.h>
-#include <multiplier/Entities/DeclRefExpr.h>
-#include <multiplier/Entities/FunctionDecl.h>
-#include <multiplier/Entities/FieldDecl.h>
-#include <multiplier/Entities/MemberExpr.h>
-#include <multiplier/Entities/PointerType.h>
-#include <multiplier/Entities/RecordDecl.h>
-#include <multiplier/Entities/RecordType.h>
-#include <multiplier/Entities/UnaryExprOrTypeTraitExpr.h>
-#include <multiplier/Entities/UnaryOperator.h>
+#include <multiplier/AST/CallExpr.h>
+#include <multiplier/AST/DeclRefExpr.h>
+#include <multiplier/AST/FunctionDecl.h>
+#include <multiplier/AST/FieldDecl.h>
+#include <multiplier/AST/MemberExpr.h>
+#include <multiplier/AST/PointerType.h>
+#include <multiplier/AST/RecordDecl.h>
+#include <multiplier/AST/RecordType.h>
+#include <multiplier/AST/UnaryExprOrTypeTraitExpr.h>
+#include <multiplier/AST/UnaryOperator.h>
 #include <sstream>
 
 #include "Index.h"

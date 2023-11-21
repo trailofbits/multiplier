@@ -7,7 +7,7 @@
 #pragma once
 
 #include <multiplier/AST.capnp.h>
-#include <multiplier/Entities/Designator.h>
+#include <multiplier/AST/Designator.h>
 
 #include "FragmentEntity.h"
 

@@ -22,8 +22,8 @@
 #include <cstdint>
 #include <functional>
 #include <iostream>
-#include <multiplier/Entities/StmtKind.h>
-#include <multiplier/Entities/TokenKind.h>
+#include <multiplier/AST/StmtKind.h>
+#include <multiplier/AST/TokenKind.h>
 #include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Macro.h>

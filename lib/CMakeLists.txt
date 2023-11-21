@@ -243,7 +243,7 @@ if(MX_ENABLE_INSTALL)
       "${PROJECT_NAME}Targets"
     PUBLIC_HEADER
       DESTINATION
-        "${MX_INSTALL_INCLUDE_DIR}/Entities"
+        "${MX_INSTALL_INCLUDE_DIR}/AST"
   )
   install(
     TARGETS

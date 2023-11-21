@@ -7,9 +7,9 @@
 #include "Fragment.h"
 
 #include <cassert>
-#include <multiplier/Entities/Attr.h>
-#include <multiplier/Entities/TokenKind.h>
-#include <multiplier/Entities/Type.h>
+#include <multiplier/AST/Attr.h>
+#include <multiplier/AST/TokenKind.h>
+#include <multiplier/AST/Type.h>
 
 #include "File.h"
 

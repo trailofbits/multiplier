@@ -6,7 +6,7 @@
 
 #include "Compilation.h"
 
-#include <multiplier/Entities/IncludePathLocation.h>
+#include <multiplier/AST/IncludePathLocation.h>
 #include <multiplier/Fragment.h>
 
 #if !defined(MX_DISABLE_VAST) && !defined(__CDT_PARSER__)

@@ -9,10 +9,10 @@
 #include <cassert>
 #include <cstdint>
 #include <memory>
-#include <multiplier/Entities/AttrKind.h>
-#include <multiplier/Entities/DeclKind.h>
-#include <multiplier/Entities/MacroKind.h>
-#include <multiplier/Entities/StmtKind.h>
+#include <multiplier/AST/AttrKind.h>
+#include <multiplier/AST/DeclKind.h>
+#include <multiplier/AST/MacroKind.h>
+#include <multiplier/AST/StmtKind.h>
 #include <multiplier/Types.h>
 #include <optional>
 #include <pasta/AST/Attr.h>

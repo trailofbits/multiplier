@@ -7,10 +7,10 @@
 #include "File.h"
 
 #include <cctype>
-#include <multiplier/Entities/Attr.h>
-#include <multiplier/Entities/Macro.h>
-#include <multiplier/Entities/Designator.h>
-#include <multiplier/Entities/Type.h>
+#include <multiplier/AST/Attr.h>
+#include <multiplier/AST/Macro.h>
+#include <multiplier/AST/Designator.h>
+#include <multiplier/AST/Type.h>
 #include <multiplier/AST.h>
 #include <mutex>
 

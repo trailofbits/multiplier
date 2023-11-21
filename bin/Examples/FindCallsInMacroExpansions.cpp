@@ -8,10 +8,10 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
-#include <multiplier/Entities/CallExpr.h>
-#include <multiplier/Entities/FunctionDecl.h>
-#include <multiplier/Entities/MacroArgument.h>
-#include <multiplier/Entities/MacroExpansion.h>
+#include <multiplier/AST/CallExpr.h>
+#include <multiplier/AST/FunctionDecl.h>
+#include <multiplier/AST/MacroArgument.h>
+#include <multiplier/AST/MacroExpansion.h>
 #include <multiplier/File.h>
 #include <multiplier/Fragment.h>
 #include <sstream>
