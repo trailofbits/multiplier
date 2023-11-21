@@ -69,6 +69,12 @@ const char *EnumeratorName(ir::AttributeKind kind) {
     case ir::AttributeKind::SECTIONATTR: return "SECTIONATTR";
     case ir::AttributeKind::UCVQUALIFIERSATTR: return "UCVQUALIFIERSATTR";
     case ir::AttributeKind::WARNUNUSEDRESULTATTR: return "WARNUNUSEDRESULTATTR";
+    case ir::AttributeKind::BOOLEANATTR: return "BOOLEANATTR";
+    case ir::AttributeKind::FLOATATTR: return "FLOATATTR";
+    case ir::AttributeKind::INTEGERATTR: return "INTEGERATTR";
+    case ir::AttributeKind::SOURCELANGUAGEATTR: return "SOURCELANGUAGEATTR";
+    case ir::AttributeKind::STRINGLITERALATTR: return "STRINGLITERALATTR";
+    case ir::AttributeKind::VOIDATTR: return "VOIDATTR";
     case ir::AttributeKind::IDENTIFIERATTR: return "IDENTIFIERATTR";
   }
 }

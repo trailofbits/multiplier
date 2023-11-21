@@ -68,6 +68,12 @@ enum class AttributeKind : unsigned {
   SECTIONATTR,
   UCVQUALIFIERSATTR,
   WARNUNUSEDRESULTATTR,
+  BOOLEANATTR,
+  FLOATATTR,
+  INTEGERATTR,
+  SOURCELANGUAGEATTR,
+  STRINGLITERALATTR,
+  VOIDATTR,
   IDENTIFIERATTR,
 };
 
@@ -78,7 +84,7 @@ inline static const char *EnumerationName(ir::AttributeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::AttributeKind) {
-  return 57;
+  return 63;
 }
 
 const char *EnumeratorName(ir::AttributeKind);

@@ -14,6 +14,8 @@
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <mlir/Dialect/MemRef/IR/MemRef.h>
 #include <vast/Dialect/Dialects.hpp>
+#include <vast/Dialect/ABI/ABIDialect.hpp>
+#include <vast/Dialect/ABI/ABIOps.hpp>
 #include <vast/Dialect/Core/CoreDialect.hpp>
 #include <vast/Dialect/Core/CoreOps.hpp>
 #include <vast/Dialect/Core/CoreTypes.hpp>
@@ -28,6 +30,7 @@
 #include <vast/Dialect/Unsupported/UnsupportedDialect.hpp>
 #include <vast/Dialect/Unsupported/UnsupportedOps.hpp>
 #include <vast/Dialect/Unsupported/UnsupportedTypes.hpp>
+#include <vast/Util/DataLayout.hpp>
 
 #else
 
@@ -103,6 +106,7 @@ class CodeGenerator {
   std::vector<Op> ops;
   std::vector<Type> types;
   std::vector<Attr> attrs;
+  std::set<const void *> seen_decls;
 
   std::map<std::string, std::string> included_by;
   std::map<std::string, std::map<uint64_t, std::string>> include_paths;
@@ -377,11 +381,16 @@ struct Dialect {
 };
 
 static Dialect gDialects[] = {
+  // MLIR.
   {"Builtin", "MLIR/Builtin", "builtin", "mlir", "", "mlir", {}, {}, {}},
-//  {"DLTI", "MLIR/DLTI", "dlti", "mlir", "", "mlir", {}, {}, {}},
   {"LLVMIR", "MLIR/LLVM", "llvm", "mlir::LLVM", "mlir", "LLVM", {}, {}, {}},
-  {"SCF", "MLIR/SCF", "scf", "mlir::scf", "mlir", "scf", {}, {}, {}},
   {"MemRef", "MLIR/MemRef", "memref", "mlir::memref", "mlir", "memref", {}, {}, {}},
+  
+  // TODO(pag): Including this seems to replicate `ModuleOp` and `UnrealizedConversionCastOp`.
+  // {"DLTI", "MLIR/DLTI", "dlti", "mlir", "", "mlir", {}, {}, {}},
+
+  // VAST.
+  {"ABI", "VAST/ABI", "abi", "vast::abi", "vast", "abi", {}, {}, {}},
   {"LowLevel", "VAST/LL", "ll", "vast::ll", "vast", "ll", {}, {}, {}},
   {"HighLevel", "VAST/HL", "hl", "vast::hl", "vast", "hl", {}, {}, {}},
   {"Core", "VAST/Core", "core", "vast::core", "vast", "core", {}, {}, {}},
@@ -694,8 +703,28 @@ void CodeGenerator::RunOnOps(void) {
   (void) std::filesystem::create_directory(mx_inc / "IR", ec);
   (void) std::filesystem::create_directory(mx_lib / "IR", ec);
 
+
+  std::ofstream summary_irhpp(mx_inc / "IR.h");
   std::ofstream hpp(mx_inc / "IR" / "OperationKind.h");
   std::ofstream cpp(mx_lib / "IR" / "Operation.h");  // In lib.
+
+  summary_irhpp
+      << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#pragma once\n\n"
+      << "#include \"IR/Attribute.h\"\n"
+      << "#include \"IR/AttributeKind.h\"\n"
+      << "#include \"IR/Block.h\"\n"
+      << "#include \"IR/Operation.h\"\n"
+      << "#include \"IR/OperationKind.h\"\n"
+      << "#include \"IR/Region.h\"\n"
+      << "#include \"IR/Type.h\"\n"
+      << "#include \"IR/TypeKind.h\"\n"
+      << "#include \"IR/Value.h\"\n\n";
 
   hpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
@@ -712,11 +741,39 @@ void CodeGenerator::RunOnOps(void) {
 
   auto num_ops = 0u;
   for (Dialect &dialect : gDialects) {
+
+    summary_irhpp << "#include \"IR/" << dialect.our_dir_name.generic_string() << "/Dialect.h\"\n";
+
+    std::ofstream dialect_hpp(mx_inc / "IR" / dialect.our_dir_name / "Dialect.h");
+    dialect_hpp
+        << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+        << "// All rights reserved.\n"
+        << "//\n"
+        << "// This source code is licensed in accordance with the terms specified in\n"
+        << "// the LICENSE file found in the root directory of this source tree.\n\n"
+        << "// Auto-generated file; do not modify!\n\n"
+        << "#pragma once\n\n";
+
+    for (Attr *attr : dialect.attrs) {
+      dialect_hpp << "#include \"" << attr->cls.Name() << ".h\"\n";
+    }
+
+    for (Type *type : dialect.types) {
+      dialect_hpp << "#include \"" << type->cls.Name() << ".h\"\n";
+    }
+
     for (Op *op : dialect.ops) {
-      hpp << "  " << OpNameToEnumCase(op->op_name) << ",\n";
+      auto oname = op->op_name;
+      oname.remove_prefix(1);
+      oname.remove_suffix(1);
+      hpp << "  " << OpNameToEnumCase(op->op_name) << ",  // "
+          << oname << '\n';
       ++num_ops;
+
+      dialect_hpp << "#include \"" << op->cls.Name() << ".h\"\n";
     }
   }
+
   hpp
       << "};\n\n"
       << "}  // namespace ir\n\n"
@@ -1245,6 +1302,14 @@ static std::unordered_map<std::string, std::string_view> kOpName{
 void CodeGenerator::RunOnClasses(const std::string &root_ns, const std::string &ns,
                                  std::vector<pasta::CXXRecordDecl> classes) {
   for (const pasta::CXXRecordDecl &cls : classes) {
+    if (!seen_decls.emplace(cls.RawDecl()).second) {
+      continue;
+    }
+
+    if (!seen_decls.emplace(cls.CanonicalDeclaration().RawDecl()).second) {
+      continue;
+    }
+
     std::string name = cls.Name();
     if (name.ends_with("Adaptor") || name.ends_with("Builder") ||
         name.ends_with("Interface") || name.ends_with("Parser") ||
@@ -1345,11 +1410,11 @@ void CodeGenerator::RunOnNamespace(const pasta::NamespaceDecl &root_ns,
 
   if (root_ns_name == "vast") {
     if (ns_name != "hl" && ns_name != "ll" && ns_name != "meta" &&
-        ns_name != "core" && ns_name != "unsup") {
+        ns_name != "core" && ns_name != "unsup" && ns_name != "abi") {
       return;
     }
   } else if (root_ns_name == "mlir") {
-    if (ns_name != "LLVM" && ns_name != "scf" && ns_name != "memref") {
+    if (ns_name != "LLVM" && ns_name != "memref") {
       return;
     }
 
