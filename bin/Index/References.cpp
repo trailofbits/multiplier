@@ -129,6 +129,14 @@ static bool MemberPointerIsMethodPointer(pasta::Expr member_pointer) {
   return mpt->IsMemberFunctionPointer();
 }
 
+enum class ContinuationAction {
+  kKeepAscending,
+  kDoneClassifying
+};
+
+using ClassificationAction = std::pair<std::optional<mx::BuiltinReferenceKind>,
+                                       ContinuationAction>;
+
 // Assuming `parent` is a statement and `child` is an immediate descendent of
 // `parent`, and `decl` is transitively reference by `child`, try to use the
 // kind of `parent` to classify how `child` uses `decl`.
@@ -138,14 +146,9 @@ static bool MemberPointerIsMethodPointer(pasta::Expr member_pointer) {
 // make a classification, in which case we `return true`. Finally, sometimes
 // we do both: make a classification and signal that we want to potentially make
 // more classifications.
-//
-// NOTE(pag): Returning `false` without changing `keep_ascending` will break
-//            out of the ascension loop. The last stage of things is still to
-//            try to emit a record, so a `return false` means "emit whatever's
-//            in `record` if we haven't emitted it yet".
-std::optional<mx::BuiltinReferenceKind> ClassifyParentChild(
+static ClassificationAction ClassifyParentChild(
     const pasta::Stmt &parent, const pasta::Stmt &child,
-    const pasta::Decl &decl, bool &keep_ascending) {
+    const pasta::Decl &decl) {
 
   switch (auto pk = parent.Kind()) {
     // Treat sources of casts kind of like taints from the perspective of
@@ -163,18 +166,19 @@ std::optional<mx::BuiltinReferenceKind> ClassifyParentChild(
     case pasta::StmtKind::kImplicitCastExpr:
       if (auto cast = pasta::CastExpr::From(parent)) {
         if (pasta::TypeDecl::From(decl)) {
-          return mx::BuiltinReferenceKind::CASTS_WITH_TYPE;
+          return {mx::BuiltinReferenceKind::CASTS_WITH_TYPE,
+                  ContinuationAction::kDoneClassifying};
 
         } else if (auto conversion_func = cast->ConversionFunction();
                    conversion_func && conversion_func.value() == decl) {
-          return mx::BuiltinReferenceKind::CALLS;
+          return {mx::BuiltinReferenceKind::CALLS,
+                  ContinuationAction::kDoneClassifying};
         }
       }
       [[fallthrough]];
 
     case pasta::StmtKind::kParenExpr:
-      keep_ascending = true;
-      break;
+      return {std::nullopt, ContinuationAction::kKeepAscending};
 
     case pasta::StmtKind::kSwitchStmt:
     case pasta::StmtKind::kDoStmt:
@@ -184,7 +188,8 @@ std::optional<mx::BuiltinReferenceKind> ClassifyParentChild(
     case pasta::StmtKind::kConditionalOperator:
       if (auto cond_expr = ConditionExpr(parent)) {
         if (cond_expr.value() == child) {
-          return mx::BuiltinReferenceKind::TESTS_VALUE;
+          return {mx::BuiltinReferenceKind::TESTS_VALUE,
+                  ContinuationAction::kDoneClassifying};
         }
       } else {
         assert(false);
@@ -199,39 +204,43 @@ std::optional<mx::BuiltinReferenceKind> ClassifyParentChild(
     case pasta::StmtKind::kCXXForRangeStmt:
     case pasta::StmtKind::kCXXCatchStmt:
     case pasta::StmtKind::kCoroutineBodyStmt:
-      return std::nullopt;
+      break;
 
     case pasta::StmtKind::kUnaryOperator:
       switch (auto uop = pasta::UnaryOperator::From(parent); uop->Opcode()) {
         case pasta::UnaryOperatorKind::kPostIncrement:
         case pasta::UnaryOperatorKind::kPostDecrement:
-          return mx::BuiltinReferenceKind::UPDATES_VALUE;
+          return {mx::BuiltinReferenceKind::UPDATES_VALUE,
+                  ContinuationAction::kDoneClassifying};
 
         case pasta::UnaryOperatorKind::kPreIncrement:
         case pasta::UnaryOperatorKind::kPreDecrement:
-          keep_ascending = true;
-          return mx::BuiltinReferenceKind::UPDATES_VALUE;
+          return {mx::BuiltinReferenceKind::UPDATES_VALUE,
+                  ContinuationAction::kKeepAscending};
 
         case pasta::UnaryOperatorKind::kPlus:
         case pasta::UnaryOperatorKind::kMinus:
         case pasta::UnaryOperatorKind::kNot:
         case pasta::UnaryOperatorKind::kReal:
         case pasta::UnaryOperatorKind::kImag:
-          keep_ascending = true;
-          return std::nullopt;
+          return {std::nullopt, ContinuationAction::kKeepAscending};
 
         case pasta::UnaryOperatorKind::kAddressOf:
-          return mx::BuiltinReferenceKind::TAKES_ADDRESS;
+          return {mx::BuiltinReferenceKind::TAKES_ADDRESS,
+                  ContinuationAction::kDoneClassifying};
 
         case pasta::UnaryOperatorKind::kDeref:
-          return mx::BuiltinReferenceKind::ACCESSES_VALUE;
+          return {mx::BuiltinReferenceKind::ACCESSES_VALUE,
+                  ContinuationAction::kDoneClassifying};
 
         case pasta::UnaryOperatorKind::kLNot:
-          return mx::BuiltinReferenceKind::TESTS_VALUE;
+          return {mx::BuiltinReferenceKind::TESTS_VALUE,
+                  ContinuationAction::kDoneClassifying};
 
         default:
-          return std::nullopt;
+          break;
       }
+      break;
 
     case pasta::StmtKind::kCompoundAssignOperator:
     case pasta::StmtKind::kBinaryOperator:
@@ -244,11 +253,11 @@ std::optional<mx::BuiltinReferenceKind> ClassifyParentChild(
           // This could be a call, e.g. `base->*member()`, and so we want
           // it to look like a `CALLS` of `member`. But that has to be done
           // by the next iteration, so we'll update the default.
-          if (bin->RHS() == child && MemberPointerIsMethodPointer(bin->RHS())) {
-            keep_ascending = true;
-          }
-
-          return mx::BuiltinReferenceKind::ACCESSES_VALUE;
+          return {mx::BuiltinReferenceKind::ACCESSES_VALUE,
+                  ((bin->RHS() == child &&
+                    MemberPointerIsMethodPointer(bin->RHS())) ?
+                   ContinuationAction::kKeepAscending :
+                   ContinuationAction::kDoneClassifying)};
 
         // `lhs = rhs`, or `lhs <op>= *`.
         case pasta::BinaryOperatorKind::kAssign:
@@ -267,14 +276,14 @@ std::optional<mx::BuiltinReferenceKind> ClassifyParentChild(
           // argument. Similarly, it might be inside of a larger assignment,
           // e.g. `a = b = c`, or inside of a comma operator, e.g.
           // `..., a = b`.
-          keep_ascending = true;
-          
-          return ClassifyAssignmentOperator(*bin, child);
+          return {ClassifyAssignmentOperator(*bin, child),
+                  ContinuationAction::kKeepAscending};
 
         // The right-hand side of a comma operator propagates up.
         case pasta::BinaryOperatorKind::kComma:
-          keep_ascending = bin->RHS() == child;
-          return std::nullopt;
+          return {std::nullopt, (bin->RHS() == child ?
+                                 ContinuationAction::kKeepAscending :
+                                 ContinuationAction::kDoneClassifying)};
 
         case pasta::BinaryOperatorKind::kCmp:
         case pasta::BinaryOperatorKind::kLT:
@@ -285,56 +294,62 @@ std::optional<mx::BuiltinReferenceKind> ClassifyParentChild(
         case pasta::BinaryOperatorKind::kNE:
         case pasta::BinaryOperatorKind::kLAnd:
         case pasta::BinaryOperatorKind::kLOr:
-          return mx::BuiltinReferenceKind::TESTS_VALUE;
+          return {mx::BuiltinReferenceKind::TESTS_VALUE,
+                  ContinuationAction::kDoneClassifying};
 
         default:
-          return std::nullopt;
+          break;
       }
       break;
 
     case pasta::StmtKind::kDeclRefExpr:
       assert(false);
-      return std::nullopt;
+      break;
 
     case pasta::StmtKind::kMemberExpr:
       if (auto member = pasta::MemberExpr::From(parent)) {
         assert(member->Base() == child);
-        return mx::BuiltinReferenceKind::ACCESSES_VALUE;
+        return {mx::BuiltinReferenceKind::ACCESSES_VALUE,
+                ContinuationAction::kDoneClassifying};
       }
 
       assert(false);
-      return std::nullopt;
+      break;
 
     case pasta::StmtKind::kArraySubscriptExpr:
-      return ClassifyArraySubscript(parent, child);
+      return {ClassifyArraySubscript(parent, child),
+              ContinuationAction::kDoneClassifying};
 
     case pasta::StmtKind::kCallExpr:
     case pasta::StmtKind::kCXXConstructExpr:
     case pasta::StmtKind::kCXXNewExpr:
     case pasta::StmtKind::kCXXDeleteExpr:
-      return ClassifyCall(parent, child, decl);
+      return {ClassifyCall(parent, child, decl),
+              ContinuationAction::kDoneClassifying};
 
     case pasta::StmtKind::kTypeTraitExpr:
     case pasta::StmtKind::kUnaryExprOrTypeTraitExpr:
-      return pasta::TypeDecl::From(decl) ?
-             mx::BuiltinReferenceKind::USES_TYPE :
-             mx::BuiltinReferenceKind::TAKES_VALUE;
+      return {(pasta::TypeDecl::From(decl) ?
+               mx::BuiltinReferenceKind::USES_TYPE :
+               mx::BuiltinReferenceKind::TAKES_VALUE),
+              ContinuationAction::kDoneClassifying};
 
     case pasta::StmtKind::kDeclStmt:
     case pasta::StmtKind::kDesignatedInitExpr:
     case pasta::StmtKind::kDesignatedInitUpdateExpr:
       for (auto init : parent.Children()) {
         if (init == child) {
-          return mx::BuiltinReferenceKind::COPIES_VALUE;
+          return {mx::BuiltinReferenceKind::COPIES_VALUE,
+                  ContinuationAction::kDoneClassifying};
         }
       }
-      return std::nullopt;
+      break;
 
     default:
       break;
   }
 
-  return std::nullopt;
+  return {std::nullopt, ContinuationAction::kDoneClassifying};
 }
 
 }  // namespace
@@ -373,10 +388,9 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
 
   std::optional<mx::ReferenceRecord> prev_record;
 
-  for (auto keep_ascending = true; keep_ascending && maybe_parent; ) {
-    keep_ascending = false;
-    auto classified_kind = ClassifyParentChild(
-        maybe_parent.value(), stmt, to_decl, keep_ascending);
+  while (maybe_parent) {
+    auto [classified_kind, continuation_action] = ClassifyParentChild(
+        maybe_parent.value(), stmt, to_decl);
     
     if (classified_kind) {
       record.context_entity_id = em->EntityId(maybe_parent.value());
@@ -385,8 +399,15 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
       prev_record = record;
     }
 
-    stmt = std::move(maybe_parent.value());
-    maybe_parent = em->ParentStmt(ast, stmt);
+    switch (continuation_action) {
+      case ContinuationAction::kDoneClassifying:
+        maybe_parent.reset();
+        break;
+      case ContinuationAction::kKeepAscending:
+        stmt = std::move(maybe_parent.value());
+        maybe_parent = em->ParentStmt(ast, stmt);
+        break;
+    }
   }
 
   // Try to prevent redundant records. It's not entirely necessary, as the
