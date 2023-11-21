@@ -154,17 +154,14 @@ public:
 
   // Does the type at the end of the chain match the one in the beginning?
   bool is_identity_preserving();
-
-  // Prepare a single CastState to represent the resolved type cast
-  CastState& resolved_cast_state();
 };
 
-
+// Main interface for dispatching typecast analyses.
 class TypecastAnalysis final {
 public:
   TypecastAnalysis(void);
 
-  // Traverse the AST tree of a starting fragment to recover all casting instances.
+  // Traverse the AST tree of a starting fragment to recover all casting instances and the associated CastExpr's ID.
   // Will not resolve a typecast chain for individual data sources.
   // Answers the question: "what are all the typecasts happening in this current fragment?"
   CastStateMap cast_instances(const Stmt &);

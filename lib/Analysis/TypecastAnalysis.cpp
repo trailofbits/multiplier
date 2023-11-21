@@ -268,17 +268,18 @@ CastSignChange CastState::sign_change() {
 TypecastChain::TypecastChain(bool is_forward) : is_forward(is_forward) {};
 
 void TypecastChain::add_new_transition(CastState &cast_state) {
-    cast_state_transitions.push_back(cast_state);
-    current_resolved_type = cast_state.type_after_conversion();
+    CastState& last_cast_state = cast_state_transitions.back();
+
+    // TODO: error if otherwise?
+    if (last_cast_state.type_after_conversion() == cast_state.type_before_conversion()) {
+        cast_state_transitions.push_back(cast_state);
+        current_resolved_type = cast_state.type_after_conversion();
+    }
 }
 
 std::optional<Type> TypecastChain::get_current_resolved_type() {
     return current_resolved_type;
 }
-
-CastState& resolved_cast_state() {
-}
-
 
 bool TypecastChain::is_identity_preserving() {
     if (cast_state_transitions.empty())
@@ -336,11 +337,10 @@ TypecastChain TypecastAnalysis::forward_cast_chain(const VariantEntity &id) {
         if (std::optional<BuiltinReferenceKind> ref_kind = ref.builtin_reference_kind()) {
             if (ref_kind == BuiltinReferenceKind::TYPE_CASTS) {
                 VariantEntity ref_entity = ref.as_variant();
-
-                // TODO: validate?
-                if (const auto stmt (std::get_if<Stmt>(&ref_entity)); stmt) {
+                if (const auto stmt = std::get_if<Stmt>(&ref_entity); stmt) {
                     if (auto cast_expr = CastExpr::from(*stmt)) {
-                        // TODO
+                        CastState cast_state(*cast_expr);
+                        chain.add_new_transition(cast_state);
                     }
                 }
             }
