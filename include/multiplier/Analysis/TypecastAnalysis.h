@@ -11,6 +11,7 @@
 
 #include <multiplier/Entities/CastExpr.h>
 
+#include <optional>
 #include <vector>
 #include <variant>
 #include <unordered_set>
@@ -102,11 +103,11 @@ public:
   const CastExpr& get_cast_expr();
 
   // What is the data entity we're casting from?
-  EntityId source_entity();
+  VariantEntity source_entity();
 
   // What is the data entity we're casting to?
   // Can return `std::nullopt` if the cast happens during a call or return.
-  std::optional<EntityId> destination_entity();
+  std::optional<VariantEntity> destination_entity();
 
   // What is the explicit type alias if any?
 
@@ -166,6 +167,10 @@ public:
 
   // Does the type at the end of the chain match the one in the beginning?
   bool is_identity_preserving();
+
+  // TODO Return lists of every typecasting path
+  //unsigned int num_chains();
+  //gap::generator<std::vector<CastState>> chains();
 };
 
 // Main interface for dispatching typecast analyses.

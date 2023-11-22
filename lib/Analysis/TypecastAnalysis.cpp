@@ -12,6 +12,7 @@
 #include "multiplier/Entities/PointerType.h"
 #include "multiplier/Entities/Stmt.h"
 #include "multiplier/Entities/StmtKind.h"
+#include "multiplier/Entity.h"
 #include "multiplier/Reference.h"
 #include "multiplier/Token.h"
 #include "multiplier/Types.h"
@@ -21,9 +22,6 @@
 #include <multiplier/Entities/BuiltinType.h>
 #include <optional>
 #include <stdexcept>
-#include <unordered_set>
-#include <utility>
-#include <iostream>
 #include <stack>
 #include <variant>
 
@@ -37,18 +35,18 @@ const CastExpr& CastState::get_cast_expr() {
 
 // Recovers the entity where the casting operation is performed on.
 // e.g running on `foo((size_t) bar)` would return the entity `bar`.
-EntityId CastState::source_entity() {
-    return cast_expr.sub_expression_as_written().id();
+VariantEntity CastState::source_entity() {
+    VariantEntity ve(cast_expr.sub_expression_as_written());
+    return ve;
 }
 
 // Attempts to recover a destination entity where the casted value is written to.
 // Certain casting behaviors may not result in a destination.
-std::optional<EntityId> CastState::destination_entity() {
+std::optional<VariantEntity> CastState::destination_entity() {
     if (auto parent = cast_expr.parent_statement()) {
 
         // ie. foo((size_t) bar)
-        // CallExprs don't have a real destination entity
-        // TODO: maybe get the FunctionDecl's specific argument?
+        // in-argument CallExpr casting doesn't have a real destination entity
         if (parent->kind() == mx::StmtKind::CALL_EXPR) {
             return std::nullopt;
         }
@@ -63,14 +61,16 @@ std::optional<EntityId> CastState::destination_entity() {
 
         // ie. foo = (int) bar;
         if (auto binop = BinaryOperator::from(parent)) {
-            return binop->lhs().id();
+            VariantEntity ve(binop->lhs());
+            return ve;
         }
     }
 
     // ie. int bar = (int) foo();
     if (auto parent = cast_expr.parent_declaration()) {
         if (auto var_decl = NamedDecl::from(parent)) {
-            return var_decl->id();
+            VariantEntity ve(*var_decl);
+            return ve;
         }
     }
     return std::nullopt;
@@ -319,6 +319,35 @@ CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
     seen_stmts.push(stmt);
     seen_stmt_ids.insert(stmt.id());
 
+    /*
+    // retrieve the original underlying Decl
+    auto data_source_entity = [&](auto ve) -> std::optional<Decl> {
+
+        // ie. VarDecl
+        if (std::holds_alternative<Decl>(ve)) {
+            return std::optional<Decl>(std::get<mx::Decl>(ve));
+
+        // if a Stmt, get the original backing Decl
+        // TODO: we should probably get a lvalue or rvalue??
+        // TODO: we might want to not deal with these
+        } else if (std::holds_alternative<Stmt>(ve)) {
+            auto stmt = std::get<mx::Stmt>(ve);
+            auto decls = mx::Decl::containing(stmt);
+            auto decl = decls.begin();
+            if (decl != decls.end()) {
+                return std::optional<Decl>(decl->canonical_declaration());
+            }
+        }
+
+        // TODO Token
+        return std::nullopt;
+    }(ve);
+
+    if (!data_source_entity) {
+        return std::nullopt;
+    }
+    */
+
     // ignore conversions not happening between values
     auto skip_cast = [&](const auto &cast_expr) {
         for (const auto &elem : kNoneTypeCasts) {
@@ -348,13 +377,14 @@ CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
     return cast_state_map;
 }
 
-// For a reference of a data variable, determine all casting
-TypecastChain TypecastAnalysis::cast_chain(const VariantEntity &id, bool backwards) {
+// For a reference of a data variable, determine all casting transitions including in
+// subsequent data sources
+TypecastChain TypecastAnalysis::cast_chain(const VariantEntity &ve, bool backwards) {
     TypecastChain chain(backwards == false);
 
     // each time there is a typecast with a known destination, continue to visit it's references
     std::stack<VariantEntity> visit_entities;
-    visit_entities.push(id);
+    visit_entities.push(ve);
 
     while (!visit_entities.empty()) {
         auto to_visit = visit_entities.top();
@@ -386,7 +416,7 @@ TypecastChain TypecastAnalysis::cast_chain(const VariantEntity &id, bool backwar
 
             // does this cast have a destination? if not it will be a sink/leaf node
             if (auto dest_entity = cast_state.destination_entity()) {
-                visit_entities.emplace(dest_entity);
+                visit_entities.push(*dest_entity);
                 chain.add_new_transition(to_visit, cast_state, true);
             } else {
                 chain.add_new_transition(to_visit, cast_state, false);
