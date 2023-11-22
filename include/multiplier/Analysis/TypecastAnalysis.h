@@ -13,6 +13,7 @@
 
 #include <vector>
 #include <variant>
+#include <unordered_set>
 
 namespace mx {
 
@@ -89,6 +90,7 @@ class CastState final {
 private:
   CastExpr cast_expr;
 
+  // helpers
   std::optional<CastKind> cxx_object_cast_kind();
   CastTypeWidth determine_width_cast(Type&, Type&);
 
@@ -134,22 +136,33 @@ public:
   CastCXXObjKind cxx_obj_cast();
 };
 
-// TODO we should have a DAG instead so we're control-flow aware
-// thus a typecast chain will represent one path
-
 // Represents all ordered typecast conversions of a single data source
 class TypecastChain final {
 private:
-  std::vector<CastState> cast_state_transitions;
+  friend CastState;
+
   bool is_forward;
 
-  std::optional<Type> current_resolved_type;
+  // populated after first transition
+  Type *root_type;
+
+  // stores final destination types after a leaf transition is added
+  std::unordered_set<Type*> last_resolved_types;
+
+  // holds most recent destination type at current transition
+  Type* current_resolved_type;
+
+  // maps taint entity IDs to subsequent type cast transitions
+  std::map<EntityId, std::vector<CastState>> cast_state_nodes;
 
 public:
   TypecastChain(bool);
 
-  void add_new_transition(const CastState&);
-  std::optional<Type> get_current_resolved_type();
+  // For a reference entity, add an associated Cast State
+  void add_new_transition(EntityId, const CastState&, bool);
+
+  // Resolve the most recent destination type
+  Type* get_current_resolved_type();
 
   // Does the type at the end of the chain match the one in the beginning?
   bool is_identity_preserving();
@@ -167,9 +180,6 @@ public:
   //  CastStateMap cast_instances(const Reference &);
 
   // At a specific entity reference point, resolve a forward or backward typecast chain
-  // TODO: MLIR DependencyAnalysis
-  TypecastChain forward_cast_chain(const VariantEntity &);
-  TypecastChain backward_cast_chain(const VariantEntity &);
-
+  TypecastChain cast_chain(const VariantEntity &id, bool backwards);
 };
 }; // namespace mx

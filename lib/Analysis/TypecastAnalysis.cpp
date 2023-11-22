@@ -259,36 +259,55 @@ CastSignChange CastState::sign_change() {
 
 TypecastChain::TypecastChain(bool is_forward) : is_forward(is_forward) {};
 
-void TypecastChain::add_new_transition(const CastState &cast_state) {
+void TypecastChain::add_new_transition(EntityId reference, const CastState &cast_state, bool is_leaf) {
     auto [curr_type_before, curr_type_after ] = cast_state.types_before_after_conversion();
 
-    // make sure the last transition's type matches up to this state's in order to remain valid.
-    if (!cast_state_transitions.empty()) {
-        CastState& last_cast_state = cast_state_transitions.back();
-        auto [_x, last_type] = last_cast_state.types_before_after_conversion();
-        if (last_type != curr_type_before) {
-            throw std::runtime_error("last type in chain does not match with current state's first type.");
+    // find key with CastState has a destination entity of `reference` and validate that the last type
+    // and this current state's type are the same.
+    // TODO: this might be a bit expensive?
+    if (!cast_state_nodes.empty()) {
+        for (auto iter : cast_state_nodes) {
+            auto [key, states] = iter;
+            for (auto state : states) {
+                if (state.destination_entity() == reference) {
+                    auto [state_before, state_after] = state.types_before_after_conversion();
+                    if (state_after != curr_type_before) {
+                        throw std::runtime_error("last type in chain does not match with current state's first type.");
+                    }
+                }
+            }
         }
     }
-    cast_state_transitions.push_back(cast_state);
-    current_resolved_type = curr_type_after;
+
+    // the very first transition added sets up the root_type
+    else if (cast_state_nodes.empty()) {
+        root_type = &curr_type_before;
+    }
+
+    // if this is a leaf node + entity is a sink, cache final type
+    if (is_leaf) {
+        last_resolved_types.emplace(&curr_type_after);
+    }
+
+    cast_state_nodes[reference].push_back(cast_state);
+    current_resolved_type = &curr_type_after;
 }
 
-std::optional<Type> TypecastChain::get_current_resolved_type() {
+Type* TypecastChain::get_current_resolved_type() {
     return current_resolved_type;
 }
 
 bool TypecastChain::is_identity_preserving() {
-    if (cast_state_transitions.empty())
+    if (cast_state_nodes.empty())
         return true;
 
-    auto [before, after] = cast_state_transitions.front().types_before_after_conversion();
-    if (cast_state_transitions.size() == 1) {
-        return before == after;
+    // check if any of the last resolved types match up the root_type,
+    // meaning that it is possible that the type cast chain resolved ultimately
+    // to its data source's initial type.
+    if (last_resolved_types.contains(root_type)) {
+        return true;
     }
-
-    auto [_, final_type] = cast_state_transitions.back().types_before_after_conversion();
-    return before == final_type;
+    return false;
 }
 
 CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
@@ -330,27 +349,50 @@ CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
 }
 
 // For a reference of a data variable, determine all casting
-TypecastChain TypecastAnalysis::forward_cast_chain(const VariantEntity &id) {
-    TypecastChain chain(true);
-    for (Reference ref : Reference::to(id)) {
-        if (std::optional<BuiltinReferenceKind> ref_kind = ref.builtin_reference_kind()) {
-            if (ref_kind == BuiltinReferenceKind::TYPE_CASTS) {
-                VariantEntity ref_entity = ref.as_variant();
-                if (const auto stmt = std::get_if<Stmt>(&ref_entity); stmt) {
-                    if (auto cast_expr = CastExpr::from(*stmt)) {
-                        CastState cast_state(*cast_expr);
-                        chain.add_new_transition(cast_state);
-                    }
-                }
+TypecastChain TypecastAnalysis::cast_chain(const VariantEntity &id, bool backwards) {
+    TypecastChain chain(backwards == false);
+
+    // each time there is a typecast with a known destination, continue to visit it's references
+    std::stack<VariantEntity> visit_entities;
+    visit_entities.push(id);
+
+    while (!visit_entities.empty()) {
+        auto to_visit = visit_entities.top();
+        visit_entities.pop();
+
+        // find typecasting references to the current data source
+        for (Reference ref : Reference::to(to_visit)) {
+            auto ref_kind = ref.builtin_reference_kind();
+            if (!ref_kind) {
+                continue;
+            }
+            if (ref_kind != BuiltinReferenceKind::TYPE_CASTS) {
+                continue;
+            }
+
+            // TODO: how do check if reference is forward/backward?
+            if (backwards) {
+            }
+
+            // retrieve the actual CastExpr
+            auto ref_entity = ref.as_variant();
+            auto cast_stmt = std::get_if<Stmt>(&ref_entity);
+            auto cast_expr = CastExpr::from(*cast_stmt);
+            if (!cast_expr) {
+                continue;
+            }
+
+            CastState cast_state(*cast_expr);
+
+            // does this cast have a destination? if not it will be a sink/leaf node
+            if (auto dest_entity = cast_state.destination_entity()) {
+                visit_entities.emplace(dest_entity);
+                chain.add_new_transition(to_visit, cast_state, true);
+            } else {
+                chain.add_new_transition(to_visit, cast_state, false);
             }
         }
     }
-    return { chain };
+    return chain;
 }
-
-TypecastChain TypecastAnalysis::backward_cast_chain(const VariantEntity &id) {
-    TypecastChain chain(false);
-    return { chain };
-}
-
 } // namespace mx
