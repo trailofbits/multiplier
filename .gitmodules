@@ -33,7 +33,7 @@
 [submodule "vendor/llvm-project/src"]
 	path = vendor/llvm-project/src
 	url = https://github.com/trail-of-forks/llvm-project.git
-	branch = pasta
+	branch = pasta-llvmorg-17.0.4
 [submodule "vendor/abseil/src"]
 	path = vendor/abseil/src
 	url = https://github.com/abseil/abseil-cpp.git
