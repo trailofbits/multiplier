@@ -103,11 +103,13 @@ public:
   const CastExpr& get_cast_expr();
 
   // What is the data entity we're casting from?
-  VariantEntity source_entity();
+  VariantEntity source_entity() const;
+  EntityId source_entity_id() const;
 
   // What is the data entity we're casting to?
   // Can return `std::nullopt` if the cast happens during a call or return.
-  std::optional<VariantEntity> destination_entity();
+  std::optional<VariantEntity> destination_entity() const;
+  std::optional<EntityId> destination_entity_id() const;
 
   // What is the explicit type alias if any?
 
@@ -159,8 +161,12 @@ private:
 public:
   TypecastChain(bool);
 
-  // For a reference entity, add an associated Cast State
-  void add_new_transition(EntityId, const CastState&, bool);
+  // For a reference entity, add an associated Cast State.
+  // Returns a positive number if the transition makes the graph cyclic
+  int add_new_transition(EntityId, const CastState&, bool);
+
+  // Get the initial data source's original type
+  Type* get_root_type();
 
   // Resolve the most recent destination type
   Type* get_current_resolved_type();
@@ -168,7 +174,7 @@ public:
   // Does the type at the end of the chain match the one in the beginning?
   bool is_identity_preserving();
 
-  // TODO Return lists of every typecasting path
+  // TODO Return lists of every possible typecasting path
   //unsigned int num_chains();
   //gap::generator<std::vector<CastState>> chains();
 };

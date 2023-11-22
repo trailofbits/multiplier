@@ -35,14 +35,18 @@ const CastExpr& CastState::get_cast_expr() {
 
 // Recovers the entity where the casting operation is performed on.
 // e.g running on `foo((size_t) bar)` would return the entity `bar`.
-VariantEntity CastState::source_entity() {
+VariantEntity CastState::source_entity() const {
     VariantEntity ve(cast_expr.sub_expression_as_written());
     return ve;
 }
 
+EntityId CastState::source_entity_id() const {
+    return cast_expr.sub_expression_as_written().id();
+}
+
 // Attempts to recover a destination entity where the casted value is written to.
 // Certain casting behaviors may not result in a destination.
-std::optional<VariantEntity> CastState::destination_entity() {
+std::optional<VariantEntity> CastState::destination_entity() const {
     if (auto parent = cast_expr.parent_statement()) {
 
         // ie. foo((size_t) bar)
@@ -71,6 +75,17 @@ std::optional<VariantEntity> CastState::destination_entity() {
         if (auto var_decl = NamedDecl::from(parent)) {
             VariantEntity ve(*var_decl);
             return ve;
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<EntityId> CastState::destination_entity_id() const {
+    if (auto dest_entity = destination_entity()) {
+        if (std::holds_alternative<Decl>(*dest_entity)) {
+            return std::get_if<Decl>(&*dest_entity)->id();
+        } else if (std::holds_alternative<Stmt>(*dest_entity)) {
+            return std::get_if<Stmt>(&*dest_entity)->id();
         }
     }
     return std::nullopt;
@@ -259,12 +274,11 @@ CastSignChange CastState::sign_change() {
 
 TypecastChain::TypecastChain(bool is_forward) : is_forward(is_forward) {};
 
-void TypecastChain::add_new_transition(EntityId reference, const CastState &cast_state, bool is_leaf) {
+int TypecastChain::add_new_transition(EntityId reference, const CastState &cast_state, bool is_leaf) {
     auto [curr_type_before, curr_type_after ] = cast_state.types_before_after_conversion();
 
-    // find key with CastState has a destination entity of `reference` and validate that the last type
-    // and this current state's type are the same.
-    // TODO: this might be a bit expensive?
+    // find CastState that has a destination entity of `reference` and validate that its destination type
+    // and this state's current type are the same. TODO: this might be a bit expensive?
     if (!cast_state_nodes.empty()) {
         for (auto iter : cast_state_nodes) {
             auto [key, states] = iter;
@@ -284,18 +298,33 @@ void TypecastChain::add_new_transition(EntityId reference, const CastState &cast
         root_type = &curr_type_before;
     }
 
-    // if this is a leaf node + entity is a sink, cache final type
+    cast_state_nodes[reference].push_back(cast_state);
+    current_resolved_type = &curr_type_after;
+
+    // check if this makes the graph cyclic
+    // if so, mark the destination type as a last resolved type and return a positive number to indicate
+    if (auto dest_entity_id = cast_state.destination_entity_id()) {
+        if (cast_state_nodes.find(*dest_entity_id) != cast_state_nodes.end()) {
+            last_resolved_types.emplace(&curr_type_after);
+            return 1;
+        }
+    }
+
+    // if this is a leaf node / entity is a sink, cache final type
     if (is_leaf) {
         last_resolved_types.emplace(&curr_type_after);
     }
+    return 0;
+}
 
-    cast_state_nodes[reference].push_back(cast_state);
-    current_resolved_type = &curr_type_after;
+Type* TypecastChain::get_root_type() {
+    return root_type;
 }
 
 Type* TypecastChain::get_current_resolved_type() {
     return current_resolved_type;
 }
+
 
 bool TypecastChain::is_identity_preserving() {
     if (cast_state_nodes.empty())
@@ -416,8 +445,10 @@ TypecastChain TypecastAnalysis::cast_chain(const VariantEntity &ve, bool backwar
 
             // does this cast have a destination? if not it will be a sink/leaf node
             if (auto dest_entity = cast_state.destination_entity()) {
-                visit_entities.push(*dest_entity);
-                chain.add_new_transition(to_visit, cast_state, true);
+                // ignore continuing the search with the destination if it's already been visited
+                if (chain.add_new_transition(to_visit, cast_state, true) == 0) {
+                    visit_entities.push(*dest_entity);
+                }
             } else {
                 chain.add_new_transition(to_visit, cast_state, false);
             }
