@@ -1178,7 +1178,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::AddNodeToSequence(
     SequenceNode *seq, const Node &node,
     const TrailingTokens &trailing_tokens) {
   return std::visit<SequenceNode *>(
-      [=, &trailing_tokens] (auto &&arg) -> SequenceNode * {
+      [=, this, &trailing_tokens] (auto &&arg) -> SequenceNode * {
         using arg_t = std::decay_t<decltype(arg)>;
         if constexpr (std::is_pointer_v<arg_t>) {
           return AddToSequence(seq, arg, trailing_tokens);

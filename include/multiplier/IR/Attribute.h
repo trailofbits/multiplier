@@ -30,6 +30,8 @@ class Attribute final {
   friend class Argument;
   friend class Value;
 
+ protected:
+
   std::shared_ptr<const SourceIRImpl> module_;
   mlir::detail::AttributeStorage *attr_;
   AttributeKind kind_;

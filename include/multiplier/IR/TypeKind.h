@@ -13,44 +13,44 @@ namespace ir {
 
 enum class TypeKind : unsigned {
   UNKNOWN,
-  LLVMARRAYTYPE,
-  LLVMFIXEDVECTORTYPE,
-  LLVMFUNCTIONTYPE,
-  LLVMPOINTERTYPE,
-  LLVMSCALABLEVECTORTYPE,
-  LLVMTARGETEXTTYPE,
-  ADJUSTEDTYPE,
-  ARRAYTYPE,
-  ATTRIBUTEDTYPE,
-  BFLOAT16TYPE,
-  BOOLTYPE,
-  CHARTYPE,
-  DECAYEDTYPE,
-  DOUBLETYPE,
-  ELABORATEDTYPE,
-  ENUMTYPE,
-  FLOAT128TYPE,
-  FLOATTYPE,
-  HALFTYPE,
-  INT128TYPE,
-  INTTYPE,
-  LVALUETYPE,
-  LABELTYPE,
-  LONGDOUBLETYPE,
-  LONGLONGTYPE,
-  LONGTYPE,
-  PARENTYPE,
-  POINTERTYPE,
-  RVALUETYPE,
-  RECORDTYPE,
-  REFERENCETYPE,
-  SHORTTYPE,
-  TYPEOFEXPRTYPE,
-  TYPEOFTYPETYPE,
-  TYPEDEFTYPE,
-  VOIDTYPE,
-  FUNCTIONTYPE,
-  UNSUPPORTEDTYPE,
+  LLVM_ARRAY,  // "array"
+  LLVM_FIXED_VECTOR,  // "vec"
+  LLVM_FUNCTION,  // "func"
+  LLVM_POINTER,  // "ptr"
+  LLVM_SCALABLE_VECTOR,  // "vec"
+  LLVM_TARGET_EXT,  // "target"
+  ADJUSTED,  // "adjusted"
+  ARRAY,  // "array"
+  ATTRIBUTED,  // "attributed"
+  B_FLOAT16,  // "bfloat16"
+  BOOL,  // "bool"
+  CHAR,  // "char"
+  DECAYED,  // "decayed"
+  DOUBLE,  // "double"
+  ELABORATED,  // "elaborated"
+  ENUM,  // "enum"
+  FLOAT128,  // "float128"
+  FLOAT,  // "float"
+  HALF,  // "half"
+  INT128,  // "int128"
+  INT,  // "int"
+  L_VALUE,  // "lvalue"
+  LABEL,  // "label"
+  LONG_DOUBLE,  // "longdouble"
+  LONG_LONG,  // "longlong"
+  LONG,  // "long"
+  PAREN,  // "paren"
+  POINTER,  // "ptr"
+  R_VALUE,  // "rvalue"
+  RECORD,  // "record"
+  REFERENCE,  // "reference"
+  SHORT,  // "short"
+  TYPE_OF_EXPR,  // "typeof.expr"
+  TYPE_OF_TYPE,  // "typeof.type"
+  TYPEDEF,  // "typedef"
+  VOID,  // "void"
+  FUNCTION,  // "fn"
+  UNSUPPORTED,  // "type"
 };
 
 }  // namespace ir

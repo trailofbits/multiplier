@@ -309,6 +309,26 @@ void CodeGenerator::FillIncludePathsFor(const pasta::CXXRecordDecl &cls) {
 //  }
 //}
 
+static std::string OpNameToCapitalCase(std::string_view name) {
+  if (name.ends_with("Op")) {
+    name.remove_suffix(2);
+  }
+
+  if (name.starts_with("llvm") || name.starts_with("LLVM")) {
+    name.remove_prefix(4);
+  }
+
+  if (name.starts_with('_')) {
+    name.remove_prefix(1);
+  }
+
+  if (std::isupper(name[0])) {
+    return std::string(name.begin(), name.end());
+  }
+
+  return Capitalize(SnakeCaseToCamelCase(name));
+}
+
 static std::string OpNameToEnumCase(std::string_view name) {
   std::string ret;
   for (char ch : name) {
@@ -692,6 +712,34 @@ void CodeGenerator::Summarize(void) {
   }
 }
 
+template <typename Ent>
+static void DoMethod(const pasta::CXXMethodDecl &meth,
+                     std::ostream &hpp, std::ostream &cpp,
+                     Ent *ent, std::string_view ent_class_name) {
+  std::string meth_name = meth.Name();
+  std::string api_name = MethodName(meth_name);
+  pasta::Type return_type = meth.ReturnType();
+  std::string return_type_str =
+      TokensToString(pasta::PrintedTokenRange::Create(return_type));
+
+  TypeWrapper *ret_wrapper = gReturnType[return_type_str];
+  if (ret_wrapper) {
+    hpp << "  ";
+    ret_wrapper->ReturnType(hpp, meth);
+    hpp << " " << api_name << "(void) const;\n";
+
+    ret_wrapper->ReturnType(cpp, meth);
+    cpp << " " << ent_class_name << "::" << api_name << "(void) const {\n";
+    std::string_view val = ret_wrapper->CallMethod(cpp, meth, "  ");
+    ret_wrapper->Implementation(cpp, meth, "  ", val);
+    cpp << "}\n\n";
+
+  } else {
+    hpp << "  //" << return_type_str << " " << api_name
+        << "(void) const;\n";
+  }
+}
+
 void CodeGenerator::RunOnOps(void) {
   // "/Users/pag/Code/multiplier/bin/Bootstrap/VAST.cpp"
   std::filesystem::path file = __FILE__;
@@ -889,24 +937,32 @@ void CodeGenerator::RunOnOps(void) {
         << "  switch (that.kind()) {\n"
         << "    default: return std::nullopt;\n";
 
+    auto any = false;
     for (Op *op : dialect.ops) {
       std::string enum_name = OpNameToEnumCase(op->op_name);
       cpp << "    case mx::ir::OperationKind::" << enum_name << ":\n";
+      any = true;
+    }
+
+    if (any) {
+      cpp
+          << "      return reinterpret_cast<const Operation &>(that);\n";
     }
 
     cpp
-        << "      return reinterpret_cast<const Operation &>(that);\n"
         << "  }\n"
         << "}\n\n"
         << "}  // namespace mx::ir::" << dialect.our_ns_name << "\n";
 
 
     for (Op *op : dialect.ops) {
+      auto op_name = OpNameToCapitalCase(op->name);
+
       hpp.close();
-      hpp.open(mx_inc / "IR" / dialect.our_dir_name / (op->name + ".h"));
+      hpp.open(mx_inc / "IR" / dialect.our_dir_name / (op_name + ".h"));
 
       cpp.close();
-      cpp.open(mx_lib / "IR" / dialect.our_dir_name / (op->name + ".cpp"));
+      cpp.open(mx_lib / "IR" / dialect.our_dir_name / (op_name + ".cpp"));
 
       std::string snake_name = OpNameToSnakeCase(op->op_name);
       std::string enum_name = OpNameToEnumCase(op->op_name);
@@ -924,14 +980,14 @@ void CodeGenerator::RunOnOps(void) {
           << "class " << op->name << ";\n"
           << "}  // namespace " << dialect.ns_key << "\n"
           << "namespace mx::ir::" << dialect.our_ns_name << " {\n"
-          << "class " << op->name << " final : public Operation {\n"
+          << "class " << op_name << " final : public Operation {\n"
           << " public:\n"
           << "  inline static OperationKind static_kind(void) {\n"
           << "    return OperationKind::" << enum_name
           << ";\n"
           << "  }\n\n"
-          << "  static std::optional<" << op->name << "> from(const ::mx::ir::Operation &that);\n"
-          << "  static std::optional<" << op->name << "> producing(const ::mx::ir::Value &val);\n\n"
+          << "  static std::optional<" << op_name << "> from(const ::mx::ir::Operation &that);\n"
+          << "  static std::optional<" << op_name << "> producing(const ::mx::ir::Value &val);\n\n"
           << "  ::" << dialect.ns_key
           << "::" << op->name << " underlying_op(void) const noexcept;\n\n"
           << "  // Imported methods:\n";
@@ -944,7 +1000,7 @@ void CodeGenerator::RunOnOps(void) {
           << "// the LICENSE file found in the root directory of this source tree.\n\n"
           << "// Auto-generated file; do not modify!\n\n"
           << "#include <multiplier/IR/" << dialect.our_dir_name.generic_string()
-          << "/" << op->name << ".h>\n"
+          << "/" << op_name << ".h>\n"
           << "#include <multiplier/IR/Attribute.h>\n"
           << "#include <multiplier/IR/Block.h>\n"
           << "#include <multiplier/IR/Region.h>\n"
@@ -960,14 +1016,14 @@ void CodeGenerator::RunOnOps(void) {
       cpp
           << "\n"
           << "namespace mx::ir::" << dialect.our_ns_name << " {\n"
-          << "std::optional<" << op->name << "> " << op->name
+          << "std::optional<" << op_name << "> " << op_name
           << "::from(const ::mx::ir::Operation &that) {\n"
           << "  if (that.kind() == OperationKind::" << enum_name << ") {\n"
-          << "    return reinterpret_cast<const " << op->name << " &>(that);\n"
+          << "    return reinterpret_cast<const " << op_name << " &>(that);\n"
           << "  }\n"
           << "  return std::nullopt;\n"
           << "}\n\n"
-          << "std::optional<" << op->name << "> " << op->name
+          << "std::optional<" << op_name << "> " << op_name
           << "::producing(const ::mx::ir::Value &that) {\n"
           << "  if (auto op = ::mx::ir::Operation::producing(that)) {\n"
           << "    return from(op.value());\n"
@@ -975,44 +1031,35 @@ void CodeGenerator::RunOnOps(void) {
           << "  return std::nullopt;\n"
           << "}\n\n"
           << "::" << dialect.ns_key << "::" << op->name
-          << " " << op->name << "::underlying_op(void) const noexcept {\n"
+          << " " << op_name << "::underlying_op(void) const noexcept {\n"
           << "  return ::" << dialect.ns_key << "::" << op->name << "(this->Operation::op_);\n"
           << "}\n\n";
 
       for (const pasta::CXXMethodDecl &meth : op->methods) {
-        std::string meth_name = meth.Name();
-        std::string api_name = MethodName(meth_name);
-        pasta::Type return_type = meth.ReturnType();
-        std::string return_type_str =
-            TokensToString(pasta::PrintedTokenRange::Create(return_type));
-
-        TypeWrapper *ret_wrapper = gReturnType[return_type_str];
-        if (ret_wrapper) {
-          hpp << "  ";
-          ret_wrapper->ReturnType(hpp, meth);
-          hpp << " " << api_name << "(void) const;\n";
-
-          ret_wrapper->ReturnType(cpp, meth);
-          cpp << " " << op->name << "::" << api_name << "(void) const {\n";
-          std::string_view val = ret_wrapper->CallMethod(cpp, meth, "  ");
-          ret_wrapper->Implementation(cpp, meth, "  ", val);
-          cpp << "}\n\n";
-
-        } else {
-          hpp << "  //" << return_type_str << " " << api_name
-              << "(void) const;\n";
-        }
+        DoMethod(meth, hpp, cpp, op, op_name);
       }
 
       hpp
           << "};\n"
-          << "static_assert(sizeof(" << op->name << ") == sizeof(Operation));\n\n"
+          << "static_assert(sizeof(" << op_name << ") == sizeof(Operation));\n\n"
           << "}  // namespace mx::ir::" << dialect.our_ns_name << "\n";
 
       cpp
           << "}  // namespace mx::ir::" << dialect.our_ns_name << "\n";
     }
   }
+}
+
+static std::string TypeNameToSnakeCase(std::string_view type_name) {
+  if (type_name.ends_with("Type")) {
+    type_name.remove_suffix(4);
+  }
+
+  return CapitalCaseToSnakeCase(type_name);
+}
+
+static std::string TypeNameToEnumCase(std::string_view type_name) {
+  return OpNameToEnumCase(TypeNameToSnakeCase(type_name));
 }
 
 void CodeGenerator::RunOnTypes(void) {
@@ -1041,7 +1088,8 @@ void CodeGenerator::RunOnTypes(void) {
   auto num_types = 0u;
   for (Dialect &dialect : gDialects) {
     for (Type *type : dialect.types) {
-      hpp << "  " << OpNameToEnumCase(type->name) << ",\n";
+      hpp << "  " << TypeNameToEnumCase(type->name) << ",  // "
+          << type->mnemonic << '\n';
       ++num_types;
     }
   }
@@ -1079,7 +1127,7 @@ void CodeGenerator::RunOnTypes(void) {
   for (Dialect &dialect : gDialects) {
     for (Type *type : dialect.types) {
       cpp << " \\\n   _" << dialect.our_ns_name << "(" << type->name << ", TypeKind::"
-          << OpNameToEnumCase(type->name) << ", " << dialect.ns_key << "::"
+          << TypeNameToEnumCase(type->name) << ", " << dialect.ns_key << "::"
           << type->name << ")";
     }
   }
@@ -1105,7 +1153,7 @@ void CodeGenerator::RunOnTypes(void) {
 
   for (Dialect &dialect : gDialects) {
     for (Type *type : dialect.types) {
-      std::string ec = OpNameToEnumCase(type->name);
+      std::string ec = TypeNameToEnumCase(type->name);
       cpp << "    case ir::TypeKind::" << ec << ": return \"" << ec << "\";\n";
     }
   }
@@ -1113,6 +1161,143 @@ void CodeGenerator::RunOnTypes(void) {
   cpp << "  }\n"
       << "}\n\n"
       << "}  // namespace mx\n";
+
+
+  for (const Dialect &dialect : gDialects) {
+    hpp.close();
+    hpp.open(mx_inc / "IR" / dialect.our_dir_name / "Type.h");
+
+    cpp.close();
+    cpp.open(mx_lib / "IR" / dialect.our_dir_name / "Type.cpp");
+
+    hpp
+        << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+        << "// All rights reserved.\n"
+        << "//\n"
+        << "// This source code is licensed in accordance with the terms specified in\n"
+        << "// the LICENSE file found in the root directory of this source tree.\n\n"
+        << "// Auto-generated file; do not modify!\n\n"
+        << "#pragma once\n\n"
+        << "#include \"../../Type.h\"\n\n"
+        << "namespace mx::ir::" << dialect.our_ns_name << " {\n"
+        << "class Type : public ::mx::ir::Type {\n"
+        << " public:\n"
+        << "  static std::optional<Type> from(const ::mx::ir::Type &);\n"
+        << "};\n"
+        << "static_assert(sizeof(Type) == sizeof(::mx::ir::Type));\n\n"
+        << "}  // namespace mx::ir::" << dialect.our_ns_name << "\n";
+
+    cpp
+        << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+        << "// All rights reserved.\n"
+        << "//\n"
+        << "// This source code is licensed in accordance with the terms specified in\n"
+        << "// the LICENSE file found in the root directory of this source tree.\n\n"
+        << "// Auto-generated file; do not modify!\n\n"
+        << "#include <multiplier/IR/" << dialect.our_dir_name.generic_string()
+        << "/Type.h>\n\n"
+        << "namespace mx::ir::" << dialect.our_ns_name << " {\n"
+        << "std::optional<Type> Type::from(const ::mx::ir::Type &that) {\n"
+        << "  switch (that.kind()) {\n"
+        << "    default: return std::nullopt;\n";
+
+    auto any = false;
+    for (Type *type : dialect.types) {
+      std::string enum_name = TypeNameToEnumCase(type->name);
+      cpp << "    case mx::ir::TypeKind::" << enum_name << ":\n";
+      any = true;
+    }
+
+    if (any) {
+      cpp
+          << "      return reinterpret_cast<const Type &>(that);\n";
+    }
+
+    cpp
+        << "  }\n"
+        << "}\n\n"
+        << "}  // namespace mx::ir::" << dialect.our_ns_name << "\n";
+
+    for (Type *type : dialect.types) {
+      hpp.close();
+      hpp.open(mx_inc / "IR" / dialect.our_dir_name / (type->name + ".h"));
+
+      cpp.close();
+      cpp.open(mx_lib / "IR" / dialect.our_dir_name / (type->name + ".cpp"));
+
+      std::string enum_name = TypeNameToEnumCase(type->name);
+
+      hpp
+          << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+          << "// All rights reserved.\n"
+          << "//\n"
+          << "// This source code is licensed in accordance with the terms specified in\n"
+          << "// the LICENSE file found in the root directory of this source tree.\n\n"
+          << "// Auto-generated file; do not modify!\n\n"
+          << "#pragma once\n\n"
+          << "#include \"Type.h\"\n\n"
+          << "namespace " << dialect.ns_key << " {\n"
+          << "class " << type->name << ";\n"
+          << "}  // namespace " << dialect.ns_key << "\n"
+          << "namespace mx::ir::" << dialect.our_ns_name << " {\n"
+          << "class " << type->name << " final : public Type {\n"
+          << " public:\n"
+          << "  inline static TypeKind static_kind(void) {\n"
+          << "    return TypeKind::" << enum_name
+          << ";\n"
+          << "  }\n\n"
+          << "  static std::optional<" << type->name << "> from(const ::mx::ir::Type &that);\n"
+          << "  ::" << dialect.ns_key
+          << "::" << type->name << " underlying_type(void) const noexcept;\n\n"
+          << "  // Imported methods:\n";
+
+      cpp
+          << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+          << "// All rights reserved.\n"
+          << "//\n"
+          << "// This source code is licensed in accordance with the terms specified in\n"
+          << "// the LICENSE file found in the root directory of this source tree.\n\n"
+          << "// Auto-generated file; do not modify!\n\n"
+          << "#include <multiplier/IR/" << dialect.our_dir_name.generic_string()
+          << "/" << type->name << ".h>\n"
+          << "#include <multiplier/IR/Attribute.h>\n"
+          << "#include <multiplier/IR/Type.h>\n\n";
+
+      std::set<std::string> seen;
+      for (const auto &[id, path] : include_paths[IncludePathFor(type->cls)]) {
+        if (seen.emplace(path).second) {
+          cpp << "#include <" << path << ">\n";
+        }
+      }
+
+      cpp
+          << "\n"
+          << "namespace mx::ir::" << dialect.our_ns_name << " {\n"
+          << "std::optional<" << type->name << "> " << type->name
+          << "::from(const ::mx::ir::Type &that) {\n"
+          << "  if (that.kind() == TypeKind::" << enum_name << ") {\n"
+          << "    return reinterpret_cast<const " << type->name << " &>(that);\n"
+          << "  }\n"
+          << "  return std::nullopt;\n"
+          << "}\n\n"
+          << "::" << dialect.ns_key << "::" << type->name
+          << " " << type->name << "::underlying_type(void) const noexcept {\n"
+          << "  return ::" << dialect.ns_key << "::" << type->name << "(this->Type::type_);\n"
+          << "}\n\n";
+
+      for (const pasta::CXXMethodDecl &meth : type->methods) {
+        DoMethod(meth, hpp, cpp, type, type->name);
+      }
+
+      hpp
+          << "};\n"
+          << "static_assert(sizeof(" << type->name << ") == sizeof(Type));\n\n"
+          << "}  // namespace mx::ir::" << dialect.our_ns_name << "\n";
+
+      cpp
+          << "}  // namespace mx::ir::" << dialect.our_ns_name << "\n";
+    }
+  }
 }
 
 void CodeGenerator::RunOnAttrs(void) {

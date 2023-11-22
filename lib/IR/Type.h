@@ -9,44 +9,44 @@
 #pragma once
 
 #define MX_IR_FOR_EACH_MLIR_TYPE(_builtin, _llvm, _memref, _abi, _ll, _hl, _core, _meta, _unsup) \
-   _llvm(LLVMArrayType, TypeKind::LLVMARRAYTYPE, mlir::LLVM::LLVMArrayType) \
-   _llvm(LLVMFixedVectorType, TypeKind::LLVMFIXEDVECTORTYPE, mlir::LLVM::LLVMFixedVectorType) \
-   _llvm(LLVMFunctionType, TypeKind::LLVMFUNCTIONTYPE, mlir::LLVM::LLVMFunctionType) \
-   _llvm(LLVMPointerType, TypeKind::LLVMPOINTERTYPE, mlir::LLVM::LLVMPointerType) \
-   _llvm(LLVMScalableVectorType, TypeKind::LLVMSCALABLEVECTORTYPE, mlir::LLVM::LLVMScalableVectorType) \
-   _llvm(LLVMTargetExtType, TypeKind::LLVMTARGETEXTTYPE, mlir::LLVM::LLVMTargetExtType) \
-   _hl(AdjustedType, TypeKind::ADJUSTEDTYPE, vast::hl::AdjustedType) \
-   _hl(ArrayType, TypeKind::ARRAYTYPE, vast::hl::ArrayType) \
-   _hl(AttributedType, TypeKind::ATTRIBUTEDTYPE, vast::hl::AttributedType) \
-   _hl(BFloat16Type, TypeKind::BFLOAT16TYPE, vast::hl::BFloat16Type) \
-   _hl(BoolType, TypeKind::BOOLTYPE, vast::hl::BoolType) \
-   _hl(CharType, TypeKind::CHARTYPE, vast::hl::CharType) \
-   _hl(DecayedType, TypeKind::DECAYEDTYPE, vast::hl::DecayedType) \
-   _hl(DoubleType, TypeKind::DOUBLETYPE, vast::hl::DoubleType) \
-   _hl(ElaboratedType, TypeKind::ELABORATEDTYPE, vast::hl::ElaboratedType) \
-   _hl(EnumType, TypeKind::ENUMTYPE, vast::hl::EnumType) \
-   _hl(Float128Type, TypeKind::FLOAT128TYPE, vast::hl::Float128Type) \
-   _hl(FloatType, TypeKind::FLOATTYPE, vast::hl::FloatType) \
-   _hl(HalfType, TypeKind::HALFTYPE, vast::hl::HalfType) \
-   _hl(Int128Type, TypeKind::INT128TYPE, vast::hl::Int128Type) \
-   _hl(IntType, TypeKind::INTTYPE, vast::hl::IntType) \
-   _hl(LValueType, TypeKind::LVALUETYPE, vast::hl::LValueType) \
-   _hl(LabelType, TypeKind::LABELTYPE, vast::hl::LabelType) \
-   _hl(LongDoubleType, TypeKind::LONGDOUBLETYPE, vast::hl::LongDoubleType) \
-   _hl(LongLongType, TypeKind::LONGLONGTYPE, vast::hl::LongLongType) \
-   _hl(LongType, TypeKind::LONGTYPE, vast::hl::LongType) \
-   _hl(ParenType, TypeKind::PARENTYPE, vast::hl::ParenType) \
-   _hl(PointerType, TypeKind::POINTERTYPE, vast::hl::PointerType) \
-   _hl(RValueType, TypeKind::RVALUETYPE, vast::hl::RValueType) \
-   _hl(RecordType, TypeKind::RECORDTYPE, vast::hl::RecordType) \
-   _hl(ReferenceType, TypeKind::REFERENCETYPE, vast::hl::ReferenceType) \
-   _hl(ShortType, TypeKind::SHORTTYPE, vast::hl::ShortType) \
-   _hl(TypeOfExprType, TypeKind::TYPEOFEXPRTYPE, vast::hl::TypeOfExprType) \
-   _hl(TypeOfTypeType, TypeKind::TYPEOFTYPETYPE, vast::hl::TypeOfTypeType) \
-   _hl(TypedefType, TypeKind::TYPEDEFTYPE, vast::hl::TypedefType) \
-   _hl(VoidType, TypeKind::VOIDTYPE, vast::hl::VoidType) \
-   _core(FunctionType, TypeKind::FUNCTIONTYPE, vast::core::FunctionType) \
-   _unsup(UnsupportedType, TypeKind::UNSUPPORTEDTYPE, vast::unsup::UnsupportedType)
+   _llvm(LLVMArrayType, TypeKind::LLVM_ARRAY, mlir::LLVM::LLVMArrayType) \
+   _llvm(LLVMFixedVectorType, TypeKind::LLVM_FIXED_VECTOR, mlir::LLVM::LLVMFixedVectorType) \
+   _llvm(LLVMFunctionType, TypeKind::LLVM_FUNCTION, mlir::LLVM::LLVMFunctionType) \
+   _llvm(LLVMPointerType, TypeKind::LLVM_POINTER, mlir::LLVM::LLVMPointerType) \
+   _llvm(LLVMScalableVectorType, TypeKind::LLVM_SCALABLE_VECTOR, mlir::LLVM::LLVMScalableVectorType) \
+   _llvm(LLVMTargetExtType, TypeKind::LLVM_TARGET_EXT, mlir::LLVM::LLVMTargetExtType) \
+   _hl(AdjustedType, TypeKind::ADJUSTED, vast::hl::AdjustedType) \
+   _hl(ArrayType, TypeKind::ARRAY, vast::hl::ArrayType) \
+   _hl(AttributedType, TypeKind::ATTRIBUTED, vast::hl::AttributedType) \
+   _hl(BFloat16Type, TypeKind::B_FLOAT16, vast::hl::BFloat16Type) \
+   _hl(BoolType, TypeKind::BOOL, vast::hl::BoolType) \
+   _hl(CharType, TypeKind::CHAR, vast::hl::CharType) \
+   _hl(DecayedType, TypeKind::DECAYED, vast::hl::DecayedType) \
+   _hl(DoubleType, TypeKind::DOUBLE, vast::hl::DoubleType) \
+   _hl(ElaboratedType, TypeKind::ELABORATED, vast::hl::ElaboratedType) \
+   _hl(EnumType, TypeKind::ENUM, vast::hl::EnumType) \
+   _hl(Float128Type, TypeKind::FLOAT128, vast::hl::Float128Type) \
+   _hl(FloatType, TypeKind::FLOAT, vast::hl::FloatType) \
+   _hl(HalfType, TypeKind::HALF, vast::hl::HalfType) \
+   _hl(Int128Type, TypeKind::INT128, vast::hl::Int128Type) \
+   _hl(IntType, TypeKind::INT, vast::hl::IntType) \
+   _hl(LValueType, TypeKind::L_VALUE, vast::hl::LValueType) \
+   _hl(LabelType, TypeKind::LABEL, vast::hl::LabelType) \
+   _hl(LongDoubleType, TypeKind::LONG_DOUBLE, vast::hl::LongDoubleType) \
+   _hl(LongLongType, TypeKind::LONG_LONG, vast::hl::LongLongType) \
+   _hl(LongType, TypeKind::LONG, vast::hl::LongType) \
+   _hl(ParenType, TypeKind::PAREN, vast::hl::ParenType) \
+   _hl(PointerType, TypeKind::POINTER, vast::hl::PointerType) \
+   _hl(RValueType, TypeKind::R_VALUE, vast::hl::RValueType) \
+   _hl(RecordType, TypeKind::RECORD, vast::hl::RecordType) \
+   _hl(ReferenceType, TypeKind::REFERENCE, vast::hl::ReferenceType) \
+   _hl(ShortType, TypeKind::SHORT, vast::hl::ShortType) \
+   _hl(TypeOfExprType, TypeKind::TYPE_OF_EXPR, vast::hl::TypeOfExprType) \
+   _hl(TypeOfTypeType, TypeKind::TYPE_OF_TYPE, vast::hl::TypeOfTypeType) \
+   _hl(TypedefType, TypeKind::TYPEDEF, vast::hl::TypedefType) \
+   _hl(VoidType, TypeKind::VOID, vast::hl::VoidType) \
+   _core(FunctionType, TypeKind::FUNCTION, vast::core::FunctionType) \
+   _unsup(UnsupportedType, TypeKind::UNSUPPORTED, vast::unsup::UnsupportedType)
 
 #define MX_IR_NUM_MLIR_TYPES 38
 

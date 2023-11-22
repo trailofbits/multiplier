@@ -28,7 +28,8 @@ class Type final {
   friend class Block;
   friend class Argument;
   friend class Value;
-
+ 
+ protected:
   mlir::MLIRContext *context_;
   const mlir::TypeStorage *type_;
 
