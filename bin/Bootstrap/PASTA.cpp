@@ -697,7 +697,10 @@ using MethodListPtr = std::shared_ptr<MethodList>;
 
 class CodeGenerator {
  private:
-  std::filesystem::path entities_lib_dir; // `lib/AST/`
+  std::filesystem::path lib_dir; // `lib/`
+  std::filesystem::path include_dir; // `include/multiplier`
+
+  std::filesystem::path entities_lib_dir; // `lib/AST`
   std::filesystem::path entities_include_dir; // `include/multiplier/AST`
   std::vector<ClassHierarchy *> roots;
 
@@ -4198,8 +4201,10 @@ int CodeGenerator::RunOnTranslationUnit(pasta::TranslationUnitDecl tu) {
 }
 
 CodeGenerator::CodeGenerator(char *argv[])
-    : entities_lib_dir(argv[5]),
-      entities_include_dir(argv[6]),
+    : lib_dir(argv[5]),
+      include_dir(argv[6]),
+      entities_lib_dir(lib_dir / "AST"),
+      entities_include_dir(include_dir / "AST"),
       schema_os(argv[4], std::ios::trunc | std::ios::out),
       include_h_os(entities_include_dir.parent_path() / "AST.h", std::ios::trunc | std::ios::out),
       serialize_h_os(argv[7], std::ios::trunc | std::ios::out),
