@@ -8,15 +8,4 @@
 
 #pragma once
 
-#include "CallArgsOp.h"
-#include "CallExecutionOp.h"
-#include "CallOp.h"
-#include "CallRetsOp.h"
-#include "DirectOp.h"
-#include "EpilogueOp.h"
-#include "FuncOp.h"
-#include "PrologueOp.h"
-#include "RetDirectOp.h"
-#include "TodoOp.h"
-#include "WrapFuncOp.h"
-#include "YieldOp.h"
+#include "Operation.h"
