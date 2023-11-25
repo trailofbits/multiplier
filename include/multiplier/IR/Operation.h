@@ -55,16 +55,16 @@ class Operation {
 
  protected:
   std::shared_ptr<const SourceIRImpl> module_;
-  OperationKind kind_;
   mlir::Operation *op_;
+  OperationKind kind_;
 
  public:
 
   inline Operation(std::shared_ptr<const SourceIRImpl> module,
                    mlir::Operation *opaque)
       : module_(std::move(module)),
-        kind_(classify(opaque)),
-        op_(opaque) {}
+        op_(opaque),
+        kind_(classify(opaque)) {}
 
   inline Operation(std::shared_ptr<const SourceIRImpl> module, void *opaque)
       : Operation(std::move(module),
@@ -87,9 +87,13 @@ class Operation {
     return kind_;
   }
 
+  // Results (a kind of value) are always produced by operations.
   inline static Operation producing(const Result &val);
 
+  // Some values are produced by operations. 
   static std::optional<Operation> producing(const Value &val);
+
+  // Regions and blocks are always contained inside of an operation.
   static Operation containing(const Region &);
   static Operation containing(const Block &);
 

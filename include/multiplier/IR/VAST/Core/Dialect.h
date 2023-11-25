@@ -8,16 +8,6 @@
 
 #pragma once
 
-#include "BooleanAttr.h"
-#include "FloatAttr.h"
-#include "IntegerAttr.h"
-#include "SourceLanguageAttr.h"
-#include "StringLiteralAttr.h"
-#include "VoidAttr.h"
-#include "FunctionType.h"
-#include "BinLAndOp.h"
-#include "BinLOrOp.h"
-#include "ImplicitReturnOp.h"
-#include "LazyOp.h"
-#include "ScopeOp.h"
-#include "SelectOp.h"
+#include "Attribute.h"
+#include "Type.h"
+#include "Operation.h"

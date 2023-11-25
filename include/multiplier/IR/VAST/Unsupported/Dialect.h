@@ -8,6 +8,5 @@
 
 #pragma once
 
-#include "UnsupportedType.h"
-#include "UnsupportedDecl.h"
-#include "UnsupportedStmt.h"
+#include "Type.h"
+#include "Operation.h"
