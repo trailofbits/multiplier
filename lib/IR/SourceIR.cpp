@@ -17,7 +17,9 @@
 #include <multiplier/AST/PseudoKind.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/AST/Type.h>
+#include <multiplier/IR/Attribute.h>
 #include <multiplier/IR/Operation.h>
+#include <multiplier/IR/Type.h>
 
 #include <llvm/ADT/DenseMap.h>
 #include <llvm/ADT/StringRef.h>
@@ -27,10 +29,12 @@
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <mlir/Dialect/MemRef/IR/MemRef.h>
 #include <mlir/InitAllDialects.h>
+#include <mlir/IR/AttributeSupport.h>
 #include <mlir/IR/BuiltinOps.h>
 #include <mlir/IR/BuiltinTypes.h>
 #include <mlir/IR/BuiltinAttributes.h>
 #include <mlir/IR/DialectRegistry.h>
+#include <mlir/IR/TypeSupport.h>
 #include <mlir/IR/Visitors.h>
 #include <mlir/Parser/Parser.h>
 #include <mlir/Support/TypeID.h>
@@ -46,11 +50,14 @@
 #include <vast/Dialect/Meta/MetaAttributes.hpp>
 #include <vast/Dialect/Meta/MetaTypes.hpp>
 #include <vast/Dialect/Unsupported/UnsupportedOps.hpp>
+#include <vast/Dialect/Unsupported/UnsupportedTypes.hpp>
 #include <vast/CodeGen/CodeGenContext.hpp>
 #include <vast/CodeGen/CodeGenBuilder.hpp>
 
 #include "../Fragment.h"
+#include "Attribute.h"
 #include "Operation.h"
+#include "Type.h"
 
 namespace mx {
 namespace ir {
@@ -88,6 +95,8 @@ class MLIRInitializer {
 
   llvm::DenseMap<llvm::StringRef, OperationKind> op_name_to_kind;
   llvm::DenseMap<mlir::TypeID, OperationKind> op_type_to_kind;
+  llvm::DenseMap<mlir::TypeID, AttributeKind> attr_type_to_kind;
+  llvm::DenseMap<mlir::TypeID, TypeKind> type_type_to_kind;
 
   explicit MLIRInitializer(int);
 
@@ -113,6 +122,12 @@ MLIRInitializer::MLIRInitializer(int)
 #define MAP_OP_TYPE(name, kind, type) \
     op_type_to_kind.try_emplace(mlir::TypeID::get<type>(), kind);
 
+#define MAP_ATTR_TYPE(name, kind, type) \
+    attr_type_to_kind.try_emplace(mlir::TypeID::get<type>(), kind);
+
+#define MAP_TYPE_TYPE(name, kind, type) \
+    type_type_to_kind.try_emplace(mlir::TypeID::get<type>(), kind);
+
   MX_IR_FOR_EACH_MLIR_OP(MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME,
                          MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME,
                          MAP_OP_NAME)
@@ -121,8 +136,18 @@ MLIRInitializer::MLIRInitializer(int)
                          MAP_OP_TYPE, MAP_OP_TYPE, MAP_OP_TYPE, MAP_OP_TYPE,
                          MAP_OP_TYPE)
 
+  MX_IR_FOR_EACH_MLIR_ATTRIBUTE(MAP_ATTR_TYPE, MAP_ATTR_TYPE, MAP_ATTR_TYPE,
+                                MAP_ATTR_TYPE, MAP_ATTR_TYPE, MAP_ATTR_TYPE,
+                                MAP_ATTR_TYPE, MAP_ATTR_TYPE, MAP_ATTR_TYPE)
+
+  MX_IR_FOR_EACH_MLIR_TYPE(MAP_TYPE_TYPE, MAP_TYPE_TYPE, MAP_TYPE_TYPE,
+                           MAP_TYPE_TYPE, MAP_TYPE_TYPE, MAP_TYPE_TYPE,
+                           MAP_TYPE_TYPE, MAP_TYPE_TYPE, MAP_TYPE_TYPE)
+
 #undef MAP_OP_NAME
 #undef MAP_OP_TYPE
+#undef MAP_ATTR_TYPE
+#undef MAP_TYPE_TYPE
 }
 
 static const MLIRInitializer kMLIR(0);
@@ -146,6 +171,26 @@ OperationKind Operation::classify(std::string_view name_) {
     return it->second;
   } else {
     return OperationKind::UNKNOWN;
+  }
+}
+
+AttributeKind Attribute::classify(::mlir::AttributeStorage *opaque) {
+  mlir::TypeID tid = opaque->getAbstractAttribute().getTypeID();
+  if (auto it = kMLIR.attr_type_to_kind.find(tid);
+      it != kMLIR.attr_type_to_kind.end()) {
+    return it->second;
+  } else {
+    return AttributeKind::UNKNOWN;
+  }
+}
+
+TypeKind Type::classify(::mlir::TypeStorage *opaque) {
+  mlir::TypeID tid = opaque->getAbstractType().getTypeID();
+  if (auto it = kMLIR.type_type_to_kind.find(tid);
+      it != kMLIR.type_type_to_kind.end()) {
+    return it->second;
+  } else {
+    return TypeKind::UNKNOWN;
   }
 }
 

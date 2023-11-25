@@ -4,8 +4,13 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#pragma once
+
 #include <memory>
 #include <optional>
+#include <string_view>
+
+#include "TypeKind.h"
 
 namespace mlir {
 class MLIRContext;
@@ -19,10 +24,8 @@ class Argument;
 class SourceIRImpl;
 class Type;
 
-enum TypeKind : unsigned;
-
 // The type of some operation / value.
-class Type final {
+class Type {
  private:
   friend class Operation;
   friend class Block;
@@ -31,14 +34,20 @@ class Type final {
  
  protected:
   mlir::MLIRContext *context_;
-  const mlir::TypeStorage *type_;
+  mlir::TypeStorage *type_;
+  TypeKind kind_;
 
  public:
-  inline Type(mlir::MLIRContext *context, const void *type)
+  inline Type(mlir::MLIRContext *context, const mlir::TypeStorage *type)
       : context_(std::move(context)),
-        type_(reinterpret_cast<const mlir::TypeStorage *>(type)) {}
+        type_(const_cast<mlir::TypeStorage *>(type)),
+        kind_(classify(type_)) {}
 
-  TypeKind kind(void) const noexcept;
+  static TypeKind classify(mlir::TypeStorage *type);
+
+  inline TypeKind kind(void) const noexcept {
+    return kind_;
+  }
 };
 
 }  // namespace mx::ir

@@ -6,8 +6,6 @@
 
 // Auto-generated file; do not modify!
 
-#pragma once
-
 #define MX_IR_FOR_EACH_MLIR_OP(_builtin, _llvm, _memref, _abi, _ll, _hl, _core, _meta, _unsup) \
    _builtin("builtin.module", OperationKind::BUILTIN_MODULE, mlir::ModuleOp) \
    _builtin("builtin.unrealized_conversion_cast", OperationKind::BUILTIN_UNREALIZED_CONVERSION_CAST, mlir::UnrealizedConversionCastOp) \

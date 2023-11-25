@@ -13,44 +13,70 @@ namespace ir {
 
 enum class TypeKind : unsigned {
   UNKNOWN,
-  LLVM_ARRAY,  // "array"
-  LLVM_FIXED_VECTOR,  // "vec"
-  LLVM_FUNCTION,  // "func"
-  LLVM_POINTER,  // "ptr"
-  LLVM_SCALABLE_VECTOR,  // "vec"
-  LLVM_TARGET_EXT,  // "target"
-  ADJUSTED,  // "adjusted"
-  ARRAY,  // "array"
-  ATTRIBUTED,  // "attributed"
-  B_FLOAT16,  // "bfloat16"
-  BOOL,  // "bool"
-  CHAR,  // "char"
-  DECAYED,  // "decayed"
-  DOUBLE,  // "double"
-  ELABORATED,  // "elaborated"
-  ENUM,  // "enum"
-  FLOAT128,  // "float128"
-  FLOAT,  // "float"
-  HALF,  // "half"
-  INT128,  // "int128"
-  INT,  // "int"
-  L_VALUE,  // "lvalue"
-  LABEL,  // "label"
-  LONG_DOUBLE,  // "longdouble"
-  LONG_LONG,  // "longlong"
-  LONG,  // "long"
-  PAREN,  // "paren"
-  POINTER,  // "ptr"
-  R_VALUE,  // "rvalue"
-  RECORD,  // "record"
-  REFERENCE,  // "reference"
-  SHORT,  // "short"
-  TYPE_OF_EXPR,  // "typeof.expr"
-  TYPE_OF_TYPE,  // "typeof.type"
-  TYPEDEF,  // "typedef"
-  VOID,  // "void"
-  FUNCTION,  // "fn"
-  UNSUPPORTED,  // "type"
+  BUILTIN_SHAPED,
+  BUILTIN_FLOAT,
+  BUILTIN_B_FLOAT16,
+  BUILTIN_COMPLEX,
+  BUILTIN_FLOAT8_E4_M3_B11_FNUZ,
+  BUILTIN_FLOAT8_E4_M3_FN,
+  BUILTIN_FLOAT8_E4_M3_FNUZ,
+  BUILTIN_FLOAT8_E5_M2,
+  BUILTIN_FLOAT8_E5_M2_FNUZ,
+  BUILTIN_FLOAT16,
+  BUILTIN_FLOAT32,
+  BUILTIN_FLOAT64,
+  BUILTIN_FLOAT80,
+  BUILTIN_FLOAT128,
+  BUILTIN_FLOAT_TF32,
+  BUILTIN_FUNCTION,
+  BUILTIN_INDEX,
+  BUILTIN_INTEGER,
+  BUILTIN_MEM_REF,
+  BUILTIN_NONE,
+  BUILTIN_OPAQUE,
+  BUILTIN_RANKED_TENSOR,
+  BUILTIN_TUPLE,
+  BUILTIN_UNRANKED_MEM_REF,
+  BUILTIN_UNRANKED_TENSOR,
+  BUILTIN_VECTOR,
+  LLVM_ARRAY,
+  LLVM_FIXED_VECTOR,
+  LLVM_FUNCTION,
+  LLVM_POINTER,
+  LLVM_SCALABLE_VECTOR,
+  LLVM_TARGET_EXT,
+  HL_ADJUSTED,
+  HL_ARRAY,
+  HL_ATTRIBUTED,
+  HL_B_FLOAT16,
+  HL_BOOL,
+  HL_CHAR,
+  HL_DECAYED,
+  HL_DOUBLE,
+  HL_ELABORATED,
+  HL_ENUM,
+  HL_FLOAT128,
+  HL_FLOAT,
+  HL_HALF,
+  HL_INT128,
+  HL_INT,
+  HL_L_VALUE,
+  HL_LABEL,
+  HL_LONG_DOUBLE,
+  HL_LONG_LONG,
+  HL_LONG,
+  HL_PAREN,
+  HL_POINTER,
+  HL_R_VALUE,
+  HL_RECORD,
+  HL_REFERENCE,
+  HL_SHORT,
+  HL_TYPE_OF_EXPR,
+  HL_TYPE_OF_TYPE,
+  HL_TYPEDEF,
+  HL_VOID,
+  CORE_FUNCTION,
+  UNSUP_UNSUPPORTED,
 };
 
 }  // namespace ir
@@ -60,7 +86,7 @@ inline static const char *EnumerationName(ir::TypeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::TypeKind) {
-  return 38;
+  return 64;
 }
 
 const char *EnumeratorName(ir::TypeKind);
