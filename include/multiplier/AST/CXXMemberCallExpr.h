@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "CallExpr.h"
+#include <multiplier/AST/CallExpr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CXXMemberCallExpr;
 class CXXMethodDecl;

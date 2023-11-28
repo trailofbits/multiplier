@@ -7,12 +7,11 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/HLSLAnnotationAttr.h>
-
 #include <multiplier/AST/Attr.h>
+#include <multiplier/AST/InheritableAttr.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/HLSLSV_DispatchThreadIDAttr.h>
 #include <multiplier/AST/HLSLSV_GroupIndexAttr.h>
-#include <multiplier/AST/InheritableAttr.h>
-#include <multiplier/AST/Token.h>
 
 #include "../EntityProvider.h"
 #include "../Attr.h"

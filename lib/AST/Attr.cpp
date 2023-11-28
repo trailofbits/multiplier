@@ -7,12 +7,9 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/Attr.h>
-
-#include <multiplier/AST/File.h>
-#include <multiplier/AST/Fragment.h>
-#include <multiplier/AST/Index.h>
-#include <multiplier/AST/Reference.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Reference.h>
+#include <multiplier/Frontend/File.h>
+#include <multiplier/Frontend/Token.h>
 
 #include "../EntityProvider.h"
 #include "../File.h"

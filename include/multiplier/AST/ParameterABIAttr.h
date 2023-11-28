@@ -8,20 +8,17 @@
 
 #pragma once
 
-#include "InheritableParamAttr.h"
-#include "ParameterABI.h"
+#include <multiplier/AST/InheritableParamAttr.h>
+#include <multiplier/AST/ParameterABI.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class InheritableAttr;
 class InheritableParamAttr;
 class ParameterABIAttr;
-class SwiftAsyncContextAttr;
-class SwiftContextAttr;
-class SwiftErrorResultAttr;
-class SwiftIndirectResultAttr;
 class Token;
 namespace ir {
 class Operation;

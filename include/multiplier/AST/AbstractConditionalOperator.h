@@ -8,14 +8,13 @@
 
 #pragma once
 
-#include "Expr.h"
+#include <multiplier/AST/Expr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class AbstractConditionalOperator;
-class BinaryConditionalOperator;
-class ConditionalOperator;
 class Decl;
 class Expr;
 class Stmt;

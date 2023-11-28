@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "AlignedAttrSpelling.h"
-#include "InheritableAttr.h"
+#include <multiplier/AST/AlignedAttrSpelling.h>
+#include <multiplier/AST/InheritableAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class AlignedAttr;
 class Attr;

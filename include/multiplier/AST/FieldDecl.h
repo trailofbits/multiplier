@@ -8,19 +8,18 @@
 
 #pragma once
 
-#include "DeclaratorDecl.h"
-#include "InClassInitStyle.h"
+#include <multiplier/AST/DeclaratorDecl.h>
+#include <multiplier/AST/InClassInitStyle.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class DeclaratorDecl;
 class Expr;
 class FieldDecl;
 class NamedDecl;
-class ObjCAtDefsFieldDecl;
-class ObjCIvarDecl;
 class Stmt;
 class Token;
 class ValueDecl;

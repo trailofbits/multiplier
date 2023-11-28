@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "Expr.h"
-#include "UnaryOperatorKind.h"
+#include <multiplier/AST/Expr.h>
+#include <multiplier/AST/UnaryOperatorKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class Expr;

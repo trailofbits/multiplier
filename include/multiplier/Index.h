@@ -12,20 +12,22 @@
 #include <string_view>
 #include <vector>
 
-#include "Compilation.h"
 #include "AST/Attr.h"
 #include "AST/CXXBaseSpecifier.h"
-#include "AST/DefineMacroDirective.h"
 #include "AST/Designator.h"
-#include "AST/Macro.h"
 #include "AST/NamedDecl.h"
 #include "AST/Stmt.h"
 #include "AST/TemplateArgument.h"
 #include "AST/TemplateParameterList.h"
-#include "AST/TokenKind.h"
-#include "AST/TokenCategory.h"
 #include "AST/Type.h"
-#include "File.h"
+
+#include "Frontend/Compilation.h"
+#include "Frontend/File.h"
+#include "Frontend/DefineMacroDirective.h"
+#include "Frontend/Macro.h"
+#include "Frontend/TokenKind.h"
+#include "Frontend/TokenCategory.h"
+
 #include "Fragment.h"
 #include "Iterator.h"
 #include "Query.h"

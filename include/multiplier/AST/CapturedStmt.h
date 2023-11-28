@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "CapturedRegionKind.h"
-#include "Stmt.h"
+#include <multiplier/AST/CapturedRegionKind.h>
+#include <multiplier/AST/Stmt.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CapturedDecl;
 class CapturedStmt;

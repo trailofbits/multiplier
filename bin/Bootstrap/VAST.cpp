@@ -450,20 +450,20 @@ struct Dialect {
 
 static Dialect gDialects[] = {
   // MLIR.
-  {"Builtin", "MLIR/Builtin", "builtin", "mlir", "", "mlir", {}, {}, {}},
-  {"LLVMIR", "MLIR/LLVM", "llvm", "mlir::LLVM", "mlir", "LLVM", {}, {}, {}},
-  {"MemRef", "MLIR/MemRef", "memref", "mlir::memref", "mlir", "memref", {}, {}, {}},
+  {"Builtin", "Builtin", "builtin", "mlir", "", "mlir", {}, {}, {}},
+  {"LLVMIR", "LLVM", "llvm", "mlir::LLVM", "mlir", "LLVM", {}, {}, {}},
+  {"MemRef", "MemRef", "memref", "mlir::memref", "mlir", "memref", {}, {}, {}},
   
   // TODO(pag): Including this seems to replicate `ModuleOp` and `UnrealizedConversionCastOp`.
   // {"DLTI", "MLIR/DLTI", "dlti", "mlir", "", "mlir", {}, {}, {}},
 
   // VAST.
-  {"ABI", "VAST/ABI", "abi", "vast::abi", "vast", "abi", {}, {}, {}},
-  {"LowLevel", "VAST/LL", "ll", "vast::ll", "vast", "ll", {}, {}, {}},
-  {"HighLevel", "VAST/HL", "hl", "vast::hl", "vast", "hl", {}, {}, {}},
-  {"Core", "VAST/Core", "core", "vast::core", "vast", "core", {}, {}, {}},
-  {"Meta", "VAST/Meta", "meta", "vast::meta", "vast", "meta", {}, {}, {}},
-  {"Unsupported", "VAST/Unsupported", "unsup", "vast::unsup", "vast", "unsup", {}, {}, {}},
+  {"ABI", "ABI", "abi", "vast::abi", "vast", "abi", {}, {}, {}},
+  {"LowLevel", "LowLevel", "ll", "vast::ll", "vast", "ll", {}, {}, {}},
+  {"HighLevel", "HighLevel", "hl", "vast::hl", "vast", "hl", {}, {}, {}},
+  {"Core", "Core", "core", "vast::core", "vast", "core", {}, {}, {}},
+  {"Meta", "Meta", "meta", "vast::meta", "vast", "meta", {}, {}, {}},
+  {"Unsupported", "Unsupported", "unsup", "vast::unsup", "vast", "unsup", {}, {}, {}},
 };
 
 class TypeWrapper {
@@ -843,6 +843,9 @@ void CodeGenerator::RunOnOps(void) {
   auto num_ops = 0u;
   for (Dialect &dialect : gDialects) {
 
+    (void) std::filesystem::create_directory(mx_inc / "IR" / dialect.our_dir_name.generic_string(), ec);
+    (void) std::filesystem::create_directory(mx_lib / "IR" / dialect.our_dir_name.generic_string(), ec);
+
     summary_irhpp << "#include \"IR/" << dialect.our_dir_name.generic_string() << "/Dialect.h\"\n";
 
     std::ofstream dialect_hpp(mx_inc / "IR" / dialect.our_dir_name / "Dialect.h");
@@ -967,7 +970,7 @@ void CodeGenerator::RunOnOps(void) {
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
         << "// Auto-generated file; do not modify!\n\n"
         << "#pragma once\n\n"
-        << "#include \"../../Operation.h\"\n\n"
+        << "#include \"../Operation.h\"\n\n"
         << "namespace " << dialect.ns_key << " {\n";
 
     for (Op *op : dialect.ops) {
@@ -1244,7 +1247,7 @@ void CodeGenerator::RunOnTypes(void) {
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
         << "// Auto-generated file; do not modify!\n\n"
         << "#pragma once\n\n"
-        << "#include \"../../Type.h\"\n\n"
+        << "#include \"../Type.h\"\n\n"
         << "namespace " << dialect.ns_key << " {\n";
 
     for (Type *type : dialect.types) {
@@ -1515,7 +1518,7 @@ void CodeGenerator::RunOnAttrs(void) {
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
         << "// Auto-generated file; do not modify!\n\n"
         << "#pragma once\n\n"
-        << "#include \"../../Attribute.h\"\n\n"
+        << "#include \"../Attribute.h\"\n\n"
         << "namespace " << dialect.ns_key << " {\n";
 
     for (Attr *attr : dialect.attrs) {

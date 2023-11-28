@@ -11,6 +11,7 @@
 
 #include "Index.h"
 #include <multiplier/AST.h>
+#include <multiplier/Frontend.h>
 
 DEFINE_uint64(fragment_id, 0, "ID of the fragment to print");
 DEFINE_bool(with_categories, false, "Also print out token categories?");

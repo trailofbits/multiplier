@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "ClassTemplateSpecializationDecl.h"
+#include <multiplier/AST/ClassTemplateSpecializationDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CXXRecordDecl;
 class ClassTemplatePartialSpecializationDecl;

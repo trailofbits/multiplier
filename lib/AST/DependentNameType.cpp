@@ -7,8 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/DependentNameType.h>
-
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/Type.h>
 #include <multiplier/AST/TypeWithKeyword.h>
 

@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "TypeDecl.h"
+#include <multiplier/AST/TypeDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class NamedDecl;

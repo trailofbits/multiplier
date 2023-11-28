@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "UsingShadowDecl.h"
+#include <multiplier/AST/UsingShadowDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CXXRecordDecl;
 class ConstructorUsingShadowDecl;

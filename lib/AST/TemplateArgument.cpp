@@ -7,11 +7,9 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/TemplateArgument.h>
-
-#include <multiplier/AST/File.h>
-#include <multiplier/AST/Fragment.h>
-#include <multiplier/AST/Reference.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Reference.h>
+#include <multiplier/Frontend/File.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/Type.h>
 #include <multiplier/AST/ValueDecl.h>
 

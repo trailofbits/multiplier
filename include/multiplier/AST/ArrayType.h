@@ -8,19 +8,16 @@
 
 #pragma once
 
-#include "ArrayTypeArraySizeModifier.h"
-#include "Type.h"
+#include <multiplier/AST/ArrayTypeArraySizeModifier.h>
+#include <multiplier/AST/Type.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class ArrayType;
-class ConstantArrayType;
-class DependentSizedArrayType;
-class IncompleteArrayType;
 class Token;
 class Type;
-class VariableArrayType;
 namespace ir {
 class Operation;
 class Value;

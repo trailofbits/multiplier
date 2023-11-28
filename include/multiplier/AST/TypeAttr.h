@@ -8,41 +8,15 @@
 
 #pragma once
 
-#include "Attr.h"
+#include <multiplier/AST/Attr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
-class AddressSpaceAttr;
-class AnnotateTypeAttr;
-class ArmMveStrictPolymorphismAttr;
-class ArmStreamingAttr;
 class Attr;
-class BTFTypeTagAttr;
-class CmseNSCallAttr;
-class HLSLGroupSharedAddressSpaceAttr;
-class NoDerefAttr;
-class ObjCGCAttr;
-class ObjCInertUnsafeUnretainedAttr;
-class ObjCKindOfAttr;
-class OpenCLConstantAddressSpaceAttr;
-class OpenCLGenericAddressSpaceAttr;
-class OpenCLGlobalAddressSpaceAttr;
-class OpenCLGlobalDeviceAddressSpaceAttr;
-class OpenCLGlobalHostAddressSpaceAttr;
-class OpenCLLocalAddressSpaceAttr;
-class OpenCLPrivateAddressSpaceAttr;
-class Ptr32Attr;
-class Ptr64Attr;
-class SPtrAttr;
 class Token;
 class TypeAttr;
-class TypeNonNullAttr;
-class TypeNullUnspecifiedAttr;
-class TypeNullableAttr;
-class TypeNullableResultAttr;
-class UPtrAttr;
-class WebAssemblyFuncrefAttr;
 namespace ir {
 class Operation;
 class Value;

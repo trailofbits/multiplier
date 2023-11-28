@@ -8,12 +8,13 @@
 
 #pragma once
 
-#include "InheritableAttr.h"
-#include "OwnershipAttrOwnershipKind.h"
-#include "OwnershipAttrSpelling.h"
+#include <multiplier/AST/InheritableAttr.h>
+#include <multiplier/AST/OwnershipAttrOwnershipKind.h>
+#include <multiplier/AST/OwnershipAttrSpelling.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class InheritableAttr;

@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "AdjustedType.h"
+#include <multiplier/AST/AdjustedType.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class AdjustedType;
 class DecayedType;

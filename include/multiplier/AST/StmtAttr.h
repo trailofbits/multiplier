@@ -8,20 +8,15 @@
 
 #pragma once
 
-#include "Attr.h"
+#include <multiplier/AST/Attr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
-class FallThroughAttr;
-class LikelyAttr;
-class MustTailAttr;
-class OpenCLUnrollHintAttr;
 class StmtAttr;
-class SuppressAttr;
 class Token;
-class UnlikelyAttr;
 namespace ir {
 class Operation;
 class Value;

@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "AutoTypeKeyword.h"
-#include "DeducedType.h"
+#include <multiplier/AST/AutoTypeKeyword.h>
+#include <multiplier/AST/DeducedType.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class AutoType;
 class ConceptDecl;

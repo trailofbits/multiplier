@@ -7,10 +7,9 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/DependentSizedMatrixType.h>
-
 #include <multiplier/AST/Expr.h>
 #include <multiplier/AST/MatrixType.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/Type.h>
 
 #include "../EntityProvider.h"

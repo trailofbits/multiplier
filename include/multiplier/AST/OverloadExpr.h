@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "Expr.h"
+#include <multiplier/AST/Expr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CXXRecordDecl;
 class Decl;
@@ -19,8 +20,6 @@ class Expr;
 class OverloadExpr;
 class Stmt;
 class Token;
-class UnresolvedLookupExpr;
-class UnresolvedMemberExpr;
 class ValueStmt;
 namespace ir {
 class Operation;

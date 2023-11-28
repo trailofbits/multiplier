@@ -7,17 +7,16 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/TemplateDecl.h>
-
-#include <multiplier/AST/BuiltinTemplateDecl.h>
-#include <multiplier/AST/ClassTemplateDecl.h>
-#include <multiplier/AST/ConceptDecl.h>
 #include <multiplier/AST/Decl.h>
-#include <multiplier/AST/FunctionTemplateDecl.h>
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/AST/TemplateParameterList.h>
+#include <multiplier/Frontend/Token.h>
+#include <multiplier/AST/BuiltinTemplateDecl.h>
+#include <multiplier/AST/ClassTemplateDecl.h>
+#include <multiplier/AST/ConceptDecl.h>
+#include <multiplier/AST/FunctionTemplateDecl.h>
 #include <multiplier/AST/TemplateTemplateParmDecl.h>
-#include <multiplier/AST/Token.h>
 #include <multiplier/AST/TypeAliasTemplateDecl.h>
 #include <multiplier/AST/VarTemplateDecl.h>
 

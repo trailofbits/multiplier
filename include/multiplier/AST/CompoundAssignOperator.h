@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "BinaryOperator.h"
+#include <multiplier/AST/BinaryOperator.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class BinaryOperator;
 class CompoundAssignOperator;

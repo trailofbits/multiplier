@@ -8,15 +8,13 @@
 
 #pragma once
 
-#include "CallExprADLCallKind.h"
-#include "Expr.h"
+#include <multiplier/AST/CallExprADLCallKind.h>
+#include <multiplier/AST/Expr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
-class CUDAKernelCallExpr;
-class CXXMemberCallExpr;
-class CXXOperatorCallExpr;
 class CallExpr;
 class CastExpr;
 class Decl;
@@ -25,7 +23,6 @@ class FunctionDecl;
 class Stmt;
 class Token;
 class Type;
-class UserDefinedLiteral;
 class ValueStmt;
 namespace ir {
 class Operation;

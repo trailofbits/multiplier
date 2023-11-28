@@ -7,9 +7,8 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/TypeNullUnspecifiedAttr.h>
-
 #include <multiplier/AST/Attr.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/TypeAttr.h>
 
 #include "../EntityProvider.h"

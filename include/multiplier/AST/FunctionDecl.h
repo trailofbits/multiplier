@@ -8,24 +8,20 @@
 
 #pragma once
 
-#include "ConstexprSpecKind.h"
-#include "DeclaratorDecl.h"
-#include "ExceptionSpecificationType.h"
-#include "FunctionDeclTemplatedKind.h"
-#include "LanguageLinkage.h"
-#include "MultiVersionKind.h"
-#include "OverloadedOperatorKind.h"
-#include "StorageClass.h"
-#include "TemplateSpecializationKind.h"
+#include <multiplier/AST/ConstexprSpecKind.h>
+#include <multiplier/AST/DeclaratorDecl.h>
+#include <multiplier/AST/ExceptionSpecificationType.h>
+#include <multiplier/AST/FunctionDeclTemplatedKind.h>
+#include <multiplier/AST/LanguageLinkage.h>
+#include <multiplier/AST/MultiVersionKind.h>
+#include <multiplier/AST/OverloadedOperatorKind.h>
+#include <multiplier/AST/StorageClass.h>
+#include <multiplier/AST/TemplateSpecializationKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
-class CXXConstructorDecl;
-class CXXConversionDecl;
-class CXXDeductionGuideDecl;
-class CXXDestructorDecl;
-class CXXMethodDecl;
 class CallExpr;
 class Decl;
 class DeclaratorDecl;
@@ -172,6 +168,9 @@ class FunctionDecl : public DeclaratorDecl {
   bool will_have_body(void) const;
   std::optional<Stmt> body(void) const;
   gap::generator<Decl> declarations_in_context(void) const &;
+  // Callers of a `FunctionDecl` can be `CallExpr`, `CxxNewExpr`,
+  // `CxxConstructExpr`, etc. Even `CastExpr` can sometimes be a call
+  // if it needs to invoke a function call to perform the conversion.
   gap::generator<Stmt> callers(void) const &;
 };
 

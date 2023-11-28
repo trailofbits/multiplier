@@ -6,7 +6,7 @@
 
 #include <cassert>
 #include <multiplier/Database.h>
-#include <multiplier/AST/MacroKind.h>
+#include <multiplier/Frontend/MacroKind.h>
 #include <multiplier/Types.h>
 #include <pasta/AST/Macro.h>
 #include <pasta/AST/Stmt.h>

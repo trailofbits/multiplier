@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "ObjCTypeParamVariance.h"
-#include "TypedefNameDecl.h"
+#include <multiplier/AST/ObjCTypeParamVariance.h>
+#include <multiplier/AST/TypedefNameDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class NamedDecl;

@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "ImplicitParamDeclImplicitParamKind.h"
-#include "VarDecl.h"
+#include <multiplier/AST/ImplicitParamDeclImplicitParamKind.h>
+#include <multiplier/AST/VarDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class DeclaratorDecl;

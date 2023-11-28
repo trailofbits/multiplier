@@ -7,7 +7,13 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/ExplicitCastExpr.h>
-
+#include <multiplier/AST/CastExpr.h>
+#include <multiplier/AST/Decl.h>
+#include <multiplier/AST/Expr.h>
+#include <multiplier/AST/Stmt.h>
+#include <multiplier/Frontend/Token.h>
+#include <multiplier/AST/Type.h>
+#include <multiplier/AST/ValueStmt.h>
 #include <multiplier/AST/BuiltinBitCastExpr.h>
 #include <multiplier/AST/CStyleCastExpr.h>
 #include <multiplier/AST/CXXAddrspaceCastExpr.h>
@@ -16,14 +22,7 @@
 #include <multiplier/AST/CXXFunctionalCastExpr.h>
 #include <multiplier/AST/CXXReinterpretCastExpr.h>
 #include <multiplier/AST/CXXStaticCastExpr.h>
-#include <multiplier/AST/CastExpr.h>
-#include <multiplier/AST/Decl.h>
-#include <multiplier/AST/Expr.h>
 #include <multiplier/AST/ObjCBridgedCastExpr.h>
-#include <multiplier/AST/Stmt.h>
-#include <multiplier/AST/Token.h>
-#include <multiplier/AST/Type.h>
-#include <multiplier/AST/ValueStmt.h>
 
 #include "../EntityProvider.h"
 #include "../Stmt.h"

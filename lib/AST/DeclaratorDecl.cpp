@@ -7,29 +7,28 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/DeclaratorDecl.h>
-
+#include <multiplier/AST/Decl.h>
+#include <multiplier/AST/Expr.h>
+#include <multiplier/AST/NamedDecl.h>
+#include <multiplier/AST/Stmt.h>
+#include <multiplier/AST/TemplateParameterList.h>
+#include <multiplier/Frontend/Token.h>
+#include <multiplier/AST/ValueDecl.h>
 #include <multiplier/AST/CXXConstructorDecl.h>
 #include <multiplier/AST/CXXConversionDecl.h>
 #include <multiplier/AST/CXXDeductionGuideDecl.h>
 #include <multiplier/AST/CXXDestructorDecl.h>
 #include <multiplier/AST/CXXMethodDecl.h>
-#include <multiplier/AST/Decl.h>
 #include <multiplier/AST/DecompositionDecl.h>
-#include <multiplier/AST/Expr.h>
 #include <multiplier/AST/FieldDecl.h>
 #include <multiplier/AST/FunctionDecl.h>
 #include <multiplier/AST/ImplicitParamDecl.h>
 #include <multiplier/AST/MSPropertyDecl.h>
-#include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/NonTypeTemplateParmDecl.h>
 #include <multiplier/AST/OMPCapturedExprDecl.h>
 #include <multiplier/AST/ObjCAtDefsFieldDecl.h>
 #include <multiplier/AST/ObjCIvarDecl.h>
 #include <multiplier/AST/ParmVarDecl.h>
-#include <multiplier/AST/Stmt.h>
-#include <multiplier/AST/TemplateParameterList.h>
-#include <multiplier/AST/Token.h>
-#include <multiplier/AST/ValueDecl.h>
 #include <multiplier/AST/VarDecl.h>
 #include <multiplier/AST/VarTemplatePartialSpecializationDecl.h>
 #include <multiplier/AST/VarTemplateSpecializationDecl.h>

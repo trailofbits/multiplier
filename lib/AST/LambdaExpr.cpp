@@ -7,7 +7,6 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/LambdaExpr.h>
-
 #include <multiplier/AST/CXXMethodDecl.h>
 #include <multiplier/AST/CXXRecordDecl.h>
 #include <multiplier/AST/CompoundStmt.h>
@@ -17,7 +16,7 @@
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/AST/TemplateParameterList.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueStmt.h>
 
 #include "../EntityProvider.h"

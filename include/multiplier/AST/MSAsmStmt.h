@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "AsmStmt.h"
+#include <multiplier/AST/AsmStmt.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class AsmStmt;
 class Decl;

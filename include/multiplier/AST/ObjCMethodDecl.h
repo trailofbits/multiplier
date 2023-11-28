@@ -8,13 +8,14 @@
 
 #pragma once
 
-#include "DeclObjCDeclQualifier.h"
-#include "NamedDecl.h"
-#include "ObjCMethodDeclImplementationControl.h"
-#include "ObjCMethodFamily.h"
+#include <multiplier/AST/DeclObjCDeclQualifier.h>
+#include <multiplier/AST/NamedDecl.h>
+#include <multiplier/AST/ObjCMethodDeclImplementationControl.h>
+#include <multiplier/AST/ObjCMethodFamily.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class ImplicitParamDecl;

@@ -15,20 +15,38 @@ set(binary_include_dir "${PROJECT_BINARY_DIR}/include/${lower_project_name}")
 capnp_generate_cpp(MX_RPC_SOURCES MX_RPC_HEADERS RPC.capnp)
 capnp_generate_cpp(MX_AST_SOURCES MX_AST_HEADERS AST.capnp)  # Bootstrapped file.
 
-file(GLOB entity_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_ENTITIES_DIR}/*.h")
-file(GLOB entity_sources CONFIGURE_DEPENDS "${MX_BOOTSTRAP_LIB_ENTITIES_DIR}/*.cpp")
+file(GLOB frontend_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_DIR}/Frontend/*.h")
+file(GLOB frontend_sources CONFIGURE_DEPENDS "${MX_BOOTSTRAP_LIB_DIR}/Frontend/*.cpp")
+
+file(GLOB ast_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_DIR}/AST/*.h")
+file(GLOB ast_sources CONFIGURE_DEPENDS "${MX_BOOTSTRAP_LIB_DIR}/AST/*.cpp")
 
 if(MX_ENABLE_VAST)
   add_subdirectory("IR")
 endif()
 
-add_library("mx-entities" INTERFACE)
-set_target_properties("mx-entities"
+add_library("mx-frontend" INTERFACE)
+set_target_properties("mx-frontend"
   PROPERTIES
     LINKER_LANGUAGE
       CXX
     PUBLIC_HEADER
-      "${entity_headers}"
+      "${frontend_headers}"
+    VISIBILITY_INLINES_HIDDEN
+      YES
+    CXX_VISIBILITY_PRESET
+      hidden
+    POSITION_INDEPENDENT_CODE
+      YES
+)
+
+add_library("mx-ast" INTERFACE)
+set_target_properties("mx-ast"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX
+    PUBLIC_HEADER
+      "${ast_headers}"
     VISIBILITY_INLINES_HIDDEN
       YES
     CXX_VISIBILITY_PRESET
@@ -79,24 +97,21 @@ add_custom_target("copy_headers"
 
 set(api_headers
   "${source_include_dir}/AST.h"
-  "${source_include_dir}/Compilation.h"
   "${source_include_dir}/Entity.h"
-  "${source_include_dir}/File.h"
   "${source_include_dir}/Fragment.h"
   "${source_include_dir}/Index.h"
   "${source_include_dir}/Iterator.h"
   "${source_include_dir}/Query.h"
   "${source_include_dir}/Re2.h"
   "${source_include_dir}/Reference.h"
-  "${source_include_dir}/Token.h"
-  "${source_include_dir}/TokenTree.h"
   "${source_include_dir}/Types.h"
 )
 
 add_library("mx-api" STATIC
   ${api_headers}
-  ${entity_headers}  # Auto-generated
-  ${entity_sources}  # Auto-generated
+
+  ${frontend_sources}  # Auto-generated
+  ${ast_sources}  # Auto-generated
 
   $<BUILD_INTERFACE:${source_include_dir}/Database.h>
   $<BUILD_INTERFACE:${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}>
@@ -170,6 +185,8 @@ add_dependencies("mx-api"
 
 target_link_libraries("mx-api"
   PUBLIC
+    "mx-frontend"
+    "mx-ast"
     "mx-sqlite"
     "gap::gap"
     "gap::gap-core"
@@ -238,7 +255,16 @@ set_target_properties("mx-api"
 if(MX_ENABLE_INSTALL)
   install(
     TARGETS
-      "mx-entities"
+      "mx-frontend"
+    EXPORT
+      "${PROJECT_NAME}Targets"
+    PUBLIC_HEADER
+      DESTINATION
+        "${MX_INSTALL_INCLUDE_DIR}/Frontend"
+  )
+  install(
+    TARGETS
+      "mx-ast"
     EXPORT
       "${PROJECT_NAME}Targets"
     PUBLIC_HEADER

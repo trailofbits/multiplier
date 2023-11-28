@@ -7,11 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/NamespaceAliasDecl.h>
-
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/Stmt.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 
 #include "../EntityProvider.h"
 #include "../Decl.h"

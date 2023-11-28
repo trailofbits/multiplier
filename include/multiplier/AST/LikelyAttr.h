@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "StmtAttr.h"
+#include <multiplier/AST/StmtAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class LikelyAttr;

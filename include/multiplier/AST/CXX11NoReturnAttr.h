@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "CXX11NoReturnAttrSpelling.h"
-#include "InheritableAttr.h"
+#include <multiplier/AST/CXX11NoReturnAttrSpelling.h>
+#include <multiplier/AST/InheritableAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class CXX11NoReturnAttr;

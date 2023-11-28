@@ -8,10 +8,9 @@
 
 #include <cctype>
 #include <multiplier/AST/Attr.h>
-#include <multiplier/AST/Macro.h>
 #include <multiplier/AST/Designator.h>
 #include <multiplier/AST/Type.h>
-#include <multiplier/AST.h>
+#include <multiplier/Frontend/Macro.h>
 #include <mutex>
 
 #include "Attr.h"

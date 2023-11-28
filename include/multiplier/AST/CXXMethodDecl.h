@@ -8,15 +8,13 @@
 
 #pragma once
 
-#include "FunctionDecl.h"
-#include "RefQualifierKind.h"
+#include <multiplier/AST/FunctionDecl.h>
+#include <multiplier/AST/RefQualifierKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
-class CXXConstructorDecl;
-class CXXConversionDecl;
-class CXXDestructorDecl;
 class CXXMethodDecl;
 class Decl;
 class DeclaratorDecl;

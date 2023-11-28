@@ -8,14 +8,15 @@
 
 #pragma once
 
-#include "LambdaCaptureDefault.h"
-#include "MSInheritanceModel.h"
-#include "MSVtorDispMode.h"
-#include "RecordDecl.h"
-#include "TemplateSpecializationKind.h"
+#include <multiplier/AST/LambdaCaptureDefault.h>
+#include <multiplier/AST/MSInheritanceModel.h>
+#include <multiplier/AST/MSVtorDispMode.h>
+#include <multiplier/AST/RecordDecl.h>
+#include <multiplier/AST/TemplateSpecializationKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CXXBaseSpecifier;
 class CXXConstructorDecl;
@@ -23,8 +24,6 @@ class CXXDestructorDecl;
 class CXXMethodDecl;
 class CXXRecordDecl;
 class ClassTemplateDecl;
-class ClassTemplatePartialSpecializationDecl;
-class ClassTemplateSpecializationDecl;
 class Decl;
 class FriendDecl;
 class FunctionDecl;

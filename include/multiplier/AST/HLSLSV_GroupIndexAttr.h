@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "HLSLAnnotationAttr.h"
+#include <multiplier/AST/HLSLAnnotationAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class HLSLAnnotationAttr;

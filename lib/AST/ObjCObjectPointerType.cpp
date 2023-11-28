@@ -7,12 +7,11 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/ObjCObjectPointerType.h>
-
 #include <multiplier/AST/ObjCInterfaceDecl.h>
 #include <multiplier/AST/ObjCInterfaceType.h>
 #include <multiplier/AST/ObjCObjectType.h>
 #include <multiplier/AST/ObjCProtocolDecl.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/Type.h>
 
 #include "../EntityProvider.h"

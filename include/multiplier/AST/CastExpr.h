@@ -8,27 +8,18 @@
 
 #pragma once
 
-#include "CastKind.h"
-#include "Expr.h"
+#include <multiplier/AST/CastKind.h>
+#include <multiplier/AST/Expr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
-class BuiltinBitCastExpr;
-class CStyleCastExpr;
-class CXXAddrspaceCastExpr;
-class CXXConstCastExpr;
-class CXXDynamicCastExpr;
-class CXXFunctionalCastExpr;
-class CXXReinterpretCastExpr;
-class CXXStaticCastExpr;
 class CastExpr;
 class Decl;
 class Expr;
 class FieldDecl;
-class ImplicitCastExpr;
 class NamedDecl;
-class ObjCBridgedCastExpr;
 class Stmt;
 class Token;
 class ValueStmt;

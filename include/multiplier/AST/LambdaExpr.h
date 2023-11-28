@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "Expr.h"
-#include "LambdaCaptureDefault.h"
+#include <multiplier/AST/Expr.h>
+#include <multiplier/AST/LambdaCaptureDefault.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CXXMethodDecl;
 class CXXRecordDecl;

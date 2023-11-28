@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "CXXConstructExpr.h"
+#include <multiplier/AST/CXXConstructExpr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CXXConstructExpr;
 class CXXTemporaryObjectExpr;

@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "Expr.h"
-#include "NonOdrUseReason.h"
+#include <multiplier/AST/Expr.h>
+#include <multiplier/AST/NonOdrUseReason.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class Expr;

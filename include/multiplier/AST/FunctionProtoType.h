@@ -8,13 +8,14 @@
 
 #pragma once
 
-#include "CanThrowResult.h"
-#include "ExceptionSpecificationType.h"
-#include "FunctionType.h"
-#include "RefQualifierKind.h"
+#include <multiplier/AST/CanThrowResult.h>
+#include <multiplier/AST/ExceptionSpecificationType.h>
+#include <multiplier/AST/FunctionType.h>
+#include <multiplier/AST/RefQualifierKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Expr;
 class FunctionDecl;

@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "AbstractConditionalOperator.h"
+#include <multiplier/AST/AbstractConditionalOperator.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class AbstractConditionalOperator;
 class ConditionalOperator;

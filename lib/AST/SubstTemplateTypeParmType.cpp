@@ -7,10 +7,9 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/SubstTemplateTypeParmType.h>
-
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/TemplateTypeParmDecl.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/Type.h>
 
 #include "../EntityProvider.h"

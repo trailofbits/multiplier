@@ -7,12 +7,11 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/EnumConstantDecl.h>
-
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Expr.h>
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/Stmt.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueDecl.h>
 
 #include "../EntityProvider.h"

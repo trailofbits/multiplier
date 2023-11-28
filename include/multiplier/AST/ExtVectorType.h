@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "VectorType.h"
+#include <multiplier/AST/VectorType.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class ExtVectorType;
 class Token;

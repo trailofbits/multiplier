@@ -6,11 +6,11 @@
 
 #include "Compilation.h"
 
-#include <multiplier/AST/IncludePathLocation.h>
 #include <multiplier/Fragment.h>
+#include <multiplier/Frontend/IncludePathLocation.h>
 
 #if !defined(MX_DISABLE_VAST) && !defined(__CDT_PARSER__)
-#include <multiplier/IR/MLIR/Builtin/Operation.h>
+#include <multiplier/IR/Builtin/Operation.h>
 #include "IR/SourceIR.h"
 #endif
 

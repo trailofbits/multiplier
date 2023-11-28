@@ -7,10 +7,9 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/NSErrorDomainAttr.h>
-
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/InheritableAttr.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/VarDecl.h>
 
 #include "../EntityProvider.h"

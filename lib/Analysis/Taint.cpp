@@ -22,7 +22,6 @@
 #include <multiplier/AST/ForStmt.h>
 #include <multiplier/AST/FunctionDecl.h>
 #include <multiplier/AST/IfStmt.h>
-#include <multiplier/AST/MacroExpansion.h>
 #include <multiplier/AST/MemberExpr.h>
 #include <multiplier/AST/ParenExpr.h>
 #include <multiplier/AST/ParmVarDecl.h>
@@ -32,6 +31,7 @@
 #include <multiplier/AST/UnaryOperatorKind.h>
 #include <multiplier/AST/VarDecl.h>
 #include <multiplier/AST/WhileStmt.h>
+#include <multiplier/Frontend/MacroExpansion.h>
 #include <multiplier/Index.h>
 #include <ostream>
 #include <sstream>

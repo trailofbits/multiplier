@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "DeclaratorDecl.h"
+#include <multiplier/AST/DeclaratorDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class DeclaratorDecl;

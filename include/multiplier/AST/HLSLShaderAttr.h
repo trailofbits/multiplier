@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "HLSLShaderAttrShaderType.h"
-#include "InheritableAttr.h"
+#include <multiplier/AST/HLSLShaderAttrShaderType.h>
+#include <multiplier/AST/InheritableAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class HLSLShaderAttr;

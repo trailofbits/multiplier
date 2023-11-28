@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "OMPExecutableDirective.h"
+#include <multiplier/AST/OMPExecutableDirective.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class OMPCriticalDirective;

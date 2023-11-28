@@ -8,14 +8,13 @@
 
 #pragma once
 
-#include "CallingConv.h"
-#include "Type.h"
+#include <multiplier/AST/CallingConv.h>
+#include <multiplier/AST/Type.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
-class FunctionNoProtoType;
-class FunctionProtoType;
 class FunctionType;
 class Token;
 class Type;

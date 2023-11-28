@@ -7,12 +7,12 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/TypeAttr.h>
-
+#include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/AddressSpaceAttr.h>
 #include <multiplier/AST/AnnotateTypeAttr.h>
 #include <multiplier/AST/ArmMveStrictPolymorphismAttr.h>
 #include <multiplier/AST/ArmStreamingAttr.h>
-#include <multiplier/AST/Attr.h>
 #include <multiplier/AST/BTFTypeTagAttr.h>
 #include <multiplier/AST/CmseNSCallAttr.h>
 #include <multiplier/AST/HLSLGroupSharedAddressSpaceAttr.h>
@@ -30,7 +30,6 @@
 #include <multiplier/AST/Ptr32Attr.h>
 #include <multiplier/AST/Ptr64Attr.h>
 #include <multiplier/AST/SPtrAttr.h>
-#include <multiplier/AST/Token.h>
 #include <multiplier/AST/TypeNonNullAttr.h>
 #include <multiplier/AST/TypeNullUnspecifiedAttr.h>
 #include <multiplier/AST/TypeNullableAttr.h>

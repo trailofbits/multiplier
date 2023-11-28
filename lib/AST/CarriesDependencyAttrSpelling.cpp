@@ -7,7 +7,6 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/CarriesDependencyAttrSpelling.h>
-
 namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push

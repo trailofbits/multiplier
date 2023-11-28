@@ -8,19 +8,15 @@
 
 #pragma once
 
-#include "TagTypeKind.h"
-#include "TypeDecl.h"
+#include <multiplier/AST/TagTypeKind.h>
+#include <multiplier/AST/TypeDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
-class CXXRecordDecl;
-class ClassTemplatePartialSpecializationDecl;
-class ClassTemplateSpecializationDecl;
 class Decl;
-class EnumDecl;
 class NamedDecl;
-class RecordDecl;
 class Stmt;
 class TagDecl;
 class TemplateParameterList;

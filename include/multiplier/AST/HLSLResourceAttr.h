@@ -8,12 +8,13 @@
 
 #pragma once
 
-#include "HLSLResourceAttrResourceClass.h"
-#include "HLSLResourceAttrResourceKind.h"
-#include "InheritableAttr.h"
+#include <multiplier/AST/HLSLResourceAttrResourceClass.h>
+#include <multiplier/AST/HLSLResourceAttrResourceKind.h>
+#include <multiplier/AST/InheritableAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class HLSLResourceAttr;

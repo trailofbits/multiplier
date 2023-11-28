@@ -20,17 +20,16 @@
 #include "../Entity.h"
 #include "../Iterator.h"
 
-#include "Linkage.h"
-#include "TypeKind.h"
-#include "Visibility.h"
+#include <multiplier/AST/Linkage.h>
+#include <multiplier/AST/TypeKind.h>
+#include <multiplier/AST/Visibility.h>
 
 namespace mx {
 class EntityProvider;
-class Index;
-class File;
 class Fragment;
 class Index;
 class Reference;
+class File;
 class Token;
 class TokenRange;
 class Type;

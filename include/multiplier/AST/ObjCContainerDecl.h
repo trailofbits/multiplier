@@ -8,21 +8,17 @@
 
 #pragma once
 
-#include "NamedDecl.h"
+#include <multiplier/AST/NamedDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class NamedDecl;
-class ObjCCategoryDecl;
-class ObjCCategoryImplDecl;
 class ObjCContainerDecl;
-class ObjCImplementationDecl;
-class ObjCInterfaceDecl;
 class ObjCMethodDecl;
 class ObjCPropertyDecl;
-class ObjCProtocolDecl;
 class Stmt;
 class Token;
 class TokenRange;

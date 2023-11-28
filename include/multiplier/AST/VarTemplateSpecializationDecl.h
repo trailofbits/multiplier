@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "TemplateSpecializationKind.h"
-#include "VarDecl.h"
+#include <multiplier/AST/TemplateSpecializationKind.h>
+#include <multiplier/AST/VarDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class DeclaratorDecl;
@@ -24,7 +25,6 @@ class Type;
 class ValueDecl;
 class VarDecl;
 class VarTemplateDecl;
-class VarTemplatePartialSpecializationDecl;
 class VarTemplateSpecializationDecl;
 namespace ir {
 class Operation;

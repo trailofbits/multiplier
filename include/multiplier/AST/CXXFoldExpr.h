@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "BinaryOperatorKind.h"
-#include "Expr.h"
+#include <multiplier/AST/BinaryOperatorKind.h>
+#include <multiplier/AST/Expr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CXXFoldExpr;
 class Decl;

@@ -7,12 +7,11 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/SwiftIndirectResultAttr.h>
-
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/AST/InheritableParamAttr.h>
 #include <multiplier/AST/ParameterABIAttr.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 
 #include "../EntityProvider.h"
 #include "../Attr.h"

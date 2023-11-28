@@ -8,17 +8,16 @@
 
 #pragma once
 
-#include "OMPLoopBasedDirective.h"
+#include <multiplier/AST/OMPLoopBasedDirective.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class OMPExecutableDirective;
 class OMPLoopBasedDirective;
 class OMPLoopTransformationDirective;
-class OMPTileDirective;
-class OMPUnrollDirective;
 class Stmt;
 class Token;
 namespace ir {

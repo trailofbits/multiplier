@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "Stmt.h"
+#include <multiplier/AST/Stmt.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CXXCatchStmt;
 class CXXTryStmt;

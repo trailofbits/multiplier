@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include "Type.h"
+#include <multiplier/AST/Type.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class ObjCInterfaceDecl;
-class ObjCInterfaceType;
 class ObjCObjectType;
 class Token;
 class Type;

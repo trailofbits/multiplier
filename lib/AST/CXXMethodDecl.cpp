@@ -7,18 +7,17 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/CXXMethodDecl.h>
-
-#include <multiplier/AST/CXXConstructorDecl.h>
-#include <multiplier/AST/CXXConversionDecl.h>
-#include <multiplier/AST/CXXDestructorDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/DeclaratorDecl.h>
 #include <multiplier/AST/FunctionDecl.h>
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/Stmt.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/Type.h>
 #include <multiplier/AST/ValueDecl.h>
+#include <multiplier/AST/CXXConstructorDecl.h>
+#include <multiplier/AST/CXXConversionDecl.h>
+#include <multiplier/AST/CXXDestructorDecl.h>
 
 #include "../EntityProvider.h"
 #include "../Decl.h"

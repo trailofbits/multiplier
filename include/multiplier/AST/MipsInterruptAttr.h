@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "InheritableAttr.h"
-#include "MipsInterruptAttrInterruptType.h"
+#include <multiplier/AST/InheritableAttr.h>
+#include <multiplier/AST/MipsInterruptAttrInterruptType.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class InheritableAttr;

@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "AlwaysInlineAttrSpelling.h"
-#include "DeclOrStmtAttr.h"
+#include <multiplier/AST/AlwaysInlineAttrSpelling.h>
+#include <multiplier/AST/DeclOrStmtAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class AlwaysInlineAttr;
 class Attr;

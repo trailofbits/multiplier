@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include "NamedDecl.h"
+#include <multiplier/AST/NamedDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class BaseUsingDecl;
-class ConstructorUsingShadowDecl;
 class Decl;
 class NamedDecl;
 class Stmt;

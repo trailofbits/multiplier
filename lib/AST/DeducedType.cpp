@@ -7,11 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/DeducedType.h>
-
+#include <multiplier/Frontend/Token.h>
+#include <multiplier/AST/Type.h>
 #include <multiplier/AST/AutoType.h>
 #include <multiplier/AST/DeducedTemplateSpecializationType.h>
-#include <multiplier/AST/Token.h>
-#include <multiplier/AST/Type.h>
 
 #include "../EntityProvider.h"
 #include "../Type.h"

@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "OMPDeclarativeDirectiveDecl.h"
+#include <multiplier/AST/OMPDeclarativeDirectiveDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class OMPDeclarativeDirectiveDecl;

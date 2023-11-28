@@ -7,13 +7,12 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/DeclOrStmtAttr.h>
-
-#include <multiplier/AST/AlwaysInlineAttr.h>
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/InheritableAttr.h>
+#include <multiplier/Frontend/Token.h>
+#include <multiplier/AST/AlwaysInlineAttr.h>
 #include <multiplier/AST/NoInlineAttr.h>
 #include <multiplier/AST/NoMergeAttr.h>
-#include <multiplier/AST/Token.h>
 
 #include "../EntityProvider.h"
 #include "../Attr.h"

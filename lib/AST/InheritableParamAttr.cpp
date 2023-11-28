@@ -7,12 +7,12 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/InheritableParamAttr.h>
-
-#include <multiplier/AST/AnnotateAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/AST/InheritableAttr.h>
+#include <multiplier/Frontend/Token.h>
+#include <multiplier/AST/AnnotateAttr.h>
 #include <multiplier/AST/CFConsumedAttr.h>
 #include <multiplier/AST/CarriesDependencyAttr.h>
-#include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/AST/NSConsumedAttr.h>
 #include <multiplier/AST/NonNullAttr.h>
 #include <multiplier/AST/OSConsumedAttr.h>
@@ -22,7 +22,6 @@
 #include <multiplier/AST/SwiftContextAttr.h>
 #include <multiplier/AST/SwiftErrorResultAttr.h>
 #include <multiplier/AST/SwiftIndirectResultAttr.h>
-#include <multiplier/AST/Token.h>
 #include <multiplier/AST/UseHandleAttr.h>
 
 #include "../EntityProvider.h"

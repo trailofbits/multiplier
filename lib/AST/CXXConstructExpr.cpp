@@ -7,14 +7,13 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/CXXConstructExpr.h>
-
 #include <multiplier/AST/CXXConstructorDecl.h>
-#include <multiplier/AST/CXXTemporaryObjectExpr.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Expr.h>
 #include <multiplier/AST/Stmt.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueStmt.h>
+#include <multiplier/AST/CXXTemporaryObjectExpr.h>
 
 #include "../EntityProvider.h"
 #include "../Fragment.h"

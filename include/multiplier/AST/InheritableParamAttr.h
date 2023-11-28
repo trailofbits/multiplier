@@ -8,28 +8,16 @@
 
 #pragma once
 
-#include "InheritableAttr.h"
+#include <multiplier/AST/InheritableAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
-class AnnotateAttr;
 class Attr;
-class CFConsumedAttr;
-class CarriesDependencyAttr;
 class InheritableAttr;
 class InheritableParamAttr;
-class NSConsumedAttr;
-class NonNullAttr;
-class OSConsumedAttr;
-class PassObjectSizeAttr;
-class ReleaseHandleAttr;
-class SwiftAsyncContextAttr;
-class SwiftContextAttr;
-class SwiftErrorResultAttr;
-class SwiftIndirectResultAttr;
 class Token;
-class UseHandleAttr;
 namespace ir {
 class Operation;
 class Value;

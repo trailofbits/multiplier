@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "ArrayType.h"
+#include <multiplier/AST/ArrayType.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class ArrayType;
 class IncompleteArrayType;
