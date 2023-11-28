@@ -185,6 +185,34 @@ static const std::unordered_set<std::string> gNotReferenceTypes{
 
 };
 
+static const std::unordered_set<std::string> gFrontendTypes{
+  "Compilation",
+  "CompilerName",
+  "IncludePathLocation",
+  "TargetLanguage",
+  "IncludePath",
+  "ArgumentVector",
+  "CompileCommand",
+  "CompileJob",
+  "Compiler",
+  "Token",
+  "MacroToken",
+  "FileToken",
+  "MacroKind",
+  "TokenKind",
+  "TokenRole",
+  "TokenCategory",
+  "PPKeywordKind",
+  "ObjCKeywordKind",
+  "File",
+  "PathKind",
+  "FileType",
+  "Stat",
+  PASTA_FOR_EACH_MACRO_IMPL(MACRO_NAME, IGNORE, MACRO_DIRECTIVE_NAME,
+                            MACRO_DIRECTIVE_NAME, MACRO_DIRECTIVE_NAME,
+                            MACRO_DIRECTIVE_NAME, STR_NAME)
+};
+
 static const std::unordered_set<std::string> kDeclContextTypes{
   "BlockDecl",
   "CXXConstructorDecl",
@@ -781,7 +809,11 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
     return false;
   }
 
-  std::ofstream os(entities_include_dir / (enum_name + ".h"), std::ios::trunc | std::ios::out);
+  auto is_frontend_type = gFrontendTypes.find(enum_name) == gFrontendTypes.end();
+  auto ns_name = is_frontend_type ? "frontend" : "ast";
+  auto dir_name = is_frontend_type ? "Frontend" : "AST";
+
+  std::ofstream os(include_dir / dir_name / (enum_name + ".h"), std::ios::trunc | std::ios::out);
   os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
       << "// All rights reserved.\n"
@@ -791,8 +823,10 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
       << "#include <cstdint>\n\n"
-      << "namespace mx {\n";
-  include_h_os << "#include \"AST/" << enum_name << ".h\"\n";
+      << "namespace mx {\n"
+      << "inline namespace " << ns_name << " {\n";
+
+  include_h_os << "#include \"" << dir_name << '/' << enum_name << ".h\"\n";
 
   auto enumerators = enum_decl.Enumerators();
   auto num_enumerators = enumerators.size();
@@ -956,7 +990,7 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << "}\n\n";  // End of `FromPasta`
 
   lib_cpp_os
-      << "const char *EnumeratorName(" << enum_name << " e) {\n"
+      << "const char *EnumeratorName(" << ns_name << "::" << enum_name << " e) {\n"
       << "  switch (e) {\n"
       << name_cases_ss.str()
       << "    default: return \"<invalid>\";\n"
@@ -965,18 +999,19 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
 
   lib_pasta_h_os
       << "enum class " << enum_name << " : " << types.first << ";\n"
-      << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n";
+      << ns_name << "::" << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n";
 
   os
       << "};\n\n"
-      << "inline static const char *EnumerationName(" << enum_name << ") {\n"
+      << "}  // namesapace " << ns_name << "\n\n"
+      << "inline static const char *EnumerationName(" << ns_name << "::" << enum_name << ") {\n"
       << "  return \"" << enum_name << "\";\n"
       << "}\n\n"
-      << "inline static constexpr unsigned NumEnumerators(" << enum_name
+      << "inline static constexpr unsigned NumEnumerators(" << ns_name << "::" << enum_name
       << ") {\n"
       << "  return " << i << ";\n"
       << "}\n\n"
-      << "const char *EnumeratorName(" << enum_name << ");\n\n"
+      << "const char *EnumeratorName(" << ns_name << "::" << enum_name << ");\n\n"
       << "} // namespace mx\n";
 
   serialize_inc_os << "MX_END_ENUM_CLASS(" << enum_name << ")\n\n";
@@ -1861,6 +1896,10 @@ MethodListPtr CodeGenerator::RunOnClass(
     return parent_methods;
   }
 
+  auto is_frontend_type = gFrontendTypes.find(class_name) == gFrontendTypes.end();
+  auto ns_name = is_frontend_type ? "frontend" : "ast";
+  auto dir_name = is_frontend_type ? "Frontend" : "AST";
+
   std::string base_name;
   std::string category = "NOT_AN_ENTITY";
   if (false) {
@@ -1874,7 +1913,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 #undef SET_STORAGE
   }
 
-  std::ofstream os(entities_include_dir / (class_name + ".h"),
+  std::ofstream os(include_dir / dir_name / (class_name + ".h"),
                    std::ios::trunc | std::ios::out);
   os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
@@ -1899,7 +1938,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "#include \"../Iterator.h\"\n\n";
   }
 
-  include_h_os << "#include \"AST/" << class_name << ".h\"\n";
+  include_h_os << "#include \"" << dir_name << '/' << class_name << ".h\"\n";
 
   std::string nth_entity_reader;
   const char *end_serializer = nullptr;
@@ -2237,7 +2276,6 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     if (class_name == base_name) {
       forward_decls.insert("File");
-      forward_decls.insert("Fragment");
       class_os
           << "  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);\n"
           << "  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);\n"
@@ -2253,14 +2291,14 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  inline bool operator==(const " << class_name << " &rhs) const noexcept {\n";
 
       // Equality on Decls need to be tested in its canonicalized form
-      if (class_name == "Decl") {
-        class_os
-            << "    return canonical_declaration().id().Pack() ==\n"
-            << "           rhs.canonical_declaration().id().Pack();\n";
-      } else {
-        class_os
-            << "    return id().Pack() == rhs.id().Pack();\n";
-      }
+      // if (class_name == "Decl") {
+      //   class_os
+      //       << "    return canonical_declaration().id().Pack() ==\n"
+      //       << "           rhs.canonical_declaration().id().Pack();\n";
+      // } else {
+      class_os
+          << "    return id().Pack() == rhs.id().Pack();\n";
+      //}
 
       class_os
           << "  }\n\n"
@@ -2429,9 +2467,7 @@ MethodListPtr CodeGenerator::RunOnClass(
   // TODO(pag): Probably remove `is_type` eventually.
   if (is_declaration || is_statement || is_attribute || is_type || is_macro) {
     if (class_name == base_name) {
-      forward_decls.insert("Fragment");
       forward_decls.insert("File");
-      forward_decls.insert("Index");
       class_os
           << "  static gap::generator<"
           << class_name << "> in(const Index &index, std::span<"
@@ -3592,6 +3628,9 @@ MethodListPtr CodeGenerator::RunOnClass(
   if (class_name == "FunctionDecl") {
     forward_decls.insert("CallExpr");
     class_os
+        << "  // Callers of a `FunctionDecl` can be `CallExpr`, `CxxNewExpr`,\n"
+        << "  // `CxxConstructExpr`, etc. Even `CastExpr` can sometimes be a call\n"
+        << "  // if it needs to invoke a function call to perform the conversion.\n"
         << "  gap::generator<Stmt> callers(void) const &;\n";
   }
 
@@ -3612,19 +3651,54 @@ MethodListPtr CodeGenerator::RunOnClass(
   os
       << "\nnamespace mx {\n"
       << "class EntityProvider;\n"
+      << "class Fragment\n"
       << "class Index;\n";
 
+  // Forward declare impl types.
   for (auto fwd : forward_decls) {
-    os << "class " << fwd << ";\n";
+    if (fwd.ends_with("Impl")) {
+      os << "class " << fwd << ";\n"; 
+    }
   }
+
+  // Forward declare frontend types.
+  auto has_ns = false;
+  for (auto fwd : forward_decls) {
+    if (gFrontendTypes.count(fwd)) {
+      if (!has_ns) {
+        os << "inline namespace frontend {\n";
+      }
+      os << "class " << fwd << ";\n"; 
+    }
+  }
+  if (has_ns) {
+    os << "}  // namespace frontend\n";
+  }
+
+  // Forward declare AST types.
+  has_ns = false;
+  for (auto fwd : forward_decls) {
+    if (!gFrontendTypes.count(fwd)) {
+      if (!has_ns) {
+        os << "inline namespace ast {\n";
+      }
+      os << "class " << fwd << ";\n"; 
+    }
+  }
+  if (has_ns) {
+    os << "}  // namespace ast\n";
+  }
+
   os
       << "namespace ir {\n"
       << "class Operation;\n"
       << "class Value;\n"
       << "}  // namespace ir\n\n"
       << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n"
+      << "inline namespace " << ns_name << " {\n"
       << class_os.str()
       << late_class_os.str()
+      << "}  // namespace " << ns_name << "\n"
       << "#endif\n"
       << "} // namespace mx\n";
 
