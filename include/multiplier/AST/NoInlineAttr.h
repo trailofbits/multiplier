@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "DeclOrStmtAttr.h"
+#include <multiplier/AST/DeclOrStmtAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class DeclOrStmtAttr;

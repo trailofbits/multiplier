@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "FieldDecl.h"
-#include "ObjCIvarDeclAccessControl.h"
+#include <multiplier/AST/FieldDecl.h>
+#include <multiplier/AST/ObjCIvarDeclAccessControl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class DeclaratorDecl;

@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "ExplicitCastExpr.h"
-#include "ObjCBridgeCastKind.h"
+#include <multiplier/AST/ExplicitCastExpr.h>
+#include <multiplier/AST/ObjCBridgeCastKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CastExpr;
 class Decl;

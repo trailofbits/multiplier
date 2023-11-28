@@ -8,12 +8,13 @@
 
 #include <array>
 #include <gap/core/generator.hpp>
-#include <multiplier/Database.h>
-#include <multiplier/AST/TokenKind.h>
-#include <multiplier/Reference.h>
 #include <type_traits>
 #include <zdict.h>
 #include <zstd.h>
+
+#include <multiplier/Database.h>
+#include <multiplier/Frontend/TokenKind.h>
+#include <multiplier/Reference.h>
 
 #include "Compilation.h"
 #include "Attr.h"

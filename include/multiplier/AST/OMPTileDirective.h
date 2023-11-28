@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "OMPLoopTransformationDirective.h"
+#include <multiplier/AST/OMPLoopTransformationDirective.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class OMPExecutableDirective;

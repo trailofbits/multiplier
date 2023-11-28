@@ -8,12 +8,13 @@
 
 #pragma once
 
-#include "AttrKind.h"
-#include "NullabilityKind.h"
-#include "Type.h"
+#include <multiplier/AST/AttrKind.h>
+#include <multiplier/AST/NullabilityKind.h>
+#include <multiplier/AST/Type.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class AttributedType;

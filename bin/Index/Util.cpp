@@ -29,6 +29,8 @@
 #pragma clang diagnostic pop
 
 #include <multiplier/AST.h>
+#include <multiplier/Frontend.h>
+
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>

@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "CallExpr.h"
-#include "OverloadedOperatorKind.h"
+#include <multiplier/AST/CallExpr.h>
+#include <multiplier/AST/OverloadedOperatorKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CXXOperatorCallExpr;
 class CallExpr;

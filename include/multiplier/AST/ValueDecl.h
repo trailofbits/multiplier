@@ -8,44 +8,19 @@
 
 #pragma once
 
-#include "NamedDecl.h"
+#include <multiplier/AST/NamedDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
-class BindingDecl;
-class CXXConstructorDecl;
-class CXXConversionDecl;
-class CXXDeductionGuideDecl;
-class CXXDestructorDecl;
-class CXXMethodDecl;
 class Decl;
-class DecompositionDecl;
-class EnumConstantDecl;
-class FieldDecl;
-class FunctionDecl;
-class ImplicitParamDecl;
-class IndirectFieldDecl;
-class MSGuidDecl;
-class MSPropertyDecl;
 class NamedDecl;
-class NonTypeTemplateParmDecl;
-class OMPCapturedExprDecl;
-class OMPDeclareMapperDecl;
-class OMPDeclareReductionDecl;
-class ObjCAtDefsFieldDecl;
-class ObjCIvarDecl;
-class ParmVarDecl;
 class Stmt;
-class TemplateParamObjectDecl;
 class Token;
 class Type;
-class UnnamedGlobalConstantDecl;
-class UnresolvedUsingValueDecl;
 class ValueDecl;
 class VarDecl;
-class VarTemplatePartialSpecializationDecl;
-class VarTemplateSpecializationDecl;
 namespace ir {
 class Operation;
 class Value;

@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "ConstInitAttrSpelling.h"
-#include "InheritableAttr.h"
+#include <multiplier/AST/ConstInitAttrSpelling.h>
+#include <multiplier/AST/InheritableAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class ConstInitAttr;

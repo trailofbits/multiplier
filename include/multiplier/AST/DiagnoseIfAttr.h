@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "DiagnoseIfAttrDiagnosticType.h"
-#include "InheritableAttr.h"
+#include <multiplier/AST/DiagnoseIfAttrDiagnosticType.h>
+#include <multiplier/AST/InheritableAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class DiagnoseIfAttr;

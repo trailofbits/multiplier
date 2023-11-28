@@ -14,6 +14,7 @@
 
 #include "Index.h"
 #include <multiplier/AST.h>
+#include <multiplier/Frontend.h>
 
 int main(int argc, char *argv[]) {
   std::stringstream ss;

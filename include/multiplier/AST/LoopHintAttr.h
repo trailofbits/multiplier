@@ -8,13 +8,14 @@
 
 #pragma once
 
-#include "Attr.h"
-#include "LoopHintAttrLoopHintState.h"
-#include "LoopHintAttrOptionType.h"
-#include "LoopHintAttrSpelling.h"
+#include <multiplier/AST/Attr.h>
+#include <multiplier/AST/LoopHintAttrLoopHintState.h>
+#include <multiplier/AST/LoopHintAttrOptionType.h>
+#include <multiplier/AST/LoopHintAttrSpelling.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class Expr;

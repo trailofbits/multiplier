@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "ArrayTypeTrait.h"
-#include "Expr.h"
+#include <multiplier/AST/ArrayTypeTrait.h>
+#include <multiplier/AST/Expr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class ArrayTypeTraitExpr;
 class Decl;

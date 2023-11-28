@@ -8,21 +8,19 @@
 
 #pragma once
 
-#include "TypeDecl.h"
+#include <multiplier/AST/TypeDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class NamedDecl;
-class ObjCTypeParamDecl;
 class Stmt;
 class TagDecl;
 class Token;
 class Type;
-class TypeAliasDecl;
 class TypeDecl;
-class TypedefDecl;
 class TypedefNameDecl;
 namespace ir {
 class Operation;

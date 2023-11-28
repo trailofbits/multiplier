@@ -20,16 +20,16 @@
 #include "../Entity.h"
 #include "../Iterator.h"
 
-#include "PseudoKind.h"
+#include <multiplier/AST/PseudoKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
+class Reference;
 class Expr;
 class File;
-class Fragment;
 class NamedDecl;
-class Reference;
 class TemplateParameterList;
 class TemplateParameterListImpl;
 class Token;

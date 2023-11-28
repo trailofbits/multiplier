@@ -7,12 +7,11 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/ArrayType.h>
-
+#include <multiplier/Frontend/Token.h>
+#include <multiplier/AST/Type.h>
 #include <multiplier/AST/ConstantArrayType.h>
 #include <multiplier/AST/DependentSizedArrayType.h>
 #include <multiplier/AST/IncompleteArrayType.h>
-#include <multiplier/AST/Token.h>
-#include <multiplier/AST/Type.h>
 #include <multiplier/AST/VariableArrayType.h>
 
 #include "../EntityProvider.h"

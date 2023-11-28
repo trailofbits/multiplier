@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "ArgumentWithTypeTagAttrSpelling.h"
-#include "InheritableAttr.h"
+#include <multiplier/AST/ArgumentWithTypeTagAttrSpelling.h>
+#include <multiplier/AST/InheritableAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class ArgumentWithTypeTagAttr;
 class Attr;

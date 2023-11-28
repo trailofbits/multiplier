@@ -8,7 +8,7 @@
 #include <glog/logging.h>
 #include <iomanip>
 #include <multiplier/AST.h>
-#include <multiplier/TokenTree.h>
+#include <multiplier/Frontend/TokenTree.h>
 #include <sstream>
 #include <unordered_set>
 

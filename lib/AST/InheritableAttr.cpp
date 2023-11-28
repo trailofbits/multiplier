@@ -7,7 +7,8 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/InheritableAttr.h>
-
+#include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/AArch64SVEPcsAttr.h>
 #include <multiplier/AST/AArch64VectorPcsAttr.h>
 #include <multiplier/AST/AMDGPUFlatWorkGroupSizeAttr.h>
@@ -44,7 +45,6 @@
 #include <multiplier/AST/AssertSharedLockAttr.h>
 #include <multiplier/AST/AssumeAlignedAttr.h>
 #include <multiplier/AST/AssumptionAttr.h>
-#include <multiplier/AST/Attr.h>
 #include <multiplier/AST/AvailabilityAttr.h>
 #include <multiplier/AST/AvailableOnlyInDefaultEvalMethodAttr.h>
 #include <multiplier/AST/BPFPreserveAccessIndexAttr.h>
@@ -289,7 +289,6 @@
 #include <multiplier/AST/TargetVersionAttr.h>
 #include <multiplier/AST/TestTypestateAttr.h>
 #include <multiplier/AST/ThisCallAttr.h>
-#include <multiplier/AST/Token.h>
 #include <multiplier/AST/TransparentUnionAttr.h>
 #include <multiplier/AST/TrivialABIAttr.h>
 #include <multiplier/AST/TryAcquireCapabilityAttr.h>

@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "TagType.h"
+#include <multiplier/AST/TagType.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class RecordType;
 class TagType;

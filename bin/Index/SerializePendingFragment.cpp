@@ -9,7 +9,7 @@
 #include <capnp/message.h>
 #include <deque>
 #include <multiplier/AST.capnp.h>
-#include <multiplier/AST/MacroKind.h>
+#include <multiplier/Frontend/MacroKind.h>
 #include <multiplier/RPC.capnp.h>
 #include <multiplier/Database.h>
 #include <unordered_set>

@@ -13,8 +13,8 @@
 #include <deque>
 #include <multiplier/AST/AttrKind.h>
 #include <multiplier/AST/DeclKind.h>
-#include <multiplier/AST/MacroKind.h>
 #include <multiplier/AST/StmtKind.h>
+#include <multiplier/Frontend/MacroKind.h>
 #include <multiplier/Iterator.h>
 #include <mutex>
 #include <thread>

@@ -8,16 +8,14 @@
 
 #pragma once
 
-#include "Decl.h"
+#include <multiplier/AST/Decl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
-class OMPAllocateDecl;
 class OMPDeclarativeDirectiveDecl;
-class OMPRequiresDecl;
-class OMPThreadPrivateDecl;
 class Stmt;
 class Token;
 namespace ir {

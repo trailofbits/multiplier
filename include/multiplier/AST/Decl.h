@@ -20,24 +20,23 @@
 #include "../Entity.h"
 #include "../Iterator.h"
 
-#include "AccessSpecifier.h"
-#include "AvailabilityResult.h"
-#include "DeclCategory.h"
-#include "DeclFriendObjectKind.h"
-#include "DeclKind.h"
-#include "DeclModuleOwnershipKind.h"
+#include <multiplier/AST/AccessSpecifier.h>
+#include <multiplier/AST/AvailabilityResult.h>
+#include <multiplier/AST/DeclCategory.h>
+#include <multiplier/AST/DeclFriendObjectKind.h>
+#include <multiplier/AST/DeclKind.h>
+#include <multiplier/AST/DeclModuleOwnershipKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
+class Reference;
 class Attr;
 class Decl;
 class DeclImpl;
 class ExternalSourceSymbolAttr;
 class File;
-class Fragment;
-class Index;
-class Reference;
 class Stmt;
 class TemplateDecl;
 class TemplateParameterList;
@@ -79,8 +78,7 @@ class Decl {
   Decl &operator=(const Decl &) = default;
 
   inline bool operator==(const Decl &rhs) const noexcept {
-    return canonical_declaration().id().Pack() ==
-           rhs.canonical_declaration().id().Pack();
+    return id().Pack() == rhs.id().Pack();
   }
 
   /* implicit */ inline Decl(std::shared_ptr<const DeclImpl> impl_)

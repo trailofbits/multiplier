@@ -8,33 +8,28 @@
 
 #pragma once
 
-#include "DeclaratorDecl.h"
-#include "LanguageLinkage.h"
-#include "StorageClass.h"
-#include "StorageDuration.h"
-#include "TemplateSpecializationKind.h"
-#include "ThreadStorageClassSpecifier.h"
-#include "VarDeclInitializationStyle.h"
-#include "VarDeclTLSKind.h"
+#include <multiplier/AST/DeclaratorDecl.h>
+#include <multiplier/AST/LanguageLinkage.h>
+#include <multiplier/AST/StorageClass.h>
+#include <multiplier/AST/StorageDuration.h>
+#include <multiplier/AST/TemplateSpecializationKind.h>
+#include <multiplier/AST/ThreadStorageClassSpecifier.h>
+#include <multiplier/AST/VarDeclInitializationStyle.h>
+#include <multiplier/AST/VarDeclTLSKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class DeclaratorDecl;
-class DecompositionDecl;
 class Expr;
-class ImplicitParamDecl;
 class NamedDecl;
-class OMPCapturedExprDecl;
-class ParmVarDecl;
 class Stmt;
 class Token;
 class ValueDecl;
 class VarDecl;
 class VarTemplateDecl;
-class VarTemplatePartialSpecializationDecl;
-class VarTemplateSpecializationDecl;
 namespace ir {
 class Operation;
 class Value;

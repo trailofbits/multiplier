@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "CastExpr.h"
+#include <multiplier/AST/CastExpr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CastExpr;
 class Decl;

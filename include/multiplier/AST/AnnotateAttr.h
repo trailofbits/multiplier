@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "InheritableParamAttr.h"
+#include <multiplier/AST/InheritableParamAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class AnnotateAttr;
 class Attr;

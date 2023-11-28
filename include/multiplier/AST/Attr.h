@@ -20,17 +20,16 @@
 #include "../Entity.h"
 #include "../Iterator.h"
 
-#include "AttrKind.h"
+#include <multiplier/AST/AttrKind.h>
 
 namespace mx {
 class EntityProvider;
-class Index;
-class Attr;
-class AttrImpl;
-class File;
 class Fragment;
 class Index;
 class Reference;
+class Attr;
+class AttrImpl;
+class File;
 class Token;
 class TokenRange;
 namespace ir {

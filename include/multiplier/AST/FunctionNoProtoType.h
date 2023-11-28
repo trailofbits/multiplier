@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "FunctionType.h"
+#include <multiplier/AST/FunctionType.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class FunctionNoProtoType;
 class FunctionType;

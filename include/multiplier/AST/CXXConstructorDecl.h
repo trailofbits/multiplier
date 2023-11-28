@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "CXXMethodDecl.h"
+#include <multiplier/AST/CXXMethodDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CXXConstructorDecl;
 class CXXMethodDecl;

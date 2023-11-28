@@ -7,13 +7,14 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/OMPLoopBasedDirective.h>
-
 #include <multiplier/AST/Decl.h>
+#include <multiplier/AST/OMPExecutableDirective.h>
+#include <multiplier/AST/Stmt.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/OMPDistributeDirective.h>
 #include <multiplier/AST/OMPDistributeParallelForDirective.h>
 #include <multiplier/AST/OMPDistributeParallelForSimdDirective.h>
 #include <multiplier/AST/OMPDistributeSimdDirective.h>
-#include <multiplier/AST/OMPExecutableDirective.h>
 #include <multiplier/AST/OMPForDirective.h>
 #include <multiplier/AST/OMPForSimdDirective.h>
 #include <multiplier/AST/OMPGenericLoopDirective.h>
@@ -47,8 +48,6 @@
 #include <multiplier/AST/OMPTeamsGenericLoopDirective.h>
 #include <multiplier/AST/OMPTileDirective.h>
 #include <multiplier/AST/OMPUnrollDirective.h>
-#include <multiplier/AST/Stmt.h>
-#include <multiplier/AST/Token.h>
 
 #include "../EntityProvider.h"
 #include "../Stmt.h"

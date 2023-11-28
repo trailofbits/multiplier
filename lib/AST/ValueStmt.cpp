@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/ValueStmt.h>
-
+#include <multiplier/AST/Decl.h>
+#include <multiplier/AST/Expr.h>
+#include <multiplier/AST/Stmt.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/AddrLabelExpr.h>
 #include <multiplier/AST/ArrayInitIndexExpr.h>
 #include <multiplier/AST/ArrayInitLoopExpr.h>
@@ -64,13 +67,11 @@
 #include <multiplier/AST/ConstantExpr.h>
 #include <multiplier/AST/ConvertVectorExpr.h>
 #include <multiplier/AST/CoyieldExpr.h>
-#include <multiplier/AST/Decl.h>
 #include <multiplier/AST/DeclRefExpr.h>
 #include <multiplier/AST/DependentCoawaitExpr.h>
 #include <multiplier/AST/DependentScopeDeclRefExpr.h>
 #include <multiplier/AST/DesignatedInitExpr.h>
 #include <multiplier/AST/DesignatedInitUpdateExpr.h>
-#include <multiplier/AST/Expr.h>
 #include <multiplier/AST/ExprWithCleanups.h>
 #include <multiplier/AST/ExpressionTraitExpr.h>
 #include <multiplier/AST/ExtVectorElementExpr.h>
@@ -124,12 +125,10 @@
 #include <multiplier/AST/ShuffleVectorExpr.h>
 #include <multiplier/AST/SizeOfPackExpr.h>
 #include <multiplier/AST/SourceLocExpr.h>
-#include <multiplier/AST/Stmt.h>
 #include <multiplier/AST/StmtExpr.h>
 #include <multiplier/AST/StringLiteral.h>
 #include <multiplier/AST/SubstNonTypeTemplateParmExpr.h>
 #include <multiplier/AST/SubstNonTypeTemplateParmPackExpr.h>
-#include <multiplier/AST/Token.h>
 #include <multiplier/AST/TypeTraitExpr.h>
 #include <multiplier/AST/TypoExpr.h>
 #include <multiplier/AST/UnaryExprOrTypeTraitExpr.h>

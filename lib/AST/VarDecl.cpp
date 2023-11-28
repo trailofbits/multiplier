@@ -7,19 +7,18 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/VarDecl.h>
-
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/DeclaratorDecl.h>
-#include <multiplier/AST/DecompositionDecl.h>
 #include <multiplier/AST/Expr.h>
-#include <multiplier/AST/ImplicitParamDecl.h>
 #include <multiplier/AST/NamedDecl.h>
-#include <multiplier/AST/OMPCapturedExprDecl.h>
-#include <multiplier/AST/ParmVarDecl.h>
 #include <multiplier/AST/Stmt.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueDecl.h>
 #include <multiplier/AST/VarTemplateDecl.h>
+#include <multiplier/AST/DecompositionDecl.h>
+#include <multiplier/AST/ImplicitParamDecl.h>
+#include <multiplier/AST/OMPCapturedExprDecl.h>
+#include <multiplier/AST/ParmVarDecl.h>
 #include <multiplier/AST/VarTemplatePartialSpecializationDecl.h>
 #include <multiplier/AST/VarTemplateSpecializationDecl.h>
 

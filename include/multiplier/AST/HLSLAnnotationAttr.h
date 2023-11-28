@@ -8,15 +8,14 @@
 
 #pragma once
 
-#include "InheritableAttr.h"
+#include <multiplier/AST/InheritableAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class HLSLAnnotationAttr;
-class HLSLSV_DispatchThreadIDAttr;
-class HLSLSV_GroupIndexAttr;
 class InheritableAttr;
 class Token;
 namespace ir {

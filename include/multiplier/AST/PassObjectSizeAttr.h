@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "InheritableParamAttr.h"
-#include "PassObjectSizeAttrSpelling.h"
+#include <multiplier/AST/InheritableParamAttr.h>
+#include <multiplier/AST/PassObjectSizeAttrSpelling.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class InheritableAttr;

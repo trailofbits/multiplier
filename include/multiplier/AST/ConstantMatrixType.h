@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "MatrixType.h"
+#include <multiplier/AST/MatrixType.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class ConstantMatrixType;
 class MatrixType;

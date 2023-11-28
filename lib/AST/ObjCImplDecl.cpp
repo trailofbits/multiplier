@@ -7,16 +7,15 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/ObjCImplDecl.h>
-
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/NamedDecl.h>
-#include <multiplier/AST/ObjCCategoryImplDecl.h>
 #include <multiplier/AST/ObjCContainerDecl.h>
-#include <multiplier/AST/ObjCImplementationDecl.h>
 #include <multiplier/AST/ObjCInterfaceDecl.h>
 #include <multiplier/AST/ObjCPropertyImplDecl.h>
 #include <multiplier/AST/Stmt.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
+#include <multiplier/AST/ObjCCategoryImplDecl.h>
+#include <multiplier/AST/ObjCImplementationDecl.h>
 
 #include "../EntityProvider.h"
 #include "../Decl.h"

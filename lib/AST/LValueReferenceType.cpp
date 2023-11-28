@@ -7,9 +7,8 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/LValueReferenceType.h>
-
 #include <multiplier/AST/ReferenceType.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/Type.h>
 
 #include "../EntityProvider.h"

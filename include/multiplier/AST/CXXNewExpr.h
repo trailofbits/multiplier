@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "CXXNewExprInitializationStyle.h"
-#include "Expr.h"
+#include <multiplier/AST/CXXNewExprInitializationStyle.h>
+#include <multiplier/AST/Expr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CXXConstructExpr;
 class CXXNewExpr;

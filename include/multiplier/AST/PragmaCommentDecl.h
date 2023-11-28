@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "Decl.h"
-#include "PragmaMSCommentKind.h"
+#include <multiplier/AST/Decl.h>
+#include <multiplier/AST/PragmaMSCommentKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class PragmaCommentDecl;

@@ -7,12 +7,11 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/OMPCanonicalLoop.h>
-
 #include <multiplier/AST/CapturedStmt.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/DeclRefExpr.h>
 #include <multiplier/AST/Stmt.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 
 #include "../EntityProvider.h"
 #include "../Stmt.h"

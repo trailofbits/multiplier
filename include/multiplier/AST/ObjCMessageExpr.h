@@ -8,12 +8,13 @@
 
 #pragma once
 
-#include "Expr.h"
-#include "ObjCMessageExprReceiverKind.h"
-#include "ObjCMethodFamily.h"
+#include <multiplier/AST/Expr.h>
+#include <multiplier/AST/ObjCMessageExprReceiverKind.h>
+#include <multiplier/AST/ObjCMethodFamily.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class Expr;

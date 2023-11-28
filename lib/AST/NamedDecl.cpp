@@ -7,7 +7,9 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/NamedDecl.h>
-
+#include <multiplier/AST/Decl.h>
+#include <multiplier/AST/Stmt.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/BindingDecl.h>
 #include <multiplier/AST/BuiltinTemplateDecl.h>
 #include <multiplier/AST/CXXConstructorDecl.h>
@@ -21,7 +23,6 @@
 #include <multiplier/AST/ClassTemplateSpecializationDecl.h>
 #include <multiplier/AST/ConceptDecl.h>
 #include <multiplier/AST/ConstructorUsingShadowDecl.h>
-#include <multiplier/AST/Decl.h>
 #include <multiplier/AST/DecompositionDecl.h>
 #include <multiplier/AST/EnumConstantDecl.h>
 #include <multiplier/AST/EnumDecl.h>
@@ -53,11 +54,9 @@
 #include <multiplier/AST/ObjCTypeParamDecl.h>
 #include <multiplier/AST/ParmVarDecl.h>
 #include <multiplier/AST/RecordDecl.h>
-#include <multiplier/AST/Stmt.h>
 #include <multiplier/AST/TemplateParamObjectDecl.h>
 #include <multiplier/AST/TemplateTemplateParmDecl.h>
 #include <multiplier/AST/TemplateTypeParmDecl.h>
-#include <multiplier/AST/Token.h>
 #include <multiplier/AST/TypeAliasDecl.h>
 #include <multiplier/AST/TypeAliasTemplateDecl.h>
 #include <multiplier/AST/TypedefDecl.h>

@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "InheritableAttr.h"
-#include "OMPAllocateDeclAttrAllocatorTypeTy.h"
+#include <multiplier/AST/InheritableAttr.h>
+#include <multiplier/AST/OMPAllocateDeclAttrAllocatorTypeTy.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class Expr;

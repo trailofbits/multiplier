@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include "Type.h"
-#include "VectorTypeVectorKind.h"
+#include <multiplier/AST/Type.h>
+#include <multiplier/AST/VectorTypeVectorKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
-class ExtVectorType;
 class Token;
 class Type;
 class VectorType;

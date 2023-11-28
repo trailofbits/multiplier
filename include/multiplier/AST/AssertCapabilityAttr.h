@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "AssertCapabilityAttrSpelling.h"
-#include "InheritableAttr.h"
+#include <multiplier/AST/AssertCapabilityAttrSpelling.h>
+#include <multiplier/AST/InheritableAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class AssertCapabilityAttr;
 class Attr;

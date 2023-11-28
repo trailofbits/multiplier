@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "Type.h"
+#include <multiplier/AST/Type.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class PointerType;
 class Token;

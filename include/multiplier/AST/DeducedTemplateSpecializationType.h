@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "DeducedType.h"
+#include <multiplier/AST/DeducedType.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class DeducedTemplateSpecializationType;
 class DeducedType;

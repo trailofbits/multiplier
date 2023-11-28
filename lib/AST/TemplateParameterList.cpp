@@ -7,13 +7,11 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/TemplateParameterList.h>
-
+#include <multiplier/Reference.h>
 #include <multiplier/AST/Expr.h>
-#include <multiplier/AST/File.h>
-#include <multiplier/AST/Fragment.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/NamedDecl.h>
-#include <multiplier/AST/Reference.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 
 #include "../EntityProvider.h"
 #include "../File.h"

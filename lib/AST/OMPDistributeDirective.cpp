@@ -7,13 +7,12 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/OMPDistributeDirective.h>
-
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/OMPExecutableDirective.h>
 #include <multiplier/AST/OMPLoopBasedDirective.h>
 #include <multiplier/AST/OMPLoopDirective.h>
 #include <multiplier/AST/Stmt.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 
 #include "../EntityProvider.h"
 #include "../Stmt.h"

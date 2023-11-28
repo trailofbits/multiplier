@@ -10,10 +10,10 @@
 #include <iostream>
 #include <multiplier/AST/CallExpr.h>
 #include <multiplier/AST/FunctionDecl.h>
-#include <multiplier/AST/MacroArgument.h>
-#include <multiplier/AST/MacroExpansion.h>
-#include <multiplier/File.h>
 #include <multiplier/Fragment.h>
+#include <multiplier/Frontend/MacroArgument.h>
+#include <multiplier/Frontend/MacroExpansion.h>
+#include <multiplier/Frontend/File.h>
 #include <sstream>
 
 #include "Index.h"

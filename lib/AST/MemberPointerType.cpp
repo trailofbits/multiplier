@@ -7,9 +7,8 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/MemberPointerType.h>
-
 #include <multiplier/AST/CXXRecordDecl.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/Type.h>
 
 #include "../EntityProvider.h"

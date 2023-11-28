@@ -8,12 +8,13 @@
 
 #pragma once
 
-#include "InheritableAttr.h"
-#include "SwiftNewTypeAttrNewtypeKind.h"
-#include "SwiftNewTypeAttrSpelling.h"
+#include <multiplier/AST/InheritableAttr.h>
+#include <multiplier/AST/SwiftNewTypeAttrNewtypeKind.h>
+#include <multiplier/AST/SwiftNewTypeAttrSpelling.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class InheritableAttr;

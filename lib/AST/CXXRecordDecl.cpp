@@ -7,14 +7,11 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/CXXRecordDecl.h>
-
 #include <multiplier/AST/CXXBaseSpecifier.h>
 #include <multiplier/AST/CXXConstructorDecl.h>
 #include <multiplier/AST/CXXDestructorDecl.h>
 #include <multiplier/AST/CXXMethodDecl.h>
 #include <multiplier/AST/ClassTemplateDecl.h>
-#include <multiplier/AST/ClassTemplatePartialSpecializationDecl.h>
-#include <multiplier/AST/ClassTemplateSpecializationDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/FriendDecl.h>
 #include <multiplier/AST/FunctionDecl.h>
@@ -24,8 +21,10 @@
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/AST/TagDecl.h>
 #include <multiplier/AST/TemplateParameterList.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/TypeDecl.h>
+#include <multiplier/AST/ClassTemplatePartialSpecializationDecl.h>
+#include <multiplier/AST/ClassTemplateSpecializationDecl.h>
 
 #include "../EntityProvider.h"
 #include "../Decl.h"

@@ -8,10 +8,12 @@
 
 #include <cassert>
 #include <multiplier/AST.h>
-#include <multiplier/Compilation.h>
 #include <multiplier/Entity.h>
-#include <multiplier/File.h>
 #include <multiplier/Fragment.h>
+#include <multiplier/Frontend/Compilation.h>
+#include <multiplier/Frontend/File.h>
+#include <multiplier/Frontend/Macro.h>
+#include <multiplier/Frontend/TokenKind.h>
 
 namespace mx {
 namespace {

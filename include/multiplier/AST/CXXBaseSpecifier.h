@@ -20,18 +20,18 @@
 #include "../Entity.h"
 #include "../Iterator.h"
 
-#include "AccessSpecifier.h"
-#include "PseudoKind.h"
-#include "TagTypeKind.h"
+#include <multiplier/AST/AccessSpecifier.h>
+#include <multiplier/AST/PseudoKind.h>
+#include <multiplier/AST/TagTypeKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
+class Reference;
 class CXXBaseSpecifier;
 class CXXBaseSpecifierImpl;
 class File;
-class Fragment;
-class Reference;
 class Token;
 class TokenRange;
 class Type;

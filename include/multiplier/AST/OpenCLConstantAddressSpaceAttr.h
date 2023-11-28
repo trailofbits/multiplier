@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "OpenCLConstantAddressSpaceAttrSpelling.h"
-#include "TypeAttr.h"
+#include <multiplier/AST/OpenCLConstantAddressSpaceAttrSpelling.h>
+#include <multiplier/AST/TypeAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class OpenCLConstantAddressSpaceAttr;

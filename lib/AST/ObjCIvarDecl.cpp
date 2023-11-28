@@ -7,14 +7,13 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/ObjCIvarDecl.h>
-
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/DeclaratorDecl.h>
 #include <multiplier/AST/FieldDecl.h>
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/ObjCInterfaceDecl.h>
 #include <multiplier/AST/Stmt.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueDecl.h>
 
 #include "../EntityProvider.h"

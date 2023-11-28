@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "DeductionCandidate.h"
-#include "FunctionDecl.h"
+#include <multiplier/AST/DeductionCandidate.h>
+#include <multiplier/AST/FunctionDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CXXConstructorDecl;
 class CXXDeductionGuideDecl;

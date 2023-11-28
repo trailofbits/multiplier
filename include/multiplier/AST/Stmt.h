@@ -20,16 +20,15 @@
 #include "../Entity.h"
 #include "../Iterator.h"
 
-#include "StmtKind.h"
+#include <multiplier/AST/StmtKind.h>
 
 namespace mx {
 class EntityProvider;
-class Index;
-class Decl;
-class File;
 class Fragment;
 class Index;
 class Reference;
+class Decl;
+class File;
 class Stmt;
 class StmtImpl;
 class Token;

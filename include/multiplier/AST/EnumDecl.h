@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "TagDecl.h"
-#include "TemplateSpecializationKind.h"
+#include <multiplier/AST/TagDecl.h>
+#include <multiplier/AST/TemplateSpecializationKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class EnumConstantDecl;

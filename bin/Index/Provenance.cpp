@@ -23,7 +23,7 @@
 #include <functional>
 #include <iostream>
 #include <multiplier/AST/StmtKind.h>
-#include <multiplier/AST/TokenKind.h>
+#include <multiplier/Frontend/TokenKind.h>
 #include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Macro.h>

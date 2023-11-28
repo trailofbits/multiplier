@@ -8,8 +8,8 @@
 
 #include <cassert>
 #include <multiplier/AST/Attr.h>
-#include <multiplier/AST/TokenKind.h>
 #include <multiplier/AST/Type.h>
+#include <multiplier/Frontend/TokenKind.h>
 
 #include "File.h"
 

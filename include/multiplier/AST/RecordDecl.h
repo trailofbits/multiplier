@@ -8,15 +8,13 @@
 
 #pragma once
 
-#include "RecordDeclArgPassingKind.h"
-#include "TagDecl.h"
+#include <multiplier/AST/RecordDeclArgPassingKind.h>
+#include <multiplier/AST/TagDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
-class CXXRecordDecl;
-class ClassTemplatePartialSpecializationDecl;
-class ClassTemplateSpecializationDecl;
 class Decl;
 class FieldDecl;
 class NamedDecl;

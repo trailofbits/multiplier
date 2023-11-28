@@ -7,13 +7,12 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/AsmStmt.h>
-
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Expr.h>
+#include <multiplier/AST/Stmt.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/GCCAsmStmt.h>
 #include <multiplier/AST/MSAsmStmt.h>
-#include <multiplier/AST/Stmt.h>
-#include <multiplier/AST/Token.h>
 
 #include "../EntityProvider.h"
 #include "../Stmt.h"

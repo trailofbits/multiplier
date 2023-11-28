@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "InheritableAttr.h"
-#include "MipsShortCallAttrSpelling.h"
+#include <multiplier/AST/InheritableAttr.h>
+#include <multiplier/AST/MipsShortCallAttrSpelling.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Attr;
 class InheritableAttr;

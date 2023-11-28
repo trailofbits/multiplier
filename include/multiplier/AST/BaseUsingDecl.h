@@ -8,18 +8,17 @@
 
 #pragma once
 
-#include "NamedDecl.h"
+#include <multiplier/AST/NamedDecl.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class BaseUsingDecl;
 class Decl;
 class NamedDecl;
 class Stmt;
 class Token;
-class UsingDecl;
-class UsingEnumDecl;
 class UsingShadowDecl;
 namespace ir {
 class Operation;

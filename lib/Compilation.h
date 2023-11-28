@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <multiplier/Compilation.h>
+#include <multiplier/Frontend/Compilation.h>
 
 #include "EntityProvider.h"
 

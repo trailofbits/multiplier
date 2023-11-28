@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "ConstantExprResultStorageKind.h"
-#include "FullExpr.h"
+#include <multiplier/AST/ConstantExprResultStorageKind.h>
+#include <multiplier/AST/FullExpr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class ConstantExpr;
 class Decl;

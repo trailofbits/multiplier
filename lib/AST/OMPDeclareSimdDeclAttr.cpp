@@ -7,10 +7,9 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/OMPDeclareSimdDeclAttr.h>
-
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/Expr.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 
 #include "../EntityProvider.h"
 #include "../Attr.h"

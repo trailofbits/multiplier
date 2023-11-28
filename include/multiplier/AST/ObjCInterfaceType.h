@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "ObjCObjectType.h"
+#include <multiplier/AST/ObjCObjectType.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class ObjCInterfaceDecl;
 class ObjCInterfaceType;

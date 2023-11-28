@@ -7,14 +7,13 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/StmtAttr.h>
-
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/FallThroughAttr.h>
 #include <multiplier/AST/LikelyAttr.h>
 #include <multiplier/AST/MustTailAttr.h>
 #include <multiplier/AST/OpenCLUnrollHintAttr.h>
 #include <multiplier/AST/SuppressAttr.h>
-#include <multiplier/AST/Token.h>
 #include <multiplier/AST/UnlikelyAttr.h>
 
 #include "../EntityProvider.h"

@@ -8,17 +8,15 @@
 
 #pragma once
 
-#include "InheritableAttr.h"
+#include <multiplier/AST/InheritableAttr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
-class AlwaysInlineAttr;
 class Attr;
 class DeclOrStmtAttr;
 class InheritableAttr;
-class NoInlineAttr;
-class NoMergeAttr;
 class Token;
 namespace ir {
 class Operation;

@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include "CoroutineSuspendExpr.h"
+#include <multiplier/AST/CoroutineSuspendExpr.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CoawaitExpr;
 class CoroutineSuspendExpr;

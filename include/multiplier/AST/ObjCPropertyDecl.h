@@ -8,13 +8,14 @@
 
 #pragma once
 
-#include "NamedDecl.h"
-#include "ObjCPropertyDeclPropertyControl.h"
-#include "ObjCPropertyDeclSetterKind.h"
-#include "ObjCPropertyQueryKind.h"
+#include <multiplier/AST/NamedDecl.h>
+#include <multiplier/AST/ObjCPropertyDeclPropertyControl.h>
+#include <multiplier/AST/ObjCPropertyDeclSetterKind.h>
+#include <multiplier/AST/ObjCPropertyQueryKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class Decl;
 class NamedDecl;

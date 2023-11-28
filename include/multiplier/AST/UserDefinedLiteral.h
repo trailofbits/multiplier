@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "CallExpr.h"
-#include "UserDefinedLiteralLiteralOperatorKind.h"
+#include <multiplier/AST/CallExpr.h>
+#include <multiplier/AST/UserDefinedLiteralLiteralOperatorKind.h>
 
 namespace mx {
 class EntityProvider;
+class Fragment;
 class Index;
 class CallExpr;
 class Decl;

@@ -7,13 +7,12 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/ConceptSpecializationExpr.h>
-
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Expr.h>
 #include <multiplier/AST/ImplicitConceptSpecializationDecl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/AST/TemplateArgument.h>
-#include <multiplier/AST/Token.h>
+#include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueStmt.h>
 
 #include "../EntityProvider.h"
