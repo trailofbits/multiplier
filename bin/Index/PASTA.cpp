@@ -9,6 +9,7 @@
 #include "PASTA.h"
 
 #include <multiplier/AST.h>
+#include <multiplier/Frontend.h>
 
 namespace mx {
 DeclKind FromPasta(pasta::DeclKind e) {

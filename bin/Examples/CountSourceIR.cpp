@@ -11,7 +11,7 @@
 #include <sstream>
 
 #include <multiplier/Index.h>
-#include <multiplier/Compilation.h>
+#include <multiplier/Frontend/Compilation.h>
 #include <multiplier/IR/MLIR/Builtin/Operation.h>
 
 DECLARE_bool(help);

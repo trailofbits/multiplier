@@ -13,10 +13,10 @@
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Designator.h>
-#include <multiplier/AST/Macro.h>
 #include <multiplier/AST/PseudoKind.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/AST/Type.h>
+#include <multiplier/Frontend/Macro.h>
 #include <multiplier/IR/Attribute.h>
 #include <multiplier/IR/Operation.h>
 #include <multiplier/IR/Type.h>

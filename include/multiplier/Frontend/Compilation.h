@@ -13,7 +13,7 @@
 #include <string_view>
 #include <utility>
 
-#include "Entity.h"
+#include "../Entity.h"
 
 namespace mx {
 namespace ir {

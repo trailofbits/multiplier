@@ -10,7 +10,7 @@
 
 #include "Index.h"
 #include <multiplier/AST.h>
-#include <multiplier/TokenTree.h>
+#include <multiplier/Frontend/TokenTree.h>
 
 DEFINE_uint64(fragment_id, mx::kInvalidEntityId, "ID of the fragment to print");
 DEFINE_uint64(file_id, mx::kInvalidEntityId, "ID of the file to print");

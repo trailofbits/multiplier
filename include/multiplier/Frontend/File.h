@@ -11,7 +11,7 @@
 #include <memory>
 #include <string_view>
 
-#include "Entity.h"
+#include "../Entity.h"
 #include "Token.h"
 
 namespace mx {

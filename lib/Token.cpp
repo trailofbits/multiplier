@@ -12,15 +12,16 @@
 #include <multiplier/AST/DeclCategory.h>
 #include <multiplier/AST/DeclKind.h>
 #include <multiplier/AST/ImplicitParamDecl.h>
-#include <multiplier/AST/MacroKind.h>
-#include <multiplier/AST/MacroSubstitution.h>
 #include <multiplier/AST/ObjCMethodDecl.h>
 #include <multiplier/AST/TagDecl.h>
 #include <multiplier/AST/TagTypeKind.h>
 #include <multiplier/AST/TemplateDecl.h>
-#include <multiplier/AST/TokenCategory.h>
-#include <multiplier/AST/TokenKind.h>
 #include <multiplier/AST/VarDecl.h>
+
+#include <multiplier/Frontend/MacroKind.h>
+#include <multiplier/Frontend/MacroSubstitution.h>
+#include <multiplier/Frontend/TokenCategory.h>
+#include <multiplier/Frontend/TokenKind.h>
 
 #include "File.h"
 #include "Fragment.h"

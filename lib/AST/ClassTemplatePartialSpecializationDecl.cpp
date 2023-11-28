@@ -1,0 +1,239 @@
+// Copyright (c) 2022-present, Trail of Bits, Inc.
+// All rights reserved.
+//
+// This source code is licensed in accordance with the terms specified in
+// the LICENSE file found in the root directory of this source tree.
+
+// Auto-generated file; do not modify!
+
+#include <multiplier/AST/ClassTemplatePartialSpecializationDecl.h>
+#include <multiplier/AST/CXXRecordDecl.h>
+#include <multiplier/AST/ClassTemplateSpecializationDecl.h>
+#include <multiplier/AST/Decl.h>
+#include <multiplier/AST/NamedDecl.h>
+#include <multiplier/AST/RecordDecl.h>
+#include <multiplier/AST/Stmt.h>
+#include <multiplier/AST/TagDecl.h>
+#include <multiplier/AST/TemplateParameterList.h>
+#include <multiplier/Frontend/Token.h>
+#include <multiplier/AST/Type.h>
+#include <multiplier/AST/TypeDecl.h>
+
+#include "../EntityProvider.h"
+#include "../Decl.h"
+
+namespace mx {
+#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+
+gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::containing(const Token &tok) {
+  for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+    if (auto d = ClassTemplatePartialSpecializationDecl::from(*ctx)) {
+      co_yield *d;
+    }
+  }
+}
+
+bool ClassTemplatePartialSpecializationDecl::contains(const Token &tok) const {
+  auto id_ = id();
+  for (auto &parent : ClassTemplatePartialSpecializationDecl::containing(tok)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::containing(const Decl &decl) {
+  for (auto ancestor = decl.parent_declaration(); ancestor.has_value();
+       ancestor = ancestor->parent_declaration()) {
+    if (auto d = ClassTemplatePartialSpecializationDecl::from(*ancestor)) {
+      co_yield *d;
+    }
+  }
+}
+
+gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::containing(const std::optional<Decl> &decl) {
+  if (decl.has_value()) {
+    for (auto res : containing(decl.value())) {
+      co_yield res;
+    }
+  }
+}
+
+gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::containing(const Stmt &stmt) {
+  for (auto ancestor = stmt.parent_declaration(); ancestor.has_value();
+       ancestor = ancestor->parent_declaration()) {
+    if (auto d = ClassTemplatePartialSpecializationDecl::from(*ancestor)) {
+      co_yield *d;
+    }
+  }
+}
+
+gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::containing(const std::optional<Stmt> &stmt) {
+  if (stmt.has_value()) {
+    for (auto res : containing(stmt.value())) {
+      co_yield res;
+    }
+  }
+}
+
+bool ClassTemplatePartialSpecializationDecl::contains(const Decl &decl) {
+  for (auto &parent : ClassTemplatePartialSpecializationDecl::containing(decl)) {
+    if (*this == parent) { return true; }
+  }
+  return false;
+}
+
+bool ClassTemplatePartialSpecializationDecl::contains(const Stmt &stmt) {
+  for (auto &parent : ClassTemplatePartialSpecializationDecl::containing(stmt)) {
+    if (*this == parent) { return true; }
+  }
+  return false;
+}
+
+ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::canonical_declaration(void) const {
+  if (auto canon = from_base(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ClassTemplatePartialSpecializationDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::definition(void) const {
+  if (auto def = this->Decl::definition()) {
+    return from_base(def.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::redeclarations(void) const & {
+  for (Decl r : Decl::redeclarations()) {
+    if (std::optional<ClassTemplatePartialSpecializationDecl> dr = from_base(r)) {
+      co_yield std::move(dr.value());
+      continue;
+    }
+    assert(false);
+  // Wrong type?
+  }
+  co_return;
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    if (auto base = index.declaration(eid.Pack())) {
+      return from_base(base.value());
+    }
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const std::optional<Decl> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
+
+namespace {
+static const DeclKind kClassTemplatePartialSpecializationDeclDerivedKinds[] = {
+    ClassTemplatePartialSpecializationDecl::static_kind(),
+};
+
+}  // namespace
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from_base(const Decl &parent) {
+  switch (parent.kind()) {
+    case ClassTemplatePartialSpecializationDecl::static_kind():
+      return reinterpret_cast<const ClassTemplatePartialSpecializationDecl &>(parent);
+    default:
+      return std::nullopt;
+  }
+}
+
+gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (DeclKind k : kClassTemplatePartialSpecializationDeclDerivedKinds) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
+      if (std::optional<ClassTemplatePartialSpecializationDecl> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (DeclKind k : kClassTemplatePartialSpecializationDeclDerivedKinds) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
+      if (std::optional<ClassTemplatePartialSpecializationDecl> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (DeclKind k : kClassTemplatePartialSpecializationDeclDerivedKinds) {
+      for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
+        if (std::optional<ClassTemplatePartialSpecializationDecl> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const Reference &r) {
+  return ClassTemplatePartialSpecializationDecl::from(r.as_declaration());
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return from_base(std::get<Decl>(e));
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const TokenContext &t) {
+  if (auto base = t.as_declaration()) {
+    return from_base(base.value());
+  }
+  return std::nullopt;
+}
+
+Type ClassTemplatePartialSpecializationDecl::injected_specialization_type(void) const {
+  RawEntityId eid = impl->reader.getVal180();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
+}
+
+ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
+  RawEntityId eid = impl->reader.getVal181();
+  return ClassTemplatePartialSpecializationDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
+}
+
+ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member_template(void) const {
+  RawEntityId eid = impl->reader.getVal357();
+  return ClassTemplatePartialSpecializationDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
+}
+
+TemplateParameterList ClassTemplatePartialSpecializationDecl::template_parameters(void) const {
+  RawEntityId eid = impl->reader.getVal358();
+  return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
+}
+
+bool ClassTemplatePartialSpecializationDecl::has_associated_constraints(void) const {
+  return impl->reader.getVal359();
+}
+
+#pragma GCC diagnostic pop
+#endif
+}  // namespace mx

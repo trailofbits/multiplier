@@ -9,11 +9,12 @@
 #include <algorithm>
 #include <functional>
 #include <iterator>
-#include <multiplier/AST/MacroParameterSubstitution.h>
-#include <multiplier/AST/MacroParameter.h>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
+
+#include <multiplier/Frontend/MacroParameterSubstitution.h>
+#include <multiplier/Frontend/MacroParameter.h>
 
 #include "File.h"
 #include "Fragment.h"

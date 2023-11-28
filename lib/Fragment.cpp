@@ -8,12 +8,12 @@
 
 #include <iostream>
 #include <cassert>
-#include <multiplier/Compilation.h>
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Designator.h>
-#include <multiplier/AST/Macro.h>
 #include <multiplier/AST/Type.h>
+#include <multiplier/Frontend/Compilation.h>
+#include <multiplier/Frontend/Macro.h>
 
 #include "Attr.h"
 #include "Pseudo.h"

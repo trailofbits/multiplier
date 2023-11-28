@@ -7,7 +7,7 @@
 #include "References.h"
 
 #include <cassert>
-#include <multiplier/AST/MacroKind.h>
+#include <multiplier/Frontend/MacroKind.h>
 #include <multiplier/Reference.h>
 #include <multiplier/Types.h>
 

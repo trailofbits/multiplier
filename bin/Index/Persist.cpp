@@ -15,6 +15,7 @@
 #include <iostream>
 #include <kj/io.h>
 #include <multiplier/AST.h>
+#include <multiplier/Frontend.h>
 #include <multiplier/AST.capnp.h>
 #include <multiplier/RPC.capnp.h>
 #include <pasta/Compile/Compiler.h>

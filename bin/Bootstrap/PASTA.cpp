@@ -730,18 +730,18 @@ class CodeGenerator {
   std::filesystem::path lib_dir; // `lib/`
   std::filesystem::path include_dir; // `include/multiplier`
 
-  std::filesystem::path entities_lib_dir; // `lib/AST`
-  std::filesystem::path entities_include_dir; // `include/multiplier/AST`
   std::vector<ClassHierarchy *> roots;
 
   std::unordered_set<std::string> enum_names;
   std::set<std::string> forward_decls;
   std::set<std::string> derived_decls;
   std::set<std::string> needed_decls;
+  bool needs_reference{false};
 
   std::ofstream schema_os;  // `lib/Common/AST.capnp`
   std::stringstream lib_cpp_os;  // Implementation file for each entity.
-  std::ofstream include_h_os;  // `include/multiplier/AST.h`
+  std::ofstream ast_h_os;  // `include/multiplier/AST.h`
+  std::ofstream frontend_h_os;  // `include/multiplier/Frontend.h`
   std::ofstream serialize_h_os;  // `bin/Index/Serialize.h`
   std::ofstream serialize_cpp_os;  // `bin/Index/Serialize.cpp`
   std::ofstream serialize_inc_os;  // `include/multiplier/Visitor.inc.h`
@@ -813,7 +813,6 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   }
 
   auto is_frontend_type = gFrontendTypes.find(enum_name) != gFrontendTypes.end();
-  auto ns_name = is_frontend_type ? "frontend" : "ast";
   auto dir_name = is_frontend_type ? "Frontend" : "AST";
 
   std::ofstream os(include_dir / dir_name / (enum_name + ".h"), std::ios::trunc | std::ios::out);
@@ -826,10 +825,13 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
       << "#include <cstdint>\n\n"
-      << "namespace mx {\n"
-      << "inline namespace " << ns_name << " {\n";
+      << "namespace mx {\n";
 
-  include_h_os << "#include \"" << dir_name << '/' << enum_name << ".h\"\n";
+  if (is_frontend_type) {
+    frontend_h_os << "#include \"" << dir_name << '/' << enum_name << ".h\"\n";
+  } else {
+    ast_h_os << "#include \"" << dir_name << '/' << enum_name << ".h\"\n";
+  }
 
   auto enumerators = enum_decl.Enumerators();
   auto num_enumerators = enumerators.size();
@@ -993,7 +995,7 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << "}\n\n";  // End of `FromPasta`
 
   lib_cpp_os
-      << "const char *EnumeratorName(" << ns_name << "::" << enum_name << " e) {\n"
+      << "const char *EnumeratorName(" << enum_name << " e) {\n"
       << "  switch (e) {\n"
       << name_cases_ss.str()
       << "    default: return \"<invalid>\";\n"
@@ -1002,19 +1004,18 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
 
   lib_pasta_h_os
       << "enum class " << enum_name << " : " << types.first << ";\n"
-      << ns_name << "::" << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n";
+      << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n";
 
   os
       << "};\n\n"
-      << "}  // namesapace " << ns_name << "\n\n"
-      << "inline static const char *EnumerationName(" << ns_name << "::" << enum_name << ") {\n"
+      << "inline static const char *EnumerationName(" << enum_name << ") {\n"
       << "  return \"" << enum_name << "\";\n"
       << "}\n\n"
-      << "inline static constexpr unsigned NumEnumerators(" << ns_name << "::" << enum_name
+      << "inline static constexpr unsigned NumEnumerators(" << enum_name
       << ") {\n"
       << "  return " << i << ";\n"
       << "}\n\n"
-      << "const char *EnumeratorName(" << ns_name << "::" << enum_name << ");\n\n"
+      << "const char *EnumeratorName(" << enum_name << ");\n\n"
       << "} // namespace mx\n";
 
   serialize_inc_os << "MX_END_ENUM_CLASS(" << enum_name << ")\n\n";
@@ -1859,6 +1860,7 @@ MethodListPtr CodeGenerator::RunOnClass(
   std::stringstream class_os;
   std::stringstream late_class_os;
 
+  needs_reference = false;
   forward_decls.clear();
   derived_decls.clear();
   needed_decls.clear();
@@ -1901,7 +1903,6 @@ MethodListPtr CodeGenerator::RunOnClass(
   }
 
   auto is_frontend_type = gFrontendTypes.find(class_name) != gFrontendTypes.end();
-  auto ns_name = is_frontend_type ? "frontend" : "ast";
   auto dir_name = is_frontend_type ? "Frontend" : "AST";
 
   std::string base_name;
@@ -1942,7 +1943,11 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "#include \"../Iterator.h\"\n\n";
   }
 
-  include_h_os << "#include \"" << dir_name << '/' << class_name << ".h\"\n";
+  if (is_frontend_type) {
+    frontend_h_os << "#include \"" << dir_name << '/' << class_name << ".h\"\n";
+  } else {
+    ast_h_os << "#include \"" << dir_name << '/' << class_name << ".h\"\n";
+  }
 
   std::string nth_entity_reader;
   const char *end_serializer = nullptr;
@@ -2328,7 +2333,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n";
     }
 
-    forward_decls.insert("Reference");
+    needs_reference = true;
 
     class_os
         << "  constexpr inline static EntityCategory static_category(void) {\n"
@@ -3015,7 +3020,7 @@ MethodListPtr CodeGenerator::RunOnClass(
   if (false) {
 #define DECLARE_DEFINE_FROM(type_name, lower_name) \
     } else if (class_name == #type_name) { \
-      forward_decls.insert("Reference"); \
+      needs_reference = true; \
       forward_decls.insert("Token"); \
       class_os \
           << "  inline static std::optional<" << class_name \
@@ -3662,41 +3667,13 @@ MethodListPtr CodeGenerator::RunOnClass(
       << "class Fragment;\n"
       << "class Index;\n";
 
+  if (needs_reference) {
+    os << "class Reference;\n";
+  }
+
   // Forward declare impl types.
   for (auto fwd : forward_decls) {
-    if (fwd.ends_with("Impl")) {
-      os << "class " << fwd << ";\n"; 
-    }
-  }
-
-  // Forward declare frontend types.
-  auto has_ns = false;
-  for (auto fwd : forward_decls) {
-    if (gFrontendTypes.count(fwd)) {
-      if (!has_ns) {
-        os << "inline namespace frontend {\n";
-        has_ns = true;
-      }
-      os << "class " << fwd << ";\n"; 
-    }
-  }
-  if (has_ns) {
-    os << "}  // namespace frontend\n";
-  }
-
-  // Forward declare AST types.
-  has_ns = false;
-  for (auto fwd : forward_decls) {
-    if (!gFrontendTypes.count(fwd)) {
-      if (!has_ns) {
-        os << "inline namespace ast {\n";
-        has_ns = true;
-      }
-      os << "class " << fwd << ";\n"; 
-    }
-  }
-  if (has_ns) {
-    os << "}  // namespace ast\n";
+    os << "class " << fwd << ";\n"; 
   }
 
   os
@@ -3705,10 +3682,8 @@ MethodListPtr CodeGenerator::RunOnClass(
       << "class Value;\n"
       << "}  // namespace ir\n\n"
       << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n"
-      << "inline namespace " << ns_name << " {\n"
       << class_os.str()
       << late_class_os.str()
-      << "}  // namespace " << ns_name << "\n"
       << "#endif\n"
       << "} // namespace mx\n";
 
@@ -3757,7 +3732,8 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#include \"PASTA.h\"\n\n"
-      << "#include <multiplier/AST.h>\n\n"
+      << "#include <multiplier/AST.h>\n"
+      << "#include <multiplier/Frontend.h>\n\n"
       << "namespace mx {\n";
 
   serialize_inc_os
@@ -3983,7 +3959,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#pragma GCC diagnostic push\n"
       << "#pragma GCC diagnostic ignored \"-Wuseless-cast\"\n\n";
 
-  include_h_os
+  ast_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
       << "// All rights reserved.\n"
       << "//\n"
@@ -3991,6 +3967,19 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n";
+
+  frontend_h_os
+      << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#pragma once\n\n"
+      << "#include \"Frontend/Compilation.h\"\n"
+      << "#include \"Frontend/File.h\"\n"
+      << "#include \"Frontend/Token.h\"\n"
+      << "#include \"Frontend/TokenTree.h\"\n\n";
 
   lib_pasta_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
@@ -4048,7 +4037,9 @@ void CodeGenerator::RunOnClassHierarchies(void) {
   }
 
   auto end_libcpp_os = [&] (std::string name, bool is_root, bool is_enum) {
-    std::ofstream fs(entities_lib_dir / (name + ".cpp"),
+    auto dir_name = gFrontendTypes.count(name) ? "Frontend" : "AST";
+
+    std::ofstream fs(lib_dir / dir_name / (name + ".cpp"),
                      std::ios::trunc | std::ios::out);
 
     fs
@@ -4058,7 +4049,11 @@ void CodeGenerator::RunOnClassHierarchies(void) {
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
         << "// Auto-generated file; do not modify!\n\n"
-        << "#include <multiplier/AST/" << name << ".h>\n\n";
+        << "#include <multiplier/" << dir_name << '/' << name << ".h>\n";
+
+    if (needs_reference) {
+      fs << "#include <multiplier/Reference.h>\n";
+    }
 
     auto needs_fragment = is_root;
     for (const std::string &other_name : forward_decls) {
@@ -4073,11 +4068,13 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       }
     }
 
-    for (const std::string &name : derived_decls) {
-      if (gFrontendTypes.count(name)) {
-        fs << "#include <multiplier/Frontend/" << name << ".h>\n";
-      } else {
-        fs << "#include <multiplier/AST/" << name << ".h>\n";
+    for (const std::string &derived_name : derived_decls) {
+      if (name != derived_name) {
+        if (gFrontendTypes.count(derived_name)) {
+          fs << "#include <multiplier/Frontend/" << derived_name << ".h>\n";
+        } else {
+          fs << "#include <multiplier/AST/" << derived_name << ".h>\n";
+        }
       }
     }
 
@@ -4298,10 +4295,9 @@ int CodeGenerator::RunOnTranslationUnit(pasta::TranslationUnitDecl tu) {
 CodeGenerator::CodeGenerator(char *argv[])
     : lib_dir(argv[5]),
       include_dir(argv[6]),
-      entities_lib_dir(lib_dir / "AST"),
-      entities_include_dir(include_dir / "AST"),
       schema_os(argv[4], std::ios::trunc | std::ios::out),
-      include_h_os(entities_include_dir.parent_path() / "AST.h", std::ios::trunc | std::ios::out),
+      ast_h_os(include_dir / "AST.h", std::ios::trunc | std::ios::out),
+      frontend_h_os(include_dir / "Frontend.h", std::ios::trunc | std::ios::out),
       serialize_h_os(argv[7], std::ios::trunc | std::ios::out),
       serialize_cpp_os(argv[8], std::ios::trunc | std::ios::out),
       serialize_inc_os(argv[9], std::ios::trunc | std::ios::out),

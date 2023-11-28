@@ -6,7 +6,10 @@
 
 #pragma once
 
-#include <multiplier/TokenTree.h>
+#include <multiplier/Frontend/TokenTree.h>
+
+#include <deque>
+#include <mutex>
 
 #include "Token.h"
 
