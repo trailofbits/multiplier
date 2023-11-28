@@ -25,6 +25,7 @@ struct sqlite3_context;
 struct sqlite3_stmt;
 struct sqlite3_value;
 }  // extern C
+#pragma GCC visibility push(hidden)
 namespace sqlite {
 
 #define MX_ENABLE_SQLITE_LOGGING 0
@@ -433,3 +434,4 @@ class ExclusiveTransaction {
 };
 
 }  // namespace sqlite
+#pragma GCC visibility pop

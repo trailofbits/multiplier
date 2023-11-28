@@ -10,6 +10,7 @@
 
 #include "EntityProvider.h"
 
+#pragma GCC visibility push(hidden)
 namespace mx {
 
 class CompilationImpl final : public EntityImpl<rpc::Compilation> {
@@ -31,3 +32,4 @@ class CompilationImpl final : public EntityImpl<rpc::Compilation> {
 };
 
 }  // namespace mx
+#pragma GCC visibility pop

@@ -11,6 +11,7 @@
 
 #include "FragmentEntity.h"
 
+#pragma GCC visibility push(hidden)
 namespace mx {
 
 // Interface for accessing an attribute.
@@ -25,3 +26,4 @@ class AttrImpl final : public FragmentEntityImpl<ast::Attr> {
 };
 
 }  // namespace mx
+#pragma GCC visibility pop

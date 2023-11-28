@@ -9,6 +9,7 @@
 #include <multiplier/Index.h>
 #include <utility>
 
+#pragma GCC visibility push(hidden)
 namespace mx {
 
 class ReferenceKindImpl {
@@ -29,3 +30,4 @@ gap::generator<Reference> EmptyReferences(void);
 gap::generator<Reference> References(EntityProviderPtr ep, RawEntityId raw_id);
 
 }  // namespace mx
+#pragma GCC visibility pop

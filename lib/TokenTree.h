@@ -13,6 +13,7 @@
 
 #include "Token.h"
 
+#pragma GCC visibility push(hidden)
 namespace mx {
 
 class TokenTreeImpl {
@@ -181,3 +182,4 @@ class TokenTreeImplCache {
 };
 
 }  // namespace mx
+#pragma GCC visibility pop

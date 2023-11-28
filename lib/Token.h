@@ -14,6 +14,7 @@
 #include <multiplier/Frontend/MacroSubstitution.h>
 #include <multiplier/Frontend/MacroVAOpt.h>
 
+#pragma GCC visibility push(hidden)
 namespace mx {
 
 class FragmentImpl;
@@ -195,3 +196,4 @@ class CustomTokenReader final : public TokenReader {
 };
 
 }  // namespace mx
+#pragma GCC visibility pop

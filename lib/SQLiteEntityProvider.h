@@ -15,6 +15,7 @@
 #include "ThreadLocal.h"
 #include "Types.h"
 
+#pragma GCC visibility push(hidden)
 namespace sqlite {
 class Statement;
 }  // namespace sqlite
@@ -119,3 +120,4 @@ class SQLiteEntityProvider final : public EntityProvider {
 };
 
 }  // namespace mx
+#pragma GCC visibility pop

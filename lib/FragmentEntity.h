@@ -8,6 +8,7 @@
 
 #include "Fragment.h"
 
+#pragma GCC visibility push(hidden)
 namespace mx {
 
 template <typename Root>
@@ -36,3 +37,4 @@ class FragmentEntityImpl {
 };
 
 }  // namespace mx
+#pragma GCC visibility pop

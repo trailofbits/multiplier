@@ -8,6 +8,7 @@
 
 #include "EntityProvider.h"
 
+#pragma GCC visibility push(hidden)
 namespace mx {
 
 class TokenContextReader {
@@ -93,3 +94,4 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
 };
 
 } // namespace mx
+#pragma GCC visibility pop

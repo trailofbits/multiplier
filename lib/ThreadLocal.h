@@ -9,6 +9,7 @@
 #include <functional>
 #include <memory>
 
+#pragma GCC visibility push(hidden)
 namespace mx {
 
 template <typename T>
@@ -64,3 +65,4 @@ class ThreadLocal : public ThreadLocalBase {
 };
 
 }  // namespace mx
+#pragma GCC visibility pop

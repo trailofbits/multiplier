@@ -13,6 +13,7 @@
 #include "Fragment.h"
 #include "Types.h"
 
+#pragma GCC visibility push(hidden)
 namespace mx {
 
 class RegexQueryResultImpl final {
@@ -67,3 +68,4 @@ class RegexQueryResultImpl final {
 };
 
 }  // namespace mx
+#pragma GCC visibility pop

@@ -12,6 +12,7 @@
 #include "Fragment.h"
 #include "Token.h"
 
+#pragma GCC visibility push(hidden)
 namespace mx {
 
 class InvalidEntityProvider final : public EntityProvider {
@@ -89,3 +90,4 @@ class InvalidEntityProvider final : public EntityProvider {
 };
 
 }  // namespace mx
+#pragma GCC visibility pop

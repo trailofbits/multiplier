@@ -11,6 +11,7 @@
 
 #include "FragmentEntity.h"
 
+#pragma GCC visibility push(hidden)
 namespace mx {
 
 #define MX_FOR_EACH_PSEUDO(m) \
@@ -34,3 +35,4 @@ MX_FOR_EACH_PSEUDO(MX_DEFINE_PSEUDO)
 #undef MX_DEFINE_PSEUDO
 
 }  // namespace mx
+#pragma GCC visibility pop

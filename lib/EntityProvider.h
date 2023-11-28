@@ -15,6 +15,7 @@
 
 #include "Entity.h"
 
+#pragma GCC visibility push(hidden)
 namespace mx {
 
 class Decl;
@@ -194,3 +195,4 @@ class EntityProvider {
 };
 
 }  // namespace mx
+#pragma GCC visibility pop
