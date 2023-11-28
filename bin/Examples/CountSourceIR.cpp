@@ -12,7 +12,7 @@
 
 #include <multiplier/Index.h>
 #include <multiplier/Frontend/Compilation.h>
-#include <multiplier/IR/MLIR/Builtin/Operation.h>
+#include <multiplier/IR/Builtin/Operation.h>
 
 DECLARE_bool(help);
 DECLARE_string(db);
