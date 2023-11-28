@@ -196,6 +196,8 @@ static const std::unordered_set<std::string> gFrontendTypes{
   "CompileJob",
   "Compiler",
   "Token",
+  "TokenRange",
+  "TokenTree",
   "MacroToken",
   "FileToken",
   "MacroKind",
@@ -734,6 +736,7 @@ class CodeGenerator {
 
   std::unordered_set<std::string> enum_names;
   std::set<std::string> forward_decls;
+  std::set<std::string> derived_decls;
   std::set<std::string> needed_decls;
 
   std::ofstream schema_os;  // `lib/Common/AST.capnp`
@@ -809,7 +812,7 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
     return false;
   }
 
-  auto is_frontend_type = gFrontendTypes.find(enum_name) == gFrontendTypes.end();
+  auto is_frontend_type = gFrontendTypes.find(enum_name) != gFrontendTypes.end();
   auto ns_name = is_frontend_type ? "frontend" : "ast";
   auto dir_name = is_frontend_type ? "Frontend" : "AST";
 
@@ -1857,6 +1860,7 @@ MethodListPtr CodeGenerator::RunOnClass(
   std::stringstream late_class_os;
 
   forward_decls.clear();
+  derived_decls.clear();
   needed_decls.clear();
 
   std::cerr << "Running on " << class_name << '\n';
@@ -1896,7 +1900,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     return parent_methods;
   }
 
-  auto is_frontend_type = gFrontendTypes.find(class_name) == gFrontendTypes.end();
+  auto is_frontend_type = gFrontendTypes.find(class_name) != gFrontendTypes.end();
   auto ns_name = is_frontend_type ? "frontend" : "ast";
   auto dir_name = is_frontend_type ? "Frontend" : "AST";
 
@@ -2935,7 +2939,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         const ClassHierarchy *c = wl[i];
         std::string c_name = c->record.Name();
         if (gConcreteClassNames.count(c_name)) {
-          forward_decls.insert(c_name);
+          derived_decls.insert(c_name);
           lib_cpp_os << "    " << c_name << "::static_kind(),\n";
         }
         for (const ClassHierarchy *d : c->derived) {
@@ -3646,12 +3650,16 @@ MethodListPtr CodeGenerator::RunOnClass(
   class_os << "};\n\n";
 
   for (auto needed : needed_decls) {
-    os << "#include \"" << needed << ".h\"\n";
+    if (gFrontendTypes.count(needed)) {
+      os << "#include <multiplier/Frontend/" << needed << ".h>\n";
+    } else {
+      os << "#include <multiplier/AST/" << needed << ".h>\n"; 
+    }
   }
   os
       << "\nnamespace mx {\n"
       << "class EntityProvider;\n"
-      << "class Fragment\n"
+      << "class Fragment;\n"
       << "class Index;\n";
 
   // Forward declare impl types.
@@ -3667,6 +3675,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     if (gFrontendTypes.count(fwd)) {
       if (!has_ns) {
         os << "inline namespace frontend {\n";
+        has_ns = true;
       }
       os << "class " << fwd << ";\n"; 
     }
@@ -3681,6 +3690,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     if (!gFrontendTypes.count(fwd)) {
       if (!has_ns) {
         os << "inline namespace ast {\n";
+        has_ns = true;
       }
       os << "class " << fwd << ";\n"; 
     }
@@ -4055,8 +4065,19 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       if (other_name == "TokenRange") {
         needs_fragment = true;
       } else if (name != other_name && !other_name.ends_with("Impl")) {
-        fs
-            << "#include <multiplier/AST/" << other_name << ".h>\n";
+        if (gFrontendTypes.count(other_name)) {
+          fs << "#include <multiplier/Frontend/" << other_name << ".h>\n";
+        } else {
+          fs << "#include <multiplier/AST/" << other_name << ".h>\n";
+        }
+      }
+    }
+
+    for (const std::string &name : derived_decls) {
+      if (gFrontendTypes.count(name)) {
+        fs << "#include <multiplier/Frontend/" << name << ".h>\n";
+      } else {
+        fs << "#include <multiplier/AST/" << name << ".h>\n";
       }
     }
 
