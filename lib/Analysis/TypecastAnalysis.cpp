@@ -27,6 +27,50 @@
 
 namespace mx {
 
+// TODO: what else?
+// TODO: interesting: VECTOR_SPLAT, ARRAY_TO_POINTER_DECAY
+
+static constexpr CastKind kCXXObjectCasts[] = {
+  // represents most non-ptr object casting
+  CastKind::BASE_TO_DERIVED,
+  CastKind::DERIVED_TO_BASE,
+  CastKind::UNCHECKED_DERIVED_TO_BASE,
+
+  // explicit pointer up/down casting
+  CastKind::REINTERPRET_MEMBER_POINTER,
+  CastKind::DYNAMIC,
+
+  // implicit pointer up/down casting
+  CastKind::BASE_TO_DERIVED_MEMBER_POINTER,
+  CastKind::DERIVED_TO_BASE_MEMBER_POINTER,
+};
+
+// CastKinds that we are choosing not to be represented as a CastState
+static constexpr CastKind kNoneTypeCasts[] = {
+  CastKind::FUNCTION_TO_POINTER_DECAY,
+  CastKind::BUILTIN_FN_TO_FN_POINTER,
+  CastKind::ARRAY_TO_POINTER_DECAY,
+  CastKind::VECTOR_SPLAT,
+  CastKind::MATRIX_CAST,
+
+  // objc casting
+  CastKind::C_POINTER_TO_OBJ_C_POINTER_CAST,
+  CastKind::BLOCK_POINTER_TO_OBJ_C_POINTER_CAST,
+  CastKind::ANY_POINTER_TO_BLOCK_POINTER_CAST,
+  CastKind::OBJ_C_OBJECT_L_VALUE_CAST,
+  CastKind::ARC_PRODUCE_OBJECT,
+  CastKind::ARC_CONSUME_OBJECT,
+  CastKind::ARC_RECLAIM_RETURNED_OBJECT,
+  CastKind::ARC_EXTEND_BLOCK_OBJECT,
+  CastKind::ATOMIC_TO_NON_ATOMIC,
+  CastKind::NON_ATOMIC_TO_ATOMIC,
+  CastKind::COPY_AND_AUTORELEASE_BLOCK_OBJECT,
+  CastKind::ZERO_TO_OCL_OPAQUE_TYPE,
+  CastKind::ADDRESS_SPACE_CONVERSION,
+  CastKind::INT_TO_OCL_SAMPLER,
+  CastKind::NO_OPERATION,
+};
+
 CastState::CastState(const CastExpr &cast_expr) : cast_expr(cast_expr) {}
 
 const CastExpr& CastState::get_cast_expr() {
@@ -272,7 +316,8 @@ CastSignChange CastState::sign_change() {
     }
 }
 
-TypecastChain::TypecastChain(bool is_forward) : is_forward(is_forward) {};
+TypecastChain::TypecastChain(bool is_forward)
+    : is_forward(is_forward), root_type(nullptr), current_resolved_type(nullptr) {};
 
 int TypecastChain::add_new_transition(EntityId reference, const CastState &cast_state, bool is_leaf) {
     auto [curr_type_before, curr_type_after ] = cast_state.types_before_after_conversion();
@@ -343,10 +388,7 @@ CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
     CastStateMap cast_state_map;
 
     std::stack<Stmt> seen_stmts;
-    std::unordered_set<PackedStmtId> seen_stmt_ids;
-
     seen_stmts.push(stmt);
-    seen_stmt_ids.insert(stmt.id());
 
     /*
     // retrieve the original underlying Decl
@@ -388,7 +430,7 @@ CastStateMap TypecastAnalysis::cast_instances(const Stmt &stmt) {
     };
 
     while (!seen_stmts.empty()) {
-        Stmt curr_stmt = seen_stmts.top();
+        Stmt curr_stmt = std::move(seen_stmts.top());
         seen_stmts.pop();
 
         if (auto cast_expr = CastExpr::from(curr_stmt)) {

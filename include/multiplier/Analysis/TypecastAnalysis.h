@@ -22,50 +22,6 @@ class CastState;
 
 using CastStateMap = std::unordered_map<PackedStmtId, CastState>;
 
-// TODO: what else?
-// TODO: interesting: VECTOR_SPLAT, ARRAY_TO_POINTER_DECAY
-
-static constexpr CastKind kCXXObjectCasts[] = {
-  // represents most non-ptr object casting
-  CastKind::BASE_TO_DERIVED,
-  CastKind::DERIVED_TO_BASE,
-  CastKind::UNCHECKED_DERIVED_TO_BASE,
-
-  // explicit pointer up/down casting
-  CastKind::REINTERPRET_MEMBER_POINTER,
-  CastKind::DYNAMIC,
-
-  // implicit pointer up/down casting
-  CastKind::BASE_TO_DERIVED_MEMBER_POINTER,
-  CastKind::DERIVED_TO_BASE_MEMBER_POINTER,
-};
-
-// CastKinds that we are choosing not to be represented as a CastState
-static constexpr CastKind kNoneTypeCasts[] = {
-  CastKind::FUNCTION_TO_POINTER_DECAY,
-  CastKind::BUILTIN_FN_TO_FN_POINTER,
-  CastKind::ARRAY_TO_POINTER_DECAY,
-  CastKind::VECTOR_SPLAT,
-  CastKind::MATRIX_CAST,
-
-  // objc casting
-  CastKind::C_POINTER_TO_OBJ_C_POINTER_CAST,
-  CastKind::BLOCK_POINTER_TO_OBJ_C_POINTER_CAST,
-  CastKind::ANY_POINTER_TO_BLOCK_POINTER_CAST,
-  CastKind::OBJ_C_OBJECT_L_VALUE_CAST,
-  CastKind::ARC_PRODUCE_OBJECT,
-  CastKind::ARC_CONSUME_OBJECT,
-  CastKind::ARC_RECLAIM_RETURNED_OBJECT,
-  CastKind::ARC_EXTEND_BLOCK_OBJECT,
-  CastKind::ATOMIC_TO_NON_ATOMIC,
-  CastKind::NON_ATOMIC_TO_ATOMIC,
-  CastKind::COPY_AND_AUTORELEASE_BLOCK_OBJECT,
-  CastKind::ZERO_TO_OCL_OPAQUE_TYPE,
-  CastKind::ADDRESS_SPACE_CONVERSION,
-  CastKind::INT_TO_OCL_SAMPLER,
-  CastKind::NO_OPERATION,
-};
-
 // Represents sign changes for built-in types
 enum class CastSignChange {
   C_UNSIGNED_TO_SIGNED,
@@ -99,7 +55,6 @@ public:
   CastState(const CastExpr &);
 
   // Grab a reference to the underlying CastExpr
-  // TODO: delete?
   const CastExpr& get_cast_expr();
 
   // What is the data entity we're casting from?
@@ -147,13 +102,13 @@ private:
   bool is_forward;
 
   // populated after first transition
-  Type *root_type;
+  Type root_type;
 
   // stores final destination types after a leaf transition is added
-  std::unordered_set<Type*> last_resolved_types;
+  std::unordered_set<Type> last_resolved_types;
 
   // holds most recent destination type at current transition
-  Type* current_resolved_type;
+  Type current_resolved_type;
 
   // maps taint entity IDs to subsequent type cast transitions
   std::map<EntityId, std::vector<CastState>> cast_state_nodes;
@@ -171,7 +126,7 @@ public:
   // Resolve the most recent destination type
   Type* get_current_resolved_type();
 
-  // Does the type at the end of the chain match the one in the beginning?
+  // Does any type at the end of the chain match the one in the beginning?
   bool is_identity_preserving();
 
   // TODO Return lists of every possible typecasting path
