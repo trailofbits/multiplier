@@ -82,23 +82,23 @@ std::optional<ObjCObjectType> ObjCObjectType::from(const TokenContext &t) {
 }
 
 Type ObjCObjectType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal18();
+  RawEntityId eid = impl->reader.getVal21();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type ObjCObjectType::base_type(void) const {
-  RawEntityId eid = impl->reader.getVal19();
+  RawEntityId eid = impl->reader.getVal22();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ObjCInterfaceDecl ObjCObjectType::interface(void) const {
-  RawEntityId eid = impl->reader.getVal25();
+  RawEntityId eid = impl->reader.getVal28();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<Type> ObjCObjectType::super_class_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal26();
+    RawEntityId eid = impl->reader.getVal29();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -110,11 +110,11 @@ std::optional<Type> ObjCObjectType::super_class_type(void) const {
 }
 
 unsigned ObjCObjectType::num_type_arguments(void) const {
-  return impl->reader.getVal23().size();
+  return impl->reader.getVal26().size();
 }
 
 std::optional<Type> ObjCObjectType::nth_type_argument(unsigned n) const {
-  auto list = impl->reader.getVal23();
+  auto list = impl->reader.getVal26();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -128,87 +128,87 @@ std::optional<Type> ObjCObjectType::nth_type_argument(unsigned n) const {
 }
 
 gap::generator<Type> ObjCObjectType::type_arguments(void) const & {
-  auto list = impl->reader.getVal23();
+  auto list = impl->reader.getVal26();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d23 = ep->TypeFor(ep, v)) {
-      co_yield Type(std::move(d23));
+    if (auto d26 = ep->TypeFor(ep, v)) {
+      co_yield Type(std::move(d26));
     }
   }
   co_return;
 }
 
 gap::generator<Type> ObjCObjectType::type_arguments_as_written(void) const & {
-  auto list = impl->reader.getVal58();
+  auto list = impl->reader.getVal61();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d58 = ep->TypeFor(ep, v)) {
-      co_yield Type(std::move(d58));
+    if (auto d61 = ep->TypeFor(ep, v)) {
+      co_yield Type(std::move(d61));
     }
   }
   co_return;
 }
 
 bool ObjCObjectType::is_kind_of_type(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal23();
 }
 
 bool ObjCObjectType::is_kind_of_type_as_written(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal24();
 }
 
 bool ObjCObjectType::is_obj_c_class(void) const {
-  return impl->reader.getVal22();
+  return impl->reader.getVal25();
 }
 
 bool ObjCObjectType::is_obj_c_id(void) const {
-  return impl->reader.getVal28();
-}
-
-bool ObjCObjectType::is_obj_c_qualified_class(void) const {
-  return impl->reader.getVal29();
-}
-
-bool ObjCObjectType::is_obj_c_qualified_id(void) const {
-  return impl->reader.getVal30();
-}
-
-bool ObjCObjectType::is_obj_c_unqualified_class(void) const {
   return impl->reader.getVal31();
 }
 
-bool ObjCObjectType::is_obj_c_unqualified_id(void) const {
+bool ObjCObjectType::is_obj_c_qualified_class(void) const {
   return impl->reader.getVal32();
 }
 
-bool ObjCObjectType::is_obj_c_unqualified_id_or_class(void) const {
+bool ObjCObjectType::is_obj_c_qualified_id(void) const {
   return impl->reader.getVal33();
 }
 
-bool ObjCObjectType::is_specialized(void) const {
+bool ObjCObjectType::is_obj_c_unqualified_class(void) const {
   return impl->reader.getVal34();
 }
 
-bool ObjCObjectType::is_specialized_as_written(void) const {
+bool ObjCObjectType::is_obj_c_unqualified_id(void) const {
   return impl->reader.getVal35();
 }
 
-bool ObjCObjectType::is_sugared(void) const {
+bool ObjCObjectType::is_obj_c_unqualified_id_or_class(void) const {
   return impl->reader.getVal36();
 }
 
-bool ObjCObjectType::is_unspecialized(void) const {
+bool ObjCObjectType::is_specialized(void) const {
   return impl->reader.getVal37();
 }
 
-bool ObjCObjectType::is_unspecialized_as_written(void) const {
+bool ObjCObjectType::is_specialized_as_written(void) const {
   return impl->reader.getVal38();
 }
 
+bool ObjCObjectType::is_sugared(void) const {
+  return impl->reader.getVal39();
+}
+
+bool ObjCObjectType::is_unspecialized(void) const {
+  return impl->reader.getVal40();
+}
+
+bool ObjCObjectType::is_unspecialized_as_written(void) const {
+  return impl->reader.getVal41();
+}
+
 Type ObjCObjectType::strip_obj_c_kind_of_type_and_qualifiers(void) const {
-  RawEntityId eid = impl->reader.getVal59();
+  RawEntityId eid = impl->reader.getVal62();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

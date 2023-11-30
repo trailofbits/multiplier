@@ -27,6 +27,7 @@
 namespace mx {
 class EntityProvider;
 class Index;
+class CXXRecordDecl;
 class File;
 class Fragment;
 class Index;
@@ -114,10 +115,13 @@ class Type {
   bool can_have_nullability(void) const;
   bool contains_errors(void) const;
   bool contains_unexpanded_parameter_pack(void) const;
+  std::optional<CXXRecordDecl> as_cxx_record_declaration(void) const;
   Linkage linkage(void) const;
   TypeKind kind(void) const;
   Type unqualified_desugared_type(void) const;
   Visibility visibility(void) const;
+  bool is_any_pointer_type(void) const;
+  bool is_pointer_type(void) const;
   bool is_vlst_builtin_type(void) const;
 };
 

@@ -78,26 +78,26 @@ std::optional<UnaryTransformType> UnaryTransformType::from(const TokenContext &t
 }
 
 Type UnaryTransformType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal18();
+  RawEntityId eid = impl->reader.getVal21();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type UnaryTransformType::base_type(void) const {
-  RawEntityId eid = impl->reader.getVal19();
+  RawEntityId eid = impl->reader.getVal22();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 UnaryTransformTypeUTTKind UnaryTransformType::utt_kind(void) const {
-  return static_cast<UnaryTransformTypeUTTKind>(impl->reader.getVal27());
+  return static_cast<UnaryTransformTypeUTTKind>(impl->reader.getVal30());
 }
 
 Type UnaryTransformType::underlying_type(void) const {
-  RawEntityId eid = impl->reader.getVal25();
+  RawEntityId eid = impl->reader.getVal28();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool UnaryTransformType::is_sugared(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal23();
 }
 
 #pragma GCC diagnostic pop

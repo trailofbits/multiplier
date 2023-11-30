@@ -81,15 +81,15 @@ std::optional<AutoType> AutoType::from(const TokenContext &t) {
 }
 
 AutoTypeKeyword AutoType::keyword(void) const {
-  return static_cast<AutoTypeKeyword>(impl->reader.getVal27());
+  return static_cast<AutoTypeKeyword>(impl->reader.getVal30());
 }
 
 unsigned AutoType::num_type_constraint_arguments(void) const {
-  return impl->reader.getVal23().size();
+  return impl->reader.getVal26().size();
 }
 
 std::optional<TemplateArgument> AutoType::nth_type_constraint_argument(unsigned n) const {
-  auto list = impl->reader.getVal23();
+  auto list = impl->reader.getVal26();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -103,12 +103,12 @@ std::optional<TemplateArgument> AutoType::nth_type_constraint_argument(unsigned 
 }
 
 gap::generator<TemplateArgument> AutoType::type_constraint_arguments(void) const & {
-  auto list = impl->reader.getVal23();
+  auto list = impl->reader.getVal26();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d23 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d23));
+    if (auto d26 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d26));
     }
   }
   co_return;
@@ -116,7 +116,7 @@ gap::generator<TemplateArgument> AutoType::type_constraint_arguments(void) const
 
 std::optional<ConceptDecl> AutoType::type_constraint_concept(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal25();
+    RawEntityId eid = impl->reader.getVal28();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -128,15 +128,15 @@ std::optional<ConceptDecl> AutoType::type_constraint_concept(void) const {
 }
 
 bool AutoType::is_constrained(void) const {
-  return impl->reader.getVal22();
+  return impl->reader.getVal25();
 }
 
 bool AutoType::is_decltype_auto(void) const {
-  return impl->reader.getVal28();
+  return impl->reader.getVal31();
 }
 
 bool AutoType::is_gnu_auto_type(void) const {
-  return impl->reader.getVal29();
+  return impl->reader.getVal32();
 }
 
 #pragma GCC diagnostic pop

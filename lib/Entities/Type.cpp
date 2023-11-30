@@ -8,6 +8,7 @@
 
 #include <multiplier/Entities/Type.h>
 
+#include <multiplier/Entities/CXXRecordDecl.h>
 #include <multiplier/Entities/File.h>
 #include <multiplier/Entities/Fragment.h>
 #include <multiplier/Entities/Index.h>
@@ -145,25 +146,46 @@ bool Type::contains_unexpanded_parameter_pack(void) const {
   return impl->reader.getVal12();
 }
 
+std::optional<CXXRecordDecl> Type::as_cxx_record_declaration(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal13();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return CXXRecordDecl::from(Decl(std::move(eptr)));
+    }
+  }
+  return std::nullopt;
+}
+
 Linkage Type::linkage(void) const {
-  return static_cast<Linkage>(impl->reader.getVal13());
+  return static_cast<Linkage>(impl->reader.getVal14());
 }
 
 TypeKind Type::kind(void) const {
-  return static_cast<TypeKind>(impl->reader.getVal14());
+  return static_cast<TypeKind>(impl->reader.getVal15());
 }
 
 Type Type::unqualified_desugared_type(void) const {
-  RawEntityId eid = impl->reader.getVal15();
+  RawEntityId eid = impl->reader.getVal16();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Visibility Type::visibility(void) const {
-  return static_cast<Visibility>(impl->reader.getVal16());
+  return static_cast<Visibility>(impl->reader.getVal17());
+}
+
+bool Type::is_any_pointer_type(void) const {
+  return impl->reader.getVal18();
+}
+
+bool Type::is_pointer_type(void) const {
+  return impl->reader.getVal19();
 }
 
 bool Type::is_vlst_builtin_type(void) const {
-  return impl->reader.getVal17();
+  return impl->reader.getVal20();
 }
 
 #pragma GCC diagnostic pop
