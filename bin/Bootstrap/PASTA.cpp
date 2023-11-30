@@ -387,7 +387,6 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
 
   // End up being a bit spammy in serialization, and we support `::from`.
   {"Type", "ArrayElementTypeNoTypeQualified"},
-  {"Type", "AsCXXRecordDeclaration"},
   {"Type", "AsComplexIntegerType"},
   {"Type", "AsObjCInterfacePointerType"},
   {"Type", "AsObjCInterfaceType"},
@@ -402,7 +401,6 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Type", "LocallyUnqualifiedSingleStepDesugaredType"},
   {"Type", "PointeeType"},  // NOTE(pag): Has special handling below.
   {"Type", "ArrayElementTypeNoTypeQualified"},
-  {"Type", "AsCXXRecordDeclaration"},
   {"Type", "AsComplexIntegerType"},
   {"Type", "AsObjCInterfacePointerType"},
   {"Type", "AsObjCInterfaceType"},
@@ -583,7 +581,6 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Type", "IsOverloadableType"},
   {"Type", "IsPipeType"},
   {"Type", "IsPlaceholderType"},
-  {"Type", "IsPointerType"},
   {"Type", "IsQueueT"},
   {"Type", "IsRVVSizelessBuiltinType"},
   {"Type", "IsRVVVLSBuiltinType"},
