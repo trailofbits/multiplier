@@ -4,13 +4,13 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <Python.h>
+// Auto-generated file; do not modify!
 
-#pragma GCC visibility push(hidden)
+#include "Types.h"
+
 namespace mx {
 
 // Size is defined in the auto-generated `Types.cpp` file.
-extern PyTypeObject gTypes[];
+PyTypeObject gTypes[1275] = {};
 
 }  // namespace mx
-#pragma GCC visibility pop

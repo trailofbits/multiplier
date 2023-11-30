@@ -4,7 +4,12 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <Python.h>
+#pragma once
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wgnu-include-next"
+#include_next <Python.h>
+#pragma GCC diagnostic pop
 
 #include <optional>
 
@@ -14,25 +19,11 @@ using BorrowedPyObject = ::PyObject;
 using SharedPyObject = ::PyObject;
 
 template <typename T>
-struct PyObject : public ::PyObject {
- public:
-  // The type of this python object.
-  static PyTypeObject * const type;
+[[gnu::noinline, gnu::flatten]]
+SharedPyObject *to_python(const T &) noexcept;
 
-  // When initialized, points to `backing_storage`.
-  T *data{nullptr};
-
-  // Load this type into its parent module.
-  static bool load(BorrowedPyObject *module) noexcept;
-
-  // Return the Python type associated with `T`.
-  static PyTypeObject *classify_type(const T &val) noexcept;
-
-  // Convert a python object to its unwrapped form.
-  static std::optional<T> from_python(const BorrowedPyObject *obj) noexcept;
-
-  // Wrap a value of type `T` as a python object.
-  static SharedPyObject *to_python(const T &val) noexcept;
-};
+template <typename T>
+[[gnu::noinline, gnu::flatten]]
+std::optional<T> from_python(BorrowedPyObject *obj) noexcept;
 
 }  // namespace mx

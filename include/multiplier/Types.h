@@ -61,7 +61,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CLASS,
 
 using NotAnEntity = std::monostate;
 
-enum class EntityCategory {
+enum class EntityCategory : int {
   NOT_AN_ENTITY,
 #define MX_DECLARE_ENTITY_CATEGORY_ENUM(type, lower, enum_, val) enum_ = val,
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CATEGORY_ENUM,

@@ -48,7 +48,7 @@ using WeakReferenceKindImplPtr = std::weak_ptr<const ReferenceKindImpl>;
 // classification of the reference, while maintaining the precision of `from`,
 // i.e. via the `from` entity, we should always be able to find the `to` entity
 // (or a redeclaration thereof), e.g. via a method call.
-enum class BuiltinReferenceKind {
+enum class BuiltinReferenceKind : int {
 
   // Default kind when the `to` entity is a `ValueDecl`.
   USES_VALUE,

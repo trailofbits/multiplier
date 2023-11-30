@@ -19,6 +19,7 @@
 
 #include "../Entity.h"
 #include "../Iterator.h"
+#include "../Frontend/TokenContext.h"
 
 #include <multiplier/AST/AccessSpecifier.h>
 #include <multiplier/AST/PseudoKind.h>

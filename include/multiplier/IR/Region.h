@@ -20,7 +20,7 @@ class Argument;
 class Operation;
 class SourceIRImpl;
 
-enum BasicBlockOrder {
+enum BasicBlockOrder : int {
   PRE_ORDER,
   POST_ORDER
 };

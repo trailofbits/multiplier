@@ -10,40 +10,12 @@ string(TOLOWER "${PROJECT_NAME}" lower_project_name)
 
 set(ir_source_include_dir "${PROJECT_SOURCE_DIR}/include/${lower_project_name}/IR")
 
-file(GLOB_RECURSE mlir_dialect_headers CONFIGURE_DEPENDS RELATIVE_PATH "${MX_BOOTSTRAP_INCLUDE_MLIR_DIR}" "*.h")
-file(GLOB_RECURSE vast_dialect_headers CONFIGURE_DEPENDS RELATIVE_PATH "${MX_BOOTSTRAP_INCLUDE_VAST_DIR}" "*.h")
-
-file(GLOB_RECURSE mlir_dialect_sources CONFIGURE_DEPENDS RELATIVE_PATH "${MX_BOOTSTRAP_LIB_MLIR_DIR}" "*.cpp")
-file(GLOB_RECURSE vast_dialect_sources CONFIGURE_DEPENDS RELATIVE_PATH "${MX_BOOTSTRAP_LIB_VAST_DIR}" "*.cpp")
+file(GLOB_RECURSE ir_sources CONFIGURE_DEPENDS RELATIVE_PATH "${CMAKE_CURRENT_LIST_DIR}" "*.cpp")
+file(GLOB_RECURSE ir_headers CONFIGURE_DEPENDS RELATIVE_PATH "${ir_source_include_dir}" "*.h")
 
 add_library("mx-mlir" STATIC
-  ${mlir_dialect_headers}
-  ${vast_dialect_headers}
-  ${mlir_dialect_sources}
-  ${vast_dialect_sources}
-  
-  "${ir_source_include_dir}/Attribute.h"
-  "${ir_source_include_dir}/AttributeKind.h"
-  "${ir_source_include_dir}/Block.h"
-  "${ir_source_include_dir}/Operation.h"
-  "${ir_source_include_dir}/OperationKind.h"
-  "${ir_source_include_dir}/Region.h"
-  "${ir_source_include_dir}/Type.h"
-  "${ir_source_include_dir}/TypeKind.h"
-  "${ir_source_include_dir}/Value.h"
-  
-  "Attribute.h"
-  "AttributeKind.cpp"
-  "Block.cpp"
-  "Operation.cpp"
-  "OperationKind.cpp"
-  "Operation.h"
-  "Region.cpp"
-  "SourceIR.cpp"
-  "SourceIR.h"
-  "Type.h"
-  "TypeKind.cpp"
-  "Value.cpp"
+  ${ir_headers}
+  ${ir_sources}
 )
 
 target_include_directories("mx-mlir"

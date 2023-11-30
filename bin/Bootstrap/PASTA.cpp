@@ -1940,7 +1940,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "#include <span>\n"
         << "#include <vector>\n\n"
         << "#include \"../Entity.h\"\n"
-        << "#include \"../Iterator.h\"\n\n";
+        << "#include \"../Iterator.h\"\n"
+        << "#include \"../Frontend/TokenContext.h\"\n\n";
   }
 
   if (is_frontend_type) {
