@@ -101,7 +101,6 @@ set(api_headers
   "${source_include_dir}/Fragment.h"
   "${source_include_dir}/Index.h"
   "${source_include_dir}/Iterator.h"
-  "${source_include_dir}/Query.h"
   "${source_include_dir}/Re2.h"
   "${source_include_dir}/Reference.h"
   "${source_include_dir}/Types.h"

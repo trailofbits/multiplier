@@ -11,6 +11,7 @@
 #include <multiplier/AST/Designator.h>
 #include <multiplier/AST/Type.h>
 #include <multiplier/Frontend/Macro.h>
+#include <multiplier/Frontend/Query.h>
 #include <mutex>
 
 #include "Attr.h"

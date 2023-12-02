@@ -42,7 +42,7 @@ static PyGetSetDef gProperties[] = {
   {}  // Sentinel.
 };
 
-static PyTypeObject gType = {
+static PyTypeObject gTypeDef = {
   .tp_base = &PyBaseObject_Type,
   .tp_name = "multiplier.Entity",
   .tp_doc = PyDoc_STR("Abstract base classes for entities, e.g. Decl, Stmt, etc."),
@@ -59,10 +59,14 @@ static PyTypeObject gType = {
   .tp_getset = gProperties,
 };
 
+static PyTypeObject *gType = nullptr;
+
 #pragma GCC diagnostic pop
 }  // namespace
 
-PyTypeObject *PythonBinding<VariantEntity>::type = nullptr;
+PyTypeObject *PythonBinding<VariantEntity>::type(void) noexcept {
+  return gType;
+}
 
 std::optional<VariantEntity> PythonBinding<VariantEntity>::from_python(
     BorrowedPyObject *obj) noexcept {
@@ -110,14 +114,14 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_CONVERT_TO_PYTHON,
 }
 
 bool PythonBinding<VariantEntity>::load(BorrowedPyObject *module) noexcept {
-  if (!type) {
-    if (0 != PyType_Ready(&gType)) {
+  if (!gType) {
+    if (0 != PyType_Ready(&gTypeDef)) {
       return false;
     }
-    type = &gType;
+    gType = &gTypeDef;
   }
 
-  auto tp_obj = reinterpret_cast<BorrowedPyObject *>(type);
+  auto tp_obj = reinterpret_cast<BorrowedPyObject *>(gType);
   if (0 != PyModule_AddObjectRef(module, "Entity", tp_obj)) {
     return false;
   }

@@ -128,7 +128,7 @@ MODULE_CPP_LOADER_LOOP = """
   if (!{lower_name}m) {{
     return nullptr;
   }}
-
+{load_entity}
   for (auto loader : mx::g{upper_name}Loaders) {{
     if (!loader({lower_name}m)) {{
       Py_DECREF(m);
@@ -146,12 +146,15 @@ MODULE_CPP_LOADER_LOOP = """
 """
 
 
-MODULE_CPP_SUFFIX = """  
+MODULE_CPP_LOAD_VARIANT_ENTITY = """
   if (!mx::PythonBinding<mx::VariantEntity>::load(m)) {
     Py_DECREF(m);
     return nullptr;
   }
+"""
 
+
+MODULE_CPP_SUFFIX = """
   return m;
 }
 """
@@ -409,8 +412,14 @@ static PySequenceMethods gSequenceMethods = {{
 
 
 PYTHON_BINDING_TYPE = """
+namespace {
+static PyTypeObject *gType = nullptr;
+}  // namespace
+
 template <>
-PyTypeObject *PythonBinding<T>::type = nullptr;
+PyTypeObject *PythonBinding<T>::type(void) noexcept {
+  return gType;
+}
 """
 
 
@@ -434,7 +443,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
 PYTHON_BINDING_TO_PYTHON_STATIC = """
 template <>
 SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
-  auto ret = type->tp_alloc(type, 0);
+  auto ret = gType->tp_alloc(gType, 0);
   if (auto obj = O_cast(ret)) {
     obj->data = new (obj->backing_storage) T(std::move(val));
   }
@@ -448,7 +457,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
-      tp = type;
+      tp = gType;
       break;
 """
 
@@ -470,14 +479,14 @@ static PyTypeObject *InitType(void) noexcept;
 
 template <>
 bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {{
-  if (!type) {{
-    type = InitType();
-    if (!type) {{
+  if (!gType) {{
+    gType = InitType();
+    if (!gType) {{
       return false;
     }}
   }}
 
-  auto tp_obj = reinterpret_cast<BorrowedPyObject *>(type);
+  auto tp_obj = reinterpret_cast<BorrowedPyObject *>(gType);
   if (0 != PyModule_AddObjectRef(module, "{py_class_name}", tp_obj)) {{
     return false;
   }}
@@ -533,13 +542,18 @@ PyTypeObject *InitType(void) noexcept {{
 
 
 ENUM_DEF = """
-template <>
-PyTypeObject *PythonBinding<T>::type = nullptr;
+namespace {
+static PyTypeObject *gType = nullptr;
+}  // namespace
 
+template <>
+PyTypeObject *PythonBinding<T>::type(void) noexcept {
+  return gType;
+}
 
 template <>
 SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
-  return PyObject_GetAttrString(reinterpret_cast<BorrowedPyObject *>(type),
+  return PyObject_GetAttrString(reinterpret_cast<BorrowedPyObject *>(gType),
                                 EnumeratorName(val));
 }
 
@@ -549,7 +563,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
     return std::nullopt;
   }
 
-  if (Py_TYPE(obj) != type) {
+  if (Py_TYPE(obj) != gType) {
     return std::nullopt;
   }
 
@@ -580,7 +594,7 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
   const char * const enum_name = EnumerationName(T{});
   bool created = false;
 
-  if (!type) {
+  if (!gType) {
     auto enum_module = PyImport_ImportModule("enum");
     if (!enum_module) {
       return false;
@@ -645,11 +659,11 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
       return false;
     }
 
-    type = reinterpret_cast<PyTypeObject *>(enum_class);
+    gType = reinterpret_cast<PyTypeObject *>(enum_class);
     created = true;
   }
 
-  auto tp_obj = reinterpret_cast<BorrowedPyObject *>(type);
+  auto tp_obj = reinterpret_cast<BorrowedPyObject *>(gType);
   if (0 != PyModule_AddObjectRef(module, enum_name, tp_obj)) {
     return false;
   }
@@ -851,15 +865,15 @@ def wrap_class(schema: ClassSchema, type_offsets: Tuple[int, int],
   if schema.bases:
     assert len(schema.bases) == 1
     base_schema = schema.bases[0]
-    rel_ns = _relative_namespace(schema)
+    rel_ns = _relative_namespace(base_schema)
     base_cxx_namespace = rel_ns and f"mx::{rel_ns}::" or "mx::"
-    base_cxx_class_name = schema.name
-    base_class = "PythonBinding<{}{}>::type".format(base_cxx_namespace, base_cxx_class_name)
-    type_hash = "PythonBinding<{}{}>::type->tp_hash".format(base_cxx_namespace, base_cxx_class_name)
+    base_cxx_class_name = base_schema.name
+    base_class = "PythonBinding<{}{}>::type()".format(base_cxx_namespace, base_cxx_class_name)
+    type_hash = "PythonBinding<{}{}>::type()->tp_hash".format(base_cxx_namespace, base_cxx_class_name)
 
   # In the Python API, we give all of the entities a common base class.
   elif is_entity_type:
-    base_class = "PythonBinding<VariantEntity>::type";
+    base_class = "PythonBinding<VariantEntity>::type()";
 
   # Figure out if we can override `__hash__` using the `id` method.
   if "id" in schema.methods:
@@ -1087,6 +1101,7 @@ def wrap(schemas: Iterable[Schema], renamer: Renamer):
       f.write(END_MODULE_CPP_DEF)
 
     f.write(MODULE_CPP_MIDDLE)
+    load_entity = MODULE_CPP_LOAD_VARIANT_ENTITY
 
     # Define the modules, and make lists of the wrappers.
     for rel_dir in sorted_directories:
@@ -1104,7 +1119,10 @@ def wrap(schemas: Iterable[Schema], renamer: Renamer):
       f.write(MODULE_CPP_LOADER_LOOP.format(
           lower_name=lower_name,
           upper_name=upper_name,
-          parent_name=parent_name))
+          parent_name=parent_name,
+          load_entity=load_entity))
+
+      load_entity = ""
 
     f.write(MODULE_CPP_SUFFIX)
 

@@ -14,6 +14,7 @@
 #include <multiplier/AST/Type.h>
 #include <multiplier/Frontend/Compilation.h>
 #include <multiplier/Frontend/Macro.h>
+#include <multiplier/Frontend/Query.h>
 
 #include "Attr.h"
 #include "Pseudo.h"

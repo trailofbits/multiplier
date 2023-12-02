@@ -34,7 +34,7 @@ template <typename T>
 struct PythonBinding {
  public:
   // The type of this python object.
-  static PyTypeObject *type;
+  static PyTypeObject *type(void) noexcept;
 
   // Load this type into its parent module.
   static bool load(BorrowedPyObject *module) noexcept;
@@ -83,36 +83,34 @@ struct PythonBinding<std::optional<T>> {
   }
 };
 
-#define MX_DECLARE_BUILTIN_BINDING(type_name, py_type) \
+#define MX_DECLARE_BUILTIN_BINDING(type_name) \
     template <> \
     struct PythonBinding<type_name> { \
      public: \
-      static constexpr PyTypeObject * const type = &py_type; \
-      \
       static std::optional<type_name> from_python( \
           BorrowedPyObject *obj) noexcept; \
       \
       static SharedPyObject *to_python(type_name val) noexcept; \
     };
 
-MX_DECLARE_BUILTIN_BINDING(bool, PyBool_Type)
-MX_DECLARE_BUILTIN_BINDING(char, PyLong_Type)
-MX_DECLARE_BUILTIN_BINDING(short, PyLong_Type)
-MX_DECLARE_BUILTIN_BINDING(int, PyLong_Type)
-MX_DECLARE_BUILTIN_BINDING(long, PyLong_Type)
-MX_DECLARE_BUILTIN_BINDING(long long, PyLong_Type)
-MX_DECLARE_BUILTIN_BINDING(unsigned char, PyLong_Type)
-MX_DECLARE_BUILTIN_BINDING(unsigned short, PyLong_Type)
-MX_DECLARE_BUILTIN_BINDING(unsigned, PyLong_Type)
-MX_DECLARE_BUILTIN_BINDING(unsigned long, PyLong_Type)
-MX_DECLARE_BUILTIN_BINDING(unsigned long long, PyLong_Type)
-MX_DECLARE_BUILTIN_BINDING(float, PyFloat_Type)
-MX_DECLARE_BUILTIN_BINDING(double, PyFloat_Type)
-MX_DECLARE_BUILTIN_BINDING(std::monostate, _PyNone_Type)
+MX_DECLARE_BUILTIN_BINDING(bool)
+MX_DECLARE_BUILTIN_BINDING(char)
+MX_DECLARE_BUILTIN_BINDING(short)
+MX_DECLARE_BUILTIN_BINDING(int)
+MX_DECLARE_BUILTIN_BINDING(long)
+MX_DECLARE_BUILTIN_BINDING(long long)
+MX_DECLARE_BUILTIN_BINDING(unsigned char)
+MX_DECLARE_BUILTIN_BINDING(unsigned short)
+MX_DECLARE_BUILTIN_BINDING(unsigned)
+MX_DECLARE_BUILTIN_BINDING(unsigned long)
+MX_DECLARE_BUILTIN_BINDING(unsigned long long)
+MX_DECLARE_BUILTIN_BINDING(float)
+MX_DECLARE_BUILTIN_BINDING(double)
+MX_DECLARE_BUILTIN_BINDING(std::monostate)
 
 // Variant entity IDs are unpacked entities, which we can pack down into
 // integers in Python to simply not expose them.
-MX_DECLARE_BUILTIN_BINDING(VariantId, PyLong_Type)
+MX_DECLARE_BUILTIN_BINDING(VariantId)
 
 #undef MX_DECLARE_BUILTIN_BINDING
 
@@ -122,7 +120,7 @@ template <>
 struct PythonBinding<VariantEntity> {
  public:
   // The type of this python object.
-  static PyTypeObject *type;
+  static PyTypeObject *type(void) noexcept;
 
   // Load this type into its parent module.
   static bool load(BorrowedPyObject *module) noexcept;
@@ -138,8 +136,6 @@ struct PythonBinding<VariantEntity> {
 template <>
 struct PythonBinding<EntityId> {
  public:
-  static constexpr PyTypeObject * const type = &PyLong_Type;
-
   inline static std::optional<EntityId> from_python(
       BorrowedPyObject *obj) noexcept {
     if (auto ret = PythonBinding<RawEntityId>::from_python(obj)) {
@@ -159,8 +155,6 @@ struct PythonBinding<EntityId> {
 template <typename T>
 struct PythonBinding<SpecificEntityId<T>> {
  public:
-  static constexpr PyTypeObject * const type = &PyLong_Type;
-
   inline static std::optional<SpecificEntityId<T>> from_python(
       BorrowedPyObject *obj) noexcept {
     if (auto ret = PythonBinding<EntityId>::from_python(obj)) {
@@ -181,8 +175,6 @@ struct PythonBinding<SpecificEntityId<T>> {
 template <typename A, typename B>
 struct PythonBinding<std::pair<A, B>> {
  public:
-  static constexpr PyTypeObject * const type = &PyTuple_Type;
-
   inline static std::optional<std::pair<A, B>> from_python(
       BorrowedPyObject *obj) noexcept {
     if (!PySequence_Check(obj) || 2 != PySequence_Size(obj)) {
@@ -251,7 +243,6 @@ struct PythonBinding<std::variant<Types...>> {
 template <>
 struct PythonBinding<std::string> {
  public:
-  static constexpr PyTypeObject * const type = &PyUnicode_Type;
   static std::optional<std::string> from_python(BorrowedPyObject *obj) noexcept;
   static SharedPyObject *to_python(std::string_view val) noexcept;
 };
@@ -274,8 +265,6 @@ struct PythonBinding<std::filesystem::path> {
 template <typename T>
 struct PythonBinding<std::vector<T>> {
  public:
-  static constexpr PyTypeObject * const type = &PyList_Type;
-
   static std::optional<std::vector<T>> from_python(
       BorrowedPyObject *obj) noexcept {
     auto iter = PyObject_GetIter(obj);
@@ -333,8 +322,6 @@ struct PythonBinding<std::vector<T>> {
 template <typename T>
 struct PythonBinding<std::span<T>> {
  public:
-  static constexpr PyTypeObject * const type = &PyList_Type;
-
   static std::optional<std::vector<T>> from_python(
       BorrowedPyObject *obj) noexcept {
     return PythonBinding<std::vector<T>>::from_python(obj);
@@ -345,8 +332,6 @@ struct PythonBinding<std::span<T>> {
 template <typename KVMap, typename K, typename V>
 struct MapPythonBinding {
  public:
-  static constexpr PyTypeObject * const type = &PyDict_Type;
-
   static std::optional<KVMap> from_python(BorrowedPyObject *obj) noexcept {
     Py_ssize_t i = 0;
     PyObject *key = nullptr;
@@ -406,8 +391,6 @@ struct PythonBinding<std::unordered_map<K, V>>
 template <typename Set, typename T>
 struct SetPythonBinding {
  public:
-  static constexpr PyTypeObject * const type = &PySet_Type;
-
   static std::optional<Set> from_python(BorrowedPyObject *obj) noexcept {
     auto iter = PyObject_GetIter(obj);
     if (!iter) {
@@ -478,8 +461,6 @@ concept ForwardIteratorProtocol = requires(T x) {
 template <ForwardIteratorProtocol IterableType>
 struct PythonBinding<IterableType> {
  public:
-  static constexpr PyTypeObject * const type = &PyList_Type;
-
   using T = std::remove_cvref_t<
       decltype(*std::declval<IterableType>().begin())>;
 

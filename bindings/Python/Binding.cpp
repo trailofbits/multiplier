@@ -227,7 +227,7 @@ static void InitPurePath(void) {
 std::optional<std::filesystem::path>
 PythonBinding<std::filesystem::path>::from_python(
     BorrowedPyObject *obj) noexcept {
-
+  InitPurePath();
   if (PyObject_IsInstance(obj, gPurePath->object)) {
     if (auto str_obj = PyObject_Str(obj)) {
       if (auto str = ::mx::from_python<std::string>(str_obj)) {

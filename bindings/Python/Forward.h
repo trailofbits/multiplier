@@ -1383,6 +1383,7 @@ class TokenRange;
 class File;
 class TokenTreeVisitor;
 class TokenTree;
+class RegexQueryMatch;
 enum class TokenKind : uint16_t;
 enum class MacroKind : uint8_t;
 enum class PathKind : uint8_t;
@@ -1421,7 +1422,6 @@ class IncludeMacrosMacroDirective;
 class IncludeNextMacroDirective;
 class IncludeMacroDirective;
 class Fragment;
-class RegexQueryMatch;
 enum class IndexStatus : uint32_t;
 class Index;
 namespace ir {

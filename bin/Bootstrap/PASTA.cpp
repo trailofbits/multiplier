@@ -3980,7 +3980,8 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#include \"Frontend/Compilation.h\"\n"
       << "#include \"Frontend/File.h\"\n"
       << "#include \"Frontend/Token.h\"\n"
-      << "#include \"Frontend/TokenTree.h\"\n\n";
+      << "#include \"Frontend/TokenTree.h\"\n"
+      << "#include \"Frontend/Query.h\"\n\n";
 
   lib_pasta_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"

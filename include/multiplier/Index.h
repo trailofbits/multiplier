@@ -30,7 +30,6 @@
 
 #include "Fragment.h"
 #include "Iterator.h"
-#include "Query.h"
 #include "Reference.h"
 
 namespace mx {

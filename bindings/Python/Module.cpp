@@ -39,7 +39,6 @@ static LoaderFunc * const gLoaders[] = {
   PythonBinding<mx::ReferenceKind>::load,
   PythonBinding<mx::Reference>::load,
   PythonBinding<mx::Fragment>::load,
-  PythonBinding<mx::RegexQueryMatch>::load,
   PythonBinding<mx::IndexStatus>::load,
   PythonBinding<mx::Index>::load,
 };
@@ -1783,6 +1782,7 @@ static LoaderFunc * const gFrontendLoaders[] = {
   PythonBinding<mx::File>::load,
   PythonBinding<mx::TokenTreeVisitor>::load,
   PythonBinding<mx::TokenTree>::load,
+  PythonBinding<mx::RegexQueryMatch>::load,
   PythonBinding<mx::TokenKind>::load,
   PythonBinding<mx::MacroKind>::load,
   PythonBinding<mx::PathKind>::load,
@@ -2077,6 +2077,11 @@ PyMODINIT_FUNC PyInit_multiplier(void) {
     return nullptr;
   }
 
+  if (!mx::PythonBinding<mx::VariantEntity>::load(m)) {
+    Py_DECREF(m);
+    return nullptr;
+  }
+
   for (auto loader : mx::gLoaders) {
     if (!loader(m)) {
       Py_DECREF(m);
@@ -2310,11 +2315,6 @@ PyMODINIT_FUNC PyInit_multiplier(void) {
       Py_DECREF(m);
       return nullptr;
     }
-  }
-  
-  if (!mx::PythonBinding<mx::VariantEntity>::load(m)) {
-    Py_DECREF(m);
-    return nullptr;
   }
 
   return m;

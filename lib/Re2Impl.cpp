@@ -8,7 +8,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <multiplier/Index.h>
+#include <multiplier/Frontend/Query.h>
 
 #include "File.h"
 #include "Fragment.h"
