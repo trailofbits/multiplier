@@ -1097,7 +1097,19 @@ VariantId EntityId::Unpack(void) const noexcept {
   return InvalidId{};
 }
 
+namespace {
+
 struct IdVisitor {
+  inline RawEntityId operator()(const InvalidId &) const noexcept {
+    return kInvalidEntityId;
+  }
+  template <typename T>
+  inline RawEntityId operator()(const T &e) const noexcept {
+    return EntityId(e).Pack();
+  }
+};
+
+struct EntityVisitor {
   inline RawEntityId operator()(const NotAnEntity &) const noexcept {
     return kInvalidEntityId;
   }
@@ -1107,9 +1119,14 @@ struct IdVisitor {
   }
 };
 
+}  // namespace
+
+EntityId::EntityId(const VariantId &id)
+    : opaque(std::visit<RawEntityId>(IdVisitor{}, id)) {}
+
 // Explicit specialization to get the entity id.
 template <>
 EntityId::EntityId(const VariantEntity &ent)
-    : opaque(std::visit<RawEntityId>(IdVisitor{}, ent)) {}
+    : opaque(std::visit<RawEntityId>(EntityVisitor{}, ent)) {}
 
 }  // namespace mx

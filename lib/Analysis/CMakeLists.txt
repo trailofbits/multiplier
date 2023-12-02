@@ -47,7 +47,7 @@ set_target_properties("mx-analysis"
     VISIBILITY_INLINES_HIDDEN
       YES
     CXX_VISIBILITY_PRESET
-      hidden
+      default
     POSITION_INDEPENDENT_CODE
       YES
     COMPILE_FEATURES
@@ -58,21 +58,9 @@ set_target_properties("mx-analysis"
 
 if(MX_ENABLE_INSTALL)
   install(
-    TARGETS
-      "mx-analysis"
-    EXPORT
-      "${PROJECT_NAME}Targets"
-    RUNTIME
-      DESTINATION
-        "${MX_INSTALL_BIN_DIR}"
-    LIBRARY
-      DESTINATION
-        "${MX_INSTALL_LIB_DIR}"
-    ARCHIVE
-      DESTINATION
-        "${MX_INSTALL_LIB_DIR}"
-    PUBLIC_HEADER
-      DESTINATION
-        "${MX_INSTALL_INCLUDE_DIR}/Analysis"
+    FILES
+      ${analysis_headers}
+    DESTINATION
+      "${MX_INSTALL_INCLUDE_DIR}/Analysis"
   )
 endif(MX_ENABLE_INSTALL)

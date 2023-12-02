@@ -443,8 +443,10 @@ class EntityId final {
   template <typename T>
   /* implicit */ inline EntityId(SpecificEntityId<T>);
 
+  EntityId(const VariantId &);
+
   template <typename... Types>
-  /* implicit */ EntityId(const std::variant<Types...> &) = delete;
+  /* implicit */ EntityId(const std::variant<Types...> &);
 
   inline EntityId &operator=(DeclId id) {
     EntityId self(id);

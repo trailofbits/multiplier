@@ -161,7 +161,7 @@ class File {
   }
 
   // Return the entity ID of this file.
-  SpecificEntityId<FileId> id(void) const noexcept;
+  PackedFileId id(void) const noexcept;
 
   // Return a list of fragments in this file.
   gap::generator<Fragment> fragments(void) const &;

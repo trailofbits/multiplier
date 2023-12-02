@@ -25,6 +25,16 @@ enum BasicBlockOrder : int {
   POST_ORDER
 };
 
+inline static const char *EnumerationName(BasicBlockOrder) {
+  return "BasicBlockOrder";
+}
+
+const char *EnumeratorName(BasicBlockOrder);
+
+inline static constexpr unsigned NumEnumerators(BasicBlockOrder) {
+  return 2;
+}
+
 // A region is owned by an operation (not all operations own regions)
 // and contain one or more blocks.
 class Region final {

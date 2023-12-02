@@ -110,7 +110,7 @@ class Fragment {
   }
 
   // Return the entity ID of this fragment.
-  SpecificEntityId<FragmentId> id(void) const noexcept;
+  PackedFragmentId id(void) const noexcept;
 
   // Returns the unique owning compilation that produced this fragment. There
   // may be many compilations which produced equivalent/redundant fragments, but

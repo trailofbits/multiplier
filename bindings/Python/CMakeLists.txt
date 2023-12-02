@@ -20,11 +20,31 @@ add_library("mx-python" STATIC
 
   "Binding.cpp"
   "Binding.h"
+  "Entity.cpp"
   "Error.cpp"
   "Error.h"
-  "Module.cpp"  # Auto-generated
-  "Types.cpp"  # Auto-generated
+  "Forward.h"  # Auto-generated.
+  "Module.cpp"  # Auto-generated.
+  "Types.cpp"  # Auto-generated.
   "Types.h"
+)
+
+set_target_properties("mx-python"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX
+    PUBLIC_HEADER
+      "${PROJECT_SOURCE_DIR}/include/${lower_project_name}/Bindings/Python.h"
+    VISIBILITY_INLINES_HIDDEN
+      YES
+    CXX_VISIBILITY_PRESET
+      default
+    POSITION_INDEPENDENT_CODE
+      YES
+    COMPILE_FEATURES
+      cxx_std_20
+    INTERFACE_COMPILE_FEATURES
+      cxx_std_20
 )
 
 target_include_directories("mx-python"

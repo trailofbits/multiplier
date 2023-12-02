@@ -16,10 +16,10 @@ capnp_generate_cpp(MX_RPC_SOURCES MX_RPC_HEADERS RPC.capnp)
 capnp_generate_cpp(MX_AST_SOURCES MX_AST_HEADERS AST.capnp)  # Bootstrapped file.
 
 file(GLOB frontend_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_DIR}/Frontend/*.h")
-file(GLOB frontend_sources CONFIGURE_DEPENDS "${MX_BOOTSTRAP_LIB_DIR}/Frontend/*.cpp")
+file(GLOB frontend_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Frontend/*.cpp")
 
 file(GLOB ast_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_DIR}/AST/*.h")
-file(GLOB ast_sources CONFIGURE_DEPENDS "${MX_BOOTSTRAP_LIB_DIR}/AST/*.cpp")
+file(GLOB ast_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/AST/*.cpp")
 
 if(MX_ENABLE_VAST)
   add_subdirectory("IR")
@@ -35,7 +35,7 @@ set_target_properties("mx-frontend"
     VISIBILITY_INLINES_HIDDEN
       YES
     CXX_VISIBILITY_PRESET
-      hidden
+      default
     POSITION_INDEPENDENT_CODE
       YES
 )
@@ -50,7 +50,7 @@ set_target_properties("mx-ast"
     VISIBILITY_INLINES_HIDDEN
       YES
     CXX_VISIBILITY_PRESET
-      hidden
+      default
     POSITION_INDEPENDENT_CODE
       YES
 )
@@ -243,7 +243,7 @@ set_target_properties("mx-api"
     VISIBILITY_INLINES_HIDDEN
       YES
     CXX_VISIBILITY_PRESET
-      hidden
+      default
     POSITION_INDEPENDENT_CODE
       YES
     COMPILE_FEATURES
@@ -272,22 +272,10 @@ if(MX_ENABLE_INSTALL)
         "${MX_INSTALL_INCLUDE_DIR}/AST"
   )
   install(
-    TARGETS
-      "mx-api"
-    EXPORT
-      "${PROJECT_NAME}Targets"
-    RUNTIME
-      DESTINATION
-        "${MX_INSTALL_BIN_DIR}"
-    LIBRARY
-      DESTINATION
-        "${MX_INSTALL_LIB_DIR}"
-    ARCHIVE
-      DESTINATION
-        "${MX_INSTALL_LIB_DIR}"
-    PUBLIC_HEADER
-      DESTINATION
-        "${MX_INSTALL_INCLUDE_DIR}"
+    FILES
+      ${api_headers}
+    DESTINATION
+      "${MX_INSTALL_INCLUDE_DIR}"
   )
 endif(MX_ENABLE_INSTALL)
 

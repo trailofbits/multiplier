@@ -20,7 +20,7 @@ using SharedPyObject = ::PyObject;
 
 template <typename T>
 [[gnu::noinline, gnu::flatten]]
-SharedPyObject *to_python(const T &) noexcept;
+SharedPyObject *to_python(T) noexcept;
 
 template <typename T>
 [[gnu::noinline, gnu::flatten]]

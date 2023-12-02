@@ -22,8 +22,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   message(FATAL_ERROR "CMAKE_BUILD_TYPE must not be RelWithDebInfo")
 endif()
 
-set(CMAKE_CXX_VISIBILITY_PRESET hidden) 
-set(CMAKE_C_VISIBILITY_PRESET hidden) 
+set(CMAKE_CXX_VISIBILITY_PRESET default)
+set(CMAKE_C_VISIBILITY_PRESET default)
 set(VISIBILITY_INLINES_HIDDEN YES)
 
 list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
@@ -31,6 +31,7 @@ list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 include("cmake/system.cmake")
 include("cmake/llvm.cmake")
 include("cmake/linker.cmake")
+include("cmake/git.cmake")
 
 if(MX_ENABLE_INSTALL)
   include("cmake/packaging.cmake")
@@ -106,11 +107,16 @@ if(MX_ENABLE_INSTALL)
     FILES
       "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
       "${PROJECT_SOURCE_DIR}/cmake/modules/FindFilesystem.cmake"
-    DESTINATION "${cmake_install_dir}"
+    DESTINATION
+      "${cmake_install_dir}"
   )
-  install(EXPORT "${PROJECT_NAME}Targets"
-    DESTINATION "${cmake_install_dir}"
-    NAMESPACE "${PROJECT_NAME}::"
+  install(
+    EXPORT
+      "${PROJECT_NAME}Targets"
+    DESTINATION
+      "${cmake_install_dir}"
+    NAMESPACE
+      "${PROJECT_NAME}::"
   )
 endif(MX_ENABLE_INSTALL)
 
@@ -125,10 +131,73 @@ set(MX_BOOTSTRAP_INDEX_SERIALIZE_H "${PROJECT_SOURCE_DIR}/bin/Index/Serialize.h"
 set(MX_BOOTSTRAP_INDEX_SERIALIZE_CPP "${PROJECT_SOURCE_DIR}/bin/Index/Serialize.cpp")
 set(MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H "${PROJECT_SOURCE_DIR}/include/multiplier/Visitor.inc.h")
 
+get_patch_from_git(MX_GIT_HASH)
+configure_file(lib/Version.cpp.in "${PROJECT_BINARY_DIR}/Version.cpp" @ONLY)
+
+
 if(MX_ENABLE_BOOTSTRAP)
   add_subdirectory("bin/Bootstrap")
 else()
   add_subdirectory("lib")
   add_subdirectory("bindings")
+
+  add_library("multiplier" SHARED
+    "${PROJECT_BINARY_DIR}/Version.cpp"
+  )
+
+  target_include_directories("multiplier"
+    PUBLIC
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+      $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+  )
+
+  target_link_libraries("multiplier"
+    PUBLIC
+      "gap::gap"
+      "gap::gap-core"
+      "gap::gap-settings"
+      "std::coroutines"
+    PRIVATE
+      $<LINK_LIBRARY:WHOLE_ARCHIVE,$<$<BOOL:${MX_ENABLE_PYTHON_BINDINGS}>:mx-python>>
+  )
+
+  set_target_properties("multiplier"
+    PROPERTIES
+      LINKER_LANGUAGE
+        CXX
+      PUBLIC_HEADER
+        "${api_headers}"
+      VISIBILITY_INLINES_HIDDEN
+        NO
+      CXX_VISIBILITY_PRESET
+        default
+      POSITION_INDEPENDENT_CODE
+        YES
+      COMPILE_FEATURES
+        cxx_std_20
+      INTERFACE_COMPILE_FEATURES
+        cxx_std_20
+  )
+
+  install(
+    TARGETS
+      "multiplier"
+    EXPORT
+      "${PROJECT_NAME}Targets"
+    RUNTIME
+      DESTINATION
+        "${MX_INSTALL_BIN_DIR}"
+    LIBRARY
+      DESTINATION
+        "${MX_INSTALL_LIB_DIR}"
+    ARCHIVE
+      DESTINATION
+        "${MX_INSTALL_LIB_DIR}"
+    PUBLIC_HEADER
+      DESTINATION
+        "${MX_INSTALL_INCLUDE_DIR}"
+  )
+
   add_subdirectory("bin")
 endif()

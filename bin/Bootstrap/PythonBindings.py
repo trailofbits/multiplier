@@ -1,11 +1,12 @@
 # Copyright (c) 2023 Trail of Bits, Inc., all rights reserved.
 
+from argparse import ArgumentParser
 import collections
 import os
 from pypasta import *
-from lift import *
+from lift import SchemaLifter, find_tags_in_namespace
 from schema import *
-from typing import DefaultDict, Dict, Iterable, List, Set, Tuple
+from typing import DefaultDict, Dict, Iterable, List, Set, Tuple, Type
 
 MX_BIN_BOOSTRAP_DIR = os.path.dirname(__file__)
 MX_BIN_DIR = os.path.dirname(MX_BIN_BOOSTRAP_DIR)
@@ -34,6 +35,31 @@ PyTypeObject gTypes[{}] = {{}};
 """
 
 
+FORWARD_H_PREFIX = """// Copyright (c) 2023-present, Trail of Bits, Inc.
+// All rights reserved.
+//
+// This source code is licensed in accordance with the terms specified in
+// the LICENSE file found in the root directory of this source tree.
+
+// Auto-generated file; do not modify!
+
+#pragma once
+
+#include <cstdint>
+
+namespace mx {
+"""
+
+
+FORWARD_DECL_CLASS = "{} {};\n"
+
+
+FORWARD_DECL_ENUM = "enum {enum_scope}{enum_name} : {stdint_type_name};\n"
+
+
+FORWARD_H_SUFFIX = "}  // namespace mx\n"
+
+
 MODULE_CPP_PREFIX = """// Copyright (c) 2023-present, Trail of Bits, Inc.
 // All rights reserved.
 //
@@ -45,24 +71,9 @@ MODULE_CPP_PREFIX = """// Copyright (c) 2023-present, Trail of Bits, Inc.
 #include <cstdint>
 
 #include "Binding.h"
+#include "Forward.h"
 
 namespace mx {
-"""
-
-
-BEGIN_NAMESPACE = "namespace {} {{\n"
-
-
-END_NAMESPACE = "}}  // namespace {}\n"
-
-
-MODULE_CPP_FORWARD_DECL_CLASS = "{} {};\n"
-
-
-MODULE_CPP_FORWARD_DECL_ENUM = "enum {enum_scope}{enum_name} : {stdint_type_name};\n"
-
-
-MODULE_CPP_MIDDLE = """
 namespace {
 
 using LoaderFunc = bool (BorrowedPyObject *);
@@ -70,8 +81,13 @@ using LoaderFunc = bool (BorrowedPyObject *);
 static PyMethodDef gEmptyMethods[] = {
   {}   // Sentinel.
 };
-
 """
+
+
+BEGIN_NAMESPACE = "namespace {} {{\n"
+
+
+END_NAMESPACE = "}}  // namespace {}\n"
 
 
 MODULE_CPP_TYPE_ROW = "  PythonBinding<{}{}>::load,\n"
@@ -98,21 +114,42 @@ static LoaderFunc * const g{upper_name}Loaders[] = {{
 END_MODULE_CPP_DEF = "};\n"
 
 
-MODULE_CPP_SUFFIX = """
+MODULE_CPP_MIDDLE = """
 }  // namespace
 }  // namespace mx
 
 PyMODINIT_FUNC PyInit_multiplier(void) {
-  auto m = PyModule_Create(&mx::gModule);
-  if (!m) {
-    return nullptr;
-  }
+  PyObject * const dummym = nullptr;
+"""
 
-  for (auto loader : mx::gLoaders) {
-    if (!loader(m)) {
+
+MODULE_CPP_LOADER_LOOP = """
+  auto {lower_name}m = PyModule_Create(&mx::g{upper_name}Module);
+  if (!{lower_name}m) {{
+    return nullptr;
+  }}
+
+  for (auto loader : mx::g{upper_name}Loaders) {{
+    if (!loader({lower_name}m)) {{
       Py_DECREF(m);
       return nullptr;
-    }
+    }}
+  }}
+
+  if ({parent_name}m) {{
+    if (0 != PyModule_AddObjectRef({parent_name}m, "{lower_name}", {lower_name}m)) {{
+      Py_DECREF({lower_name}m);
+      Py_DECREF(m);
+      return nullptr;
+    }}
+  }}
+"""
+
+
+MODULE_CPP_SUFFIX = """  
+  if (!mx::PythonBinding<mx::VariantEntity>::load(m)) {
+    Py_DECREF(m);
+    return nullptr;
   }
 
   return m;
@@ -120,7 +157,7 @@ PyMODINIT_FUNC PyInit_multiplier(void) {
 """
 
 
-HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
+CLASS_HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
 // All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
@@ -128,12 +165,45 @@ HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
 
 // Auto-generated file; do not modify!
 
-#include <multiplier/Types.h>
+#include <multiplier/AST.h>
+#include <multiplier/Fragment.h>
+#include <multiplier/Frontend.h>
+#include <multiplier/Index.h>
+#include <multiplier/IR.h>
+
+#include <new>
 
 #include "Binding.h"
 #include "Error.h"
 #include "Types.h"
 
+"""
+
+
+ENUM_HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
+// All rights reserved.
+//
+// This source code is licensed in accordance with the terms specified in
+// the LICENSE file found in the root directory of this source tree.
+
+// Auto-generated file; do not modify!
+
+#include <{}>
+#include <multiplier/Iterator.h>
+
+#include "Binding.h"
+#include "Error.h"
+#include "Types.h"
+
+namespace mx {{
+namespace {{
+using T = {}{};
+}}  // namespace
+"""
+
+
+ENUM_FOOTER = """
+}  // namespace mx
 """
 
 
@@ -144,12 +214,7 @@ DISABLE_DIAGNOSTICS = """
 """
 
 
-ENABLE_DIAGNOSTICS = """
-#pragma GCC diagnostic pop
-"""
-
-
-INCLUDE = "#include <{}>\n"
+ENABLE_DIAGNOSTICS = "#pragma GCC diagnostic pop\n"
 
 
 BEGIN_MX_NAMESPACE = "namespace mx {\n"
@@ -172,24 +237,41 @@ METHOD_SPEC_PREFIX = """  {{
     "{}",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {{
-          (void) self;
+          auto obj = T_cast(self);
           (void) args;
-          (void) num_args;
+"""
+
+METHOD_SPEC_CHECK_ARGCOUNT_BEGIN = "          while (num_args == {num_args}) {{\n"
+
+
+METHOD_SPEC_GET_ARG = """            auto arg_{arg_num} = ::mx::from_python<{arg_type}>(args[{arg_num}]);
+            if (!arg_{arg_num}.has_value()) {{
+              break;
+            }}
 """
 
 
-METHOD_SPEC_SUFFIX = """          return nullptr;
-        }}),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for {}{}::{}"),
-  }},
+METHOD_SPEC_CALL_ARG = "arg_{}.value()"
+
+
+METHOD_SPEC_CALL = """
+            return ::mx::to_python(obj->{method_name}({args}));
 """
 
 
-STATIC_METHOD_SPEC_SUFFIX = """          return nullptr;
+METHOD_SPEC_CHECK_ARGCOUNT_END = "          }\n"
+
+
+METHOD_SPEC_STATIC_FLAG = " | METH_STATIC"
+
+
+METHOD_SPEC_SUFFIX = """
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to '{py_method_name}'";
+          return nullptr;
         }}),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for {}{}::{}"),
+    METH_FASTCALL{extra_method_flags},
+    PyDoc_STR("Wrapper for {cxx_namespace}{cxx_class_name}::{cxx_method_name}"),
   }},
 """
 
@@ -200,16 +282,14 @@ static PyGetSetDef gProperties[] = {
 """
 
 
-PROPERTY_SPEC_PREFIX = """  {{
-    "{}",
+PROPERTY_SPEC = """  {{
+    "{py_method_name}",
     reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) {{
-"""
-
-
-PROPERTY_SPEC_SUFFIX = """        }}),
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {{
+          return ::mx::to_python(T_cast(self)->{cxx_method_name}());
+        }}),
     nullptr,
-    PyDoc_STR("Wrapper for {}::{}"),
+    PyDoc_STR("Wrapper for {cxx_namespace}{cxx_class_name}::{cxx_method_name}"),
     nullptr,
   }},
 """
@@ -301,18 +381,18 @@ static PyNumberMethods gNumberMethods = {
 
 
 SEQUENCE_SIZE = """[] (BorrowedPyObject *obj) -> Py_ssize_t {{
-        return static_cast<Py_ssize_t>(T_cast(obj)->{}());
+        return static_cast<Py_ssize_t>(T_cast(obj)->{len_func}());
       }}"""
 
 
-OPTIONAL_SEQUENCE_ITEM = """[] (BorrowedPyObject *obj, Py_ssize_t index) -> SharedPyObject * {{
-        auto val = T_cast(obj)->{}();
-        if (!val.has_value()) {{
+SEQUENCE_ITEM = """[] (BorrowedPyObject *obj, Py_ssize_t index) -> SharedPyObject * {{
+        auto len = static_cast<Py_ssize_t>(T_cast(obj)->{len_func}());
+        if (index >= len) {{
           PyErrorStreamer(PyExc_IndexError)
               << "Invalid index '" << index << "'";
           return nullptr;
         }}
-        return PythonBinding<
+        return ::mx::to_python(T_cast(obj)->{item_func}(static_cast<unsigned>(index)));
       }}"""
 
 
@@ -351,16 +431,39 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
 """
 
 
-PYTHON_BINDING_TO_PYTHON = """
+PYTHON_BINDING_TO_PYTHON_STATIC = """
 template <>
-SharedPyObject *PythonBinding<T>::to_python(const T &val) noexcept {{
-  (void) val;
-  return nullptr;
-}}
+SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
+  auto ret = type->tp_alloc(type, 0);
+  if (auto obj = O_cast(ret)) {
+    obj->data = new (obj->backing_storage) T(std::move(val));
+  }
+  return ret;
+}
+"""
+
+PYTHON_BINDING_TO_PYTHON_DYNAMIC_BEGIN = """
+template <>
+SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
+  PyTypeObject *tp = nullptr;
+  switch (val.kind()) {
+    default:
+      tp = type;
+      break;
+"""
+
+PYTHON_BINDING_TO_PYTHON_DYNAMIC_END = """
+  }
+  auto ret = tp->tp_alloc(tp, 0);
+  if (auto obj = O_cast(ret)) {
+    obj->data = new (obj->backing_storage) T(std::move(val));
+  }
+  return ret;
+}
 """
 
 
-PYTHON_BINDING_LOAD = """
+LOAD_CLASS = """
 namespace {{
 static PyTypeObject *InitType(void) noexcept;
 }}  // namespace
@@ -374,7 +477,7 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {{
     }}
   }}
 
-  auto tp_obj = reinterpret_cast<BorrowedPyObject *>(PythonBinding<T>::type);
+  auto tp_obj = reinterpret_cast<BorrowedPyObject *>(type);
   if (0 != PyModule_AddObjectRef(module, "{py_class_name}", tp_obj)) {{
     return false;
   }}
@@ -397,7 +500,7 @@ PyTypeObject *InitType(void) noexcept {{
     }}
     PyObject_Free(obj);
   }};
-  tp->tp_name = "{py_class_name}";
+  tp->tp_name = "{py_namespace_path}{py_class_name}";
   tp->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_DISALLOW_INSTANTIATION{py_flag_sequencing};
   tp->tp_doc = PyDoc_STR("Wrapper for {cxx_namespace}::{cxx_class_name}");
   tp->tp_as_number = {py_number};
@@ -429,6 +532,182 @@ PyTypeObject *InitType(void) noexcept {{
 """
 
 
+ENUM_DEF = """
+template <>
+PyTypeObject *PythonBinding<T>::type = nullptr;
+
+
+template <>
+SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
+  return PyObject_GetAttrString(reinterpret_cast<BorrowedPyObject *>(type),
+                                EnumeratorName(val));
+}
+
+template <>
+std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
+  if (!obj) {
+    return std::nullopt;
+  }
+
+  if (Py_TYPE(obj) != type) {
+    return std::nullopt;
+  }
+
+  auto long_val = PyObject_GetAttrString(obj, "value");
+  if (!long_val) {
+    PyErr_Clear();
+    return std::nullopt;
+  }
+
+  if (!PyLong_Check(long_val)) {
+    Py_DECREF(long_val);
+    return std::nullopt;
+  }
+
+  int did_overflow = 0;
+  const auto ret = static_cast<T>(
+      PyLong_AsLongLongAndOverflow(obj, &did_overflow));
+  if (did_overflow) {
+    Py_DECREF(long_val);
+    return std::nullopt;
+  }
+
+  return ret;
+}
+
+template <>
+bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
+  const char * const enum_name = EnumerationName(T{});
+  bool created = false;
+
+  if (!type) {
+    auto enum_module = PyImport_ImportModule("enum");
+    if (!enum_module) {
+      return false;
+    }
+
+    auto int_enum = PyObject_GetAttrString(enum_module, "IntEnum");
+    Py_DECREF(enum_module);
+    if (!int_enum) {
+      return false;
+    }
+
+    auto enum_meta = PyObject_Type(int_enum);
+    auto prepare = PyObject_GetAttrString(enum_meta, "__prepare__");
+    if (!prepare) {
+      Py_DECREF(enum_meta);
+      Py_DECREF(int_enum);
+      return false;
+    }
+
+    // Get the `enum._EnumDict` for what we're making.
+    auto ns_dict = PyObject_CallFunction(prepare, "s(N)", enum_name, int_enum);
+    Py_DECREF(prepare);
+    if (!ns_dict) {
+      Py_DECREF(enum_meta);
+      Py_DECREF(int_enum);
+      return false;
+    }
+
+    // Assign each enumerator.
+    for (T val : EnumerationRange<T>()) {
+      auto ival = PyLong_FromUnsignedLongLong(static_cast<uint64_t>(val));
+      if (ival) {
+        if (!PyObject_SetAttrString(ns_dict, EnumeratorName(val), ival)) {
+          continue;
+        }
+        Py_DECREF(ival);
+      }
+
+      Py_DECREF(ns_dict);
+      Py_DECREF(enum_meta);
+      Py_DECREF(int_enum);
+      return false;
+    }
+
+    // Create the type.
+    auto enum_class = PyObject_CallFunction(
+        enum_meta, "s(N)N", enum_name, int_enum, ns_dict);
+    Py_DECREF(ns_dict);
+    Py_DECREF(enum_meta);
+    Py_DECREF(int_enum);
+
+    if (!enum_class) {
+      return false;
+    }
+
+    if (!PyType_Check(enum_class)) {
+      Py_DECREF(enum_class);
+
+      PyErrorStreamer(PyExc_ImportError)
+          << "Created enum class for enumerator '" << enum_name
+          << "' is not a python type";
+      return false;
+    }
+
+    type = reinterpret_cast<PyTypeObject *>(enum_class);
+    created = true;
+  }
+
+  auto tp_obj = reinterpret_cast<BorrowedPyObject *>(type);
+  if (0 != PyModule_AddObjectRef(module, enum_name, tp_obj)) {
+    return false;
+  }
+
+  if (created) {
+    Py_DECREF(tp_obj);
+  }
+
+  return true;
+}
+"""
+
+class EntityIdSchema(Schema):
+  def __init__(self, *args):
+    super().__init__()
+
+
+class SpecificEntityIdSchema(EntityIdSchema):
+  specific_type: Schema
+
+  def __init__(self, specific_type: Schema):
+    super().__init__()
+    self.specific_type = specific_type
+
+  @property
+  def cxx_value_name(self):
+    return "SpecificEntityId<{}>".format(self.specific_type.cxx_name)
+
+
+def make_entity_id_schema(name) -> Tuple[str, type[Schema]]:
+  class SpecificEntityIdSchema(EntityIdSchema):
+    def __init__(self, *args):
+      super().__init__()
+  
+    @property
+    def cxx_value_name(self):
+      return name
+
+  return name, SpecificEntityIdSchema
+
+
+class EntitySchema(Schema):
+  def __init__(self, *args):
+    super().__init__()
+  
+  @property
+  def cxx_value_name(self):
+    return "mx::VariantEntity"
+
+
+def cxx_type_name(schema: Schema) -> str:
+  pass
+
+
+def py_type_name(schema: Schema) -> str:
+  pass
+
+
 class Renamer:
   def rename_class(self, class_schema:ClassSchema) -> str:
     return class_schema.name
@@ -448,9 +727,24 @@ class BasicRenamer(Renamer):
     return self.METHOD_RENAMES.get(method_schema.name, method_schema.name)
 
 
-class EntityIdSchema(Schema):
-  def __init__(self, *args):
-    super().__init__()
+def _wrap_method_impl(class_schema: ClassSchema, schema: MethodSchema,
+                      is_static: bool, out: List[str]):
+  if isinstance(schema.return_type, UnknownSchema):
+    return
+
+  num_args = len(schema.parameters)
+  out.append(METHOD_SPEC_CHECK_ARGCOUNT_BEGIN.format(num_args=num_args))
+
+  for i, arg in enumerate(schema.parameters):
+    out.append(METHOD_SPEC_GET_ARG.format(
+        arg_num=i,
+        arg_type=arg.element_type.cxx_value_name))
+
+  out.append(METHOD_SPEC_CALL.format(
+      method_name=schema.name,
+      args=", ".join(METHOD_SPEC_CALL_ARG.format(i) for i in range(num_args))))
+
+  out.append(METHOD_SPEC_CHECK_ARGCOUNT_END)
 
 
 def _wrap_method(class_schema: ClassSchema, schema: NamedSchema,
@@ -461,22 +755,40 @@ def _wrap_method(class_schema: ClassSchema, schema: NamedSchema,
 
   rel_ns = _relative_namespace(class_schema)
   cxx_namespace = rel_ns and f"mx::{rel_ns}::" or "mx::"
+  py_method_name = renamer.rename_method(class_schema, schema)
 
-  out.append(METHOD_SPEC_PREFIX.format(
-      renamer.rename_method(class_schema, schema)))
+  out.append(METHOD_SPEC_PREFIX.format(py_method_name))
+
+  if isinstance(schema, OverloadSetSchema):
+    for method in schema.overloads:
+      _wrap_method_impl(class_schema, method, is_static, out)
+  elif isinstance(schema, MethodSchema):
+    _wrap_method_impl(class_schema, schema, is_static, out)
+  else:
+    assert False
 
   out.append(
-      (is_static and STATIC_METHOD_SPEC_SUFFIX or METHOD_SPEC_SUFFIX).format(
-          cxx_namespace, class_schema.name, schema.name))
+      METHOD_SPEC_SUFFIX.format(
+          cxx_namespace=cxx_namespace,
+          cxx_class_name=class_schema.name,
+          cxx_method_name=schema.name,
+          py_method_name=py_method_name,
+          extra_method_flags=(is_static and METHOD_SPEC_STATIC_FLAG or "")))
 
 
 def _wrap_property(class_schema: ClassSchema, schema: NamedSchema,
                    renamer: Renamer, out: List[str]):
   """Creates Python bindings for an instance method with no arguments. These are
   implemented as Python properties."""
-  out.append(PROPERTY_SPEC_PREFIX.format(
-      renamer.rename_method(class_schema, schema)))
-  out.append(PROPERTY_SPEC_SUFFIX.format(class_schema.name, schema.name))
+
+  rel_ns = _relative_namespace(class_schema)
+  cxx_namespace = rel_ns and f"mx::{rel_ns}::" or "mx::"
+
+  out.append(PROPERTY_SPEC.format(
+      py_method_name=renamer.rename_method(class_schema, schema),
+      cxx_class_name=class_schema.name,
+      cxx_method_name=schema.name,
+      cxx_namespace=cxx_namespace))
 
 
 def _relative_namespace(schema: ClassSchema | EnumSchema) -> str:
@@ -495,20 +807,47 @@ def _relative_dir(schema: ClassSchema | EnumSchema) -> str:
   return "/".join(path)
 
 
+def _get_method(schema: ClassSchema, method_name: str) -> Optional[MethodSchema | OverloadSetSchema]:
+  if method_name in schema.methods:
+    return schema.methods[method_name]
+
+  for base in schema.bases:
+    method_schema = _get_method(base, method_name)
+    if method_schema:
+      return method_schema
+
+  return None
+
+
+def _is_id_method(schema: Optional[MethodSchema | OverloadSetSchema]) -> bool:
+  return isinstance(schema, MethodSchema) and schema.name == "id" and \
+         isinstance(schema.return_type, EntityIdSchema)
+
+
+def _has_id_method(schema: ClassSchema) -> bool:
+  return _is_id_method(_get_method(schema, "id"))
+
+
 def wrap_class(schema: ClassSchema, type_offsets: Tuple[int, int],
                renamer: Renamer):
   """Create Python bindings for a class schema."""
 
   out: List[str] = []
-  out.append(HEADER)
+  out.append(CLASS_HEADER)
 
   rel_ns = _relative_namespace(schema)
+  rel_dir = _relative_dir(schema)
   cxx_namespace = rel_ns and f"mx::{rel_ns}::" or "mx::"
   cxx_class_name = schema.name
   py_class_name = renamer.rename_class(schema)
 
+  py_namespace_path = rel_dir and f"multiplier.{rel_dir.lower().replace('/', '.')}." or "multiplier."
+
   type_hash = "PyObject_HashNotImplemented"
   base_class = "nullptr"
+
+  is_entity_type = _has_id_method(schema)
+  
   if schema.bases:
     assert len(schema.bases) == 1
     base_schema = schema.bases[0]
@@ -518,15 +857,17 @@ def wrap_class(schema: ClassSchema, type_offsets: Tuple[int, int],
     base_class = "PythonBinding<{}{}>::type".format(base_cxx_namespace, base_cxx_class_name)
     type_hash = "PythonBinding<{}{}>::type->tp_hash".format(base_cxx_namespace, base_cxx_class_name)
 
-  for method in schema.methods.values():
-    if isinstance(method, MethodSchema) and \
-       method.name == "id" and \
-       isinstance(method.return_type, EntityIdSchema):
+  # In the Python API, we give all of the entities a common base class.
+  elif is_entity_type:
+    base_class = "PythonBinding<VariantEntity>::type";
+
+  # Figure out if we can override `__hash__` using the `id` method.
+  if "id" in schema.methods:
+    id_method = schema.methods["id"]
+    if _is_id_method(id_method):
       type_hash = TYPE_HASH
-      break
 
   assert schema.location is not None
-  out.append(INCLUDE.format(schema.location))
   out.append(DISABLE_DIAGNOSTICS)
   out.append(CLASS_TYPEDEF.format(cxx_namespace, cxx_class_name))
   out.append(BEGIN_MX_NAMESPACE)
@@ -534,9 +875,20 @@ def wrap_class(schema: ClassSchema, type_offsets: Tuple[int, int],
   out.append(PYTHON_BINDING_FROM_PYTHON.format(
       type_offset=type_offsets[0],
       type_offset_upper_bound=type_offsets[1]))
-  out.append(PYTHON_BINDING_TO_PYTHON.format())
-  out.append(PYTHON_BINDING_LOAD.format(
+  
+  # Figure out if this class can use kind-based dispatch.
+  kind_method = _get_method(schema, "kind")
+  if isinstance(kind_method, MethodSchema) and \
+     isinstance(kind_method.return_type, EnumSchema):
+    out.append(PYTHON_BINDING_TO_PYTHON_DYNAMIC_BEGIN)
+    out.append(PYTHON_BINDING_TO_PYTHON_DYNAMIC_END)
+  else:
+    out.append(PYTHON_BINDING_TO_PYTHON_STATIC)
+
+  out.append(LOAD_CLASS.format(
       py_class_name=py_class_name))
+
+  # Add in the methods.
   out.append(METHOD_LIST_PREFIX)
 
   for method in schema.static_methods.values():
@@ -550,12 +902,18 @@ def wrap_class(schema: ClassSchema, type_offsets: Tuple[int, int],
       _wrap_method(schema, method, renamer, False, out)
 
   out.append(METHOD_LIST_SUFFIX)
+
+  # Add in the properties.
   out.append(PROPERTY_LIST_PREFIX)
 
   for method in schema.methods.values():
-    if isinstance(schema, MethodSchema) and not method.max_num_parameters:
-      _wrap_property(schema, method, renamer, out)
-
+    if not isinstance(method, MethodSchema) or \
+       not method.is_const or \
+       0 < method.max_num_parameters:
+       continue
+    
+    _wrap_property(schema, method, renamer, out)
+  
   out.append(PROPERTY_LIST_SUFFIX)
 
   if schema.has_boolean_conversion:
@@ -568,22 +926,18 @@ def wrap_class(schema: ClassSchema, type_offsets: Tuple[int, int],
         assert size_name is None, "More than one size-like method"
         size_name = method_name
     assert size_name is not None
-    
-    py_seq_item = "nullptr"
-    if isinstance(schema.indexed_type, StdOptionalSchema):
-      py_seq_item = OPTIONAL_SEQUENCE_ITEM
-    elif schema.has_boolean_conversion:
-      pass
-    else:
-      pass
 
     out.append(SEQUENCE_METHODS.format(
-        py_seq_length=SEQUENCE_SIZE.format(size_name),
-        py_seq_item=py_seq_item))
+        py_seq_length=SEQUENCE_SIZE.format(
+            len_func=size_name),
+        py_seq_item=SEQUENCE_ITEM.format(
+            len_func=size_name,
+            item_func="operator[]")))
 
   out.append(INIT_TYPE.format(
       cxx_namespace=cxx_namespace,
       cxx_class_name=schema.name,
+      py_namespace_path=py_namespace_path,
       py_class_name=py_class_name,
       py_flag_sequencing=schema.indexed_type and " | Py_TPFLAGS_SEQUENCE " or "",
       py_hash=type_hash,
@@ -598,17 +952,30 @@ def wrap_class(schema: ClassSchema, type_offsets: Tuple[int, int],
   out.append(ENABLE_DIAGNOSTICS)
   out.append(END_MX_NAMESPACE)
 
+  _save_output(schema, out)
+
+
+def wrap_enum(schema: EnumSchema, renamer: Renamer):
+  """Wrap an enumeration and its enumerators."""
+  rel_ns = _relative_namespace(schema)
+  cxx_namespace = rel_ns and f"mx::{rel_ns}::" or "mx::"
+  cxx_enum_name = schema.name
+
+  out: List[str] = []
+  out.append(ENUM_HEADER.format(schema.location, cxx_namespace, cxx_enum_name))
+  out.append(ENUM_DEF)
+  out.append(ENUM_FOOTER)
+  _save_output(schema, out)
+
+
+def _save_output(schema: ClassSchema | EnumSchema, out: List[str]):
   out_path = os.path.join(MX_BINDINGS_PYTHON_DIR, "Generated",
-                          _relative_dir(schema),
-                          cxx_class_name + ".cpp")
+                        _relative_dir(schema),
+                        schema.name + ".cpp")
   os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
   with open(out_path, "w") as f:
     f.write("".join(out))
-
-
-def wrap_enum(schema: EnumSchema, renamer: Renamer):
-  pass
 
 
 def _fill_into(schema: ClassSchema, children: Dict[ClassSchema, List[ClassSchema]],
@@ -665,11 +1032,11 @@ def wrap(schemas: Iterable[Schema], renamer: Renamer):
   with open(os.path.join(MX_BINDINGS_PYTHON_DIR, "Types.cpp"), "w") as f:
     f.write(TYPES_CPP.format(len(classes)))
 
-  # Fill in `Module.cpp`. This defines the main module, and invokes all of the
-  # class initializers.
-  with open(os.path.join(MX_BINDINGS_PYTHON_DIR, "Module.cpp"), "w") as f:
 
-    f.write(MODULE_CPP_PREFIX)
+  # Fill in `Forward.h`. This forward declares all the various classes and
+  # enums.
+  with open(os.path.join(MX_BINDINGS_PYTHON_DIR, "Forward.h"), "w") as f:
+    f.write(FORWARD_H_PREFIX)
 
     # Forward declare the classes/enums.
     for namespace, schemas in namespaces.items():
@@ -677,18 +1044,24 @@ def wrap(schemas: Iterable[Schema], renamer: Renamer):
         f.write(BEGIN_NAMESPACE.format(namespace))
       for schema in schemas:
         if isinstance(schema, ClassSchema):
-          f.write(MODULE_CPP_FORWARD_DECL_CLASS.format(schema.elaborator, schema.name))
+          f.write(FORWARD_DECL_CLASS.format(schema.elaborator, schema.name))
         elif isinstance(schema, EnumSchema):
           assert schema.is_explicitly_typed
           enum_scope = schema.is_scoped and "class " or ""
-          f.write(MODULE_CPP_FORWARD_DECL_ENUM.format(
+          f.write(FORWARD_DECL_ENUM.format(
               enum_scope=enum_scope,
               enum_name=schema.name,
-              stdint_type_name=schema.base_type.stdint_type_name))
+              stdint_type_name=schema.base_type.cxx_value_name))
       if len(namespace):
         f.write(END_NAMESPACE.format(namespace))
 
-    f.write(MODULE_CPP_MIDDLE)
+    f.write(FORWARD_H_SUFFIX)
+
+  # Fill in `Module.cpp`. This defines the main module, and invokes all of the
+  # class initializers.
+  with open(os.path.join(MX_BINDINGS_PYTHON_DIR, "Module.cpp"), "w") as f:
+
+    f.write(MODULE_CPP_PREFIX)
 
     sorted_directories = list(directories.keys())
     sorted_directories.sort(key=len)
@@ -713,10 +1086,33 @@ def wrap(schemas: Iterable[Schema], renamer: Renamer):
 
       f.write(END_MODULE_CPP_DEF)
 
+    f.write(MODULE_CPP_MIDDLE)
+
+    # Define the modules, and make lists of the wrappers.
+    for rel_dir in sorted_directories:
+      rel_dir_parts = rel_dir.split("/")
+      upper_name = rel_dir and rel_dir_parts[-1] or ""
+      lower_name = upper_name.lower()
+
+      if rel_dir == "":
+        parent_name = "dummy"
+      elif 1 == len(rel_dir_parts):
+        parent_name = ""
+      elif 1 < len(rel_dir_parts):
+        parent_name = rel_dir_parts[-2].lower()
+
+      f.write(MODULE_CPP_LOADER_LOOP.format(
+          lower_name=lower_name,
+          upper_name=upper_name,
+          parent_name=parent_name))
+
     f.write(MODULE_CPP_SUFFIX)
 
   for schema in classes:
     wrap_class(schema, offsets[schema], renamer)
+
+  for schema in enums:
+    wrap_enum(schema, renamer)
 
 
 ENTITY_KINDS: Tuple[str] = (
@@ -736,18 +1132,21 @@ ENTITY_KINDS: Tuple[str] = (
 
 def run_on_ast(ast: AST, ns_name: str):
   schemas: List[Schema] = []
-  lifter = SchemaLifter()
-  lifter.add_lifter("mx::EntityId", EntityIdSchema)
-  lifter.add_lifter("mx::RawEntityId", EntityIdSchema)
-  lifter.add_lifter("mx::FileTokenId", EntityIdSchema)
-  lifter.add_lifter("mx::MacroTokenId", EntityIdSchema)
-  lifter.add_lifter("mx::ParsedTokenId", EntityIdSchema)
+  lifter: SchemaLifter = SchemaLifter()
+  lifter.add_lifter(*make_entity_id_schema("mx::EntityId"))
+  lifter.add_lifter(*make_entity_id_schema("mx::RawEntityId"))
+  lifter.add_lifter(*make_entity_id_schema("mx::FileTokenId"))
+  lifter.add_lifter(*make_entity_id_schema("mx::MacroTokenId"))
+  lifter.add_lifter(*make_entity_id_schema("mx::ParsedTokenId"))
+  lifter.add_lifter(*make_entity_id_schema("mx::VariantId"))
+  lifter.add_lifter(*make_entity_id_schema("mx::VariantEntity"))
 
   for entity in ENTITY_KINDS:
-    lifter.add_lifter(f"mx::{entity}Id", EntityIdSchema)
-    lifter.add_lifter(f"mx::Packed{entity}Id", EntityIdSchema)
+    lifter.add_lifter(*make_entity_id_schema(f"mx::{entity}Id"))
+    lifter.add_lifter(*make_entity_id_schema(f"mx::Packed{entity}Id"))
 
-  lifter.add_parameterized_lifter("mx::SpecificEntityId", 1, EntityIdSchema)
+  lifter.add_parameterized_lifter("mx::SpecificEntityId", 1,
+                                  SpecificEntityIdSchema)
 
   # Filter out all tag decls that aren't private `*Impl` classes, and also
   # only look at the definitions.

@@ -81,7 +81,6 @@ add_executable("${exe_name}"
 
 target_link_libraries("${exe_name}"
   PRIVATE
-    ${MX_BEGIN_FORCE_LOAD_GROUP}
     "mx-api"
     clangIndex
     glog::glog
@@ -90,8 +89,7 @@ target_link_libraries("${exe_name}"
     reproc++
     xxHash::xxhash
     RocksDB::rocksdb
-    ${MX_BEGIN_FORCE_LOAD_LIB} pasta::pasta ${MX_END_FORCE_LOAD_LIB}
-    ${MX_END_FORCE_LOAD_GROUP}
+    pasta::pasta
 )
 
 # When we're bootstrapping, we might be using a different version of Clang and

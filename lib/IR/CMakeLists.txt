@@ -13,6 +13,30 @@ set(ir_source_include_dir "${PROJECT_SOURCE_DIR}/include/${lower_project_name}/I
 file(GLOB_RECURSE ir_sources CONFIGURE_DEPENDS RELATIVE_PATH "${CMAKE_CURRENT_LIST_DIR}" "*.cpp")
 file(GLOB_RECURSE ir_headers CONFIGURE_DEPENDS RELATIVE_PATH "${ir_source_include_dir}" "*.h")
 
+add_library("mx-vast" INTERFACE)
+
+set_target_properties("mx-vast"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX
+    VISIBILITY_INLINES_HIDDEN
+      YES
+    CXX_VISIBILITY_PRESET
+      hidden
+    POSITION_INDEPENDENT_CODE
+      YES
+    COMPILE_FEATURES
+      cxx_std_20
+    INTERFACE_COMPILE_FEATURES
+      cxx_std_20
+)
+
+target_link_libraries("mx-vast"
+  INTERFACE
+    ${MLIR_LIBS}
+    ${VAST_LIBS}
+)
+
 add_library("mx-mlir" STATIC
   ${ir_headers}
   ${ir_sources}
@@ -35,7 +59,7 @@ set_target_properties("mx-mlir"
     VISIBILITY_INLINES_HIDDEN
       YES
     CXX_VISIBILITY_PRESET
-      hidden
+      default
     POSITION_INDEPENDENT_CODE
       YES
 )
@@ -43,6 +67,24 @@ set_target_properties("mx-mlir"
 target_link_directories("mx-mlir"
   PRIVATE
     "${MLIR_LIB_DIR}"
+)
+
+set_target_properties("mx-vast"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX
+    PUBLIC_HEADER
+      "${api_headers}"
+    VISIBILITY_INLINES_HIDDEN
+      YES
+    CXX_VISIBILITY_PRESET
+      default
+    POSITION_INDEPENDENT_CODE
+      YES
+    COMPILE_FEATURES
+      cxx_std_20
+    INTERFACE_COMPILE_FEATURES
+      cxx_std_20
 )
 
 target_link_libraries("mx-mlir"
@@ -53,8 +95,7 @@ target_link_libraries("mx-mlir"
     "gap::gap-settings"
 
   PRIVATE
-    ${MLIR_LIBS}
-    ${VAST_LIBS}
+    "mx-vast"
 )
 
 if(MX_ENABLE_INSTALL)
@@ -63,21 +104,5 @@ if(MX_ENABLE_INSTALL)
       "${ir_source_include_dir}"
     DESTINATION
       "${MX_INSTALL_INCLUDE_DIR}/IR"
-  )
-
-  install(
-    TARGETS
-      "mx-mlir"
-    EXPORT
-      "${PROJECT_NAME}Targets"
-    RUNTIME
-      DESTINATION
-        "${MX_INSTALL_BIN_DIR}"
-    LIBRARY
-      DESTINATION
-        "${MX_INSTALL_LIB_DIR}"
-    ARCHIVE
-      DESTINATION
-        "${MX_INSTALL_LIB_DIR}"
   )
 endif(MX_ENABLE_INSTALL)

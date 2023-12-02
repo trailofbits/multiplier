@@ -8,7 +8,29 @@
 
 #include <cmath>
 
+#include <multiplier/Entity.h>
+
 namespace mx {
+
+std::optional<bool> PythonBinding<bool>::from_python(
+    BorrowedPyObject *obj) noexcept {
+
+  auto truthy = PyObject_IsTrue(obj);
+  if (-1 == truthy) {
+    PyErr_Clear();
+    return std::nullopt;
+  }
+
+  return !!truthy;
+}
+
+SharedPyObject *PythonBinding<bool>::to_python(bool val) noexcept {
+  if (val) {
+    Py_RETURN_TRUE;
+  } else {
+    Py_RETURN_FALSE;
+  }
+}
 
 #define MAKE_INTEGRAL_CONVERTER(type_name, longest_type, from_func) \
     std::optional<type_name> PythonBinding<type_name>::from_python( \
@@ -34,15 +56,16 @@ namespace mx {
       return from_func(static_cast<longest_type>(val)); \
     }
 
-MAKE_INTEGRAL_CONVERTER(int8_t, int64_t, PyLong_FromLongLong)
-MAKE_INTEGRAL_CONVERTER(int16_t, int64_t, PyLong_FromLongLong)
-MAKE_INTEGRAL_CONVERTER(int32_t, int64_t, PyLong_FromLongLong)
-MAKE_INTEGRAL_CONVERTER(int64_t, int64_t, PyLong_FromLongLong)
-
-MAKE_INTEGRAL_CONVERTER(uint8_t, uint64_t, PyLong_FromUnsignedLongLong)
-MAKE_INTEGRAL_CONVERTER(uint16_t, uint64_t, PyLong_FromUnsignedLongLong)
-MAKE_INTEGRAL_CONVERTER(uint32_t, uint64_t, PyLong_FromUnsignedLongLong)
-MAKE_INTEGRAL_CONVERTER(uint64_t, uint64_t, PyLong_FromUnsignedLongLong)
+MAKE_INTEGRAL_CONVERTER(char, int64_t, PyLong_FromLongLong)
+MAKE_INTEGRAL_CONVERTER(short, int64_t, PyLong_FromLongLong)
+MAKE_INTEGRAL_CONVERTER(int, int64_t, PyLong_FromLongLong)
+MAKE_INTEGRAL_CONVERTER(long, int64_t, PyLong_FromLongLong)
+MAKE_INTEGRAL_CONVERTER(long long, int64_t, PyLong_FromLongLong)
+MAKE_INTEGRAL_CONVERTER(unsigned char, uint64_t, PyLong_FromUnsignedLongLong)
+MAKE_INTEGRAL_CONVERTER(unsigned short, uint64_t, PyLong_FromUnsignedLongLong)
+MAKE_INTEGRAL_CONVERTER(unsigned, uint64_t, PyLong_FromUnsignedLongLong)
+MAKE_INTEGRAL_CONVERTER(unsigned long, uint64_t, PyLong_FromUnsignedLongLong)
+MAKE_INTEGRAL_CONVERTER(unsigned long long, uint64_t, PyLong_FromUnsignedLongLong)
 
 std::optional<float> PythonBinding<float>::from_python(
     BorrowedPyObject *obj) noexcept {
@@ -80,6 +103,34 @@ std::optional<double> PythonBinding<double>::from_python(
 
 SharedPyObject *PythonBinding<double>::to_python(double val) noexcept {
   return PyFloat_FromDouble(val);
+}
+
+std::optional<std::monostate> PythonBinding<std::monostate>::from_python(
+    BorrowedPyObject *obj) noexcept {
+  if (obj != Py_None) {
+    return std::nullopt;
+  }
+
+  return std::monostate{};
+}
+
+SharedPyObject *PythonBinding<std::monostate>::to_python(
+    std::monostate) noexcept {
+  Py_RETURN_NONE;
+}
+
+std::optional<VariantId> PythonBinding<VariantId>::from_python(
+    BorrowedPyObject *obj) noexcept {
+  auto int_val = PythonBinding<RawEntityId>::from_python(obj);
+  if (!int_val) {
+    return std::nullopt;
+  }
+
+  return EntityId(int_val.value()).Unpack();
+}
+
+SharedPyObject *PythonBinding<VariantId>::to_python(VariantId val) noexcept {
+  return PythonBinding<RawEntityId>::to_python(EntityId(val).Pack());
 }
 
 std::optional<std::string> PythonBinding<std::string>::from_python(
@@ -143,6 +194,62 @@ SharedPyObject *PythonBinding<std::string>::to_python(
   }
 
   return nullptr;
+}
+
+namespace {
+
+struct PermRef {
+  SharedPyObject * const object;
+
+  inline PermRef(SharedPyObject *object_)
+      : object(object_) {}
+
+  inline ~PermRef(void) {
+    Py_DECREF(object);
+  }
+};
+
+static std::optional<PermRef> gPurePath;
+static std::optional<PermRef> gPathLib;
+
+static void InitPurePath(void) {
+  if (!gPathLib) {
+    gPathLib.emplace(PyImport_ImportModule("pathlib"));
+  }
+
+  if (!gPurePath) {
+    gPurePath.emplace(PyObject_GetAttrString(gPathLib->object, "PurePath"));
+  }
+}
+
+}  // namespace
+
+std::optional<std::filesystem::path>
+PythonBinding<std::filesystem::path>::from_python(
+    BorrowedPyObject *obj) noexcept {
+
+  if (PyObject_IsInstance(obj, gPurePath->object)) {
+    if (auto str_obj = PyObject_Str(obj)) {
+      if (auto str = ::mx::from_python<std::string>(str_obj)) {
+        Py_DECREF(str_obj);
+        return std::filesystem::path(std::move(str.value()));
+      }
+      Py_DECREF(str_obj);
+    }
+
+  } else if (auto str = ::mx::from_python<std::string>(obj)) {
+    return std::filesystem::path(std::move(str.value()));
+  }
+
+  PyErr_Clear();
+  return std::nullopt;
+}
+
+SharedPyObject *PythonBinding<std::filesystem::path>::to_python(
+    std::filesystem::path val) noexcept {
+  InitPurePath();
+  return PyObject_CallFunction(gPurePath->object, "s",
+                               val.generic_string().c_str());
 }
 
 }  // namespace mx
