@@ -166,8 +166,8 @@ SharedPyObject *PythonBinding<std::string>::to_python(
     std::string_view val) noexcept {
 
   auto val_data = "";
-  Py_ssize_t val_len = 0;
-  if (!val.empty()) {
+  Py_ssize_t val_len = static_cast<Py_ssize_t>(val.size());
+  if (val_len) {
     val_data = val.data();
   }
 

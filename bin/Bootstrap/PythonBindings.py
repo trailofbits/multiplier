@@ -625,9 +625,10 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
     // Assign each enumerator.
     for (T val : EnumerationRange<T>()) {
+      auto iname = PyUnicode_FromString(EnumeratorName(val));
       auto ival = PyLong_FromUnsignedLongLong(static_cast<uint64_t>(val));
       if (ival) {
-        if (!PyObject_SetAttrString(ns_dict, EnumeratorName(val), ival)) {
+        if (!PyObject_SetItem(ns_dict, iname, ival)) {
           continue;
         }
         Py_DECREF(ival);
