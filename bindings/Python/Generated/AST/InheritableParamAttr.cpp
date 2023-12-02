@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/AST/InheritableParamAttr.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,60 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::CarriesDependencyAttr::static_kind():
+      tp = &(gTypes[368]);
+      break;
+
+    case mx::CFConsumedAttr::static_kind():
+      tp = &(gTypes[369]);
+      break;
+
+    case mx::AnnotateAttr::static_kind():
+      tp = &(gTypes[370]);
+      break;
+
+    case mx::UseHandleAttr::static_kind():
+      tp = &(gTypes[371]);
+      break;
+
+    case mx::ReleaseHandleAttr::static_kind():
+      tp = &(gTypes[372]);
+      break;
+
+    case mx::PassObjectSizeAttr::static_kind():
+      tp = &(gTypes[373]);
+      break;
+
+    case mx::SwiftIndirectResultAttr::static_kind():
+      tp = &(gTypes[375]);
+      break;
+
+    case mx::SwiftErrorResultAttr::static_kind():
+      tp = &(gTypes[376]);
+      break;
+
+    case mx::SwiftContextAttr::static_kind():
+      tp = &(gTypes[377]);
+      break;
+
+    case mx::SwiftAsyncContextAttr::static_kind():
+      tp = &(gTypes[378]);
+      break;
+
+    case mx::OSConsumedAttr::static_kind():
+      tp = &(gTypes[379]);
+      break;
+
+    case mx::NonNullAttr::static_kind():
+      tp = &(gTypes[380]);
+      break;
+
+    case mx::NSConsumedAttr::static_kind():
+      tp = &(gTypes[381]);
       break;
 
   }

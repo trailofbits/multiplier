@@ -849,8 +849,8 @@ EntityProviderPtr TokenReader::EntityProviderFor(const Token &token) {
   }
 }
 
-TokenReader::Ptr TokenReader::ReaderForToken(
-    const TokenReader::Ptr &self, const EntityProviderPtr &ep, EntityId eid) {
+TokenReaderPtr TokenReader::ReaderForToken(
+    const TokenReaderPtr &self, const EntityProviderPtr &ep, EntityId eid) {
 
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<FileTokenId>(vid)) {
@@ -974,6 +974,94 @@ EntityId InvalidTokenReader::NthFileTokenId(EntityOffset) const {
 // Returns `true` if `this` is logically equivalent to `that`.
 bool InvalidTokenReader::Equals(const TokenReader *) const {
   return false;
+}
+
+ProxyTokenReader::~ProxyTokenReader(void) noexcept {}
+
+// Return the number of tokens accessible to this reader.
+EntityOffset ProxyTokenReader::NumTokens(void) const {
+  return next->NumTokens();
+}
+
+// Return the kind of the Nth token.
+TokenKind ProxyTokenReader::NthTokenKind(EntityOffset to) const {
+  return next->NthTokenKind(to);
+}
+
+// Return the data of the Nth token.
+std::string_view ProxyTokenReader::NthTokenData(EntityOffset to) const {
+  return next->NthTokenData(to);
+}
+
+// Return the id of the token from which the Nth token is derived.
+EntityId ProxyTokenReader::NthDerivedTokenId(EntityOffset to) const {
+  return next->NthDerivedTokenId(to);
+}
+
+// Return the id of the parsed token which is derived from the Nth token.
+EntityId ProxyTokenReader::NthParsedTokenId(EntityOffset to) const {
+  return next->NthParsedTokenId(to);
+}
+
+// Return the id of the macro containing the Nth token.
+EntityId ProxyTokenReader::NthContainingMacroId(EntityOffset to) const {
+  return next->NthContainingMacroId(to);
+}
+
+// Return an entity id associated with the Nth token.
+EntityId ProxyTokenReader::NthRelatedEntityId(EntityOffset to) const {
+  return next->NthRelatedEntityId(to);
+}
+
+// Return the entity associated with the Nth token.
+VariantEntity ProxyTokenReader::NthRelatedEntity(EntityOffset to) const {
+  return next->NthRelatedEntity(to);
+}
+
+// Return the id of the Nth token.
+EntityId ProxyTokenReader::NthTokenId(EntityOffset to) const {
+  return next->NthTokenId(to);
+}
+
+EntityId ProxyTokenReader::NthFileTokenId(EntityOffset to) const {
+  return next->NthFileTokenId(to);
+}
+
+// Returns `true` if `this` is logically equivalent to `that`.
+bool ProxyTokenReader::Equals(const TokenReader *that) const {
+  return this == that || next->Equals(that);
+}
+
+const FragmentImpl *
+ProxyTokenReader::NthOwningFragment(EntityOffset to) const noexcept {
+  return next->NthOwningFragment(to);
+}
+
+const FileImpl *
+ProxyTokenReader::NthOwningFile(EntityOffset to) const noexcept {
+  return next->NthOwningFile(to);
+}
+
+const TypeImpl *
+ProxyTokenReader::NthOwningType(EntityOffset to) const noexcept {
+  return next->NthOwningType(to);
+}
+
+const FragmentImpl *ProxyTokenReader::OwningFragment(void) const noexcept {
+  return next->OwningFragment();
+}
+
+const FileImpl *ProxyTokenReader::OwningFile(void) const noexcept {
+  return next->OwningFile();
+}
+
+const TypeImpl *ProxyTokenReader::OwningType(void) const noexcept {
+  return next->OwningType();
+}
+
+TokenContextReaderPtr ProxyTokenReader::TokenContextReaderFor(
+    const Ptr &self, EntityOffset offset, EntityId eid) const noexcept {
+  return next->TokenContextReaderFor(self, offset, eid);
 }
 
 CustomTokenReader::CustomTokenReader(

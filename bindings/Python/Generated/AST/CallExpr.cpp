@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/AST/CallExpr.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,28 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::CallExpr::static_kind():
+      tp = &(gTypes[587]);
+      break;
+
+    case mx::CXXOperatorCallExpr::static_kind():
+      tp = &(gTypes[588]);
+      break;
+
+    case mx::CXXMemberCallExpr::static_kind():
+      tp = &(gTypes[589]);
+      break;
+
+    case mx::CUDAKernelCallExpr::static_kind():
+      tp = &(gTypes[590]);
+      break;
+
+    case mx::UserDefinedLiteral::static_kind():
+      tp = &(gTypes[591]);
       break;
 
   }

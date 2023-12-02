@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/AST/StmtAttr.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,32 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::OpenCLUnrollHintAttr::static_kind():
+      tp = &(gTypes[40]);
+      break;
+
+    case mx::MustTailAttr::static_kind():
+      tp = &(gTypes[41]);
+      break;
+
+    case mx::LikelyAttr::static_kind():
+      tp = &(gTypes[42]);
+      break;
+
+    case mx::FallThroughAttr::static_kind():
+      tp = &(gTypes[43]);
+      break;
+
+    case mx::UnlikelyAttr::static_kind():
+      tp = &(gTypes[44]);
+      break;
+
+    case mx::SuppressAttr::static_kind():
+      tp = &(gTypes[45]);
       break;
 
   }

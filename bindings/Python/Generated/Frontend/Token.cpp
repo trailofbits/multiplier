@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/Frontend/Token.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,6 +85,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
       break;
 
@@ -132,6 +137,72 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::Token::entity_category"),
+  },
+  {
+    "location",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<FileLocationCache>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->location(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'location'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::Token::location"),
+  },
+  {
+    "next_location",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<FileLocationCache>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->next_location(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'next_location'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::Token::next_location"),
+  },
+  {
+    "nearest_location",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<FileLocationCache>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nearest_location(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nearest_location'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::Token::nearest_location"),
   },
   {}  // Sentinel.
 };

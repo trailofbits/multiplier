@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/AST/ValueDecl.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,116 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::UnresolvedUsingValueDecl::static_kind():
+      tp = &(gTypes[720]);
+      break;
+
+    case mx::UnnamedGlobalConstantDecl::static_kind():
+      tp = &(gTypes[721]);
+      break;
+
+    case mx::TemplateParamObjectDecl::static_kind():
+      tp = &(gTypes[722]);
+      break;
+
+    case mx::OMPDeclareReductionDecl::static_kind():
+      tp = &(gTypes[723]);
+      break;
+
+    case mx::MSGuidDecl::static_kind():
+      tp = &(gTypes[724]);
+      break;
+
+    case mx::IndirectFieldDecl::static_kind():
+      tp = &(gTypes[725]);
+      break;
+
+    case mx::EnumConstantDecl::static_kind():
+      tp = &(gTypes[726]);
+      break;
+
+    case mx::VarDecl::static_kind():
+      tp = &(gTypes[728]);
+      break;
+
+    case mx::ParmVarDecl::static_kind():
+      tp = &(gTypes[729]);
+      break;
+
+    case mx::OMPCapturedExprDecl::static_kind():
+      tp = &(gTypes[730]);
+      break;
+
+    case mx::ImplicitParamDecl::static_kind():
+      tp = &(gTypes[731]);
+      break;
+
+    case mx::DecompositionDecl::static_kind():
+      tp = &(gTypes[732]);
+      break;
+
+    case mx::VarTemplateSpecializationDecl::static_kind():
+      tp = &(gTypes[733]);
+      break;
+
+    case mx::VarTemplatePartialSpecializationDecl::static_kind():
+      tp = &(gTypes[734]);
+      break;
+
+    case mx::NonTypeTemplateParmDecl::static_kind():
+      tp = &(gTypes[735]);
+      break;
+
+    case mx::MSPropertyDecl::static_kind():
+      tp = &(gTypes[736]);
+      break;
+
+    case mx::FunctionDecl::static_kind():
+      tp = &(gTypes[737]);
+      break;
+
+    case mx::CXXMethodDecl::static_kind():
+      tp = &(gTypes[738]);
+      break;
+
+    case mx::CXXDestructorDecl::static_kind():
+      tp = &(gTypes[739]);
+      break;
+
+    case mx::CXXConversionDecl::static_kind():
+      tp = &(gTypes[740]);
+      break;
+
+    case mx::CXXConstructorDecl::static_kind():
+      tp = &(gTypes[741]);
+      break;
+
+    case mx::CXXDeductionGuideDecl::static_kind():
+      tp = &(gTypes[742]);
+      break;
+
+    case mx::FieldDecl::static_kind():
+      tp = &(gTypes[743]);
+      break;
+
+    case mx::ObjCIvarDecl::static_kind():
+      tp = &(gTypes[744]);
+      break;
+
+    case mx::ObjCAtDefsFieldDecl::static_kind():
+      tp = &(gTypes[745]);
+      break;
+
+    case mx::BindingDecl::static_kind():
+      tp = &(gTypes[746]);
+      break;
+
+    case mx::OMPDeclareMapperDecl::static_kind():
+      tp = &(gTypes[748]);
       break;
 
   }

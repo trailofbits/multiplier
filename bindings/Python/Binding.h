@@ -27,8 +27,8 @@
 #pragma GCC visibility push(hidden)
 namespace mx {
 
-class TokenRange;
 class RegexQueryMatch;
+class TokenRange;
 
 template <typename T>
 struct PythonBinding {

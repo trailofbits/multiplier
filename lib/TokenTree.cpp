@@ -1373,7 +1373,7 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
 // if it can't be found, formulating a new token index position for that reader.
 TokenTreeImpl::TokenIndex TokenTreeImpl::GetOrCreateIndex(const Token &tok) {
   EntityOffset i = 0u;
-  for (TokenReader::Ptr &reader : readers) {
+  for (TokenReaderPtr &reader : readers) {
     if (reader == tok.impl) {
       return TokenIndex(i, tok.offset);
     }
@@ -1410,7 +1410,7 @@ static std::optional<TokenTreeImpl::TokenIndex> RightCornerOfUse(
 // Counts the number of tokens after `begin` and before `end` that we can
 // inject before the token which logically represents `end`.
 static EntityOffset CountInjectable(
-    const TokenReader::Ptr &reader, const TokenTreeImpl::Bounds &bounds,
+    const TokenReaderPtr &reader, const TokenTreeImpl::Bounds &bounds,
     TokenTreeImpl::TokenIndex upper_bound,
     TokenTreeImpl::SequenceNode *parent_seq,
     TokenTreeImpl::SequenceNode *seq, int depth) {
@@ -1489,7 +1489,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
   }
 
   // Inject the missing whitespace/comment tokens.
-  const TokenReader::Ptr &fti_reader = readers[fti.first];
+  const TokenReaderPtr &fti_reader = readers[fti.first];
   for (auto num = CountInjectable(fti_reader, bounds, fti, last_sequence,
                                   seq, depth);
        num; --num) {
@@ -2307,7 +2307,7 @@ class TokenTreeReader final : public TokenReader {
 void TokenTreeReader::Append(TokenTreeImpl::TokenIndex ti) {
 
   auto [ri, to] = ti;
-  const TokenReader::Ptr &tok_reader = impl->readers[ri];
+  const TokenReaderPtr &tok_reader = impl->readers[ri];
 
   TokenKind tk = tok_reader->NthTokenKind(to);
   VariantId rel_id = EntityId(tok_reader->NthRelatedEntity(to)).Unpack();

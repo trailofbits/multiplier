@@ -67,7 +67,7 @@ class FileLocationCache {
   ~FileLocationCache(void);
 
   FileLocationCache(
-    const FileLocationConfiguration &config=FileLocationConfiguration());
+      const FileLocationConfiguration &config=FileLocationConfiguration());
 
   // Add a file to the cache.
   void add(const File &) const;

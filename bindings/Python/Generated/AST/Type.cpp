@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/AST/Type.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,228 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::TemplateTypeParmType::static_kind():
+      tp = &(gTypes[386]);
+      break;
+
+    case mx::TemplateSpecializationType::static_kind():
+      tp = &(gTypes[387]);
+      break;
+
+    case mx::RecordType::static_kind():
+      tp = &(gTypes[389]);
+      break;
+
+    case mx::EnumType::static_kind():
+      tp = &(gTypes[390]);
+      break;
+
+    case mx::SubstTemplateTypeParmType::static_kind():
+      tp = &(gTypes[391]);
+      break;
+
+    case mx::SubstTemplateTypeParmPackType::static_kind():
+      tp = &(gTypes[392]);
+      break;
+
+    case mx::RValueReferenceType::static_kind():
+      tp = &(gTypes[394]);
+      break;
+
+    case mx::LValueReferenceType::static_kind():
+      tp = &(gTypes[395]);
+      break;
+
+    case mx::QualifiedType::static_kind():
+      tp = &(gTypes[396]);
+      break;
+
+    case mx::PointerType::static_kind():
+      tp = &(gTypes[397]);
+      break;
+
+    case mx::PipeType::static_kind():
+      tp = &(gTypes[398]);
+      break;
+
+    case mx::ParenType::static_kind():
+      tp = &(gTypes[399]);
+      break;
+
+    case mx::PackExpansionType::static_kind():
+      tp = &(gTypes[400]);
+      break;
+
+    case mx::ObjCTypeParamType::static_kind():
+      tp = &(gTypes[401]);
+      break;
+
+    case mx::ObjCObjectType::static_kind():
+      tp = &(gTypes[402]);
+      break;
+
+    case mx::ObjCInterfaceType::static_kind():
+      tp = &(gTypes[403]);
+      break;
+
+    case mx::ObjCObjectPointerType::static_kind():
+      tp = &(gTypes[404]);
+      break;
+
+    case mx::MemberPointerType::static_kind():
+      tp = &(gTypes[405]);
+      break;
+
+    case mx::DependentSizedMatrixType::static_kind():
+      tp = &(gTypes[407]);
+      break;
+
+    case mx::ConstantMatrixType::static_kind():
+      tp = &(gTypes[408]);
+      break;
+
+    case mx::MacroQualifiedType::static_kind():
+      tp = &(gTypes[409]);
+      break;
+
+    case mx::InjectedClassNameType::static_kind():
+      tp = &(gTypes[410]);
+      break;
+
+    case mx::FunctionProtoType::static_kind():
+      tp = &(gTypes[412]);
+      break;
+
+    case mx::FunctionNoProtoType::static_kind():
+      tp = &(gTypes[413]);
+      break;
+
+    case mx::DependentVectorType::static_kind():
+      tp = &(gTypes[414]);
+      break;
+
+    case mx::DependentSizedExtVectorType::static_kind():
+      tp = &(gTypes[415]);
+      break;
+
+    case mx::DependentBitIntType::static_kind():
+      tp = &(gTypes[416]);
+      break;
+
+    case mx::DependentAddressSpaceType::static_kind():
+      tp = &(gTypes[417]);
+      break;
+
+    case mx::DeducedTemplateSpecializationType::static_kind():
+      tp = &(gTypes[419]);
+      break;
+
+    case mx::AutoType::static_kind():
+      tp = &(gTypes[420]);
+      break;
+
+    case mx::DecltypeType::static_kind():
+      tp = &(gTypes[421]);
+      break;
+
+    case mx::ComplexType::static_kind():
+      tp = &(gTypes[422]);
+      break;
+
+    case mx::BuiltinType::static_kind():
+      tp = &(gTypes[423]);
+      break;
+
+    case mx::BlockPointerType::static_kind():
+      tp = &(gTypes[424]);
+      break;
+
+    case mx::BitIntType::static_kind():
+      tp = &(gTypes[425]);
+      break;
+
+    case mx::BTFTagAttributedType::static_kind():
+      tp = &(gTypes[426]);
+      break;
+
+    case mx::AttributedType::static_kind():
+      tp = &(gTypes[427]);
+      break;
+
+    case mx::AtomicType::static_kind():
+      tp = &(gTypes[428]);
+      break;
+
+    case mx::VariableArrayType::static_kind():
+      tp = &(gTypes[430]);
+      break;
+
+    case mx::IncompleteArrayType::static_kind():
+      tp = &(gTypes[431]);
+      break;
+
+    case mx::DependentSizedArrayType::static_kind():
+      tp = &(gTypes[432]);
+      break;
+
+    case mx::ConstantArrayType::static_kind():
+      tp = &(gTypes[433]);
+      break;
+
+    case mx::AdjustedType::static_kind():
+      tp = &(gTypes[434]);
+      break;
+
+    case mx::DecayedType::static_kind():
+      tp = &(gTypes[435]);
+      break;
+
+    case mx::ElaboratedType::static_kind():
+      tp = &(gTypes[437]);
+      break;
+
+    case mx::DependentTemplateSpecializationType::static_kind():
+      tp = &(gTypes[438]);
+      break;
+
+    case mx::DependentNameType::static_kind():
+      tp = &(gTypes[439]);
+      break;
+
+    case mx::VectorType::static_kind():
+      tp = &(gTypes[440]);
+      break;
+
+    case mx::ExtVectorType::static_kind():
+      tp = &(gTypes[441]);
+      break;
+
+    case mx::UsingType::static_kind():
+      tp = &(gTypes[442]);
+      break;
+
+    case mx::UnresolvedUsingType::static_kind():
+      tp = &(gTypes[443]);
+      break;
+
+    case mx::UnaryTransformType::static_kind():
+      tp = &(gTypes[444]);
+      break;
+
+    case mx::TypedefType::static_kind():
+      tp = &(gTypes[445]);
+      break;
+
+    case mx::TypeOfType::static_kind():
+      tp = &(gTypes[446]);
+      break;
+
+    case mx::TypeOfExprType::static_kind():
+      tp = &(gTypes[447]);
       break;
 
   }

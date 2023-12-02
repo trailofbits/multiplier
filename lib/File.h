@@ -22,7 +22,9 @@ using FileIdList = std::vector<SpecificEntityId<FileId>>;
 class FileLocationCacheImpl {
  public:
   std::mutex lock;
+
   const FileLocationConfiguration config;
+
   std::unordered_map<RawEntityId, FileLocationVector> cache;
 
   inline FileLocationCacheImpl(const FileLocationConfiguration &config_)
@@ -108,7 +110,7 @@ class FileImpl final : public EntityImpl<rpc::File> {
   // Return a reader for the tokens in the file.
   inline std::shared_ptr<const class TokenReader> TokenReader(
       const FileImplPtr &self) const {
-    return TokenReader::Ptr(self, &file_token_reader);
+    return TokenReaderPtr(self, &file_token_reader);
   }
 
   // Return the data of the file.

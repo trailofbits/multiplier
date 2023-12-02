@@ -23,6 +23,7 @@ add_library("mx-python" STATIC
   "Entity.cpp"
   "Error.cpp"
   "Error.h"
+  "FileLocationCache.cpp"
   "Forward.h"  # Auto-generated.
   "Module.cpp"  # Auto-generated.
   "Types.cpp"  # Auto-generated.

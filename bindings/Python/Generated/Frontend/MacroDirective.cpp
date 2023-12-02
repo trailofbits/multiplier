@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/Frontend/MacroDirective.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,72 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::DefineMacroDirective::static_kind():
+      tp = &(gTypes[818]);
+      break;
+
+    case mx::PragmaMacroDirective::static_kind():
+      tp = &(gTypes[819]);
+      break;
+
+    case mx::UndefineMacroDirective::static_kind():
+      tp = &(gTypes[820]);
+      break;
+
+    case mx::OtherMacroDirective::static_kind():
+      tp = &(gTypes[821]);
+      break;
+
+    case mx::EndIfMacroDirective::static_kind():
+      tp = &(gTypes[823]);
+      break;
+
+    case mx::ElseMacroDirective::static_kind():
+      tp = &(gTypes[824]);
+      break;
+
+    case mx::ElseIfNotDefinedMacroDirective::static_kind():
+      tp = &(gTypes[825]);
+      break;
+
+    case mx::ElseIfDefinedMacroDirective::static_kind():
+      tp = &(gTypes[826]);
+      break;
+
+    case mx::ElseIfMacroDirective::static_kind():
+      tp = &(gTypes[827]);
+      break;
+
+    case mx::IfNotDefinedMacroDirective::static_kind():
+      tp = &(gTypes[828]);
+      break;
+
+    case mx::IfDefinedMacroDirective::static_kind():
+      tp = &(gTypes[829]);
+      break;
+
+    case mx::IfMacroDirective::static_kind():
+      tp = &(gTypes[830]);
+      break;
+
+    case mx::ImportMacroDirective::static_kind():
+      tp = &(gTypes[832]);
+      break;
+
+    case mx::IncludeMacrosMacroDirective::static_kind():
+      tp = &(gTypes[833]);
+      break;
+
+    case mx::IncludeNextMacroDirective::static_kind():
+      tp = &(gTypes[834]);
+      break;
+
+    case mx::IncludeMacroDirective::static_kind():
+      tp = &(gTypes[835]);
       break;
 
   }

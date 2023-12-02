@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/Frontend/ConditionalMacroDirective.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,40 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::EndIfMacroDirective::static_kind():
+      tp = &(gTypes[823]);
+      break;
+
+    case mx::ElseMacroDirective::static_kind():
+      tp = &(gTypes[824]);
+      break;
+
+    case mx::ElseIfNotDefinedMacroDirective::static_kind():
+      tp = &(gTypes[825]);
+      break;
+
+    case mx::ElseIfDefinedMacroDirective::static_kind():
+      tp = &(gTypes[826]);
+      break;
+
+    case mx::ElseIfMacroDirective::static_kind():
+      tp = &(gTypes[827]);
+      break;
+
+    case mx::IfNotDefinedMacroDirective::static_kind():
+      tp = &(gTypes[828]);
+      break;
+
+    case mx::IfDefinedMacroDirective::static_kind():
+      tp = &(gTypes[829]);
+      break;
+
+    case mx::IfMacroDirective::static_kind():
+      tp = &(gTypes[830]);
       break;
 
   }

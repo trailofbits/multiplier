@@ -10,7 +10,6 @@
 #include <memory>
 #include <string_view>
 #include <string>
-#include <vector>
 
 #include <gap/core/generator.hpp>
 
@@ -20,12 +19,14 @@ class File;
 class Fragment;
 class RegexQueryImpl;
 class RegexQueryMatch;
+class RegexQueryMatchImpl;
 
 // A regular expression.
 class RegexQuery final {
  private:
   friend class Index;
   friend class RegexQueryMatch;
+  friend class RegexQueryMatchImpl;
 
   std::shared_ptr<RegexQueryImpl> impl;
 

@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/AST/CastExpr.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,48 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::ImplicitCastExpr::static_kind():
+      tp = &(gTypes[575]);
+      break;
+
+    case mx::CXXDynamicCastExpr::static_kind():
+      tp = &(gTypes[578]);
+      break;
+
+    case mx::CXXConstCastExpr::static_kind():
+      tp = &(gTypes[579]);
+      break;
+
+    case mx::CXXAddrspaceCastExpr::static_kind():
+      tp = &(gTypes[580]);
+      break;
+
+    case mx::CXXStaticCastExpr::static_kind():
+      tp = &(gTypes[581]);
+      break;
+
+    case mx::CXXReinterpretCastExpr::static_kind():
+      tp = &(gTypes[582]);
+      break;
+
+    case mx::CXXFunctionalCastExpr::static_kind():
+      tp = &(gTypes[583]);
+      break;
+
+    case mx::CStyleCastExpr::static_kind():
+      tp = &(gTypes[584]);
+      break;
+
+    case mx::BuiltinBitCastExpr::static_kind():
+      tp = &(gTypes[585]);
+      break;
+
+    case mx::ObjCBridgedCastExpr::static_kind():
+      tp = &(gTypes[586]);
       break;
 
   }

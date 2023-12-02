@@ -24,7 +24,7 @@ class Index;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryImpl;
-class RegexQueryMatch;
+class RegexQueryMatchImpl;
 class InvalidEntityProvider;
 
 // The range of tokens that matches a regular expression.
@@ -33,35 +33,22 @@ class RegexQueryMatch : public TokenRange {
   friend class File;
   friend class Fragment;
   friend class RegexQuery;
+  friend class RegexQueryMatchImpl;
   friend class RegexQueryResultImpl;
-
-  // The actual range of matched data. This is possibly a sub-sequence of
-  // `this->TokenRange::data()`.
-  std::vector<std::string_view> matched_ranges;
-
-  // Fragment with the match.
-  std::shared_ptr<const FragmentImpl> frag;
-
-  // The regular expression used.
-  std::shared_ptr<RegexQueryImpl> query;
-
-  // Translate a data capture into a token range capture.
-  std::optional<TokenRange> TranslateCapture(std::string_view capture) const;
-
-  RegexQueryMatch(TokenRange range_, std::string_view data_range_,
-                  std::shared_ptr<const FragmentImpl> frag_,
-                  const RegexQuery &query_);
 
   RegexQueryMatch(void) = delete;
 
+  /* implicit */ RegexQueryMatch(
+      std::shared_ptr<const RegexQueryMatchImpl> match,
+      EntityOffset index_, EntityOffset num_tokens_);
+
  public:
-  ~RegexQueryMatch(void);
+
+  ~RegexQueryMatch(void) = default;
 
   // The actual range of matched data. This is possibly a sub-sequence of
   // `this->TokenRange::data()`.
-  inline std::string_view data(void) const noexcept {
-    return matched_ranges[0];
-  }
+  std::string_view data(void) const noexcept;
 
   // Return the index of a capture variable.
   std::optional<size_t> index_of_captured_variable(const std::string &var) const;
@@ -84,5 +71,7 @@ class RegexQueryMatch : public TokenRange {
   // Return the number of capture groups.
   size_t num_captures(void) const;
 };
+
+static_assert(sizeof(RegexQueryMatch) == sizeof(TokenRange));
 
 }  // namespace mx

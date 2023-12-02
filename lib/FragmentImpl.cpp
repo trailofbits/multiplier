@@ -50,21 +50,21 @@ RawEntityId FragmentImpl::FileContaingFirstToken(void) const {
 
 // Return a reader for the parsed tokens in the fragment. This doesn't
 // include all tokens, i.e. macro use tokens, comments, etc.
-TokenReader::Ptr FragmentImpl::ParsedTokenReader(
+TokenReaderPtr FragmentImpl::ParsedTokenReader(
     const FragmentImplPtr &self) const {
-  return TokenReader::Ptr(self, &parsed_token_reader);
+  return TokenReaderPtr(self, &parsed_token_reader);
 }
 
 // Return a reader for the macro tokens in the fragment.
-TokenReader::Ptr FragmentImpl::MacroTokenReader(
+TokenReaderPtr FragmentImpl::MacroTokenReader(
     const FragmentImplPtr &self) const {
-  return TokenReader::Ptr(self, &macro_token_reader);
+  return TokenReaderPtr(self, &macro_token_reader);
 }
 
 // Return a reader for the parsed tokens in the fragment. This doesn't
 // include all tokens, i.e. macro use tokens, comments, etc.
 TokenContextReader::Ptr
-FragmentImpl::TokenContextReader(const TokenReader::Ptr &ptr) const {
+FragmentImpl::TokenContextReader(const TokenReaderPtr &ptr) const {
   return TokenContextReader::Ptr(ptr, &token_context_reader);
 }
 

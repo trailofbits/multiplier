@@ -240,7 +240,7 @@ set_target_properties("mx-api"
     PUBLIC_HEADER
       "${api_headers}"
     VISIBILITY_INLINES_HIDDEN
-      YES
+      NO
     CXX_VISIBILITY_PRESET
       default
     POSITION_INDEPENDENT_CODE

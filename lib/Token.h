@@ -21,10 +21,11 @@ class FragmentImpl;
 class FileImpl;
 
 using TokenContextReaderPtr = std::shared_ptr<const TokenContextReader>;
+using TokenReaderPtr = std::shared_ptr<const TokenReader>;
 
 class TokenReader {
  public:
-  using Ptr = std::shared_ptr<const TokenReader>;
+  using Ptr = TokenReaderPtr;
 
   virtual ~TokenReader(void) noexcept;
 
@@ -81,6 +82,10 @@ class TokenReader {
   virtual const FileImpl *NthOwningFile(EntityOffset) const noexcept;
   virtual const TypeImpl *NthOwningType(EntityOffset) const noexcept;
 
+  // The contract of `Owning*` and `NthOwning*` is that if these methods return
+  // a raw pointer of the thing, then the shared pointer managing `this`
+  // (i.e. this `TokenReader` instance) can be aliased to the return value, and
+  // will match the lifetime of the returned pointer.
   virtual const FragmentImpl *OwningFragment(void) const noexcept;
   virtual const FileImpl *OwningFile(void) const noexcept;
   virtual const TypeImpl *OwningType(void) const noexcept;
@@ -126,7 +131,60 @@ class InvalidTokenReader final : public TokenReader {
 
   // Returns `true` if `this` is logically equivalent to `that`.
   bool Equals(const TokenReader *) const override;
+};
 
+// Used to proxy another token reader.
+class ProxyTokenReader : public TokenReader {
+ protected:
+  Ptr next;
+
+ public:
+  /* implicit */ inline ProxyTokenReader(Ptr next_)
+      : next(std::move(next_)) {}
+
+  virtual ~ProxyTokenReader(void) noexcept;
+
+  // Return the number of tokens accessible to this reader.
+  EntityOffset NumTokens(void) const override;
+
+  // Return the kind of the Nth token.
+  TokenKind NthTokenKind(EntityOffset) const override;
+
+  // Return the data of the Nth token.
+  std::string_view NthTokenData(EntityOffset) const override;
+
+  // Return the id of the token from which the Nth token is derived.
+  EntityId NthDerivedTokenId(EntityOffset) const override;
+
+  // Return the id of the parsed token which is derived from the Nth token.
+  EntityId NthParsedTokenId(EntityOffset) const override;
+
+  // Return the id of the macro containing the Nth token.
+  EntityId NthContainingMacroId(EntityOffset) const override;
+
+  // Return an entity id associated with the Nth token.
+  EntityId NthRelatedEntityId(EntityOffset) const override;
+
+  // Return the entity associated with the Nth token.
+  VariantEntity NthRelatedEntity(EntityOffset token_index) const override;
+
+  // Return the id of the Nth token.
+  EntityId NthTokenId(EntityOffset) const override;
+  EntityId NthFileTokenId(EntityOffset) const override;
+
+  // Returns `true` if `this` is logically equivalent to `that`.
+  bool Equals(const TokenReader *) const override;
+
+  const FragmentImpl *NthOwningFragment(EntityOffset) const noexcept override;
+  const FileImpl *NthOwningFile(EntityOffset) const noexcept override;
+  const TypeImpl *NthOwningType(EntityOffset) const noexcept override;
+
+  const FragmentImpl *OwningFragment(void) const noexcept override;
+  const FileImpl *OwningFile(void) const noexcept override;
+  const TypeImpl *OwningType(void) const noexcept override;
+
+  TokenContextReaderPtr TokenContextReaderFor(
+      const Ptr &self, EntityOffset offset, EntityId eid) const noexcept override;
 };
 
 // Used for custom token ranges.

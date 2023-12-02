@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/AST/ObjCContainerDecl.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,28 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::ObjCCategoryDecl::static_kind():
+      tp = &(gTypes[779]);
+      break;
+
+    case mx::ObjCProtocolDecl::static_kind():
+      tp = &(gTypes[780]);
+      break;
+
+    case mx::ObjCInterfaceDecl::static_kind():
+      tp = &(gTypes[781]);
+      break;
+
+    case mx::ObjCCategoryImplDecl::static_kind():
+      tp = &(gTypes[783]);
+      break;
+
+    case mx::ObjCImplementationDecl::static_kind():
+      tp = &(gTypes[784]);
       break;
 
   }

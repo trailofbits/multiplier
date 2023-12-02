@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/AST/CXXNamedCastExpr.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,28 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::CXXDynamicCastExpr::static_kind():
+      tp = &(gTypes[578]);
+      break;
+
+    case mx::CXXConstCastExpr::static_kind():
+      tp = &(gTypes[579]);
+      break;
+
+    case mx::CXXAddrspaceCastExpr::static_kind():
+      tp = &(gTypes[580]);
+      break;
+
+    case mx::CXXStaticCastExpr::static_kind():
+      tp = &(gTypes[581]);
+      break;
+
+    case mx::CXXReinterpretCastExpr::static_kind():
+      tp = &(gTypes[582]);
       break;
 
   }

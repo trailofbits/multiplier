@@ -45,7 +45,7 @@ set_target_properties("mx-analysis"
     PUBLIC_HEADER
       "${analysis_headers}"
     VISIBILITY_INLINES_HIDDEN
-      YES
+      NO
     CXX_VISIBILITY_PRESET
       default
     POSITION_INDEPENDENT_CODE

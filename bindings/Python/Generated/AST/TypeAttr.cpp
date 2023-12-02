@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/AST/TypeAttr.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,116 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::SPtrAttr::static_kind():
+      tp = &(gTypes[10]);
+      break;
+
+    case mx::Ptr64Attr::static_kind():
+      tp = &(gTypes[11]);
+      break;
+
+    case mx::Ptr32Attr::static_kind():
+      tp = &(gTypes[12]);
+      break;
+
+    case mx::OpenCLPrivateAddressSpaceAttr::static_kind():
+      tp = &(gTypes[13]);
+      break;
+
+    case mx::OpenCLLocalAddressSpaceAttr::static_kind():
+      tp = &(gTypes[14]);
+      break;
+
+    case mx::OpenCLGlobalHostAddressSpaceAttr::static_kind():
+      tp = &(gTypes[15]);
+      break;
+
+    case mx::OpenCLGlobalDeviceAddressSpaceAttr::static_kind():
+      tp = &(gTypes[16]);
+      break;
+
+    case mx::OpenCLGlobalAddressSpaceAttr::static_kind():
+      tp = &(gTypes[17]);
+      break;
+
+    case mx::OpenCLGenericAddressSpaceAttr::static_kind():
+      tp = &(gTypes[18]);
+      break;
+
+    case mx::OpenCLConstantAddressSpaceAttr::static_kind():
+      tp = &(gTypes[19]);
+      break;
+
+    case mx::ObjCKindOfAttr::static_kind():
+      tp = &(gTypes[20]);
+      break;
+
+    case mx::ObjCInertUnsafeUnretainedAttr::static_kind():
+      tp = &(gTypes[21]);
+      break;
+
+    case mx::ObjCGCAttr::static_kind():
+      tp = &(gTypes[22]);
+      break;
+
+    case mx::NoDerefAttr::static_kind():
+      tp = &(gTypes[23]);
+      break;
+
+    case mx::HLSLGroupSharedAddressSpaceAttr::static_kind():
+      tp = &(gTypes[24]);
+      break;
+
+    case mx::CmseNSCallAttr::static_kind():
+      tp = &(gTypes[25]);
+      break;
+
+    case mx::BTFTypeTagAttr::static_kind():
+      tp = &(gTypes[26]);
+      break;
+
+    case mx::ArmStreamingAttr::static_kind():
+      tp = &(gTypes[27]);
+      break;
+
+    case mx::ArmMveStrictPolymorphismAttr::static_kind():
+      tp = &(gTypes[28]);
+      break;
+
+    case mx::AnnotateTypeAttr::static_kind():
+      tp = &(gTypes[29]);
+      break;
+
+    case mx::AddressSpaceAttr::static_kind():
+      tp = &(gTypes[30]);
+      break;
+
+    case mx::WebAssemblyFuncrefAttr::static_kind():
+      tp = &(gTypes[31]);
+      break;
+
+    case mx::UPtrAttr::static_kind():
+      tp = &(gTypes[32]);
+      break;
+
+    case mx::TypeNullableResultAttr::static_kind():
+      tp = &(gTypes[33]);
+      break;
+
+    case mx::TypeNullableAttr::static_kind():
+      tp = &(gTypes[34]);
+      break;
+
+    case mx::TypeNullUnspecifiedAttr::static_kind():
+      tp = &(gTypes[35]);
+      break;
+
+    case mx::TypeNonNullAttr::static_kind():
+      tp = &(gTypes[36]);
       break;
 
   }

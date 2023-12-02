@@ -199,26 +199,28 @@ SharedPyObject *PythonBinding<std::string>::to_python(
 namespace {
 
 struct PermRef {
-  SharedPyObject * const object;
-
-  inline PermRef(SharedPyObject *object_)
-      : object(object_) {}
+  SharedPyObject *object{nullptr};
 
   inline ~PermRef(void) {
-    Py_DECREF(object);
+    // Py_XDECREF(object);  // NOTE(pag): Crashes.
+    object = nullptr;
+  }
+
+  inline operator bool(void) const noexcept {
+    return object;
   }
 };
 
-static std::optional<PermRef> gPurePath;
-static std::optional<PermRef> gPathLib;
+static PermRef gPurePath;
+static PermRef gPathLib;
 
 static void InitPurePath(void) {
   if (!gPathLib) {
-    gPathLib.emplace(PyImport_ImportModule("pathlib"));
+    gPathLib.object = PyImport_ImportModule("pathlib");
   }
 
   if (!gPurePath) {
-    gPurePath.emplace(PyObject_GetAttrString(gPathLib->object, "PurePath"));
+    gPurePath.object = PyObject_GetAttrString(gPathLib.object, "PurePath");
   }
 }
 
@@ -228,7 +230,7 @@ std::optional<std::filesystem::path>
 PythonBinding<std::filesystem::path>::from_python(
     BorrowedPyObject *obj) noexcept {
   InitPurePath();
-  if (PyObject_IsInstance(obj, gPurePath->object)) {
+  if (PyObject_IsInstance(obj, gPurePath.object)) {
     if (auto str_obj = PyObject_Str(obj)) {
       if (auto str = ::mx::from_python<std::string>(str_obj)) {
         Py_DECREF(str_obj);
@@ -248,7 +250,7 @@ PythonBinding<std::filesystem::path>::from_python(
 SharedPyObject *PythonBinding<std::filesystem::path>::to_python(
     std::filesystem::path val) noexcept {
   InitPurePath();
-  return PyObject_CallFunction(gPurePath->object, "s",
+  return PyObject_CallFunction(gPurePath.object, "s",
                                val.generic_string().c_str());
 }
 

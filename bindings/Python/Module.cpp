@@ -12,6 +12,9 @@
 #include "Forward.h"
 
 namespace mx {
+
+class FileLocationCache;
+
 namespace {
 
 using LoaderFunc = bool (BorrowedPyObject *);
@@ -41,6 +44,7 @@ static LoaderFunc * const gLoaders[] = {
   PythonBinding<mx::Fragment>::load,
   PythonBinding<mx::IndexStatus>::load,
   PythonBinding<mx::Index>::load,
+  PythonBinding<mx::RegexQuery>::load,
 };
 
 // multiplier.ir
@@ -2077,6 +2081,7 @@ PyMODINIT_FUNC PyInit_multiplier(void) {
     return nullptr;
   }
 
+  // Fake injected base class for `Decl`, `Stmt`, etc.
   if (!mx::PythonBinding<mx::VariantEntity>::load(m)) {
     Py_DECREF(m);
     return nullptr;
@@ -2315,6 +2320,13 @@ PyMODINIT_FUNC PyInit_multiplier(void) {
       Py_DECREF(m);
       return nullptr;
     }
+  }
+
+  // Doesn't have any methods, so no schema is made for it. We manually inject
+  // this so that we can handle `Token::location`.
+  if (!mx::PythonBinding<mx::FileLocationCache>::load(frontendm)) {
+    Py_DECREF(m);
+    return nullptr;
   }
 
   return m;

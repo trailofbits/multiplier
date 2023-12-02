@@ -1424,6 +1424,7 @@ class IncludeMacroDirective;
 class Fragment;
 enum class IndexStatus : uint32_t;
 class Index;
+class RegexQuery;
 namespace ir {
 enum class AttributeKind : uint32_t;
 class Attribute;

@@ -74,6 +74,9 @@ MODULE_CPP_PREFIX = """// Copyright (c) 2023-present, Trail of Bits, Inc.
 #include "Forward.h"
 
 namespace mx {
+
+class FileLocationCache;
+
 namespace {
 
 using LoaderFunc = bool (BorrowedPyObject *);
@@ -147,6 +150,7 @@ MODULE_CPP_LOADER_LOOP = """
 
 
 MODULE_CPP_LOAD_VARIANT_ENTITY = """
+  // Fake injected base class for `Decl`, `Stmt`, etc.
   if (!mx::PythonBinding<mx::VariantEntity>::load(m)) {
     Py_DECREF(m);
     return nullptr;
@@ -155,6 +159,13 @@ MODULE_CPP_LOAD_VARIANT_ENTITY = """
 
 
 MODULE_CPP_SUFFIX = """
+  // Doesn't have any methods, so no schema is made for it. We manually inject
+  // this so that we can handle `Token::location`.
+  if (!mx::PythonBinding<mx::FileLocationCache>::load(frontendm)) {
+    Py_DECREF(m);
+    return nullptr;
+  }
+
   return m;
 }
 """
@@ -168,12 +179,16 @@ CLASS_HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
 
 // Auto-generated file; do not modify!
 
+#include <{}>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -457,9 +472,17 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
       break;
 """
+
+PYTHON_BINDING_TO_PYTHON_DYNAMIC_CASE = """
+    case {cxx_namespace}{cxx_class_name}::static_kind():
+      tp = &(gTypes[{type_offset}]);
+      break;
+"""
+
 
 PYTHON_BINDING_TO_PYTHON_DYNAMIC_END = """
   }
@@ -541,6 +564,7 @@ PyTypeObject *InitType(void) noexcept {{
 """
 
 
+# From: https://stackoverflow.com/questions/68131786/how-to-create-an-enum-object-in-python-c-api
 ENUM_DEF = """
 namespace {
 static PyTypeObject *gType = nullptr;
@@ -676,6 +700,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
   return true;
 }
 """
+
+
+class FileLocationCacheSchema(Schema):
+  def __init__(self, *args):
+    super().__init__()
+
+  @property
+  def cxx_value_name(self):
+    return "FileLocationCache"
+
 
 class EntityIdSchema(Schema):
   def __init__(self, *args):
@@ -843,12 +877,34 @@ def _has_id_method(schema: ClassSchema) -> bool:
   return _is_id_method(_get_method(schema, "id"))
 
 
-def wrap_class(schema: ClassSchema, type_offsets: Tuple[int, int],
+def _dynamic_case(schema: ClassSchema,
+                  offsets: Dict[ClassSchema, Tuple[int, int]],
+                  children: Dict[ClassSchema, List[ClassSchema]],
+                  out: List[str]):
+
+  if "static_kind" in schema.static_methods:
+    type_offsets = offsets[schema]
+    rel_ns = _relative_namespace(schema)
+    cxx_namespace = rel_ns and f"mx::{rel_ns}::" or "mx::"
+    cxx_class_name = schema.name
+    out.append(PYTHON_BINDING_TO_PYTHON_DYNAMIC_CASE.format(
+        cxx_namespace=cxx_namespace,
+        cxx_class_name=cxx_class_name,
+        type_offset=type_offsets[0]))
+
+  for child_schema in children[schema]:
+    _dynamic_case(child_schema, offsets, children, out)
+
+
+def wrap_class(schema: ClassSchema,
+               offsets: Dict[ClassSchema, Tuple[int, int]],
+               children: Dict[ClassSchema, List[ClassSchema]],
                renamer: Renamer):
   """Create Python bindings for a class schema."""
+  type_offsets = offsets[schema]
 
   out: List[str] = []
-  out.append(CLASS_HEADER)
+  out.append(CLASS_HEADER.format(schema.location))
 
   rel_ns = _relative_namespace(schema)
   rel_dir = _relative_dir(schema)
@@ -896,6 +952,7 @@ def wrap_class(schema: ClassSchema, type_offsets: Tuple[int, int],
   if isinstance(kind_method, MethodSchema) and \
      isinstance(kind_method.return_type, EnumSchema):
     out.append(PYTHON_BINDING_TO_PYTHON_DYNAMIC_BEGIN)
+    _dynamic_case(schema, offsets, children, out)
     out.append(PYTHON_BINDING_TO_PYTHON_DYNAMIC_END)
   else:
     out.append(PYTHON_BINDING_TO_PYTHON_STATIC)
@@ -1128,7 +1185,7 @@ def wrap(schemas: Iterable[Schema], renamer: Renamer):
     f.write(MODULE_CPP_SUFFIX)
 
   for schema in classes:
-    wrap_class(schema, offsets[schema], renamer)
+    wrap_class(schema, offsets, children, renamer)
 
   for schema in enums:
     wrap_enum(schema, renamer)
@@ -1152,6 +1209,7 @@ ENTITY_KINDS: Tuple[str] = (
 def run_on_ast(ast: AST, ns_name: str):
   schemas: List[Schema] = []
   lifter: SchemaLifter = SchemaLifter()
+  lifter.add_lifter("mx::FileLocationCache", FileLocationCacheSchema)
   lifter.add_lifter(*make_entity_id_schema("mx::EntityId"))
   lifter.add_lifter(*make_entity_id_schema("mx::RawEntityId"))
   lifter.add_lifter(*make_entity_id_schema("mx::FileTokenId"))

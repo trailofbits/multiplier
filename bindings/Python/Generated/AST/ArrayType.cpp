@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/AST/ArrayType.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,24 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::VariableArrayType::static_kind():
+      tp = &(gTypes[430]);
+      break;
+
+    case mx::IncompleteArrayType::static_kind():
+      tp = &(gTypes[431]);
+      break;
+
+    case mx::DependentSizedArrayType::static_kind():
+      tp = &(gTypes[432]);
+      break;
+
+    case mx::ConstantArrayType::static_kind():
+      tp = &(gTypes[433]);
       break;
 
   }

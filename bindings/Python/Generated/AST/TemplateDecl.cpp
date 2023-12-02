@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/AST/TemplateDecl.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,36 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::FunctionTemplateDecl::static_kind():
+      tp = &(gTypes[769]);
+      break;
+
+    case mx::ClassTemplateDecl::static_kind():
+      tp = &(gTypes[770]);
+      break;
+
+    case mx::VarTemplateDecl::static_kind():
+      tp = &(gTypes[771]);
+      break;
+
+    case mx::TypeAliasTemplateDecl::static_kind():
+      tp = &(gTypes[772]);
+      break;
+
+    case mx::ConceptDecl::static_kind():
+      tp = &(gTypes[773]);
+      break;
+
+    case mx::BuiltinTemplateDecl::static_kind():
+      tp = &(gTypes[774]);
+      break;
+
+    case mx::TemplateTemplateParmDecl::static_kind():
+      tp = &(gTypes[775]);
       break;
 
   }

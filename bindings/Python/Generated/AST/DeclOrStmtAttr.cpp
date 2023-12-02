@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/AST/DeclOrStmtAttr.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,20 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::AlwaysInlineAttr::static_kind():
+      tp = &(gTypes[106]);
+      break;
+
+    case mx::NoMergeAttr::static_kind():
+      tp = &(gTypes[107]);
+      break;
+
+    case mx::NoInlineAttr::static_kind():
+      tp = &(gTypes[108]);
       break;
 
   }

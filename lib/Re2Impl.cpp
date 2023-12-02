@@ -107,19 +107,24 @@ RegexQueryResultImpl::GetNextMatchInFragment(void) {
 
   assert(begin_token_index_it->second <= end_token_index_it->second);
 
+  // Slice the tokens; then we'll get the proper indices.
+  auto toks = frag_file_tokens.slice(begin_token_index_it->second,
+                                     end_token_index_it->second + 1u);
+
   return RegexQueryMatch(
-      frag_file_tokens.slice(begin_token_index_it->second,
-                             end_token_index_it->second + 1u),
-      match, frag, query);
+      std::make_shared<const RegexQueryMatchImpl>(
+          frag_file_tokens, match, frag, query),
+      toks.index, toks.num_tokens);
 }
 
-RegexQueryMatch::~RegexQueryMatch(void) {}
+RegexQueryMatchImpl::~RegexQueryMatchImpl(void) {}
 
-RegexQueryMatch::RegexQueryMatch(TokenRange range_ /* file token range */,
-                                 std::string_view data_range /* file data */,
-                                 std::shared_ptr<const FragmentImpl> frag_,
-                                 const RegexQuery &query_)
-    : TokenRange(std::move(range_)),
+RegexQueryMatchImpl::RegexQueryMatchImpl(
+    const TokenRange &range_ /* file token range */,
+    std::string_view data_range /* file data */,
+    std::shared_ptr<const FragmentImpl> frag_,
+    const RegexQuery &query_)
+    : ProxyTokenReader(range_.impl),
       frag(std::move(frag_)),
       query(query_.impl) {
 
@@ -149,9 +154,9 @@ RegexQueryMatch::RegexQueryMatch(TokenRange range_ /* file token range */,
 }
 
 // Translate a data capture into a token range capture.
-std::optional<TokenRange> RegexQueryMatch::TranslateCapture(
-    std::string_view capture) const {
-
+std::optional<std::pair<unsigned, unsigned>>
+RegexQueryMatchImpl::TranslateCapture(const TokenRange &self,
+                                      std::string_view capture) const {
   auto begin_ptr = capture.data();
   auto end_ptr = &(begin_ptr[capture.size()]);
 
@@ -168,8 +173,8 @@ std::optional<TokenRange> RegexQueryMatch::TranslateCapture(
   std::optional<unsigned> begin_index;
   std::optional<unsigned> end_index;
 
-  for (size_t i = 0u, max_i = size(); i < max_i; ++i) {
-    Token tok = (*this)[i];
+  for (size_t i = 0u, max_i = self.size(); i < max_i; ++i) {
+    Token tok = self[i];
     std::string_view tok_data = tok.data();
     auto tok_begin = tok_data.data();
     auto tok_end = &(tok_begin[tok_data.size()]);
@@ -184,17 +189,27 @@ std::optional<TokenRange> RegexQueryMatch::TranslateCapture(
   }
 
   if (begin_index && end_index) {
-    return slice(*begin_index, *end_index + 1u);
+    return std::pair<unsigned, unsigned>(*begin_index, *end_index + 1u);
   }
 
   return std::nullopt;
 }
 
+RegexQueryMatch::RegexQueryMatch(
+    std::shared_ptr<const RegexQueryMatchImpl> match,
+    EntityOffset index_, EntityOffset num_tokens_)
+    : TokenRange(std::move(match), index_, num_tokens_) {}
+
 // Return the index of a capture variable.
 std::optional<size_t> RegexQueryMatch::index_of_captured_variable(
     const std::string &var) const {
+  auto real_impl = dynamic_cast<const RegexQueryMatchImpl *>(impl.get());
+  if (!real_impl) {
+    assert(false);
+    return std::nullopt;
+  }
 
-  const auto &named_captures = query->re.NamedCapturingGroups();
+  const auto &named_captures = real_impl->query->re.NamedCapturingGroups();
   auto index_it = named_captures.find(var);
   if (index_it == named_captures.end()) {
     return std::nullopt;
@@ -206,23 +221,42 @@ std::optional<size_t> RegexQueryMatch::index_of_captured_variable(
 // Return the captured tokens for a given named capture group.
 std::optional<TokenRange> RegexQueryMatch::captured_tokens(
     const std::string &var) const {
+  auto real_impl = dynamic_cast<const RegexQueryMatchImpl *>(impl.get());
+  if (!real_impl) {
+    assert(false);
+    return std::nullopt;
+  }
+
   std::optional<std::string_view> maybe_data = captured_data(var);
   if (!maybe_data) {
     return std::nullopt;
-  } else {
-    if (index_of_captured_variable(var).value()) {
-      return TranslateCapture(*maybe_data);
-    } else {
-      return *this;
+  }
+
+  if (index_of_captured_variable(var).value()) {
+    auto captured_tokens_indices = real_impl->TranslateCapture(
+        *this, *maybe_data);
+    if (captured_tokens_indices) {
+      return slice(captured_tokens_indices->first,
+                   captured_tokens_indices->second);
     }
+    return std::nullopt;
+
+  // Index zero is the whole capture.
+  } else {
+    return *this;
   }
 }
 
 // Return the captured data for a given named capture group.
 std::optional<std::string_view> RegexQueryMatch::captured_data(
     const std::string &var) const {
+  auto real_impl = dynamic_cast<const RegexQueryMatchImpl *>(impl.get());
+  if (!real_impl) {
+    assert(false);
+    return std::nullopt;
+  }
 
-  const auto &named_captures = query->re.NamedCapturingGroups();
+  const auto &named_captures = real_impl->query->re.NamedCapturingGroups();
   auto index_it = named_captures.find(var);
   if (index_it == named_captures.end()) {
     return std::nullopt;
@@ -233,11 +267,27 @@ std::optional<std::string_view> RegexQueryMatch::captured_data(
 
 // Return the captured tokens for a given indexed capture group.
 std::optional<TokenRange> RegexQueryMatch::captured_tokens(size_t ti) const {
+  auto real_impl = dynamic_cast<const RegexQueryMatchImpl *>(impl.get());
+  if (!real_impl) {
+    assert(false);
+    return std::nullopt;
+  }
+
   std::optional<std::string_view> maybe_data = captured_data(ti);
   if (!maybe_data) {
     return std::nullopt;
+  
+  // Sub-capture.
   } else if (ti) {
-    return TranslateCapture(*maybe_data);
+    auto captured_tokens_indices = real_impl->TranslateCapture(
+        *this, *maybe_data);
+    if (captured_tokens_indices) {
+      return slice(captured_tokens_indices->first,
+                   captured_tokens_indices->second);
+    }
+    return std::nullopt;
+  
+  // Index zero is the entire capture.
   } else {
     return *this;
   }
@@ -246,8 +296,14 @@ std::optional<TokenRange> RegexQueryMatch::captured_tokens(size_t ti) const {
 // Return the captured data for a given indexed capture group.
 std::optional<std::string_view> RegexQueryMatch::captured_data(
     size_t capture_index) const {
-  if (capture_index < matched_ranges.size()) {
-    if (auto ret = matched_ranges[capture_index]; ret.data()) {
+  auto real_impl = dynamic_cast<const RegexQueryMatchImpl *>(impl.get());
+  if (!real_impl) {
+    assert(false);
+    return std::nullopt;
+  }
+
+  if (capture_index < real_impl->matched_ranges.size()) {
+    if (auto ret = real_impl->matched_ranges[capture_index]; ret.data()) {
       return ret;
     }
   }
@@ -256,16 +312,41 @@ std::optional<std::string_view> RegexQueryMatch::captured_data(
 
 // Return the number of capture groups.
 size_t RegexQueryMatch::num_captures(void) const {
-  return matched_ranges.size();
+  auto real_impl = dynamic_cast<const RegexQueryMatchImpl *>(impl.get());
+  if (!real_impl) {
+    assert(false);
+    return 0u;
+  }
+
+  return real_impl->matched_ranges.size();
 }
 
 // Return a list of matched variables.
 std::vector<std::string> RegexQueryMatch::captured_variables(void) const {
   std::vector<std::string> ret;
-  for (const auto &[name, capture_index] : query->re.NamedCapturingGroups()) {
+  auto real_impl = dynamic_cast<const RegexQueryMatchImpl *>(impl.get());
+  if (!real_impl) {
+    assert(false);
+    return ret;
+  }
+
+  for (const auto &[name, capture_index] :
+           real_impl->query->re.NamedCapturingGroups()) {
     ret.emplace_back(name);
   }
   return ret;
+}
+
+// The actual range of matched data. This is possibly a sub-sequence of
+// `this->TokenRange::data()`.
+std::string_view RegexQueryMatch::data(void) const noexcept {
+  auto real_impl = dynamic_cast<const RegexQueryMatchImpl *>(impl.get());
+  if (!real_impl) {
+    assert(false);
+    return {};
+  }
+
+  return real_impl->matched_ranges[0];
 }
 
 gap::generator<RegexQueryMatch> RegexQueryResultImpl::Enumerate(void) & {
@@ -290,7 +371,13 @@ gap::generator<RegexQueryMatch> RegexQueryResultImpl::Enumerate(void) & {
 }
 
 RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
-  return RegexQuery(match.query);
+  auto real_impl = dynamic_cast<const RegexQueryMatchImpl *>(match.impl.get());
+  if (!real_impl) {
+    assert(false);
+    return RegexQuery();
+  }
+
+  return RegexQuery(real_impl->query);
 }
 
 // Match this regular expression against a file.
@@ -349,6 +436,7 @@ gap::generator<RegexQueryMatch> RegexQuery::match_fragments(
   RegexQueryResultImpl result_impl(
       *this, ep,
       ep->FragmentsCoveringTokens(ep, file.id(), std::move(matched_offsets)));
+
   for (auto match : result_impl.Enumerate()) {
     co_yield match;
   }
@@ -390,7 +478,7 @@ bool RegexQueryResultImpl::InitForFragment(PackedFragmentId) {
 
 std::optional<RegexQueryMatch>
 RegexQueryResultImpl::GetNextMatchInFragment(void) {
-    return std::nullopt;
+  return std::nullopt;
 }
 
 gap::generator<RegexQueryMatch> RegexQueryResultImpl::Enumerate(void) & {
@@ -399,16 +487,13 @@ gap::generator<RegexQueryMatch> RegexQueryResultImpl::Enumerate(void) & {
 
 RegexQueryMatch::~RegexQueryMatch(void) {}
 
-RegexQueryMatch::RegexQueryMatch(TokenRange range_ /* file token range */,
-                                 std::string_view /* file data */,
-                                 std::shared_ptr<const FragmentImpl> frag_,
-                                 const RegexQuery &query_)
-    : TokenRange(std::move(range_)),
-      frag(std::move(frag_)),
-      query(query_.impl) {}
+RegexQueryMatch::RegexQueryMatch(
+    std::shared_ptr<const RegexQueryMatchImpl> match,
+    EntityOffset index_, EntityOffset num_tokens_)
+    : TokenRange(std::move(match), index_, num_tokens_) {}
 
 // Translate a data capture into a token range capture.
-std::optional<TokenRange> RegexQueryMatch::TranslateCapture(
+std::optional<std::pair<unsigned, unsigned>> RegexQueryMatch::TranslateCapture(
     std::string_view) const {
   return std::nullopt;
 }
@@ -452,7 +537,13 @@ std::vector<std::string> RegexQueryMatch::captured_variables(void) const {
 }
 
 RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
-  return RegexQuery(match.query);
+  auto real_impl = dynamic_cast<const RegexQueryMatchImpl *>(match.impl.get());
+  if (!real_impl) {
+    assert(false);
+    return RegexQuery();
+  }
+
+  return RegexQuery(real_impl->query);
 }
 
 // Match this regular expression against a file.

@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/Fragment.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -243,6 +247,28 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::Fragment::entity_category"),
+  },
+  {
+    "query",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::RegexQuery>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->query(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'query'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::Fragment::query"),
   },
   {}  // Sentinel.
 };

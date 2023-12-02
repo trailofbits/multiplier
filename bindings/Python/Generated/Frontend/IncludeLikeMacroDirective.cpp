@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/Frontend/IncludeLikeMacroDirective.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,24 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::ImportMacroDirective::static_kind():
+      tp = &(gTypes[832]);
+      break;
+
+    case mx::IncludeMacrosMacroDirective::static_kind():
+      tp = &(gTypes[833]);
+      break;
+
+    case mx::IncludeNextMacroDirective::static_kind():
+      tp = &(gTypes[834]);
+      break;
+
+    case mx::IncludeMacroDirective::static_kind():
+      tp = &(gTypes[835]);
       break;
 
   }

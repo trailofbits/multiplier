@@ -62,7 +62,8 @@ std::optional<PackedFragmentId> Fragment::parent_id(void) const noexcept {
 
 // Return the fragment containing a query match.
 Fragment Fragment::containing(const RegexQueryMatch &match) {
-  return Fragment(match.frag);
+  return Fragment(
+      dynamic_cast<const RegexQueryMatchImpl *>(match.impl.get())->frag);
 }
 
 Fragment Fragment::containing(const Decl &entity) {

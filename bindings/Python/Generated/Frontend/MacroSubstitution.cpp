@@ -6,12 +6,16 @@
 
 // Auto-generated file; do not modify!
 
+#include <multiplier/Frontend/MacroSubstitution.h>
+
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR.h>
+#include <multiplier/Re2.h>
 
+#include <cassert>
 #include <new>
 
 #include "Binding.h"
@@ -81,7 +85,28 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
   PyTypeObject *tp = nullptr;
   switch (val.kind()) {
     default:
+      assert(false);
       tp = gType;
+      break;
+
+    case mx::MacroSubstitution::static_kind():
+      tp = &(gTypes[810]);
+      break;
+
+    case mx::MacroConcatenate::static_kind():
+      tp = &(gTypes[811]);
+      break;
+
+    case mx::MacroStringify::static_kind():
+      tp = &(gTypes[812]);
+      break;
+
+    case mx::MacroExpansion::static_kind():
+      tp = &(gTypes[813]);
+      break;
+
+    case mx::MacroParameterSubstitution::static_kind():
+      tp = &(gTypes[814]);
       break;
 
   }
