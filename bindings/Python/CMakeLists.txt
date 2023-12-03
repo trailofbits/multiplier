@@ -6,9 +6,6 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-set(MX_PY_VERSION 3.11)
-find_package(Python3 REQUIRED COMPONENTS Development.SABIModule)
-
 string(TOLOWER "${PROJECT_NAME}" lower_project_name)
 
 file(GLOB_RECURSE generated_sources CONFIGURE_DEPENDS RELATIVE_PATH "${CMAKE_CURRENT_LIST_DIR}/Generated" "*.cpp")
@@ -58,6 +55,7 @@ target_include_directories("mx-python"
 
 target_link_libraries("mx-python"
   PUBLIC
+    Python3::Python
     Python3::SABIModule
   PRIVATE
     "mx-api"

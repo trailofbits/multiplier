@@ -92,6 +92,14 @@ if(MX_ENABLE_VAST)
   include("cmake/vast.cmake")
 endif()
 
+if(MX_ENABLE_PYTHON_BINDINGS)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed Development.SABIModule)
+
+  if(NOT TARGET Python3::SABIModule)
+    message(FATAL_ERROR "Unable to find Python3 Stable API module")
+  endif()
+endif()
+
 if(MX_ENABLE_INSTALL)
   export(PACKAGE "${PROJECT_NAME}")
   
@@ -158,8 +166,9 @@ else()
       "gap::gap-core"
       "gap::gap-settings"
       "std::coroutines"
+      $<$<BOOL:${MX_ENABLE_PYTHON_BINDINGS}>:Python3::SABIModule>
     PRIVATE
-      $<LINK_LIBRARY:WHOLE_ARCHIVE,$<$<BOOL:${MX_ENABLE_PYTHON_BINDINGS}>:mx-python>>
+      $<LINK_LIBRARY:WHOLE_ARCHIVE,$<IF:$<BOOL:${MX_ENABLE_PYTHON_BINDINGS}>,mx-python,mx-analysis>>
   )
 
   set_target_properties("multiplier"

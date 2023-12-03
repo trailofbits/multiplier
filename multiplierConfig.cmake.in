@@ -8,44 +8,28 @@
 
 @PACKAGE_INIT@
 
-set(MX_ENABLE_WEGGLI @MX_ENABLE_WEGGLI@)
 set(MX_ENABLE_RE2 @MX_ENABLE_RE2@)
 set(MX_ENABLE_VAST @MX_ENABLE_VAST@)
+set(MX_ENABLE_PYTHON_BINDINGS @MX_ENABLE_PYTHON_BINDINGS@)
 
 if(NOT TARGET @PROJECT_NAME@::mx-api)
   if(NOT TARGET Threads::Threads)
-    find_package(Threads REQUIRED)
-  endif()
-
-  if(NOT TARGET CapnProto::cpnp-rpc)
-    find_package(CapnProto CONFIG REQUIRED)
-  endif()
-
-  if(NOT TARGET zstd::libzstd_shared AND NOT TARGET zstd::libzstd_static)
-    find_package(zstd CONFIG REQUIRED)
-  endif()
-
-  if(MX_ENABLE_RE2 AND NOT TARGET re2::re2)
-    find_package(re2 CONFIG REQUIRED)
-  endif()
-
-  if(NOT TARGET glog::glog)
-    find_package(glog REQUIRED)
+    find_dependency(Threads REQUIRED)
   endif()
 
   if(NOT TARGET gap::gap)
-    find_package(gap CONFIG REQUIRED)
+    find_dependency(gap CONFIG REQUIRED)
+  endif()
+
+  if(NOT TARGET Python3::SABIModule)
+    find_dependency(Python3 REQUIRED COMPONENTS Interpreter Development.Embed Development.SABIModule)
   endif()
   
   if (MX_ENABLE_VAST AND NOT TARGET vast::vast)
-    find_package(LLVM CONFIG REQUIRED)
-    find_package(MLIR CONFIG REQUIRED)
-    find_package(Clang CONFIG REQUIRED)
-    find_package(VAST CONFIG REQUIRED)
-  endif()
-
-  if(MX_ENABLE_WEGGLI AND NOT TARGET weggli_native::static)
-    find_package(weggli_native CONFIG REQUIRED)
+    find_dependency(LLVM CONFIG REQUIRED)
+    find_dependency(MLIR CONFIG REQUIRED)
+    find_dependency(Clang CONFIG REQUIRED)
+    find_dependency(VAST CONFIG REQUIRED)
   endif()
 
   include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
