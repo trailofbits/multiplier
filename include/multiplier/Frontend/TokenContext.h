@@ -37,7 +37,7 @@ class TokenContext {
   std::shared_ptr<const TokenContextReader> reader;
 
   // Offset of this token context inside of the fragment.
-  unsigned offset{0};
+  unsigned offset;
 
   // Offset of this token context's parent within the fragment.
   std::optional<unsigned> parent_offset;
@@ -47,12 +47,23 @@ class TokenContext {
 
   // Entity to which this token context refers. In general, this belongs to
   // the current fragment, but in rare instances it may not.
-  RawEntityId entity_id{kInvalidEntityId};
+  RawEntityId entity_id;
+
+  TokenContext(void) = delete;
 
   inline TokenContext(std::shared_ptr<const TokenContextReader> reader_)
-      : reader(std::move(reader_)) {}
+      : reader(std::move(reader_)),
+        offset(0u),
+        entity_id(kInvalidEntityId) {}
 
  public:
+
+  TokenContext(TokenContext &&) noexcept = default;
+  TokenContext(const TokenContext &) noexcept = default;
+
+  TokenContext &operator=(TokenContext &&) noexcept = default;
+  TokenContext &operator=(const TokenContext &) noexcept = default;
+
   inline bool has_parent(void) const noexcept {
     return parent_offset.has_value();
   }
