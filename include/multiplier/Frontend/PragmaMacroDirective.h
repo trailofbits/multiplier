@@ -23,7 +23,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class PragmaMacroDirective : public MacroDirective {
+class MX_EXPORT PragmaMacroDirective : public MacroDirective {
  private:
   friend class FragmentImpl;
   friend class MacroDirective;

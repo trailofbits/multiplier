@@ -35,7 +35,7 @@ set_target_properties("mx-frontend"
     VISIBILITY_INLINES_HIDDEN
       YES
     CXX_VISIBILITY_PRESET
-      default
+      hidden
     POSITION_INDEPENDENT_CODE
       YES
 )
@@ -50,7 +50,7 @@ set_target_properties("mx-ast"
     VISIBILITY_INLINES_HIDDEN
       YES
     CXX_VISIBILITY_PRESET
-      default
+      hidden
     POSITION_INDEPENDENT_CODE
       YES
 )
@@ -96,10 +96,13 @@ add_custom_target("copy_headers"
 )
 
 set(api_headers
-  "${source_include_dir}/AST.h"
+  "${source_include_dir}/AST.h"  # Auto-generated.
+  "${source_include_dir}/Frontend.h"  # Auto-generated.
+  "${source_include_dir}/Compiler.h"
   "${source_include_dir}/Entity.h"
   "${source_include_dir}/Fragment.h"
   "${source_include_dir}/Index.h"
+  "${source_include_dir}/IR.h"  # Auto-generated.
   "${source_include_dir}/Iterator.h"
   "${source_include_dir}/Re2.h"
   "${source_include_dir}/Reference.h"
@@ -197,6 +200,11 @@ target_link_libraries("mx-api"
     $<BUILD_INTERFACE:concurrentqueue>
 )
 
+target_compile_definitions("mx-api"
+  PUBLIC
+    $<BUILD_INTERFACE:MX_BUILD>
+)
+
 if(MX_ENABLE_VAST)
   target_link_libraries("mx-api"
     PUBLIC
@@ -240,9 +248,9 @@ set_target_properties("mx-api"
     PUBLIC_HEADER
       "${api_headers}"
     VISIBILITY_INLINES_HIDDEN
-      NO
+      YES
     CXX_VISIBILITY_PRESET
-      default
+      hidden
     POSITION_INDEPENDENT_CODE
       YES
     COMPILE_FEATURES

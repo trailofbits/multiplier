@@ -27,7 +27,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ConstructorUsingShadowDecl : public UsingShadowDecl {
+class MX_EXPORT ConstructorUsingShadowDecl : public UsingShadowDecl {
  private:
   friend class FragmentImpl;
   friend class UsingShadowDecl;

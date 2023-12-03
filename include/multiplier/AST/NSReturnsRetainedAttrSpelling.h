@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -26,6 +28,6 @@ inline static constexpr unsigned NumEnumerators(NSReturnsRetainedAttrSpelling) {
   return 4;
 }
 
-const char *EnumeratorName(NSReturnsRetainedAttrSpelling);
+MX_EXPORT const char *EnumeratorName(NSReturnsRetainedAttrSpelling);
 
 } // namespace mx

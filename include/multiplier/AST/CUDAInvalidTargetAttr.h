@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class CUDAInvalidTargetAttr : public InheritableAttr {
+class MX_EXPORT CUDAInvalidTargetAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;

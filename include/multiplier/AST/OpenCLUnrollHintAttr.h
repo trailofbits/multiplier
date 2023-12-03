@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class OpenCLUnrollHintAttr : public StmtAttr {
+class MX_EXPORT OpenCLUnrollHintAttr : public StmtAttr {
  private:
   friend class FragmentImpl;
   friend class StmtAttr;

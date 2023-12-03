@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class OpenCLAccessAttr : public Attr {
+class MX_EXPORT OpenCLAccessAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;

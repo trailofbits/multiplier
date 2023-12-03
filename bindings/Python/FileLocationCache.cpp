@@ -28,9 +28,10 @@ struct O final : public ::PyObject {
 
 static PyTypeObject gTypeDef = {
   .tp_name = "multiplier.frontend.FileLocationCache",
-  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_IMMUTABLETYPE,
   .tp_hash = PyObject_HashNotImplemented,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_IMMUTABLETYPE,
   .tp_doc = PyDoc_STR("Cache of files to pre-computed line/column number locations."),
+  .tp_base = &PyBaseObject_Type,
   .tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args,
                  BorrowedPyObject *kwargs) -> int {
     if (args) {
@@ -106,7 +107,6 @@ static PyTypeObject gTypeDef = {
 
     return 0;
   },
-  .tp_base = &PyBaseObject_Type,
   .tp_alloc = PyType_GenericAlloc,
   .tp_new = PyType_GenericNew,
 };

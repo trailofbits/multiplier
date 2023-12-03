@@ -14,7 +14,6 @@
 
 #include <re2/re2.h>
 
-#pragma GCC visibility push(hidden)
 namespace mx {
 
 class RegexQueryImpl {
@@ -39,7 +38,6 @@ class RegexQueryImpl {
 };
 
 }  // namespace mx
-
 #else
 
 namespace mx {
@@ -65,6 +63,5 @@ class RegexQueryImpl {
 };
 
 }  // namespace mx
-#pragma GCC visibility pop
-
 #endif   // MX_DISABLE_RE2
+

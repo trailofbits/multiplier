@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class OMPArraySectionExpr : public Expr {
+class MX_EXPORT OMPArraySectionExpr : public Expr {
  private:
   friend class FragmentImpl;
   friend class Expr;

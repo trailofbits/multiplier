@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class DefaultStmt : public SwitchCase {
+class MX_EXPORT DefaultStmt : public SwitchCase {
  private:
   friend class FragmentImpl;
   friend class SwitchCase;

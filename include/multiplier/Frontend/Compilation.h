@@ -20,7 +20,7 @@ namespace ir {
 class SourceIRImpl;
 namespace builtin {
 #ifdef MX_DISABLE_VAST
-class ModuleOp {};
+class MX_EXPORT ModuleOp {};
 #else
 class ModuleOp;
 #endif  // MX_DISABLE_VAST
@@ -50,7 +50,7 @@ using CompilationImplPtr = std::shared_ptr<const CompilationImpl>;
 enum class IncludePathLocation : unsigned char;
 
 // Represents a single compile command.
-class Compilation {
+class MX_EXPORT Compilation {
  private:
   friend class CompilationImpl;
   friend class EntityProvider;

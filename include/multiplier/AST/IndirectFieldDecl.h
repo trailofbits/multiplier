@@ -28,7 +28,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class IndirectFieldDecl : public ValueDecl {
+class MX_EXPORT IndirectFieldDecl : public ValueDecl {
  private:
   friend class FragmentImpl;
   friend class ValueDecl;

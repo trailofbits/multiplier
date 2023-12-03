@@ -824,6 +824,7 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
+      << "#include \"../Compiler.h\"\n\n"
       << "#include <cstdint>\n\n"
       << "namespace mx {\n";
 
@@ -1015,7 +1016,7 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << ") {\n"
       << "  return " << i << ";\n"
       << "}\n\n"
-      << "const char *EnumeratorName(" << enum_name << ");\n\n"
+      << "MX_EXPORT const char *EnumeratorName(" << enum_name << ");\n\n"
       << "} // namespace mx\n";
 
   serialize_inc_os << "MX_END_ENUM_CLASS(" << enum_name << ")\n\n";
@@ -1939,6 +1940,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "#include <optional>\n"
         << "#include <span>\n"
         << "#include <vector>\n\n"
+        << "#include \"../Compiler.h\"\n"
         << "#include \"../Entity.h\"\n"
         << "#include \"../Iterator.h\"\n"
         << "#include \"../Frontend/TokenContext.h\"\n\n";
@@ -2152,7 +2154,7 @@ MethodListPtr CodeGenerator::RunOnClass(
   }
 
   class_os
-      << "class " << class_name;
+      << "class MX_EXPORT " << class_name;
 
 //  std::stringstream dummy_ss;
 //  std::ostream &maybe_serialize_cpp_os =

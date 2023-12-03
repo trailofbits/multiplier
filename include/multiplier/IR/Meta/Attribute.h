@@ -15,13 +15,13 @@ class IdentifierAttr;
 }  // namespace vast::meta
 namespace mx::ir::meta {
 
-class Attribute : public ::mx::ir::Attribute {
+class MX_EXPORT Attribute : public ::mx::ir::Attribute {
  public:
   static std::optional<Attribute> from(const ::mx::ir::Attribute &);
 };
 static_assert(sizeof(Attribute) == sizeof(::mx::ir::Attribute));
 
-class IdentifierAttr final : public Attribute {
+class MX_EXPORT IdentifierAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::META_IDENTIFIER;

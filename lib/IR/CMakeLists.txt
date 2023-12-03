@@ -59,7 +59,7 @@ set_target_properties("mx-mlir"
     VISIBILITY_INLINES_HIDDEN
       YES
     CXX_VISIBILITY_PRESET
-      default
+      hidden
     POSITION_INDEPENDENT_CODE
       YES
 )
@@ -76,9 +76,9 @@ set_target_properties("mx-vast"
     PUBLIC_HEADER
       "${api_headers}"
     VISIBILITY_INLINES_HIDDEN
-      NO
+      YES
     CXX_VISIBILITY_PRESET
-      default
+      hidden
     POSITION_INDEPENDENT_CODE
       YES
     COMPILE_FEATURES

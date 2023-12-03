@@ -11,6 +11,7 @@
 #include <string_view>
 
 #include "TypeKind.h"
+#include "../Compiler.h"
 
 namespace mlir {
 class MLIRContext;
@@ -25,7 +26,7 @@ class SourceIRImpl;
 class Type;
 
 // The type of some operation / value.
-class Type {
+class MX_EXPORT Type {
  private:
   friend class Operation;
   friend class Block;

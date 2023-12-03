@@ -24,7 +24,7 @@ class SourceIRImpl;
 class Type;
 
 // The type of some operation / value.
-class Attribute {
+class MX_EXPORT Attribute {
  private:
   friend class Operation;
   friend class Block;

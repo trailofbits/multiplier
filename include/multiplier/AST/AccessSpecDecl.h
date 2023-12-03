@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class AccessSpecDecl : public Decl {
+class MX_EXPORT AccessSpecDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;

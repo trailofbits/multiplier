@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ObjCCompatibleAliasDecl : public NamedDecl {
+class MX_EXPORT ObjCCompatibleAliasDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;

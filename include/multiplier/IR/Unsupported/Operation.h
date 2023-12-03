@@ -16,13 +16,13 @@ class UnsupportedStmt;
 }  // namespace vast::unsup
 namespace mx::ir::unsup {
 
-class Operation : public ::mx::ir::Operation {
+class MX_EXPORT Operation : public ::mx::ir::Operation {
  public:
   static std::optional<Operation> from(const ::mx::ir::Operation &);
 };
 static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));
 
-class UnsupportedDeclOp final : public Operation {
+class MX_EXPORT UnsupportedDeclOp final : public Operation {
  public:
   inline static OperationKind static_kind(void) {
     return OperationKind::UNSUP_DECL;
@@ -39,7 +39,7 @@ class UnsupportedDeclOp final : public Operation {
 };
 static_assert(sizeof(UnsupportedDeclOp) == sizeof(Operation));
 
-class UnsupportedStmtOp final : public Operation {
+class MX_EXPORT UnsupportedStmtOp final : public Operation {
  public:
   inline static OperationKind static_kind(void) {
     return OperationKind::UNSUP_STMT;

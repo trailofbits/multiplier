@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class CFGuardAttr : public InheritableAttr {
+class MX_EXPORT CFGuardAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;

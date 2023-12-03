@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -26,6 +28,6 @@ inline static constexpr unsigned NumEnumerators(SYCLMajorVersion) {
   return 3;
 }
 
-const char *EnumeratorName(SYCLMajorVersion);
+MX_EXPORT const char *EnumeratorName(SYCLMajorVersion);
 
 } // namespace mx

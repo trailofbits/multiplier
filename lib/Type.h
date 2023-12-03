@@ -13,7 +13,6 @@
 #include "Token.h"
 #include "TokenContext.h"
 
-#pragma GCC visibility push(hidden)
 namespace mx {
 
 class TypeImpl;
@@ -118,4 +117,3 @@ class TypeImpl {
 };
 
 }  // namespace mx
-#pragma GCC visibility pop

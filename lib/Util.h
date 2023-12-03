@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <type_traits>
 
-#pragma GCC visibility push(hidden)
 namespace mx {
 
 enum class StmtKind : unsigned char;
@@ -52,4 +51,3 @@ static ForwardIterator UpperBound(ForwardIterator first, ForwardIterator last,
 bool IsNonValueStatement(StmtKind kind);
 
 }  // namespace mx
-#pragma GCC visibility pop

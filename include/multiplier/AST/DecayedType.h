@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class DecayedType : public AdjustedType {
+class MX_EXPORT DecayedType : public AdjustedType {
  private:
   friend class FragmentImpl;
   friend class AdjustedType;

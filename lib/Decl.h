@@ -14,7 +14,6 @@
 
 #include "FragmentEntity.h"
 
-#pragma GCC visibility push(hidden)
 namespace mx {
 
 // Interface for accessing a declaration.
@@ -38,4 +37,3 @@ class DeclImpl final : public FragmentEntityImpl<ast::Decl> {
 };
 
 }  // namespace mx
-#pragma GCC visibility pop

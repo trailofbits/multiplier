@@ -11,7 +11,6 @@
 #include <mutex>
 #include <unordered_map>
 
-#pragma GCC visibility push(hidden)
 namespace mx {
 
 class TokenReader;
@@ -118,4 +117,3 @@ class FileImpl final : public EntityImpl<rpc::File> {
 };
 
 }  // namespace mx
-#pragma GCC visibility pop

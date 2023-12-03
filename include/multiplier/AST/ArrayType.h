@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ArrayType : public Type {
+class MX_EXPORT ArrayType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;

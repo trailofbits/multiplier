@@ -27,7 +27,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class AutoType : public DeducedType {
+class MX_EXPORT AutoType : public DeducedType {
  private:
   friend class FragmentImpl;
   friend class DeducedType;

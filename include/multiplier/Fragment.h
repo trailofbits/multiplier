@@ -45,7 +45,7 @@ using MacroOrToken = std::variant<Macro, Token>;
 // A fragment of code containing one or more top-level declarations, the
 // associated declaration and statement entities, macro expansion/substitution
 // trees, and tokens.
-class Fragment {
+class MX_EXPORT Fragment {
  private:
   friend class Compilation;
   friend class CompilationImpl;

@@ -17,6 +17,7 @@
 #include <span>
 #include <vector>
 
+#include "../Compiler.h"
 #include "../Entity.h"
 #include "../Iterator.h"
 #include "../Frontend/TokenContext.h"
@@ -49,7 +50,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class Decl {
+class MX_EXPORT Decl {
  public:
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;

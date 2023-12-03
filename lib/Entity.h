@@ -15,7 +15,6 @@
 
 #include "Types.h"
 
-#pragma GCC visibility push(hidden)
 namespace mx {
 namespace {
 static const capnp::ReaderOptions kOptions = {
@@ -54,4 +53,3 @@ class EntityImpl {
 };
 
 }  // namespace mx
-#pragma GCC visibility pop

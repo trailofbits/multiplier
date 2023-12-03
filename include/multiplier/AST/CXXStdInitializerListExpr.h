@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class CXXStdInitializerListExpr : public Expr {
+class MX_EXPORT CXXStdInitializerListExpr : public Expr {
  private:
   friend class FragmentImpl;
   friend class Expr;

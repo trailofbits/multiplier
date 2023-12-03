@@ -50,13 +50,13 @@ class LoopVectorizeAttr;
 }  // namespace mlir::LLVM
 namespace mx::ir::llvm {
 
-class Attribute : public ::mx::ir::Attribute {
+class MX_EXPORT Attribute : public ::mx::ir::Attribute {
  public:
   static std::optional<Attribute> from(const ::mx::ir::Attribute &);
 };
 static_assert(sizeof(Attribute) == sizeof(::mx::ir::Attribute));
 
-class CConvAttr final : public Attribute {
+class MX_EXPORT CConvAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_C_CONV;
@@ -71,7 +71,7 @@ class CConvAttr final : public Attribute {
 };
 static_assert(sizeof(CConvAttr) == sizeof(Attribute));
 
-class ComdatAttr final : public Attribute {
+class MX_EXPORT ComdatAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_COMDAT;
@@ -86,7 +86,7 @@ class ComdatAttr final : public Attribute {
 };
 static_assert(sizeof(ComdatAttr) == sizeof(Attribute));
 
-class AccessGroupAttr final : public Attribute {
+class MX_EXPORT AccessGroupAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_ACCESS_GROUP;
@@ -101,7 +101,7 @@ class AccessGroupAttr final : public Attribute {
 };
 static_assert(sizeof(AccessGroupAttr) == sizeof(Attribute));
 
-class AliasScopeAttr final : public Attribute {
+class MX_EXPORT AliasScopeAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_ALIAS_SCOPE;
@@ -118,7 +118,7 @@ class AliasScopeAttr final : public Attribute {
 };
 static_assert(sizeof(AliasScopeAttr) == sizeof(Attribute));
 
-class AliasScopeDomainAttr final : public Attribute {
+class MX_EXPORT AliasScopeDomainAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_ALIAS_SCOPE_DOMAIN;
@@ -134,7 +134,7 @@ class AliasScopeDomainAttr final : public Attribute {
 };
 static_assert(sizeof(AliasScopeDomainAttr) == sizeof(Attribute));
 
-class DIBasicTypeAttr final : public Attribute {
+class MX_EXPORT DIBasicTypeAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_DI_BASIC_TYPE;
@@ -152,7 +152,7 @@ class DIBasicTypeAttr final : public Attribute {
 };
 static_assert(sizeof(DIBasicTypeAttr) == sizeof(Attribute));
 
-class DICompileUnitAttr final : public Attribute {
+class MX_EXPORT DICompileUnitAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_DI_COMPILE_UNIT;
@@ -171,7 +171,7 @@ class DICompileUnitAttr final : public Attribute {
 };
 static_assert(sizeof(DICompileUnitAttr) == sizeof(Attribute));
 
-class DICompositeTypeAttr final : public Attribute {
+class MX_EXPORT DICompositeTypeAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_DI_COMPOSITE_TYPE;
@@ -195,7 +195,7 @@ class DICompositeTypeAttr final : public Attribute {
 };
 static_assert(sizeof(DICompositeTypeAttr) == sizeof(Attribute));
 
-class DIDerivedTypeAttr final : public Attribute {
+class MX_EXPORT DIDerivedTypeAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_DI_DERIVED_TYPE;
@@ -215,7 +215,7 @@ class DIDerivedTypeAttr final : public Attribute {
 };
 static_assert(sizeof(DIDerivedTypeAttr) == sizeof(Attribute));
 
-class DIFileAttr final : public Attribute {
+class MX_EXPORT DIFileAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_DI_FILE;
@@ -231,7 +231,7 @@ class DIFileAttr final : public Attribute {
 };
 static_assert(sizeof(DIFileAttr) == sizeof(Attribute));
 
-class DILabelAttr final : public Attribute {
+class MX_EXPORT DILabelAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_DI_LABEL;
@@ -249,7 +249,7 @@ class DILabelAttr final : public Attribute {
 };
 static_assert(sizeof(DILabelAttr) == sizeof(Attribute));
 
-class DILexicalBlockAttr final : public Attribute {
+class MX_EXPORT DILexicalBlockAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_DI_LEXICAL_BLOCK;
@@ -267,7 +267,7 @@ class DILexicalBlockAttr final : public Attribute {
 };
 static_assert(sizeof(DILexicalBlockAttr) == sizeof(Attribute));
 
-class DILexicalBlockFileAttr final : public Attribute {
+class MX_EXPORT DILexicalBlockFileAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_DI_LEXICAL_BLOCK_FILE;
@@ -284,7 +284,7 @@ class DILexicalBlockFileAttr final : public Attribute {
 };
 static_assert(sizeof(DILexicalBlockFileAttr) == sizeof(Attribute));
 
-class DILocalVariableAttr final : public Attribute {
+class MX_EXPORT DILocalVariableAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_DI_LOCAL_VARIABLE;
@@ -305,7 +305,7 @@ class DILocalVariableAttr final : public Attribute {
 };
 static_assert(sizeof(DILocalVariableAttr) == sizeof(Attribute));
 
-class DINamespaceAttr final : public Attribute {
+class MX_EXPORT DINamespaceAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_DI_NAMESPACE;
@@ -322,7 +322,7 @@ class DINamespaceAttr final : public Attribute {
 };
 static_assert(sizeof(DINamespaceAttr) == sizeof(Attribute));
 
-class DINullTypeAttr final : public Attribute {
+class MX_EXPORT DINullTypeAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_DI_NULL_TYPE;
@@ -336,7 +336,7 @@ class DINullTypeAttr final : public Attribute {
 };
 static_assert(sizeof(DINullTypeAttr) == sizeof(Attribute));
 
-class DISubprogramAttr final : public Attribute {
+class MX_EXPORT DISubprogramAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_DI_SUBPROGRAM;
@@ -359,7 +359,7 @@ class DISubprogramAttr final : public Attribute {
 };
 static_assert(sizeof(DISubprogramAttr) == sizeof(Attribute));
 
-class DISubrangeAttr final : public Attribute {
+class MX_EXPORT DISubrangeAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_DI_SUBRANGE;
@@ -377,7 +377,7 @@ class DISubrangeAttr final : public Attribute {
 };
 static_assert(sizeof(DISubrangeAttr) == sizeof(Attribute));
 
-class DISubroutineTypeAttr final : public Attribute {
+class MX_EXPORT DISubroutineTypeAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_DI_SUBROUTINE_TYPE;
@@ -393,7 +393,7 @@ class DISubroutineTypeAttr final : public Attribute {
 };
 static_assert(sizeof(DISubroutineTypeAttr) == sizeof(Attribute));
 
-class FastmathFlagsAttr final : public Attribute {
+class MX_EXPORT FastmathFlagsAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_FASTMATH_FLAGS;
@@ -408,7 +408,7 @@ class FastmathFlagsAttr final : public Attribute {
 };
 static_assert(sizeof(FastmathFlagsAttr) == sizeof(Attribute));
 
-class MemoryEffectsAttr final : public Attribute {
+class MX_EXPORT MemoryEffectsAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_MEMORY_EFFECTS;
@@ -426,7 +426,7 @@ class MemoryEffectsAttr final : public Attribute {
 };
 static_assert(sizeof(MemoryEffectsAttr) == sizeof(Attribute));
 
-class TBAAMemberAttr final : public Attribute {
+class MX_EXPORT TBAAMemberAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_TBAA_MEMBER;
@@ -442,7 +442,7 @@ class TBAAMemberAttr final : public Attribute {
 };
 static_assert(sizeof(TBAAMemberAttr) == sizeof(Attribute));
 
-class TBAARootAttr final : public Attribute {
+class MX_EXPORT TBAARootAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_TBAA_ROOT;
@@ -457,7 +457,7 @@ class TBAARootAttr final : public Attribute {
 };
 static_assert(sizeof(TBAARootAttr) == sizeof(Attribute));
 
-class TBAATagAttr final : public Attribute {
+class MX_EXPORT TBAATagAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_TBAA_TAG;
@@ -475,7 +475,7 @@ class TBAATagAttr final : public Attribute {
 };
 static_assert(sizeof(TBAATagAttr) == sizeof(Attribute));
 
-class TBAATypeDescriptorAttr final : public Attribute {
+class MX_EXPORT TBAATypeDescriptorAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_TBAA_TYPE_DESCRIPTOR;
@@ -491,7 +491,7 @@ class TBAATypeDescriptorAttr final : public Attribute {
 };
 static_assert(sizeof(TBAATypeDescriptorAttr) == sizeof(Attribute));
 
-class LinkageAttr final : public Attribute {
+class MX_EXPORT LinkageAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_LINKAGE;
@@ -506,7 +506,7 @@ class LinkageAttr final : public Attribute {
 };
 static_assert(sizeof(LinkageAttr) == sizeof(Attribute));
 
-class LoopAnnotationAttr final : public Attribute {
+class MX_EXPORT LoopAnnotationAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_LOOP_ANNOTATION;
@@ -535,7 +535,7 @@ class LoopAnnotationAttr final : public Attribute {
 };
 static_assert(sizeof(LoopAnnotationAttr) == sizeof(Attribute));
 
-class LoopDistributeAttr final : public Attribute {
+class MX_EXPORT LoopDistributeAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_LOOP_DISTRIBUTE;
@@ -554,7 +554,7 @@ class LoopDistributeAttr final : public Attribute {
 };
 static_assert(sizeof(LoopDistributeAttr) == sizeof(Attribute));
 
-class LoopInterleaveAttr final : public Attribute {
+class MX_EXPORT LoopInterleaveAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_LOOP_INTERLEAVE;
@@ -569,7 +569,7 @@ class LoopInterleaveAttr final : public Attribute {
 };
 static_assert(sizeof(LoopInterleaveAttr) == sizeof(Attribute));
 
-class LoopLICMAttr final : public Attribute {
+class MX_EXPORT LoopLICMAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_LOOP_LICM;
@@ -585,7 +585,7 @@ class LoopLICMAttr final : public Attribute {
 };
 static_assert(sizeof(LoopLICMAttr) == sizeof(Attribute));
 
-class LoopPeeledAttr final : public Attribute {
+class MX_EXPORT LoopPeeledAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_LOOP_PEELED;
@@ -600,7 +600,7 @@ class LoopPeeledAttr final : public Attribute {
 };
 static_assert(sizeof(LoopPeeledAttr) == sizeof(Attribute));
 
-class LoopPipelineAttr final : public Attribute {
+class MX_EXPORT LoopPipelineAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_LOOP_PIPELINE;
@@ -616,7 +616,7 @@ class LoopPipelineAttr final : public Attribute {
 };
 static_assert(sizeof(LoopPipelineAttr) == sizeof(Attribute));
 
-class LoopUnrollAndJamAttr final : public Attribute {
+class MX_EXPORT LoopUnrollAndJamAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_LOOP_UNROLL_AND_JAM;
@@ -637,7 +637,7 @@ class LoopUnrollAndJamAttr final : public Attribute {
 };
 static_assert(sizeof(LoopUnrollAndJamAttr) == sizeof(Attribute));
 
-class LoopUnrollAttr final : public Attribute {
+class MX_EXPORT LoopUnrollAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_LOOP_UNROLL;
@@ -658,7 +658,7 @@ class LoopUnrollAttr final : public Attribute {
 };
 static_assert(sizeof(LoopUnrollAttr) == sizeof(Attribute));
 
-class LoopUnswitchAttr final : public Attribute {
+class MX_EXPORT LoopUnswitchAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_LOOP_UNSWITCH;
@@ -673,7 +673,7 @@ class LoopUnswitchAttr final : public Attribute {
 };
 static_assert(sizeof(LoopUnswitchAttr) == sizeof(Attribute));
 
-class LoopVectorizeAttr final : public Attribute {
+class MX_EXPORT LoopVectorizeAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::LLVM_LOOP_VECTORIZE;

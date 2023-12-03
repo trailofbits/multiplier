@@ -452,9 +452,10 @@ gap::generator<RegexQueryMatch> RegexQuery::match_fragments(
 }
 
 }  // namespace mx
-
 #else
 namespace mx {
+
+RegexQueryMatchImpl::~RegexQueryMatchImpl(void) {}
 
 RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 
@@ -493,8 +494,9 @@ RegexQueryMatch::RegexQueryMatch(
     : TokenRange(std::move(match), index_, num_tokens_) {}
 
 // Translate a data capture into a token range capture.
-std::optional<std::pair<unsigned, unsigned>> RegexQueryMatch::TranslateCapture(
-    std::string_view) const {
+std::optional<std::pair<unsigned, unsigned>>
+RegexQueryMatchImpl::TranslateCapture(
+    const TokenRange &, std::string_view) const {
   return std::nullopt;
 }
 
@@ -558,6 +560,5 @@ RegexQuery::match_fragments(const Fragment &) const & {
 }
 
 }  // namespace mx
-
 #endif   // MX_DISABLE_RE2
 

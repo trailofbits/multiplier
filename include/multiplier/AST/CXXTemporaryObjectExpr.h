@@ -27,7 +27,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class CXXTemporaryObjectExpr : public CXXConstructExpr {
+class MX_EXPORT CXXTemporaryObjectExpr : public CXXConstructExpr {
  private:
   friend class FragmentImpl;
   friend class CXXConstructExpr;

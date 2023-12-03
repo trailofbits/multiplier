@@ -27,7 +27,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class AlignedAttr : public InheritableAttr {
+class MX_EXPORT AlignedAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;

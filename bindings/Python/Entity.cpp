@@ -44,17 +44,17 @@ static PyGetSetDef gProperties[] = {
 
 static PyTypeObject gTypeDef = {
   .tp_name = "multiplier.Entity",
+  .tp_hash = PyObject_HashNotImplemented,
   .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_DISALLOW_INSTANTIATION |
               Py_TPFLAGS_BASETYPE | Py_TPFLAGS_IMMUTABLETYPE,
-  .tp_hash = PyObject_HashNotImplemented,
   .tp_doc = PyDoc_STR("Abstract base classes for entities, e.g. Decl, Stmt, etc."),
+  .tp_getset = gProperties,
+  .tp_base = &PyBaseObject_Type,
   .tp_init = [] (BorrowedPyObject *, BorrowedPyObject *, BorrowedPyObject *) -> int {
     PyErrorStreamer(PyExc_TypeError)
         << "Class 'Entity' cannot be directly instantiated";
     return -1;
   },
-  .tp_getset = gProperties,
-  .tp_base = &PyBaseObject_Type,
   .tp_alloc = PyType_GenericAlloc,
   .tp_new = nullptr,
 };

@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class OMPTargetEnterDataDirective : public OMPExecutableDirective {
+class MX_EXPORT OMPTargetEnterDataDirective : public OMPExecutableDirective {
  private:
   friend class FragmentImpl;
   friend class OMPExecutableDirective;

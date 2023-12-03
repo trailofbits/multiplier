@@ -9,7 +9,6 @@
 #include "TokenContext.h"
 #include "TokenTree.h"
 
-#pragma GCC visibility push(hidden)
 namespace mx {
 namespace ir {
 class SourceIRImpl;
@@ -175,4 +174,3 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
 };
 
 }  // namespace mx
-#pragma GCC visibility pop

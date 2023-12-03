@@ -12,7 +12,7 @@
 
 namespace mx {
 
-class TokenTreeVisitor {
+class MX_EXPORT TokenTreeVisitor {
  public:
   virtual ~TokenTreeVisitor(void) = default;
 
@@ -26,7 +26,7 @@ class TokenTreeVisitor {
 // A tree of tokens, which can represent the variability of overlapping
 // fragments, macro expansions, etc., allowing one to render the tree down
 // into a singular linear range of tokens.
-class TokenTree {
+class MX_EXPORT TokenTree {
  private:
   friend class Compilation;
   friend class File;

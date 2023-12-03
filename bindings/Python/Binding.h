@@ -24,7 +24,6 @@
 #include <multiplier/Bindings/Python.h>
 #include <multiplier/Entity.h>
 
-#pragma GCC visibility push(hidden)
 namespace mx {
 
 class RegexQueryMatch;
@@ -492,13 +491,6 @@ struct PythonBinding<IterableType> {
     return nullptr;
   }
 };
-
-}  // namespace mx
-#pragma GCC visibility pop
-
-// Implementations of `to_python` and `from_python` are visible outside of
-// this shared library.
-namespace mx {
 
 template <typename T>
 SharedPyObject *to_python(T val) noexcept {

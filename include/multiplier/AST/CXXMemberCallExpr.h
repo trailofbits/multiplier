@@ -30,7 +30,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class CXXMemberCallExpr : public CallExpr {
+class MX_EXPORT CXXMemberCallExpr : public CallExpr {
  private:
   friend class FragmentImpl;
   friend class CallExpr;

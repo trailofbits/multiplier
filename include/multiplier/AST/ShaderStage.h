@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -38,6 +40,6 @@ inline static constexpr unsigned NumEnumerators(ShaderStage) {
   return 16;
 }
 
-const char *EnumeratorName(ShaderStage);
+MX_EXPORT const char *EnumeratorName(ShaderStage);
 
 } // namespace mx

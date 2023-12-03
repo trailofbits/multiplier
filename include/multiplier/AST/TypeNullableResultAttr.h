@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class TypeNullableResultAttr : public TypeAttr {
+class MX_EXPORT TypeNullableResultAttr : public TypeAttr {
  private:
   friend class FragmentImpl;
   friend class TypeAttr;

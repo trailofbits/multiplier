@@ -15,13 +15,13 @@ class FunctionType;
 }  // namespace vast::core
 namespace mx::ir::core {
 
-class Type : public ::mx::ir::Type {
+class MX_EXPORT Type : public ::mx::ir::Type {
  public:
   static std::optional<Type> from(const ::mx::ir::Type &);
 };
 static_assert(sizeof(Type) == sizeof(::mx::ir::Type));
 
-class FunctionType final : public Type {
+class MX_EXPORT FunctionType final : public Type {
  public:
   inline static TypeKind static_kind(void) {
     return TypeKind::CORE_FUNCTION;

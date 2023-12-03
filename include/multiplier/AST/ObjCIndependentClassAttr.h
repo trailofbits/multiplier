@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ObjCIndependentClassAttr : public InheritableAttr {
+class MX_EXPORT ObjCIndependentClassAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;

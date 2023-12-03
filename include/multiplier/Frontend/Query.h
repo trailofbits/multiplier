@@ -28,7 +28,7 @@ class RegexQueryMatchImpl;
 class InvalidEntityProvider;
 
 // The range of tokens that matches a regular expression.
-class RegexQueryMatch : public TokenRange {
+class MX_EXPORT RegexQueryMatch : public TokenRange {
  private:
   friend class File;
   friend class Fragment;
@@ -44,7 +44,7 @@ class RegexQueryMatch : public TokenRange {
 
  public:
 
-  ~RegexQueryMatch(void) = default;
+  ~RegexQueryMatch(void);
 
   // The actual range of matched data. This is possibly a sub-sequence of
   // `this->TokenRange::data()`.

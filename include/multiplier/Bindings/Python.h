@@ -13,6 +13,8 @@
 
 #include <optional>
 
+#include "../Compiler.h"
+
 namespace mx {
 
 using BorrowedPyObject = ::PyObject;
@@ -20,10 +22,10 @@ using SharedPyObject = ::PyObject;
 
 template <typename T>
 [[gnu::noinline, gnu::flatten]]
-SharedPyObject *to_python(T) noexcept;
+MX_EXPORT SharedPyObject *to_python(T) noexcept;
 
 template <typename T>
 [[gnu::noinline, gnu::flatten]]
-std::optional<T> from_python(BorrowedPyObject *obj) noexcept;
+MX_EXPORT std::optional<T> from_python(BorrowedPyObject *obj) noexcept;
 
 }  // namespace mx

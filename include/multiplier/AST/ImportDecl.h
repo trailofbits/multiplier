@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ImportDecl : public Decl {
+class MX_EXPORT ImportDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;

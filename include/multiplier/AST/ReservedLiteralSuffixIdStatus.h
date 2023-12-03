@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -25,6 +27,6 @@ inline static constexpr unsigned NumEnumerators(ReservedLiteralSuffixIdStatus) {
   return 3;
 }
 
-const char *EnumeratorName(ReservedLiteralSuffixIdStatus);
+MX_EXPORT const char *EnumeratorName(ReservedLiteralSuffixIdStatus);
 
 } // namespace mx

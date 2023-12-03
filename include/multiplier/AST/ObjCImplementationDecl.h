@@ -29,7 +29,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ObjCImplementationDecl : public ObjCImplDecl {
+class MX_EXPORT ObjCImplementationDecl : public ObjCImplDecl {
  private:
   friend class FragmentImpl;
   friend class ObjCImplDecl;

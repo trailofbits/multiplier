@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ObjCAtThrowStmt : public Stmt {
+class MX_EXPORT ObjCAtThrowStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;

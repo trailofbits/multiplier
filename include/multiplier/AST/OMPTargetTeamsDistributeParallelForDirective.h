@@ -28,7 +28,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class OMPTargetTeamsDistributeParallelForDirective : public OMPLoopDirective {
+class MX_EXPORT OMPTargetTeamsDistributeParallelForDirective : public OMPLoopDirective {
  private:
   friend class FragmentImpl;
   friend class OMPLoopDirective;

@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -27,6 +29,6 @@ inline static constexpr unsigned NumEnumerators(OpenCLPrivateAddressSpaceAttrSpe
   return 5;
 }
 
-const char *EnumeratorName(OpenCLPrivateAddressSpaceAttrSpelling);
+MX_EXPORT const char *EnumeratorName(OpenCLPrivateAddressSpaceAttrSpelling);
 
 } // namespace mx

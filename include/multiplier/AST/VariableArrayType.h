@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class VariableArrayType : public ArrayType {
+class MX_EXPORT VariableArrayType : public ArrayType {
  private:
   friend class FragmentImpl;
   friend class ArrayType;

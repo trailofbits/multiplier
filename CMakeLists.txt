@@ -175,12 +175,10 @@ else()
     PROPERTIES
       LINKER_LANGUAGE
         CXX
-      PUBLIC_HEADER
-        "${api_headers}"
       VISIBILITY_INLINES_HIDDEN
-        NO
+        YES
       CXX_VISIBILITY_PRESET
-        default
+        hidden
       POSITION_INDEPENDENT_CODE
         YES
       COMPILE_FEATURES

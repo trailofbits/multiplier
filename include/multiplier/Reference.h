@@ -120,13 +120,13 @@ inline static const char *EnumerationName(BuiltinReferenceKind) {
   return "BuiltinReferenceKind";
 }
 
-const char *EnumeratorName(BuiltinReferenceKind);
+MX_EXPORT const char *EnumeratorName(BuiltinReferenceKind);
 
 inline static constexpr unsigned NumEnumerators(BuiltinReferenceKind) {
   return 13;
 }
 
-class ReferenceKind {
+class MX_EXPORT ReferenceKind {
  private:
   friend class Reference;
   friend class ReferenceKindImpl;
@@ -176,7 +176,7 @@ class ReferenceKind {
 // sometimes it differs. When it does, it's good to think about it as providing
 // *visual* context for `from`, and thus is should be an entity that is a
 // parent of `from`.
-class Reference {
+class MX_EXPORT Reference {
  private:
   OpaqueImplPtr impl;
   // The reference context will have entity id of referrer that references the

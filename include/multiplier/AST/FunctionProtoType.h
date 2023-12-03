@@ -29,7 +29,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class FunctionProtoType : public FunctionType {
+class MX_EXPORT FunctionProtoType : public FunctionType {
  private:
   friend class FragmentImpl;
   friend class FunctionType;

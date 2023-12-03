@@ -13,7 +13,6 @@
 #include "Fragment.h"
 #include "Types.h"
 
-#pragma GCC visibility push(hidden)
 namespace mx {
 
 class RegexQueryResultImpl final {
@@ -91,4 +90,3 @@ class RegexQueryMatchImpl final : public ProxyTokenReader {
 };
 
 }  // namespace mx
-#pragma GCC visibility pop

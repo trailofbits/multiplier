@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class AnnotateAttr : public InheritableParamAttr {
+class MX_EXPORT AnnotateAttr : public InheritableParamAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableParamAttr;

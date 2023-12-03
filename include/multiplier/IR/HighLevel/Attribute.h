@@ -34,13 +34,13 @@ class WarnUnusedResultAttr;
 }  // namespace vast::hl
 namespace mx::ir::hl {
 
-class Attribute : public ::mx::ir::Attribute {
+class MX_EXPORT Attribute : public ::mx::ir::Attribute {
  public:
   static std::optional<Attribute> from(const ::mx::ir::Attribute &);
 };
 static_assert(sizeof(Attribute) == sizeof(::mx::ir::Attribute));
 
-class AllocAlignAttr final : public Attribute {
+class MX_EXPORT AllocAlignAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_ALLOC_ALIGN;
@@ -55,7 +55,7 @@ class AllocAlignAttr final : public Attribute {
 };
 static_assert(sizeof(AllocAlignAttr) == sizeof(Attribute));
 
-class AllocSizeAttr final : public Attribute {
+class MX_EXPORT AllocSizeAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_ALLOC_SIZE;
@@ -71,7 +71,7 @@ class AllocSizeAttr final : public Attribute {
 };
 static_assert(sizeof(AllocSizeAttr) == sizeof(Attribute));
 
-class AnnotationAttr final : public Attribute {
+class MX_EXPORT AnnotationAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_ANNOTATION;
@@ -86,7 +86,7 @@ class AnnotationAttr final : public Attribute {
 };
 static_assert(sizeof(AnnotationAttr) == sizeof(Attribute));
 
-class AsmLabelAttr final : public Attribute {
+class MX_EXPORT AsmLabelAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_ASM_LABEL;
@@ -102,7 +102,7 @@ class AsmLabelAttr final : public Attribute {
 };
 static_assert(sizeof(AsmLabelAttr) == sizeof(Attribute));
 
-class BuiltinAttr final : public Attribute {
+class MX_EXPORT BuiltinAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_BUILTIN;
@@ -117,7 +117,7 @@ class BuiltinAttr final : public Attribute {
 };
 static_assert(sizeof(BuiltinAttr) == sizeof(Attribute));
 
-class CVQualifiersAttr final : public Attribute {
+class MX_EXPORT CVQualifiersAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_CV_QUALIFIERS;
@@ -133,7 +133,7 @@ class CVQualifiersAttr final : public Attribute {
 };
 static_assert(sizeof(CVQualifiersAttr) == sizeof(Attribute));
 
-class CVRQualifiersAttr final : public Attribute {
+class MX_EXPORT CVRQualifiersAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_CVR_QUALIFIERS;
@@ -150,7 +150,7 @@ class CVRQualifiersAttr final : public Attribute {
 };
 static_assert(sizeof(CVRQualifiersAttr) == sizeof(Attribute));
 
-class ConstAttr final : public Attribute {
+class MX_EXPORT ConstAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_CONST;
@@ -164,7 +164,7 @@ class ConstAttr final : public Attribute {
 };
 static_assert(sizeof(ConstAttr) == sizeof(Attribute));
 
-class FormatAttr final : public Attribute {
+class MX_EXPORT FormatAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_FORMAT;
@@ -179,7 +179,7 @@ class FormatAttr final : public Attribute {
 };
 static_assert(sizeof(FormatAttr) == sizeof(Attribute));
 
-class LoaderUninitializedAttr final : public Attribute {
+class MX_EXPORT LoaderUninitializedAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_LOADER_UNINITIALIZED;
@@ -193,7 +193,7 @@ class LoaderUninitializedAttr final : public Attribute {
 };
 static_assert(sizeof(LoaderUninitializedAttr) == sizeof(Attribute));
 
-class ModeAttr final : public Attribute {
+class MX_EXPORT ModeAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_MODE;
@@ -208,7 +208,7 @@ class ModeAttr final : public Attribute {
 };
 static_assert(sizeof(ModeAttr) == sizeof(Attribute));
 
-class NoInstrumentFunctionAttr final : public Attribute {
+class MX_EXPORT NoInstrumentFunctionAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_NO_INSTRUMENT_FUNCTION;
@@ -222,7 +222,7 @@ class NoInstrumentFunctionAttr final : public Attribute {
 };
 static_assert(sizeof(NoInstrumentFunctionAttr) == sizeof(Attribute));
 
-class NoThrowAttr final : public Attribute {
+class MX_EXPORT NoThrowAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_NO_THROW;
@@ -236,7 +236,7 @@ class NoThrowAttr final : public Attribute {
 };
 static_assert(sizeof(NoThrowAttr) == sizeof(Attribute));
 
-class NonNullAttr final : public Attribute {
+class MX_EXPORT NonNullAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_NON_NULL;
@@ -250,7 +250,7 @@ class NonNullAttr final : public Attribute {
 };
 static_assert(sizeof(NonNullAttr) == sizeof(Attribute));
 
-class PackedAttr final : public Attribute {
+class MX_EXPORT PackedAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_PACKED;
@@ -264,7 +264,7 @@ class PackedAttr final : public Attribute {
 };
 static_assert(sizeof(PackedAttr) == sizeof(Attribute));
 
-class PureAttr final : public Attribute {
+class MX_EXPORT PureAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_PURE;
@@ -278,7 +278,7 @@ class PureAttr final : public Attribute {
 };
 static_assert(sizeof(PureAttr) == sizeof(Attribute));
 
-class RestrictAttr final : public Attribute {
+class MX_EXPORT RestrictAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_RESTRICT;
@@ -292,7 +292,7 @@ class RestrictAttr final : public Attribute {
 };
 static_assert(sizeof(RestrictAttr) == sizeof(Attribute));
 
-class SectionAttr final : public Attribute {
+class MX_EXPORT SectionAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_SECTION;
@@ -307,7 +307,7 @@ class SectionAttr final : public Attribute {
 };
 static_assert(sizeof(SectionAttr) == sizeof(Attribute));
 
-class UCVQualifiersAttr final : public Attribute {
+class MX_EXPORT UCVQualifiersAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_UCV_QUALIFIERS;
@@ -324,7 +324,7 @@ class UCVQualifiersAttr final : public Attribute {
 };
 static_assert(sizeof(UCVQualifiersAttr) == sizeof(Attribute));
 
-class WarnUnusedResultAttr final : public Attribute {
+class MX_EXPORT WarnUnusedResultAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::HL_WARN_UNUSED_RESULT;

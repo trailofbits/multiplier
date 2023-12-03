@@ -30,7 +30,7 @@ class TokenContextReader;
 //   func_ptr -> ParmVarDecl -> FunctionType -> ParmVarDecl -+-> FunctionDecl
 //                    |                              ^
 //                    '----------- alias ------------'
-class TokenContext {
+class MX_EXPORT TokenContext {
  private:
   friend class Token;
 

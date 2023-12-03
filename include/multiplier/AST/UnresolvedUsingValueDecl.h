@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class UnresolvedUsingValueDecl : public ValueDecl {
+class MX_EXPORT UnresolvedUsingValueDecl : public ValueDecl {
  private:
   friend class FragmentImpl;
   friend class ValueDecl;

@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -24,6 +26,6 @@ inline static constexpr unsigned NumEnumerators(ASTDumpOutputFormat) {
   return 2;
 }
 
-const char *EnumeratorName(ASTDumpOutputFormat);
+MX_EXPORT const char *EnumeratorName(ASTDumpOutputFormat);
 
 } // namespace mx

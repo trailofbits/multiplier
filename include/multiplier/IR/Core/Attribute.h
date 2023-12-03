@@ -20,13 +20,13 @@ class VoidAttr;
 }  // namespace vast::core
 namespace mx::ir::core {
 
-class Attribute : public ::mx::ir::Attribute {
+class MX_EXPORT Attribute : public ::mx::ir::Attribute {
  public:
   static std::optional<Attribute> from(const ::mx::ir::Attribute &);
 };
 static_assert(sizeof(Attribute) == sizeof(::mx::ir::Attribute));
 
-class BooleanAttr final : public Attribute {
+class MX_EXPORT BooleanAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::CORE_BOOLEAN;
@@ -42,7 +42,7 @@ class BooleanAttr final : public Attribute {
 };
 static_assert(sizeof(BooleanAttr) == sizeof(Attribute));
 
-class FloatAttr final : public Attribute {
+class MX_EXPORT FloatAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::CORE_FLOAT;
@@ -58,7 +58,7 @@ class FloatAttr final : public Attribute {
 };
 static_assert(sizeof(FloatAttr) == sizeof(Attribute));
 
-class IntegerAttr final : public Attribute {
+class MX_EXPORT IntegerAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::CORE_INTEGER;
@@ -74,7 +74,7 @@ class IntegerAttr final : public Attribute {
 };
 static_assert(sizeof(IntegerAttr) == sizeof(Attribute));
 
-class SourceLanguageAttr final : public Attribute {
+class MX_EXPORT SourceLanguageAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::CORE_SOURCE_LANGUAGE;
@@ -89,7 +89,7 @@ class SourceLanguageAttr final : public Attribute {
 };
 static_assert(sizeof(SourceLanguageAttr) == sizeof(Attribute));
 
-class StringLiteralAttr final : public Attribute {
+class MX_EXPORT StringLiteralAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::CORE_STRING_LITERAL;
@@ -105,7 +105,7 @@ class StringLiteralAttr final : public Attribute {
 };
 static_assert(sizeof(StringLiteralAttr) == sizeof(Attribute));
 
-class VoidAttr final : public Attribute {
+class MX_EXPORT VoidAttr final : public Attribute {
  public:
   inline static AttributeKind static_kind(void) {
     return AttributeKind::CORE_VOID;

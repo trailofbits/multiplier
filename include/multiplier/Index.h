@@ -84,10 +84,10 @@ inline constexpr unsigned NumEnumerators(IndexStatus) {
   return 3u;
 }
 
-const char *EnumeratorName(IndexStatus);
+MX_EXPORT const char *EnumeratorName(IndexStatus);
 
 // Access to the indexed code.
-class Index {
+class MX_EXPORT Index {
  private:
   friend class Reference;
   friend class ReferenceKind;
@@ -239,7 +239,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_REFERENCE_AS,
 }
 #endif  // __CDT_PARSER__
 
-class SimpleToken {
+class MX_EXPORT SimpleToken {
  public:
   // The kind of this token.
   TokenKind kind{TokenKind::UNKNOWN};

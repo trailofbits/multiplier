@@ -11,7 +11,6 @@
 
 #include "FragmentEntity.h"
 
-#pragma GCC visibility push(hidden)
 namespace mx {
 
 // Interface for accessing a macro.
@@ -26,4 +25,3 @@ class MacroImpl final : public FragmentEntityImpl<ast::Macro> {
 };
 
 }  // namespace mx
-#pragma GCC visibility pop

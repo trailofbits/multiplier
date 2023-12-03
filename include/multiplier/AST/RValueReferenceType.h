@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class RValueReferenceType : public ReferenceType {
+class MX_EXPORT RValueReferenceType : public ReferenceType {
  private:
   friend class FragmentImpl;
   friend class ReferenceType;

@@ -23,7 +23,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class IFuncAttr : public Attr {
+class MX_EXPORT IFuncAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;

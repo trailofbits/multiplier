@@ -835,6 +835,7 @@ void CodeGenerator::RunOnOps(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
+      << "#include \"../Compiler.h\"\n\n"
       << "namespace mx {\n"
       << "namespace ir {\n\n"
       << "enum class OperationKind : unsigned {\n"
@@ -889,7 +890,7 @@ void CodeGenerator::RunOnOps(void) {
       << "inline static constexpr unsigned NumEnumerators(ir::OperationKind) {\n"
       << "  return " << num_ops << ";\n"
       << "}\n\n"
-      << "const char *EnumeratorName(ir::OperationKind);\n\n"
+      << "MX_EXPORT const char *EnumeratorName(ir::OperationKind);\n\n"
       << "}  // namespace mx\n";
 
   cpp
@@ -980,7 +981,7 @@ void CodeGenerator::RunOnOps(void) {
     hpp
         << "}  // namespace " << dialect.ns_key << "\n"
         << "namespace mx::ir::" << dialect.our_ns_name << " {\n\n"
-        << "class Operation : public ::mx::ir::Operation {\n"
+        << "class MX_EXPORT Operation : public ::mx::ir::Operation {\n"
         << " public:\n"
         << "  static std::optional<Operation> from(const ::mx::ir::Operation &);\n"
         << "};\n"
@@ -1040,7 +1041,7 @@ void CodeGenerator::RunOnOps(void) {
       std::string enum_name = OpNameToEnumCase(op->op_name);
 
       hpp
-          << "class " << op_name << " final : public Operation {\n"
+          << "class MX_EXPORT " << op_name << " final : public Operation {\n"
           << " public:\n"
           << "  inline static OperationKind static_kind(void) {\n"
           << "    return OperationKind::" << enum_name
@@ -1148,6 +1149,7 @@ void CodeGenerator::RunOnTypes(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
+      << "#include \"../Compiler.h\"\n\n"
       << "namespace mx {\n"
       << "namespace ir {\n\n"
       << "enum class TypeKind : unsigned {\n"
@@ -1170,7 +1172,7 @@ void CodeGenerator::RunOnTypes(void) {
       << "inline static constexpr unsigned NumEnumerators(ir::TypeKind) {\n"
       << "  return " << num_types << ";\n"
       << "}\n\n"
-      << "const char *EnumeratorName(ir::TypeKind);\n\n"
+      << "MX_EXPORT const char *EnumeratorName(ir::TypeKind);\n\n"
       << "}  // namespace mx\n";
 
   cpp
@@ -1256,7 +1258,7 @@ void CodeGenerator::RunOnTypes(void) {
 
     hpp << "}  // namespace " << dialect.ns_key << "\n"
         << "namespace mx::ir::" << dialect.our_ns_name << " {\n\n"
-        << "class Type : public ::mx::ir::Type {\n"
+        << "class MX_EXPORT Type : public ::mx::ir::Type {\n"
         << " public:\n"
         << "  static std::optional<Type> from(const ::mx::ir::Type &);\n"
         << "};\n"
@@ -1310,7 +1312,7 @@ void CodeGenerator::RunOnTypes(void) {
       std::string enum_name = TypeNameToEnumCase(dialect, type->name);
 
       hpp
-          << "class " << type_name << " final : public Type {\n"
+          << "class MX_EXPORT " << type_name << " final : public Type {\n"
           << " public:\n"
           << "  inline static TypeKind static_kind(void) {\n"
           << "    return TypeKind::" << enum_name
@@ -1414,6 +1416,7 @@ void CodeGenerator::RunOnAttrs(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
+      << "#include \"../Compiler.h\"\n\n"
       << "namespace mx {\n"
       << "namespace ir {\n"
       << "enum class AttributeKind : unsigned {\n"
@@ -1436,7 +1439,7 @@ void CodeGenerator::RunOnAttrs(void) {
       << "inline static constexpr unsigned NumEnumerators(ir::AttributeKind) {\n"
       << "  return " << num_attrs << ";\n"
       << "}\n\n"
-      << "const char *EnumeratorName(ir::AttributeKind);\n\n"
+      << "MX_EXPORT const char *EnumeratorName(ir::AttributeKind);\n\n"
       << "}  // namespace mx\n";
 
   cpp
@@ -1528,7 +1531,7 @@ void CodeGenerator::RunOnAttrs(void) {
     hpp
         << "}  // namespace " << dialect.ns_key << "\n"
         << "namespace mx::ir::" << dialect.our_ns_name << " {\n\n"
-        << "class Attribute : public ::mx::ir::Attribute {\n"
+        << "class MX_EXPORT Attribute : public ::mx::ir::Attribute {\n"
         << " public:\n"
         << "  static std::optional<Attribute> from(const ::mx::ir::Attribute &);\n"
         << "};\n"
@@ -1582,7 +1585,7 @@ void CodeGenerator::RunOnAttrs(void) {
       std::string enum_name = AttrNameToEnumCase(dialect, attr->name);
 
       hpp
-          << "class " << attr_name << " final : public Attribute {\n"
+          << "class MX_EXPORT " << attr_name << " final : public Attribute {\n"
           << " public:\n"
           << "  inline static AttributeKind static_kind(void) {\n"
           << "    return AttributeKind::" << enum_name

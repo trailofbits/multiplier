@@ -14,7 +14,6 @@
 
 #include "FragmentEntity.h"
 
-#pragma GCC visibility push(hidden)
 namespace mx {
 
 // Interface for accessing a statement.
@@ -29,4 +28,3 @@ class StmtImpl final : public FragmentEntityImpl<ast::Stmt> {
 };
 
 }  // namespace mx
-#pragma GCC visibility pop

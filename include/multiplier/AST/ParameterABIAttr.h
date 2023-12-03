@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ParameterABIAttr : public InheritableParamAttr {
+class MX_EXPORT ParameterABIAttr : public InheritableParamAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableParamAttr;

@@ -8,8 +8,10 @@
 
 #include <string_view>
 
+#include "Compiler.h"
+
 namespace mx {
 
-std::string_view revision(void) noexcept;
+MX_EXPORT std::string_view revision(void) noexcept;
 
 }  // namespace mx

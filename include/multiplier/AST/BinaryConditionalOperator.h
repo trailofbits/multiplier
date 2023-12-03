@@ -28,7 +28,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class BinaryConditionalOperator : public AbstractConditionalOperator {
+class MX_EXPORT BinaryConditionalOperator : public AbstractConditionalOperator {
  private:
   friend class FragmentImpl;
   friend class AbstractConditionalOperator;

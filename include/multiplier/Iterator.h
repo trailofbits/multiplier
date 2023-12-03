@@ -42,7 +42,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE_ENTITY,
 class IteratorEnd {};
 
 template <typename Enum>
-class EnumeratorIterator {
+class MX_EXPORT EnumeratorIterator {
  private:
   using IType = std::underlying_type_t<Enum>;
   unsigned val{0};
@@ -91,7 +91,7 @@ class EnumeratorIterator {
 };
 
 template <typename Enum>
-class EnumerationRange {
+class MX_EXPORT EnumerationRange {
  public:
   inline EnumeratorIterator<Enum> begin(void) const noexcept {
     return EnumeratorIterator<Enum>();
@@ -103,7 +103,7 @@ class EnumerationRange {
 };
 
 template <typename Iter, typename Derived>
-class DerivedEntityIterator {
+class MX_EXPORT DerivedEntityIterator {
  private:
   Iter iter;
   std::optional<Derived> item;
@@ -165,7 +165,7 @@ class DerivedEntityIterator {
 };
 
 template <typename Iter, typename Derived>
-class DerivedEntityRange {
+class MX_EXPORT DerivedEntityRange {
  public:
   using DerivedEntityIter = DerivedEntityIterator<Iter, Derived>;
   using EndIteratorType = typename Iter::EndIteratorType;

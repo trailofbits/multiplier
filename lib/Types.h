@@ -10,7 +10,6 @@
 
 #include <optional>
 
-#pragma GCC visibility push(hidden)
 namespace mx {
 namespace {
 
@@ -68,4 +67,3 @@ int KindFromEntityId(RawEntityId id);
 EntityCategory CategoryFromEntityId(RawEntityId);
 
 }  // namespace mx
-#pragma GCC visibility pop

@@ -82,7 +82,6 @@ bool RegexQuery::is_valid(void) const {
 }
 
 }  // namespace mx
-
 #else
 
 namespace mx {
@@ -122,5 +121,4 @@ bool RegexQuery::is_valid(void) const {
 }
 
 }  // namespace mx
-
 #endif   // MX_DISABLE_RE2

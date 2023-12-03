@@ -12,7 +12,6 @@
 #include <mutex>
 #include <unordered_map>
 
-#pragma GCC visibility push(hidden)
 namespace mx {
 
 class CachingEntityProvider final : public EntityProvider {
@@ -141,4 +140,3 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
 };
 
 }  // namespace mx
-#pragma GCC visibility pop

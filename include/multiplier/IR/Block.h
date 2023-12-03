@@ -26,7 +26,7 @@ class SourceIRImpl;
 
 // A region is owned by an operation (not all operations own regions)
 // and contain one or more blocks.
-class Block final {
+class MX_EXPORT Block final {
  private:
   friend class Operation;
   friend class Region;
@@ -78,7 +78,7 @@ class Block final {
 // An parameter to a block is like a PHI node in an SSA IR. It provides a merge
 // point for values used by this block (or made available to successors) that
 // that come from predecessors.
-class Argument final : public Value {
+class MX_EXPORT Argument final : public Value {
  private:
   friend class Block;
   friend class Region;
@@ -99,7 +99,7 @@ class Argument final : public Value {
 static_assert(sizeof(Argument) == sizeof(Value));
 
 // A use of a block, e.g. in a terminator operation.
-class Label final {
+class MX_EXPORT Label final {
  private:
   friend class Block;
   friend class Label;

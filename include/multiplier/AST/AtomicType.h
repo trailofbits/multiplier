@@ -23,7 +23,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class AtomicType : public Type {
+class MX_EXPORT AtomicType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;

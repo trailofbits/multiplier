@@ -17,6 +17,7 @@
 #include <span>
 #include <vector>
 
+#include "../Compiler.h"
 #include "../Entity.h"
 #include "../Iterator.h"
 #include "../Frontend/TokenContext.h"
@@ -39,7 +40,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class Attr {
+class MX_EXPORT Attr {
  public:
  protected:
   friend class Decl;

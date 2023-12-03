@@ -28,7 +28,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ConstantExpr : public FullExpr {
+class MX_EXPORT ConstantExpr : public FullExpr {
  private:
   friend class FragmentImpl;
   friend class FullExpr;
