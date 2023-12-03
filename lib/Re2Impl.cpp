@@ -533,6 +533,12 @@ size_t RegexQueryMatch::num_captures(void) const {
   return 0;
 }
 
+// The actual range of matched data. This is possibly a sub-sequence of
+// `this->TokenRange::data()`.
+std::string_view RegexQueryMatch::data(void) const noexcept {
+  return {};
+}
+
 // Return a list of matched variables.
 std::vector<std::string> RegexQueryMatch::captured_variables(void) const {
   return {};

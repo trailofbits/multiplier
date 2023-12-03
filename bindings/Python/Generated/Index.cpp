@@ -118,6 +118,14 @@ static PyMethodDef gMethods[] = {
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           auto obj = T_cast(self);
           (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Index>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->in_memory_cache(arg_0.value()));
+          }
           while (num_args == 2) {
             auto arg_0 = ::mx::from_python<mx::Index>(args[0]);
             if (!arg_0.has_value()) {
@@ -747,7 +755,7 @@ PyTypeObject *InitType(void) noexcept {
     PyObject_Free(obj);
   };
   tp->tp_name = "multiplier.Index";
-  tp->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_DISALLOW_INSTANTIATION;
+  tp->tp_flags = Py_TPFLAGS_DEFAULT;
   tp->tp_doc = PyDoc_STR("Wrapper for mx::::Index");
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
@@ -758,13 +766,34 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
   tp->tp_base = nullptr;
-  tp->tp_init = [] (BorrowedPyObject *, BorrowedPyObject *, BorrowedPyObject *) -> int {
+  tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
+    if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
+      PyErrorStreamer(PyExc_TypeError)
+          << "'Index.__init__' does not take any keyword arguments";
+      return -1;
+    }
+
+    if (!args || !PySequence_Check(args)) {
+      PyErrorStreamer(PyExc_TypeError)
+          << "Invalid positional arguments passed to 'Index.__init__'";
+      return -1;
+    }
+
+    auto obj = O_cast(self);
+    auto num_args = PySequence_Size(args);
+    
+    while (num_args == 0) {
+      obj->data = new (obj->backing_storage) Index();
+      return 0;
+    }
+
     PyErrorStreamer(PyExc_TypeError)
-        << "Class 'Index' cannot be directly instantiated";
+        << "Invalid arguments to 'Index.__init__'";
     return -1;
+
   };
   tp->tp_alloc = PyType_GenericAlloc;
-  tp->tp_new = nullptr;  // Don't allow instantiation.
+  tp->tp_new = PyType_GenericNew;
 
   if (0 != PyType_Ready(tp)) {
     return nullptr;

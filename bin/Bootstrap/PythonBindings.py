@@ -533,7 +533,7 @@ PyTypeObject *InitType(void) noexcept {{
     PyObject_Free(obj);
   }};
   tp->tp_name = "{py_namespace_path}{py_class_name}";
-  tp->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_DISALLOW_INSTANTIATION{py_flag_sequencing};
+  tp->tp_flags = Py_TPFLAGS_DEFAULT{py_flag_instantiation}{py_flag_sequencing};
   tp->tp_doc = PyDoc_STR("Wrapper for {cxx_namespace}::{cxx_class_name}");
   tp->tp_as_number = {py_number};
   tp->tp_as_sequence = {py_sequence};
@@ -544,13 +544,25 @@ PyTypeObject *InitType(void) noexcept {{
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
   tp->tp_base = {py_base_class};
-  tp->tp_init = [] (BorrowedPyObject *, BorrowedPyObject *, BorrowedPyObject *) -> int {{
-    PyErrorStreamer(PyExc_TypeError)
-        << "Class '{py_class_name}' cannot be directly instantiated";
-    return -1;
+  tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {{
+    if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {{
+      PyErrorStreamer(PyExc_TypeError)
+          << "'{py_class_name}.__init__' does not take any keyword arguments";
+      return -1;
+    }}
+
+    if (!args || !PySequence_Check(args)) {{
+      PyErrorStreamer(PyExc_TypeError)
+          << "Invalid positional arguments passed to '{py_class_name}.__init__'";
+      return -1;
+    }}
+
+    auto obj = O_cast(self);
+    auto num_args = PySequence_Size(args);
+    {py_constructor}
   }};
   tp->tp_alloc = PyType_GenericAlloc;
-  tp->tp_new = nullptr;  // Don't allow instantiation.
+  tp->tp_new = {py_new};
 
   if (0 != PyType_Ready(tp)) {{
     return nullptr;
@@ -561,6 +573,50 @@ PyTypeObject *InitType(void) noexcept {{
 
 }}  // namespace
 
+"""
+
+
+NOT_CONSTRUCTIBLE = """
+    (void) obj;
+    (void) num_args;
+    PyErrorStreamer(PyExc_TypeError)
+        << "Class '{py_class_name}' cannot be directly instantiated";
+    return -1;
+"""
+
+
+INIT_SPEC_CHECK_ARGCOUNT_BEGIN = """
+    while (num_args == {num_args}) {{"""
+
+
+INIT_SPEC_CHECK_ARGCOUNT_END = """    }
+"""
+
+
+INIT_SPEC_GET_ARG = """
+      auto obj_{arg_num} = PySequence_GetItem(args, {arg_num});
+      PyErr_Clear();
+      if (!obj_{arg_num}) {{
+        break;
+      }}
+      auto arg_{arg_num} = ::mx::from_python<{arg_type}>(obj_{arg_num});
+      Py_DECREF(obj_{arg_num});
+      if (!arg_{arg_num}.has_value()) {{
+        break;
+      }}
+"""
+
+
+INIT_SPEC_CALL = """
+      obj->data = new (obj->backing_storage) {cxx_class_name}({args});
+      return 0;
+"""
+
+
+INIT_SPEC_ERROR = """
+    PyErrorStreamer(PyExc_TypeError)
+        << "Invalid arguments to '{py_class_name}.__init__'";
+    return -1;
 """
 
 
@@ -796,6 +852,23 @@ def _wrap_method_impl(class_schema: ClassSchema, schema: MethodSchema,
   out.append(METHOD_SPEC_CHECK_ARGCOUNT_END)
 
 
+def _wrap_constructor_impl(class_schema: ClassSchema, schema: MethodSchema,
+                           out: List[str]):
+  num_args = len(schema.parameters)
+  out.append(INIT_SPEC_CHECK_ARGCOUNT_BEGIN.format(num_args=num_args))
+
+  for i, arg in enumerate(schema.parameters):
+    out.append(INIT_SPEC_GET_ARG.format(
+        arg_num=i,
+        arg_type=arg.element_type.cxx_value_name))
+
+  out.append(INIT_SPEC_CALL.format(
+      cxx_class_name=class_schema.name,
+      args=", ".join(METHOD_SPEC_CALL_ARG.format(i) for i in range(num_args))))
+
+  out.append(INIT_SPEC_CHECK_ARGCOUNT_END)
+
+
 def _wrap_method(class_schema: ClassSchema, schema: NamedSchema,
                  renamer: Renamer, is_static: bool, out: List[str]):
   """Create Python bindings for a method. This skips over methods that have no
@@ -1006,11 +1079,24 @@ def wrap_class(schema: ClassSchema,
             len_func=size_name,
             item_func="operator[]")))
 
+  py_constructor = NOT_CONSTRUCTIBLE.format(py_class_name=py_class_name)
+  constructors: List[MethodSchema] = _non_copy_constructors(schema)
+  if len(constructors):
+    constructor_out: List[str] = []
+    for method in constructors:
+      _wrap_constructor_impl(schema, method, constructor_out)
+
+    constructor_out.append(INIT_SPEC_ERROR.format(py_class_name=py_class_name))
+    py_constructor = "".join(constructor_out)
+
   out.append(INIT_TYPE.format(
       cxx_namespace=cxx_namespace,
       cxx_class_name=schema.name,
       py_namespace_path=py_namespace_path,
       py_class_name=py_class_name,
+      py_constructor=py_constructor,
+      py_new=len(constructors) == 0 and "nullptr" or "PyType_GenericNew",
+      py_flag_instantiation=len(constructors) == 0 and " | Py_TPFLAGS_DISALLOW_INSTANTIATION" or "",
       py_flag_sequencing=schema.indexed_type and " | Py_TPFLAGS_SEQUENCE " or "",
       py_hash=type_hash,
       py_rich_compare=(
@@ -1048,6 +1134,35 @@ def _save_output(schema: ClassSchema | EnumSchema, out: List[str]):
 
   with open(out_path, "w") as f:
     f.write("".join(out))
+
+
+def _non_copy_constructors(schema: ClassSchema) -> List[MethodSchema]:
+  constructors: List[MethodSchema] = []
+
+  if isinstance(schema.constructor, OverloadSetSchema):
+    constructors.extend(schema.constructor.overloads)
+
+  elif isinstance(schema.constructor, MethodSchema):
+    constructors.append(schema.constructor)
+
+  non_copy_constructors: List[MethodSchema] = []
+  for method in constructors:
+    assert isinstance(method.return_type, UnknownSchema)
+
+    if method.min_num_parameters == 0 or 1 < method.min_num_parameters:
+      non_copy_constructors.append(method)
+      continue
+
+    only_param_type = method.parameters[0].element_type
+    assert not isinstance(only_param_type, UnknownSchema)
+
+    if isinstance(only_param_type, ConstReferenceSchema) and \
+       only_param_type.element_type == schema:
+      continue
+
+    non_copy_constructors.append(method)
+
+  return non_copy_constructors
 
 
 def _fill_into(schema: ClassSchema, children: Dict[ClassSchema, List[ClassSchema]],

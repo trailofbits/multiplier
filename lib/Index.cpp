@@ -59,11 +59,19 @@ IndexStatus Index::status(bool block) const {
   }
 }
 
-// Create an in-memory caching index provider.
+// Create an in-memory caching index provider using the default timeout (1s).
+Index Index::in_memory_cache(Index next) {
+  return EntityProvider::CreateInMemoryCache(std::move(next.impl), 1u);
+}
+
+// Create an in-memory caching index provider using a custom timeout in
+// seconds.
 Index Index::in_memory_cache(Index next, unsigned timeout_s) {
   return EntityProvider::CreateInMemoryCache(std::move(next.impl), timeout_s);
 }
 
+// Create an index that opens a database produced by Multiplier's indexer
+// by specifying the path to that database.
 Index Index::from_database(std::filesystem::path path) {
   return EntityProvider::CreateFromDatabase(std::move(path));
 }

@@ -207,7 +207,7 @@ PyTypeObject *InitType(void) noexcept {
     PyObject_Free(obj);
   };
   tp->tp_name = "multiplier.RegexQuery";
-  tp->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_DISALLOW_INSTANTIATION;
+  tp->tp_flags = Py_TPFLAGS_DEFAULT;
   tp->tp_doc = PyDoc_STR("Wrapper for mx::::RegexQuery");
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
@@ -218,13 +218,50 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
   tp->tp_base = nullptr;
-  tp->tp_init = [] (BorrowedPyObject *, BorrowedPyObject *, BorrowedPyObject *) -> int {
+  tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
+    if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
+      PyErrorStreamer(PyExc_TypeError)
+          << "'RegexQuery.__init__' does not take any keyword arguments";
+      return -1;
+    }
+
+    if (!args || !PySequence_Check(args)) {
+      PyErrorStreamer(PyExc_TypeError)
+          << "Invalid positional arguments passed to 'RegexQuery.__init__'";
+      return -1;
+    }
+
+    auto obj = O_cast(self);
+    auto num_args = PySequence_Size(args);
+    
+    while (num_args == 0) {
+      obj->data = new (obj->backing_storage) RegexQuery();
+      return 0;
+    }
+
+    while (num_args == 1) {
+      auto obj_0 = PySequence_GetItem(args, 0);
+      PyErr_Clear();
+      if (!obj_0) {
+        break;
+      }
+      auto arg_0 = ::mx::from_python<std::string>(obj_0);
+      Py_DECREF(obj_0);
+      if (!arg_0.has_value()) {
+        break;
+      }
+
+      obj->data = new (obj->backing_storage) RegexQuery(arg_0.value());
+      return 0;
+    }
+
     PyErrorStreamer(PyExc_TypeError)
-        << "Class 'RegexQuery' cannot be directly instantiated";
+        << "Invalid arguments to 'RegexQuery.__init__'";
     return -1;
+
   };
   tp->tp_alloc = PyType_GenericAlloc;
-  tp->tp_new = nullptr;  // Don't allow instantiation.
+  tp->tp_new = PyType_GenericNew;
 
   if (0 != PyType_Ready(tp)) {
     return nullptr;

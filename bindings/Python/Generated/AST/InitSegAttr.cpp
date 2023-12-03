@@ -370,13 +370,31 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
   tp->tp_base = PythonBinding<mx::Attr>::type();
-  tp->tp_init = [] (BorrowedPyObject *, BorrowedPyObject *, BorrowedPyObject *) -> int {
+  tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
+    if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
+      PyErrorStreamer(PyExc_TypeError)
+          << "'InitSegAttr.__init__' does not take any keyword arguments";
+      return -1;
+    }
+
+    if (!args || !PySequence_Check(args)) {
+      PyErrorStreamer(PyExc_TypeError)
+          << "Invalid positional arguments passed to 'InitSegAttr.__init__'";
+      return -1;
+    }
+
+    auto obj = O_cast(self);
+    auto num_args = PySequence_Size(args);
+    
+    (void) obj;
+    (void) num_args;
     PyErrorStreamer(PyExc_TypeError)
         << "Class 'InitSegAttr' cannot be directly instantiated";
     return -1;
+
   };
   tp->tp_alloc = PyType_GenericAlloc;
-  tp->tp_new = nullptr;  // Don't allow instantiation.
+  tp->tp_new = nullptr;
 
   if (0 != PyType_Ready(tp)) {
     return nullptr;

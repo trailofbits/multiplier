@@ -119,8 +119,15 @@ class MX_EXPORT Index {
   /* implicit */ inline Index(EntityProviderPtr impl_)
       : impl(std::move(impl_)) {}
 
-  // Create an in-memory caching index provider.
-  static Index in_memory_cache(Index next, unsigned timeout_s=1u);
+  // Create an in-memory caching index provider using the default timeout (1s).
+  static Index in_memory_cache(Index next);
+
+  // Create an in-memory caching index provider using a custom timeout in
+  // seconds.
+  static Index in_memory_cache(Index next, unsigned timeout_s);
+  
+  // Create an index that opens a database produced by Multiplier's indexer
+  // by specifying the path to that database.
   static Index from_database(std::filesystem::path path);
 
   static Index containing(const Fragment &entity);

@@ -96,6 +96,7 @@ target_link_libraries("mx-mlir"
 
   PRIVATE
     "mx-vast"
+    "mx-serialize"
 )
 
 if(MX_ENABLE_INSTALL)

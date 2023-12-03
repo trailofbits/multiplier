@@ -21,6 +21,28 @@ file(GLOB frontend_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Frontend
 file(GLOB ast_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_DIR}/AST/*.h")
 file(GLOB ast_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/AST/*.cpp")
 
+add_library("mx-serialize" INTERFACE
+  ${MX_AST_SOURCES}
+  ${MX_RPC_SOURCES}
+)
+
+set_target_properties("mx-serialize"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX
+    VISIBILITY_INLINES_HIDDEN
+      YES
+    CXX_VISIBILITY_PRESET
+      hidden
+    POSITION_INDEPENDENT_CODE
+      YES
+)
+
+target_link_libraries("mx-serialize"
+  INTERFACE
+    "CapnProto::capnp"
+)
+
 if(MX_ENABLE_VAST)
   add_subdirectory("IR")
 endif()
@@ -177,8 +199,6 @@ add_library("mx-api" STATIC
 
   # Auto-generated.
   ${copied_headers}
-  ${MX_AST_SOURCES}
-  ${MX_RPC_SOURCES}
 )
 
 add_dependencies("mx-api"
@@ -187,6 +207,7 @@ add_dependencies("mx-api"
 
 target_link_libraries("mx-api"
   PUBLIC
+    "mx-serialize"
     "mx-frontend"
     "mx-ast"
     "mx-sqlite"
@@ -196,7 +217,6 @@ target_link_libraries("mx-api"
     "gap::gap-settings"
   PRIVATE
     "zstd::zstd"
-    "CapnProto::capnp"
     $<BUILD_INTERFACE:concurrentqueue>
 )
 

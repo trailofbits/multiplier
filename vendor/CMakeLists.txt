@@ -36,7 +36,3 @@ if(MX_ENABLE_RE2)
   add_subdirectory(abseil)
   add_subdirectory(re2)  # Depends on abseil
 endif()
-
-if(MX_ENABLE_PYTHON_BINDINGS)
-  add_subdirectory(nanobind)
-endif()
