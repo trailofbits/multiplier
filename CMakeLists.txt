@@ -22,8 +22,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   message(FATAL_ERROR "CMAKE_BUILD_TYPE must not be RelWithDebInfo")
 endif()
 
-set(CMAKE_CXX_VISIBILITY_PRESET default)
-set(CMAKE_C_VISIBILITY_PRESET default)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(VISIBILITY_INLINES_HIDDEN YES)
 
 list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
@@ -160,15 +160,25 @@ else()
       $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 
+  set(multiplier_public_libs
+    "gap::gap"
+    "gap::gap-core"
+    "gap::gap-settings"
+    "std::coroutines"
+  )
+
+  if(MX_ENABLE_PYTHON_BINDINGS)
+    list(APPEND multiplier_public_libs Python3::SABIModule)
+    set(multiplier_private_lib mx-python)
+  else()
+    set(multiplier_private_lib mx-analysis)
+  endif()
+
   target_link_libraries("multiplier"
     PUBLIC
-      "gap::gap"
-      "gap::gap-core"
-      "gap::gap-settings"
-      "std::coroutines"
-      $<$<BOOL:${MX_ENABLE_PYTHON_BINDINGS}>:Python3::SABIModule>
+      ${multiplier_public_libs}
     PRIVATE
-      $<LINK_LIBRARY:WHOLE_ARCHIVE,$<IF:$<BOOL:${MX_ENABLE_PYTHON_BINDINGS}>,mx-python,mx-analysis>>
+      $<LINK_LIBRARY:WHOLE_ARCHIVE,${multiplier_private_lib}>
   )
 
   set_target_properties("multiplier"
