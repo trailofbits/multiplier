@@ -43,6 +43,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_MODULE_LINKER_FLAGS_INIT=${CMAKE_MODULE_LINKER_FLAGS_INIT}"
                         "-DCMAKE_SHARED_LINKER_FLAGS_INIT=${CMAKE_SHARED_LINKER_FLAGS_INIT}"
                         -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
+                        -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
                         -DBUILD_SHARED_LIBS:BOOL=OFF
                         -DRE2_USE_ICU:BOOL=OFF
                         -DUSEPCRE:BOOL=OFF

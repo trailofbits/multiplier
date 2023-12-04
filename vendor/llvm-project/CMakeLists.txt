@@ -58,7 +58,8 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_EXE_LINKER_FLAGS_INIT=${CMAKE_EXE_LINKER_FLAGS_INIT}"
                         "-DCMAKE_MODULE_LINKER_FLAGS_INIT=${CMAKE_MODULE_LINKER_FLAGS_INIT}"
                         "-DCMAKE_SHARED_LINKER_FLAGS_INIT=${CMAKE_SHARED_LINKER_FLAGS_INIT}"
-                        "-DCMAKE_CXX_STANDARD=17"
+                        -DCMAKE_CXX_STANDARD=17
+                        -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
                         "-DLLVM_ENABLE_PROJECTS=clang;mlir"
                         "-DLLVM_TARGETS_TO_BUILD=AArch64;X86;ARM"
                         "-DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=ARM"

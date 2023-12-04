@@ -6,11 +6,9 @@
 
 #include <Python.h>
 
-#pragma GCC visibility push(hidden)
 namespace mx {
 
 // Size is defined in the auto-generated `Types.cpp` file.
 extern PyTypeObject gTypes[];
 
 }  // namespace mx
-#pragma GCC visibility pop

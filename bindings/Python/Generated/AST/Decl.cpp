@@ -1248,7 +1248,7 @@ PyTypeObject *InitType(void) noexcept {
         << Py_TYPE(a_obj)->tp_name << "' and '" << Py_TYPE(b_obj)->tp_name << "'";
     return nullptr;
   };
-  tp->tp_iter = nullptr;  // TODO
+  tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
   tp->tp_base = PythonBinding<VariantEntity>::type();

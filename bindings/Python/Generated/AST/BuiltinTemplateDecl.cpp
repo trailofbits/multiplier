@@ -396,7 +396,7 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_mapping = nullptr;
   tp->tp_hash = PythonBinding<mx::TemplateDecl>::type()->tp_hash;
   tp->tp_richcompare = nullptr;
-  tp->tp_iter = nullptr;  // TODO
+  tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
   tp->tp_base = PythonBinding<mx::TemplateDecl>::type();

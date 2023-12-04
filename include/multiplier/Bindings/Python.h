@@ -20,12 +20,18 @@ namespace mx {
 using BorrowedPyObject = ::PyObject;
 using SharedPyObject = ::PyObject;
 
+// Convert an object of type `T` to a new reference to a Python object.
 template <typename T>
 [[gnu::noinline, gnu::flatten]]
 MX_EXPORT SharedPyObject *to_python(T) noexcept;
 
+// Convert a borrowed reference to a Python object, and try to convert it to
+// a value of type `T`.
 template <typename T>
 [[gnu::noinline, gnu::flatten]]
 MX_EXPORT std::optional<T> from_python(BorrowedPyObject *obj) noexcept;
+
+// Return a new reference to the loaded `multiplier` module, if any.
+MX_EXPORT SharedPyObject *python_module(void) noexcept;
 
 }  // namespace mx

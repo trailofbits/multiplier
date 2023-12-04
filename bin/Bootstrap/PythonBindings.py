@@ -540,7 +540,7 @@ PyTypeObject *InitType(void) noexcept {{
   tp->tp_as_mapping = nullptr;
   tp->tp_hash = {py_hash};
   tp->tp_richcompare = {py_rich_compare};
-  tp->tp_iter = nullptr;  // TODO
+  tp->tp_iter = {py_iter};
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
   tp->tp_base = {py_base_class};
@@ -574,6 +574,20 @@ PyTypeObject *InitType(void) noexcept {{
 }}  // namespace
 
 """
+
+
+ITER_FUNC = """[] (BorrowedPyObject *self) {{
+    auto generator_func = [] (BorrowedPyObject *self_) {{
+      T *obj = T_cast(self_);
+      for (auto val : *(obj->data)) {{
+        co_yield val;
+      }}
+      Py_DECREF(self);
+    }};
+
+    Py_INCREF(self);
+    return ::mx::to_python<gap::generator<{cxx_value_type}>(generator_func(self));
+  }}"""
 
 
 NOT_CONSTRUCTIBLE = """
@@ -1089,6 +1103,10 @@ def wrap_class(schema: ClassSchema,
     constructor_out.append(INIT_SPEC_ERROR.format(py_class_name=py_class_name))
     py_constructor = "".join(constructor_out)
 
+  py_iter = "nullptr"
+  if schema.generated_type and schema.indexed_type != schema.generated_type:
+    py_iter = ITER_FUNC.format(schema.generated_type.cxx_value_name)
+
   out.append(INIT_TYPE.format(
       cxx_namespace=cxx_namespace,
       cxx_class_name=schema.name,
@@ -1104,6 +1122,7 @@ def wrap_class(schema: ClassSchema,
       py_base_class=base_class,
       py_number=schema.has_boolean_conversion and "&gNumberMethods" or "nullptr",
       py_sequence=schema.indexed_type and "&gSequenceMethods" or "nullptr",
+      py_iter=py_iter,
       type_offset=type_offsets[0],
       type_offset_upper_bound=type_offsets[1]))
 

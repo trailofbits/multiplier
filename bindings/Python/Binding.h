@@ -9,11 +9,13 @@
 #include <cstdint>
 #include <filesystem>
 #include <map>
+#include <new>
 #include <set>
 #include <span>
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <typeinfo>
 #include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
@@ -23,6 +25,8 @@
 
 #include <multiplier/Bindings/Python.h>
 #include <multiplier/Entity.h>
+
+#include "Error.h"
 
 namespace mx {
 
@@ -456,41 +460,129 @@ concept ForwardIteratorProtocol = requires(T x) {
   ++std::declval<decltype(x.begin())>();
 };
 
-// Conversions for iterables, e.g. `gap::generator`, or other ones.
-template <ForwardIteratorProtocol IterableType>
-struct PythonBinding<IterableType> {
- public:
+template <typename RangeType>
+struct RangePythonBinding {
+  using BeginType = std::decay_t<decltype(std::declval<RangeType>().begin())>;
+  using EndType = std::decay_t<decltype(std::declval<RangeType>().end())>;
+
   using T = std::remove_cvref_t<
-      decltype(*std::declval<IterableType>().begin())>;
+      decltype(*std::declval<RangeType>().begin())>;
 
-  static SharedPyObject *to_python(IterableType val) noexcept {
-    std::vector<SharedPyObject *> new_elements;
-    SharedPyObject *list = nullptr;
-    Py_ssize_t i = 0;
+  // Python object that can hold an iterator range.
+  struct IterRange final : public ::PyObject {
+    RangeType *range{nullptr};
+    BeginType *it{nullptr};
+    EndType *end{nullptr};
+    alignas(alignof(RangeType)) char range_storage[sizeof(RangeType)];
+    alignas(alignof(BeginType)) char it_storage[sizeof(BeginType)];
+    alignas(alignof(EndType)) char end_storage[sizeof(EndType)];
+  };
 
-    for (T elem : val) {
-      auto elem_obj = PythonBinding<T>::to_python(std::move(elem));
-      if (!elem_obj) {
-        goto unwind;
+  static bool gInitialized;
+  static bool gSucceeded;
+  static PyTypeObject gRangeType;
+  static PyTypeObject gIterType;
+
+  static bool InitType(void) {
+    if (gInitialized) {
+      return gSucceeded;
+    }
+
+    gInitialized = true;
+    auto module = ::mx::python_module();
+    if (!module) {
+      return false;
+    }
+
+    // Define the range type. It holds the range before Python has asked for
+    // iteration.
+    gRangeType.tp_name = typeid(RangeType).name();
+    gRangeType.tp_basicsize = sizeof(IterRange);
+    gRangeType.tp_itemsize = 0;
+    gRangeType.tp_init = nullptr;
+    gRangeType.tp_new = nullptr;
+    gRangeType.tp_flags = Py_TPFLAGS_DEFAULT |
+                          Py_TPFLAGS_DISALLOW_INSTANTIATION |
+                          Py_TPFLAGS_IMMUTABLETYPE;
+    gRangeType.tp_alloc = PyType_GenericAlloc;
+
+    gRangeType.tp_dealloc = [] (BorrowedPyObject *obj) {
+      if (auto *data = reinterpret_cast<IterRange *>(obj)) {
+        data->it->~BeginType();
+        data->end->~EndType();
+        data->range->~RangeType();
       }
-      
-      new_elements.emplace_back(elem_obj);
+      PyObject_Free(obj);
+    };
+
+    gRangeType.tp_iter = [] (BorrowedPyObject *obj) {
+      Py_INCREF(obj);
+      return obj;
+    };
+
+    gRangeType.tp_iternext = [] (BorrowedPyObject *obj) -> SharedPyObject * {
+      auto iter_obj = reinterpret_cast<IterRange *>(obj);
+      BeginType &it = *(iter_obj->it);
+      EndType &end = *(iter_obj->end);
+      if (it == end) {
+        PyErr_SetNone(PyExc_StopIteration);
+        return nullptr;
+      }
+
+      auto ret = ::mx::to_python<T>(*it);
+      ++it;
+      return ret;
+    };
+
+    if (0 != PyType_Ready(&gRangeType)) {
+      return false;
     }
 
-    list = PyList_New(static_cast<Py_ssize_t>(new_elements.size()));
-    for (auto elem_obj : new_elements) {
-      PyList_SetItem(list, i++, elem_obj);
+    auto rt = reinterpret_cast<BorrowedPyObject *>(&gRangeType);
+    if (0 != PyModule_AddObjectRef(module, gRangeType.tp_name, rt)) {
+      return false;
     }
-    return list;
 
-  unwind:
-    while (!new_elements.empty()) {
-      Py_DECREF(new_elements.back());
-      new_elements.pop_back();
+    gSucceeded = true;
+    return true;
+  }
+
+  static SharedPyObject *to_python(RangeType val) noexcept {
+    if (!InitType()) {
+      if (!PyErr_Occurred()) {
+        PyErrorStreamer(PyExc_TypeError)
+            << "Unable to wrap iterator range type '"
+            << typeid(RangeType).name() << "'";
+      }
+      return nullptr;
     }
-    return nullptr;
+
+    auto obj = gRangeType.tp_alloc(&gRangeType, 0);
+    if (auto range = reinterpret_cast<IterRange *>(obj)) {
+      range->range = new (range->range_storage) RangeType(std::move(val));
+      range->it = new (range->it_storage) BeginType(range->range->begin());
+      range->end = new (range->end_storage) EndType(range->range->end());
+    }
+
+    return obj;
   }
 };
+
+template <typename RangeType>
+bool RangePythonBinding<RangeType>::gInitialized = false;
+
+template <typename RangeType>
+bool RangePythonBinding<RangeType>::gSucceeded = false;
+
+template <typename RangeType>
+PyTypeObject RangePythonBinding<RangeType>::gRangeType = {};
+
+// Conversions for iterables, e.g. `gap::generator`, or other ones.
+//
+// NOTE(pag): Separated from `RangePythonBinding` because concepts don't seem to
+//            play well with out-of-line static member definitions.
+template <ForwardIteratorProtocol RangeType>
+struct PythonBinding<RangeType> : public RangePythonBinding<RangeType> {};
 
 template <typename T>
 SharedPyObject *to_python(T val) noexcept {

@@ -404,7 +404,7 @@ PyTypeObject *InitType(void) noexcept {
     return static_cast<Py_hash_t>(EntityId(T_cast(obj)->id()).Pack());
   };
   tp->tp_richcompare = nullptr;
-  tp->tp_iter = nullptr;  // TODO
+  tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
   tp->tp_base = PythonBinding<VariantEntity>::type();
