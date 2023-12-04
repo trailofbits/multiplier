@@ -51,6 +51,10 @@ function(find_and_link_llvm_dependency target_name dependency_name)
       "$<INSTALL_INTERFACE:${target_filename}>"
   )
 
+  target_link_directories("mx-${dependency_name}"
+    INTERFACE
+      "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/lib>")
+
   if(PLATFORM_MACOS)
     find_program(install_name_tool install_name_tool)
     if("${install_name_tool}" STREQUAL "install_name_tool-NOTFOUND")
