@@ -25,7 +25,6 @@ static PyMethodDef gEmptyMethods[] = {
 
 // multiplier
 static PyModuleDef gModule = {
-  PyModuleDef_HEAD_INIT,
   .m_name = "",
   .m_doc = PyDoc_STR("Multiplier source code auditing API"),
   .m_size = 0,
@@ -49,7 +48,6 @@ static LoaderFunc * const gLoaders[] = {
 
 // multiplier.ir
 static PyModuleDef gIRModule = {
-  PyModuleDef_HEAD_INIT,
   .m_name = "ir",
   .m_doc = PyDoc_STR("Wrapper of IR"),
   .m_size = 0,
@@ -79,7 +77,6 @@ static LoaderFunc * const gIRLoaders[] = {
 
 // multiplier.ast
 static PyModuleDef gASTModule = {
-  PyModuleDef_HEAD_INIT,
   .m_name = "ast",
   .m_doc = PyDoc_STR("Wrapper of AST"),
   .m_size = 0,
@@ -1456,7 +1453,6 @@ static LoaderFunc * const gASTLoaders[] = {
 
 // multiplier.ir.abi
 static PyModuleDef gABIModule = {
-  PyModuleDef_HEAD_INIT,
   .m_name = "abi",
   .m_doc = PyDoc_STR("Wrapper of IR/ABI"),
   .m_size = 0,
@@ -1484,7 +1480,6 @@ static LoaderFunc * const gABILoaders[] = {
 
 // multiplier.ir.llvm
 static PyModuleDef gLLVMModule = {
-  PyModuleDef_HEAD_INIT,
   .m_name = "llvm",
   .m_doc = PyDoc_STR("Wrapper of IR/LLVM"),
   .m_size = 0,
@@ -1742,7 +1737,6 @@ static LoaderFunc * const gLLVMLoaders[] = {
 
 // multiplier.ir.core
 static PyModuleDef gCoreModule = {
-  PyModuleDef_HEAD_INIT,
   .m_name = "core",
   .m_doc = PyDoc_STR("Wrapper of IR/Core"),
   .m_size = 0,
@@ -1767,7 +1761,6 @@ static LoaderFunc * const gCoreLoaders[] = {
 
 // multiplier.frontend
 static PyModuleDef gFrontendModule = {
-  PyModuleDef_HEAD_INIT,
   .m_name = "frontend",
   .m_doc = PyDoc_STR("Wrapper of Frontend"),
   .m_size = 0,
@@ -1828,7 +1821,6 @@ static LoaderFunc * const gFrontendLoaders[] = {
 
 // multiplier.ir.memref
 static PyModuleDef gMemRefModule = {
-  PyModuleDef_HEAD_INIT,
   .m_name = "memref",
   .m_doc = PyDoc_STR("Wrapper of IR/MemRef"),
   .m_size = 0,
@@ -1864,7 +1856,6 @@ static LoaderFunc * const gMemRefLoaders[] = {
 
 // multiplier.ir.builtin
 static PyModuleDef gBuiltinModule = {
-  PyModuleDef_HEAD_INIT,
   .m_name = "builtin",
   .m_doc = PyDoc_STR("Wrapper of IR/Builtin"),
   .m_size = 0,
@@ -1896,7 +1887,6 @@ static LoaderFunc * const gBuiltinLoaders[] = {
 
 // multiplier.ir.lowlevel
 static PyModuleDef gLowLevelModule = {
-  PyModuleDef_HEAD_INIT,
   .m_name = "lowlevel",
   .m_doc = PyDoc_STR("Wrapper of IR/LowLevel"),
   .m_size = 0,
@@ -1924,7 +1914,6 @@ static LoaderFunc * const gLowLevelLoaders[] = {
 
 // multiplier.ir.highlevel
 static PyModuleDef gHighLevelModule = {
-  PyModuleDef_HEAD_INIT,
   .m_name = "highlevel",
   .m_doc = PyDoc_STR("Wrapper of IR/HighLevel"),
   .m_size = 0,
@@ -2053,7 +2042,6 @@ static LoaderFunc * const gHighLevelLoaders[] = {
 
 // multiplier.ir.unsupported
 static PyModuleDef gUnsupportedModule = {
-  PyModuleDef_HEAD_INIT,
   .m_name = "unsupported",
   .m_doc = PyDoc_STR("Wrapper of IR/Unsupported"),
   .m_size = 0,

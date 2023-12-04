@@ -91,10 +91,8 @@ target_link_libraries("mx-mlir"
   PUBLIC
     "gap::gap"
     "gap::gap-core"
-    "std::coroutines"
     "gap::gap-settings"
-
-  PRIVATE
+    "std::coroutines"
     "mx-vast"
     "mx-serialize"
 )

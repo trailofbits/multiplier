@@ -99,7 +99,6 @@ MODULE_CPP_TYPE_ROW = "  PythonBinding<{}{}>::load,\n"
 BEGIN_MODULE_CPP_DEF = """
 // multiplier{dot_name}
 static PyModuleDef g{upper_name}Module = {{
-  PyModuleDef_HEAD_INIT,
   .m_name = "{lower_name}",
   .m_doc = PyDoc_STR("{py_doc}"),
   .m_size = 0,
