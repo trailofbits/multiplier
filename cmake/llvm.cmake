@@ -30,7 +30,7 @@ function(find_and_link_llvm_dependency target_name dependency_name)
   cmake_path(GET dest_lib PARENT_PATH dest_lib_dir)
   if(target_file_dir STREQUAL dest_lib_dir)
     message(STATUS "Found already installed ${dependency_name} library: ${target_file}")
-    target_link_libraries("${target_name}" PUBLIC "${dest_lib}")
+    target_link_libraries("${target_name}" PUBLIC "${target_file}")
     return()
   endif()
 
