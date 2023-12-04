@@ -237,7 +237,7 @@ if(MX_ENABLE_INSTALL)
   if(MX_ENABLE_PYTHON_BINDINGS)
     include("cmake/python.cmake")
     get_python_extension_suffix(python_module_extension)
-    set(site_packages_dir "${MX_INSTALL_LIB_DIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages")
+    set(site_packages_dir "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_LIB_DIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages")
     install(DIRECTORY DESTINATION "${site_packages_dir}")
     install(
       CODE

@@ -19,19 +19,22 @@ function(find_and_link_llvm_dependency target_name dependency_name)
     cmake_path(ABSOLUTE_PATH found_lib NORMALIZE)
   endif()
 
-  message(STATUS "Found ${dependency_name} library: ${target_file}")
-
   cmake_path(GET target_file FILENAME target_filename)
   file(REAL_PATH "${target_file}" target_realfile)
 
-  set(dest_lib "${MX_INSTALL_LIB_DIR}/${target_filename}")
+  set(dest_lib "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_LIB_DIR}/${target_filename}")
   cmake_path(ABSOLUTE_PATH dest_lib NORMALIZE)
 
   # It's already in the right spot!
-  if(target_file STREQUAL dest_lib OR target_realfile STREQUAL dest_lib)
+  cmake_path(GET target_realfile PARENT_PATH target_realfile_dir)
+  cmake_path(GET dest_lib PARENT_PATH dest_lib_dir)
+  if(target_file_dir STREQUAL dest_lib_dir)
+    message(STATUS "Found already installed ${dependency_name} library: ${target_file}")
     target_link_libraries("${target_name}" PUBLIC "${dest_lib}")
     return()
   endif()
+
+  message(STATUS "Found ${dependency_name} library: ${target_file}")
 
   set(local_lib "${PROJECT_BINARY_DIR}/lib/${target_filename}")
 
