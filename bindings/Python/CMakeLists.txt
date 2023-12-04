@@ -57,5 +57,6 @@ target_link_libraries("mx-python"
   PUBLIC
     Python3::Python
     Python3::SABIModule
-    "mx-analysis"
+  PRIVATE
+    "mx-api"
 )

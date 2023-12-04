@@ -171,7 +171,7 @@ else()
     list(APPEND multiplier_public_libs Python3::SABIModule)
     set(multiplier_private_lib mx-python)
   else()
-    set(multiplier_private_lib mx-analysis)
+    set(multiplier_private_lib mx-api)
   endif()
 
   target_link_libraries("multiplier"

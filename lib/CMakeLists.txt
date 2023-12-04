@@ -305,5 +305,3 @@ if(MX_ENABLE_INSTALL)
       "${MX_INSTALL_INCLUDE_DIR}"
   )
 endif(MX_ENABLE_INSTALL)
-
-add_subdirectory("Analysis")
