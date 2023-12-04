@@ -17,7 +17,6 @@ function(find_and_link_llvm_dependency target_name dependency_name)
   else()
     find_library(found_lib ${dependency_name} REQUIRED HINTS ${LLVM_LIBRARY_DIRS} NO_DEFAULT_PATH)
     cmake_path(ABSOLUTE_PATH found_lib NORMALIZE)
-    file(REAL_PATH "${found_lib}" target_file)
   endif()
 
   message(STATUS "Found ${dependency_name} library: ${target_file}")
