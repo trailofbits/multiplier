@@ -48,7 +48,7 @@ set_target_properties("mx-python"
 target_include_directories("mx-python"
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    $<INSTALL_INTERFACE:${MX_INSTALL_INCLUDE_DIR}>
   PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}"
 )
@@ -60,3 +60,19 @@ target_link_libraries("mx-python"
   PRIVATE
     "mx-api"
 )
+
+file(GENERATE
+  OUTPUT
+    "${CMAKE_CURRENT_BINARY_DIR}/setup.py"
+  INPUT
+    "${CMAKE_CURRENT_LIST_DIR}/setup.py.in"
+)
+
+if(MX_ENABLE_INSTALL)
+  install(
+    FILES
+      "${CMAKE_CURRENT_BINARY_DIR}/setup.py"
+    DESTINATION
+      "${MX_INSTALL_SHARE_DIR}/multiplier"
+  )
+endif()

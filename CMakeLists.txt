@@ -139,64 +139,67 @@ set(MX_BOOTSTRAP_INDEX_SERIALIZE_H "${PROJECT_SOURCE_DIR}/bin/Index/Serialize.h"
 set(MX_BOOTSTRAP_INDEX_SERIALIZE_CPP "${PROJECT_SOURCE_DIR}/bin/Index/Serialize.cpp")
 set(MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H "${PROJECT_SOURCE_DIR}/include/multiplier/Visitor.inc.h")
 
+# If we're bootstrapping then stop here.
+if(MX_ENABLE_BOOTSTRAP)
+  add_subdirectory("bin/Bootstrap")
+  return()
+endif()
+
 get_patch_from_git(MX_GIT_HASH)
 configure_file(lib/Version.cpp.in "${PROJECT_BINARY_DIR}/Version.cpp" @ONLY)
 
+add_subdirectory("lib")
+add_subdirectory("bindings")
 
-if(MX_ENABLE_BOOTSTRAP)
-  add_subdirectory("bin/Bootstrap")
+add_library("multiplier" SHARED
+  "${PROJECT_BINARY_DIR}/Version.cpp"
+)
+
+target_include_directories("multiplier"
+  PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:${MX_INSTALL_INCLUDE_DIR}>
+)
+
+set(multiplier_public_libs
+  "gap::gap"
+  "gap::gap-core"
+  "gap::gap-settings"
+  "std::coroutines"
+)
+
+if(MX_ENABLE_PYTHON_BINDINGS)
+  list(APPEND multiplier_public_libs Python3::SABIModule)
+  set(multiplier_private_lib mx-python)
 else()
-  add_subdirectory("lib")
-  add_subdirectory("bindings")
+  set(multiplier_private_lib mx-api)
+endif()
 
-  add_library("multiplier" SHARED
-    "${PROJECT_BINARY_DIR}/Version.cpp"
-  )
+target_link_libraries("multiplier"
+  PUBLIC
+    ${multiplier_public_libs}
+  PRIVATE
+    $<LINK_LIBRARY:WHOLE_ARCHIVE,${multiplier_private_lib}>
+)
 
-  target_include_directories("multiplier"
-    PUBLIC
-      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-      $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-  )
+set_target_properties("multiplier"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX
+    VISIBILITY_INLINES_HIDDEN
+      YES
+    CXX_VISIBILITY_PRESET
+      hidden
+    POSITION_INDEPENDENT_CODE
+      YES
+    COMPILE_FEATURES
+      cxx_std_20
+    INTERFACE_COMPILE_FEATURES
+      cxx_std_20
+)
 
-  set(multiplier_public_libs
-    "gap::gap"
-    "gap::gap-core"
-    "gap::gap-settings"
-    "std::coroutines"
-  )
-
-  if(MX_ENABLE_PYTHON_BINDINGS)
-    list(APPEND multiplier_public_libs Python3::SABIModule)
-    set(multiplier_private_lib mx-python)
-  else()
-    set(multiplier_private_lib mx-api)
-  endif()
-
-  target_link_libraries("multiplier"
-    PUBLIC
-      ${multiplier_public_libs}
-    PRIVATE
-      $<LINK_LIBRARY:WHOLE_ARCHIVE,${multiplier_private_lib}>
-  )
-
-  set_target_properties("multiplier"
-    PROPERTIES
-      LINKER_LANGUAGE
-        CXX
-      VISIBILITY_INLINES_HIDDEN
-        YES
-      CXX_VISIBILITY_PRESET
-        hidden
-      POSITION_INDEPENDENT_CODE
-        YES
-      COMPILE_FEATURES
-        cxx_std_20
-      INTERFACE_COMPILE_FEATURES
-        cxx_std_20
-  )
-
+if(MX_ENABLE_INSTALL)
   install(
     TARGETS
       "multiplier"
@@ -213,8 +216,8 @@ else()
         "${MX_INSTALL_LIB_DIR}"
     PUBLIC_HEADER
       DESTINATION
-        "${MX_INSTALL_INCLUDE_DIR}"
+        "${MX_INSTALL_INCLUDE_DIR}/multiplier"
   )
-
-  add_subdirectory("bin")
 endif()
+
+add_subdirectory("bin")

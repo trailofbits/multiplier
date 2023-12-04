@@ -12,8 +12,9 @@ set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard version")
 
 set(MX_INSTALL_LIB_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE PATH "Directory in which Multiplier libraries will be installed")
 set(MX_INSTALL_BIN_DIR "${CMAKE_INSTALL_BINDIR}" CACHE PATH "Directory in which Multiplier binaries will be installed")
-set(MX_INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_INCLUDEDIR}/multiplier" CACHE PATH "Directory in which Multiplier headers will be installed")
+set(MX_INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_INCLUDEDIR}" CACHE PATH "Directory in which Multiplier headers will be installed")
 set(MX_INSTALL_SHARE_DIR "${CMAKE_INSTALL_DATADIR}" CACHE PATH "Directory in which Multiplier CMake files will be installed")
+set(MX_VENDOR_INSTALL_DIR "${PROJECT_BINARY_DIR}/vendor/install" CACHE PATH "Directory in which multiplier's vendored dependencies are installed")
 
 option(MX_USE_VENDORED_CAPNPROTO "Set to OFF to disable default building of Cap'n Proto as a vendored library." ON)
 option(MX_USE_VENDORED_GLOG "Set to OFF to disable default building of Google glog as a vendored library." ON)

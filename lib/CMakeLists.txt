@@ -207,17 +207,17 @@ add_dependencies("mx-api"
 
 target_link_libraries("mx-api"
   PUBLIC
-    "mx-serialize"
     "mx-frontend"
     "mx-ast"
-    "mx-sqlite"
     "gap::gap"
     "gap::gap-core"
-    "std::coroutines"
     "gap::gap-settings"
+    "std::coroutines"
   PRIVATE
+    "mx-serialize"
+    "mx-sqlite"
     "zstd::zstd"
-    $<BUILD_INTERFACE:concurrentqueue>
+    "concurrentqueue"
 )
 
 target_compile_definitions("mx-api"
@@ -255,7 +255,7 @@ target_include_directories("mx-api"
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    $<INSTALL_INTERFACE:${MX_INSTALL_INCLUDE_DIR}>
   PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_CURRENT_BINARY_DIR}"
@@ -281,27 +281,21 @@ set_target_properties("mx-api"
 
 if(MX_ENABLE_INSTALL)
   install(
-    TARGETS
-      "mx-frontend"
-    EXPORT
-      "${PROJECT_NAME}Targets"
-    PUBLIC_HEADER
-      DESTINATION
-        "${MX_INSTALL_INCLUDE_DIR}/Frontend"
-  )
+    FILES
+      ${ast_headers}
+    DESTINATION
+      "${MX_INSTALL_INCLUDE_DIR}/multiplier/AST"
+  )  
   install(
-    TARGETS
-      "mx-ast"
-    EXPORT
-      "${PROJECT_NAME}Targets"
-    PUBLIC_HEADER
-      DESTINATION
-        "${MX_INSTALL_INCLUDE_DIR}/AST"
+    FILES
+      ${frontend_headers}
+    DESTINATION
+      "${MX_INSTALL_INCLUDE_DIR}/multiplier/Frontend"
   )
   install(
     FILES
       ${api_headers}
     DESTINATION
-      "${MX_INSTALL_INCLUDE_DIR}"
+      "${MX_INSTALL_INCLUDE_DIR}/multiplier"
   )
 endif(MX_ENABLE_INSTALL)
