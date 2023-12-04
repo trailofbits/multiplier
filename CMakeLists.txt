@@ -62,7 +62,6 @@ if(NOT TARGET gflags::gflags)
 endif()
 
 find_package(Filesystem REQUIRED COMPONENTS Final Experimental)
-find_package(Python3 COMPONENTS Interpreter REQUIRED)
 find_package(CapnProto CONFIG REQUIRED)
 find_package(xxHash CONFIG REQUIRED)
 find_package(zstd CONFIG REQUIRED)
@@ -200,6 +199,18 @@ set_target_properties("multiplier"
       cxx_std_20
     INTERFACE_COMPILE_FEATURES
       cxx_std_20
+
+    # NOTE(pag): This is important! We need to emulate the shape of the
+    #            install directories, so that install targets behave in the
+    #            same way to local build targets w.r.t. shared library
+    #            resolution. This places `libmultiplier.so` in the `lib/` sub-
+    #            directory, where we also place copies of `libLTO.so` and
+    #            `libRemarks.so`. This mirrors the organization inside of
+    #            `<install-prefix>/lib`. This same-shapedness is necessary for
+    #            how we fiddle with the RPATH, and do symlinking for Python
+    #            extensions.
+    LIBRARY_OUTPUT_DIRECTORY
+      "${PROJECT_BINARY_DIR}/lib"
 )
 
 if(MX_ENABLE_INSTALL)
@@ -221,6 +232,17 @@ if(MX_ENABLE_INSTALL)
       DESTINATION
         "${MX_INSTALL_INCLUDE_DIR}/multiplier"
   )
+
+  # This is a horrible way of "installing" libmultiplier as a Python extension.
+  if(MX_ENABLE_PYTHON_BINDINGS)
+    include("cmake/python.cmake")
+    get_python_extension_suffix(python_module_extension)
+    set(site_packages_dir "${MX_INSTALL_LIB_DIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages")
+    install(DIRECTORY DESTINATION "${site_packages_dir}")
+    install(
+      CODE
+        "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"../../$<TARGET_FILE_NAME:multiplier>\" \"multiplier${python_module_extension}\" WORKING_DIRECTORY \"${site_packages_dir}\")")
+  endif()
 endif()
 
 add_subdirectory("bin")

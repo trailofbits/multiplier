@@ -33,7 +33,7 @@ function(find_and_link_llvm_dependency target_name dependency_name)
     return()
   endif()
 
-  set(local_lib "${PROJECT_BINARY_DIR}/${target_filename}")
+  set(local_lib "${PROJECT_BINARY_DIR}/lib/${target_filename}")
 
   add_custom_target(
     "gen-${dependency_name}" ALL DEPENDS "${local_lib}")
@@ -50,6 +50,17 @@ function(find_and_link_llvm_dependency target_name dependency_name)
       "$<BUILD_INTERFACE:${local_lib}>"
       "$<INSTALL_INTERFACE:${target_filename}>"
   )
+
+  if(PLATFORM_MACOS)
+    find_program(install_name_tool install_name_tool)
+    if("${install_name_tool}" STREQUAL "install_name_tool-NOTFOUND")
+      message(FATAL_ERROR "Could not find install_name_tool")  
+    endif()
+
+    add_custom_command(TARGET "${target_name}"
+      COMMAND
+        COMMAND "${install_name_tool}" -change "@rpath/${target_filename}" "@loader_path/../lib/${target_filename}" "$<TARGET_FILE:${target_name}>")
+  endif()
 
   if(MX_ENABLE_INSTALL)
     install(

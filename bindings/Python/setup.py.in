@@ -10,6 +10,9 @@
 import distutils.core
 import os
 
+# This file is isntalled to `<prefix>/share/multiplier/setup.py`, and our
+# shared library should be in `<prefix>/lib/$<TARGET_FILE_NAME:multiplier>`.
+
 distutils.core.setup(
     name="multiplier",
     version="0.1",
@@ -20,4 +23,4 @@ distutils.core.setup(
     license="Proprietary and confidential",
     packages=[''],
     package_dir={'': '.'},
-    package_data={'': "$<TARGET_FILE_NAME:multiplier>"})
+    package_data={'': os.path.abspath(os.path.join(__file__, "..", "..", "..", "lib", "$<TARGET_FILE_NAME:multiplier>"))})

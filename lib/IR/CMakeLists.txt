@@ -44,6 +44,7 @@ add_library("mx-mlir" STATIC
 
 target_include_directories("mx-mlir"
   PUBLIC
+    "$<BUILD_INTERFACE:${LLVM_INCLUDE_DIRS};${LLVM_INCLUDE_DIR};${MLIR_INCLUDE_DIRS}>"
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:${MX_INSTALL_INCLUDE_DIR}>
