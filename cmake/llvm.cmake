@@ -28,7 +28,7 @@ function(find_and_link_llvm_dependency target_name dependency_name)
   cmake_path(ABSOLUTE_PATH dest_lib NORMALIZE)
 
   # It's already in the right spot!
-  if(target_file STREQUAL dest_lib)
+  if(target_file STREQUAL dest_lib OR target_realfile STREQUAL dest_lib)
     target_link_libraries("${target_name}" PUBLIC "${dest_lib}")
     return()
   endif()
