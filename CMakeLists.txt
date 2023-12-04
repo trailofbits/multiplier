@@ -179,9 +179,12 @@ endif()
 target_link_libraries("multiplier"
   PUBLIC
     ${multiplier_public_libs}
+    ${MX_LLVM_LIBRARIES}
   PRIVATE
     $<LINK_LIBRARY:WHOLE_ARCHIVE,${multiplier_private_lib}>
 )
+
+find_and_link_llvm_dependencies("multiplier")
 
 set_target_properties("multiplier"
   PROPERTIES

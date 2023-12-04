@@ -118,6 +118,4 @@ if(MX_ENABLE_INSTALL)
       DESTINATION
         "${CMAKE_INSTALL_BINDIR}"
   )
-
-  find_and_install_llvm_dependencies()
 endif()
