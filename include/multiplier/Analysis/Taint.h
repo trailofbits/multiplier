@@ -42,7 +42,7 @@ using TaintTrackingResult = std::variant<TaintTrackingStep,
 using TaintTrackingResults = gap::generator<TaintTrackingResult>;
 
 // An edge in a taint tracking graph.
-class TraintTrackingEdge {
+class MX_EXPORT TraintTrackingEdge {
  protected:
   friend class TaintTrackingSink;
   friend class TaintTrackingStep;
@@ -78,7 +78,7 @@ class TraintTrackingEdge {
 
 // The driver for a taint tracking analysis. Executes a single step of taint
 // tracking.
-class TaintTracker {
+class MX_EXPORT TaintTracker {
  private:
   friend class TaintTracker;
   friend class TaintTrackerImpl;
@@ -126,7 +126,7 @@ enum class TaintTrackingSinkKind {
 
 // The stopping point for the taint tracker, where it isn't able to evaluate
 // its condition further, or where the sink condition is accepted.
-class TaintTrackingSink final : public TraintTrackingEdge {
+class MX_EXPORT TaintTrackingSink final : public TraintTrackingEdge {
  private:
   friend class TaintTracker;
   friend class TaintTrackerImpl;
@@ -175,7 +175,7 @@ enum class TaintTrackingStepKind {
 
 // A taint propagation step that was taken from source node to destination
 // node.
-class TaintTrackingStep final : public TraintTrackingEdge {
+class MX_EXPORT TaintTrackingStep final : public TraintTrackingEdge {
  protected:
   friend class TaintTracker;
   friend class TaintTrackerImpl;
