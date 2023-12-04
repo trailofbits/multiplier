@@ -195,6 +195,8 @@ RegexQueryMatchImpl::TranslateCapture(const TokenRange &self,
   return std::nullopt;
 }
 
+RegexQueryMatch::~RegexQueryMatch(void) {}
+
 RegexQueryMatch::RegexQueryMatch(
     std::shared_ptr<const RegexQueryMatchImpl> match,
     EntityOffset index_, EntityOffset num_tokens_)
