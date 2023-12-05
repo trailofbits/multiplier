@@ -38,6 +38,7 @@ if(MX_ENABLE_INSTALL)
 endif(MX_ENABLE_INSTALL)
 
 if(PLATFORM_MACOS)
+  set(CMAKE_MACOSX_RPATH 1)
   set(CMAKE_INSTALL_RPATH "@executable_path/../${MX_INSTALL_LIB_DIR}")
 elseif(PLATFORM_LINUX)
   set(CMAKE_INSTALL_RPATH "$ORIGIN/../${MX_INSTALL_LIB_DIR}")
@@ -199,6 +200,8 @@ set_target_properties("multiplier"
       cxx_std_20
     INTERFACE_COMPILE_FEATURES
       cxx_std_20
+    BUILD_RPATH_USE_ORIGIN
+      TRUE
 
     # NOTE(pag): This is important! We need to emulate the shape of the
     #            install directories, so that install targets behave in the

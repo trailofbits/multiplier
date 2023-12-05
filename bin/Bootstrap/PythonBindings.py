@@ -2,6 +2,7 @@
 
 from argparse import ArgumentParser
 import collections
+import hashlib
 import os
 from pypasta import *
 from lift import SchemaLifter, find_tags_in_namespace
@@ -1149,6 +1150,15 @@ def _save_output(schema: ClassSchema | EnumSchema, out: List[str]):
                         _relative_dir(schema),
                         schema.name + ".cpp")
   os.makedirs(os.path.dirname(out_path), exist_ok=True)
+
+  new_output = "".join(out).encode('utf-8')
+
+  # Avoid overwriting the file if we won't change anything.
+  if os.path.exists(out_path):
+    with open(out_path, "r") as f:
+      old_output = f.read().encode('utf-8')
+      if hashlib.sha1(new_output).hexdigest() == hashlib.sha1(old_output).hexdigest():
+        return
 
   with open(out_path, "w") as f:
     f.write("".join(out))
