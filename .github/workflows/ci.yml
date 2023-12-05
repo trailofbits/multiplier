@@ -17,6 +17,7 @@ concurrency:
 env:
   LLVM_PASTA_VER: beeda8d
   LLVM_VER: 17
+  PYTHON_VER: 3.11
 
 jobs:
   build:
@@ -44,7 +45,7 @@ jobs:
           curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
           echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VER} main" | tee -a /etc/apt/sources.list > /dev/null
           echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VER} main" | tee -a /etc/apt/sources.list > /dev/null
-          apt-get update; apt-get install gh clang-${LLVM_VER} lld-${LLVM_VER} -y
+          apt-get update; apt-get install gh clang-${LLVM_VER} lld-${LLVM_VER} python${PYTHON_VER} python${PYTHON_VER}-dev -y
 
       - name: Setup cmake
         uses: trail-of-forks/actions-setup-cmake@master
@@ -85,6 +86,7 @@ jobs:
             -DMLIR_DIR=${LLVM_PREFIX_DIR}/lib/cmake/mlir \
             -DMX_USE_VENDORED_CLANG=OFF \
             -DMX_USE_VENDORED_PASTA=OFF \
+            -DLLVM_ENABLE_LLD:BOOL=TRUE \
             -GNinja \
             ./
 
