@@ -14,6 +14,8 @@
 namespace mx {
 
 class FileLocationCache;
+class ProxyTokenTreeVisitor;
+class UserToken;
 
 namespace {
 
@@ -1777,7 +1779,6 @@ static LoaderFunc * const gFrontendLoaders[] = {
   PythonBinding<mx::Token>::load,
   PythonBinding<mx::TokenRange>::load,
   PythonBinding<mx::File>::load,
-  PythonBinding<mx::TokenTreeVisitor>::load,
   PythonBinding<mx::TokenTree>::load,
   PythonBinding<mx::RegexQueryMatch>::load,
   PythonBinding<mx::TokenKind>::load,
@@ -2313,6 +2314,19 @@ PyMODINIT_FUNC PyInit_multiplier(void) {
   // Doesn't have any methods, so no schema is made for it. We manually inject
   // this so that we can handle `Token::location`.
   if (!mx::PythonBinding<mx::FileLocationCache>::load(frontendm)) {
+    Py_DECREF(m);
+    return nullptr;
+  }
+
+  // Doesn't have any methods, so no schema is made for it. We manually inject
+  // this so that we can handle `TokenRange::create`.
+  if (!mx::PythonBinding<mx::UserToken>::load(frontendm)) {
+    Py_DECREF(m);
+    return nullptr;
+  }
+
+  // Has virtual methods that we need to manually trampoline.
+  if (!mx::PythonBinding<mx::ProxyTokenTreeVisitor>::load(frontendm)) {
     Py_DECREF(m);
     return nullptr;
   }

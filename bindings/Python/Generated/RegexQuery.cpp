@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1275]) || tp >= &(gTypes[1276])) {
+  if (tp < &(gTypes[1274]) || tp >= &(gTypes[1275])) {
     return std::nullopt;
   }
 
@@ -113,13 +113,13 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyMethodDef gMethods[] = {
   {
-    "cast",
+    "FROM",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::RegexQueryMatch>(args[0]);
+            auto arg_0 = PythonBinding<mx::RegexQueryMatch>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -128,7 +128,7 @@ static PyMethodDef gMethods[] = {
           }
 
           PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'cast'";
+              << "Invalid arguments passed to 'FROM'";
           return nullptr;
         }),
     METH_FASTCALL | METH_STATIC,
@@ -141,7 +141,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::File>(args[0]);
+            auto arg_0 = PythonBinding<mx::File>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -149,7 +149,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->match_fragments(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Fragment>(args[0]);
+            auto arg_0 = PythonBinding<mx::Fragment>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -197,7 +197,7 @@ static PyGetSetDef gProperties[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1275]);
+  PyTypeObject * const tp = &(gTypes[1274]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -245,7 +245,7 @@ PyTypeObject *InitType(void) noexcept {
       if (!obj_0) {
         break;
       }
-      auto arg_0 = ::mx::from_python<std::string>(obj_0);
+      auto arg_0 = PythonBinding<std::string>::from_python(obj_0);
       Py_DECREF(obj_0);
       if (!arg_0.has_value()) {
         break;

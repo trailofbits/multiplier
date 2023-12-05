@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[839]) || tp >= &(gTypes[840])) {
+  if (tp < &(gTypes[838]) || tp >= &(gTypes[839])) {
     return std::nullopt;
   }
 
@@ -119,7 +119,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::ir::Operation>(args[0]);
+            auto arg_0 = PythonBinding<mx::ir::Operation>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -135,13 +135,13 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::ir::Result::of"),
   },
   {
-    "cast",
+    "FROM",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::ir::Value>(args[0]);
+            auto arg_0 = PythonBinding<mx::ir::Value>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -150,7 +150,7 @@ static PyMethodDef gMethods[] = {
           }
 
           PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'cast'";
+              << "Invalid arguments passed to 'FROM'";
           return nullptr;
         }),
     METH_FASTCALL | METH_STATIC,
@@ -189,7 +189,7 @@ static PyGetSetDef gProperties[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[839]);
+  PyTypeObject * const tp = &(gTypes[838]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -204,12 +204,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = PythonBinding<mx::ir::Value>::type()->tp_hash;
+  tp->tp_hash = gTypes[836].tp_hash;
   tp->tp_richcompare = nullptr;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = PythonBinding<mx::ir::Value>::type();
+  tp->tp_base = &(gTypes[836]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

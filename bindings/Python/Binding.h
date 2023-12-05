@@ -27,6 +27,7 @@
 #include <multiplier/Entity.h>
 
 #include "Error.h"
+#include "TokenTreeVisitor.h"
 
 namespace mx {
 
@@ -172,6 +173,20 @@ struct PythonBinding<SpecificEntityId<T>> {
   inline static SharedPyObject *to_python(SpecificEntityId<T> val) noexcept {
     return PythonBinding<RawEntityId>::to_python(val.Pack());
   }
+};
+
+// Handle token tree visitors. These have virtual methods, so when we convert
+// from Python, we actually return a `ProxyTokenTreeVisitor`.
+//
+// NOTE(pag): The methods are implemented in `TokenTreeVisitor.cpp`.
+template <>
+struct PythonBinding<ProxyTokenTreeVisitor> {
+ public:
+  // Load this type into its parent module.
+  static bool load(BorrowedPyObject *module) noexcept;
+
+  static std::optional<ProxyTokenTreeVisitor> from_python( 
+      BorrowedPyObject *obj) noexcept;
 };
 
 // Handle a pair.

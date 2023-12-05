@@ -1091,7 +1091,7 @@ void CustomTokenReader::Append(TokenImplPtr tr, EntityOffset to) noexcept {
 }
 
 // Append a simple token into this reader.
-void CustomTokenReader::Append(SimpleToken stok) noexcept {
+void CustomTokenReader::Append(UserToken stok) noexcept {
   data.insert(data.end(), stok.data.begin(), stok.data.end());
   data_offset.push_back(static_cast<EntityOffset>(data.size()));
 
@@ -1363,8 +1363,8 @@ TokenRange TokenRange::create(std::vector<CustomToken> tokens) {
       reader->Append(std::move(tok.impl), tok.offset);
       ++num_tokens;
 
-    } else if (std::holds_alternative<SimpleToken>(ctok)) {
-      reader->Append(std::move(std::get<SimpleToken>(ctok)));
+    } else if (std::holds_alternative<UserToken>(ctok)) {
+      reader->Append(std::move(std::get<UserToken>(ctok)));
       ++num_tokens;
 
     } else {

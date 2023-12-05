@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1226]) || tp >= &(gTypes[1227])) {
+  if (tp < &(gTypes[1225]) || tp >= &(gTypes[1226])) {
     return std::nullopt;
   }
 
@@ -131,13 +131,13 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::ir::hl::MinusOp::static_kind"),
   },
   {
-    "cast",
+    "FROM",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::ir::Operation>(args[0]);
+            auto arg_0 = PythonBinding<mx::ir::Operation>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -146,7 +146,7 @@ static PyMethodDef gMethods[] = {
           }
 
           PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'cast'";
+              << "Invalid arguments passed to 'FROM'";
           return nullptr;
         }),
     METH_FASTCALL | METH_STATIC,
@@ -159,7 +159,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::ir::Value>(args[0]);
+            auto arg_0 = PythonBinding<mx::ir::Value>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -207,7 +207,7 @@ static PyGetSetDef gProperties[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1226]);
+  PyTypeObject * const tp = &(gTypes[1225]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

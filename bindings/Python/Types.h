@@ -8,7 +8,10 @@
 
 namespace mx {
 
-// Size is defined in the auto-generated `Types.cpp` file.
+// Size is defined in the auto-generated `Types.cpp` file. We put all auto-
+// generated types into a single array so that we can easily do the equivalent
+// of `PyObject_IsInstance` checks. We don't allow extension of most of our
+// wrapped types, so these ranges allow us to be precise.
 extern PyTypeObject gTypes[];
 
 }  // namespace mx

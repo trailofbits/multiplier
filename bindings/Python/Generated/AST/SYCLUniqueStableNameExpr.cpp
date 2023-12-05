@@ -125,13 +125,13 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyMethodDef gMethods[] = {
   {
-    "contained_in",
+    "IN",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Index>(args[0]);
+            auto arg_0 = PythonBinding<mx::Index>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -139,7 +139,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->in(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Fragment>(args[0]);
+            auto arg_0 = PythonBinding<mx::Fragment>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -147,7 +147,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->in(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::File>(args[0]);
+            auto arg_0 = PythonBinding<mx::File>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -156,7 +156,7 @@ static PyMethodDef gMethods[] = {
           }
 
           PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'contained_in'";
+              << "Invalid arguments passed to 'IN'";
           return nullptr;
         }),
     METH_FASTCALL | METH_STATIC,
@@ -169,7 +169,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Token>(args[0]);
+            auto arg_0 = PythonBinding<mx::Token>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -177,7 +177,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Decl>(args[0]);
+            auto arg_0 = PythonBinding<mx::Decl>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -185,7 +185,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::optional<mx::Decl>>(args[0]);
+            auto arg_0 = PythonBinding<std::optional<mx::Decl>>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -193,7 +193,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Stmt>(args[0]);
+            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -201,7 +201,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::optional<mx::Stmt>>(args[0]);
+            auto arg_0 = PythonBinding<std::optional<mx::Stmt>>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -223,11 +223,11 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 2) {
-            auto arg_0 = ::mx::from_python<mx::Index>(args[0]);
+            auto arg_0 = PythonBinding<mx::Index>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = ::mx::from_python<mx::EntityId>(args[1]);
+            auto arg_1 = PythonBinding<mx::EntityId>::from_python(args[1]);
             if (!arg_1.has_value()) {
               break;
             }
@@ -267,7 +267,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Stmt>(args[0]);
+            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -283,13 +283,13 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::SYCLUniqueStableNameExpr::from_base"),
   },
   {
-    "cast",
+    "FROM",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Stmt>(args[0]);
+            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -297,7 +297,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::optional<mx::Stmt>>(args[0]);
+            auto arg_0 = PythonBinding<std::optional<mx::Stmt>>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -305,7 +305,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Reference>(args[0]);
+            auto arg_0 = PythonBinding<mx::Reference>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -313,7 +313,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>(args[0]);
+            auto arg_0 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -321,7 +321,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::TokenContext>(args[0]);
+            auto arg_0 = PythonBinding<mx::TokenContext>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -330,7 +330,7 @@ static PyMethodDef gMethods[] = {
           }
 
           PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'cast'";
+              << "Invalid arguments passed to 'FROM'";
           return nullptr;
         }),
     METH_FASTCALL | METH_STATIC,
@@ -404,12 +404,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = PythonBinding<mx::Expr>::type()->tp_hash;
+  tp->tp_hash = gTypes[560].tp_hash;
   tp->tp_richcompare = nullptr;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = PythonBinding<mx::Expr>::type();
+  tp->tp_base = &(gTypes[560]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

@@ -145,43 +145,17 @@ if(MX_ENABLE_BOOTSTRAP)
   return()
 endif()
 
+# Configure the version to include the git hash.
+#
+# TODO(pag): This only tracks the hash that was present at CMake configure time.
 get_patch_from_git(MX_GIT_HASH)
 configure_file(lib/Version.cpp.in "${PROJECT_BINARY_DIR}/Version.cpp" @ONLY)
 
-add_subdirectory("lib")
-add_subdirectory("bindings")
-
+# NOTE(pag): Make the `multiplier` target visible prior to adding the
+#            `bindings` subdirectory so that the Python bindings CMakeLists.txt
+#            can be responsible for installation.
 add_library("multiplier" SHARED
   "${PROJECT_BINARY_DIR}/Version.cpp"
-)
-
-target_include_directories("multiplier"
-  PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-    $<INSTALL_INTERFACE:${MX_INSTALL_INCLUDE_DIR}>
-)
-
-set(multiplier_public_libs
-  "gap::gap"
-  "gap::gap-core"
-  "gap::gap-settings"
-  "std::coroutines"
-)
-
-if(MX_ENABLE_PYTHON_BINDINGS)
-  list(APPEND multiplier_public_libs Python3::SABIModule)
-  set(multiplier_private_lib mx-python)
-else()
-  set(multiplier_private_lib mx-api)
-endif()
-
-target_link_libraries("multiplier"
-  PUBLIC
-    ${multiplier_public_libs}
-    ${MX_LLVM_LIBRARIES}
-  PRIVATE
-    $<LINK_LIBRARY:WHOLE_ARCHIVE,${multiplier_private_lib}>
 )
 
 set_target_properties("multiplier"
@@ -212,6 +186,13 @@ set_target_properties("multiplier"
       "${PROJECT_BINARY_DIR}/lib"
 )
 
+target_include_directories("multiplier"
+  PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:${MX_INSTALL_INCLUDE_DIR}>
+)
+
 if(MX_ENABLE_INSTALL)
   install(
     TARGETS
@@ -231,17 +212,25 @@ if(MX_ENABLE_INSTALL)
       DESTINATION
         "${MX_INSTALL_INCLUDE_DIR}/multiplier"
   )
-
-  # This is a horrible way of "installing" libmultiplier as a Python extension.
-  if(MX_ENABLE_PYTHON_BINDINGS)
-    include("cmake/python.cmake")
-    get_python_extension_suffix(python_module_extension)
-    set(site_packages_dir "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_LIB_DIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages")
-    install(DIRECTORY DESTINATION "${site_packages_dir}")
-    install(
-      CODE
-        "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"../../$<TARGET_FILE_NAME:multiplier>\" \"multiplier${python_module_extension}\" WORKING_DIRECTORY \"${site_packages_dir}\")")
-  endif()
 endif()
 
+add_subdirectory("lib")
 add_subdirectory("bin")
+add_subdirectory("bindings")
+
+if(MX_ENABLE_PYTHON_BINDINGS)
+  set(multiplier_private_lib "mx-python")
+else()
+  set(multiplier_private_lib "mx-api")
+endif()
+
+target_link_libraries("multiplier"
+  PUBLIC
+    "gap::gap"
+    "gap::gap-core"
+    "gap::gap-settings"
+    "std::coroutines"
+  PRIVATE
+    "$<LINK_LIBRARY:WHOLE_ARCHIVE,${multiplier_private_lib}>"
+)
+

@@ -9,6 +9,7 @@
 #include <multiplier/Frontend/File.h>
 
 #include "Error.h"
+#include "SharedPyPtr.h"
 
 namespace mx {
 namespace {
@@ -51,17 +52,14 @@ static PyTypeObject gTypeDef = {
     FileLocationConfiguration config;
 
     if (kwargs && PyMapping_Check(kwargs)) {
-      auto tab_width = PyMapping_GetItemString(kwargs, "tab_width");
+      SharedPyPtr tab_width(PyMapping_GetItemString(kwargs, "tab_width"));
       PyErr_Clear();
 
-      auto use_tab_stops = PyMapping_GetItemString(kwargs, "use_tab_stops");
+      SharedPyPtr use_tab_stops(PyMapping_GetItemString(kwargs, "use_tab_stops"));
       PyErr_Clear();
 
       Py_ssize_t count = int(!!tab_width) + int(!!use_tab_stops);
       if (count != PyMapping_Size(kwargs)) {
-        Py_XDECREF(use_tab_stops);
-        Py_XDECREF(tab_width);
-
         PyErrorStreamer(PyExc_TypeError)
             << "'FileLocationCache.__init__' only takes in the 'tab_width' "
                "and 'use_tab_stops' keyword arguments";
@@ -71,19 +69,17 @@ static PyTypeObject gTypeDef = {
       if (tab_width) {
         auto val = PythonBinding<unsigned>::from_python(tab_width);
         if (!val) {
-          Py_XDECREF(use_tab_stops);
-          Py_DECREF(tab_width);
           PyErrorStreamer(PyExc_TypeError)
                << "'tab_width' keyword argument to 'FileLocationCache.__init__'"
                   " must be an integer";
+          return -1;
         }
 
         if (val.value() > 128u) {
-          Py_XDECREF(use_tab_stops);
-          Py_DECREF(tab_width);
           PyErrorStreamer(PyExc_TypeError)
                << "'tab_width' keyword argument to 'FileLocationCache.__init__'"
                   " must not exceed 128.";
+          return -1;
         }
 
         config.tab_width = val.value();
@@ -91,14 +87,13 @@ static PyTypeObject gTypeDef = {
 
       if (use_tab_stops) {
         if (!PyBool_Check(use_tab_stops)) {
-          Py_XDECREF(tab_width);
-          Py_DECREF(use_tab_stops);
+          PyErrorStreamer(PyExc_TypeError)
+               << "'use_tab_stops' keyword argument to 'FileLocationCache.__init__'"
+                  " must be boolean.";
+          return -1;
         }
         config.use_tab_stops = use_tab_stops == Py_True;
       }
-
-      Py_XDECREF(use_tab_stops);
-      Py_XDECREF(tab_width);
     }
 
     // Initialize the cache.

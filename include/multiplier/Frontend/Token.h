@@ -44,8 +44,8 @@ class TypeImpl;
 
 enum class TokenKind : unsigned short;
 enum class TokenCategory : unsigned char;
-class SimpleToken;  // Defined in Index.h due to `VariantEntity`.
-using CustomToken = std::variant<SimpleToken, Token>;
+class UserToken;  // Defined in Index.h due to `VariantEntity`.
+using CustomToken = std::variant<UserToken, Token>;
 
 // A single token, e.g. from a file or from a macro expansion. There are several
 // types of tokens, and they can be distinguished by way of the token ID, when

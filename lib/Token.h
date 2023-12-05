@@ -211,7 +211,7 @@ class CustomTokenReader final : public TokenReader {
   void Append(TokenImplPtr reader, EntityOffset offset) noexcept;
 
   // Append a simple token into this reader.
-  void Append(SimpleToken stok) noexcept;
+  void Append(UserToken stok) noexcept;
 
   // Return the number of tokens accessible to this reader.
   EntityOffset NumTokens(void) const override;

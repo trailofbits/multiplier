@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[844]) || tp >= &(gTypes[845])) {
+  if (tp < &(gTypes[843]) || tp >= &(gTypes[844])) {
     return std::nullopt;
   }
 
@@ -119,7 +119,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::ir::Block>(args[0]);
+            auto arg_0 = PythonBinding<mx::ir::Block>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -127,7 +127,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::ir::Operation>(args[0]);
+            auto arg_0 = PythonBinding<mx::ir::Operation>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -149,7 +149,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<uint32_t>(args[0]);
+            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -171,7 +171,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<uint32_t>(args[0]);
+            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -259,7 +259,7 @@ static PyGetSetDef gProperties[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[844]);
+  PyTypeObject * const tp = &(gTypes[843]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

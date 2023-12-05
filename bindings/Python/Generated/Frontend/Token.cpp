@@ -145,7 +145,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<FileLocationCache>(args[0]);
+            auto arg_0 = PythonBinding<FileLocationCache>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -167,7 +167,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<FileLocationCache>(args[0]);
+            auto arg_0 = PythonBinding<FileLocationCache>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -189,7 +189,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<FileLocationCache>(args[0]);
+            auto arg_0 = PythonBinding<FileLocationCache>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }

@@ -4,30 +4,24 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-// Auto-generated file; do not modify!
-
+#include <multiplier/Frontend/MacroSubstitution.h>
 #include <multiplier/Frontend/TokenTree.h>
-
-#include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
-#include <multiplier/Frontend.h>
-#include <multiplier/Index.h>
-#include <multiplier/IR.h>
-#include <multiplier/Re2.h>
 
 #include <cassert>
 #include <new>
 
 #include "Binding.h"
 #include "Error.h"
-#include "Types.h"
-
+#include "TokenTreeVisitor.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wc99-extensions"
 #pragma GCC diagnostic ignored "-Wunused-function"
+namespace mx {
 namespace {
-using T = mx::TokenTreeVisitor;
+
+using T = ::mx::TokenTreeVisitor;
 
 struct O final : public ::PyObject {
 
@@ -54,63 +48,10 @@ inline static const T *T_cast(const void *obj) noexcept {
   return O_cast(obj)->data;
 }
 
-}  // namespace
-namespace mx {
-
-namespace {
+static PyTypeObject gTypeDef;
 static PyTypeObject *gType = nullptr;
-}  // namespace
-
-template <>
-PyTypeObject *PythonBinding<T>::type(void) noexcept {
-  return gType;
-}
-
-template <>
-std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
-  if (!obj) {
-    return std::nullopt;
-  }
-
-  PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[805]) || tp >= &(gTypes[806])) {
-    return std::nullopt;
-  }
-
-  return *T_cast(obj);
-}
-
-template <>
-SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
-  auto ret = gType->tp_alloc(gType, 0);
-  if (auto obj = O_cast(ret)) {
-    obj->data = new (obj->backing_storage) T(std::move(val));
-  }
-  return ret;
-}
-
-namespace {
 static PyTypeObject *InitType(void) noexcept;
-}  // namespace
 
-template <>
-bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
-  if (!gType) {
-    gType = InitType();
-    if (!gType) {
-      return false;
-    }
-  }
-
-  auto tp_obj = reinterpret_cast<BorrowedPyObject *>(gType);
-  if (0 != PyModule_AddObjectRef(module, "TokenTreeVisitor", tp_obj)) {
-    return false;
-  }
-
-  return true;
-}
-
-namespace {
 static PyMethodDef gMethods[] = {
   {
     "should_expand",
@@ -119,7 +60,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::MacroSubstitution>(args[0]);
+            auto arg_0 = PythonBinding<mx::MacroSubstitution>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -141,7 +82,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::vector<mx::Fragment>>(args[0]);
+            auto arg_0 = PythonBinding<std::vector<mx::Fragment>>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -158,18 +99,9 @@ static PyMethodDef gMethods[] = {
   },
   {}  // Sentinel.
 };
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[805]);
+  PyTypeObject * const tp = &gTypeDef;
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -179,7 +111,7 @@ PyTypeObject *InitType(void) noexcept {
     PyObject_Free(obj);
   };
   tp->tp_name = "multiplier.frontend.TokenTreeVisitor";
-  tp->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_DISALLOW_INSTANTIATION;
+  tp->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE;
   tp->tp_doc = PyDoc_STR("Wrapper for mx::::TokenTreeVisitor");
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
@@ -188,8 +120,8 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_richcompare = nullptr;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
-  tp->tp_getset = gProperties;
-  tp->tp_base = nullptr;
+  tp->tp_getset = nullptr;
+  tp->tp_base = &PyBaseObject_Type;
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)
@@ -197,24 +129,19 @@ PyTypeObject *InitType(void) noexcept {
       return -1;
     }
 
-    if (!args || !PySequence_Check(args)) {
+    if (!args || !PySequence_Check(args) || PySequence_Size(args)) {
       PyErrorStreamer(PyExc_TypeError)
           << "Invalid positional arguments passed to 'TokenTreeVisitor.__init__'";
       return -1;
     }
 
     auto obj = O_cast(self);
-    auto num_args = PySequence_Size(args);
+    obj->data = new (obj->backing_storage) T;
     
-    (void) obj;
-    (void) num_args;
-    PyErrorStreamer(PyExc_TypeError)
-        << "Class 'TokenTreeVisitor' cannot be directly instantiated";
-    return -1;
-
+    return 0;
   };
   tp->tp_alloc = PyType_GenericAlloc;
-  tp->tp_new = nullptr;
+  tp->tp_new = PyType_GenericNew;
 
   if (0 != PyType_Ready(tp)) {
     return nullptr;
@@ -224,6 +151,79 @@ PyTypeObject *InitType(void) noexcept {
 }
 
 }  // namespace
+
+ProxyTokenTreeVisitor::~ProxyTokenTreeVisitor(void) {}
+
+// Return `true` if the input substitution should be expanded or not.
+bool ProxyTokenTreeVisitor::should_expand(
+    const MacroSubstitution &sub) const {
+
+  SharedPyPtr sub_obj(::mx::to_python<MacroSubstitution>(sub));
+  SharedPyPtr ret(PyObject_CallMethod(
+      obj, "should_expand", "(N)", sub_obj.Get()));
+
+  if (ret == nullptr) {
+    assert(false);
+    return false;
+  }
+
+  if (auto bool_ret = ::mx::from_python<bool>(ret)) {
+    return bool_ret.value();
+  }
+
+  assert(false);
+  return TokenTreeVisitor::should_expand(sub);
+}
+
+// Choose which fragment to show.
+Fragment ProxyTokenTreeVisitor::choose(
+    const std::vector<Fragment> &fragments) const {
+
+  SharedPyPtr frags_list(::mx::to_python<std::vector<Fragment>>(fragments));
+  SharedPyPtr ret(PyObject_CallMethod(
+      obj, "choose", "(N)", frags_list.Get()));
+
+  if (!ret) {
+    assert(false);
+    return TokenTreeVisitor::choose(fragments);
+  }
+
+  if (auto frag_reg = ::mx::from_python<::mx::Fragment>(ret)) {
+    return frag_reg.value();
+  }
+
+  assert(false);
+  return TokenTreeVisitor::choose(fragments);
+}
+
+std::optional<ProxyTokenTreeVisitor> PythonBinding<ProxyTokenTreeVisitor>::from_python(
+    BorrowedPyObject *obj) noexcept {
+  if (!obj) {
+    return std::nullopt;
+  }
+
+  if (!PyObject_IsInstance(obj, reinterpret_cast<::PyObject *>(gType))) {
+    return std::nullopt;
+  }
+
+  return ProxyTokenTreeVisitor(obj);
+}
+
+bool PythonBinding<ProxyTokenTreeVisitor>::load(BorrowedPyObject *module) noexcept {
+  if (!gType) {
+    gType = InitType();
+    if (!gType) {
+      return false;
+    }
+  }
+
+  auto tp_obj = reinterpret_cast<BorrowedPyObject *>(gType);
+  if (0 != PyModule_AddObjectRef(module, "TokenTreeVisitor", tp_obj)) {
+    return false;
+  }
+
+  return true;
+}
 
 #pragma GCC diagnostic pop
 }  // namespace mx

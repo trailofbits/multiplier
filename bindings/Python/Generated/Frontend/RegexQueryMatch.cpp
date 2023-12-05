@@ -119,7 +119,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::string>(args[0]);
+            auto arg_0 = PythonBinding<std::string>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -141,7 +141,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::string>(args[0]);
+            auto arg_0 = PythonBinding<std::string>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -149,7 +149,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->captured_tokens(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
+            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -171,7 +171,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::string>(args[0]);
+            auto arg_0 = PythonBinding<std::string>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -179,7 +179,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->captured_data(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
+            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -252,12 +252,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = PythonBinding<mx::TokenRange>::type()->tp_hash;
+  tp->tp_hash = gTypes[802].tp_hash;
   tp->tp_richcompare = nullptr;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = PythonBinding<mx::TokenRange>::type();
+  tp->tp_base = &(gTypes[802]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

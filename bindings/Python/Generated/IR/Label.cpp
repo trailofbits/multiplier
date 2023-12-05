@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[841]) || tp >= &(gTypes[842])) {
+  if (tp < &(gTypes[840]) || tp >= &(gTypes[841])) {
     return std::nullopt;
   }
 
@@ -155,7 +155,7 @@ static PyGetSetDef gProperties[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[841]);
+  PyTypeObject * const tp = &(gTypes[840]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

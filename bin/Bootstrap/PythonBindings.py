@@ -77,6 +77,8 @@ MODULE_CPP_PREFIX = """// Copyright (c) 2023-present, Trail of Bits, Inc.
 namespace mx {
 
 class FileLocationCache;
+class ProxyTokenTreeVisitor;
+class UserToken;
 
 namespace {
 
@@ -162,6 +164,19 @@ MODULE_CPP_SUFFIX = """
   // Doesn't have any methods, so no schema is made for it. We manually inject
   // this so that we can handle `Token::location`.
   if (!mx::PythonBinding<mx::FileLocationCache>::load(frontendm)) {
+    Py_DECREF(m);
+    return nullptr;
+  }
+
+  // Doesn't have any methods, so no schema is made for it. We manually inject
+  // this so that we can handle `TokenRange::create`.
+  if (!mx::PythonBinding<mx::UserToken>::load(frontendm)) {
+    Py_DECREF(m);
+    return nullptr;
+  }
+
+  // Has virtual methods that we need to manually trampoline.
+  if (!mx::PythonBinding<mx::ProxyTokenTreeVisitor>::load(frontendm)) {
     Py_DECREF(m);
     return nullptr;
   }
@@ -262,7 +277,7 @@ METHOD_SPEC_PREFIX = """  {{
 METHOD_SPEC_CHECK_ARGCOUNT_BEGIN = "          while (num_args == {num_args}) {{\n"
 
 
-METHOD_SPEC_GET_ARG = """            auto arg_{arg_num} = ::mx::from_python<{arg_type}>(args[{arg_num}]);
+METHOD_SPEC_GET_ARG = """            auto arg_{arg_num} = PythonBinding<{arg_type}>::from_python(args[{arg_num}]);
             if (!arg_{arg_num}.has_value()) {{
               break;
             }}
@@ -613,7 +628,7 @@ INIT_SPEC_GET_ARG = """
       if (!obj_{arg_num}) {{
         break;
       }}
-      auto arg_{arg_num} = ::mx::from_python<{arg_type}>(obj_{arg_num});
+      auto arg_{arg_num} = PythonBinding<{arg_type}>::from_python(obj_{arg_num});
       Py_DECREF(obj_{arg_num});
       if (!arg_{arg_num}.has_value()) {{
         break;
@@ -772,6 +787,15 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 """
 
 
+class UserTokenSchema(Schema):
+  def __init__(self, *args):
+    super().__init__()
+
+  @property
+  def cxx_value_name(self):
+    return "UserToken"
+
+
 class FileLocationCacheSchema(Schema):
   def __init__(self, *args):
     super().__init__()
@@ -779,6 +803,15 @@ class FileLocationCacheSchema(Schema):
   @property
   def cxx_value_name(self):
     return "FileLocationCache"
+
+
+class TokenTreeVisitorSchema(Schema):
+  def __init__(self, *args):
+    super().__init__()
+
+  @property
+  def cxx_value_name(self):
+    return "ProxyTokenTreeVisitor"
 
 
 class EntityIdSchema(Schema):
@@ -838,8 +871,8 @@ class Renamer:
 
 class BasicRenamer(Renamer):
   METHOD_RENAMES = {
-    "from": "cast",
-    "in": "contained_in",
+    "from": "FROM",
+    "in": "IN",
   }
   def rename_method(self, class_schema: ClassSchema,
                     method_schema: MethodSchema | OverloadSetSchema) -> str:
@@ -983,6 +1016,12 @@ def _dynamic_case(schema: ClassSchema,
     _dynamic_case(child_schema, offsets, children, out)
 
 
+def _strip_optional_const_ref(schema: Schema) -> Schema:
+  if isinstance(schema, (StdOptionalSchema, ConstReferenceSchema)):
+    return _strip_optional_const_ref(schema.element_type)
+  else:
+    return schema
+
 def wrap_class(schema: ClassSchema,
                offsets: Dict[ClassSchema, Tuple[int, int]],
                children: Dict[ClassSchema, List[ClassSchema]],
@@ -1009,11 +1048,10 @@ def wrap_class(schema: ClassSchema,
   if schema.bases:
     assert len(schema.bases) == 1
     base_schema = schema.bases[0]
-    rel_ns = _relative_namespace(base_schema)
-    base_cxx_namespace = rel_ns and f"mx::{rel_ns}::" or "mx::"
-    base_cxx_class_name = base_schema.name
-    base_class = "PythonBinding<{}{}>::type()".format(base_cxx_namespace, base_cxx_class_name)
-    type_hash = "PythonBinding<{}{}>::type()->tp_hash".format(base_cxx_namespace, base_cxx_class_name)
+    assert base_schema in offsets
+    base_offsets = offsets[base_schema]
+    base_class = "&(gTypes[{}])".format(base_offsets[0])
+    type_hash = "gTypes[{}].tp_hash".format(base_offsets[0])
 
   # In the Python API, we give all of the entities a common base class.
   elif is_entity_type:
@@ -1104,7 +1142,10 @@ def wrap_class(schema: ClassSchema,
     py_constructor = "".join(constructor_out)
 
   py_iter = "nullptr"
-  if schema.generated_type and schema.indexed_type != schema.generated_type:
+  if schema.generated_type and \
+     (not schema.indexed_type or 
+      (_strip_optional_const_ref(schema.indexed_type) != \
+       _strip_optional_const_ref(schema.generated_type))):
     py_iter = ITER_FUNC.format(schema.generated_type.cxx_value_name)
 
   out.append(INIT_TYPE.format(
@@ -1346,6 +1387,7 @@ ENTITY_KINDS: Tuple[str] = (
   "CXXBaseSpecifier",
   "TemplateArgument",
   "TemplateParameterList",
+  "Macro",
 )
 
 
@@ -1353,6 +1395,8 @@ def run_on_ast(ast: AST, ns_name: str):
   schemas: List[Schema] = []
   lifter: SchemaLifter = SchemaLifter()
   lifter.add_lifter("mx::FileLocationCache", FileLocationCacheSchema)
+  lifter.add_lifter("mx::TokenTreeVisitor", TokenTreeVisitorSchema)
+  lifter.add_lifter("mx::UserToken", UserTokenSchema)
   lifter.add_lifter(*make_entity_id_schema("mx::EntityId"))
   lifter.add_lifter(*make_entity_id_schema("mx::RawEntityId"))
   lifter.add_lifter(*make_entity_id_schema("mx::FileTokenId"))

@@ -1381,7 +1381,6 @@ class Reference;
 class Token;
 class TokenRange;
 class File;
-class TokenTreeVisitor;
 class TokenTree;
 class RegexQueryMatch;
 enum class TokenKind : uint16_t;

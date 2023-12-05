@@ -246,7 +246,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_REFERENCE_AS,
 }
 #endif  // __CDT_PARSER__
 
-class MX_EXPORT SimpleToken {
+class MX_EXPORT UserToken {
  public:
   // The kind of this token.
   TokenKind kind{TokenKind::UNKNOWN};

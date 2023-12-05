@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[806]) || tp >= &(gTypes[807])) {
+  if (tp < &(gTypes[805]) || tp >= &(gTypes[806])) {
     return std::nullopt;
   }
 
@@ -113,13 +113,13 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyMethodDef gMethods[] = {
   {
-    "cast",
+    "FROM",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::File>(args[0]);
+            auto arg_0 = PythonBinding<mx::File>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -127,7 +127,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Fragment>(args[0]);
+            auto arg_0 = PythonBinding<mx::Fragment>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -135,7 +135,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::TokenRange>(args[0]);
+            auto arg_0 = PythonBinding<mx::TokenRange>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -144,7 +144,7 @@ static PyMethodDef gMethods[] = {
           }
 
           PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'cast'";
+              << "Invalid arguments passed to 'FROM'";
           return nullptr;
         }),
     METH_FASTCALL | METH_STATIC,
@@ -157,7 +157,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::TokenTreeVisitor>(args[0]);
+            auto arg_0 = PythonBinding<ProxyTokenTreeVisitor>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -185,7 +185,7 @@ static PyGetSetDef gProperties[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[806]);
+  PyTypeObject * const tp = &(gTypes[805]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

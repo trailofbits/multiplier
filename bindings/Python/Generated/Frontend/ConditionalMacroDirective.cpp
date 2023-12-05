@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[822]) || tp >= &(gTypes[831])) {
+  if (tp < &(gTypes[821]) || tp >= &(gTypes[830])) {
     return std::nullopt;
   }
 
@@ -90,35 +90,35 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::EndIfMacroDirective::static_kind():
-      tp = &(gTypes[823]);
+      tp = &(gTypes[822]);
       break;
 
     case mx::ElseMacroDirective::static_kind():
-      tp = &(gTypes[824]);
+      tp = &(gTypes[823]);
       break;
 
     case mx::ElseIfNotDefinedMacroDirective::static_kind():
-      tp = &(gTypes[825]);
+      tp = &(gTypes[824]);
       break;
 
     case mx::ElseIfDefinedMacroDirective::static_kind():
-      tp = &(gTypes[826]);
+      tp = &(gTypes[825]);
       break;
 
     case mx::ElseIfMacroDirective::static_kind():
-      tp = &(gTypes[827]);
+      tp = &(gTypes[826]);
       break;
 
     case mx::IfNotDefinedMacroDirective::static_kind():
-      tp = &(gTypes[828]);
+      tp = &(gTypes[827]);
       break;
 
     case mx::IfDefinedMacroDirective::static_kind():
-      tp = &(gTypes[829]);
+      tp = &(gTypes[828]);
       break;
 
     case mx::IfMacroDirective::static_kind():
-      tp = &(gTypes[830]);
+      tp = &(gTypes[829]);
       break;
 
   }
@@ -153,13 +153,13 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyMethodDef gMethods[] = {
   {
-    "contained_in",
+    "IN",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Fragment>(args[0]);
+            auto arg_0 = PythonBinding<mx::Fragment>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -167,7 +167,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->in(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::File>(args[0]);
+            auto arg_0 = PythonBinding<mx::File>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -175,7 +175,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->in(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Index>(args[0]);
+            auto arg_0 = PythonBinding<mx::Index>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -184,7 +184,7 @@ static PyMethodDef gMethods[] = {
           }
 
           PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'contained_in'";
+              << "Invalid arguments passed to 'IN'";
           return nullptr;
         }),
     METH_FASTCALL | METH_STATIC,
@@ -197,11 +197,11 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 2) {
-            auto arg_0 = ::mx::from_python<mx::Index>(args[0]);
+            auto arg_0 = PythonBinding<mx::Index>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = ::mx::from_python<mx::EntityId>(args[1]);
+            auto arg_1 = PythonBinding<mx::EntityId>::from_python(args[1]);
             if (!arg_1.has_value()) {
               break;
             }
@@ -223,7 +223,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Macro>(args[0]);
+            auto arg_0 = PythonBinding<mx::Macro>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -231,7 +231,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Token>(args[0]);
+            auto arg_0 = PythonBinding<mx::Token>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -253,7 +253,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Macro>(args[0]);
+            auto arg_0 = PythonBinding<mx::Macro>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -269,13 +269,13 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::ConditionalMacroDirective::from_base"),
   },
   {
-    "cast",
+    "FROM",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Macro>(args[0]);
+            auto arg_0 = PythonBinding<mx::Macro>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -283,7 +283,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::optional<mx::Macro>>(args[0]);
+            auto arg_0 = PythonBinding<std::optional<mx::Macro>>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -291,7 +291,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Reference>(args[0]);
+            auto arg_0 = PythonBinding<mx::Reference>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -299,7 +299,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>(args[0]);
+            auto arg_0 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -307,7 +307,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::TokenContext>(args[0]);
+            auto arg_0 = PythonBinding<mx::TokenContext>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -316,7 +316,7 @@ static PyMethodDef gMethods[] = {
           }
 
           PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'cast'";
+              << "Invalid arguments passed to 'FROM'";
           return nullptr;
         }),
     METH_FASTCALL | METH_STATIC,
@@ -335,7 +335,7 @@ static PyGetSetDef gProperties[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[822]);
+  PyTypeObject * const tp = &(gTypes[821]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -350,12 +350,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = PythonBinding<mx::MacroDirective>::type()->tp_hash;
+  tp->tp_hash = gTypes[816].tp_hash;
   tp->tp_richcompare = nullptr;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = PythonBinding<mx::MacroDirective>::type();
+  tp->tp_base = &(gTypes[816]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)
