@@ -23,7 +23,7 @@ static_assert(sizeof(Attribute) == sizeof(::mx::ir::Attribute));
 
 class MX_EXPORT IdentifierAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::META_IDENTIFIER;
   }
 

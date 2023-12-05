@@ -23,7 +23,7 @@ static_assert(sizeof(Type) == sizeof(::mx::ir::Type));
 
 class MX_EXPORT FunctionType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::CORE_FUNCTION;
   }
 

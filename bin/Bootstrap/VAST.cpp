@@ -1314,7 +1314,7 @@ void CodeGenerator::RunOnTypes(void) {
       hpp
           << "class MX_EXPORT " << type_name << " final : public Type {\n"
           << " public:\n"
-          << "  inline static TypeKind static_kind(void) {\n"
+          << "  inline static constexpr TypeKind static_kind(void) {\n"
           << "    return TypeKind::" << enum_name
           << ";\n"
           << "  }\n\n"
@@ -1587,7 +1587,7 @@ void CodeGenerator::RunOnAttrs(void) {
       hpp
           << "class MX_EXPORT " << attr_name << " final : public Attribute {\n"
           << " public:\n"
-          << "  inline static AttributeKind static_kind(void) {\n"
+          << "  inline static constexpr AttributeKind static_kind(void) {\n"
           << "    return AttributeKind::" << enum_name
           << ";\n"
           << "  }\n\n"

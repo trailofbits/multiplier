@@ -28,7 +28,7 @@ static_assert(sizeof(Attribute) == sizeof(::mx::ir::Attribute));
 
 class MX_EXPORT BooleanAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::CORE_BOOLEAN;
   }
 
@@ -44,7 +44,7 @@ static_assert(sizeof(BooleanAttr) == sizeof(Attribute));
 
 class MX_EXPORT FloatAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::CORE_FLOAT;
   }
 
@@ -60,7 +60,7 @@ static_assert(sizeof(FloatAttr) == sizeof(Attribute));
 
 class MX_EXPORT IntegerAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::CORE_INTEGER;
   }
 
@@ -76,7 +76,7 @@ static_assert(sizeof(IntegerAttr) == sizeof(Attribute));
 
 class MX_EXPORT SourceLanguageAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::CORE_SOURCE_LANGUAGE;
   }
 
@@ -91,7 +91,7 @@ static_assert(sizeof(SourceLanguageAttr) == sizeof(Attribute));
 
 class MX_EXPORT StringLiteralAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::CORE_STRING_LITERAL;
   }
 
@@ -107,7 +107,7 @@ static_assert(sizeof(StringLiteralAttr) == sizeof(Attribute));
 
 class MX_EXPORT VoidAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::CORE_VOID;
   }
 

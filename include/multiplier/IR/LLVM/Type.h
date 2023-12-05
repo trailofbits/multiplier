@@ -28,7 +28,7 @@ static_assert(sizeof(Type) == sizeof(::mx::ir::Type));
 
 class MX_EXPORT ArrayType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::LLVM_ARRAY;
   }
 
@@ -44,7 +44,7 @@ static_assert(sizeof(ArrayType) == sizeof(Type));
 
 class MX_EXPORT FixedVectorType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::LLVM_FIXED_VECTOR;
   }
 
@@ -59,7 +59,7 @@ static_assert(sizeof(FixedVectorType) == sizeof(Type));
 
 class MX_EXPORT FunctionType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::LLVM_FUNCTION;
   }
 
@@ -78,7 +78,7 @@ static_assert(sizeof(FunctionType) == sizeof(Type));
 
 class MX_EXPORT PointerType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::LLVM_POINTER;
   }
 
@@ -94,7 +94,7 @@ static_assert(sizeof(PointerType) == sizeof(Type));
 
 class MX_EXPORT ScalableVectorType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::LLVM_SCALABLE_VECTOR;
   }
 
@@ -109,7 +109,7 @@ static_assert(sizeof(ScalableVectorType) == sizeof(Type));
 
 class MX_EXPORT TargetExtType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::LLVM_TARGET_EXT;
   }
 
