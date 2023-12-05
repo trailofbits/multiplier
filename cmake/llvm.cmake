@@ -52,16 +52,6 @@ function(find_and_link_llvm_dependency target_name dependency_name)
 
   add_library("mx-${dependency_name}" INTERFACE)
 
-  target_link_libraries("mx-${dependency_name}"
-      INTERFACE
-        "$<BUILD_INTERFACE:${local_lib}>"
-        "$<INSTALL_INTERFACE:${target_filename}>"
-    )
-
-  target_link_directories("mx-${dependency_name}"
-    INTERFACE
-      "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/lib>")
-
   if(PLATFORM_MACOS)
 
     find_program(install_name_tool install_name_tool)
@@ -69,16 +59,32 @@ function(find_and_link_llvm_dependency target_name dependency_name)
       message(FATAL_ERROR "Could not find install_name_tool")  
     endif()
 
+    target_link_libraries("mx-${dependency_name}"
+      INTERFACE
+        "$<BUILD_INTERFACE:${local_lib}>"
+        "$<INSTALL_INTERFACE:${target_filename}>"
+    )
+
     add_custom_command(TARGET "${target_name}"
       COMMAND
         COMMAND "${install_name_tool}" -change "@rpath/${target_filename}" "@loader_path/../lib/${target_filename}" "$<TARGET_FILE:${target_name}>"
     )
 
   elseif(PLATFORM_LINUX)
-    set_target_properties("mx-${dependency_name}"
-      PROPERTIES
-        BUILD_WITH_INSTALL_RPATH FALSE
-        LINK_FLAGS "-Wl,-rpath,$ORIGIN/../${MX_INSTALL_LIB_DIR}"
+    target_link_directories("mx-${dependency_name}"
+      INTERFACE
+        "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/lib>"
+    )
+
+    # `--disable-new-dtags` forces the linker to use `DT_RPATH` instead of
+    # `DR_RUNPATH` in the ELF, which we want because our Python bindings use
+    # a symbolic link to the installed `libmultiplier.so`, and the RPATH is
+    # relative to the installed `libmultiplier.so`, and `DR_RUNPATH` lookups
+    # don't work that way.
+    target_link_libraries("mx-${dependency_name}"
+      INTERFACE
+        "$<BUILD_INTERFACE:-Wl,--disable-new-dtags>"
+        "$<BUILD_INTERFACE:-l:${target_filename}>"
     )
   endif()
 

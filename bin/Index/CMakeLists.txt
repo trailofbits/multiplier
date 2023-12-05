@@ -108,6 +108,8 @@ target_compile_options("${exe_name}"
 
 set_target_properties("${exe_name}" PROPERTIES LINKER_LANGUAGE CXX)
 
+find_and_link_llvm_dependencies("${exe_name}")
+
 if(MX_ENABLE_INSTALL)
   install(
     TARGETS

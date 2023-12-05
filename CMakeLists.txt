@@ -184,8 +184,6 @@ target_link_libraries("multiplier"
     $<LINK_LIBRARY:WHOLE_ARCHIVE,${multiplier_private_lib}>
 )
 
-find_and_link_llvm_dependencies("multiplier")
-
 set_target_properties("multiplier"
   PROPERTIES
     LINKER_LANGUAGE
@@ -200,8 +198,6 @@ set_target_properties("multiplier"
       cxx_std_20
     INTERFACE_COMPILE_FEATURES
       cxx_std_20
-    BUILD_RPATH_USE_ORIGIN
-      TRUE
 
     # NOTE(pag): This is important! We need to emulate the shape of the
     #            install directories, so that install targets behave in the
