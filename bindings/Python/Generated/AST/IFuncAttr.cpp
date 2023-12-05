@@ -123,6 +123,22 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "resolver",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->resolver());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IFuncAttr::resolver"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,22 +341,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::IFuncAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "resolver",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->resolver());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IFuncAttr::resolver"),
-    nullptr,
   },
   {}  // Sentinel.
 };

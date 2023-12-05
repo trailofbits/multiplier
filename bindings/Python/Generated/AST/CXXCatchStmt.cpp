@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "catch_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->catch_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXCatchStmt::catch_token"),
+    nullptr,
+  },
+  {
+    "caught_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->caught_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXCatchStmt::caught_type"),
+    nullptr,
+  },
+  {
+    "exception_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->exception_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXCatchStmt::exception_declaration"),
+    nullptr,
+  },
+  {
+    "handler_block",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->handler_block());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXCatchStmt::handler_block"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,52 +381,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXCatchStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "catch_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->catch_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXCatchStmt::catch_token"),
-    nullptr,
-  },
-  {
-    "caught_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->caught_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXCatchStmt::caught_type"),
-    nullptr,
-  },
-  {
-    "exception_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->exception_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXCatchStmt::exception_declaration"),
-    nullptr,
-  },
-  {
-    "handler_block",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->handler_block());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXCatchStmt::handler_block"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -123,6 +123,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "desugar",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->desugar());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentVectorType::desugar"),
+    nullptr,
+  },
+  {
+    "attribute_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->attribute_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentVectorType::attribute_token"),
+    nullptr,
+  },
+  {
+    "element_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->element_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentVectorType::element_type"),
+    nullptr,
+  },
+  {
+    "size_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->size_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentVectorType::size_expression"),
+    nullptr,
+  },
+  {
+    "vector_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->vector_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentVectorType::vector_kind"),
+    nullptr,
+  },
+  {
+    "is_sugared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sugared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentVectorType::is_sugared"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -309,72 +375,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::DependentVectorType::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentVectorType::desugar"),
-    nullptr,
-  },
-  {
-    "attribute_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->attribute_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentVectorType::attribute_token"),
-    nullptr,
-  },
-  {
-    "element_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->element_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentVectorType::element_type"),
-    nullptr,
-  },
-  {
-    "size_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->size_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentVectorType::size_expression"),
-    nullptr,
-  },
-  {
-    "vector_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->vector_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentVectorType::vector_kind"),
-    nullptr,
-  },
-  {
-    "is_sugared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sugared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentVectorType::is_sugared"),
-    nullptr,
   },
   {}  // Sentinel.
 };

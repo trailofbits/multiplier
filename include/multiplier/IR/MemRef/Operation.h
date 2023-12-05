@@ -54,7 +54,7 @@ static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));
 
 class MX_EXPORT AssumeAlignmentOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_ASSUME_ALIGNMENT;
   }
 
@@ -71,7 +71,7 @@ static_assert(sizeof(AssumeAlignmentOp) == sizeof(Operation));
 
 class MX_EXPORT AtomicRMWOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_ATOMIC_RMW;
   }
 
@@ -92,7 +92,7 @@ static_assert(sizeof(AtomicRMWOp) == sizeof(Operation));
 
 class MX_EXPORT AtomicYieldOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_ATOMIC_YIELD;
   }
 
@@ -108,7 +108,7 @@ static_assert(sizeof(AtomicYieldOp) == sizeof(Operation));
 
 class MX_EXPORT CopyOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_COPY;
   }
 
@@ -125,7 +125,7 @@ static_assert(sizeof(CopyOp) == sizeof(Operation));
 
 class MX_EXPORT GenericAtomicRMWOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_GENERIC_ATOMIC_RMW;
   }
 
@@ -147,7 +147,7 @@ static_assert(sizeof(GenericAtomicRMWOp) == sizeof(Operation));
 
 class MX_EXPORT LoadOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_LOAD;
   }
 
@@ -168,7 +168,7 @@ static_assert(sizeof(LoadOp) == sizeof(Operation));
 
 class MX_EXPORT AllocOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_ALLOC;
   }
 
@@ -190,7 +190,7 @@ static_assert(sizeof(AllocOp) == sizeof(Operation));
 
 class MX_EXPORT AllocaOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_ALLOCA;
   }
 
@@ -214,7 +214,7 @@ static_assert(sizeof(AllocaOp) == sizeof(Operation));
 
 class MX_EXPORT AllocaScopeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_ALLOCA_SCOPE;
   }
 
@@ -231,7 +231,7 @@ static_assert(sizeof(AllocaScopeOp) == sizeof(Operation));
 
 class MX_EXPORT AllocaScopeReturnOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_ALLOCA_SCOPE_RETURN;
   }
 
@@ -247,7 +247,7 @@ static_assert(sizeof(AllocaScopeReturnOp) == sizeof(Operation));
 
 class MX_EXPORT CastOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_CAST;
   }
 
@@ -265,7 +265,7 @@ static_assert(sizeof(CastOp) == sizeof(Operation));
 
 class MX_EXPORT CollapseShapeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_COLLAPSE_SHAPE;
   }
 
@@ -289,7 +289,7 @@ static_assert(sizeof(CollapseShapeOp) == sizeof(Operation));
 
 class MX_EXPORT DeallocOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_DEALLOC;
   }
 
@@ -305,7 +305,7 @@ static_assert(sizeof(DeallocOp) == sizeof(Operation));
 
 class MX_EXPORT DimOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_DIM;
   }
 
@@ -327,7 +327,7 @@ static_assert(sizeof(DimOp) == sizeof(Operation));
 
 class MX_EXPORT DMAStartOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_DMA_START;
   }
 
@@ -361,7 +361,7 @@ static_assert(sizeof(DMAStartOp) == sizeof(Operation));
 
 class MX_EXPORT DMAWaitOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_DMA_WAIT;
   }
 
@@ -380,7 +380,7 @@ static_assert(sizeof(DMAWaitOp) == sizeof(Operation));
 
 class MX_EXPORT ExpandShapeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_EXPAND_SHAPE;
   }
 
@@ -404,7 +404,7 @@ static_assert(sizeof(ExpandShapeOp) == sizeof(Operation));
 
 class MX_EXPORT ExtractAlignedPointerAsIndexOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_EXTRACT_ALIGNED_POINTER_AS_INDEX;
   }
 
@@ -421,7 +421,7 @@ static_assert(sizeof(ExtractAlignedPointerAsIndexOp) == sizeof(Operation));
 
 class MX_EXPORT ExtractStridedMetadataOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_EXTRACT_STRIDED_METADATA;
   }
 
@@ -445,7 +445,7 @@ static_assert(sizeof(ExtractStridedMetadataOp) == sizeof(Operation));
 
 class MX_EXPORT GetGlobalOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_GET_GLOBAL;
   }
 
@@ -462,7 +462,7 @@ static_assert(sizeof(GetGlobalOp) == sizeof(Operation));
 
 class MX_EXPORT GlobalOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_GLOBAL;
   }
 
@@ -486,7 +486,7 @@ static_assert(sizeof(GlobalOp) == sizeof(Operation));
 
 class MX_EXPORT MemorySpaceCastOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_MEMORY_SPACE_CAST;
   }
 
@@ -504,7 +504,7 @@ static_assert(sizeof(MemorySpaceCastOp) == sizeof(Operation));
 
 class MX_EXPORT PrefetchOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_PREFETCH;
   }
 
@@ -528,7 +528,7 @@ static_assert(sizeof(PrefetchOp) == sizeof(Operation));
 
 class MX_EXPORT RankOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_RANK;
   }
 
@@ -544,7 +544,7 @@ static_assert(sizeof(RankOp) == sizeof(Operation));
 
 class MX_EXPORT ReallocOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_REALLOC;
   }
 
@@ -563,7 +563,7 @@ static_assert(sizeof(ReallocOp) == sizeof(Operation));
 
 class MX_EXPORT ReinterpretCastOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_REINTERPRET_CAST;
   }
 
@@ -595,7 +595,7 @@ static_assert(sizeof(ReinterpretCastOp) == sizeof(Operation));
 
 class MX_EXPORT ReshapeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_RESHAPE;
   }
 
@@ -615,7 +615,7 @@ static_assert(sizeof(ReshapeOp) == sizeof(Operation));
 
 class MX_EXPORT StoreOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_STORE;
   }
 
@@ -637,7 +637,7 @@ static_assert(sizeof(StoreOp) == sizeof(Operation));
 
 class MX_EXPORT TransposeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_TRANSPOSE;
   }
 
@@ -655,7 +655,7 @@ static_assert(sizeof(TransposeOp) == sizeof(Operation));
 
 class MX_EXPORT ViewOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_VIEW;
   }
 
@@ -676,7 +676,7 @@ static_assert(sizeof(ViewOp) == sizeof(Operation));
 
 class MX_EXPORT SubViewOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_SUBVIEW;
   }
 
@@ -706,7 +706,7 @@ static_assert(sizeof(SubViewOp) == sizeof(Operation));
 
 class MX_EXPORT TensorStoreOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::MEMREF_TENSOR_STORE;
   }
 

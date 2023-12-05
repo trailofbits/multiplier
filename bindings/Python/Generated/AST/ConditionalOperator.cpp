@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "lhs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->lhs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConditionalOperator::lhs"),
+    nullptr,
+  },
+  {
+    "rhs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->rhs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConditionalOperator::rhs"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,32 +361,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ConditionalOperator::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "lhs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->lhs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConditionalOperator::lhs"),
-    nullptr,
-  },
-  {
-    "rhs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->rhs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConditionalOperator::rhs"),
-    nullptr,
   },
   {}  // Sentinel.
 };

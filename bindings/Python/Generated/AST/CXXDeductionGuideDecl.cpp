@@ -123,6 +123,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "corresponding_constructor",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->corresponding_constructor());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::corresponding_constructor"),
+    nullptr,
+  },
+  {
+    "deduced_template",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->deduced_template());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::deduced_template"),
+    nullptr,
+  },
+  {
+    "deduction_candidate_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->deduction_candidate_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::deduction_candidate_kind"),
+    nullptr,
+  },
+  {
+    "is_explicit",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_explicit());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::is_explicit"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,82 +411,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "corresponding_constructor",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->corresponding_constructor());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::corresponding_constructor"),
-    nullptr,
-  },
-  {
-    "deduced_template",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->deduced_template());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::deduced_template"),
-    nullptr,
-  },
-  {
-    "deduction_candidate_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->deduction_candidate_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::deduction_candidate_kind"),
-    nullptr,
-  },
-  {
-    "is_explicit",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_explicit());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDeductionGuideDecl::is_explicit"),
-    nullptr,
   },
   {}  // Sentinel.
 };

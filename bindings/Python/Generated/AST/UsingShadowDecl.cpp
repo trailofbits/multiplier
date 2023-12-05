@@ -127,6 +127,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UsingShadowDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UsingShadowDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UsingShadowDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "introducer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->introducer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UsingShadowDecl::introducer"),
+    nullptr,
+  },
+  {
+    "next_using_shadow_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->next_using_shadow_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UsingShadowDecl::next_using_shadow_declaration"),
+    nullptr,
+  },
+  {
+    "target_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->target_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UsingShadowDecl::target_declaration"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -339,72 +405,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::UsingShadowDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UsingShadowDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UsingShadowDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UsingShadowDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "introducer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->introducer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UsingShadowDecl::introducer"),
-    nullptr,
-  },
-  {
-    "next_using_shadow_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->next_using_shadow_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UsingShadowDecl::next_using_shadow_declaration"),
-    nullptr,
-  },
-  {
-    "target_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->target_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UsingShadowDecl::target_declaration"),
-    nullptr,
   },
   {}  // Sentinel.
 };

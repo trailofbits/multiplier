@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "try_block",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->try_block());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXTryStmt::try_block"),
+    nullptr,
+  },
+  {
+    "try_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->try_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXTryStmt::try_token"),
+    nullptr,
+  },
+  {
+    "num_handlers",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_handlers());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXTryStmt::num_handlers"),
+    nullptr,
+  },
+  {
+    "handlers",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->handlers());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXTryStmt::handlers"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,52 +403,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::CXXTryStmt::nth_handler"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "try_block",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->try_block());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXTryStmt::try_block"),
-    nullptr,
-  },
-  {
-    "try_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->try_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXTryStmt::try_token"),
-    nullptr,
-  },
-  {
-    "num_handlers",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_handlers());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXTryStmt::num_handlers"),
-    nullptr,
-  },
-  {
-    "handlers",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->handlers());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXTryStmt::handlers"),
-    nullptr,
   },
   {}  // Sentinel.
 };

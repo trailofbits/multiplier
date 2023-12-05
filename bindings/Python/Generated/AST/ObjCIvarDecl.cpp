@@ -123,6 +123,92 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "access_control",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->access_control());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::access_control"),
+    nullptr,
+  },
+  {
+    "canonical_access_control",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_access_control());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::canonical_access_control"),
+    nullptr,
+  },
+  {
+    "containing_interface",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->containing_interface());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::containing_interface"),
+    nullptr,
+  },
+  {
+    "next_instance_variable",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->next_instance_variable());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::next_instance_variable"),
+    nullptr,
+  },
+  {
+    "synthesize",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->synthesize());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::synthesize"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,92 +421,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ObjCIvarDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "access_control",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->access_control());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::access_control"),
-    nullptr,
-  },
-  {
-    "canonical_access_control",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_access_control());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::canonical_access_control"),
-    nullptr,
-  },
-  {
-    "containing_interface",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->containing_interface());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::containing_interface"),
-    nullptr,
-  },
-  {
-    "next_instance_variable",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->next_instance_variable());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::next_instance_variable"),
-    nullptr,
-  },
-  {
-    "synthesize",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->synthesize());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCIvarDecl::synthesize"),
-    nullptr,
   },
   {}  // Sentinel.
 };

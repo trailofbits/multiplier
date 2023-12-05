@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "semantic_spelling",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->semantic_spelling());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ErrorAttr::semantic_spelling"),
+    nullptr,
+  },
+  {
+    "user_diagnostic",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->user_diagnostic());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ErrorAttr::user_diagnostic"),
+    nullptr,
+  },
+  {
+    "is_error",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_error());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ErrorAttr::is_error"),
+    nullptr,
+  },
+  {
+    "is_warning",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_warning());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ErrorAttr::is_warning"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,52 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::ErrorAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "semantic_spelling",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->semantic_spelling());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ErrorAttr::semantic_spelling"),
-    nullptr,
-  },
-  {
-    "user_diagnostic",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->user_diagnostic());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ErrorAttr::user_diagnostic"),
-    nullptr,
-  },
-  {
-    "is_error",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_error());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ErrorAttr::is_error"),
-    nullptr,
-  },
-  {
-    "is_warning",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_warning());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ErrorAttr::is_warning"),
-    nullptr,
   },
   {}  // Sentinel.
 };

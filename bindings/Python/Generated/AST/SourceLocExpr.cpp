@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "builtin_string",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->builtin_string());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SourceLocExpr::builtin_string"),
+    nullptr,
+  },
+  {
+    "identifier_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->identifier_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SourceLocExpr::identifier_kind"),
+    nullptr,
+  },
+  {
+    "token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SourceLocExpr::token"),
+    nullptr,
+  },
+  {
+    "is_int_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_int_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SourceLocExpr::is_int_type"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,52 +381,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::SourceLocExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "builtin_string",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->builtin_string());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SourceLocExpr::builtin_string"),
-    nullptr,
-  },
-  {
-    "identifier_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->identifier_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SourceLocExpr::identifier_kind"),
-    nullptr,
-  },
-  {
-    "token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SourceLocExpr::token"),
-    nullptr,
-  },
-  {
-    "is_int_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_int_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SourceLocExpr::is_int_type"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -123,6 +123,172 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::body"),
+    nullptr,
+  },
+  {
+    "call_operator",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->call_operator());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::call_operator"),
+    nullptr,
+  },
+  {
+    "capture_default",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->capture_default());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::capture_default"),
+    nullptr,
+  },
+  {
+    "capture_default_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->capture_default_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::capture_default_token"),
+    nullptr,
+  },
+  {
+    "compound_statement_body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->compound_statement_body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::compound_statement_body"),
+    nullptr,
+  },
+  {
+    "dependent_call_operator",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->dependent_call_operator());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::dependent_call_operator"),
+    nullptr,
+  },
+  {
+    "num_explicit_template_parameters",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_explicit_template_parameters());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::num_explicit_template_parameters"),
+    nullptr,
+  },
+  {
+    "explicit_template_parameters",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->explicit_template_parameters());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::explicit_template_parameters"),
+    nullptr,
+  },
+  {
+    "introducer_range",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->introducer_range());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::introducer_range"),
+    nullptr,
+  },
+  {
+    "lambda_class",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->lambda_class());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::lambda_class"),
+    nullptr,
+  },
+  {
+    "template_parameter_list",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_parameter_list());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::template_parameter_list"),
+    nullptr,
+  },
+  {
+    "trailing_requires_clause",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->trailing_requires_clause());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::trailing_requires_clause"),
+    nullptr,
+  },
+  {
+    "has_explicit_parameters",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_explicit_parameters());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::has_explicit_parameters"),
+    nullptr,
+  },
+  {
+    "has_explicit_result_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_explicit_result_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::has_explicit_result_type"),
+    nullptr,
+  },
+  {
+    "is_generic_lambda",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_generic_lambda());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::is_generic_lambda"),
+    nullptr,
+  },
+  {
+    "is_mutable",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_mutable());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LambdaExpr::is_mutable"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,172 +523,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::LambdaExpr::nth_explicit_template_parameter"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::body"),
-    nullptr,
-  },
-  {
-    "call_operator",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->call_operator());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::call_operator"),
-    nullptr,
-  },
-  {
-    "capture_default",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->capture_default());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::capture_default"),
-    nullptr,
-  },
-  {
-    "capture_default_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->capture_default_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::capture_default_token"),
-    nullptr,
-  },
-  {
-    "compound_statement_body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->compound_statement_body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::compound_statement_body"),
-    nullptr,
-  },
-  {
-    "dependent_call_operator",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->dependent_call_operator());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::dependent_call_operator"),
-    nullptr,
-  },
-  {
-    "num_explicit_template_parameters",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_explicit_template_parameters());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::num_explicit_template_parameters"),
-    nullptr,
-  },
-  {
-    "explicit_template_parameters",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->explicit_template_parameters());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::explicit_template_parameters"),
-    nullptr,
-  },
-  {
-    "introducer_range",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->introducer_range());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::introducer_range"),
-    nullptr,
-  },
-  {
-    "lambda_class",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->lambda_class());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::lambda_class"),
-    nullptr,
-  },
-  {
-    "template_parameter_list",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_parameter_list());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::template_parameter_list"),
-    nullptr,
-  },
-  {
-    "trailing_requires_clause",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->trailing_requires_clause());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::trailing_requires_clause"),
-    nullptr,
-  },
-  {
-    "has_explicit_parameters",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_explicit_parameters());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::has_explicit_parameters"),
-    nullptr,
-  },
-  {
-    "has_explicit_result_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_explicit_result_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::has_explicit_result_type"),
-    nullptr,
-  },
-  {
-    "is_generic_lambda",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_generic_lambda());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::is_generic_lambda"),
-    nullptr,
-  },
-  {
-    "is_mutable",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_mutable());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LambdaExpr::is_mutable"),
-    nullptr,
   },
   {}  // Sentinel.
 };

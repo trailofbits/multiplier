@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ImportDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ImportDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ImportDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "num_identifier_tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_identifier_tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ImportDecl::num_identifier_tokens"),
+    nullptr,
+  },
+  {
+    "identifier_tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->identifier_tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ImportDecl::identifier_tokens"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,62 +413,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::ImportDecl::nth_identifier_token"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ImportDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ImportDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ImportDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "num_identifier_tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_identifier_tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ImportDecl::num_identifier_tokens"),
-    nullptr,
-  },
-  {
-    "identifier_tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->identifier_tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ImportDecl::identifier_tokens"),
-    nullptr,
   },
   {}  // Sentinel.
 };

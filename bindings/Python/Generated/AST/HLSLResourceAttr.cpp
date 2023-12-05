@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "resource_shape",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->resource_shape());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::HLSLResourceAttr::resource_shape"),
+    nullptr,
+  },
+  {
+    "resource_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->resource_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::HLSLResourceAttr::resource_type"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,32 +351,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::HLSLResourceAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "resource_shape",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->resource_shape());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::HLSLResourceAttr::resource_shape"),
-    nullptr,
-  },
-  {
-    "resource_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->resource_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::HLSLResourceAttr::resource_type"),
-    nullptr,
   },
   {}  // Sentinel.
 };

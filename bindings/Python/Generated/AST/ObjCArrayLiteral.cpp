@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "array_with_objects_method",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->array_with_objects_method());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCArrayLiteral::array_with_objects_method"),
+    nullptr,
+  },
+  {
+    "num_elements",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_elements());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCArrayLiteral::num_elements"),
+    nullptr,
+  },
+  {
+    "elements",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->elements());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCArrayLiteral::elements"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,42 +393,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::ObjCArrayLiteral::nth_element"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "array_with_objects_method",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->array_with_objects_method());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCArrayLiteral::array_with_objects_method"),
-    nullptr,
-  },
-  {
-    "num_elements",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_elements());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCArrayLiteral::num_elements"),
-    nullptr,
-  },
-  {
-    "elements",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->elements());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCArrayLiteral::elements"),
-    nullptr,
   },
   {}  // Sentinel.
 };

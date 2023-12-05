@@ -147,6 +147,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "template_parameters",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_parameters());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateDecl::template_parameters"),
+    nullptr,
+  },
+  {
+    "templated_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->templated_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateDecl::templated_declaration"),
+    nullptr,
+  },
+  {
+    "has_associated_constraints",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_associated_constraints());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateDecl::has_associated_constraints"),
+    nullptr,
+  },
+  {
+    "is_type_alias",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_type_alias());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateDecl::is_type_alias"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -341,82 +417,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::TemplateDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "template_parameters",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_parameters());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateDecl::template_parameters"),
-    nullptr,
-  },
-  {
-    "templated_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->templated_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateDecl::templated_declaration"),
-    nullptr,
-  },
-  {
-    "has_associated_constraints",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_associated_constraints());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateDecl::has_associated_constraints"),
-    nullptr,
-  },
-  {
-    "is_type_alias",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_type_alias());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateDecl::is_type_alias"),
-    nullptr,
   },
   {}  // Sentinel.
 };

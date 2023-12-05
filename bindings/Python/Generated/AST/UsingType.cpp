@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "desugar",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->desugar());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UsingType::desugar"),
+    nullptr,
+  },
+  {
+    "found_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->found_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UsingType::found_declaration"),
+    nullptr,
+  },
+  {
+    "underlying_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->underlying_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UsingType::underlying_type"),
+    nullptr,
+  },
+  {
+    "is_sugared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sugared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UsingType::is_sugared"),
+    nullptr,
+  },
+  {
+    "type_matches_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_matches_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UsingType::type_matches_declaration"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -309,62 +365,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::UsingType::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UsingType::desugar"),
-    nullptr,
-  },
-  {
-    "found_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->found_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UsingType::found_declaration"),
-    nullptr,
-  },
-  {
-    "underlying_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->underlying_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UsingType::underlying_type"),
-    nullptr,
-  },
-  {
-    "is_sugared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sugared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UsingType::is_sugared"),
-    nullptr,
-  },
-  {
-    "type_matches_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_matches_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UsingType::type_matches_declaration"),
-    nullptr,
   },
   {}  // Sentinel.
 };

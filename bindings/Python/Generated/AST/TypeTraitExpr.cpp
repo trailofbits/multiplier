@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "trait",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->trait());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypeTraitExpr::trait"),
+    nullptr,
+  },
+  {
+    "value",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->value());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypeTraitExpr::value"),
+    nullptr,
+  },
+  {
+    "num_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypeTraitExpr::num_arguments"),
+    nullptr,
+  },
+  {
+    "arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypeTraitExpr::arguments"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,52 +403,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::TypeTraitExpr::nth_argument"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "trait",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->trait());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypeTraitExpr::trait"),
-    nullptr,
-  },
-  {
-    "value",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->value());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypeTraitExpr::value"),
-    nullptr,
-  },
-  {
-    "num_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypeTraitExpr::num_arguments"),
-    nullptr,
-  },
-  {
-    "arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypeTraitExpr::arguments"),
-    nullptr,
   },
   {}  // Sentinel.
 };

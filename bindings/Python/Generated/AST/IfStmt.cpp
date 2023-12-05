@@ -123,6 +123,212 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "condition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->condition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::condition"),
+    nullptr,
+  },
+  {
+    "condition_variable",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->condition_variable());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::condition_variable"),
+    nullptr,
+  },
+  {
+    "condition_variable_declaration_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->condition_variable_declaration_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::condition_variable_declaration_statement"),
+    nullptr,
+  },
+  {
+    "else_",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->else_());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::else_"),
+    nullptr,
+  },
+  {
+    "else_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->else_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::else_token"),
+    nullptr,
+  },
+  {
+    "if_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->if_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::if_token"),
+    nullptr,
+  },
+  {
+    "initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::initializer"),
+    nullptr,
+  },
+  {
+    "l_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->l_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::l_paren_token"),
+    nullptr,
+  },
+  {
+    "nondiscarded_case",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->nondiscarded_case());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::nondiscarded_case"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::r_paren_token"),
+    nullptr,
+  },
+  {
+    "statement_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->statement_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::statement_kind"),
+    nullptr,
+  },
+  {
+    "then",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->then());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::then"),
+    nullptr,
+  },
+  {
+    "has_else_storage",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_else_storage());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::has_else_storage"),
+    nullptr,
+  },
+  {
+    "has_initializer_storage",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_initializer_storage());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::has_initializer_storage"),
+    nullptr,
+  },
+  {
+    "has_variable_storage",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_variable_storage());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::has_variable_storage"),
+    nullptr,
+  },
+  {
+    "is_consteval",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_consteval());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::is_consteval"),
+    nullptr,
+  },
+  {
+    "is_constexpr",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_constexpr());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::is_constexpr"),
+    nullptr,
+  },
+  {
+    "is_negated_consteval",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_negated_consteval());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::is_negated_consteval"),
+    nullptr,
+  },
+  {
+    "is_non_negated_consteval",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_non_negated_consteval());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::is_non_negated_consteval"),
+    nullptr,
+  },
+  {
+    "is_obj_c_availability_check",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_obj_c_availability_check());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IfStmt::is_obj_c_availability_check"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,212 +541,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::IfStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "condition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->condition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::condition"),
-    nullptr,
-  },
-  {
-    "condition_variable",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->condition_variable());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::condition_variable"),
-    nullptr,
-  },
-  {
-    "condition_variable_declaration_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->condition_variable_declaration_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::condition_variable_declaration_statement"),
-    nullptr,
-  },
-  {
-    "else_",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->else_());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::else_"),
-    nullptr,
-  },
-  {
-    "else_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->else_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::else_token"),
-    nullptr,
-  },
-  {
-    "if_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->if_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::if_token"),
-    nullptr,
-  },
-  {
-    "initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::initializer"),
-    nullptr,
-  },
-  {
-    "l_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->l_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::l_paren_token"),
-    nullptr,
-  },
-  {
-    "nondiscarded_case",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->nondiscarded_case());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::nondiscarded_case"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::r_paren_token"),
-    nullptr,
-  },
-  {
-    "statement_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->statement_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::statement_kind"),
-    nullptr,
-  },
-  {
-    "then",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->then());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::then"),
-    nullptr,
-  },
-  {
-    "has_else_storage",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_else_storage());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::has_else_storage"),
-    nullptr,
-  },
-  {
-    "has_initializer_storage",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_initializer_storage());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::has_initializer_storage"),
-    nullptr,
-  },
-  {
-    "has_variable_storage",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_variable_storage());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::has_variable_storage"),
-    nullptr,
-  },
-  {
-    "is_consteval",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_consteval());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::is_consteval"),
-    nullptr,
-  },
-  {
-    "is_constexpr",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_constexpr());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::is_constexpr"),
-    nullptr,
-  },
-  {
-    "is_negated_consteval",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_negated_consteval());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::is_negated_consteval"),
-    nullptr,
-  },
-  {
-    "is_non_negated_consteval",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_non_negated_consteval());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::is_non_negated_consteval"),
-    nullptr,
-  },
-  {
-    "is_obj_c_availability_check",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_obj_c_availability_check());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IfStmt::is_obj_c_availability_check"),
-    nullptr,
   },
   {}  // Sentinel.
 };

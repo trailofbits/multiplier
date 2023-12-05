@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "base",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ArraySubscriptExpr::base"),
+    nullptr,
+  },
+  {
+    "index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ArraySubscriptExpr::index"),
+    nullptr,
+  },
+  {
+    "lhs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->lhs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ArraySubscriptExpr::lhs"),
+    nullptr,
+  },
+  {
+    "r_bracket_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_bracket_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ArraySubscriptExpr::r_bracket_token"),
+    nullptr,
+  },
+  {
+    "rhs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->rhs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ArraySubscriptExpr::rhs"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,62 +391,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ArraySubscriptExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "base",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ArraySubscriptExpr::base"),
-    nullptr,
-  },
-  {
-    "index",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->index());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ArraySubscriptExpr::index"),
-    nullptr,
-  },
-  {
-    "lhs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->lhs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ArraySubscriptExpr::lhs"),
-    nullptr,
-  },
-  {
-    "r_bracket_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_bracket_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ArraySubscriptExpr::r_bracket_token"),
-    nullptr,
-  },
-  {
-    "rhs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->rhs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ArraySubscriptExpr::rhs"),
-    nullptr,
   },
   {}  // Sentinel.
 };

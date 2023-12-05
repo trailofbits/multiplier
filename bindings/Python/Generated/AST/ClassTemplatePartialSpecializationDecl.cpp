@@ -123,6 +123,92 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "injected_specialization_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->injected_specialization_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::injected_specialization_type"),
+    nullptr,
+  },
+  {
+    "instantiated_from_member",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->instantiated_from_member());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::instantiated_from_member"),
+    nullptr,
+  },
+  {
+    "instantiated_from_member_template",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->instantiated_from_member_template());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::instantiated_from_member_template"),
+    nullptr,
+  },
+  {
+    "template_parameters",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_parameters());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::template_parameters"),
+    nullptr,
+  },
+  {
+    "has_associated_constraints",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_associated_constraints());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::has_associated_constraints"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,92 +421,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "injected_specialization_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->injected_specialization_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::injected_specialization_type"),
-    nullptr,
-  },
-  {
-    "instantiated_from_member",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instantiated_from_member());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::instantiated_from_member"),
-    nullptr,
-  },
-  {
-    "instantiated_from_member_template",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instantiated_from_member_template());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::instantiated_from_member_template"),
-    nullptr,
-  },
-  {
-    "template_parameters",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_parameters());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::template_parameters"),
-    nullptr,
-  },
-  {
-    "has_associated_constraints",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_associated_constraints());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::has_associated_constraints"),
-    nullptr,
   },
   {}  // Sentinel.
 };

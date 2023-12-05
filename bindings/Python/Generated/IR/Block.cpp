@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[839]) || tp >= &(gTypes[840])) {
+  if (tp < &(gTypes[929]) || tp >= &(gTypes[930])) {
     return std::nullopt;
   }
 
@@ -109,64 +109,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
   return true;
 }
-
-namespace {
-static PyMethodDef gMethods[] = {
-  {
-    "containing",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::ir::Argument>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->containing(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::ir::Operation>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->containing(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'containing'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::ir::Block::containing"),
-  },
-  {
-    "nth_argument",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->nth_argument(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'nth_argument'";
-          return nullptr;
-        }),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for mx::ir::Block::nth_argument"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
 
 namespace {
 static PyGetSetDef gProperties[] = {
@@ -235,9 +177,67 @@ static PyGetSetDef gProperties[] = {
 }  // namespace
 
 namespace {
+static PyMethodDef gMethods[] = {
+  {
+    "containing",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::ir::Argument>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->containing(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::ir::Operation>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->containing(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'containing'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::ir::Block::containing"),
+  },
+  {
+    "nth_argument",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nth_argument(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nth_argument'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::ir::Block::nth_argument"),
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[839]);
+  PyTypeObject * const tp = &(gTypes[929]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

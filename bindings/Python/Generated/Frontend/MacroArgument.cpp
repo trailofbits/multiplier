@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "is_variadic",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_variadic());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MacroArgument::is_variadic"),
+    nullptr,
+  },
+  {
+    "index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MacroArgument::index"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -311,32 +337,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::MacroArgument::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "is_variadic",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_variadic());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MacroArgument::is_variadic"),
-    nullptr,
-  },
-  {
-    "index",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->index());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MacroArgument::index"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "at_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->at_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCBoxedExpr::at_token"),
+    nullptr,
+  },
+  {
+    "boxing_method",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->boxing_method());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCBoxedExpr::boxing_method"),
+    nullptr,
+  },
+  {
+    "sub_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sub_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCBoxedExpr::sub_expression"),
+    nullptr,
+  },
+  {
+    "is_expressible_as_constant_initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_expressible_as_constant_initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCBoxedExpr::is_expressible_as_constant_initializer"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,52 +381,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ObjCBoxedExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "at_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->at_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCBoxedExpr::at_token"),
-    nullptr,
-  },
-  {
-    "boxing_method",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->boxing_method());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCBoxedExpr::boxing_method"),
-    nullptr,
-  },
-  {
-    "sub_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sub_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCBoxedExpr::sub_expression"),
-    nullptr,
-  },
-  {
-    "is_expressible_as_constant_initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_expressible_as_constant_initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCBoxedExpr::is_expressible_as_constant_initializer"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[855]) || tp >= &(gTypes[856])) {
+  if (tp < &(gTypes[1367]) || tp >= &(gTypes[1368])) {
     return std::nullopt;
   }
 
@@ -82,7 +82,19 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
 
 template <>
 SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
-  auto ret = gType->tp_alloc(gType, 0);
+  PyTypeObject *tp = nullptr;
+  switch (val.kind()) {
+    default:
+      assert(false);
+      tp = gType;
+      break;
+
+    case mx::ir::builtin::ShapedType::static_kind():
+      tp = &(gTypes[1367]);
+      break;
+
+  }
+  auto ret = tp->tp_alloc(tp, 0);
   if (auto obj = O_cast(ret)) {
     obj->data = new (obj->backing_storage) T(std::move(val));
   }
@@ -109,52 +121,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
   return true;
 }
-
-namespace {
-static PyMethodDef gMethods[] = {
-  {
-    "static_kind",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 0) {
-
-            return ::mx::to_python(obj->static_kind());
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'static_kind'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::ir::builtin::ShapedType::static_kind"),
-  },
-  {
-    "FROM",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::ir::Type>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->from(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'FROM'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::ir::builtin::ShapedType::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
 
 namespace {
 static PyGetSetDef gProperties[] = {
@@ -213,9 +179,55 @@ static PyGetSetDef gProperties[] = {
 }  // namespace
 
 namespace {
+static PyMethodDef gMethods[] = {
+  {
+    "static_kind",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 0) {
+
+            return ::mx::to_python(obj->static_kind());
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'static_kind'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::ir::builtin::ShapedType::static_kind"),
+  },
+  {
+    "FROM",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::ir::Type>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'FROM'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::ir::builtin::ShapedType::from"),
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[855]);
+  PyTypeObject * const tp = &(gTypes[1367]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -230,12 +242,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = PyObject_HashNotImplemented;
+  tp->tp_hash = gTypes[1366].tp_hash;
   tp->tp_richcompare = nullptr;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = nullptr;
+  tp->tp_base = &(gTypes[1366]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

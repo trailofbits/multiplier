@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "attribute_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->attribute_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentSizedMatrixType::attribute_token"),
+    nullptr,
+  },
+  {
+    "column_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->column_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentSizedMatrixType::column_expression"),
+    nullptr,
+  },
+  {
+    "row_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->row_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentSizedMatrixType::row_expression"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -309,42 +345,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::DependentSizedMatrixType::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "attribute_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->attribute_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentSizedMatrixType::attribute_token"),
-    nullptr,
-  },
-  {
-    "column_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->column_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentSizedMatrixType::column_expression"),
-    nullptr,
-  },
-  {
-    "row_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->row_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentSizedMatrixType::row_expression"),
-    nullptr,
   },
   {}  // Sentinel.
 };

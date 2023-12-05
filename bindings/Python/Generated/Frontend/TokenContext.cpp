@@ -111,12 +111,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
-static PyMethodDef gMethods[] = {
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
 static PyGetSetDef gProperties[] = {
   {
     "has_parent",
@@ -258,6 +252,12 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::TokenContext::parent"),
     nullptr,
   },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
+static PyMethodDef gMethods[] = {
   {}  // Sentinel.
 };
 }  // namespace

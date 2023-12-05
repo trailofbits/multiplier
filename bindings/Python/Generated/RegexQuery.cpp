@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1274]) || tp >= &(gTypes[1275])) {
+  if (tp < &(gTypes[1437]) || tp >= &(gTypes[1438])) {
     return std::nullopt;
   }
 
@@ -109,6 +109,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
   return true;
 }
+
+namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "pattern",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->pattern());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::RegexQuery::pattern"),
+    nullptr,
+  },
+  {
+    "is_valid",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_valid());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::RegexQuery::is_valid"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
 
 namespace {
 static PyMethodDef gMethods[] = {
@@ -169,35 +195,9 @@ static PyMethodDef gMethods[] = {
 }  // namespace
 
 namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "pattern",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pattern());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RegexQuery::pattern"),
-    nullptr,
-  },
-  {
-    "is_valid",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_valid());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RegexQuery::is_valid"),
-    nullptr,
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1274]);
+  PyTypeObject * const tp = &(gTypes[1437]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

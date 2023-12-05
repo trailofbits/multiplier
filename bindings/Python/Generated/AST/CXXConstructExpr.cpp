@@ -127,6 +127,132 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "num_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructExpr::num_arguments"),
+    nullptr,
+  },
+  {
+    "arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructExpr::arguments"),
+    nullptr,
+  },
+  {
+    "construction_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->construction_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructExpr::construction_kind"),
+    nullptr,
+  },
+  {
+    "constructor",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->constructor());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructExpr::constructor"),
+    nullptr,
+  },
+  {
+    "token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructExpr::token"),
+    nullptr,
+  },
+  {
+    "parenthesis_or_brace_range",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parenthesis_or_brace_range());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructExpr::parenthesis_or_brace_range"),
+    nullptr,
+  },
+  {
+    "had_multiple_candidates",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->had_multiple_candidates());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructExpr::had_multiple_candidates"),
+    nullptr,
+  },
+  {
+    "is_elidable",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_elidable());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructExpr::is_elidable"),
+    nullptr,
+  },
+  {
+    "is_immediate_escalating",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_immediate_escalating());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructExpr::is_immediate_escalating"),
+    nullptr,
+  },
+  {
+    "is_list_initialization",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_list_initialization());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructExpr::is_list_initialization"),
+    nullptr,
+  },
+  {
+    "is_std_initializer_list_initialization",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_std_initializer_list_initialization());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructExpr::is_std_initializer_list_initialization"),
+    nullptr,
+  },
+  {
+    "requires_zero_initialization",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->requires_zero_initialization());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructExpr::requires_zero_initialization"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -361,132 +487,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::CXXConstructExpr::nth_argument"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "num_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructExpr::num_arguments"),
-    nullptr,
-  },
-  {
-    "arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructExpr::arguments"),
-    nullptr,
-  },
-  {
-    "construction_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->construction_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructExpr::construction_kind"),
-    nullptr,
-  },
-  {
-    "constructor",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->constructor());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructExpr::constructor"),
-    nullptr,
-  },
-  {
-    "token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructExpr::token"),
-    nullptr,
-  },
-  {
-    "parenthesis_or_brace_range",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parenthesis_or_brace_range());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructExpr::parenthesis_or_brace_range"),
-    nullptr,
-  },
-  {
-    "had_multiple_candidates",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->had_multiple_candidates());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructExpr::had_multiple_candidates"),
-    nullptr,
-  },
-  {
-    "is_elidable",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_elidable());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructExpr::is_elidable"),
-    nullptr,
-  },
-  {
-    "is_immediate_escalating",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_immediate_escalating());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructExpr::is_immediate_escalating"),
-    nullptr,
-  },
-  {
-    "is_list_initialization",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_list_initialization());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructExpr::is_list_initialization"),
-    nullptr,
-  },
-  {
-    "is_std_initializer_list_initialization",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_std_initializer_list_initialization());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructExpr::is_std_initializer_list_initialization"),
-    nullptr,
-  },
-  {
-    "requires_zero_initialization",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->requires_zero_initialization());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructExpr::requires_zero_initialization"),
-    nullptr,
   },
   {}  // Sentinel.
 };

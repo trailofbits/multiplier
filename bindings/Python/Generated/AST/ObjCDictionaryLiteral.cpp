@@ -123,6 +123,22 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "dictionary_with_objects_method",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->dictionary_with_objects_method());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCDictionaryLiteral::dictionary_with_objects_method"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,22 +351,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ObjCDictionaryLiteral::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "dictionary_with_objects_method",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->dictionary_with_objects_method());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCDictionaryLiteral::dictionary_with_objects_method"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -123,6 +123,172 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "builtin_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->builtin_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::builtin_token"),
+    nullptr,
+  },
+  {
+    "operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::operation"),
+    nullptr,
+  },
+  {
+    "order",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->order());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::order"),
+    nullptr,
+  },
+  {
+    "order_fail",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->order_fail());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::order_fail"),
+    nullptr,
+  },
+  {
+    "pointer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->pointer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::pointer"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::r_paren_token"),
+    nullptr,
+  },
+  {
+    "scope",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->scope());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::scope"),
+    nullptr,
+  },
+  {
+    "value1",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->value1());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::value1"),
+    nullptr,
+  },
+  {
+    "value2",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->value2());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::value2"),
+    nullptr,
+  },
+  {
+    "value_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->value_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::value_type"),
+    nullptr,
+  },
+  {
+    "weak",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->weak());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::weak"),
+    nullptr,
+  },
+  {
+    "is_cmp_x_chg",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_cmp_x_chg());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::is_cmp_x_chg"),
+    nullptr,
+  },
+  {
+    "is_open_cl",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_open_cl());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::is_open_cl"),
+    nullptr,
+  },
+  {
+    "is_volatile",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_volatile());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::is_volatile"),
+    nullptr,
+  },
+  {
+    "num_sub_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_sub_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::num_sub_expressions"),
+    nullptr,
+  },
+  {
+    "sub_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sub_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AtomicExpr::sub_expressions"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,172 +523,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::AtomicExpr::nth_sub_expression"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "builtin_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->builtin_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::builtin_token"),
-    nullptr,
-  },
-  {
-    "operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::operation"),
-    nullptr,
-  },
-  {
-    "order",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->order());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::order"),
-    nullptr,
-  },
-  {
-    "order_fail",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->order_fail());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::order_fail"),
-    nullptr,
-  },
-  {
-    "pointer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pointer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::pointer"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::r_paren_token"),
-    nullptr,
-  },
-  {
-    "scope",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->scope());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::scope"),
-    nullptr,
-  },
-  {
-    "value1",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->value1());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::value1"),
-    nullptr,
-  },
-  {
-    "value2",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->value2());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::value2"),
-    nullptr,
-  },
-  {
-    "value_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->value_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::value_type"),
-    nullptr,
-  },
-  {
-    "weak",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->weak());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::weak"),
-    nullptr,
-  },
-  {
-    "is_cmp_x_chg",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_cmp_x_chg());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::is_cmp_x_chg"),
-    nullptr,
-  },
-  {
-    "is_open_cl",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_open_cl());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::is_open_cl"),
-    nullptr,
-  },
-  {
-    "is_volatile",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_volatile());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::is_volatile"),
-    nullptr,
-  },
-  {
-    "num_sub_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_sub_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::num_sub_expressions"),
-    nullptr,
-  },
-  {
-    "sub_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sub_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AtomicExpr::sub_expressions"),
-    nullptr,
   },
   {}  // Sentinel.
 };

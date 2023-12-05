@@ -123,6 +123,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "children",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->children());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::children"),
+    nullptr,
+  },
+  {
+    "extending_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->extending_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::extending_declaration"),
+    nullptr,
+  },
+  {
+    "storage_duration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->storage_duration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::storage_duration"),
+    nullptr,
+  },
+  {
+    "temporary_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->temporary_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::temporary_expression"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,82 +411,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "children",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->children());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::children"),
-    nullptr,
-  },
-  {
-    "extending_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->extending_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::extending_declaration"),
-    nullptr,
-  },
-  {
-    "storage_duration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->storage_duration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::storage_duration"),
-    nullptr,
-  },
-  {
-    "temporary_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->temporary_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::temporary_expression"),
-    nullptr,
   },
   {}  // Sentinel.
 };

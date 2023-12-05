@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "alignment",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->alignment());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AssumeAlignedAttr::alignment"),
+    nullptr,
+  },
+  {
+    "offset",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->offset());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AssumeAlignedAttr::offset"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,32 +351,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::AssumeAlignedAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "alignment",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->alignment());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AssumeAlignedAttr::alignment"),
-    nullptr,
-  },
-  {
-    "offset",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->offset());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AssumeAlignedAttr::offset"),
-    nullptr,
   },
   {}  // Sentinel.
 };

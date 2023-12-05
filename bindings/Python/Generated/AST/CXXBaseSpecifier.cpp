@@ -111,84 +111,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
-static PyMethodDef gMethods[] = {
-  {
-    "static_category",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 0) {
-
-            return ::mx::to_python(obj->static_category());
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'static_category'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::static_category"),
-  },
-  {
-    "FROM",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::CXXBaseSpecifier>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->from(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::optional<mx::CXXBaseSpecifier>>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->from(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Reference>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->from(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->from(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::TokenContext>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->from(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'FROM'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
 static PyGetSetDef gProperties[] = {
   {
     "parent_declaration",
@@ -309,6 +231,84 @@ static PyGetSetDef gProperties[] = {
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::base_type"),
     nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
+static PyMethodDef gMethods[] = {
+  {
+    "static_category",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 0) {
+
+            return ::mx::to_python(obj->static_category());
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'static_category'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::static_category"),
+  },
+  {
+    "FROM",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::CXXBaseSpecifier>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<std::optional<mx::CXXBaseSpecifier>>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Reference>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::TokenContext>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'FROM'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::from"),
   },
   {}  // Sentinel.
 };

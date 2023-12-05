@@ -123,6 +123,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::RequiresExpr::body"),
+    nullptr,
+  },
+  {
+    "num_local_parameters",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_local_parameters());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::RequiresExpr::num_local_parameters"),
+    nullptr,
+  },
+  {
+    "local_parameters",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->local_parameters());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::RequiresExpr::local_parameters"),
+    nullptr,
+  },
+  {
+    "r_brace_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_brace_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::RequiresExpr::r_brace_token"),
+    nullptr,
+  },
+  {
+    "requires_keyword_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->requires_keyword_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::RequiresExpr::requires_keyword_token"),
+    nullptr,
+  },
+  {
+    "is_satisfied",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_satisfied());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::RequiresExpr::is_satisfied"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,72 +423,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::RequiresExpr::nth_local_parameter"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RequiresExpr::body"),
-    nullptr,
-  },
-  {
-    "num_local_parameters",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_local_parameters());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RequiresExpr::num_local_parameters"),
-    nullptr,
-  },
-  {
-    "local_parameters",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->local_parameters());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RequiresExpr::local_parameters"),
-    nullptr,
-  },
-  {
-    "r_brace_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_brace_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RequiresExpr::r_brace_token"),
-    nullptr,
-  },
-  {
-    "requires_keyword_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->requires_keyword_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RequiresExpr::requires_keyword_token"),
-    nullptr,
-  },
-  {
-    "is_satisfied",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_satisfied());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RequiresExpr::is_satisfied"),
-    nullptr,
   },
   {}  // Sentinel.
 };

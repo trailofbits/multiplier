@@ -123,6 +123,92 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "base",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::base"),
+    nullptr,
+  },
+  {
+    "colon_colon_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->colon_colon_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::colon_colon_token"),
+    nullptr,
+  },
+  {
+    "destroyed_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->destroyed_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::destroyed_type"),
+    nullptr,
+  },
+  {
+    "destroyed_type_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->destroyed_type_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::destroyed_type_token"),
+    nullptr,
+  },
+  {
+    "operator_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::operator_token"),
+    nullptr,
+  },
+  {
+    "tilde_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->tilde_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::tilde_token"),
+    nullptr,
+  },
+  {
+    "has_qualifier",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_qualifier());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::has_qualifier"),
+    nullptr,
+  },
+  {
+    "is_arrow",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_arrow());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::is_arrow"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,92 +421,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "base",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::base"),
-    nullptr,
-  },
-  {
-    "colon_colon_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->colon_colon_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::colon_colon_token"),
-    nullptr,
-  },
-  {
-    "destroyed_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->destroyed_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::destroyed_type"),
-    nullptr,
-  },
-  {
-    "destroyed_type_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->destroyed_type_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::destroyed_type_token"),
-    nullptr,
-  },
-  {
-    "operator_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::operator_token"),
-    nullptr,
-  },
-  {
-    "tilde_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->tilde_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::tilde_token"),
-    nullptr,
-  },
-  {
-    "has_qualifier",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_qualifier());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::has_qualifier"),
-    nullptr,
-  },
-  {
-    "is_arrow",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_arrow());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXPseudoDestructorExpr::is_arrow"),
-    nullptr,
   },
   {}  // Sentinel.
 };

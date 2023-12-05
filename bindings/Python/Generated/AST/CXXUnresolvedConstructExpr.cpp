@@ -123,6 +123,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "num_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXUnresolvedConstructExpr::num_arguments"),
+    nullptr,
+  },
+  {
+    "arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXUnresolvedConstructExpr::arguments"),
+    nullptr,
+  },
+  {
+    "l_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->l_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXUnresolvedConstructExpr::l_paren_token"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXUnresolvedConstructExpr::r_paren_token"),
+    nullptr,
+  },
+  {
+    "type_as_written",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_as_written());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXUnresolvedConstructExpr::type_as_written"),
+    nullptr,
+  },
+  {
+    "is_list_initialization",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_list_initialization());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXUnresolvedConstructExpr::is_list_initialization"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,72 +423,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::CXXUnresolvedConstructExpr::nth_argument"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "num_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXUnresolvedConstructExpr::num_arguments"),
-    nullptr,
-  },
-  {
-    "arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXUnresolvedConstructExpr::arguments"),
-    nullptr,
-  },
-  {
-    "l_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->l_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXUnresolvedConstructExpr::l_paren_token"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXUnresolvedConstructExpr::r_paren_token"),
-    nullptr,
-  },
-  {
-    "type_as_written",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_as_written());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXUnresolvedConstructExpr::type_as_written"),
-    nullptr,
-  },
-  {
-    "is_list_initialization",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_list_initialization());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXUnresolvedConstructExpr::is_list_initialization"),
-    nullptr,
   },
   {}  // Sentinel.
 };

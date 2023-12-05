@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "at_catch_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->at_catch_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCAtCatchStmt::at_catch_token"),
+    nullptr,
+  },
+  {
+    "catch_body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->catch_body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCAtCatchStmt::catch_body"),
+    nullptr,
+  },
+  {
+    "catch_parameter_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->catch_parameter_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCAtCatchStmt::catch_parameter_declaration"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCAtCatchStmt::r_paren_token"),
+    nullptr,
+  },
+  {
+    "has_ellipsis",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_ellipsis());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCAtCatchStmt::has_ellipsis"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,62 +391,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ObjCAtCatchStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "at_catch_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->at_catch_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCAtCatchStmt::at_catch_token"),
-    nullptr,
-  },
-  {
-    "catch_body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->catch_body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCAtCatchStmt::catch_body"),
-    nullptr,
-  },
-  {
-    "catch_parameter_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->catch_parameter_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCAtCatchStmt::catch_parameter_declaration"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCAtCatchStmt::r_paren_token"),
-    nullptr,
-  },
-  {
-    "has_ellipsis",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_ellipsis());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCAtCatchStmt::has_ellipsis"),
-    nullptr,
   },
   {}  // Sentinel.
 };

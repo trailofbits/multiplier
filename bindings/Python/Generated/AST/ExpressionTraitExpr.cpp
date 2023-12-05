@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "queried_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->queried_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExpressionTraitExpr::queried_expression"),
+    nullptr,
+  },
+  {
+    "trait",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->trait());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExpressionTraitExpr::trait"),
+    nullptr,
+  },
+  {
+    "value",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->value());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExpressionTraitExpr::value"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,42 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ExpressionTraitExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "queried_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->queried_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ExpressionTraitExpr::queried_expression"),
-    nullptr,
-  },
-  {
-    "trait",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->trait());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ExpressionTraitExpr::trait"),
-    nullptr,
-  },
-  {
-    "value",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->value());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ExpressionTraitExpr::value"),
-    nullptr,
   },
   {}  // Sentinel.
 };

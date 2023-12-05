@@ -123,6 +123,172 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "base",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::base"),
+    nullptr,
+  },
+  {
+    "class_receiver",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->class_receiver());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::class_receiver"),
+    nullptr,
+  },
+  {
+    "explicit_property",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->explicit_property());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::explicit_property"),
+    nullptr,
+  },
+  {
+    "implicit_property_getter",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->implicit_property_getter());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::implicit_property_getter"),
+    nullptr,
+  },
+  {
+    "implicit_property_setter",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->implicit_property_setter());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::implicit_property_setter"),
+    nullptr,
+  },
+  {
+    "token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::token"),
+    nullptr,
+  },
+  {
+    "receiver_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->receiver_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::receiver_token"),
+    nullptr,
+  },
+  {
+    "receiver_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->receiver_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::receiver_type"),
+    nullptr,
+  },
+  {
+    "super_receiver_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->super_receiver_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::super_receiver_type"),
+    nullptr,
+  },
+  {
+    "is_class_receiver",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_class_receiver());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::is_class_receiver"),
+    nullptr,
+  },
+  {
+    "is_explicit_property",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_explicit_property());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::is_explicit_property"),
+    nullptr,
+  },
+  {
+    "is_implicit_property",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_implicit_property());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::is_implicit_property"),
+    nullptr,
+  },
+  {
+    "is_messaging_getter",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_messaging_getter());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::is_messaging_getter"),
+    nullptr,
+  },
+  {
+    "is_messaging_setter",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_messaging_setter());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::is_messaging_setter"),
+    nullptr,
+  },
+  {
+    "is_object_receiver",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_object_receiver());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::is_object_receiver"),
+    nullptr,
+  },
+  {
+    "is_super_receiver",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_super_receiver());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::is_super_receiver"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,172 +501,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "base",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::base"),
-    nullptr,
-  },
-  {
-    "class_receiver",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->class_receiver());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::class_receiver"),
-    nullptr,
-  },
-  {
-    "explicit_property",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->explicit_property());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::explicit_property"),
-    nullptr,
-  },
-  {
-    "implicit_property_getter",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->implicit_property_getter());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::implicit_property_getter"),
-    nullptr,
-  },
-  {
-    "implicit_property_setter",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->implicit_property_setter());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::implicit_property_setter"),
-    nullptr,
-  },
-  {
-    "token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::token"),
-    nullptr,
-  },
-  {
-    "receiver_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->receiver_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::receiver_token"),
-    nullptr,
-  },
-  {
-    "receiver_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->receiver_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::receiver_type"),
-    nullptr,
-  },
-  {
-    "super_receiver_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->super_receiver_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::super_receiver_type"),
-    nullptr,
-  },
-  {
-    "is_class_receiver",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_class_receiver());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::is_class_receiver"),
-    nullptr,
-  },
-  {
-    "is_explicit_property",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_explicit_property());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::is_explicit_property"),
-    nullptr,
-  },
-  {
-    "is_implicit_property",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_implicit_property());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::is_implicit_property"),
-    nullptr,
-  },
-  {
-    "is_messaging_getter",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_messaging_getter());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::is_messaging_getter"),
-    nullptr,
-  },
-  {
-    "is_messaging_setter",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_messaging_setter());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::is_messaging_setter"),
-    nullptr,
-  },
-  {
-    "is_object_receiver",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_object_receiver());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::is_object_receiver"),
-    nullptr,
-  },
-  {
-    "is_super_receiver",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_super_receiver());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyRefExpr::is_super_receiver"),
-    nullptr,
   },
   {}  // Sentinel.
 };

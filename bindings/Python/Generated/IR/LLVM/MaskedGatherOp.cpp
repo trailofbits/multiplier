@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1083]) || tp >= &(gTypes[1084])) {
+  if (tp < &(gTypes[1160]) || tp >= &(gTypes[1161])) {
     return std::nullopt;
   }
 
@@ -82,7 +82,19 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
 
 template <>
 SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
-  auto ret = gType->tp_alloc(gType, 0);
+  PyTypeObject *tp = nullptr;
+  switch (val.kind()) {
+    default:
+      assert(false);
+      tp = gType;
+      break;
+
+    case mx::ir::llvm::MaskedGatherOp::static_kind():
+      tp = &(gTypes[1160]);
+      break;
+
+  }
+  auto ret = tp->tp_alloc(tp, 0);
   if (auto obj = O_cast(ret)) {
     obj->data = new (obj->backing_storage) T(std::move(val));
   }
@@ -109,6 +121,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
   return true;
 }
+
+namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "ptrs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->ptrs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::MaskedGatherOp::ptrs"),
+    nullptr,
+  },
+  {
+    "mask",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->mask());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::MaskedGatherOp::mask"),
+    nullptr,
+  },
+  {
+    "pass_thru",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->pass_thru());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::MaskedGatherOp::pass_thru"),
+    nullptr,
+  },
+  {
+    "res",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->res());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::MaskedGatherOp::res"),
+    nullptr,
+  },
+  {
+    "alignment",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->alignment());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::MaskedGatherOp::alignment"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
 
 namespace {
 static PyMethodDef gMethods[] = {
@@ -179,65 +247,9 @@ static PyMethodDef gMethods[] = {
 }  // namespace
 
 namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "ptrs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->ptrs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::MaskedGatherOp::ptrs"),
-    nullptr,
-  },
-  {
-    "mask",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->mask());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::MaskedGatherOp::mask"),
-    nullptr,
-  },
-  {
-    "pass_thru",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pass_thru());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::MaskedGatherOp::pass_thru"),
-    nullptr,
-  },
-  {
-    "res",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->res());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::MaskedGatherOp::res"),
-    nullptr,
-  },
-  {
-    "alignment",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->alignment());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::MaskedGatherOp::alignment"),
-    nullptr,
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1083]);
+  PyTypeObject * const tp = &(gTypes[1160]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -252,12 +264,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = PyObject_HashNotImplemented;
+  tp->tp_hash = gTypes[935].tp_hash;
   tp->tp_richcompare = nullptr;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = nullptr;
+  tp->tp_base = &(gTypes[935]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

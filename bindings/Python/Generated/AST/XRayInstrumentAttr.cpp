@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "always_x_ray_instrument",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->always_x_ray_instrument());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::XRayInstrumentAttr::always_x_ray_instrument"),
+    nullptr,
+  },
+  {
+    "semantic_spelling",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->semantic_spelling());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::XRayInstrumentAttr::semantic_spelling"),
+    nullptr,
+  },
+  {
+    "never_x_ray_instrument",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->never_x_ray_instrument());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::XRayInstrumentAttr::never_x_ray_instrument"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,42 +361,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::XRayInstrumentAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "always_x_ray_instrument",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->always_x_ray_instrument());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::XRayInstrumentAttr::always_x_ray_instrument"),
-    nullptr,
-  },
-  {
-    "semantic_spelling",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->semantic_spelling());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::XRayInstrumentAttr::semantic_spelling"),
-    nullptr,
-  },
-  {
-    "never_x_ray_instrument",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->never_x_ray_instrument());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::XRayInstrumentAttr::never_x_ray_instrument"),
-    nullptr,
   },
   {}  // Sentinel.
 };

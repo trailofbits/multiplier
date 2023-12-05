@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1117]) || tp >= &(gTypes[1118])) {
+  if (tp < &(gTypes[1201]) || tp >= &(gTypes[1202])) {
     return std::nullopt;
   }
 
@@ -82,7 +82,19 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
 
 template <>
 SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
-  auto ret = gType->tp_alloc(gType, 0);
+  PyTypeObject *tp = nullptr;
+  switch (val.kind()) {
+    default:
+      assert(false);
+      tp = gType;
+      break;
+
+    case mx::ir::memref::GlobalOp::static_kind():
+      tp = &(gTypes[1201]);
+      break;
+
+  }
+  auto ret = tp->tp_alloc(tp, 0);
   if (auto obj = O_cast(ret)) {
     obj->data = new (obj->backing_storage) T(std::move(val));
   }
@@ -109,6 +121,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
   return true;
 }
+
+namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "sym_name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sym_name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::GlobalOp::sym_name"),
+    nullptr,
+  },
+  {
+    "sym_visibility",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sym_visibility());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::GlobalOp::sym_visibility"),
+    nullptr,
+  },
+  {
+    "constant",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->constant());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::GlobalOp::constant"),
+    nullptr,
+  },
+  {
+    "is_external",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_external());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::GlobalOp::is_external"),
+    nullptr,
+  },
+  {
+    "is_uninitialized",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_uninitialized());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::GlobalOp::is_uninitialized"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
 
 namespace {
 static PyMethodDef gMethods[] = {
@@ -179,65 +247,9 @@ static PyMethodDef gMethods[] = {
 }  // namespace
 
 namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "sym_name",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sym_name());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::memref::GlobalOp::sym_name"),
-    nullptr,
-  },
-  {
-    "sym_visibility",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sym_visibility());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::memref::GlobalOp::sym_visibility"),
-    nullptr,
-  },
-  {
-    "constant",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->constant());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::memref::GlobalOp::constant"),
-    nullptr,
-  },
-  {
-    "is_external",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_external());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::memref::GlobalOp::is_external"),
-    nullptr,
-  },
-  {
-    "is_uninitialized",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_uninitialized());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::memref::GlobalOp::is_uninitialized"),
-    nullptr,
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1117]);
+  PyTypeObject * const tp = &(gTypes[1201]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -252,12 +264,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = PyObject_HashNotImplemented;
+  tp->tp_hash = gTypes[1180].tp_hash;
   tp->tp_richcompare = nullptr;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = nullptr;
+  tp->tp_base = &(gTypes[1180]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

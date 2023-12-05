@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "desugar",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->desugar());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypeOfExprType::desugar"),
+    nullptr,
+  },
+  {
+    "type_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypeOfExprType::type_kind"),
+    nullptr,
+  },
+  {
+    "underlying_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->underlying_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypeOfExprType::underlying_expression"),
+    nullptr,
+  },
+  {
+    "is_sugared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sugared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypeOfExprType::is_sugared"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -309,52 +355,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::TypeOfExprType::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypeOfExprType::desugar"),
-    nullptr,
-  },
-  {
-    "type_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypeOfExprType::type_kind"),
-    nullptr,
-  },
-  {
-    "underlying_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->underlying_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypeOfExprType::underlying_expression"),
-    nullptr,
-  },
-  {
-    "is_sugared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sugared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypeOfExprType::is_sugared"),
-    nullptr,
   },
   {}  // Sentinel.
 };

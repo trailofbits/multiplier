@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[859]) || tp >= &(gTypes[860])) {
+  if (tp < &(gTypes[933]) || tp >= &(gTypes[934])) {
     return std::nullopt;
   }
 
@@ -82,7 +82,19 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
 
 template <>
 SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
-  auto ret = gType->tp_alloc(gType, 0);
+  PyTypeObject *tp = nullptr;
+  switch (val.kind()) {
+    default:
+      assert(false);
+      tp = gType;
+      break;
+
+    case mx::ir::builtin::ModuleOp::static_kind():
+      tp = &(gTypes[933]);
+      break;
+
+  }
+  auto ret = tp->tp_alloc(tp, 0);
   if (auto obj = O_cast(ret)) {
     obj->data = new (obj->backing_storage) T(std::move(val));
   }
@@ -109,6 +121,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
   return true;
 }
+
+namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "body_region",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body_region());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::body_region"),
+    nullptr,
+  },
+  {
+    "sym_name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sym_name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::sym_name"),
+    nullptr,
+  },
+  {
+    "sym_visibility",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sym_visibility());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::sym_visibility"),
+    nullptr,
+  },
+  {
+    "name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::name"),
+    nullptr,
+  },
+  {
+    "is_optional_symbol",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_optional_symbol());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::is_optional_symbol"),
+    nullptr,
+  },
+  {
+    "default_dialect",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->default_dialect());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::default_dialect"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
 
 namespace {
 static PyMethodDef gMethods[] = {
@@ -179,75 +257,9 @@ static PyMethodDef gMethods[] = {
 }  // namespace
 
 namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "body_region",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->body_region());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::body_region"),
-    nullptr,
-  },
-  {
-    "sym_name",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sym_name());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::sym_name"),
-    nullptr,
-  },
-  {
-    "sym_visibility",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sym_visibility());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::sym_visibility"),
-    nullptr,
-  },
-  {
-    "name",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->name());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::name"),
-    nullptr,
-  },
-  {
-    "is_optional_symbol",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_optional_symbol());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::is_optional_symbol"),
-    nullptr,
-  },
-  {
-    "default_dialect",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->default_dialect());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::default_dialect"),
-    nullptr,
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[859]);
+  PyTypeObject * const tp = &(gTypes[933]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -262,12 +274,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = PyObject_HashNotImplemented;
+  tp->tp_hash = gTypes[932].tp_hash;
   tp->tp_richcompare = nullptr;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = nullptr;
+  tp->tp_base = &(gTypes[932]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

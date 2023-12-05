@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "result_storage_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->result_storage_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConstantExpr::result_storage_kind"),
+    nullptr,
+  },
+  {
+    "has_ap_value_result",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_ap_value_result());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConstantExpr::has_ap_value_result"),
+    nullptr,
+  },
+  {
+    "is_immediate_invocation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_immediate_invocation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConstantExpr::is_immediate_invocation"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,42 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ConstantExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "result_storage_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->result_storage_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConstantExpr::result_storage_kind"),
-    nullptr,
-  },
-  {
-    "has_ap_value_result",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_ap_value_result());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConstantExpr::has_ap_value_result"),
-    nullptr,
-  },
-  {
-    "is_immediate_invocation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_immediate_invocation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConstantExpr::is_immediate_invocation"),
-    nullptr,
   },
   {}  // Sentinel.
 };

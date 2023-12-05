@@ -123,6 +123,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "does_usual_array_delete_want_size",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->does_usual_array_delete_want_size());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDeleteExpr::does_usual_array_delete_want_size"),
+    nullptr,
+  },
+  {
+    "argument",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->argument());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDeleteExpr::argument"),
+    nullptr,
+  },
+  {
+    "destroyed_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->destroyed_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDeleteExpr::destroyed_type"),
+    nullptr,
+  },
+  {
+    "operator_delete",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_delete());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDeleteExpr::operator_delete"),
+    nullptr,
+  },
+  {
+    "is_array_form",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_array_form());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDeleteExpr::is_array_form"),
+    nullptr,
+  },
+  {
+    "is_array_form_as_written",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_array_form_as_written());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDeleteExpr::is_array_form_as_written"),
+    nullptr,
+  },
+  {
+    "is_global_delete",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_global_delete());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDeleteExpr::is_global_delete"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,82 +411,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXDeleteExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "does_usual_array_delete_want_size",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->does_usual_array_delete_want_size());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDeleteExpr::does_usual_array_delete_want_size"),
-    nullptr,
-  },
-  {
-    "argument",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->argument());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDeleteExpr::argument"),
-    nullptr,
-  },
-  {
-    "destroyed_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->destroyed_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDeleteExpr::destroyed_type"),
-    nullptr,
-  },
-  {
-    "operator_delete",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_delete());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDeleteExpr::operator_delete"),
-    nullptr,
-  },
-  {
-    "is_array_form",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_array_form());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDeleteExpr::is_array_form"),
-    nullptr,
-  },
-  {
-    "is_array_form_as_written",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_array_form_as_written());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDeleteExpr::is_array_form_as_written"),
-    nullptr,
-  },
-  {
-    "is_global_delete",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_global_delete());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDeleteExpr::is_global_delete"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -127,6 +127,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "pointee_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->pointee_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ReferenceType::pointee_type"),
+    nullptr,
+  },
+  {
+    "pointee_type_as_written",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->pointee_type_as_written());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ReferenceType::pointee_type_as_written"),
+    nullptr,
+  },
+  {
+    "is_inner_reference",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_inner_reference());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ReferenceType::is_inner_reference"),
+    nullptr,
+  },
+  {
+    "is_spelled_as_l_value",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_spelled_as_l_value());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ReferenceType::is_spelled_as_l_value"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -295,52 +341,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::ReferenceType::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "pointee_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pointee_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ReferenceType::pointee_type"),
-    nullptr,
-  },
-  {
-    "pointee_type_as_written",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pointee_type_as_written());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ReferenceType::pointee_type_as_written"),
-    nullptr,
-  },
-  {
-    "is_inner_reference",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_inner_reference());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ReferenceType::is_inner_reference"),
-    nullptr,
-  },
-  {
-    "is_spelled_as_l_value",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_spelled_as_l_value());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ReferenceType::is_spelled_as_l_value"),
-    nullptr,
   },
   {}  // Sentinel.
 };

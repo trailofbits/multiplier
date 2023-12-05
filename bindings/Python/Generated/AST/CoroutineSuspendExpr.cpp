@@ -127,6 +127,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "common_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->common_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::common_expression"),
+    nullptr,
+  },
+  {
+    "keyword_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->keyword_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::keyword_token"),
+    nullptr,
+  },
+  {
+    "opaque_value",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->opaque_value());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::opaque_value"),
+    nullptr,
+  },
+  {
+    "operand",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operand());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::operand"),
+    nullptr,
+  },
+  {
+    "ready_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->ready_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::ready_expression"),
+    nullptr,
+  },
+  {
+    "resume_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->resume_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::resume_expression"),
+    nullptr,
+  },
+  {
+    "suspend_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->suspend_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::suspend_expression"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -321,82 +397,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "common_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->common_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::common_expression"),
-    nullptr,
-  },
-  {
-    "keyword_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->keyword_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::keyword_token"),
-    nullptr,
-  },
-  {
-    "opaque_value",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->opaque_value());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::opaque_value"),
-    nullptr,
-  },
-  {
-    "operand",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operand());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::operand"),
-    nullptr,
-  },
-  {
-    "ready_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->ready_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::ready_expression"),
-    nullptr,
-  },
-  {
-    "resume_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->resume_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::resume_expression"),
-    nullptr,
-  },
-  {
-    "suspend_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->suspend_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineSuspendExpr::suspend_expression"),
-    nullptr,
   },
   {}  // Sentinel.
 };

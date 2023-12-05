@@ -123,6 +123,172 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "array_filler",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->array_filler());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::array_filler"),
+    nullptr,
+  },
+  {
+    "initialized_field_in_union",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initialized_field_in_union());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::initialized_field_in_union"),
+    nullptr,
+  },
+  {
+    "l_brace_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->l_brace_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::l_brace_token"),
+    nullptr,
+  },
+  {
+    "r_brace_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_brace_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::r_brace_token"),
+    nullptr,
+  },
+  {
+    "semantic_form",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->semantic_form());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::semantic_form"),
+    nullptr,
+  },
+  {
+    "syntactic_form",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->syntactic_form());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::syntactic_form"),
+    nullptr,
+  },
+  {
+    "had_array_range_designator",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->had_array_range_designator());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::had_array_range_designator"),
+    nullptr,
+  },
+  {
+    "has_array_filler",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_array_filler());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::has_array_filler"),
+    nullptr,
+  },
+  {
+    "has_designated_initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_designated_initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::has_designated_initializer"),
+    nullptr,
+  },
+  {
+    "num_initializers",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_initializers());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::num_initializers"),
+    nullptr,
+  },
+  {
+    "initializers",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializers());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::initializers"),
+    nullptr,
+  },
+  {
+    "is_explicit",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_explicit());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::is_explicit"),
+    nullptr,
+  },
+  {
+    "is_semantic_form",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_semantic_form());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::is_semantic_form"),
+    nullptr,
+  },
+  {
+    "is_string_literal_initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_string_literal_initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::is_string_literal_initializer"),
+    nullptr,
+  },
+  {
+    "is_syntactic_form",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_syntactic_form());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::is_syntactic_form"),
+    nullptr,
+  },
+  {
+    "is_transparent",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_transparent());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitListExpr::is_transparent"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,172 +523,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::InitListExpr::nth_initializer"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "array_filler",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->array_filler());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::array_filler"),
-    nullptr,
-  },
-  {
-    "initialized_field_in_union",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initialized_field_in_union());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::initialized_field_in_union"),
-    nullptr,
-  },
-  {
-    "l_brace_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->l_brace_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::l_brace_token"),
-    nullptr,
-  },
-  {
-    "r_brace_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_brace_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::r_brace_token"),
-    nullptr,
-  },
-  {
-    "semantic_form",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->semantic_form());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::semantic_form"),
-    nullptr,
-  },
-  {
-    "syntactic_form",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->syntactic_form());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::syntactic_form"),
-    nullptr,
-  },
-  {
-    "had_array_range_designator",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->had_array_range_designator());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::had_array_range_designator"),
-    nullptr,
-  },
-  {
-    "has_array_filler",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_array_filler());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::has_array_filler"),
-    nullptr,
-  },
-  {
-    "has_designated_initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_designated_initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::has_designated_initializer"),
-    nullptr,
-  },
-  {
-    "num_initializers",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_initializers());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::num_initializers"),
-    nullptr,
-  },
-  {
-    "initializers",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializers());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::initializers"),
-    nullptr,
-  },
-  {
-    "is_explicit",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_explicit());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::is_explicit"),
-    nullptr,
-  },
-  {
-    "is_semantic_form",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_semantic_form());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::is_semantic_form"),
-    nullptr,
-  },
-  {
-    "is_string_literal_initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_string_literal_initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::is_string_literal_initializer"),
-    nullptr,
-  },
-  {
-    "is_syntactic_form",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_syntactic_form());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::is_syntactic_form"),
-    nullptr,
-  },
-  {
-    "is_transparent",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_transparent());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InitListExpr::is_transparent"),
-    nullptr,
   },
   {}  // Sentinel.
 };

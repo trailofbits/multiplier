@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "array_filler",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->array_filler());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXParenListInitExpr::array_filler"),
+    nullptr,
+  },
+  {
+    "initializer_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXParenListInitExpr::initializer_token"),
+    nullptr,
+  },
+  {
+    "initialized_field_in_union",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initialized_field_in_union());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXParenListInitExpr::initialized_field_in_union"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,42 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXParenListInitExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "array_filler",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->array_filler());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXParenListInitExpr::array_filler"),
-    nullptr,
-  },
-  {
-    "initializer_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializer_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXParenListInitExpr::initializer_token"),
-    nullptr,
-  },
-  {
-    "initialized_field_in_union",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initialized_field_in_union());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXParenListInitExpr::initialized_field_in_union"),
-    nullptr,
   },
   {}  // Sentinel.
 };

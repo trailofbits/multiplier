@@ -123,6 +123,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::HLSLBufferDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::HLSLBufferDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::HLSLBufferDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "l_brace_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->l_brace_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::HLSLBufferDecl::l_brace_token"),
+    nullptr,
+  },
+  {
+    "token_start",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->token_start());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::HLSLBufferDecl::token_start"),
+    nullptr,
+  },
+  {
+    "r_brace_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_brace_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::HLSLBufferDecl::r_brace_token"),
+    nullptr,
+  },
+  {
+    "is_c_buffer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_c_buffer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::HLSLBufferDecl::is_c_buffer"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,82 +411,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::HLSLBufferDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::HLSLBufferDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::HLSLBufferDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::HLSLBufferDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "l_brace_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->l_brace_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::HLSLBufferDecl::l_brace_token"),
-    nullptr,
-  },
-  {
-    "token_start",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->token_start());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::HLSLBufferDecl::token_start"),
-    nullptr,
-  },
-  {
-    "r_brace_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_brace_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::HLSLBufferDecl::r_brace_token"),
-    nullptr,
-  },
-  {
-    "is_c_buffer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_c_buffer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::HLSLBufferDecl::is_c_buffer"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -127,6 +127,202 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "lhs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->lhs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::lhs"),
+    nullptr,
+  },
+  {
+    "opcode",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->opcode());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::opcode"),
+    nullptr,
+  },
+  {
+    "opcode_string",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->opcode_string());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::opcode_string"),
+    nullptr,
+  },
+  {
+    "operator_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::operator_token"),
+    nullptr,
+  },
+  {
+    "rhs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->rhs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::rhs"),
+    nullptr,
+  },
+  {
+    "has_stored_fp_features",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_stored_fp_features());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::has_stored_fp_features"),
+    nullptr,
+  },
+  {
+    "is_additive_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_additive_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::is_additive_operation"),
+    nullptr,
+  },
+  {
+    "is_assignment_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_assignment_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::is_assignment_operation"),
+    nullptr,
+  },
+  {
+    "is_bitwise_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_bitwise_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::is_bitwise_operation"),
+    nullptr,
+  },
+  {
+    "is_comma_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_comma_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::is_comma_operation"),
+    nullptr,
+  },
+  {
+    "is_comparison_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_comparison_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::is_comparison_operation"),
+    nullptr,
+  },
+  {
+    "is_compound_assignment_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_compound_assignment_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::is_compound_assignment_operation"),
+    nullptr,
+  },
+  {
+    "is_equality_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_equality_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::is_equality_operation"),
+    nullptr,
+  },
+  {
+    "is_logical_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_logical_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::is_logical_operation"),
+    nullptr,
+  },
+  {
+    "is_multiplicative_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_multiplicative_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::is_multiplicative_operation"),
+    nullptr,
+  },
+  {
+    "is_pointer_memory_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_pointer_memory_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::is_pointer_memory_operation"),
+    nullptr,
+  },
+  {
+    "is_relational_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_relational_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::is_relational_operation"),
+    nullptr,
+  },
+  {
+    "is_shift_assign_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_shift_assign_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::is_shift_assign_operation"),
+    nullptr,
+  },
+  {
+    "is_shift_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_shift_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BinaryOperator::is_shift_operation"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -339,202 +535,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::BinaryOperator::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "lhs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->lhs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::lhs"),
-    nullptr,
-  },
-  {
-    "opcode",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->opcode());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::opcode"),
-    nullptr,
-  },
-  {
-    "opcode_string",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->opcode_string());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::opcode_string"),
-    nullptr,
-  },
-  {
-    "operator_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::operator_token"),
-    nullptr,
-  },
-  {
-    "rhs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->rhs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::rhs"),
-    nullptr,
-  },
-  {
-    "has_stored_fp_features",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_stored_fp_features());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::has_stored_fp_features"),
-    nullptr,
-  },
-  {
-    "is_additive_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_additive_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::is_additive_operation"),
-    nullptr,
-  },
-  {
-    "is_assignment_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_assignment_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::is_assignment_operation"),
-    nullptr,
-  },
-  {
-    "is_bitwise_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_bitwise_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::is_bitwise_operation"),
-    nullptr,
-  },
-  {
-    "is_comma_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_comma_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::is_comma_operation"),
-    nullptr,
-  },
-  {
-    "is_comparison_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_comparison_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::is_comparison_operation"),
-    nullptr,
-  },
-  {
-    "is_compound_assignment_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_compound_assignment_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::is_compound_assignment_operation"),
-    nullptr,
-  },
-  {
-    "is_equality_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_equality_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::is_equality_operation"),
-    nullptr,
-  },
-  {
-    "is_logical_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_logical_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::is_logical_operation"),
-    nullptr,
-  },
-  {
-    "is_multiplicative_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_multiplicative_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::is_multiplicative_operation"),
-    nullptr,
-  },
-  {
-    "is_pointer_memory_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_pointer_memory_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::is_pointer_memory_operation"),
-    nullptr,
-  },
-  {
-    "is_relational_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_relational_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::is_relational_operation"),
-    nullptr,
-  },
-  {
-    "is_shift_assign_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_shift_assign_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::is_shift_assign_operation"),
-    nullptr,
-  },
-  {
-    "is_shift_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_shift_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BinaryOperator::is_shift_operation"),
-    nullptr,
   },
   {}  // Sentinel.
 };

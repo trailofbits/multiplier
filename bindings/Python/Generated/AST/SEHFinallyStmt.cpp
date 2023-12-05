@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "block",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->block());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SEHFinallyStmt::block"),
+    nullptr,
+  },
+  {
+    "finally_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->finally_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SEHFinallyStmt::finally_token"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,32 +361,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::SEHFinallyStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "block",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->block());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SEHFinallyStmt::block"),
-    nullptr,
-  },
-  {
-    "finally_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->finally_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SEHFinallyStmt::finally_token"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -123,6 +123,172 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "assembly_string",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->assembly_string());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::assembly_string"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::r_paren_token"),
+    nullptr,
+  },
+  {
+    "is_assembly_goto",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_assembly_goto());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::is_assembly_goto"),
+    nullptr,
+  },
+  {
+    "num_labels",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_labels());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::num_labels"),
+    nullptr,
+  },
+  {
+    "labels",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->labels());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::labels"),
+    nullptr,
+  },
+  {
+    "num_output_constraint_literals",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_output_constraint_literals());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::num_output_constraint_literals"),
+    nullptr,
+  },
+  {
+    "output_constraint_literals",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->output_constraint_literals());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::output_constraint_literals"),
+    nullptr,
+  },
+  {
+    "output_names",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->output_names());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::output_names"),
+    nullptr,
+  },
+  {
+    "num_input_constraint_literals",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_input_constraint_literals());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::num_input_constraint_literals"),
+    nullptr,
+  },
+  {
+    "input_constraint_literals",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->input_constraint_literals());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::input_constraint_literals"),
+    nullptr,
+  },
+  {
+    "input_names",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->input_names());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::input_names"),
+    nullptr,
+  },
+  {
+    "num_clobber_string_literals",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_clobber_string_literals());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::num_clobber_string_literals"),
+    nullptr,
+  },
+  {
+    "clobber_string_literals",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->clobber_string_literals());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::clobber_string_literals"),
+    nullptr,
+  },
+  {
+    "num_label_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_label_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::num_label_expressions"),
+    nullptr,
+  },
+  {
+    "label_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->label_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::label_expressions"),
+    nullptr,
+  },
+  {
+    "label_names",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->label_names());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::label_names"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -445,172 +611,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::nth_label_expression"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "assembly_string",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->assembly_string());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::assembly_string"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::r_paren_token"),
-    nullptr,
-  },
-  {
-    "is_assembly_goto",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_assembly_goto());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::is_assembly_goto"),
-    nullptr,
-  },
-  {
-    "num_labels",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_labels());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::num_labels"),
-    nullptr,
-  },
-  {
-    "labels",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->labels());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::labels"),
-    nullptr,
-  },
-  {
-    "num_output_constraint_literals",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_output_constraint_literals());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::num_output_constraint_literals"),
-    nullptr,
-  },
-  {
-    "output_constraint_literals",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->output_constraint_literals());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::output_constraint_literals"),
-    nullptr,
-  },
-  {
-    "output_names",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->output_names());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::output_names"),
-    nullptr,
-  },
-  {
-    "num_input_constraint_literals",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_input_constraint_literals());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::num_input_constraint_literals"),
-    nullptr,
-  },
-  {
-    "input_constraint_literals",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->input_constraint_literals());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::input_constraint_literals"),
-    nullptr,
-  },
-  {
-    "input_names",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->input_names());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::input_names"),
-    nullptr,
-  },
-  {
-    "num_clobber_string_literals",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_clobber_string_literals());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::num_clobber_string_literals"),
-    nullptr,
-  },
-  {
-    "clobber_string_literals",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->clobber_string_literals());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::clobber_string_literals"),
-    nullptr,
-  },
-  {
-    "num_label_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_label_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::num_label_expressions"),
-    nullptr,
-  },
-  {
-    "label_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->label_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::label_expressions"),
-    nullptr,
-  },
-  {
-    "label_names",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->label_names());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::label_names"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "num_declarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_declarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DeclStmt::num_declarations"),
+    nullptr,
+  },
+  {
+    "declarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->declarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DeclStmt::declarations"),
+    nullptr,
+  },
+  {
+    "single_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->single_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DeclStmt::single_declaration"),
+    nullptr,
+  },
+  {
+    "is_single_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_single_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DeclStmt::is_single_declaration"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,52 +403,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::DeclStmt::nth_declaration"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "num_declarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_declarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DeclStmt::num_declarations"),
-    nullptr,
-  },
-  {
-    "declarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->declarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DeclStmt::declarations"),
-    nullptr,
-  },
-  {
-    "single_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->single_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DeclStmt::single_declaration"),
-    nullptr,
-  },
-  {
-    "is_single_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_single_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DeclStmt::is_single_declaration"),
-    nullptr,
   },
   {}  // Sentinel.
 };

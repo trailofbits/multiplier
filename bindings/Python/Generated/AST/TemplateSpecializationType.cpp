@@ -123,6 +123,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "desugar",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->desugar());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateSpecializationType::desugar"),
+    nullptr,
+  },
+  {
+    "aliased_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->aliased_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateSpecializationType::aliased_type"),
+    nullptr,
+  },
+  {
+    "is_current_instantiation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_current_instantiation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateSpecializationType::is_current_instantiation"),
+    nullptr,
+  },
+  {
+    "is_sugared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sugared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateSpecializationType::is_sugared"),
+    nullptr,
+  },
+  {
+    "is_type_alias",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_type_alias());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateSpecializationType::is_type_alias"),
+    nullptr,
+  },
+  {
+    "num_template_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_template_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateSpecializationType::num_template_arguments"),
+    nullptr,
+  },
+  {
+    "template_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateSpecializationType::template_arguments"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -331,82 +407,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::TemplateSpecializationType::nth_template_argument"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateSpecializationType::desugar"),
-    nullptr,
-  },
-  {
-    "aliased_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->aliased_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateSpecializationType::aliased_type"),
-    nullptr,
-  },
-  {
-    "is_current_instantiation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_current_instantiation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateSpecializationType::is_current_instantiation"),
-    nullptr,
-  },
-  {
-    "is_sugared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sugared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateSpecializationType::is_sugared"),
-    nullptr,
-  },
-  {
-    "is_type_alias",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_type_alias());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateSpecializationType::is_type_alias"),
-    nullptr,
-  },
-  {
-    "num_template_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_template_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateSpecializationType::num_template_arguments"),
-    nullptr,
-  },
-  {
-    "template_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateSpecializationType::template_arguments"),
-    nullptr,
   },
   {}  // Sentinel.
 };

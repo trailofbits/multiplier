@@ -111,106 +111,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
-static PyMethodDef gMethods[] = {
-  {
-    "add",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 3) {
-            auto arg_0 = PythonBinding<mx::ReferenceKind>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-            auto arg_1 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[1]);
-            if (!arg_1.has_value()) {
-              break;
-            }
-            auto arg_2 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[2]);
-            if (!arg_2.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->add(arg_0.value(), arg_1.value(), arg_2.value()));
-          }
-          while (num_args == 4) {
-            auto arg_0 = PythonBinding<mx::ReferenceKind>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-            auto arg_1 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[1]);
-            if (!arg_1.has_value()) {
-              break;
-            }
-            auto arg_2 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[2]);
-            if (!arg_2.has_value()) {
-              break;
-            }
-            auto arg_3 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[3]);
-            if (!arg_3.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->add(arg_0.value(), arg_1.value(), arg_2.value(), arg_3.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'add'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::Reference::add"),
-  },
-  {
-    "FROM",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->from(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'FROM'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::Reference::from"),
-  },
-  {
-    "to",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->to(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'to'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::Reference::to"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
 static PyGetSetDef gProperties[] = {
   {
     "category",
@@ -391,6 +291,106 @@ static PyGetSetDef gProperties[] = {
     nullptr,
     PyDoc_STR("Wrapper for mx::Reference::as_compilation"),
     nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
+static PyMethodDef gMethods[] = {
+  {
+    "add",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 3) {
+            auto arg_0 = PythonBinding<mx::ReferenceKind>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+            auto arg_1 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[1]);
+            if (!arg_1.has_value()) {
+              break;
+            }
+            auto arg_2 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[2]);
+            if (!arg_2.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->add(arg_0.value(), arg_1.value(), arg_2.value()));
+          }
+          while (num_args == 4) {
+            auto arg_0 = PythonBinding<mx::ReferenceKind>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+            auto arg_1 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[1]);
+            if (!arg_1.has_value()) {
+              break;
+            }
+            auto arg_2 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[2]);
+            if (!arg_2.has_value()) {
+              break;
+            }
+            auto arg_3 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[3]);
+            if (!arg_3.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->add(arg_0.value(), arg_1.value(), arg_2.value(), arg_3.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'add'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::Reference::add"),
+  },
+  {
+    "FROM",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'FROM'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::Reference::from"),
+  },
+  {
+    "to",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->to(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'to'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::Reference::to"),
   },
   {}  // Sentinel.
 };

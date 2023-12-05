@@ -135,6 +135,172 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "reference_qualifier",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->reference_qualifier());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::reference_qualifier"),
+    nullptr,
+  },
+  {
+    "this_object_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->this_object_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::this_object_type"),
+    nullptr,
+  },
+  {
+    "this_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->this_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::this_type"),
+    nullptr,
+  },
+  {
+    "has_inline_body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_inline_body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::has_inline_body"),
+    nullptr,
+  },
+  {
+    "is_const",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_const());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::is_const"),
+    nullptr,
+  },
+  {
+    "is_copy_assignment_operator",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_copy_assignment_operator());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::is_copy_assignment_operator"),
+    nullptr,
+  },
+  {
+    "is_instance",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_instance());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::is_instance"),
+    nullptr,
+  },
+  {
+    "is_lambda_static_invoker",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_lambda_static_invoker());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::is_lambda_static_invoker"),
+    nullptr,
+  },
+  {
+    "is_move_assignment_operator",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_move_assignment_operator());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::is_move_assignment_operator"),
+    nullptr,
+  },
+  {
+    "is_virtual",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_virtual());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::is_virtual"),
+    nullptr,
+  },
+  {
+    "is_volatile",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_volatile());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::is_volatile"),
+    nullptr,
+  },
+  {
+    "num_overridden_methods",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_overridden_methods());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::num_overridden_methods"),
+    nullptr,
+  },
+  {
+    "overridden_methods",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->overridden_methods());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::overridden_methods"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -369,172 +535,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::CXXMethodDecl::nth_overridden_method"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "reference_qualifier",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->reference_qualifier());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::reference_qualifier"),
-    nullptr,
-  },
-  {
-    "this_object_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->this_object_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::this_object_type"),
-    nullptr,
-  },
-  {
-    "this_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->this_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::this_type"),
-    nullptr,
-  },
-  {
-    "has_inline_body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_inline_body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::has_inline_body"),
-    nullptr,
-  },
-  {
-    "is_const",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_const());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::is_const"),
-    nullptr,
-  },
-  {
-    "is_copy_assignment_operator",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_copy_assignment_operator());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::is_copy_assignment_operator"),
-    nullptr,
-  },
-  {
-    "is_instance",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_instance());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::is_instance"),
-    nullptr,
-  },
-  {
-    "is_lambda_static_invoker",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_lambda_static_invoker());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::is_lambda_static_invoker"),
-    nullptr,
-  },
-  {
-    "is_move_assignment_operator",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_move_assignment_operator());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::is_move_assignment_operator"),
-    nullptr,
-  },
-  {
-    "is_virtual",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_virtual());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::is_virtual"),
-    nullptr,
-  },
-  {
-    "is_volatile",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_volatile());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::is_volatile"),
-    nullptr,
-  },
-  {
-    "num_overridden_methods",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_overridden_methods());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::num_overridden_methods"),
-    nullptr,
-  },
-  {
-    "overridden_methods",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->overridden_methods());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMethodDecl::overridden_methods"),
-    nullptr,
   },
   {}  // Sentinel.
 };

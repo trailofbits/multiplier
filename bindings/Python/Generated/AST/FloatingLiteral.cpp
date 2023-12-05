@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FloatingLiteral::token"),
+    nullptr,
+  },
+  {
+    "is_exact",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_exact());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FloatingLiteral::is_exact"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,32 +361,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::FloatingLiteral::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FloatingLiteral::token"),
-    nullptr,
-  },
-  {
-    "is_exact",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_exact());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FloatingLiteral::is_exact"),
-    nullptr,
   },
   {}  // Sentinel.
 };

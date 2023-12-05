@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "base",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSPropertySubscriptExpr::base"),
+    nullptr,
+  },
+  {
+    "index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSPropertySubscriptExpr::index"),
+    nullptr,
+  },
+  {
+    "r_bracket_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_bracket_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSPropertySubscriptExpr::r_bracket_token"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,42 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::MSPropertySubscriptExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "base",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSPropertySubscriptExpr::base"),
-    nullptr,
-  },
-  {
-    "index",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->index());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSPropertySubscriptExpr::index"),
-    nullptr,
-  },
-  {
-    "r_bracket_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_bracket_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSPropertySubscriptExpr::r_bracket_token"),
-    nullptr,
   },
   {}  // Sentinel.
 };

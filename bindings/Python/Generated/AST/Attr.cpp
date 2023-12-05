@@ -1607,6 +1607,92 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Attr::id"),
+    nullptr,
+  },
+  {
+    "token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Attr::token"),
+    nullptr,
+  },
+  {
+    "is_implicit",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_implicit());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Attr::is_implicit"),
+    nullptr,
+  },
+  {
+    "is_inherited",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_inherited());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Attr::is_inherited"),
+    nullptr,
+  },
+  {
+    "is_late_parsed",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_late_parsed());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Attr::is_late_parsed"),
+    nullptr,
+  },
+  {
+    "is_pack_expansion",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_pack_expansion());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Attr::is_pack_expansion"),
+    nullptr,
+  },
+  {
+    "kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Attr::kind"),
+    nullptr,
+  },
+  {
+    "tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Attr::tokens"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "static_category",
@@ -1787,92 +1873,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::Attr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "id",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->id());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Attr::id"),
-    nullptr,
-  },
-  {
-    "token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Attr::token"),
-    nullptr,
-  },
-  {
-    "is_implicit",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_implicit());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Attr::is_implicit"),
-    nullptr,
-  },
-  {
-    "is_inherited",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_inherited());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Attr::is_inherited"),
-    nullptr,
-  },
-  {
-    "is_late_parsed",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_late_parsed());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Attr::is_late_parsed"),
-    nullptr,
-  },
-  {
-    "is_pack_expansion",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_pack_expansion());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Attr::is_pack_expansion"),
-    nullptr,
-  },
-  {
-    "kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Attr::kind"),
-    nullptr,
-  },
-  {
-    "tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Attr::tokens"),
-    nullptr,
   },
   {}  // Sentinel.
 };

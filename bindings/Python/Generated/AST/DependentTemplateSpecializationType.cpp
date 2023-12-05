@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "desugar",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->desugar());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentTemplateSpecializationType::desugar"),
+    nullptr,
+  },
+  {
+    "is_sugared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sugared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentTemplateSpecializationType::is_sugared"),
+    nullptr,
+  },
+  {
+    "num_template_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_template_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentTemplateSpecializationType::num_template_arguments"),
+    nullptr,
+  },
+  {
+    "template_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentTemplateSpecializationType::template_arguments"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -331,52 +377,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::DependentTemplateSpecializationType::nth_template_argument"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentTemplateSpecializationType::desugar"),
-    nullptr,
-  },
-  {
-    "is_sugared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sugared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentTemplateSpecializationType::is_sugared"),
-    nullptr,
-  },
-  {
-    "num_template_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_template_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentTemplateSpecializationType::num_template_arguments"),
-    nullptr,
-  },
-  {
-    "template_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentTemplateSpecializationType::template_arguments"),
-    nullptr,
   },
   {}  // Sentinel.
 };

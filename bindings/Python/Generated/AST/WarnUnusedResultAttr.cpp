@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "is_cxx11_no_discard",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_cxx11_no_discard());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::WarnUnusedResultAttr::is_cxx11_no_discard"),
+    nullptr,
+  },
+  {
+    "message",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->message());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::WarnUnusedResultAttr::message"),
+    nullptr,
+  },
+  {
+    "semantic_spelling",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->semantic_spelling());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::WarnUnusedResultAttr::semantic_spelling"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,42 +361,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::WarnUnusedResultAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "is_cxx11_no_discard",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_cxx11_no_discard());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::WarnUnusedResultAttr::is_cxx11_no_discard"),
-    nullptr,
-  },
-  {
-    "message",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->message());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::WarnUnusedResultAttr::message"),
-    nullptr,
-  },
-  {
-    "semantic_spelling",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->semantic_spelling());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::WarnUnusedResultAttr::semantic_spelling"),
-    nullptr,
   },
   {}  // Sentinel.
 };

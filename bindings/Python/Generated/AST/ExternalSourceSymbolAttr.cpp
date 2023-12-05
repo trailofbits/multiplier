@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "defined_in",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->defined_in());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExternalSourceSymbolAttr::defined_in"),
+    nullptr,
+  },
+  {
+    "generated_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->generated_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExternalSourceSymbolAttr::generated_declaration"),
+    nullptr,
+  },
+  {
+    "language",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->language());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExternalSourceSymbolAttr::language"),
+    nullptr,
+  },
+  {
+    "usr",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->usr());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExternalSourceSymbolAttr::usr"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,52 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::ExternalSourceSymbolAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "defined_in",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->defined_in());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ExternalSourceSymbolAttr::defined_in"),
-    nullptr,
-  },
-  {
-    "generated_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->generated_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ExternalSourceSymbolAttr::generated_declaration"),
-    nullptr,
-  },
-  {
-    "language",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->language());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ExternalSourceSymbolAttr::language"),
-    nullptr,
-  },
-  {
-    "usr",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->usr());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ExternalSourceSymbolAttr::usr"),
-    nullptr,
   },
   {}  // Sentinel.
 };

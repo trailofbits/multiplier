@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "desugar",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->desugar());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InjectedClassNameType::desugar"),
+    nullptr,
+  },
+  {
+    "declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InjectedClassNameType::declaration"),
+    nullptr,
+  },
+  {
+    "injected_specialization_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->injected_specialization_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InjectedClassNameType::injected_specialization_type"),
+    nullptr,
+  },
+  {
+    "injected_tst",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->injected_tst());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InjectedClassNameType::injected_tst"),
+    nullptr,
+  },
+  {
+    "is_sugared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sugared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InjectedClassNameType::is_sugared"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -309,62 +365,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::InjectedClassNameType::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InjectedClassNameType::desugar"),
-    nullptr,
-  },
-  {
-    "declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InjectedClassNameType::declaration"),
-    nullptr,
-  },
-  {
-    "injected_specialization_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->injected_specialization_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InjectedClassNameType::injected_specialization_type"),
-    nullptr,
-  },
-  {
-    "injected_tst",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->injected_tst());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InjectedClassNameType::injected_tst"),
-    nullptr,
-  },
-  {
-    "is_sugared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sugared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InjectedClassNameType::is_sugared"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -259,382 +259,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
-static PyMethodDef gMethods[] = {
-  {
-    "IN",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Index>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->in(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Fragment>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->in(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::File>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->in(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'IN'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::OMPLoopDirective::in"),
-  },
-  {
-    "containing",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Token>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->containing(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Decl>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->containing(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::optional<mx::Decl>>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->containing(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->containing(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::optional<mx::Stmt>>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->containing(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'containing'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::OMPLoopDirective::containing"),
-  },
-  {
-    "by_id",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 2) {
-            auto arg_0 = PythonBinding<mx::Index>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-            auto arg_1 = PythonBinding<mx::EntityId>::from_python(args[1]);
-            if (!arg_1.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->by_id(arg_0.value(), arg_1.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'by_id'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::OMPLoopDirective::by_id"),
-  },
-  {
-    "from_base",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->from_base(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'from_base'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::OMPLoopDirective::from_base"),
-  },
-  {
-    "FROM",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->from(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::optional<mx::Stmt>>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->from(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Reference>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->from(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->from(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::TokenContext>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->from(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'FROM'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::OMPLoopDirective::from"),
-  },
-  {
-    "nth_counter",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->nth_counter(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'nth_counter'";
-          return nullptr;
-        }),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_counter"),
-  },
-  {
-    "nth_dependent_counter",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->nth_dependent_counter(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'nth_dependent_counter'";
-          return nullptr;
-        }),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_dependent_counter"),
-  },
-  {
-    "nth_dependent_initializer",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->nth_dependent_initializer(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'nth_dependent_initializer'";
-          return nullptr;
-        }),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_dependent_initializer"),
-  },
-  {
-    "nth_final",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->nth_final(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'nth_final'";
-          return nullptr;
-        }),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_final"),
-  },
-  {
-    "nth_finals_condition",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->nth_finals_condition(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'nth_finals_condition'";
-          return nullptr;
-        }),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_finals_condition"),
-  },
-  {
-    "nth_initializer",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->nth_initializer(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'nth_initializer'";
-          return nullptr;
-        }),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_initializer"),
-  },
-  {
-    "nth_private_counter",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->nth_private_counter(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'nth_private_counter'";
-          return nullptr;
-        }),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_private_counter"),
-  },
-  {
-    "nth_update",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->nth_update(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'nth_update'";
-          return nullptr;
-        }),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_update"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
 static PyGetSetDef gProperties[] = {
   {
     "num_counters",
@@ -1085,6 +709,382 @@ static PyGetSetDef gProperties[] = {
     nullptr,
     PyDoc_STR("Wrapper for mx::OMPLoopDirective::updates"),
     nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
+static PyMethodDef gMethods[] = {
+  {
+    "IN",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Index>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->in(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Fragment>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->in(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::File>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->in(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'IN'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::OMPLoopDirective::in"),
+  },
+  {
+    "containing",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Token>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->containing(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Decl>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->containing(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<std::optional<mx::Decl>>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->containing(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->containing(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<std::optional<mx::Stmt>>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->containing(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'containing'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::OMPLoopDirective::containing"),
+  },
+  {
+    "by_id",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 2) {
+            auto arg_0 = PythonBinding<mx::Index>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+            auto arg_1 = PythonBinding<mx::EntityId>::from_python(args[1]);
+            if (!arg_1.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->by_id(arg_0.value(), arg_1.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'by_id'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::OMPLoopDirective::by_id"),
+  },
+  {
+    "from_base",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from_base(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'from_base'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::OMPLoopDirective::from_base"),
+  },
+  {
+    "FROM",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<std::optional<mx::Stmt>>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Reference>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::TokenContext>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'FROM'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::OMPLoopDirective::from"),
+  },
+  {
+    "nth_counter",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nth_counter(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nth_counter'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_counter"),
+  },
+  {
+    "nth_dependent_counter",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nth_dependent_counter(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nth_dependent_counter'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_dependent_counter"),
+  },
+  {
+    "nth_dependent_initializer",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nth_dependent_initializer(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nth_dependent_initializer'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_dependent_initializer"),
+  },
+  {
+    "nth_final",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nth_final(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nth_final'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_final"),
+  },
+  {
+    "nth_finals_condition",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nth_finals_condition(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nth_finals_condition'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_finals_condition"),
+  },
+  {
+    "nth_initializer",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nth_initializer(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nth_initializer'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_initializer"),
+  },
+  {
+    "nth_private_counter",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nth_private_counter(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nth_private_counter'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_private_counter"),
+  },
+  {
+    "nth_update",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nth_update(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nth_update'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::OMPLoopDirective::nth_update"),
   },
   {}  // Sentinel.
 };

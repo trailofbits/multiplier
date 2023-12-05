@@ -111,6 +111,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::File::id"),
+    nullptr,
+  },
+  {
+    "fragments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->fragments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::File::fragments"),
+    nullptr,
+  },
+  {
+    "paths",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->paths());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::File::paths"),
+    nullptr,
+  },
+  {
+    "fragment_ids",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->fragment_ids());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::File::fragment_ids"),
+    nullptr,
+  },
+  {
+    "tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::File::tokens"),
+    nullptr,
+  },
+  {
+    "data",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->data());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::File::data"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "containing",
@@ -263,72 +329,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::File::entity_category"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "id",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->id());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::File::id"),
-    nullptr,
-  },
-  {
-    "fragments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->fragments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::File::fragments"),
-    nullptr,
-  },
-  {
-    "paths",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->paths());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::File::paths"),
-    nullptr,
-  },
-  {
-    "fragment_ids",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->fragment_ids());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::File::fragment_ids"),
-    nullptr,
-  },
-  {
-    "tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::File::tokens"),
-    nullptr,
-  },
-  {
-    "data",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->data());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::File::data"),
-    nullptr,
   },
   {}  // Sentinel.
 };

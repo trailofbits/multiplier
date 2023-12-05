@@ -266,7 +266,7 @@ static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));
 
 class MX_EXPORT AShrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_ASHR;
   }
 
@@ -284,7 +284,7 @@ static_assert(sizeof(AShrOp) == sizeof(Operation));
 
 class MX_EXPORT AddOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_ADD;
   }
 
@@ -302,7 +302,7 @@ static_assert(sizeof(AddOp) == sizeof(Operation));
 
 class MX_EXPORT AddrSpaceCastOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_ADDRSPACECAST;
   }
 
@@ -319,7 +319,7 @@ static_assert(sizeof(AddrSpaceCastOp) == sizeof(Operation));
 
 class MX_EXPORT AddressOfOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_MLIR_ADDRESSOF;
   }
 
@@ -336,7 +336,7 @@ static_assert(sizeof(AddressOfOp) == sizeof(Operation));
 
 class MX_EXPORT AllocaOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_ALLOCA;
   }
 
@@ -359,7 +359,7 @@ static_assert(sizeof(AllocaOp) == sizeof(Operation));
 
 class MX_EXPORT AndOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_AND;
   }
 
@@ -377,7 +377,7 @@ static_assert(sizeof(AndOp) == sizeof(Operation));
 
 class MX_EXPORT AtomicCmpXchgOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_CMPXCHG;
   }
 
@@ -407,7 +407,7 @@ static_assert(sizeof(AtomicCmpXchgOp) == sizeof(Operation));
 
 class MX_EXPORT AtomicRMWOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_ATOMICRMW;
   }
 
@@ -435,7 +435,7 @@ static_assert(sizeof(AtomicRMWOp) == sizeof(Operation));
 
 class MX_EXPORT BitcastOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_BITCAST;
   }
 
@@ -452,7 +452,7 @@ static_assert(sizeof(BitcastOp) == sizeof(Operation));
 
 class MX_EXPORT BrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_BR;
   }
 
@@ -470,7 +470,7 @@ static_assert(sizeof(BrOp) == sizeof(Operation));
 
 class MX_EXPORT CallOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_CALL;
   }
 
@@ -496,7 +496,7 @@ static_assert(sizeof(CallOp) == sizeof(Operation));
 
 class MX_EXPORT ComdatOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_COMDAT;
   }
 
@@ -513,7 +513,7 @@ static_assert(sizeof(ComdatOp) == sizeof(Operation));
 
 class MX_EXPORT ComdatSelectorOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_COMDAT_SELECTOR;
   }
 
@@ -530,7 +530,7 @@ static_assert(sizeof(ComdatSelectorOp) == sizeof(Operation));
 
 class MX_EXPORT CondBrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_COND_BR;
   }
 
@@ -552,7 +552,7 @@ static_assert(sizeof(CondBrOp) == sizeof(Operation));
 
 class MX_EXPORT ConstantOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_MLIR_CONSTANT;
   }
 
@@ -569,7 +569,7 @@ static_assert(sizeof(ConstantOp) == sizeof(Operation));
 
 class MX_EXPORT ExtractElementOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_EXTRACTELEMENT;
   }
 
@@ -587,7 +587,7 @@ static_assert(sizeof(ExtractElementOp) == sizeof(Operation));
 
 class MX_EXPORT ExtractValueOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_EXTRACTVALUE;
   }
 
@@ -605,7 +605,7 @@ static_assert(sizeof(ExtractValueOp) == sizeof(Operation));
 
 class MX_EXPORT FAddOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_FADD;
   }
 
@@ -624,7 +624,7 @@ static_assert(sizeof(FAddOp) == sizeof(Operation));
 
 class MX_EXPORT FCmpOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_FCMP;
   }
 
@@ -644,7 +644,7 @@ static_assert(sizeof(FCmpOp) == sizeof(Operation));
 
 class MX_EXPORT FDivOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_FDIV;
   }
 
@@ -663,7 +663,7 @@ static_assert(sizeof(FDivOp) == sizeof(Operation));
 
 class MX_EXPORT FMulOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_FMUL;
   }
 
@@ -682,7 +682,7 @@ static_assert(sizeof(FMulOp) == sizeof(Operation));
 
 class MX_EXPORT FNegOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_FNEG;
   }
 
@@ -700,7 +700,7 @@ static_assert(sizeof(FNegOp) == sizeof(Operation));
 
 class MX_EXPORT FPExtOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_FPEXT;
   }
 
@@ -717,7 +717,7 @@ static_assert(sizeof(FPExtOp) == sizeof(Operation));
 
 class MX_EXPORT FPToSIOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_FPTOSI;
   }
 
@@ -734,7 +734,7 @@ static_assert(sizeof(FPToSIOp) == sizeof(Operation));
 
 class MX_EXPORT FPToUIOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_FPTOUI;
   }
 
@@ -751,7 +751,7 @@ static_assert(sizeof(FPToUIOp) == sizeof(Operation));
 
 class MX_EXPORT FPTruncOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_FPTRUNC;
   }
 
@@ -768,7 +768,7 @@ static_assert(sizeof(FPTruncOp) == sizeof(Operation));
 
 class MX_EXPORT FRemOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_FREM;
   }
 
@@ -787,7 +787,7 @@ static_assert(sizeof(FRemOp) == sizeof(Operation));
 
 class MX_EXPORT FSubOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_FSUB;
   }
 
@@ -806,7 +806,7 @@ static_assert(sizeof(FSubOp) == sizeof(Operation));
 
 class MX_EXPORT FenceOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_FENCE;
   }
 
@@ -823,7 +823,7 @@ static_assert(sizeof(FenceOp) == sizeof(Operation));
 
 class MX_EXPORT FreezeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_FREEZE;
   }
 
@@ -840,7 +840,7 @@ static_assert(sizeof(FreezeOp) == sizeof(Operation));
 
 class MX_EXPORT GetElementPtrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_GETELEMENTPTR;
   }
 
@@ -864,7 +864,7 @@ static_assert(sizeof(GetElementPtrOp) == sizeof(Operation));
 
 class MX_EXPORT GlobalCtorsOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_MLIR_GLOBAL_CTORS;
   }
 
@@ -881,7 +881,7 @@ static_assert(sizeof(GlobalCtorsOp) == sizeof(Operation));
 
 class MX_EXPORT GlobalDtorsOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_MLIR_GLOBAL_DTORS;
   }
 
@@ -898,7 +898,7 @@ static_assert(sizeof(GlobalDtorsOp) == sizeof(Operation));
 
 class MX_EXPORT GlobalOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_MLIR_GLOBAL;
   }
 
@@ -931,7 +931,7 @@ static_assert(sizeof(GlobalOp) == sizeof(Operation));
 
 class MX_EXPORT ICmpOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_ICMP;
   }
 
@@ -950,7 +950,7 @@ static_assert(sizeof(ICmpOp) == sizeof(Operation));
 
 class MX_EXPORT InlineAsmOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INLINE_ASM;
   }
 
@@ -973,7 +973,7 @@ static_assert(sizeof(InlineAsmOp) == sizeof(Operation));
 
 class MX_EXPORT InsertElementOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INSERTELEMENT;
   }
 
@@ -992,7 +992,7 @@ static_assert(sizeof(InsertElementOp) == sizeof(Operation));
 
 class MX_EXPORT InsertValueOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INSERTVALUE;
   }
 
@@ -1011,7 +1011,7 @@ static_assert(sizeof(InsertValueOp) == sizeof(Operation));
 
 class MX_EXPORT IntToPtrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTTOPTR;
   }
 
@@ -1028,7 +1028,7 @@ static_assert(sizeof(IntToPtrOp) == sizeof(Operation));
 
 class MX_EXPORT InvokeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INVOKE;
   }
 
@@ -1052,7 +1052,7 @@ static_assert(sizeof(InvokeOp) == sizeof(Operation));
 
 class MX_EXPORT FuncOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_FUNC;
   }
 
@@ -1095,7 +1095,7 @@ static_assert(sizeof(FuncOp) == sizeof(Operation));
 
 class MX_EXPORT LShrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_LSHR;
   }
 
@@ -1113,7 +1113,7 @@ static_assert(sizeof(LShrOp) == sizeof(Operation));
 
 class MX_EXPORT LandingpadOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_LANDINGPAD;
   }
 
@@ -1130,7 +1130,7 @@ static_assert(sizeof(LandingpadOp) == sizeof(Operation));
 
 class MX_EXPORT LoadOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_LOAD;
   }
 
@@ -1157,7 +1157,7 @@ static_assert(sizeof(LoadOp) == sizeof(Operation));
 
 class MX_EXPORT MetadataOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_METADATA;
   }
 
@@ -1174,7 +1174,7 @@ static_assert(sizeof(MetadataOp) == sizeof(Operation));
 
 class MX_EXPORT MulOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_MUL;
   }
 
@@ -1192,7 +1192,7 @@ static_assert(sizeof(MulOp) == sizeof(Operation));
 
 class MX_EXPORT NullOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_MLIR_NULL;
   }
 
@@ -1208,7 +1208,7 @@ static_assert(sizeof(NullOp) == sizeof(Operation));
 
 class MX_EXPORT OrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_OR;
   }
 
@@ -1226,7 +1226,7 @@ static_assert(sizeof(OrOp) == sizeof(Operation));
 
 class MX_EXPORT PoisonOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_MLIR_POISON;
   }
 
@@ -1242,7 +1242,7 @@ static_assert(sizeof(PoisonOp) == sizeof(Operation));
 
 class MX_EXPORT PtrToIntOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_PTRTOINT;
   }
 
@@ -1259,7 +1259,7 @@ static_assert(sizeof(PtrToIntOp) == sizeof(Operation));
 
 class MX_EXPORT ResumeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_RESUME;
   }
 
@@ -1275,7 +1275,7 @@ static_assert(sizeof(ResumeOp) == sizeof(Operation));
 
 class MX_EXPORT ReturnOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_RETURN;
   }
 
@@ -1291,7 +1291,7 @@ static_assert(sizeof(ReturnOp) == sizeof(Operation));
 
 class MX_EXPORT SDivOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_SDIV;
   }
 
@@ -1309,7 +1309,7 @@ static_assert(sizeof(SDivOp) == sizeof(Operation));
 
 class MX_EXPORT SExtOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_SEXT;
   }
 
@@ -1326,7 +1326,7 @@ static_assert(sizeof(SExtOp) == sizeof(Operation));
 
 class MX_EXPORT SIToFPOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_SITOFP;
   }
 
@@ -1343,7 +1343,7 @@ static_assert(sizeof(SIToFPOp) == sizeof(Operation));
 
 class MX_EXPORT SRemOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_SREM;
   }
 
@@ -1361,7 +1361,7 @@ static_assert(sizeof(SRemOp) == sizeof(Operation));
 
 class MX_EXPORT SelectOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_SELECT;
   }
 
@@ -1381,7 +1381,7 @@ static_assert(sizeof(SelectOp) == sizeof(Operation));
 
 class MX_EXPORT ShlOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_SHL;
   }
 
@@ -1399,7 +1399,7 @@ static_assert(sizeof(ShlOp) == sizeof(Operation));
 
 class MX_EXPORT ShuffleVectorOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_SHUFFLEVECTOR;
   }
 
@@ -1418,7 +1418,7 @@ static_assert(sizeof(ShuffleVectorOp) == sizeof(Operation));
 
 class MX_EXPORT StoreOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_STORE;
   }
 
@@ -1445,7 +1445,7 @@ static_assert(sizeof(StoreOp) == sizeof(Operation));
 
 class MX_EXPORT SubOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_SUB;
   }
 
@@ -1463,7 +1463,7 @@ static_assert(sizeof(SubOp) == sizeof(Operation));
 
 class MX_EXPORT SwitchOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_SWITCH;
   }
 
@@ -1486,7 +1486,7 @@ static_assert(sizeof(SwitchOp) == sizeof(Operation));
 
 class MX_EXPORT TruncOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_TRUNC;
   }
 
@@ -1503,7 +1503,7 @@ static_assert(sizeof(TruncOp) == sizeof(Operation));
 
 class MX_EXPORT UDivOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_UDIV;
   }
 
@@ -1521,7 +1521,7 @@ static_assert(sizeof(UDivOp) == sizeof(Operation));
 
 class MX_EXPORT UIToFPOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_UITOFP;
   }
 
@@ -1538,7 +1538,7 @@ static_assert(sizeof(UIToFPOp) == sizeof(Operation));
 
 class MX_EXPORT URemOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_UREM;
   }
 
@@ -1556,7 +1556,7 @@ static_assert(sizeof(URemOp) == sizeof(Operation));
 
 class MX_EXPORT UndefOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_MLIR_UNDEF;
   }
 
@@ -1572,7 +1572,7 @@ static_assert(sizeof(UndefOp) == sizeof(Operation));
 
 class MX_EXPORT UnreachableOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_UNREACHABLE;
   }
 
@@ -1587,7 +1587,7 @@ static_assert(sizeof(UnreachableOp) == sizeof(Operation));
 
 class MX_EXPORT XOrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_XOR;
   }
 
@@ -1605,7 +1605,7 @@ static_assert(sizeof(XOrOp) == sizeof(Operation));
 
 class MX_EXPORT ZExtOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_ZEXT;
   }
 
@@ -1622,7 +1622,7 @@ static_assert(sizeof(ZExtOp) == sizeof(Operation));
 
 class MX_EXPORT AbsOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_ABS;
   }
 
@@ -1640,7 +1640,7 @@ static_assert(sizeof(AbsOp) == sizeof(Operation));
 
 class MX_EXPORT AnnotationOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_ANNOTATION;
   }
 
@@ -1660,7 +1660,7 @@ static_assert(sizeof(AnnotationOp) == sizeof(Operation));
 
 class MX_EXPORT AssumeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_ASSUME;
   }
 
@@ -1676,7 +1676,7 @@ static_assert(sizeof(AssumeOp) == sizeof(Operation));
 
 class MX_EXPORT BitReverseOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_BITREVERSE;
   }
 
@@ -1693,7 +1693,7 @@ static_assert(sizeof(BitReverseOp) == sizeof(Operation));
 
 class MX_EXPORT ByteSwapOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_BSWAP;
   }
 
@@ -1710,7 +1710,7 @@ static_assert(sizeof(ByteSwapOp) == sizeof(Operation));
 
 class MX_EXPORT CallIntrinsicOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_CALL_INTRINSIC;
   }
 
@@ -1729,7 +1729,7 @@ static_assert(sizeof(CallIntrinsicOp) == sizeof(Operation));
 
 class MX_EXPORT CopySignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_COPYSIGN;
   }
 
@@ -1748,7 +1748,7 @@ static_assert(sizeof(CopySignOp) == sizeof(Operation));
 
 class MX_EXPORT CoroAlignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_CORO_ALIGN;
   }
 
@@ -1764,7 +1764,7 @@ static_assert(sizeof(CoroAlignOp) == sizeof(Operation));
 
 class MX_EXPORT CoroBeginOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_CORO_BEGIN;
   }
 
@@ -1782,7 +1782,7 @@ static_assert(sizeof(CoroBeginOp) == sizeof(Operation));
 
 class MX_EXPORT CoroEndOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_CORO_END;
   }
 
@@ -1800,7 +1800,7 @@ static_assert(sizeof(CoroEndOp) == sizeof(Operation));
 
 class MX_EXPORT CoroFreeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_CORO_FREE;
   }
 
@@ -1818,7 +1818,7 @@ static_assert(sizeof(CoroFreeOp) == sizeof(Operation));
 
 class MX_EXPORT CoroIdOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_CORO_ID;
   }
 
@@ -1838,7 +1838,7 @@ static_assert(sizeof(CoroIdOp) == sizeof(Operation));
 
 class MX_EXPORT CoroResumeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_CORO_RESUME;
   }
 
@@ -1854,7 +1854,7 @@ static_assert(sizeof(CoroResumeOp) == sizeof(Operation));
 
 class MX_EXPORT CoroSaveOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_CORO_SAVE;
   }
 
@@ -1871,7 +1871,7 @@ static_assert(sizeof(CoroSaveOp) == sizeof(Operation));
 
 class MX_EXPORT CoroSizeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_CORO_SIZE;
   }
 
@@ -1887,7 +1887,7 @@ static_assert(sizeof(CoroSizeOp) == sizeof(Operation));
 
 class MX_EXPORT CoroSuspendOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_CORO_SUSPEND;
   }
 
@@ -1905,7 +1905,7 @@ static_assert(sizeof(CoroSuspendOp) == sizeof(Operation));
 
 class MX_EXPORT CosOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_COS;
   }
 
@@ -1923,7 +1923,7 @@ static_assert(sizeof(CosOp) == sizeof(Operation));
 
 class MX_EXPORT CountLeadingZerosOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_CTLZ;
   }
 
@@ -1941,7 +1941,7 @@ static_assert(sizeof(CountLeadingZerosOp) == sizeof(Operation));
 
 class MX_EXPORT CountTrailingZerosOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_CTTZ;
   }
 
@@ -1959,7 +1959,7 @@ static_assert(sizeof(CountTrailingZerosOp) == sizeof(Operation));
 
 class MX_EXPORT CtPopOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_CTPOP;
   }
 
@@ -1976,7 +1976,7 @@ static_assert(sizeof(CtPopOp) == sizeof(Operation));
 
 class MX_EXPORT DbgDeclareOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_DBG_DECLARE;
   }
 
@@ -1993,7 +1993,7 @@ static_assert(sizeof(DbgDeclareOp) == sizeof(Operation));
 
 class MX_EXPORT DbgLabelOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_DBG_LABEL;
   }
 
@@ -2009,7 +2009,7 @@ static_assert(sizeof(DbgLabelOp) == sizeof(Operation));
 
 class MX_EXPORT DbgValueOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_DBG_VALUE;
   }
 
@@ -2026,7 +2026,7 @@ static_assert(sizeof(DbgValueOp) == sizeof(Operation));
 
 class MX_EXPORT DebugTrapOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_DEBUGTRAP;
   }
 
@@ -2041,7 +2041,7 @@ static_assert(sizeof(DebugTrapOp) == sizeof(Operation));
 
 class MX_EXPORT EhTypeidForOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_EH_TYPEID_FOR;
   }
 
@@ -2058,7 +2058,7 @@ static_assert(sizeof(EhTypeidForOp) == sizeof(Operation));
 
 class MX_EXPORT Exp2Op final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_EXP2;
   }
 
@@ -2076,7 +2076,7 @@ static_assert(sizeof(Exp2Op) == sizeof(Operation));
 
 class MX_EXPORT ExpOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_EXP;
   }
 
@@ -2094,7 +2094,7 @@ static_assert(sizeof(ExpOp) == sizeof(Operation));
 
 class MX_EXPORT ExpectOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_EXPECT;
   }
 
@@ -2112,7 +2112,7 @@ static_assert(sizeof(ExpectOp) == sizeof(Operation));
 
 class MX_EXPORT ExpectWithProbabilityOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_EXPECT_WITH_PROBABILITY;
   }
 
@@ -2131,7 +2131,7 @@ static_assert(sizeof(ExpectWithProbabilityOp) == sizeof(Operation));
 
 class MX_EXPORT FAbsOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_FABS;
   }
 
@@ -2149,7 +2149,7 @@ static_assert(sizeof(FAbsOp) == sizeof(Operation));
 
 class MX_EXPORT FCeilOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_CEIL;
   }
 
@@ -2167,7 +2167,7 @@ static_assert(sizeof(FCeilOp) == sizeof(Operation));
 
 class MX_EXPORT FFloorOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_FLOOR;
   }
 
@@ -2185,7 +2185,7 @@ static_assert(sizeof(FFloorOp) == sizeof(Operation));
 
 class MX_EXPORT FMAOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_FMA;
   }
 
@@ -2205,7 +2205,7 @@ static_assert(sizeof(FMAOp) == sizeof(Operation));
 
 class MX_EXPORT FMulAddOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_FMULADD;
   }
 
@@ -2225,7 +2225,7 @@ static_assert(sizeof(FMulAddOp) == sizeof(Operation));
 
 class MX_EXPORT FTruncOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_TRUNC;
   }
 
@@ -2243,7 +2243,7 @@ static_assert(sizeof(FTruncOp) == sizeof(Operation));
 
 class MX_EXPORT FShlOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_FSHL;
   }
 
@@ -2262,7 +2262,7 @@ static_assert(sizeof(FShlOp) == sizeof(Operation));
 
 class MX_EXPORT FShrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_FSHR;
   }
 
@@ -2281,7 +2281,7 @@ static_assert(sizeof(FShrOp) == sizeof(Operation));
 
 class MX_EXPORT GetActiveLaneMaskOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_GET_ACTIVE_LANE_MASK;
   }
 
@@ -2299,7 +2299,7 @@ static_assert(sizeof(GetActiveLaneMaskOp) == sizeof(Operation));
 
 class MX_EXPORT IsConstantOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_IS_CONSTANT;
   }
 
@@ -2316,7 +2316,7 @@ static_assert(sizeof(IsConstantOp) == sizeof(Operation));
 
 class MX_EXPORT IsFPClassOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_IS_FPCLASS;
   }
 
@@ -2334,7 +2334,7 @@ static_assert(sizeof(IsFPClassOp) == sizeof(Operation));
 
 class MX_EXPORT LifetimeEndOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_LIFETIME_END;
   }
 
@@ -2351,7 +2351,7 @@ static_assert(sizeof(LifetimeEndOp) == sizeof(Operation));
 
 class MX_EXPORT LifetimeStartOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_LIFETIME_START;
   }
 
@@ -2368,7 +2368,7 @@ static_assert(sizeof(LifetimeStartOp) == sizeof(Operation));
 
 class MX_EXPORT RoundAndCastToLongLongOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_LLRINT;
   }
 
@@ -2385,7 +2385,7 @@ static_assert(sizeof(RoundAndCastToLongLongOp) == sizeof(Operation));
 
 class MX_EXPORT RoundAndCastToNearestLongLongOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_LLROUND;
   }
 
@@ -2402,7 +2402,7 @@ static_assert(sizeof(RoundAndCastToNearestLongLongOp) == sizeof(Operation));
 
 class MX_EXPORT Log10Op final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_LOG10;
   }
 
@@ -2420,7 +2420,7 @@ static_assert(sizeof(Log10Op) == sizeof(Operation));
 
 class MX_EXPORT Log2Op final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_LOG2;
   }
 
@@ -2438,7 +2438,7 @@ static_assert(sizeof(Log2Op) == sizeof(Operation));
 
 class MX_EXPORT LogOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_LOG;
   }
 
@@ -2456,7 +2456,7 @@ static_assert(sizeof(LogOp) == sizeof(Operation));
 
 class MX_EXPORT RoundAndCastToLongOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_LRINT;
   }
 
@@ -2473,7 +2473,7 @@ static_assert(sizeof(RoundAndCastToLongOp) == sizeof(Operation));
 
 class MX_EXPORT RoundAndCastToNearestLongOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_LROUND;
   }
 
@@ -2490,7 +2490,7 @@ static_assert(sizeof(RoundAndCastToNearestLongOp) == sizeof(Operation));
 
 class MX_EXPORT MaskedLoadOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MASKED_LOAD;
   }
 
@@ -2510,7 +2510,7 @@ static_assert(sizeof(MaskedLoadOp) == sizeof(Operation));
 
 class MX_EXPORT MaskedStoreOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MASKED_STORE;
   }
 
@@ -2529,7 +2529,7 @@ static_assert(sizeof(MaskedStoreOp) == sizeof(Operation));
 
 class MX_EXPORT MatrixColumnMajorLoadOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MATRIX_COLUMN_MAJOR_LOAD;
   }
 
@@ -2550,7 +2550,7 @@ static_assert(sizeof(MatrixColumnMajorLoadOp) == sizeof(Operation));
 
 class MX_EXPORT MatrixColumnMajorStoreOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MATRIX_COLUMN_MAJOR_STORE;
   }
 
@@ -2571,7 +2571,7 @@ static_assert(sizeof(MatrixColumnMajorStoreOp) == sizeof(Operation));
 
 class MX_EXPORT MatrixMultiplyOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MATRIX_MULTIPLY;
   }
 
@@ -2592,7 +2592,7 @@ static_assert(sizeof(MatrixMultiplyOp) == sizeof(Operation));
 
 class MX_EXPORT MatrixTransposeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MATRIX_TRANSPOSE;
   }
 
@@ -2611,7 +2611,7 @@ static_assert(sizeof(MatrixTransposeOp) == sizeof(Operation));
 
 class MX_EXPORT MaxNumOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MAXNUM;
   }
 
@@ -2630,7 +2630,7 @@ static_assert(sizeof(MaxNumOp) == sizeof(Operation));
 
 class MX_EXPORT MaximumOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MAXIMUM;
   }
 
@@ -2649,7 +2649,7 @@ static_assert(sizeof(MaximumOp) == sizeof(Operation));
 
 class MX_EXPORT MemcpyInlineOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MEMCPY_INLINE;
   }
 
@@ -2673,7 +2673,7 @@ static_assert(sizeof(MemcpyInlineOp) == sizeof(Operation));
 
 class MX_EXPORT MemcpyOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MEMCPY;
   }
 
@@ -2697,7 +2697,7 @@ static_assert(sizeof(MemcpyOp) == sizeof(Operation));
 
 class MX_EXPORT MemmoveOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MEMMOVE;
   }
 
@@ -2721,7 +2721,7 @@ static_assert(sizeof(MemmoveOp) == sizeof(Operation));
 
 class MX_EXPORT MemsetOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MEMSET;
   }
 
@@ -2745,7 +2745,7 @@ static_assert(sizeof(MemsetOp) == sizeof(Operation));
 
 class MX_EXPORT MinNumOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MINNUM;
   }
 
@@ -2764,7 +2764,7 @@ static_assert(sizeof(MinNumOp) == sizeof(Operation));
 
 class MX_EXPORT MinimumOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MINIMUM;
   }
 
@@ -2783,7 +2783,7 @@ static_assert(sizeof(MinimumOp) == sizeof(Operation));
 
 class MX_EXPORT RoundToNearbyIntOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_NEARBYINT;
   }
 
@@ -2801,7 +2801,7 @@ static_assert(sizeof(RoundToNearbyIntOp) == sizeof(Operation));
 
 class MX_EXPORT NoAliasScopeDeclOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_EXPERIMENTAL_NOALIAS_SCOPE_DECL;
   }
 
@@ -2817,7 +2817,7 @@ static_assert(sizeof(NoAliasScopeDeclOp) == sizeof(Operation));
 
 class MX_EXPORT PowIOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_POWI;
   }
 
@@ -2836,7 +2836,7 @@ static_assert(sizeof(PowIOp) == sizeof(Operation));
 
 class MX_EXPORT FPowOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_POW;
   }
 
@@ -2855,7 +2855,7 @@ static_assert(sizeof(FPowOp) == sizeof(Operation));
 
 class MX_EXPORT PrefetchOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_PREFETCH;
   }
 
@@ -2874,7 +2874,7 @@ static_assert(sizeof(PrefetchOp) == sizeof(Operation));
 
 class MX_EXPORT PtrAnnotationOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_PTR_ANNOTATION;
   }
 
@@ -2895,7 +2895,7 @@ static_assert(sizeof(PtrAnnotationOp) == sizeof(Operation));
 
 class MX_EXPORT RoundToIntOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_RINT;
   }
 
@@ -2913,7 +2913,7 @@ static_assert(sizeof(RoundToIntOp) == sizeof(Operation));
 
 class MX_EXPORT RoundToNearestEvenOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_ROUNDEVEN;
   }
 
@@ -2931,7 +2931,7 @@ static_assert(sizeof(RoundToNearestEvenOp) == sizeof(Operation));
 
 class MX_EXPORT RoundToNearestOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_ROUND;
   }
 
@@ -2949,7 +2949,7 @@ static_assert(sizeof(RoundToNearestOp) == sizeof(Operation));
 
 class MX_EXPORT SAddSatOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_SADD_SAT;
   }
 
@@ -2967,7 +2967,7 @@ static_assert(sizeof(SAddSatOp) == sizeof(Operation));
 
 class MX_EXPORT SAddWithOverflowOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_SADD_WITH_OVERFLOW;
   }
 
@@ -2983,7 +2983,7 @@ static_assert(sizeof(SAddWithOverflowOp) == sizeof(Operation));
 
 class MX_EXPORT SMaxOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_SMAX;
   }
 
@@ -3001,7 +3001,7 @@ static_assert(sizeof(SMaxOp) == sizeof(Operation));
 
 class MX_EXPORT SMinOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_SMIN;
   }
 
@@ -3019,7 +3019,7 @@ static_assert(sizeof(SMinOp) == sizeof(Operation));
 
 class MX_EXPORT SMulWithOverflowOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_SMUL_WITH_OVERFLOW;
   }
 
@@ -3035,7 +3035,7 @@ static_assert(sizeof(SMulWithOverflowOp) == sizeof(Operation));
 
 class MX_EXPORT SSACopyOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_SSA_COPY;
   }
 
@@ -3052,7 +3052,7 @@ static_assert(sizeof(SSACopyOp) == sizeof(Operation));
 
 class MX_EXPORT SShlSatOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_SSHL_SAT;
   }
 
@@ -3070,7 +3070,7 @@ static_assert(sizeof(SShlSatOp) == sizeof(Operation));
 
 class MX_EXPORT SSubSatOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_SSUB_SAT;
   }
 
@@ -3088,7 +3088,7 @@ static_assert(sizeof(SSubSatOp) == sizeof(Operation));
 
 class MX_EXPORT SSubWithOverflowOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_SSUB_WITH_OVERFLOW;
   }
 
@@ -3104,7 +3104,7 @@ static_assert(sizeof(SSubWithOverflowOp) == sizeof(Operation));
 
 class MX_EXPORT SinOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_SIN;
   }
 
@@ -3122,7 +3122,7 @@ static_assert(sizeof(SinOp) == sizeof(Operation));
 
 class MX_EXPORT SqrtOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_SQRT;
   }
 
@@ -3140,7 +3140,7 @@ static_assert(sizeof(SqrtOp) == sizeof(Operation));
 
 class MX_EXPORT StackRestoreOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_STACKRESTORE;
   }
 
@@ -3156,7 +3156,7 @@ static_assert(sizeof(StackRestoreOp) == sizeof(Operation));
 
 class MX_EXPORT StackSaveOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_STACKSAVE;
   }
 
@@ -3172,7 +3172,7 @@ static_assert(sizeof(StackSaveOp) == sizeof(Operation));
 
 class MX_EXPORT StepVectorOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_EXPERIMENTAL_STEPVECTOR;
   }
 
@@ -3188,7 +3188,7 @@ static_assert(sizeof(StepVectorOp) == sizeof(Operation));
 
 class MX_EXPORT ThreadLocalAddressOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_THREADLOCAL_ADDRESS;
   }
 
@@ -3205,7 +3205,7 @@ static_assert(sizeof(ThreadLocalAddressOp) == sizeof(Operation));
 
 class MX_EXPORT TrapOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_TRAP;
   }
 
@@ -3220,7 +3220,7 @@ static_assert(sizeof(TrapOp) == sizeof(Operation));
 
 class MX_EXPORT UAddSatOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_UADD_SAT;
   }
 
@@ -3238,7 +3238,7 @@ static_assert(sizeof(UAddSatOp) == sizeof(Operation));
 
 class MX_EXPORT UAddWithOverflowOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_UADD_WITH_OVERFLOW;
   }
 
@@ -3254,7 +3254,7 @@ static_assert(sizeof(UAddWithOverflowOp) == sizeof(Operation));
 
 class MX_EXPORT UBSanTrapOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_UBSANTRAP;
   }
 
@@ -3270,7 +3270,7 @@ static_assert(sizeof(UBSanTrapOp) == sizeof(Operation));
 
 class MX_EXPORT UMaxOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_UMAX;
   }
 
@@ -3288,7 +3288,7 @@ static_assert(sizeof(UMaxOp) == sizeof(Operation));
 
 class MX_EXPORT UMinOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_UMIN;
   }
 
@@ -3306,7 +3306,7 @@ static_assert(sizeof(UMinOp) == sizeof(Operation));
 
 class MX_EXPORT UMulWithOverflowOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_UMUL_WITH_OVERFLOW;
   }
 
@@ -3322,7 +3322,7 @@ static_assert(sizeof(UMulWithOverflowOp) == sizeof(Operation));
 
 class MX_EXPORT UShlSatOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_USHL_SAT;
   }
 
@@ -3340,7 +3340,7 @@ static_assert(sizeof(UShlSatOp) == sizeof(Operation));
 
 class MX_EXPORT USubSatOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_USUB_SAT;
   }
 
@@ -3358,7 +3358,7 @@ static_assert(sizeof(USubSatOp) == sizeof(Operation));
 
 class MX_EXPORT USubWithOverflowOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_USUB_WITH_OVERFLOW;
   }
 
@@ -3374,7 +3374,7 @@ static_assert(sizeof(USubWithOverflowOp) == sizeof(Operation));
 
 class MX_EXPORT VPAShrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_ASHR;
   }
 
@@ -3394,7 +3394,7 @@ static_assert(sizeof(VPAShrOp) == sizeof(Operation));
 
 class MX_EXPORT VPAddOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_ADD;
   }
 
@@ -3414,7 +3414,7 @@ static_assert(sizeof(VPAddOp) == sizeof(Operation));
 
 class MX_EXPORT VPAndOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_AND;
   }
 
@@ -3434,7 +3434,7 @@ static_assert(sizeof(VPAndOp) == sizeof(Operation));
 
 class MX_EXPORT VPFAddOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_FADD;
   }
 
@@ -3454,7 +3454,7 @@ static_assert(sizeof(VPFAddOp) == sizeof(Operation));
 
 class MX_EXPORT VPFDivOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_FDIV;
   }
 
@@ -3474,7 +3474,7 @@ static_assert(sizeof(VPFDivOp) == sizeof(Operation));
 
 class MX_EXPORT VPFMulAddOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_FMULADD;
   }
 
@@ -3495,7 +3495,7 @@ static_assert(sizeof(VPFMulAddOp) == sizeof(Operation));
 
 class MX_EXPORT VPFMulOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_FMUL;
   }
 
@@ -3515,7 +3515,7 @@ static_assert(sizeof(VPFMulOp) == sizeof(Operation));
 
 class MX_EXPORT VPFNegOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_FNEG;
   }
 
@@ -3534,7 +3534,7 @@ static_assert(sizeof(VPFNegOp) == sizeof(Operation));
 
 class MX_EXPORT VPFPExtOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_FPEXT;
   }
 
@@ -3553,7 +3553,7 @@ static_assert(sizeof(VPFPExtOp) == sizeof(Operation));
 
 class MX_EXPORT VPFPToSIOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_FPTOSI;
   }
 
@@ -3572,7 +3572,7 @@ static_assert(sizeof(VPFPToSIOp) == sizeof(Operation));
 
 class MX_EXPORT VPFPToUIOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_FPTOUI;
   }
 
@@ -3591,7 +3591,7 @@ static_assert(sizeof(VPFPToUIOp) == sizeof(Operation));
 
 class MX_EXPORT VPFPTruncOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_FPTRUNC;
   }
 
@@ -3610,7 +3610,7 @@ static_assert(sizeof(VPFPTruncOp) == sizeof(Operation));
 
 class MX_EXPORT VPFRemOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_FREM;
   }
 
@@ -3630,7 +3630,7 @@ static_assert(sizeof(VPFRemOp) == sizeof(Operation));
 
 class MX_EXPORT VPFSubOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_FSUB;
   }
 
@@ -3650,7 +3650,7 @@ static_assert(sizeof(VPFSubOp) == sizeof(Operation));
 
 class MX_EXPORT VPFmaOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_FMA;
   }
 
@@ -3671,7 +3671,7 @@ static_assert(sizeof(VPFmaOp) == sizeof(Operation));
 
 class MX_EXPORT VPIntToPtrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_INTTOPTR;
   }
 
@@ -3690,7 +3690,7 @@ static_assert(sizeof(VPIntToPtrOp) == sizeof(Operation));
 
 class MX_EXPORT VPLShrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_LSHR;
   }
 
@@ -3710,7 +3710,7 @@ static_assert(sizeof(VPLShrOp) == sizeof(Operation));
 
 class MX_EXPORT VPLoadOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_LOAD;
   }
 
@@ -3729,7 +3729,7 @@ static_assert(sizeof(VPLoadOp) == sizeof(Operation));
 
 class MX_EXPORT VPMergeMinOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_MERGE;
   }
 
@@ -3749,7 +3749,7 @@ static_assert(sizeof(VPMergeMinOp) == sizeof(Operation));
 
 class MX_EXPORT VPMulOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_MUL;
   }
 
@@ -3769,7 +3769,7 @@ static_assert(sizeof(VPMulOp) == sizeof(Operation));
 
 class MX_EXPORT VPOrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_OR;
   }
 
@@ -3789,7 +3789,7 @@ static_assert(sizeof(VPOrOp) == sizeof(Operation));
 
 class MX_EXPORT VPPtrToIntOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_PTRTOINT;
   }
 
@@ -3808,7 +3808,7 @@ static_assert(sizeof(VPPtrToIntOp) == sizeof(Operation));
 
 class MX_EXPORT VPReduceAddOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_REDUCE_ADD;
   }
 
@@ -3828,7 +3828,7 @@ static_assert(sizeof(VPReduceAddOp) == sizeof(Operation));
 
 class MX_EXPORT VPReduceAndOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_REDUCE_AND;
   }
 
@@ -3848,7 +3848,7 @@ static_assert(sizeof(VPReduceAndOp) == sizeof(Operation));
 
 class MX_EXPORT VPReduceFAddOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_REDUCE_FADD;
   }
 
@@ -3868,7 +3868,7 @@ static_assert(sizeof(VPReduceFAddOp) == sizeof(Operation));
 
 class MX_EXPORT VPReduceFMaxOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_REDUCE_FMAX;
   }
 
@@ -3888,7 +3888,7 @@ static_assert(sizeof(VPReduceFMaxOp) == sizeof(Operation));
 
 class MX_EXPORT VPReduceFMinOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_REDUCE_FMIN;
   }
 
@@ -3908,7 +3908,7 @@ static_assert(sizeof(VPReduceFMinOp) == sizeof(Operation));
 
 class MX_EXPORT VPReduceFMulOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_REDUCE_FMUL;
   }
 
@@ -3928,7 +3928,7 @@ static_assert(sizeof(VPReduceFMulOp) == sizeof(Operation));
 
 class MX_EXPORT VPReduceMulOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_REDUCE_MUL;
   }
 
@@ -3948,7 +3948,7 @@ static_assert(sizeof(VPReduceMulOp) == sizeof(Operation));
 
 class MX_EXPORT VPReduceOrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_REDUCE_OR;
   }
 
@@ -3968,7 +3968,7 @@ static_assert(sizeof(VPReduceOrOp) == sizeof(Operation));
 
 class MX_EXPORT VPReduceSMaxOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_REDUCE_SMAX;
   }
 
@@ -3988,7 +3988,7 @@ static_assert(sizeof(VPReduceSMaxOp) == sizeof(Operation));
 
 class MX_EXPORT VPReduceSMinOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_REDUCE_SMIN;
   }
 
@@ -4008,7 +4008,7 @@ static_assert(sizeof(VPReduceSMinOp) == sizeof(Operation));
 
 class MX_EXPORT VPReduceUMaxOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_REDUCE_UMAX;
   }
 
@@ -4028,7 +4028,7 @@ static_assert(sizeof(VPReduceUMaxOp) == sizeof(Operation));
 
 class MX_EXPORT VPReduceUMinOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_REDUCE_UMIN;
   }
 
@@ -4048,7 +4048,7 @@ static_assert(sizeof(VPReduceUMinOp) == sizeof(Operation));
 
 class MX_EXPORT VPReduceXorOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_REDUCE_XOR;
   }
 
@@ -4068,7 +4068,7 @@ static_assert(sizeof(VPReduceXorOp) == sizeof(Operation));
 
 class MX_EXPORT VPSDivOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_SDIV;
   }
 
@@ -4088,7 +4088,7 @@ static_assert(sizeof(VPSDivOp) == sizeof(Operation));
 
 class MX_EXPORT VPSExtOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_SEXT;
   }
 
@@ -4107,7 +4107,7 @@ static_assert(sizeof(VPSExtOp) == sizeof(Operation));
 
 class MX_EXPORT VPSIToFPOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_SITOFP;
   }
 
@@ -4126,7 +4126,7 @@ static_assert(sizeof(VPSIToFPOp) == sizeof(Operation));
 
 class MX_EXPORT VPSRemOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_SREM;
   }
 
@@ -4146,7 +4146,7 @@ static_assert(sizeof(VPSRemOp) == sizeof(Operation));
 
 class MX_EXPORT VPSelectMinOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_SELECT;
   }
 
@@ -4166,7 +4166,7 @@ static_assert(sizeof(VPSelectMinOp) == sizeof(Operation));
 
 class MX_EXPORT VPShlOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_SHL;
   }
 
@@ -4186,7 +4186,7 @@ static_assert(sizeof(VPShlOp) == sizeof(Operation));
 
 class MX_EXPORT VPStoreOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_STORE;
   }
 
@@ -4205,7 +4205,7 @@ static_assert(sizeof(VPStoreOp) == sizeof(Operation));
 
 class MX_EXPORT VPStridedLoadOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_EXPERIMENTAL_VP_STRIDED_LOAD;
   }
 
@@ -4225,7 +4225,7 @@ static_assert(sizeof(VPStridedLoadOp) == sizeof(Operation));
 
 class MX_EXPORT VPStridedStoreOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_EXPERIMENTAL_VP_STRIDED_STORE;
   }
 
@@ -4245,7 +4245,7 @@ static_assert(sizeof(VPStridedStoreOp) == sizeof(Operation));
 
 class MX_EXPORT VPSubOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_SUB;
   }
 
@@ -4265,7 +4265,7 @@ static_assert(sizeof(VPSubOp) == sizeof(Operation));
 
 class MX_EXPORT VPTruncOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_TRUNC;
   }
 
@@ -4284,7 +4284,7 @@ static_assert(sizeof(VPTruncOp) == sizeof(Operation));
 
 class MX_EXPORT VPUDivOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_UDIV;
   }
 
@@ -4304,7 +4304,7 @@ static_assert(sizeof(VPUDivOp) == sizeof(Operation));
 
 class MX_EXPORT VPUIToFPOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_UITOFP;
   }
 
@@ -4323,7 +4323,7 @@ static_assert(sizeof(VPUIToFPOp) == sizeof(Operation));
 
 class MX_EXPORT VPURemOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_UREM;
   }
 
@@ -4343,7 +4343,7 @@ static_assert(sizeof(VPURemOp) == sizeof(Operation));
 
 class MX_EXPORT VPXorOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_XOR;
   }
 
@@ -4363,7 +4363,7 @@ static_assert(sizeof(VPXorOp) == sizeof(Operation));
 
 class MX_EXPORT VPZExtOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VP_ZEXT;
   }
 
@@ -4382,7 +4382,7 @@ static_assert(sizeof(VPZExtOp) == sizeof(Operation));
 
 class MX_EXPORT VaCopyOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VACOPY;
   }
 
@@ -4399,7 +4399,7 @@ static_assert(sizeof(VaCopyOp) == sizeof(Operation));
 
 class MX_EXPORT VaEndOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VAEND;
   }
 
@@ -4415,7 +4415,7 @@ static_assert(sizeof(VaEndOp) == sizeof(Operation));
 
 class MX_EXPORT VaStartOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VASTART;
   }
 
@@ -4431,7 +4431,7 @@ static_assert(sizeof(VaStartOp) == sizeof(Operation));
 
 class MX_EXPORT VarAnnotationOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VAR_ANNOTATION;
   }
 
@@ -4451,7 +4451,7 @@ static_assert(sizeof(VarAnnotationOp) == sizeof(Operation));
 
 class MX_EXPORT MaskedCompressStoreOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MASKED_COMPRESSSTORE;
   }
 
@@ -4466,7 +4466,7 @@ static_assert(sizeof(MaskedCompressStoreOp) == sizeof(Operation));
 
 class MX_EXPORT MaskedExpandLoadOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MASKED_EXPANDLOAD;
   }
 
@@ -4482,7 +4482,7 @@ static_assert(sizeof(MaskedExpandLoadOp) == sizeof(Operation));
 
 class MX_EXPORT MaskedGatherOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MASKED_GATHER;
   }
 
@@ -4502,7 +4502,7 @@ static_assert(sizeof(MaskedGatherOp) == sizeof(Operation));
 
 class MX_EXPORT MaskedScatterOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_MASKED_SCATTER;
   }
 
@@ -4521,7 +4521,7 @@ static_assert(sizeof(MaskedScatterOp) == sizeof(Operation));
 
 class MX_EXPORT VectorExtractOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_EXTRACT;
   }
 
@@ -4541,7 +4541,7 @@ static_assert(sizeof(VectorExtractOp) == sizeof(Operation));
 
 class MX_EXPORT VectorInsertOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_INSERT;
   }
 
@@ -4562,7 +4562,7 @@ static_assert(sizeof(VectorInsertOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceAddOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_ADD;
   }
 
@@ -4579,7 +4579,7 @@ static_assert(sizeof(VectorReduceAddOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceAndOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_AND;
   }
 
@@ -4596,7 +4596,7 @@ static_assert(sizeof(VectorReduceAndOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceFAddOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_FADD;
   }
 
@@ -4615,7 +4615,7 @@ static_assert(sizeof(VectorReduceFAddOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceFMaxOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_FMAX;
   }
 
@@ -4633,7 +4633,7 @@ static_assert(sizeof(VectorReduceFMaxOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceFMaximumOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_FMAXIMUM;
   }
 
@@ -4651,7 +4651,7 @@ static_assert(sizeof(VectorReduceFMaximumOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceFMinOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_FMIN;
   }
 
@@ -4669,7 +4669,7 @@ static_assert(sizeof(VectorReduceFMinOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceFMinimumOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_FMINIMUM;
   }
 
@@ -4687,7 +4687,7 @@ static_assert(sizeof(VectorReduceFMinimumOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceFMulOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_FMUL;
   }
 
@@ -4706,7 +4706,7 @@ static_assert(sizeof(VectorReduceFMulOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceMulOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_MUL;
   }
 
@@ -4723,7 +4723,7 @@ static_assert(sizeof(VectorReduceMulOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceOrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_OR;
   }
 
@@ -4740,7 +4740,7 @@ static_assert(sizeof(VectorReduceOrOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceSMaxOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_SMAX;
   }
 
@@ -4757,7 +4757,7 @@ static_assert(sizeof(VectorReduceSMaxOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceSMinOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_SMIN;
   }
 
@@ -4774,7 +4774,7 @@ static_assert(sizeof(VectorReduceSMinOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceUMaxOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_UMAX;
   }
 
@@ -4791,7 +4791,7 @@ static_assert(sizeof(VectorReduceUMaxOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceUMinOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_UMIN;
   }
 
@@ -4808,7 +4808,7 @@ static_assert(sizeof(VectorReduceUMinOp) == sizeof(Operation));
 
 class MX_EXPORT VectorReduceXorOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VECTOR_REDUCE_XOR;
   }
 
@@ -4825,7 +4825,7 @@ static_assert(sizeof(VectorReduceXorOp) == sizeof(Operation));
 
 class MX_EXPORT VScaleOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LLVM_INTR_VSCALE;
   }
 

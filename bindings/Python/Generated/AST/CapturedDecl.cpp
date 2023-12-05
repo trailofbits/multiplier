@@ -123,6 +123,92 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CapturedDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CapturedDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CapturedDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "context_parameter",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->context_parameter());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CapturedDecl::context_parameter"),
+    nullptr,
+  },
+  {
+    "is_nothrow",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_nothrow());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CapturedDecl::is_nothrow"),
+    nullptr,
+  },
+  {
+    "num_parameters",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_parameters());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CapturedDecl::num_parameters"),
+    nullptr,
+  },
+  {
+    "parameters",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parameters());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CapturedDecl::parameters"),
+    nullptr,
+  },
+  {
+    "declarations_in_context",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->declarations_in_context());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CapturedDecl::declarations_in_context"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,92 +443,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::CapturedDecl::nth_parameter"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CapturedDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CapturedDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CapturedDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "context_parameter",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->context_parameter());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CapturedDecl::context_parameter"),
-    nullptr,
-  },
-  {
-    "is_nothrow",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_nothrow());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CapturedDecl::is_nothrow"),
-    nullptr,
-  },
-  {
-    "num_parameters",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_parameters());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CapturedDecl::num_parameters"),
-    nullptr,
-  },
-  {
-    "parameters",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameters());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CapturedDecl::parameters"),
-    nullptr,
-  },
-  {
-    "declarations_in_context",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->declarations_in_context());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CapturedDecl::declarations_in_context"),
-    nullptr,
   },
   {}  // Sentinel.
 };

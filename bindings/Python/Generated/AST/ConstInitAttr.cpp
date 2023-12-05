@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "semantic_spelling",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->semantic_spelling());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConstInitAttr::semantic_spelling"),
+    nullptr,
+  },
+  {
+    "is_constinit",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_constinit());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConstInitAttr::is_constinit"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,32 +351,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::ConstInitAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "semantic_spelling",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->semantic_spelling());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConstInitAttr::semantic_spelling"),
-    nullptr,
-  },
-  {
-    "is_constinit",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_constinit());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConstInitAttr::is_constinit"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCForCollectionStmt::body"),
+    nullptr,
+  },
+  {
+    "collection",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->collection());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCForCollectionStmt::collection"),
+    nullptr,
+  },
+  {
+    "element",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->element());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCForCollectionStmt::element"),
+    nullptr,
+  },
+  {
+    "for_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->for_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCForCollectionStmt::for_token"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCForCollectionStmt::r_paren_token"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,62 +391,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ObjCForCollectionStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCForCollectionStmt::body"),
-    nullptr,
-  },
-  {
-    "collection",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->collection());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCForCollectionStmt::collection"),
-    nullptr,
-  },
-  {
-    "element",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->element());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCForCollectionStmt::element"),
-    nullptr,
-  },
-  {
-    "for_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->for_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCForCollectionStmt::for_token"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCForCollectionStmt::r_paren_token"),
-    nullptr,
   },
   {}  // Sentinel.
 };

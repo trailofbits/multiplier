@@ -123,6 +123,122 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "obj_c_runtime_name_as_string",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->obj_c_runtime_name_as_string());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::obj_c_runtime_name_as_string"),
+    nullptr,
+  },
+  {
+    "has_definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::has_definition"),
+    nullptr,
+  },
+  {
+    "is_non_runtime_protocol",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_non_runtime_protocol());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::is_non_runtime_protocol"),
+    nullptr,
+  },
+  {
+    "is_this_declaration_a_definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_this_declaration_a_definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::is_this_declaration_a_definition"),
+    nullptr,
+  },
+  {
+    "num_protocol_tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_protocol_tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::num_protocol_tokens"),
+    nullptr,
+  },
+  {
+    "protocol_tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->protocol_tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::protocol_tokens"),
+    nullptr,
+  },
+  {
+    "num_protocols",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_protocols());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::num_protocols"),
+    nullptr,
+  },
+  {
+    "protocols",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->protocols());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::protocols"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -379,122 +495,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::nth_protocol"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "obj_c_runtime_name_as_string",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->obj_c_runtime_name_as_string());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::obj_c_runtime_name_as_string"),
-    nullptr,
-  },
-  {
-    "has_definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::has_definition"),
-    nullptr,
-  },
-  {
-    "is_non_runtime_protocol",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_non_runtime_protocol());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::is_non_runtime_protocol"),
-    nullptr,
-  },
-  {
-    "is_this_declaration_a_definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_this_declaration_a_definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::is_this_declaration_a_definition"),
-    nullptr,
-  },
-  {
-    "num_protocol_tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_protocol_tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::num_protocol_tokens"),
-    nullptr,
-  },
-  {
-    "protocol_tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->protocol_tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::protocol_tokens"),
-    nullptr,
-  },
-  {
-    "num_protocols",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_protocols());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::num_protocols"),
-    nullptr,
-  },
-  {
-    "protocols",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->protocols());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::protocols"),
-    nullptr,
   },
   {}  // Sentinel.
 };

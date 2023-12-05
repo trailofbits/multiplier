@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "specialization_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->specialization_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::specialization_declaration"),
+    nullptr,
+  },
+  {
+    "num_template_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_template_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::num_template_arguments"),
+    nullptr,
+  },
+  {
+    "template_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::template_arguments"),
+    nullptr,
+  },
+  {
+    "is_satisfied",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_satisfied());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::is_satisfied"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,52 +403,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::nth_template_argument"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "specialization_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->specialization_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::specialization_declaration"),
-    nullptr,
-  },
-  {
-    "num_template_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_template_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::num_template_arguments"),
-    nullptr,
-  },
-  {
-    "template_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::template_arguments"),
-    nullptr,
-  },
-  {
-    "is_satisfied",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_satisfied());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::is_satisfied"),
-    nullptr,
   },
   {}  // Sentinel.
 };

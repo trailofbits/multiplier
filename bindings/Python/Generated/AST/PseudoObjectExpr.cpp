@@ -123,6 +123,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "result_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->result_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::PseudoObjectExpr::result_expression"),
+    nullptr,
+  },
+  {
+    "syntactic_form",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->syntactic_form());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::PseudoObjectExpr::syntactic_form"),
+    nullptr,
+  },
+  {
+    "num_semantics",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_semantics());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::PseudoObjectExpr::num_semantics"),
+    nullptr,
+  },
+  {
+    "semantics",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->semantics());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::PseudoObjectExpr::semantics"),
+    nullptr,
+  },
+  {
+    "num_semantic_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_semantic_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::PseudoObjectExpr::num_semantic_expressions"),
+    nullptr,
+  },
+  {
+    "semantic_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->semantic_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::PseudoObjectExpr::semantic_expressions"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -379,72 +445,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::PseudoObjectExpr::nth_semantic_expression"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "result_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->result_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::PseudoObjectExpr::result_expression"),
-    nullptr,
-  },
-  {
-    "syntactic_form",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->syntactic_form());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::PseudoObjectExpr::syntactic_form"),
-    nullptr,
-  },
-  {
-    "num_semantics",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_semantics());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::PseudoObjectExpr::num_semantics"),
-    nullptr,
-  },
-  {
-    "semantics",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->semantics());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::PseudoObjectExpr::semantics"),
-    nullptr,
-  },
-  {
-    "num_semantic_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_semantic_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::PseudoObjectExpr::num_semantic_expressions"),
-    nullptr,
-  },
-  {
-    "semantic_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->semantic_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::PseudoObjectExpr::semantic_expressions"),
-    nullptr,
   },
   {}  // Sentinel.
 };

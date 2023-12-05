@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "dimension_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->dimension_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ArrayTypeTraitExpr::dimension_expression"),
+    nullptr,
+  },
+  {
+    "queried_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->queried_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ArrayTypeTraitExpr::queried_type"),
+    nullptr,
+  },
+  {
+    "trait",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->trait());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ArrayTypeTraitExpr::trait"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,42 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ArrayTypeTraitExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "dimension_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->dimension_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ArrayTypeTraitExpr::dimension_expression"),
-    nullptr,
-  },
-  {
-    "queried_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->queried_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ArrayTypeTraitExpr::queried_type"),
-    nullptr,
-  },
-  {
-    "trait",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->trait());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ArrayTypeTraitExpr::trait"),
-    nullptr,
   },
   {}  // Sentinel.
 };

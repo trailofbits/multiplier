@@ -123,6 +123,122 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "can_overflow",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->can_overflow());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryOperator::can_overflow"),
+    nullptr,
+  },
+  {
+    "opcode",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->opcode());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryOperator::opcode"),
+    nullptr,
+  },
+  {
+    "operator_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryOperator::operator_token"),
+    nullptr,
+  },
+  {
+    "sub_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sub_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryOperator::sub_expression"),
+    nullptr,
+  },
+  {
+    "has_stored_fp_features",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_stored_fp_features());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryOperator::has_stored_fp_features"),
+    nullptr,
+  },
+  {
+    "is_arithmetic_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_arithmetic_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryOperator::is_arithmetic_operation"),
+    nullptr,
+  },
+  {
+    "is_decrement_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_decrement_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryOperator::is_decrement_operation"),
+    nullptr,
+  },
+  {
+    "is_increment_decrement_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_increment_decrement_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryOperator::is_increment_decrement_operation"),
+    nullptr,
+  },
+  {
+    "is_increment_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_increment_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryOperator::is_increment_operation"),
+    nullptr,
+  },
+  {
+    "is_postfix",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_postfix());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryOperator::is_postfix"),
+    nullptr,
+  },
+  {
+    "is_prefix",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_prefix());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryOperator::is_prefix"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,122 +451,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::UnaryOperator::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "can_overflow",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->can_overflow());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryOperator::can_overflow"),
-    nullptr,
-  },
-  {
-    "opcode",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->opcode());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryOperator::opcode"),
-    nullptr,
-  },
-  {
-    "operator_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryOperator::operator_token"),
-    nullptr,
-  },
-  {
-    "sub_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sub_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryOperator::sub_expression"),
-    nullptr,
-  },
-  {
-    "has_stored_fp_features",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_stored_fp_features());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryOperator::has_stored_fp_features"),
-    nullptr,
-  },
-  {
-    "is_arithmetic_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_arithmetic_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryOperator::is_arithmetic_operation"),
-    nullptr,
-  },
-  {
-    "is_decrement_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_decrement_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryOperator::is_decrement_operation"),
-    nullptr,
-  },
-  {
-    "is_increment_decrement_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_increment_decrement_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryOperator::is_increment_decrement_operation"),
-    nullptr,
-  },
-  {
-    "is_increment_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_increment_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryOperator::is_increment_operation"),
-    nullptr,
-  },
-  {
-    "is_postfix",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_postfix());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryOperator::is_postfix"),
-    nullptr,
-  },
-  {
-    "is_prefix",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_prefix());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryOperator::is_prefix"),
-    nullptr,
   },
   {}  // Sentinel.
 };

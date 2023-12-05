@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "task_reduction_reference_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->task_reduction_reference_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPTargetTeamsDistributeParallelForDirective::task_reduction_reference_expression"),
+    nullptr,
+  },
+  {
+    "has_cancel",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_cancel());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPTargetTeamsDistributeParallelForDirective::has_cancel"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,32 +361,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::OMPTargetTeamsDistributeParallelForDirective::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "task_reduction_reference_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->task_reduction_reference_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPTargetTeamsDistributeParallelForDirective::task_reduction_reference_expression"),
-    nullptr,
-  },
-  {
-    "has_cancel",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_cancel());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPTargetTeamsDistributeParallelForDirective::has_cancel"),
-    nullptr,
   },
   {}  // Sentinel.
 };

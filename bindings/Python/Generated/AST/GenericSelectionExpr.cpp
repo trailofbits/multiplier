@@ -123,6 +123,122 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "num_association_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_association_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::num_association_expressions"),
+    nullptr,
+  },
+  {
+    "association_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->association_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::association_expressions"),
+    nullptr,
+  },
+  {
+    "controlling_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->controlling_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::controlling_expression"),
+    nullptr,
+  },
+  {
+    "controlling_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->controlling_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::controlling_type"),
+    nullptr,
+  },
+  {
+    "default_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->default_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::default_token"),
+    nullptr,
+  },
+  {
+    "generic_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->generic_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::generic_token"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::r_paren_token"),
+    nullptr,
+  },
+  {
+    "result_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->result_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::result_expression"),
+    nullptr,
+  },
+  {
+    "is_expression_predicate",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_expression_predicate());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::is_expression_predicate"),
+    nullptr,
+  },
+  {
+    "is_result_dependent",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_result_dependent());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::is_result_dependent"),
+    nullptr,
+  },
+  {
+    "is_type_predicate",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_type_predicate());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::is_type_predicate"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,122 +473,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::GenericSelectionExpr::nth_association_expression"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "num_association_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_association_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::num_association_expressions"),
-    nullptr,
-  },
-  {
-    "association_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->association_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::association_expressions"),
-    nullptr,
-  },
-  {
-    "controlling_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->controlling_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::controlling_expression"),
-    nullptr,
-  },
-  {
-    "controlling_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->controlling_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::controlling_type"),
-    nullptr,
-  },
-  {
-    "default_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->default_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::default_token"),
-    nullptr,
-  },
-  {
-    "generic_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->generic_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::generic_token"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::r_paren_token"),
-    nullptr,
-  },
-  {
-    "result_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->result_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::result_expression"),
-    nullptr,
-  },
-  {
-    "is_expression_predicate",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_expression_predicate());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::is_expression_predicate"),
-    nullptr,
-  },
-  {
-    "is_result_dependent",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_result_dependent());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::is_result_dependent"),
-    nullptr,
-  },
-  {
-    "is_type_predicate",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_type_predicate());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::is_type_predicate"),
-    nullptr,
   },
   {}  // Sentinel.
 };

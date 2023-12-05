@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "case_statement_is_gnu_range",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->case_statement_is_gnu_range());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CaseStmt::case_statement_is_gnu_range"),
+    nullptr,
+  },
+  {
+    "case_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->case_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CaseStmt::case_token"),
+    nullptr,
+  },
+  {
+    "ellipsis_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->ellipsis_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CaseStmt::ellipsis_token"),
+    nullptr,
+  },
+  {
+    "lhs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->lhs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CaseStmt::lhs"),
+    nullptr,
+  },
+  {
+    "rhs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->rhs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CaseStmt::rhs"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,62 +391,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CaseStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "case_statement_is_gnu_range",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->case_statement_is_gnu_range());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CaseStmt::case_statement_is_gnu_range"),
-    nullptr,
-  },
-  {
-    "case_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->case_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CaseStmt::case_token"),
-    nullptr,
-  },
-  {
-    "ellipsis_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->ellipsis_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CaseStmt::ellipsis_token"),
-    nullptr,
-  },
-  {
-    "lhs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->lhs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CaseStmt::lhs"),
-    nullptr,
-  },
-  {
-    "rhs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->rhs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CaseStmt::rhs"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "desugar",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->desugar());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryTransformType::desugar"),
+    nullptr,
+  },
+  {
+    "base_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryTransformType::base_type"),
+    nullptr,
+  },
+  {
+    "utt_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->utt_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryTransformType::utt_kind"),
+    nullptr,
+  },
+  {
+    "underlying_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->underlying_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryTransformType::underlying_type"),
+    nullptr,
+  },
+  {
+    "is_sugared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sugared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryTransformType::is_sugared"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -309,62 +365,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::UnaryTransformType::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryTransformType::desugar"),
-    nullptr,
-  },
-  {
-    "base_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryTransformType::base_type"),
-    nullptr,
-  },
-  {
-    "utt_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->utt_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryTransformType::utt_kind"),
-    nullptr,
-  },
-  {
-    "underlying_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->underlying_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryTransformType::underlying_type"),
-    nullptr,
-  },
-  {
-    "is_sugared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sugared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryTransformType::is_sugared"),
-    nullptr,
   },
   {}  // Sentinel.
 };

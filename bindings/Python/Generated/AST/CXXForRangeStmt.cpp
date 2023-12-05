@@ -123,6 +123,152 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "begin_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->begin_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::begin_statement"),
+    nullptr,
+  },
+  {
+    "body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::body"),
+    nullptr,
+  },
+  {
+    "coawait_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->coawait_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::coawait_token"),
+    nullptr,
+  },
+  {
+    "colon_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->colon_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::colon_token"),
+    nullptr,
+  },
+  {
+    "condition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->condition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::condition"),
+    nullptr,
+  },
+  {
+    "end_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->end_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::end_statement"),
+    nullptr,
+  },
+  {
+    "for_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->for_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::for_token"),
+    nullptr,
+  },
+  {
+    "increment",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->increment());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::increment"),
+    nullptr,
+  },
+  {
+    "initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::initializer"),
+    nullptr,
+  },
+  {
+    "loop_variable_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->loop_variable_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::loop_variable_statement"),
+    nullptr,
+  },
+  {
+    "loop_variable",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->loop_variable());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::loop_variable"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::r_paren_token"),
+    nullptr,
+  },
+  {
+    "range_initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->range_initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::range_initializer"),
+    nullptr,
+  },
+  {
+    "range_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->range_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::range_statement"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,152 +481,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXForRangeStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "begin_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->begin_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::begin_statement"),
-    nullptr,
-  },
-  {
-    "body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::body"),
-    nullptr,
-  },
-  {
-    "coawait_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->coawait_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::coawait_token"),
-    nullptr,
-  },
-  {
-    "colon_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->colon_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::colon_token"),
-    nullptr,
-  },
-  {
-    "condition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->condition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::condition"),
-    nullptr,
-  },
-  {
-    "end_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->end_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::end_statement"),
-    nullptr,
-  },
-  {
-    "for_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->for_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::for_token"),
-    nullptr,
-  },
-  {
-    "increment",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->increment());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::increment"),
-    nullptr,
-  },
-  {
-    "initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::initializer"),
-    nullptr,
-  },
-  {
-    "loop_variable_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->loop_variable_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::loop_variable_statement"),
-    nullptr,
-  },
-  {
-    "loop_variable",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->loop_variable());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::loop_variable"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::r_paren_token"),
-    nullptr,
-  },
-  {
-    "range_initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->range_initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::range_initializer"),
-    nullptr,
-  },
-  {
-    "range_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->range_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXForRangeStmt::range_statement"),
-    nullptr,
   },
   {}  // Sentinel.
 };

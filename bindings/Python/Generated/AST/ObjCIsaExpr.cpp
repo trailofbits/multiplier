@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "base",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCIsaExpr::base"),
+    nullptr,
+  },
+  {
+    "base_token_end",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base_token_end());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCIsaExpr::base_token_end"),
+    nullptr,
+  },
+  {
+    "isa_member_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->isa_member_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCIsaExpr::isa_member_token"),
+    nullptr,
+  },
+  {
+    "operation_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operation_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCIsaExpr::operation_token"),
+    nullptr,
+  },
+  {
+    "is_arrow",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_arrow());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCIsaExpr::is_arrow"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,62 +391,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ObjCIsaExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "base",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCIsaExpr::base"),
-    nullptr,
-  },
-  {
-    "base_token_end",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base_token_end());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCIsaExpr::base_token_end"),
-    nullptr,
-  },
-  {
-    "isa_member_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->isa_member_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCIsaExpr::isa_member_token"),
-    nullptr,
-  },
-  {
-    "operation_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operation_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCIsaExpr::operation_token"),
-    nullptr,
-  },
-  {
-    "is_arrow",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_arrow());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCIsaExpr::is_arrow"),
-    nullptr,
   },
   {}  // Sentinel.
 };

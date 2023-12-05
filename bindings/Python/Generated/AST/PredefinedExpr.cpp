@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "function_name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->function_name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::PredefinedExpr::function_name"),
+    nullptr,
+  },
+  {
+    "identifier_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->identifier_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::PredefinedExpr::identifier_kind"),
+    nullptr,
+  },
+  {
+    "identifier_kind_name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->identifier_kind_name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::PredefinedExpr::identifier_kind_name"),
+    nullptr,
+  },
+  {
+    "token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::PredefinedExpr::token"),
+    nullptr,
+  },
+  {
+    "is_transparent",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_transparent());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::PredefinedExpr::is_transparent"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,62 +391,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::PredefinedExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "function_name",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->function_name());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::PredefinedExpr::function_name"),
-    nullptr,
-  },
-  {
-    "identifier_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->identifier_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::PredefinedExpr::identifier_kind"),
-    nullptr,
-  },
-  {
-    "identifier_kind_name",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->identifier_kind_name());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::PredefinedExpr::identifier_kind_name"),
-    nullptr,
-  },
-  {
-    "token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::PredefinedExpr::token"),
-    nullptr,
-  },
-  {
-    "is_transparent",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_transparent());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::PredefinedExpr::is_transparent"),
-    nullptr,
   },
   {}  // Sentinel.
 };

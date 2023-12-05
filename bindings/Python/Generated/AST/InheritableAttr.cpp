@@ -1359,6 +1359,22 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "should_inherit_even_if_already_present",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->should_inherit_even_if_already_present());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InheritableAttr::should_inherit_even_if_already_present"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -1543,22 +1559,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::InheritableAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "should_inherit_even_if_already_present",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->should_inherit_even_if_already_present());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::InheritableAttr::should_inherit_even_if_already_present"),
-    nullptr,
   },
   {}  // Sentinel.
 };

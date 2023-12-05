@@ -123,6 +123,202 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "block_missing_return_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->block_missing_return_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::block_missing_return_type"),
+    nullptr,
+  },
+  {
+    "can_avoid_copy_to_heap",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->can_avoid_copy_to_heap());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::can_avoid_copy_to_heap"),
+    nullptr,
+  },
+  {
+    "captures_cxx_this",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->captures_cxx_this());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::captures_cxx_this"),
+    nullptr,
+  },
+  {
+    "does_not_escape",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->does_not_escape());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::does_not_escape"),
+    nullptr,
+  },
+  {
+    "block_mangling_context_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->block_mangling_context_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::block_mangling_context_declaration"),
+    nullptr,
+  },
+  {
+    "caret_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->caret_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::caret_token"),
+    nullptr,
+  },
+  {
+    "compound_body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->compound_body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::compound_body"),
+    nullptr,
+  },
+  {
+    "signature_as_written",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->signature_as_written());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::signature_as_written"),
+    nullptr,
+  },
+  {
+    "has_captures",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_captures());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::has_captures"),
+    nullptr,
+  },
+  {
+    "is_conversion_from_lambda",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_conversion_from_lambda());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::is_conversion_from_lambda"),
+    nullptr,
+  },
+  {
+    "is_variadic",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_variadic());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::is_variadic"),
+    nullptr,
+  },
+  {
+    "num_parameters",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_parameters());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::num_parameters"),
+    nullptr,
+  },
+  {
+    "parameters",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parameters());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::parameters"),
+    nullptr,
+  },
+  {
+    "num_parameter_declarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_parameter_declarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::num_parameter_declarations"),
+    nullptr,
+  },
+  {
+    "parameter_declarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parameter_declarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::parameter_declarations"),
+    nullptr,
+  },
+  {
+    "declarations_in_context",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->declarations_in_context());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::declarations_in_context"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -379,202 +575,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::BlockDecl::nth_parameter_declaration"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "block_missing_return_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->block_missing_return_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::block_missing_return_type"),
-    nullptr,
-  },
-  {
-    "can_avoid_copy_to_heap",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->can_avoid_copy_to_heap());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::can_avoid_copy_to_heap"),
-    nullptr,
-  },
-  {
-    "captures_cxx_this",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->captures_cxx_this());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::captures_cxx_this"),
-    nullptr,
-  },
-  {
-    "does_not_escape",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->does_not_escape());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::does_not_escape"),
-    nullptr,
-  },
-  {
-    "block_mangling_context_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->block_mangling_context_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::block_mangling_context_declaration"),
-    nullptr,
-  },
-  {
-    "caret_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->caret_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::caret_token"),
-    nullptr,
-  },
-  {
-    "compound_body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->compound_body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::compound_body"),
-    nullptr,
-  },
-  {
-    "signature_as_written",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->signature_as_written());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::signature_as_written"),
-    nullptr,
-  },
-  {
-    "has_captures",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_captures());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::has_captures"),
-    nullptr,
-  },
-  {
-    "is_conversion_from_lambda",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_conversion_from_lambda());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::is_conversion_from_lambda"),
-    nullptr,
-  },
-  {
-    "is_variadic",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_variadic());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::is_variadic"),
-    nullptr,
-  },
-  {
-    "num_parameters",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_parameters());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::num_parameters"),
-    nullptr,
-  },
-  {
-    "parameters",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameters());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::parameters"),
-    nullptr,
-  },
-  {
-    "num_parameter_declarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_parameter_declarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::num_parameter_declarations"),
-    nullptr,
-  },
-  {
-    "parameter_declarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameter_declarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::parameter_declarations"),
-    nullptr,
-  },
-  {
-    "declarations_in_context",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->declarations_in_context());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BlockDecl::declarations_in_context"),
-    nullptr,
   },
   {}  // Sentinel.
 };

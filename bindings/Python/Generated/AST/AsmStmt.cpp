@@ -127,6 +127,162 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "generate_assembly_string",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->generate_assembly_string());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::generate_assembly_string"),
+    nullptr,
+  },
+  {
+    "assembly_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->assembly_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::assembly_token"),
+    nullptr,
+  },
+  {
+    "num_inputs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_inputs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::num_inputs"),
+    nullptr,
+  },
+  {
+    "inputs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->inputs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::inputs"),
+    nullptr,
+  },
+  {
+    "is_simple",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_simple());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::is_simple"),
+    nullptr,
+  },
+  {
+    "is_volatile",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_volatile());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::is_volatile"),
+    nullptr,
+  },
+  {
+    "num_outputs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_outputs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::num_outputs"),
+    nullptr,
+  },
+  {
+    "outputs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->outputs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::outputs"),
+    nullptr,
+  },
+  {
+    "output_constraints",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->output_constraints());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::output_constraints"),
+    nullptr,
+  },
+  {
+    "num_output_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_output_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::num_output_expressions"),
+    nullptr,
+  },
+  {
+    "output_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->output_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::output_expressions"),
+    nullptr,
+  },
+  {
+    "input_constraints",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->input_constraints());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::input_constraints"),
+    nullptr,
+  },
+  {
+    "num_input_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_input_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::num_input_expressions"),
+    nullptr,
+  },
+  {
+    "input_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->input_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::input_expressions"),
+    nullptr,
+  },
+  {
+    "clobbers",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->clobbers());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmStmt::clobbers"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -409,162 +565,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::AsmStmt::nth_input_expression"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "generate_assembly_string",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->generate_assembly_string());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::generate_assembly_string"),
-    nullptr,
-  },
-  {
-    "assembly_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->assembly_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::assembly_token"),
-    nullptr,
-  },
-  {
-    "num_inputs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_inputs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::num_inputs"),
-    nullptr,
-  },
-  {
-    "inputs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->inputs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::inputs"),
-    nullptr,
-  },
-  {
-    "is_simple",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_simple());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::is_simple"),
-    nullptr,
-  },
-  {
-    "is_volatile",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_volatile());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::is_volatile"),
-    nullptr,
-  },
-  {
-    "num_outputs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_outputs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::num_outputs"),
-    nullptr,
-  },
-  {
-    "outputs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->outputs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::outputs"),
-    nullptr,
-  },
-  {
-    "output_constraints",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->output_constraints());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::output_constraints"),
-    nullptr,
-  },
-  {
-    "num_output_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_output_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::num_output_expressions"),
-    nullptr,
-  },
-  {
-    "output_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->output_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::output_expressions"),
-    nullptr,
-  },
-  {
-    "input_constraints",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->input_constraints());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::input_constraints"),
-    nullptr,
-  },
-  {
-    "num_input_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_input_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::num_input_expressions"),
-    nullptr,
-  },
-  {
-    "input_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->input_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::input_expressions"),
-    nullptr,
-  },
-  {
-    "clobbers",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->clobbers());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmStmt::clobbers"),
-    nullptr,
   },
   {}  // Sentinel.
 };

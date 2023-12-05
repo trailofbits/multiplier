@@ -123,6 +123,102 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FriendDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FriendDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FriendDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "friend_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->friend_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FriendDecl::friend_declaration"),
+    nullptr,
+  },
+  {
+    "friend_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->friend_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FriendDecl::friend_token"),
+    nullptr,
+  },
+  {
+    "friend_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->friend_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FriendDecl::friend_type"),
+    nullptr,
+  },
+  {
+    "is_unsupported_friend",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_unsupported_friend());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FriendDecl::is_unsupported_friend"),
+    nullptr,
+  },
+  {
+    "num_friend_type_template_parameter_lists",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_friend_type_template_parameter_lists());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FriendDecl::num_friend_type_template_parameter_lists"),
+    nullptr,
+  },
+  {
+    "friend_type_template_parameter_lists",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->friend_type_template_parameter_lists());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FriendDecl::friend_type_template_parameter_lists"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,102 +453,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::FriendDecl::nth_friend_type_template_parameter_list"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FriendDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FriendDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FriendDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "friend_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->friend_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FriendDecl::friend_declaration"),
-    nullptr,
-  },
-  {
-    "friend_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->friend_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FriendDecl::friend_token"),
-    nullptr,
-  },
-  {
-    "friend_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->friend_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FriendDecl::friend_type"),
-    nullptr,
-  },
-  {
-    "is_unsupported_friend",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_unsupported_friend());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FriendDecl::is_unsupported_friend"),
-    nullptr,
-  },
-  {
-    "num_friend_type_template_parameter_lists",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_friend_type_template_parameter_lists());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FriendDecl::num_friend_type_template_parameter_lists"),
-    nullptr,
-  },
-  {
-    "friend_type_template_parameter_lists",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->friend_type_template_parameter_lists());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FriendDecl::friend_type_template_parameter_lists"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -171,6 +171,12 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -356,12 +362,6 @@ static PyMethodDef gMethods[] = {
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::InheritableParamAttr::contains"),
   },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
   {}  // Sentinel.
 };
 }  // namespace

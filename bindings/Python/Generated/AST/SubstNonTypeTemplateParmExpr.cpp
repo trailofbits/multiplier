@@ -123,6 +123,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "associated_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->associated_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::associated_declaration"),
+    nullptr,
+  },
+  {
+    "name_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->name_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::name_token"),
+    nullptr,
+  },
+  {
+    "pack_index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->pack_index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::pack_index"),
+    nullptr,
+  },
+  {
+    "parameter",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parameter());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::parameter"),
+    nullptr,
+  },
+  {
+    "parameter_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parameter_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::parameter_type"),
+    nullptr,
+  },
+  {
+    "replacement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->replacement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::replacement"),
+    nullptr,
+  },
+  {
+    "is_reference_parameter",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_reference_parameter());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::is_reference_parameter"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,82 +411,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "associated_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->associated_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::associated_declaration"),
-    nullptr,
-  },
-  {
-    "name_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->name_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::name_token"),
-    nullptr,
-  },
-  {
-    "pack_index",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pack_index());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::pack_index"),
-    nullptr,
-  },
-  {
-    "parameter",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameter());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::parameter"),
-    nullptr,
-  },
-  {
-    "parameter_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameter_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::parameter_type"),
-    nullptr,
-  },
-  {
-    "replacement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->replacement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::replacement"),
-    nullptr,
-  },
-  {
-    "is_reference_parameter",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_reference_parameter());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmExpr::is_reference_parameter"),
-    nullptr,
   },
   {}  // Sentinel.
 };

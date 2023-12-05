@@ -139,6 +139,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "angle_brackets",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->angle_brackets());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNamedCastExpr::angle_brackets"),
+    nullptr,
+  },
+  {
+    "cast_name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->cast_name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNamedCastExpr::cast_name"),
+    nullptr,
+  },
+  {
+    "operator_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNamedCastExpr::operator_token"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNamedCastExpr::r_paren_token"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -333,52 +379,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXNamedCastExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "angle_brackets",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->angle_brackets());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNamedCastExpr::angle_brackets"),
-    nullptr,
-  },
-  {
-    "cast_name",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->cast_name());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNamedCastExpr::cast_name"),
-    nullptr,
-  },
-  {
-    "operator_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNamedCastExpr::operator_token"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNamedCastExpr::r_paren_token"),
-    nullptr,
   },
   {}  // Sentinel.
 };

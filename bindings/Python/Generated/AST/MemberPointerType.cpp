@@ -123,6 +123,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "desugar",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->desugar());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberPointerType::desugar"),
+    nullptr,
+  },
+  {
+    "class_",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->class_());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberPointerType::class_"),
+    nullptr,
+  },
+  {
+    "most_recent_cxx_record_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->most_recent_cxx_record_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberPointerType::most_recent_cxx_record_declaration"),
+    nullptr,
+  },
+  {
+    "pointee_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->pointee_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberPointerType::pointee_type"),
+    nullptr,
+  },
+  {
+    "is_member_data_pointer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_member_data_pointer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberPointerType::is_member_data_pointer"),
+    nullptr,
+  },
+  {
+    "is_member_function_pointer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_member_function_pointer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberPointerType::is_member_function_pointer"),
+    nullptr,
+  },
+  {
+    "is_sugared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sugared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberPointerType::is_sugared"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -309,82 +385,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::MemberPointerType::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberPointerType::desugar"),
-    nullptr,
-  },
-  {
-    "class_",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->class_());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberPointerType::class_"),
-    nullptr,
-  },
-  {
-    "most_recent_cxx_record_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->most_recent_cxx_record_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberPointerType::most_recent_cxx_record_declaration"),
-    nullptr,
-  },
-  {
-    "pointee_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pointee_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberPointerType::pointee_type"),
-    nullptr,
-  },
-  {
-    "is_member_data_pointer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_member_data_pointer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberPointerType::is_member_data_pointer"),
-    nullptr,
-  },
-  {
-    "is_member_function_pointer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_member_function_pointer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberPointerType::is_member_function_pointer"),
-    nullptr,
-  },
-  {
-    "is_sugared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sugared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberPointerType::is_sugared"),
-    nullptr,
   },
   {}  // Sentinel.
 };

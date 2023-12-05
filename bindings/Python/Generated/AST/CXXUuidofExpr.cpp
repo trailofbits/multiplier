@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "expression_operand",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->expression_operand());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXUuidofExpr::expression_operand"),
+    nullptr,
+  },
+  {
+    "guid_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->guid_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXUuidofExpr::guid_declaration"),
+    nullptr,
+  },
+  {
+    "type_operand",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_operand());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXUuidofExpr::type_operand"),
+    nullptr,
+  },
+  {
+    "type_operand_source_info",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_operand_source_info());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXUuidofExpr::type_operand_source_info"),
+    nullptr,
+  },
+  {
+    "is_type_operand",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_type_operand());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXUuidofExpr::is_type_operand"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,62 +391,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXUuidofExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "expression_operand",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->expression_operand());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXUuidofExpr::expression_operand"),
-    nullptr,
-  },
-  {
-    "guid_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->guid_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXUuidofExpr::guid_declaration"),
-    nullptr,
-  },
-  {
-    "type_operand",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_operand());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXUuidofExpr::type_operand"),
-    nullptr,
-  },
-  {
-    "type_operand_source_info",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_operand_source_info());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXUuidofExpr::type_operand_source_info"),
-    nullptr,
-  },
-  {
-    "is_type_operand",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_type_operand());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXUuidofExpr::is_type_operand"),
-    nullptr,
   },
   {}  // Sentinel.
 };

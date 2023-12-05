@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "nrvo_candidate",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->nrvo_candidate());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ReturnStmt::nrvo_candidate"),
+    nullptr,
+  },
+  {
+    "return_value",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->return_value());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ReturnStmt::return_value"),
+    nullptr,
+  },
+  {
+    "return_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->return_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ReturnStmt::return_token"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,42 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ReturnStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "nrvo_candidate",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->nrvo_candidate());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ReturnStmt::nrvo_candidate"),
-    nullptr,
-  },
-  {
-    "return_value",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->return_value());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ReturnStmt::return_value"),
-    nullptr,
-  },
-  {
-    "return_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->return_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ReturnStmt::return_token"),
-    nullptr,
   },
   {}  // Sentinel.
 };

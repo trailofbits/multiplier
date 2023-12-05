@@ -139,6 +139,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "replacement_children",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->replacement_children());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MacroSubstitution::replacement_children"),
+    nullptr,
+  },
+  {
+    "first_fully_substituted_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->first_fully_substituted_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MacroSubstitution::first_fully_substituted_token"),
+    nullptr,
+  },
+  {
+    "last_fully_substituted_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->last_fully_substituted_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MacroSubstitution::last_fully_substituted_token"),
+    nullptr,
+  },
+  {
+    "name_or_operator",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->name_or_operator());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MacroSubstitution::name_or_operator"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -327,52 +373,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::MacroSubstitution::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "replacement_children",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->replacement_children());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MacroSubstitution::replacement_children"),
-    nullptr,
-  },
-  {
-    "first_fully_substituted_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->first_fully_substituted_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MacroSubstitution::first_fully_substituted_token"),
-    nullptr,
-  },
-  {
-    "last_fully_substituted_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->last_fully_substituted_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MacroSubstitution::last_fully_substituted_token"),
-    nullptr,
-  },
-  {
-    "name_or_operator",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->name_or_operator());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MacroSubstitution::name_or_operator"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -123,6 +123,152 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "base",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberExpr::base"),
+    nullptr,
+  },
+  {
+    "l_angle_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->l_angle_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberExpr::l_angle_token"),
+    nullptr,
+  },
+  {
+    "member_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->member_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberExpr::member_declaration"),
+    nullptr,
+  },
+  {
+    "member_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->member_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberExpr::member_token"),
+    nullptr,
+  },
+  {
+    "operator_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberExpr::operator_token"),
+    nullptr,
+  },
+  {
+    "r_angle_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_angle_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberExpr::r_angle_token"),
+    nullptr,
+  },
+  {
+    "template_keyword_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_keyword_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberExpr::template_keyword_token"),
+    nullptr,
+  },
+  {
+    "had_multiple_candidates",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->had_multiple_candidates());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberExpr::had_multiple_candidates"),
+    nullptr,
+  },
+  {
+    "has_explicit_template_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_explicit_template_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberExpr::has_explicit_template_arguments"),
+    nullptr,
+  },
+  {
+    "has_qualifier",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_qualifier());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberExpr::has_qualifier"),
+    nullptr,
+  },
+  {
+    "has_template_keyword",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_template_keyword());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberExpr::has_template_keyword"),
+    nullptr,
+  },
+  {
+    "is_arrow",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_arrow());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberExpr::is_arrow"),
+    nullptr,
+  },
+  {
+    "is_implicit_access",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_implicit_access());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberExpr::is_implicit_access"),
+    nullptr,
+  },
+  {
+    "is_non_odr_use",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_non_odr_use());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MemberExpr::is_non_odr_use"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,152 +481,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::MemberExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "base",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberExpr::base"),
-    nullptr,
-  },
-  {
-    "l_angle_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->l_angle_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberExpr::l_angle_token"),
-    nullptr,
-  },
-  {
-    "member_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->member_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberExpr::member_declaration"),
-    nullptr,
-  },
-  {
-    "member_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->member_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberExpr::member_token"),
-    nullptr,
-  },
-  {
-    "operator_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberExpr::operator_token"),
-    nullptr,
-  },
-  {
-    "r_angle_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_angle_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberExpr::r_angle_token"),
-    nullptr,
-  },
-  {
-    "template_keyword_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_keyword_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberExpr::template_keyword_token"),
-    nullptr,
-  },
-  {
-    "had_multiple_candidates",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->had_multiple_candidates());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberExpr::had_multiple_candidates"),
-    nullptr,
-  },
-  {
-    "has_explicit_template_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_explicit_template_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberExpr::has_explicit_template_arguments"),
-    nullptr,
-  },
-  {
-    "has_qualifier",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_qualifier());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberExpr::has_qualifier"),
-    nullptr,
-  },
-  {
-    "has_template_keyword",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_template_keyword());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberExpr::has_template_keyword"),
-    nullptr,
-  },
-  {
-    "is_arrow",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_arrow());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberExpr::is_arrow"),
-    nullptr,
-  },
-  {
-    "is_implicit_access",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_implicit_access());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberExpr::is_implicit_access"),
-    nullptr,
-  },
-  {
-    "is_non_odr_use",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_non_odr_use());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberExpr::is_non_odr_use"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -123,6 +123,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "desugar",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->desugar());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentSizedArrayType::desugar"),
+    nullptr,
+  },
+  {
+    "brackets_range",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->brackets_range());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentSizedArrayType::brackets_range"),
+    nullptr,
+  },
+  {
+    "l_bracket_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->l_bracket_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentSizedArrayType::l_bracket_token"),
+    nullptr,
+  },
+  {
+    "r_bracket_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_bracket_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentSizedArrayType::r_bracket_token"),
+    nullptr,
+  },
+  {
+    "size_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->size_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentSizedArrayType::size_expression"),
+    nullptr,
+  },
+  {
+    "is_sugared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sugared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentSizedArrayType::is_sugared"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -309,72 +375,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::DependentSizedArrayType::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentSizedArrayType::desugar"),
-    nullptr,
-  },
-  {
-    "brackets_range",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->brackets_range());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentSizedArrayType::brackets_range"),
-    nullptr,
-  },
-  {
-    "l_bracket_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->l_bracket_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentSizedArrayType::l_bracket_token"),
-    nullptr,
-  },
-  {
-    "r_bracket_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_bracket_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentSizedArrayType::r_bracket_token"),
-    nullptr,
-  },
-  {
-    "size_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->size_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentSizedArrayType::size_expression"),
-    nullptr,
-  },
-  {
-    "is_sugared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sugared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentSizedArrayType::is_sugared"),
-    nullptr,
   },
   {}  // Sentinel.
 };

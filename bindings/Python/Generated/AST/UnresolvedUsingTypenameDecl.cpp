@@ -123,6 +123,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "ellipsis_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->ellipsis_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::ellipsis_token"),
+    nullptr,
+  },
+  {
+    "typename_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->typename_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::typename_token"),
+    nullptr,
+  },
+  {
+    "using_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->using_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::using_token"),
+    nullptr,
+  },
+  {
+    "is_pack_expansion",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_pack_expansion());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::is_pack_expansion"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,82 +411,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "ellipsis_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->ellipsis_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::ellipsis_token"),
-    nullptr,
-  },
-  {
-    "typename_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->typename_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::typename_token"),
-    nullptr,
-  },
-  {
-    "using_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->using_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::using_token"),
-    nullptr,
-  },
-  {
-    "is_pack_expansion",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_pack_expansion());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnresolvedUsingTypenameDecl::is_pack_expansion"),
-    nullptr,
   },
   {}  // Sentinel.
 };

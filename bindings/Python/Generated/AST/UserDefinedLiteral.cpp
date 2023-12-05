@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "cooked_literal",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->cooked_literal());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UserDefinedLiteral::cooked_literal"),
+    nullptr,
+  },
+  {
+    "literal_operator_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->literal_operator_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UserDefinedLiteral::literal_operator_kind"),
+    nullptr,
+  },
+  {
+    "ud_suffix_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->ud_suffix_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UserDefinedLiteral::ud_suffix_token"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,42 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::UserDefinedLiteral::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "cooked_literal",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->cooked_literal());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UserDefinedLiteral::cooked_literal"),
-    nullptr,
-  },
-  {
-    "literal_operator_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->literal_operator_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UserDefinedLiteral::literal_operator_kind"),
-    nullptr,
-  },
-  {
-    "ud_suffix_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->ud_suffix_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UserDefinedLiteral::ud_suffix_token"),
-    nullptr,
   },
   {}  // Sentinel.
 };

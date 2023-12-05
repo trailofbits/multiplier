@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "bridge_keyword_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->bridge_keyword_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCBridgedCastExpr::bridge_keyword_token"),
+    nullptr,
+  },
+  {
+    "bridge_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->bridge_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCBridgedCastExpr::bridge_kind"),
+    nullptr,
+  },
+  {
+    "bridge_kind_name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->bridge_kind_name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCBridgedCastExpr::bridge_kind_name"),
+    nullptr,
+  },
+  {
+    "l_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->l_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCBridgedCastExpr::l_paren_token"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,52 +381,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ObjCBridgedCastExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "bridge_keyword_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->bridge_keyword_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCBridgedCastExpr::bridge_keyword_token"),
-    nullptr,
-  },
-  {
-    "bridge_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->bridge_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCBridgedCastExpr::bridge_kind"),
-    nullptr,
-  },
-  {
-    "bridge_kind_name",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->bridge_kind_name());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCBridgedCastExpr::bridge_kind_name"),
-    nullptr,
-  },
-  {
-    "l_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->l_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCBridgedCastExpr::l_paren_token"),
-    nullptr,
   },
   {}  // Sentinel.
 };

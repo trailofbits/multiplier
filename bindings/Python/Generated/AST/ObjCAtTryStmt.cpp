@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "at_try_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->at_try_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCAtTryStmt::at_try_token"),
+    nullptr,
+  },
+  {
+    "finally_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->finally_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCAtTryStmt::finally_statement"),
+    nullptr,
+  },
+  {
+    "try_body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->try_body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCAtTryStmt::try_body"),
+    nullptr,
+  },
+  {
+    "num_catch_statements",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_catch_statements());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCAtTryStmt::num_catch_statements"),
+    nullptr,
+  },
+  {
+    "catch_statements",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->catch_statements());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCAtTryStmt::catch_statements"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,62 +413,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::ObjCAtTryStmt::nth_catch_statement"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "at_try_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->at_try_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCAtTryStmt::at_try_token"),
-    nullptr,
-  },
-  {
-    "finally_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->finally_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCAtTryStmt::finally_statement"),
-    nullptr,
-  },
-  {
-    "try_body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->try_body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCAtTryStmt::try_body"),
-    nullptr,
-  },
-  {
-    "num_catch_statements",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_catch_statements());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCAtTryStmt::num_catch_statements"),
-    nullptr,
-  },
-  {
-    "catch_statements",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->catch_statements());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCAtTryStmt::catch_statements"),
-    nullptr,
   },
   {}  // Sentinel.
 };

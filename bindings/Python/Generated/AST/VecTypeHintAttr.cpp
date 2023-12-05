@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "type_hint",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_hint());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::VecTypeHintAttr::type_hint"),
+    nullptr,
+  },
+  {
+    "type_hint_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_hint_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::VecTypeHintAttr::type_hint_token"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,32 +351,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::VecTypeHintAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "type_hint",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_hint());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::VecTypeHintAttr::type_hint"),
-    nullptr,
-  },
-  {
-    "type_hint_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_hint_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::VecTypeHintAttr::type_hint_token"),
-    nullptr,
   },
   {}  // Sentinel.
 };

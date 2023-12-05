@@ -123,6 +123,102 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ForStmt::body"),
+    nullptr,
+  },
+  {
+    "condition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->condition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ForStmt::condition"),
+    nullptr,
+  },
+  {
+    "condition_variable",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->condition_variable());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ForStmt::condition_variable"),
+    nullptr,
+  },
+  {
+    "condition_variable_declaration_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->condition_variable_declaration_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ForStmt::condition_variable_declaration_statement"),
+    nullptr,
+  },
+  {
+    "for_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->for_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ForStmt::for_token"),
+    nullptr,
+  },
+  {
+    "increment",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->increment());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ForStmt::increment"),
+    nullptr,
+  },
+  {
+    "initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ForStmt::initializer"),
+    nullptr,
+  },
+  {
+    "l_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->l_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ForStmt::l_paren_token"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ForStmt::r_paren_token"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,102 +431,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ForStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ForStmt::body"),
-    nullptr,
-  },
-  {
-    "condition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->condition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ForStmt::condition"),
-    nullptr,
-  },
-  {
-    "condition_variable",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->condition_variable());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ForStmt::condition_variable"),
-    nullptr,
-  },
-  {
-    "condition_variable_declaration_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->condition_variable_declaration_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ForStmt::condition_variable_declaration_statement"),
-    nullptr,
-  },
-  {
-    "for_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->for_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ForStmt::for_token"),
-    nullptr,
-  },
-  {
-    "increment",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->increment());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ForStmt::increment"),
-    nullptr,
-  },
-  {
-    "initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ForStmt::initializer"),
-    nullptr,
-  },
-  {
-    "l_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->l_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ForStmt::l_paren_token"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ForStmt::r_paren_token"),
-    nullptr,
   },
   {}  // Sentinel.
 };

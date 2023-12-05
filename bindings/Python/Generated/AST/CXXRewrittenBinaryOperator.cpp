@@ -123,6 +123,112 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "lhs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->lhs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::lhs"),
+    nullptr,
+  },
+  {
+    "opcode",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->opcode());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::opcode"),
+    nullptr,
+  },
+  {
+    "opcode_string",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->opcode_string());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::opcode_string"),
+    nullptr,
+  },
+  {
+    "operator_",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::operator_"),
+    nullptr,
+  },
+  {
+    "operator_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::operator_token"),
+    nullptr,
+  },
+  {
+    "rhs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->rhs());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::rhs"),
+    nullptr,
+  },
+  {
+    "semantic_form",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->semantic_form());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::semantic_form"),
+    nullptr,
+  },
+  {
+    "is_assignment_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_assignment_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::is_assignment_operation"),
+    nullptr,
+  },
+  {
+    "is_comparison_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_comparison_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::is_comparison_operation"),
+    nullptr,
+  },
+  {
+    "is_reversed",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_reversed());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::is_reversed"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,112 +441,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "lhs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->lhs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::lhs"),
-    nullptr,
-  },
-  {
-    "opcode",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->opcode());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::opcode"),
-    nullptr,
-  },
-  {
-    "opcode_string",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->opcode_string());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::opcode_string"),
-    nullptr,
-  },
-  {
-    "operator_",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::operator_"),
-    nullptr,
-  },
-  {
-    "operator_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::operator_token"),
-    nullptr,
-  },
-  {
-    "rhs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->rhs());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::rhs"),
-    nullptr,
-  },
-  {
-    "semantic_form",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->semantic_form());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::semantic_form"),
-    nullptr,
-  },
-  {
-    "is_assignment_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_assignment_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::is_assignment_operation"),
-    nullptr,
-  },
-  {
-    "is_comparison_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_comparison_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::is_comparison_operation"),
-    nullptr,
-  },
-  {
-    "is_reversed",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_reversed());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRewrittenBinaryOperator::is_reversed"),
-    nullptr,
   },
   {}  // Sentinel.
 };

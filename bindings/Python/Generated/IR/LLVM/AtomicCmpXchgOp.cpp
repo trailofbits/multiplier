@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[879]) || tp >= &(gTypes[880])) {
+  if (tp < &(gTypes[942]) || tp >= &(gTypes[943])) {
     return std::nullopt;
   }
 
@@ -82,7 +82,19 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
 
 template <>
 SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
-  auto ret = gType->tp_alloc(gType, 0);
+  PyTypeObject *tp = nullptr;
+  switch (val.kind()) {
+    default:
+      assert(false);
+      tp = gType;
+      break;
+
+    case mx::ir::llvm::AtomicCmpXchgOp::static_kind():
+      tp = &(gTypes[942]);
+      break;
+
+  }
+  auto ret = tp->tp_alloc(tp, 0);
   if (auto obj = O_cast(ret)) {
     obj->data = new (obj->backing_storage) T(std::move(val));
   }
@@ -109,6 +121,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
   return true;
 }
+
+namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "cmp",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->cmp());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::cmp"),
+    nullptr,
+  },
+  {
+    "val",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->val());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::val"),
+    nullptr,
+  },
+  {
+    "res",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->res());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::res"),
+    nullptr,
+  },
+  {
+    "syncscope",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->syncscope());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::syncscope"),
+    nullptr,
+  },
+  {
+    "weak",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->weak());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::weak"),
+    nullptr,
+  },
+  {
+    "volatile__",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->volatile__());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::volatile__"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
 
 namespace {
 static PyMethodDef gMethods[] = {
@@ -179,75 +257,9 @@ static PyMethodDef gMethods[] = {
 }  // namespace
 
 namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "cmp",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->cmp());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::cmp"),
-    nullptr,
-  },
-  {
-    "val",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->val());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::val"),
-    nullptr,
-  },
-  {
-    "res",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->res());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::res"),
-    nullptr,
-  },
-  {
-    "syncscope",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->syncscope());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::syncscope"),
-    nullptr,
-  },
-  {
-    "weak",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->weak());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::weak"),
-    nullptr,
-  },
-  {
-    "volatile__",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->volatile__());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::volatile__"),
-    nullptr,
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[879]);
+  PyTypeObject * const tp = &(gTypes[942]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -262,12 +274,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = PyObject_HashNotImplemented;
+  tp->tp_hash = gTypes[935].tp_hash;
   tp->tp_richcompare = nullptr;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = nullptr;
+  tp->tp_base = &(gTypes[935]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

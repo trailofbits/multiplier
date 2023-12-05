@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "intermediate_children",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->intermediate_children());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MacroExpansion::intermediate_children"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MacroExpansion::definition"),
+    nullptr,
+  },
+  {
+    "num_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MacroExpansion::num_arguments"),
+    nullptr,
+  },
+  {
+    "arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MacroExpansion::arguments"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -333,52 +379,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::MacroExpansion::nth_argument"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "intermediate_children",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->intermediate_children());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MacroExpansion::intermediate_children"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MacroExpansion::definition"),
-    nullptr,
-  },
-  {
-    "num_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MacroExpansion::num_arguments"),
-    nullptr,
-  },
-  {
-    "arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MacroExpansion::arguments"),
-    nullptr,
   },
   {}  // Sentinel.
 };

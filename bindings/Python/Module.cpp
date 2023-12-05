@@ -1466,6 +1466,7 @@ static PyModuleDef gABIModule = {
 };
 
 static LoaderFunc * const gABILoaders[] = {
+  PythonBinding<mx::ir::abi::Operation>::load,
   PythonBinding<mx::ir::abi::CallArgsOp>::load,
   PythonBinding<mx::ir::abi::CallExecutionOp>::load,
   PythonBinding<mx::ir::abi::CallOp>::load,
@@ -1493,18 +1494,51 @@ static PyModuleDef gLLVMModule = {
 };
 
 static LoaderFunc * const gLLVMLoaders[] = {
+  PythonBinding<mx::ir::llvm::Attribute>::load,
+  PythonBinding<mx::ir::llvm::CConvAttr>::load,
+  PythonBinding<mx::ir::llvm::ComdatAttr>::load,
+  PythonBinding<mx::ir::llvm::AccessGroupAttr>::load,
+  PythonBinding<mx::ir::llvm::AliasScopeAttr>::load,
+  PythonBinding<mx::ir::llvm::AliasScopeDomainAttr>::load,
   PythonBinding<mx::ir::llvm::DIBasicTypeAttr>::load,
   PythonBinding<mx::ir::llvm::DICompileUnitAttr>::load,
   PythonBinding<mx::ir::llvm::DICompositeTypeAttr>::load,
   PythonBinding<mx::ir::llvm::DIDerivedTypeAttr>::load,
+  PythonBinding<mx::ir::llvm::DIFileAttr>::load,
+  PythonBinding<mx::ir::llvm::DILabelAttr>::load,
+  PythonBinding<mx::ir::llvm::DILexicalBlockAttr>::load,
+  PythonBinding<mx::ir::llvm::DILexicalBlockFileAttr>::load,
+  PythonBinding<mx::ir::llvm::DILocalVariableAttr>::load,
   PythonBinding<mx::ir::llvm::DINamespaceAttr>::load,
+  PythonBinding<mx::ir::llvm::DINullTypeAttr>::load,
+  PythonBinding<mx::ir::llvm::DISubprogramAttr>::load,
+  PythonBinding<mx::ir::llvm::DISubrangeAttr>::load,
+  PythonBinding<mx::ir::llvm::DISubroutineTypeAttr>::load,
+  PythonBinding<mx::ir::llvm::FastmathFlagsAttr>::load,
   PythonBinding<mx::ir::llvm::MemoryEffectsAttr>::load,
   PythonBinding<mx::ir::llvm::TBAAMemberAttr>::load,
+  PythonBinding<mx::ir::llvm::TBAARootAttr>::load,
   PythonBinding<mx::ir::llvm::TBAATagAttr>::load,
   PythonBinding<mx::ir::llvm::TBAATypeDescriptorAttr>::load,
+  PythonBinding<mx::ir::llvm::LinkageAttr>::load,
+  PythonBinding<mx::ir::llvm::LoopAnnotationAttr>::load,
+  PythonBinding<mx::ir::llvm::LoopDistributeAttr>::load,
+  PythonBinding<mx::ir::llvm::LoopInterleaveAttr>::load,
+  PythonBinding<mx::ir::llvm::LoopLICMAttr>::load,
+  PythonBinding<mx::ir::llvm::LoopPeeledAttr>::load,
+  PythonBinding<mx::ir::llvm::LoopPipelineAttr>::load,
+  PythonBinding<mx::ir::llvm::LoopUnrollAndJamAttr>::load,
+  PythonBinding<mx::ir::llvm::LoopUnrollAttr>::load,
+  PythonBinding<mx::ir::llvm::LoopUnswitchAttr>::load,
+  PythonBinding<mx::ir::llvm::LoopVectorizeAttr>::load,
+  PythonBinding<mx::ir::llvm::Type>::load,
+  PythonBinding<mx::ir::llvm::ArrayType>::load,
+  PythonBinding<mx::ir::llvm::FixedVectorType>::load,
   PythonBinding<mx::ir::llvm::FunctionType>::load,
   PythonBinding<mx::ir::llvm::PointerType>::load,
+  PythonBinding<mx::ir::llvm::ScalableVectorType>::load,
   PythonBinding<mx::ir::llvm::TargetExtType>::load,
+  PythonBinding<mx::ir::llvm::Operation>::load,
   PythonBinding<mx::ir::llvm::AShrOp>::load,
   PythonBinding<mx::ir::llvm::AddOp>::load,
   PythonBinding<mx::ir::llvm::AddrSpaceCastOp>::load,
@@ -1536,6 +1570,8 @@ static LoaderFunc * const gLLVMLoaders[] = {
   PythonBinding<mx::ir::llvm::FenceOp>::load,
   PythonBinding<mx::ir::llvm::FreezeOp>::load,
   PythonBinding<mx::ir::llvm::GetElementPtrOp>::load,
+  PythonBinding<mx::ir::llvm::GlobalCtorsOp>::load,
+  PythonBinding<mx::ir::llvm::GlobalDtorsOp>::load,
   PythonBinding<mx::ir::llvm::GlobalOp>::load,
   PythonBinding<mx::ir::llvm::ICmpOp>::load,
   PythonBinding<mx::ir::llvm::InlineAsmOp>::load,
@@ -1549,6 +1585,7 @@ static LoaderFunc * const gLLVMLoaders[] = {
   PythonBinding<mx::ir::llvm::LoadOp>::load,
   PythonBinding<mx::ir::llvm::MetadataOp>::load,
   PythonBinding<mx::ir::llvm::MulOp>::load,
+  PythonBinding<mx::ir::llvm::NullOp>::load,
   PythonBinding<mx::ir::llvm::OrOp>::load,
   PythonBinding<mx::ir::llvm::PoisonOp>::load,
   PythonBinding<mx::ir::llvm::PtrToIntOp>::load,
@@ -1569,9 +1606,12 @@ static LoaderFunc * const gLLVMLoaders[] = {
   PythonBinding<mx::ir::llvm::UIToFPOp>::load,
   PythonBinding<mx::ir::llvm::URemOp>::load,
   PythonBinding<mx::ir::llvm::UndefOp>::load,
+  PythonBinding<mx::ir::llvm::UnreachableOp>::load,
   PythonBinding<mx::ir::llvm::XOrOp>::load,
   PythonBinding<mx::ir::llvm::ZExtOp>::load,
   PythonBinding<mx::ir::llvm::AbsOp>::load,
+  PythonBinding<mx::ir::llvm::AnnotationOp>::load,
+  PythonBinding<mx::ir::llvm::AssumeOp>::load,
   PythonBinding<mx::ir::llvm::BitReverseOp>::load,
   PythonBinding<mx::ir::llvm::ByteSwapOp>::load,
   PythonBinding<mx::ir::llvm::CallIntrinsicOp>::load,
@@ -1589,7 +1629,10 @@ static LoaderFunc * const gLLVMLoaders[] = {
   PythonBinding<mx::ir::llvm::CountLeadingZerosOp>::load,
   PythonBinding<mx::ir::llvm::CountTrailingZerosOp>::load,
   PythonBinding<mx::ir::llvm::CtPopOp>::load,
+  PythonBinding<mx::ir::llvm::DbgDeclareOp>::load,
+  PythonBinding<mx::ir::llvm::DbgLabelOp>::load,
   PythonBinding<mx::ir::llvm::DbgValueOp>::load,
+  PythonBinding<mx::ir::llvm::DebugTrapOp>::load,
   PythonBinding<mx::ir::llvm::EhTypeidForOp>::load,
   PythonBinding<mx::ir::llvm::Exp2Op>::load,
   PythonBinding<mx::ir::llvm::ExpOp>::load,
@@ -1630,9 +1673,11 @@ static LoaderFunc * const gLLVMLoaders[] = {
   PythonBinding<mx::ir::llvm::MinNumOp>::load,
   PythonBinding<mx::ir::llvm::MinimumOp>::load,
   PythonBinding<mx::ir::llvm::RoundToNearbyIntOp>::load,
+  PythonBinding<mx::ir::llvm::NoAliasScopeDeclOp>::load,
   PythonBinding<mx::ir::llvm::PowIOp>::load,
   PythonBinding<mx::ir::llvm::FPowOp>::load,
   PythonBinding<mx::ir::llvm::PrefetchOp>::load,
+  PythonBinding<mx::ir::llvm::PtrAnnotationOp>::load,
   PythonBinding<mx::ir::llvm::RoundToIntOp>::load,
   PythonBinding<mx::ir::llvm::RoundToNearestEvenOp>::load,
   PythonBinding<mx::ir::llvm::RoundToNearestOp>::load,
@@ -1651,6 +1696,7 @@ static LoaderFunc * const gLLVMLoaders[] = {
   PythonBinding<mx::ir::llvm::StackSaveOp>::load,
   PythonBinding<mx::ir::llvm::StepVectorOp>::load,
   PythonBinding<mx::ir::llvm::ThreadLocalAddressOp>::load,
+  PythonBinding<mx::ir::llvm::TrapOp>::load,
   PythonBinding<mx::ir::llvm::UAddSatOp>::load,
   PythonBinding<mx::ir::llvm::UAddWithOverflowOp>::load,
   PythonBinding<mx::ir::llvm::UBSanTrapOp>::load,
@@ -1714,6 +1760,8 @@ static LoaderFunc * const gLLVMLoaders[] = {
   PythonBinding<mx::ir::llvm::VaCopyOp>::load,
   PythonBinding<mx::ir::llvm::VaEndOp>::load,
   PythonBinding<mx::ir::llvm::VaStartOp>::load,
+  PythonBinding<mx::ir::llvm::VarAnnotationOp>::load,
+  PythonBinding<mx::ir::llvm::MaskedCompressStoreOp>::load,
   PythonBinding<mx::ir::llvm::MaskedExpandLoadOp>::load,
   PythonBinding<mx::ir::llvm::MaskedGatherOp>::load,
   PythonBinding<mx::ir::llvm::MaskedScatterOp>::load,
@@ -1750,15 +1798,39 @@ static PyModuleDef gCoreModule = {
 };
 
 static LoaderFunc * const gCoreLoaders[] = {
+  PythonBinding<mx::ir::core::Attribute>::load,
   PythonBinding<mx::ir::core::BooleanAttr>::load,
+  PythonBinding<mx::ir::core::FloatAttr>::load,
+  PythonBinding<mx::ir::core::IntegerAttr>::load,
+  PythonBinding<mx::ir::core::SourceLanguageAttr>::load,
   PythonBinding<mx::ir::core::StringLiteralAttr>::load,
+  PythonBinding<mx::ir::core::VoidAttr>::load,
+  PythonBinding<mx::ir::core::Type>::load,
   PythonBinding<mx::ir::core::FunctionType>::load,
+  PythonBinding<mx::ir::core::Operation>::load,
   PythonBinding<mx::ir::core::BinLAndOp>::load,
   PythonBinding<mx::ir::core::BinLOrOp>::load,
   PythonBinding<mx::ir::core::ImplicitReturnOp>::load,
   PythonBinding<mx::ir::core::LazyOp>::load,
   PythonBinding<mx::ir::core::ScopeOp>::load,
   PythonBinding<mx::ir::core::SelectOp>::load,
+};
+
+// multiplier.ir.meta
+static PyModuleDef gMetaModule = {
+  .m_name = "meta",
+  .m_doc = PyDoc_STR("Wrapper of IR/Meta"),
+  .m_size = 0,
+  .m_methods = gEmptyMethods,
+  .m_slots = {},
+  .m_traverse = {},
+  .m_clear = {},
+  .m_free = {},
+};
+
+static LoaderFunc * const gMetaLoaders[] = {
+  PythonBinding<mx::ir::meta::Attribute>::load,
+  PythonBinding<mx::ir::meta::IdentifierAttr>::load,
 };
 
 // multiplier.frontend
@@ -1833,26 +1905,39 @@ static PyModuleDef gMemRefModule = {
 };
 
 static LoaderFunc * const gMemRefLoaders[] = {
+  PythonBinding<mx::ir::memref::Operation>::load,
   PythonBinding<mx::ir::memref::AssumeAlignmentOp>::load,
   PythonBinding<mx::ir::memref::AtomicRMWOp>::load,
   PythonBinding<mx::ir::memref::AtomicYieldOp>::load,
+  PythonBinding<mx::ir::memref::CopyOp>::load,
   PythonBinding<mx::ir::memref::GenericAtomicRMWOp>::load,
   PythonBinding<mx::ir::memref::LoadOp>::load,
   PythonBinding<mx::ir::memref::AllocOp>::load,
   PythonBinding<mx::ir::memref::AllocaOp>::load,
   PythonBinding<mx::ir::memref::AllocaScopeOp>::load,
   PythonBinding<mx::ir::memref::AllocaScopeReturnOp>::load,
+  PythonBinding<mx::ir::memref::CastOp>::load,
+  PythonBinding<mx::ir::memref::CollapseShapeOp>::load,
+  PythonBinding<mx::ir::memref::DeallocOp>::load,
   PythonBinding<mx::ir::memref::DimOp>::load,
   PythonBinding<mx::ir::memref::DMAStartOp>::load,
   PythonBinding<mx::ir::memref::DMAWaitOp>::load,
+  PythonBinding<mx::ir::memref::ExpandShapeOp>::load,
+  PythonBinding<mx::ir::memref::ExtractAlignedPointerAsIndexOp>::load,
   PythonBinding<mx::ir::memref::ExtractStridedMetadataOp>::load,
   PythonBinding<mx::ir::memref::GetGlobalOp>::load,
   PythonBinding<mx::ir::memref::GlobalOp>::load,
+  PythonBinding<mx::ir::memref::MemorySpaceCastOp>::load,
   PythonBinding<mx::ir::memref::PrefetchOp>::load,
+  PythonBinding<mx::ir::memref::RankOp>::load,
+  PythonBinding<mx::ir::memref::ReallocOp>::load,
   PythonBinding<mx::ir::memref::ReinterpretCastOp>::load,
+  PythonBinding<mx::ir::memref::ReshapeOp>::load,
   PythonBinding<mx::ir::memref::StoreOp>::load,
+  PythonBinding<mx::ir::memref::TransposeOp>::load,
   PythonBinding<mx::ir::memref::ViewOp>::load,
   PythonBinding<mx::ir::memref::SubViewOp>::load,
+  PythonBinding<mx::ir::memref::TensorStoreOp>::load,
 };
 
 // multiplier.ir.builtin
@@ -1868,20 +1953,57 @@ static PyModuleDef gBuiltinModule = {
 };
 
 static LoaderFunc * const gBuiltinLoaders[] = {
+  PythonBinding<mx::ir::builtin::Attribute>::load,
+  PythonBinding<mx::ir::builtin::TypedAttr>::load,
   PythonBinding<mx::ir::builtin::ElementsAttr>::load,
+  PythonBinding<mx::ir::builtin::AffineMapAttr>::load,
   PythonBinding<mx::ir::builtin::ArrayAttr>::load,
   PythonBinding<mx::ir::builtin::DenseArrayAttr>::load,
+  PythonBinding<mx::ir::builtin::DenseIntOrFPElementsAttr>::load,
+  PythonBinding<mx::ir::builtin::DenseResourceElementsAttr>::load,
+  PythonBinding<mx::ir::builtin::DenseStringElementsAttr>::load,
   PythonBinding<mx::ir::builtin::DictionaryAttr>::load,
   PythonBinding<mx::ir::builtin::FloatAttr>::load,
   PythonBinding<mx::ir::builtin::IntegerAttr>::load,
+  PythonBinding<mx::ir::builtin::IntegerSetAttr>::load,
   PythonBinding<mx::ir::builtin::OpaqueAttr>::load,
+  PythonBinding<mx::ir::builtin::SparseElementsAttr>::load,
   PythonBinding<mx::ir::builtin::StringAttr>::load,
+  PythonBinding<mx::ir::builtin::SymbolRefAttr>::load,
+  PythonBinding<mx::ir::builtin::TypeAttr>::load,
+  PythonBinding<mx::ir::builtin::UnitAttr>::load,
   PythonBinding<mx::ir::builtin::StridedLayoutAttr>::load,
   PythonBinding<mx::ir::builtin::BoolAttr>::load,
+  PythonBinding<mx::ir::builtin::FlatSymbolRefAttr>::load,
+  PythonBinding<mx::ir::builtin::DenseIntElementsAttr>::load,
+  PythonBinding<mx::ir::builtin::Type>::load,
   PythonBinding<mx::ir::builtin::ShapedType>::load,
+  PythonBinding<mx::ir::builtin::FloatType>::load,
+  PythonBinding<mx::ir::builtin::BFloat16Type>::load,
+  PythonBinding<mx::ir::builtin::ComplexType>::load,
+  PythonBinding<mx::ir::builtin::Float8E4M3B11FNUZType>::load,
+  PythonBinding<mx::ir::builtin::Float8E4M3FNType>::load,
+  PythonBinding<mx::ir::builtin::Float8E4M3FNUZType>::load,
+  PythonBinding<mx::ir::builtin::Float8E5M2Type>::load,
+  PythonBinding<mx::ir::builtin::Float8E5M2FNUZType>::load,
+  PythonBinding<mx::ir::builtin::Float16Type>::load,
+  PythonBinding<mx::ir::builtin::Float32Type>::load,
+  PythonBinding<mx::ir::builtin::Float64Type>::load,
+  PythonBinding<mx::ir::builtin::Float80Type>::load,
+  PythonBinding<mx::ir::builtin::Float128Type>::load,
+  PythonBinding<mx::ir::builtin::FloatTF32Type>::load,
+  PythonBinding<mx::ir::builtin::FunctionType>::load,
+  PythonBinding<mx::ir::builtin::IndexType>::load,
   PythonBinding<mx::ir::builtin::IntegerType>::load,
+  PythonBinding<mx::ir::builtin::MemRefType>::load,
+  PythonBinding<mx::ir::builtin::NoneType>::load,
   PythonBinding<mx::ir::builtin::OpaqueType>::load,
+  PythonBinding<mx::ir::builtin::RankedTensorType>::load,
+  PythonBinding<mx::ir::builtin::TupleType>::load,
+  PythonBinding<mx::ir::builtin::UnrankedMemRefType>::load,
+  PythonBinding<mx::ir::builtin::UnrankedTensorType>::load,
   PythonBinding<mx::ir::builtin::VectorType>::load,
+  PythonBinding<mx::ir::builtin::Operation>::load,
   PythonBinding<mx::ir::builtin::ModuleOp>::load,
   PythonBinding<mx::ir::builtin::UnrealizedConversionCastOp>::load,
 };
@@ -1899,6 +2021,7 @@ static PyModuleDef gLowLevelModule = {
 };
 
 static LoaderFunc * const gLowLevelLoaders[] = {
+  PythonBinding<mx::ir::ll::Operation>::load,
   PythonBinding<mx::ir::ll::BrOp>::load,
   PythonBinding<mx::ir::ll::ConcatOp>::load,
   PythonBinding<mx::ir::ll::CondBrOp>::load,
@@ -1910,6 +2033,8 @@ static LoaderFunc * const gLowLevelLoaders[] = {
   PythonBinding<mx::ir::ll::StructGEPOp>::load,
   PythonBinding<mx::ir::ll::ReturnOp>::load,
   PythonBinding<mx::ir::ll::ScopeOp>::load,
+  PythonBinding<mx::ir::ll::ScopeRecurseOp>::load,
+  PythonBinding<mx::ir::ll::ScopeRetOp>::load,
   PythonBinding<mx::ir::ll::UninitializedVarOp>::load,
 };
 
@@ -1926,16 +2051,60 @@ static PyModuleDef gHighLevelModule = {
 };
 
 static LoaderFunc * const gHighLevelLoaders[] = {
+  PythonBinding<mx::ir::hl::Attribute>::load,
   PythonBinding<mx::ir::hl::AllocAlignAttr>::load,
   PythonBinding<mx::ir::hl::AllocSizeAttr>::load,
+  PythonBinding<mx::ir::hl::AnnotationAttr>::load,
   PythonBinding<mx::ir::hl::AsmLabelAttr>::load,
+  PythonBinding<mx::ir::hl::BuiltinAttr>::load,
   PythonBinding<mx::ir::hl::CVQualifiersAttr>::load,
   PythonBinding<mx::ir::hl::CVRQualifiersAttr>::load,
+  PythonBinding<mx::ir::hl::ConstAttr>::load,
+  PythonBinding<mx::ir::hl::FormatAttr>::load,
+  PythonBinding<mx::ir::hl::LoaderUninitializedAttr>::load,
+  PythonBinding<mx::ir::hl::ModeAttr>::load,
+  PythonBinding<mx::ir::hl::NoInstrumentFunctionAttr>::load,
+  PythonBinding<mx::ir::hl::NoThrowAttr>::load,
+  PythonBinding<mx::ir::hl::NonNullAttr>::load,
+  PythonBinding<mx::ir::hl::PackedAttr>::load,
+  PythonBinding<mx::ir::hl::PureAttr>::load,
+  PythonBinding<mx::ir::hl::RestrictAttr>::load,
+  PythonBinding<mx::ir::hl::SectionAttr>::load,
   PythonBinding<mx::ir::hl::UCVQualifiersAttr>::load,
+  PythonBinding<mx::ir::hl::WarnUnusedResultAttr>::load,
+  PythonBinding<mx::ir::hl::Type>::load,
+  PythonBinding<mx::ir::hl::AdjustedType>::load,
+  PythonBinding<mx::ir::hl::ArrayType>::load,
+  PythonBinding<mx::ir::hl::AttributedType>::load,
+  PythonBinding<mx::ir::hl::BFloat16Type>::load,
+  PythonBinding<mx::ir::hl::BoolType>::load,
+  PythonBinding<mx::ir::hl::CharType>::load,
+  PythonBinding<mx::ir::hl::DecayedType>::load,
+  PythonBinding<mx::ir::hl::DoubleType>::load,
+  PythonBinding<mx::ir::hl::ElaboratedType>::load,
   PythonBinding<mx::ir::hl::EnumType>::load,
+  PythonBinding<mx::ir::hl::Float128Type>::load,
+  PythonBinding<mx::ir::hl::FloatType>::load,
+  PythonBinding<mx::ir::hl::HalfType>::load,
+  PythonBinding<mx::ir::hl::Int128Type>::load,
+  PythonBinding<mx::ir::hl::IntType>::load,
+  PythonBinding<mx::ir::hl::LValueType>::load,
+  PythonBinding<mx::ir::hl::LabelType>::load,
+  PythonBinding<mx::ir::hl::LongDoubleType>::load,
+  PythonBinding<mx::ir::hl::LongLongType>::load,
+  PythonBinding<mx::ir::hl::LongType>::load,
+  PythonBinding<mx::ir::hl::ParenType>::load,
+  PythonBinding<mx::ir::hl::PointerType>::load,
+  PythonBinding<mx::ir::hl::RValueType>::load,
   PythonBinding<mx::ir::hl::RecordType>::load,
+  PythonBinding<mx::ir::hl::ReferenceType>::load,
+  PythonBinding<mx::ir::hl::ShortType>::load,
   PythonBinding<mx::ir::hl::TypeOfExprType>::load,
+  PythonBinding<mx::ir::hl::TypeOfTypeType>::load,
   PythonBinding<mx::ir::hl::TypedefType>::load,
+  PythonBinding<mx::ir::hl::VoidType>::load,
+  PythonBinding<mx::ir::hl::Operation>::load,
+  PythonBinding<mx::ir::hl::AccessSpecifierOp>::load,
   PythonBinding<mx::ir::hl::AddFAssignOp>::load,
   PythonBinding<mx::ir::hl::AddFOp>::load,
   PythonBinding<mx::ir::hl::AddIAssignOp>::load,
@@ -1985,16 +2154,21 @@ static LoaderFunc * const gHighLevelLoaders[] = {
   PythonBinding<mx::ir::hl::FieldDeclOp>::load,
   PythonBinding<mx::ir::hl::FuncRefOp>::load,
   PythonBinding<mx::ir::hl::GlobalRefOp>::load,
+  PythonBinding<mx::ir::hl::BreakOp>::load,
   PythonBinding<mx::ir::hl::CaseOp>::load,
   PythonBinding<mx::ir::hl::CondOp>::load,
   PythonBinding<mx::ir::hl::CondYieldOp>::load,
+  PythonBinding<mx::ir::hl::ContinueOp>::load,
   PythonBinding<mx::ir::hl::DefaultOp>::load,
   PythonBinding<mx::ir::hl::DoOp>::load,
+  PythonBinding<mx::ir::hl::EmptyDeclOp>::load,
   PythonBinding<mx::ir::hl::ForOp>::load,
   PythonBinding<mx::ir::hl::FuncOp>::load,
+  PythonBinding<mx::ir::hl::GotoStmtOp>::load,
   PythonBinding<mx::ir::hl::IfOp>::load,
   PythonBinding<mx::ir::hl::LabelDeclOp>::load,
   PythonBinding<mx::ir::hl::LabelStmtOp>::load,
+  PythonBinding<mx::ir::hl::SkipStmtOp>::load,
   PythonBinding<mx::ir::hl::SwitchOp>::load,
   PythonBinding<mx::ir::hl::TypeYieldOp>::load,
   PythonBinding<mx::ir::hl::ValueYieldOp>::load,
@@ -2038,7 +2212,9 @@ static LoaderFunc * const gHighLevelLoaders[] = {
   PythonBinding<mx::ir::hl::TypeDeclOp>::load,
   PythonBinding<mx::ir::hl::TypeDefOp>::load,
   PythonBinding<mx::ir::hl::TypeOfExprOp>::load,
+  PythonBinding<mx::ir::hl::TypeOfTypeOp>::load,
   PythonBinding<mx::ir::hl::UnionDeclOp>::load,
+  PythonBinding<mx::ir::hl::UnreachableOp>::load,
 };
 
 // multiplier.ir.unsupported
@@ -2054,7 +2230,9 @@ static PyModuleDef gUnsupportedModule = {
 };
 
 static LoaderFunc * const gUnsupportedLoaders[] = {
+  PythonBinding<mx::ir::unsup::Type>::load,
   PythonBinding<mx::ir::unsup::UnsupportedType>::load,
+  PythonBinding<mx::ir::unsup::Operation>::load,
   PythonBinding<mx::ir::unsup::UnsupportedDeclOp>::load,
   PythonBinding<mx::ir::unsup::UnsupportedStmtOp>::load,
 };
@@ -2186,6 +2364,26 @@ PyMODINIT_FUNC PyInit_multiplier(void) {
   if (irm) {
     if (0 != PyModule_AddObjectRef(irm, "core", corem)) {
       Py_DECREF(corem);
+      Py_DECREF(m);
+      return nullptr;
+    }
+  }
+
+  auto metam = PyModule_Create(&mx::gMetaModule);
+  if (!metam) {
+    return nullptr;
+  }
+
+  for (auto loader : mx::gMetaLoaders) {
+    if (!loader(metam)) {
+      Py_DECREF(m);
+      return nullptr;
+    }
+  }
+
+  if (irm) {
+    if (0 != PyModule_AddObjectRef(irm, "meta", metam)) {
+      Py_DECREF(metam);
       Py_DECREF(m);
       return nullptr;
     }

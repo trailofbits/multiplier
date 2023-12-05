@@ -123,6 +123,102 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "num_designators",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_designators());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::num_designators"),
+    nullptr,
+  },
+  {
+    "designators",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->designators());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::designators"),
+    nullptr,
+  },
+  {
+    "designators_tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->designators_tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::designators_tokens"),
+    nullptr,
+  },
+  {
+    "equal_or_colon_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->equal_or_colon_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::equal_or_colon_token"),
+    nullptr,
+  },
+  {
+    "initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::initializer"),
+    nullptr,
+  },
+  {
+    "is_direct_initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_direct_initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::is_direct_initializer"),
+    nullptr,
+  },
+  {
+    "uses_gnu_syntax",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->uses_gnu_syntax());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::uses_gnu_syntax"),
+    nullptr,
+  },
+  {
+    "num_sub_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_sub_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::num_sub_expressions"),
+    nullptr,
+  },
+  {
+    "sub_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sub_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::sub_expressions"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -379,102 +475,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::DesignatedInitExpr::nth_sub_expression"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "num_designators",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_designators());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::num_designators"),
-    nullptr,
-  },
-  {
-    "designators",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->designators());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::designators"),
-    nullptr,
-  },
-  {
-    "designators_tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->designators_tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::designators_tokens"),
-    nullptr,
-  },
-  {
-    "equal_or_colon_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->equal_or_colon_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::equal_or_colon_token"),
-    nullptr,
-  },
-  {
-    "initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::initializer"),
-    nullptr,
-  },
-  {
-    "is_direct_initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_direct_initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::is_direct_initializer"),
-    nullptr,
-  },
-  {
-    "uses_gnu_syntax",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->uses_gnu_syntax());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::uses_gnu_syntax"),
-    nullptr,
-  },
-  {
-    "num_sub_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_sub_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::num_sub_expressions"),
-    nullptr,
-  },
-  {
-    "sub_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sub_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::sub_expressions"),
-    nullptr,
   },
   {}  // Sentinel.
 };

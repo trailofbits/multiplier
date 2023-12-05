@@ -127,6 +127,102 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "call_conv",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->call_conv());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionType::call_conv"),
+    nullptr,
+  },
+  {
+    "call_result_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->call_result_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionType::call_result_type"),
+    nullptr,
+  },
+  {
+    "cmse_ns_call_attribute",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->cmse_ns_call_attribute());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionType::cmse_ns_call_attribute"),
+    nullptr,
+  },
+  {
+    "has_reg_parm",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_reg_parm());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionType::has_reg_parm"),
+    nullptr,
+  },
+  {
+    "no_return_attribute",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->no_return_attribute());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionType::no_return_attribute"),
+    nullptr,
+  },
+  {
+    "return_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->return_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionType::return_type"),
+    nullptr,
+  },
+  {
+    "is_const",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_const());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionType::is_const"),
+    nullptr,
+  },
+  {
+    "is_restrict",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_restrict());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionType::is_restrict"),
+    nullptr,
+  },
+  {
+    "is_volatile",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_volatile());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionType::is_volatile"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -295,102 +391,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::FunctionType::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "call_conv",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->call_conv());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionType::call_conv"),
-    nullptr,
-  },
-  {
-    "call_result_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->call_result_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionType::call_result_type"),
-    nullptr,
-  },
-  {
-    "cmse_ns_call_attribute",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->cmse_ns_call_attribute());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionType::cmse_ns_call_attribute"),
-    nullptr,
-  },
-  {
-    "has_reg_parm",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_reg_parm());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionType::has_reg_parm"),
-    nullptr,
-  },
-  {
-    "no_return_attribute",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->no_return_attribute());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionType::no_return_attribute"),
-    nullptr,
-  },
-  {
-    "return_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->return_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionType::return_type"),
-    nullptr,
-  },
-  {
-    "is_const",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_const());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionType::is_const"),
-    nullptr,
-  },
-  {
-    "is_restrict",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_restrict());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionType::is_restrict"),
-    nullptr,
-  },
-  {
-    "is_volatile",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_volatile());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionType::is_volatile"),
-    nullptr,
   },
   {}  // Sentinel.
 };

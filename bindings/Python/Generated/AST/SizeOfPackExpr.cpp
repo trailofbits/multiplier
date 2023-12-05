@@ -123,6 +123,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "operator_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SizeOfPackExpr::operator_token"),
+    nullptr,
+  },
+  {
+    "pack",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->pack());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SizeOfPackExpr::pack"),
+    nullptr,
+  },
+  {
+    "pack_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->pack_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SizeOfPackExpr::pack_length"),
+    nullptr,
+  },
+  {
+    "pack_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->pack_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SizeOfPackExpr::pack_token"),
+    nullptr,
+  },
+  {
+    "partial_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->partial_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SizeOfPackExpr::partial_arguments"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SizeOfPackExpr::r_paren_token"),
+    nullptr,
+  },
+  {
+    "is_partially_substituted",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_partially_substituted());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SizeOfPackExpr::is_partially_substituted"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,82 +411,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::SizeOfPackExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "operator_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SizeOfPackExpr::operator_token"),
-    nullptr,
-  },
-  {
-    "pack",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pack());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SizeOfPackExpr::pack"),
-    nullptr,
-  },
-  {
-    "pack_length",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pack_length());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SizeOfPackExpr::pack_length"),
-    nullptr,
-  },
-  {
-    "pack_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pack_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SizeOfPackExpr::pack_token"),
-    nullptr,
-  },
-  {
-    "partial_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->partial_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SizeOfPackExpr::partial_arguments"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SizeOfPackExpr::r_paren_token"),
-    nullptr,
-  },
-  {
-    "is_partially_substituted",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_partially_substituted());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SizeOfPackExpr::is_partially_substituted"),
-    nullptr,
   },
   {}  // Sentinel.
 };

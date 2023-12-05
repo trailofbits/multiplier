@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "message",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->message());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AvailabilityAttr::message"),
+    nullptr,
+  },
+  {
+    "replacement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->replacement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AvailabilityAttr::replacement"),
+    nullptr,
+  },
+  {
+    "strict",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->strict());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AvailabilityAttr::strict"),
+    nullptr,
+  },
+  {
+    "unavailable",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->unavailable());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AvailabilityAttr::unavailable"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,52 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::AvailabilityAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "message",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->message());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AvailabilityAttr::message"),
-    nullptr,
-  },
-  {
-    "replacement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->replacement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AvailabilityAttr::replacement"),
-    nullptr,
-  },
-  {
-    "strict",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->strict());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AvailabilityAttr::strict"),
-    nullptr,
-  },
-  {
-    "unavailable",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->unavailable());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AvailabilityAttr::unavailable"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -127,6 +127,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "colon_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->colon_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AbstractConditionalOperator::colon_token"),
+    nullptr,
+  },
+  {
+    "condition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->condition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AbstractConditionalOperator::condition"),
+    nullptr,
+  },
+  {
+    "false_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->false_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AbstractConditionalOperator::false_expression"),
+    nullptr,
+  },
+  {
+    "question_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->question_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AbstractConditionalOperator::question_token"),
+    nullptr,
+  },
+  {
+    "true_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->true_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AbstractConditionalOperator::true_expression"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -321,62 +377,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::AbstractConditionalOperator::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "colon_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->colon_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AbstractConditionalOperator::colon_token"),
-    nullptr,
-  },
-  {
-    "condition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->condition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AbstractConditionalOperator::condition"),
-    nullptr,
-  },
-  {
-    "false_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->false_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AbstractConditionalOperator::false_expression"),
-    nullptr,
-  },
-  {
-    "question_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->question_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AbstractConditionalOperator::question_token"),
-    nullptr,
-  },
-  {
-    "true_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->true_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AbstractConditionalOperator::true_expression"),
-    nullptr,
   },
   {}  // Sentinel.
 };

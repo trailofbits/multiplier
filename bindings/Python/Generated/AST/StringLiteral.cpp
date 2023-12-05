@@ -123,6 +123,132 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "contains_non_ascii",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->contains_non_ascii());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::contains_non_ascii"),
+    nullptr,
+  },
+  {
+    "contains_non_ascii_or_null",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->contains_non_ascii_or_null());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::contains_non_ascii_or_null"),
+    nullptr,
+  },
+  {
+    "bytes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->bytes());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::bytes"),
+    nullptr,
+  },
+  {
+    "literal_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->literal_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::literal_kind"),
+    nullptr,
+  },
+  {
+    "string",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->string());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::string"),
+    nullptr,
+  },
+  {
+    "is_ordinary",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_ordinary());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::is_ordinary"),
+    nullptr,
+  },
+  {
+    "is_pascal",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_pascal());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::is_pascal"),
+    nullptr,
+  },
+  {
+    "is_utf16",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_utf16());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::is_utf16"),
+    nullptr,
+  },
+  {
+    "is_utf32",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_utf32());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::is_utf32"),
+    nullptr,
+  },
+  {
+    "is_utf8",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_utf8());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::is_utf8"),
+    nullptr,
+  },
+  {
+    "is_unevaluated",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_unevaluated());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::is_unevaluated"),
+    nullptr,
+  },
+  {
+    "is_wide",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_wide());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::is_wide"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,132 +461,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::StringLiteral::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "contains_non_ascii",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->contains_non_ascii());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::StringLiteral::contains_non_ascii"),
-    nullptr,
-  },
-  {
-    "contains_non_ascii_or_null",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->contains_non_ascii_or_null());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::StringLiteral::contains_non_ascii_or_null"),
-    nullptr,
-  },
-  {
-    "bytes",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->bytes());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::StringLiteral::bytes"),
-    nullptr,
-  },
-  {
-    "literal_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->literal_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::StringLiteral::literal_kind"),
-    nullptr,
-  },
-  {
-    "string",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->string());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::StringLiteral::string"),
-    nullptr,
-  },
-  {
-    "is_ordinary",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_ordinary());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::StringLiteral::is_ordinary"),
-    nullptr,
-  },
-  {
-    "is_pascal",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_pascal());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::StringLiteral::is_pascal"),
-    nullptr,
-  },
-  {
-    "is_utf16",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_utf16());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::StringLiteral::is_utf16"),
-    nullptr,
-  },
-  {
-    "is_utf32",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_utf32());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::StringLiteral::is_utf32"),
-    nullptr,
-  },
-  {
-    "is_utf8",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_utf8());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::StringLiteral::is_utf8"),
-    nullptr,
-  },
-  {
-    "is_unevaluated",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_unevaluated());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::StringLiteral::is_unevaluated"),
-    nullptr,
-  },
-  {
-    "is_wide",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_wide());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::StringLiteral::is_wide"),
-    nullptr,
   },
   {}  // Sentinel.
 };

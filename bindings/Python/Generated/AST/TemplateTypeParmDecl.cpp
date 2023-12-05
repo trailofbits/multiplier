@@ -123,6 +123,132 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "default_argument_was_inherited",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->default_argument_was_inherited());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::default_argument_was_inherited"),
+    nullptr,
+  },
+  {
+    "default_argument",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->default_argument());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::default_argument"),
+    nullptr,
+  },
+  {
+    "default_argument_info",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->default_argument_info());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::default_argument_info"),
+    nullptr,
+  },
+  {
+    "default_argument_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->default_argument_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::default_argument_token"),
+    nullptr,
+  },
+  {
+    "has_default_argument",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_default_argument());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::has_default_argument"),
+    nullptr,
+  },
+  {
+    "has_type_constraint",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_type_constraint());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::has_type_constraint"),
+    nullptr,
+  },
+  {
+    "is_expanded_parameter_pack",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_expanded_parameter_pack());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::is_expanded_parameter_pack"),
+    nullptr,
+  },
+  {
+    "is_pack_expansion",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_pack_expansion());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::is_pack_expansion"),
+    nullptr,
+  },
+  {
+    "was_declared_with_typename",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->was_declared_with_typename());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::was_declared_with_typename"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,132 +461,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "default_argument_was_inherited",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->default_argument_was_inherited());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::default_argument_was_inherited"),
-    nullptr,
-  },
-  {
-    "default_argument",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->default_argument());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::default_argument"),
-    nullptr,
-  },
-  {
-    "default_argument_info",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->default_argument_info());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::default_argument_info"),
-    nullptr,
-  },
-  {
-    "default_argument_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->default_argument_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::default_argument_token"),
-    nullptr,
-  },
-  {
-    "has_default_argument",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_default_argument());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::has_default_argument"),
-    nullptr,
-  },
-  {
-    "has_type_constraint",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_type_constraint());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::has_type_constraint"),
-    nullptr,
-  },
-  {
-    "is_expanded_parameter_pack",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_expanded_parameter_pack());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::is_expanded_parameter_pack"),
-    nullptr,
-  },
-  {
-    "is_pack_expansion",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_pack_expansion());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::is_pack_expansion"),
-    nullptr,
-  },
-  {
-    "was_declared_with_typename",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->was_declared_with_typename());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateTypeParmDecl::was_declared_with_typename"),
-    nullptr,
   },
   {}  // Sentinel.
 };

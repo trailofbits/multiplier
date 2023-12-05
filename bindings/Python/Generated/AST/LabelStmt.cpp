@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LabelStmt::declaration"),
+    nullptr,
+  },
+  {
+    "identifier_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->identifier_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LabelStmt::identifier_token"),
+    nullptr,
+  },
+  {
+    "name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LabelStmt::name"),
+    nullptr,
+  },
+  {
+    "sub_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sub_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LabelStmt::sub_statement"),
+    nullptr,
+  },
+  {
+    "is_side_entry",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_side_entry());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LabelStmt::is_side_entry"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,62 +391,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::LabelStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LabelStmt::declaration"),
-    nullptr,
-  },
-  {
-    "identifier_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->identifier_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LabelStmt::identifier_token"),
-    nullptr,
-  },
-  {
-    "name",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->name());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LabelStmt::name"),
-    nullptr,
-  },
-  {
-    "sub_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sub_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LabelStmt::sub_statement"),
-    nullptr,
-  },
-  {
-    "is_side_entry",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_side_entry());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LabelStmt::is_side_entry"),
-    nullptr,
   },
   {}  // Sentinel.
 };

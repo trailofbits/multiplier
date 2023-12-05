@@ -123,6 +123,192 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "does_usual_array_delete_want_size",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->does_usual_array_delete_want_size());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::does_usual_array_delete_want_size"),
+    nullptr,
+  },
+  {
+    "allocated_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->allocated_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::allocated_type"),
+    nullptr,
+  },
+  {
+    "array_size",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->array_size());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::array_size"),
+    nullptr,
+  },
+  {
+    "construct_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->construct_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::construct_expression"),
+    nullptr,
+  },
+  {
+    "direct_initializer_range",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->direct_initializer_range());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::direct_initializer_range"),
+    nullptr,
+  },
+  {
+    "initialization_style",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initialization_style());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::initialization_style"),
+    nullptr,
+  },
+  {
+    "initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::initializer"),
+    nullptr,
+  },
+  {
+    "operator_delete",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_delete());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::operator_delete"),
+    nullptr,
+  },
+  {
+    "operator_new",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_new());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::operator_new"),
+    nullptr,
+  },
+  {
+    "type_id_parentheses",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_id_parentheses());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::type_id_parentheses"),
+    nullptr,
+  },
+  {
+    "has_initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::has_initializer"),
+    nullptr,
+  },
+  {
+    "is_array",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_array());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::is_array"),
+    nullptr,
+  },
+  {
+    "is_global_new",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_global_new());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::is_global_new"),
+    nullptr,
+  },
+  {
+    "is_parenthesis_type_id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_parenthesis_type_id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::is_parenthesis_type_id"),
+    nullptr,
+  },
+  {
+    "pass_alignment",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->pass_alignment());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::pass_alignment"),
+    nullptr,
+  },
+  {
+    "num_placement_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_placement_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::num_placement_arguments"),
+    nullptr,
+  },
+  {
+    "placement_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->placement_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::placement_arguments"),
+    nullptr,
+  },
+  {
+    "should_null_check_allocation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->should_null_check_allocation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXNewExpr::should_null_check_allocation"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,192 +543,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::CXXNewExpr::nth_placement_argument"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "does_usual_array_delete_want_size",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->does_usual_array_delete_want_size());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::does_usual_array_delete_want_size"),
-    nullptr,
-  },
-  {
-    "allocated_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->allocated_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::allocated_type"),
-    nullptr,
-  },
-  {
-    "array_size",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->array_size());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::array_size"),
-    nullptr,
-  },
-  {
-    "construct_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->construct_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::construct_expression"),
-    nullptr,
-  },
-  {
-    "direct_initializer_range",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->direct_initializer_range());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::direct_initializer_range"),
-    nullptr,
-  },
-  {
-    "initialization_style",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initialization_style());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::initialization_style"),
-    nullptr,
-  },
-  {
-    "initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::initializer"),
-    nullptr,
-  },
-  {
-    "operator_delete",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_delete());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::operator_delete"),
-    nullptr,
-  },
-  {
-    "operator_new",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_new());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::operator_new"),
-    nullptr,
-  },
-  {
-    "type_id_parentheses",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_id_parentheses());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::type_id_parentheses"),
-    nullptr,
-  },
-  {
-    "has_initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::has_initializer"),
-    nullptr,
-  },
-  {
-    "is_array",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_array());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::is_array"),
-    nullptr,
-  },
-  {
-    "is_global_new",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_global_new());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::is_global_new"),
-    nullptr,
-  },
-  {
-    "is_parenthesis_type_id",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_parenthesis_type_id());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::is_parenthesis_type_id"),
-    nullptr,
-  },
-  {
-    "pass_alignment",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pass_alignment());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::pass_alignment"),
-    nullptr,
-  },
-  {
-    "num_placement_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_placement_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::num_placement_arguments"),
-    nullptr,
-  },
-  {
-    "placement_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->placement_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::placement_arguments"),
-    nullptr,
-  },
-  {
-    "should_null_check_allocation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->should_null_check_allocation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::should_null_check_allocation"),
-    nullptr,
   },
   {}  // Sentinel.
 };

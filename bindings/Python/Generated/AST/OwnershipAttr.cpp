@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "own_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->own_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OwnershipAttr::own_kind"),
+    nullptr,
+  },
+  {
+    "semantic_spelling",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->semantic_spelling());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OwnershipAttr::semantic_spelling"),
+    nullptr,
+  },
+  {
+    "is_holds",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_holds());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OwnershipAttr::is_holds"),
+    nullptr,
+  },
+  {
+    "is_returns",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_returns());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OwnershipAttr::is_returns"),
+    nullptr,
+  },
+  {
+    "is_takes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_takes());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OwnershipAttr::is_takes"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,62 +381,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::OwnershipAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "own_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->own_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OwnershipAttr::own_kind"),
-    nullptr,
-  },
-  {
-    "semantic_spelling",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->semantic_spelling());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OwnershipAttr::semantic_spelling"),
-    nullptr,
-  },
-  {
-    "is_holds",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_holds());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OwnershipAttr::is_holds"),
-    nullptr,
-  },
-  {
-    "is_returns",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_returns());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OwnershipAttr::is_returns"),
-    nullptr,
-  },
-  {
-    "is_takes",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_takes());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OwnershipAttr::is_takes"),
-    nullptr,
   },
   {}  // Sentinel.
 };

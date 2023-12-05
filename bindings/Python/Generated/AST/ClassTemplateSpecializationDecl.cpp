@@ -127,6 +127,172 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "extern_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->extern_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::extern_token"),
+    nullptr,
+  },
+  {
+    "point_of_instantiation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->point_of_instantiation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::point_of_instantiation"),
+    nullptr,
+  },
+  {
+    "specialization_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->specialization_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::specialization_kind"),
+    nullptr,
+  },
+  {
+    "specialized_template",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->specialized_template());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::specialized_template"),
+    nullptr,
+  },
+  {
+    "num_template_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_template_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::num_template_arguments"),
+    nullptr,
+  },
+  {
+    "template_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::template_arguments"),
+    nullptr,
+  },
+  {
+    "num_template_instantiation_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_template_instantiation_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::num_template_instantiation_arguments"),
+    nullptr,
+  },
+  {
+    "template_instantiation_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_instantiation_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::template_instantiation_arguments"),
+    nullptr,
+  },
+  {
+    "template_keyword_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_keyword_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::template_keyword_token"),
+    nullptr,
+  },
+  {
+    "type_as_written",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_as_written());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::type_as_written"),
+    nullptr,
+  },
+  {
+    "is_class_scope_explicit_specialization",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_class_scope_explicit_specialization());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::is_class_scope_explicit_specialization"),
+    nullptr,
+  },
+  {
+    "is_explicit_instantiation_or_specialization",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_explicit_instantiation_or_specialization());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::is_explicit_instantiation_or_specialization"),
+    nullptr,
+  },
+  {
+    "is_explicit_specialization",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_explicit_specialization());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::is_explicit_specialization"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -383,172 +549,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::nth_template_instantiation_argument"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "extern_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->extern_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::extern_token"),
-    nullptr,
-  },
-  {
-    "point_of_instantiation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->point_of_instantiation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::point_of_instantiation"),
-    nullptr,
-  },
-  {
-    "specialization_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->specialization_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::specialization_kind"),
-    nullptr,
-  },
-  {
-    "specialized_template",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->specialized_template());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::specialized_template"),
-    nullptr,
-  },
-  {
-    "num_template_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_template_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::num_template_arguments"),
-    nullptr,
-  },
-  {
-    "template_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::template_arguments"),
-    nullptr,
-  },
-  {
-    "num_template_instantiation_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_template_instantiation_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::num_template_instantiation_arguments"),
-    nullptr,
-  },
-  {
-    "template_instantiation_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_instantiation_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::template_instantiation_arguments"),
-    nullptr,
-  },
-  {
-    "template_keyword_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_keyword_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::template_keyword_token"),
-    nullptr,
-  },
-  {
-    "type_as_written",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_as_written());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::type_as_written"),
-    nullptr,
-  },
-  {
-    "is_class_scope_explicit_specialization",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_class_scope_explicit_specialization());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::is_class_scope_explicit_specialization"),
-    nullptr,
-  },
-  {
-    "is_explicit_instantiation_or_specialization",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_explicit_instantiation_or_specialization());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::is_explicit_instantiation_or_specialization"),
-    nullptr,
-  },
-  {
-    "is_explicit_specialization",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_explicit_specialization());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::is_explicit_specialization"),
-    nullptr,
   },
   {}  // Sentinel.
 };

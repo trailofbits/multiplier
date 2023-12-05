@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "sub_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sub_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXThrowExpr::sub_expression"),
+    nullptr,
+  },
+  {
+    "throw_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->throw_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXThrowExpr::throw_token"),
+    nullptr,
+  },
+  {
+    "is_thrown_variable_in_scope",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_thrown_variable_in_scope());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXThrowExpr::is_thrown_variable_in_scope"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,42 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXThrowExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "sub_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sub_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXThrowExpr::sub_expression"),
-    nullptr,
-  },
-  {
-    "throw_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->throw_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXThrowExpr::throw_token"),
-    nullptr,
-  },
-  {
-    "is_thrown_variable_in_scope",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_thrown_variable_in_scope());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXThrowExpr::is_thrown_variable_in_scope"),
-    nullptr,
   },
   {}  // Sentinel.
 };

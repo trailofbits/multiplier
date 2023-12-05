@@ -131,6 +131,192 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "bit_width",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->bit_width());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::bit_width"),
+    nullptr,
+  },
+  {
+    "captured_vla_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->captured_vla_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::captured_vla_type"),
+    nullptr,
+  },
+  {
+    "in_class_initializer_style",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->in_class_initializer_style());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::in_class_initializer_style"),
+    nullptr,
+  },
+  {
+    "in_class_initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->in_class_initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::in_class_initializer"),
+    nullptr,
+  },
+  {
+    "has_captured_vla_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_captured_vla_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::has_captured_vla_type"),
+    nullptr,
+  },
+  {
+    "has_in_class_initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_in_class_initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::has_in_class_initializer"),
+    nullptr,
+  },
+  {
+    "has_non_null_in_class_initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_non_null_in_class_initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::has_non_null_in_class_initializer"),
+    nullptr,
+  },
+  {
+    "is_anonymous_struct_or_union",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_anonymous_struct_or_union());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::is_anonymous_struct_or_union"),
+    nullptr,
+  },
+  {
+    "is_bit_field",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_bit_field());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::is_bit_field"),
+    nullptr,
+  },
+  {
+    "is_mutable",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_mutable());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::is_mutable"),
+    nullptr,
+  },
+  {
+    "is_potentially_overlapping",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_potentially_overlapping());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::is_potentially_overlapping"),
+    nullptr,
+  },
+  {
+    "is_unnamed_bitfield",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_unnamed_bitfield());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::is_unnamed_bitfield"),
+    nullptr,
+  },
+  {
+    "is_zero_length_bit_field",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_zero_length_bit_field());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::is_zero_length_bit_field"),
+    nullptr,
+  },
+  {
+    "is_zero_size",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_zero_size());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::is_zero_size"),
+    nullptr,
+  },
+  {
+    "offset_in_bits",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->offset_in_bits());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FieldDecl::offset_in_bits"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -343,192 +529,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::FieldDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "bit_width",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->bit_width());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::bit_width"),
-    nullptr,
-  },
-  {
-    "captured_vla_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->captured_vla_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::captured_vla_type"),
-    nullptr,
-  },
-  {
-    "in_class_initializer_style",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->in_class_initializer_style());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::in_class_initializer_style"),
-    nullptr,
-  },
-  {
-    "in_class_initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->in_class_initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::in_class_initializer"),
-    nullptr,
-  },
-  {
-    "has_captured_vla_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_captured_vla_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::has_captured_vla_type"),
-    nullptr,
-  },
-  {
-    "has_in_class_initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_in_class_initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::has_in_class_initializer"),
-    nullptr,
-  },
-  {
-    "has_non_null_in_class_initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_non_null_in_class_initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::has_non_null_in_class_initializer"),
-    nullptr,
-  },
-  {
-    "is_anonymous_struct_or_union",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_anonymous_struct_or_union());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::is_anonymous_struct_or_union"),
-    nullptr,
-  },
-  {
-    "is_bit_field",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_bit_field());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::is_bit_field"),
-    nullptr,
-  },
-  {
-    "is_mutable",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_mutable());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::is_mutable"),
-    nullptr,
-  },
-  {
-    "is_potentially_overlapping",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_potentially_overlapping());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::is_potentially_overlapping"),
-    nullptr,
-  },
-  {
-    "is_unnamed_bitfield",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_unnamed_bitfield());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::is_unnamed_bitfield"),
-    nullptr,
-  },
-  {
-    "is_zero_length_bit_field",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_zero_length_bit_field());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::is_zero_length_bit_field"),
-    nullptr,
-  },
-  {
-    "is_zero_size",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_zero_size());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::is_zero_size"),
-    nullptr,
-  },
-  {
-    "offset_in_bits",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->offset_in_bits());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FieldDecl::offset_in_bits"),
-    nullptr,
   },
   {}  // Sentinel.
 };

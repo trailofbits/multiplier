@@ -123,6 +123,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "adjusted_rewritten_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->adjusted_rewritten_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDefaultArgExpr::adjusted_rewritten_expression"),
+    nullptr,
+  },
+  {
+    "expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDefaultArgExpr::expression"),
+    nullptr,
+  },
+  {
+    "parameter",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parameter());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDefaultArgExpr::parameter"),
+    nullptr,
+  },
+  {
+    "rewritten_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->rewritten_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDefaultArgExpr::rewritten_expression"),
+    nullptr,
+  },
+  {
+    "used_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->used_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDefaultArgExpr::used_token"),
+    nullptr,
+  },
+  {
+    "has_rewritten_initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_rewritten_initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXDefaultArgExpr::has_rewritten_initializer"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,72 +401,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXDefaultArgExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "adjusted_rewritten_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->adjusted_rewritten_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDefaultArgExpr::adjusted_rewritten_expression"),
-    nullptr,
-  },
-  {
-    "expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDefaultArgExpr::expression"),
-    nullptr,
-  },
-  {
-    "parameter",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameter());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDefaultArgExpr::parameter"),
-    nullptr,
-  },
-  {
-    "rewritten_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->rewritten_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDefaultArgExpr::rewritten_expression"),
-    nullptr,
-  },
-  {
-    "used_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->used_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDefaultArgExpr::used_token"),
-    nullptr,
-  },
-  {
-    "has_rewritten_initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_rewritten_initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDefaultArgExpr::has_rewritten_initializer"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -36,7 +36,7 @@ static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));
 
 class MX_EXPORT BrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LL_BR;
   }
 
@@ -53,7 +53,7 @@ static_assert(sizeof(BrOp) == sizeof(Operation));
 
 class MX_EXPORT ConcatOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LL_CONCAT;
   }
 
@@ -70,7 +70,7 @@ static_assert(sizeof(ConcatOp) == sizeof(Operation));
 
 class MX_EXPORT CondBrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LL_COND_BR;
   }
 
@@ -90,7 +90,7 @@ static_assert(sizeof(CondBrOp) == sizeof(Operation));
 
 class MX_EXPORT CondScopeRetOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LL_COND_SCOPE_RET;
   }
 
@@ -108,7 +108,7 @@ static_assert(sizeof(CondScopeRetOp) == sizeof(Operation));
 
 class MX_EXPORT ExtractOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LL_EXTRACT;
   }
 
@@ -128,7 +128,7 @@ static_assert(sizeof(ExtractOp) == sizeof(Operation));
 
 class MX_EXPORT InitializeVarOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LL_INITIALIZE;
   }
 
@@ -146,7 +146,7 @@ static_assert(sizeof(InitializeVarOp) == sizeof(Operation));
 
 class MX_EXPORT InlineScopeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LL_INLINE_SCOPE;
   }
 
@@ -162,7 +162,7 @@ static_assert(sizeof(InlineScopeOp) == sizeof(Operation));
 
 class MX_EXPORT FuncOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LL_FUNC;
   }
 
@@ -192,7 +192,7 @@ static_assert(sizeof(FuncOp) == sizeof(Operation));
 
 class MX_EXPORT StructGEPOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LL_GEP;
   }
 
@@ -211,7 +211,7 @@ static_assert(sizeof(StructGEPOp) == sizeof(Operation));
 
 class MX_EXPORT ReturnOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LL_RETURN;
   }
 
@@ -227,7 +227,7 @@ static_assert(sizeof(ReturnOp) == sizeof(Operation));
 
 class MX_EXPORT ScopeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LL_SCOPE;
   }
 
@@ -244,7 +244,7 @@ static_assert(sizeof(ScopeOp) == sizeof(Operation));
 
 class MX_EXPORT ScopeRecurseOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LL_SCOPE_RECURSE;
   }
 
@@ -259,7 +259,7 @@ static_assert(sizeof(ScopeRecurseOp) == sizeof(Operation));
 
 class MX_EXPORT ScopeRetOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LL_SCOPE_RET;
   }
 
@@ -274,7 +274,7 @@ static_assert(sizeof(ScopeRetOp) == sizeof(Operation));
 
 class MX_EXPORT UninitializedVarOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::LL_UNINITIALIZED_VAR;
   }
 

@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OpaqueValueExpr::token"),
+    nullptr,
+  },
+  {
+    "source_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->source_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OpaqueValueExpr::source_expression"),
+    nullptr,
+  },
+  {
+    "is_unique",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_unique());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OpaqueValueExpr::is_unique"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,42 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::OpaqueValueExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OpaqueValueExpr::token"),
-    nullptr,
-  },
-  {
-    "source_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->source_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OpaqueValueExpr::source_expression"),
-    nullptr,
-  },
-  {
-    "is_unique",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_unique());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OpaqueValueExpr::is_unique"),
-    nullptr,
   },
   {}  // Sentinel.
 };

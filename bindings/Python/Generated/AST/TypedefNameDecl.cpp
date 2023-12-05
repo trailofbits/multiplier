@@ -131,6 +131,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypedefNameDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypedefNameDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypedefNameDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "anonymous_declaration_with_typedef_name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->anonymous_declaration_with_typedef_name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypedefNameDecl::anonymous_declaration_with_typedef_name"),
+    nullptr,
+  },
+  {
+    "underlying_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->underlying_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypedefNameDecl::underlying_type"),
+    nullptr,
+  },
+  {
+    "is_moded",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_moded());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypedefNameDecl::is_moded"),
+    nullptr,
+  },
+  {
+    "is_transparent_tag",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_transparent_tag());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypedefNameDecl::is_transparent_tag"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,82 +401,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::TypedefNameDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypedefNameDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypedefNameDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypedefNameDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "anonymous_declaration_with_typedef_name",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->anonymous_declaration_with_typedef_name());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypedefNameDecl::anonymous_declaration_with_typedef_name"),
-    nullptr,
-  },
-  {
-    "underlying_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->underlying_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypedefNameDecl::underlying_type"),
-    nullptr,
-  },
-  {
-    "is_moded",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_moded());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypedefNameDecl::is_moded"),
-    nullptr,
-  },
-  {
-    "is_transparent_tag",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_transparent_tag());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypedefNameDecl::is_transparent_tag"),
-    nullptr,
   },
   {}  // Sentinel.
 };

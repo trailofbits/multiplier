@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "block",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->block());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SEHExceptStmt::block"),
+    nullptr,
+  },
+  {
+    "except_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->except_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SEHExceptStmt::except_token"),
+    nullptr,
+  },
+  {
+    "filter_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->filter_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SEHExceptStmt::filter_expression"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,42 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::SEHExceptStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "block",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->block());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SEHExceptStmt::block"),
-    nullptr,
-  },
-  {
-    "except_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->except_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SEHExceptStmt::except_token"),
-    nullptr,
-  },
-  {
-    "filter_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->filter_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SEHExceptStmt::filter_expression"),
-    nullptr,
   },
   {}  // Sentinel.
 };

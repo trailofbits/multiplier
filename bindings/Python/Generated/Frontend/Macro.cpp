@@ -219,6 +219,102 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Macro::id"),
+    nullptr,
+  },
+  {
+    "root",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->root());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Macro::root"),
+    nullptr,
+  },
+  {
+    "use_tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->use_tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Macro::use_tokens"),
+    nullptr,
+  },
+  {
+    "generate_use_tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->generate_use_tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Macro::generate_use_tokens"),
+    nullptr,
+  },
+  {
+    "expansion_tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->expansion_tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Macro::expansion_tokens"),
+    nullptr,
+  },
+  {
+    "generate_expansion_tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->generate_expansion_tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Macro::generate_expansion_tokens"),
+    nullptr,
+  },
+  {
+    "kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Macro::kind"),
+    nullptr,
+  },
+  {
+    "parent",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parent());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Macro::parent"),
+    nullptr,
+  },
+  {
+    "children",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->children());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Macro::children"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "static_category",
@@ -385,102 +481,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::Macro::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "id",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->id());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Macro::id"),
-    nullptr,
-  },
-  {
-    "root",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->root());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Macro::root"),
-    nullptr,
-  },
-  {
-    "use_tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->use_tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Macro::use_tokens"),
-    nullptr,
-  },
-  {
-    "generate_use_tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->generate_use_tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Macro::generate_use_tokens"),
-    nullptr,
-  },
-  {
-    "expansion_tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->expansion_tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Macro::expansion_tokens"),
-    nullptr,
-  },
-  {
-    "generate_expansion_tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->generate_expansion_tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Macro::generate_expansion_tokens"),
-    nullptr,
-  },
-  {
-    "kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Macro::kind"),
-    nullptr,
-  },
-  {
-    "parent",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parent());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Macro::parent"),
-    nullptr,
-  },
-  {
-    "children",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->children());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Macro::children"),
-    nullptr,
   },
   {}  // Sentinel.
 };

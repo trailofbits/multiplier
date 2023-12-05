@@ -123,6 +123,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "extending_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->extending_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MaterializeTemporaryExpr::extending_declaration"),
+    nullptr,
+  },
+  {
+    "lifetime_extended_temporary_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->lifetime_extended_temporary_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MaterializeTemporaryExpr::lifetime_extended_temporary_declaration"),
+    nullptr,
+  },
+  {
+    "storage_duration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->storage_duration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MaterializeTemporaryExpr::storage_duration"),
+    nullptr,
+  },
+  {
+    "sub_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sub_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MaterializeTemporaryExpr::sub_expression"),
+    nullptr,
+  },
+  {
+    "is_bound_to_lvalue_reference",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_bound_to_lvalue_reference());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MaterializeTemporaryExpr::is_bound_to_lvalue_reference"),
+    nullptr,
+  },
+  {
+    "is_usable_in_constant_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_usable_in_constant_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MaterializeTemporaryExpr::is_usable_in_constant_expressions"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,72 +401,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::MaterializeTemporaryExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "extending_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->extending_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MaterializeTemporaryExpr::extending_declaration"),
-    nullptr,
-  },
-  {
-    "lifetime_extended_temporary_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->lifetime_extended_temporary_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MaterializeTemporaryExpr::lifetime_extended_temporary_declaration"),
-    nullptr,
-  },
-  {
-    "storage_duration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->storage_duration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MaterializeTemporaryExpr::storage_duration"),
-    nullptr,
-  },
-  {
-    "sub_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sub_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MaterializeTemporaryExpr::sub_expression"),
-    nullptr,
-  },
-  {
-    "is_bound_to_lvalue_reference",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_bound_to_lvalue_reference());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MaterializeTemporaryExpr::is_bound_to_lvalue_reference"),
-    nullptr,
-  },
-  {
-    "is_usable_in_constant_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_usable_in_constant_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MaterializeTemporaryExpr::is_usable_in_constant_expressions"),
-    nullptr,
   },
   {}  // Sentinel.
 };

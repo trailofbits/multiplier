@@ -123,6 +123,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "base",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::base"),
+    nullptr,
+  },
+  {
+    "first_colon_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->first_colon_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::first_colon_token"),
+    nullptr,
+  },
+  {
+    "second_colon_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->second_colon_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::second_colon_token"),
+    nullptr,
+  },
+  {
+    "length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::length"),
+    nullptr,
+  },
+  {
+    "lower_bound",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->lower_bound());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::lower_bound"),
+    nullptr,
+  },
+  {
+    "r_bracket_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_bracket_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::r_bracket_token"),
+    nullptr,
+  },
+  {
+    "stride",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->stride());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::stride"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,82 +411,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "base",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::base"),
-    nullptr,
-  },
-  {
-    "first_colon_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->first_colon_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::first_colon_token"),
-    nullptr,
-  },
-  {
-    "second_colon_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->second_colon_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::second_colon_token"),
-    nullptr,
-  },
-  {
-    "length",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->length());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::length"),
-    nullptr,
-  },
-  {
-    "lower_bound",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->lower_bound());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::lower_bound"),
-    nullptr,
-  },
-  {
-    "r_bracket_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_bracket_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::r_bracket_token"),
-    nullptr,
-  },
-  {
-    "stride",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->stride());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPArraySectionExpr::stride"),
-    nullptr,
   },
   {}  // Sentinel.
 };

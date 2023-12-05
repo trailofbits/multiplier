@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "attribute_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->attribute_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedStmt::attribute_token"),
+    nullptr,
+  },
+  {
+    "num_attributes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_attributes());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedStmt::num_attributes"),
+    nullptr,
+  },
+  {
+    "attributes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->attributes());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedStmt::attributes"),
+    nullptr,
+  },
+  {
+    "sub_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sub_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedStmt::sub_statement"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,52 +403,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::AttributedStmt::nth_attribute"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "attribute_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->attribute_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedStmt::attribute_token"),
-    nullptr,
-  },
-  {
-    "num_attributes",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_attributes());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedStmt::num_attributes"),
-    nullptr,
-  },
-  {
-    "attributes",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->attributes());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedStmt::attributes"),
-    nullptr,
-  },
-  {
-    "sub_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sub_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedStmt::sub_statement"),
-    nullptr,
   },
   {}  // Sentinel.
 };

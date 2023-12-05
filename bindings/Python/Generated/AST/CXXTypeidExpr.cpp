@@ -123,6 +123,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "expression_operand",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->expression_operand());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXTypeidExpr::expression_operand"),
+    nullptr,
+  },
+  {
+    "type_operand",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_operand());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXTypeidExpr::type_operand"),
+    nullptr,
+  },
+  {
+    "type_operand_source_info",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_operand_source_info());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXTypeidExpr::type_operand_source_info"),
+    nullptr,
+  },
+  {
+    "is_most_derived",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_most_derived());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXTypeidExpr::is_most_derived"),
+    nullptr,
+  },
+  {
+    "is_potentially_evaluated",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_potentially_evaluated());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXTypeidExpr::is_potentially_evaluated"),
+    nullptr,
+  },
+  {
+    "is_type_operand",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_type_operand());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXTypeidExpr::is_type_operand"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,72 +401,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXTypeidExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "expression_operand",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->expression_operand());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXTypeidExpr::expression_operand"),
-    nullptr,
-  },
-  {
-    "type_operand",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_operand());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXTypeidExpr::type_operand"),
-    nullptr,
-  },
-  {
-    "type_operand_source_info",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_operand_source_info());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXTypeidExpr::type_operand_source_info"),
-    nullptr,
-  },
-  {
-    "is_most_derived",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_most_derived());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXTypeidExpr::is_most_derived"),
-    nullptr,
-  },
-  {
-    "is_potentially_evaluated",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_potentially_evaluated());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXTypeidExpr::is_potentially_evaluated"),
-    nullptr,
-  },
-  {
-    "is_type_operand",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_type_operand());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXTypeidExpr::is_type_operand"),
-    nullptr,
   },
   {}  // Sentinel.
 };

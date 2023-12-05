@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "keyword_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->keyword_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoreturnStmt::keyword_token"),
+    nullptr,
+  },
+  {
+    "operand",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operand());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoreturnStmt::operand"),
+    nullptr,
+  },
+  {
+    "promise_call",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->promise_call());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoreturnStmt::promise_call"),
+    nullptr,
+  },
+  {
+    "is_implicit",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_implicit());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoreturnStmt::is_implicit"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,52 +381,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CoreturnStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "keyword_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->keyword_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoreturnStmt::keyword_token"),
-    nullptr,
-  },
-  {
-    "operand",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operand());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoreturnStmt::operand"),
-    nullptr,
-  },
-  {
-    "promise_call",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->promise_call());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoreturnStmt::promise_call"),
-    nullptr,
-  },
-  {
-    "is_implicit",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_implicit());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoreturnStmt::is_implicit"),
-    nullptr,
   },
   {}  // Sentinel.
 };

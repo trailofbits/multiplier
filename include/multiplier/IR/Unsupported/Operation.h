@@ -24,7 +24,7 @@ static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));
 
 class MX_EXPORT UnsupportedDeclOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::UNSUP_DECL;
   }
 
@@ -41,7 +41,7 @@ static_assert(sizeof(UnsupportedDeclOp) == sizeof(Operation));
 
 class MX_EXPORT UnsupportedStmtOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::UNSUP_STMT;
   }
 

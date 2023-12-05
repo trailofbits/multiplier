@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "max_threads",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->max_threads());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CUDALaunchBoundsAttr::max_threads"),
+    nullptr,
+  },
+  {
+    "min_blocks",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->min_blocks());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CUDALaunchBoundsAttr::min_blocks"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,32 +351,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::CUDALaunchBoundsAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "max_threads",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->max_threads());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CUDALaunchBoundsAttr::max_threads"),
-    nullptr,
-  },
-  {
-    "min_blocks",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->min_blocks());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CUDALaunchBoundsAttr::min_blocks"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -123,6 +123,102 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "desugar",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->desugar());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BuiltinType::desugar"),
+    nullptr,
+  },
+  {
+    "builtin_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->builtin_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BuiltinType::builtin_kind"),
+    nullptr,
+  },
+  {
+    "is_floating_point",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_floating_point());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BuiltinType::is_floating_point"),
+    nullptr,
+  },
+  {
+    "is_integer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_integer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BuiltinType::is_integer"),
+    nullptr,
+  },
+  {
+    "is_sve_bool",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sve_bool());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BuiltinType::is_sve_bool"),
+    nullptr,
+  },
+  {
+    "is_sve_count",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sve_count());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BuiltinType::is_sve_count"),
+    nullptr,
+  },
+  {
+    "is_signed_integer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_signed_integer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BuiltinType::is_signed_integer"),
+    nullptr,
+  },
+  {
+    "is_sugared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sugared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BuiltinType::is_sugared"),
+    nullptr,
+  },
+  {
+    "is_unsigned_integer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_unsigned_integer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BuiltinType::is_unsigned_integer"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -309,102 +405,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::BuiltinType::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BuiltinType::desugar"),
-    nullptr,
-  },
-  {
-    "builtin_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->builtin_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BuiltinType::builtin_kind"),
-    nullptr,
-  },
-  {
-    "is_floating_point",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_floating_point());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BuiltinType::is_floating_point"),
-    nullptr,
-  },
-  {
-    "is_integer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_integer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BuiltinType::is_integer"),
-    nullptr,
-  },
-  {
-    "is_sve_bool",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sve_bool());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BuiltinType::is_sve_bool"),
-    nullptr,
-  },
-  {
-    "is_sve_count",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sve_count());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BuiltinType::is_sve_count"),
-    nullptr,
-  },
-  {
-    "is_signed_integer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_signed_integer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BuiltinType::is_signed_integer"),
-    nullptr,
-  },
-  {
-    "is_sugared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sugared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BuiltinType::is_sugared"),
-    nullptr,
-  },
-  {
-    "is_unsigned_integer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_unsigned_integer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::BuiltinType::is_unsigned_integer"),
-    nullptr,
   },
   {}  // Sentinel.
 };

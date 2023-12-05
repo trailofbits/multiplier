@@ -123,6 +123,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "desugar",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->desugar());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstTemplateTypeParmType::desugar"),
+    nullptr,
+  },
+  {
+    "associated_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->associated_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstTemplateTypeParmType::associated_declaration"),
+    nullptr,
+  },
+  {
+    "pack_index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->pack_index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstTemplateTypeParmType::pack_index"),
+    nullptr,
+  },
+  {
+    "replaced_parameter",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->replaced_parameter());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstTemplateTypeParmType::replaced_parameter"),
+    nullptr,
+  },
+  {
+    "replacement_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->replacement_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstTemplateTypeParmType::replacement_type"),
+    nullptr,
+  },
+  {
+    "is_sugared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sugared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstTemplateTypeParmType::is_sugared"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -309,72 +375,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::SubstTemplateTypeParmType::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstTemplateTypeParmType::desugar"),
-    nullptr,
-  },
-  {
-    "associated_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->associated_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstTemplateTypeParmType::associated_declaration"),
-    nullptr,
-  },
-  {
-    "pack_index",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pack_index());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstTemplateTypeParmType::pack_index"),
-    nullptr,
-  },
-  {
-    "replaced_parameter",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->replaced_parameter());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstTemplateTypeParmType::replaced_parameter"),
-    nullptr,
-  },
-  {
-    "replacement_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->replacement_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstTemplateTypeParmType::replacement_type"),
-    nullptr,
-  },
-  {
-    "is_sugared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sugared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstTemplateTypeParmType::is_sugared"),
-    nullptr,
   },
   {}  // Sentinel.
 };

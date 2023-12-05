@@ -139,6 +139,172 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "num_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::num_arguments"),
+    nullptr,
+  },
+  {
+    "arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::arguments"),
+    nullptr,
+  },
+  {
+    "adl_call_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->adl_call_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::adl_call_kind"),
+    nullptr,
+  },
+  {
+    "call_return_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->call_return_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::call_return_type"),
+    nullptr,
+  },
+  {
+    "callee",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->callee());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::callee"),
+    nullptr,
+  },
+  {
+    "callee_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->callee_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::callee_declaration"),
+    nullptr,
+  },
+  {
+    "direct_callee",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->direct_callee());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::direct_callee"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::r_paren_token"),
+    nullptr,
+  },
+  {
+    "has_stored_fp_features",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_stored_fp_features());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::has_stored_fp_features"),
+    nullptr,
+  },
+  {
+    "has_unused_result_attribute",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_unused_result_attribute());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::has_unused_result_attribute"),
+    nullptr,
+  },
+  {
+    "is_builtin_assume_false",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_builtin_assume_false());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::is_builtin_assume_false"),
+    nullptr,
+  },
+  {
+    "is_call_to_std_move",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_call_to_std_move());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::is_call_to_std_move"),
+    nullptr,
+  },
+  {
+    "is_unevaluated_builtin_call",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_unevaluated_builtin_call());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::is_unevaluated_builtin_call"),
+    nullptr,
+  },
+  {
+    "uses_adl",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->uses_adl());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::uses_adl"),
+    nullptr,
+  },
+  {
+    "casted_return_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->casted_return_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::casted_return_type"),
+    nullptr,
+  },
+  {
+    "casted_return_value",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->casted_return_value());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::casted_return_value"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -373,172 +539,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::CallExpr::nth_argument"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "num_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::num_arguments"),
-    nullptr,
-  },
-  {
-    "arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::arguments"),
-    nullptr,
-  },
-  {
-    "adl_call_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->adl_call_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::adl_call_kind"),
-    nullptr,
-  },
-  {
-    "call_return_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->call_return_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::call_return_type"),
-    nullptr,
-  },
-  {
-    "callee",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->callee());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::callee"),
-    nullptr,
-  },
-  {
-    "callee_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->callee_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::callee_declaration"),
-    nullptr,
-  },
-  {
-    "direct_callee",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->direct_callee());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::direct_callee"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::r_paren_token"),
-    nullptr,
-  },
-  {
-    "has_stored_fp_features",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_stored_fp_features());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::has_stored_fp_features"),
-    nullptr,
-  },
-  {
-    "has_unused_result_attribute",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_unused_result_attribute());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::has_unused_result_attribute"),
-    nullptr,
-  },
-  {
-    "is_builtin_assume_false",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_builtin_assume_false());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::is_builtin_assume_false"),
-    nullptr,
-  },
-  {
-    "is_call_to_std_move",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_call_to_std_move());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::is_call_to_std_move"),
-    nullptr,
-  },
-  {
-    "is_unevaluated_builtin_call",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_unevaluated_builtin_call());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::is_unevaluated_builtin_call"),
-    nullptr,
-  },
-  {
-    "uses_adl",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->uses_adl());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::uses_adl"),
-    nullptr,
-  },
-  {
-    "casted_return_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->casted_return_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::casted_return_type"),
-    nullptr,
-  },
-  {
-    "casted_return_value",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->casted_return_value());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CallExpr::casted_return_value"),
-    nullptr,
   },
   {}  // Sentinel.
 };

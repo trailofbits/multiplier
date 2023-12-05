@@ -123,6 +123,232 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "desugar",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->desugar());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::desugar"),
+    nullptr,
+  },
+  {
+    "ellipsis_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->ellipsis_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::ellipsis_token"),
+    nullptr,
+  },
+  {
+    "exception_spec_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->exception_spec_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::exception_spec_declaration"),
+    nullptr,
+  },
+  {
+    "exception_spec_template",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->exception_spec_template());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::exception_spec_template"),
+    nullptr,
+  },
+  {
+    "exception_spec_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->exception_spec_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::exception_spec_type"),
+    nullptr,
+  },
+  {
+    "noexcept_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->noexcept_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::noexcept_expression"),
+    nullptr,
+  },
+  {
+    "num_parameter_types",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_parameter_types());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::num_parameter_types"),
+    nullptr,
+  },
+  {
+    "parameter_types",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parameter_types());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::parameter_types"),
+    nullptr,
+  },
+  {
+    "reference_qualifier",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->reference_qualifier());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::reference_qualifier"),
+    nullptr,
+  },
+  {
+    "has_dependent_exception_spec",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_dependent_exception_spec());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::has_dependent_exception_spec"),
+    nullptr,
+  },
+  {
+    "has_dynamic_exception_spec",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_dynamic_exception_spec());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::has_dynamic_exception_spec"),
+    nullptr,
+  },
+  {
+    "has_exception_spec",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_exception_spec());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::has_exception_spec"),
+    nullptr,
+  },
+  {
+    "has_ext_parameter_infos",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_ext_parameter_infos());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::has_ext_parameter_infos"),
+    nullptr,
+  },
+  {
+    "has_instantiation_dependent_exception_spec",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_instantiation_dependent_exception_spec());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::has_instantiation_dependent_exception_spec"),
+    nullptr,
+  },
+  {
+    "has_noexcept_exception_spec",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_noexcept_exception_spec());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::has_noexcept_exception_spec"),
+    nullptr,
+  },
+  {
+    "has_trailing_return",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_trailing_return());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::has_trailing_return"),
+    nullptr,
+  },
+  {
+    "is_nothrow",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_nothrow());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::is_nothrow"),
+    nullptr,
+  },
+  {
+    "is_sugared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sugared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::is_sugared"),
+    nullptr,
+  },
+  {
+    "is_template_variadic",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_template_variadic());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::is_template_variadic"),
+    nullptr,
+  },
+  {
+    "is_variadic",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_variadic());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::is_variadic"),
+    nullptr,
+  },
+  {
+    "num_exception_types",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_exception_types());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::num_exception_types"),
+    nullptr,
+  },
+  {
+    "exception_types",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->exception_types());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::exception_types"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -353,232 +579,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::FunctionProtoType::nth_exception_type"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::desugar"),
-    nullptr,
-  },
-  {
-    "ellipsis_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->ellipsis_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::ellipsis_token"),
-    nullptr,
-  },
-  {
-    "exception_spec_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->exception_spec_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::exception_spec_declaration"),
-    nullptr,
-  },
-  {
-    "exception_spec_template",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->exception_spec_template());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::exception_spec_template"),
-    nullptr,
-  },
-  {
-    "exception_spec_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->exception_spec_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::exception_spec_type"),
-    nullptr,
-  },
-  {
-    "noexcept_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->noexcept_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::noexcept_expression"),
-    nullptr,
-  },
-  {
-    "num_parameter_types",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_parameter_types());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::num_parameter_types"),
-    nullptr,
-  },
-  {
-    "parameter_types",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameter_types());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::parameter_types"),
-    nullptr,
-  },
-  {
-    "reference_qualifier",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->reference_qualifier());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::reference_qualifier"),
-    nullptr,
-  },
-  {
-    "has_dependent_exception_spec",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_dependent_exception_spec());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::has_dependent_exception_spec"),
-    nullptr,
-  },
-  {
-    "has_dynamic_exception_spec",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_dynamic_exception_spec());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::has_dynamic_exception_spec"),
-    nullptr,
-  },
-  {
-    "has_exception_spec",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_exception_spec());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::has_exception_spec"),
-    nullptr,
-  },
-  {
-    "has_ext_parameter_infos",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_ext_parameter_infos());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::has_ext_parameter_infos"),
-    nullptr,
-  },
-  {
-    "has_instantiation_dependent_exception_spec",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_instantiation_dependent_exception_spec());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::has_instantiation_dependent_exception_spec"),
-    nullptr,
-  },
-  {
-    "has_noexcept_exception_spec",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_noexcept_exception_spec());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::has_noexcept_exception_spec"),
-    nullptr,
-  },
-  {
-    "has_trailing_return",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_trailing_return());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::has_trailing_return"),
-    nullptr,
-  },
-  {
-    "is_nothrow",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_nothrow());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::is_nothrow"),
-    nullptr,
-  },
-  {
-    "is_sugared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sugared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::is_sugared"),
-    nullptr,
-  },
-  {
-    "is_template_variadic",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_template_variadic());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::is_template_variadic"),
-    nullptr,
-  },
-  {
-    "is_variadic",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_variadic());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::is_variadic"),
-    nullptr,
-  },
-  {
-    "num_exception_types",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_exception_types());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::num_exception_types"),
-    nullptr,
-  },
-  {
-    "exception_types",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->exception_types());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::exception_types"),
-    nullptr,
   },
   {}  // Sentinel.
 };

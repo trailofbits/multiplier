@@ -24,7 +24,7 @@ static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));
 
 class MX_EXPORT ModuleOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::BUILTIN_MODULE;
   }
 
@@ -46,7 +46,7 @@ static_assert(sizeof(ModuleOp) == sizeof(Operation));
 
 class MX_EXPORT UnrealizedConversionCastOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::BUILTIN_UNREALIZED_CONVERSION_CAST;
   }
 

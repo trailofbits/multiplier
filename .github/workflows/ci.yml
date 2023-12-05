@@ -61,8 +61,9 @@ jobs:
       - name: Install llvm-pasta
         run: |
           mkdir -p ${RELEASE_DIR}
+          mkdir -p ${LLVM_PREFIX_DIR}
           gh release download ${LLVM_PASTA_VER} --repo trail-of-forks/llvm-project --pattern 'llvm-*'
-          tar -xvJf llvm-pasta-*.tar.xz -C ${RELEASE_DIR}
+          tar -xvJf llvm-pasta-*.tar.xz -C ${LLVM_PREFIX_DIR}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

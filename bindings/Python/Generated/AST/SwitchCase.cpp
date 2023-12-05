@@ -127,6 +127,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "colon_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->colon_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchCase::colon_token"),
+    nullptr,
+  },
+  {
+    "keyword_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->keyword_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchCase::keyword_token"),
+    nullptr,
+  },
+  {
+    "next_switch_case",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->next_switch_case());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchCase::next_switch_case"),
+    nullptr,
+  },
+  {
+    "sub_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sub_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchCase::sub_statement"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -321,52 +367,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::SwitchCase::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "colon_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->colon_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchCase::colon_token"),
-    nullptr,
-  },
-  {
-    "keyword_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->keyword_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchCase::keyword_token"),
-    nullptr,
-  },
-  {
-    "next_switch_case",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->next_switch_case());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchCase::next_switch_case"),
-    nullptr,
-  },
-  {
-    "sub_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sub_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchCase::sub_statement"),
-    nullptr,
   },
   {}  // Sentinel.
 };

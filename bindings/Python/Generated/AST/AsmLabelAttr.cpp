@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "is_literal_label",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_literal_label());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmLabelAttr::is_literal_label"),
+    nullptr,
+  },
+  {
+    "label",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->label());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AsmLabelAttr::label"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,32 +351,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::AsmLabelAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "is_literal_label",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_literal_label());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmLabelAttr::is_literal_label"),
-    nullptr,
-  },
-  {
-    "label",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->label());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AsmLabelAttr::label"),
-    nullptr,
   },
   {}  // Sentinel.
 };

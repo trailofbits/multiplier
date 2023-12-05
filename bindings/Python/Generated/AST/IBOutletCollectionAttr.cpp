@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "interface",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->interface());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IBOutletCollectionAttr::interface"),
+    nullptr,
+  },
+  {
+    "interface_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->interface_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IBOutletCollectionAttr::interface_token"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,32 +351,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::IBOutletCollectionAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "interface",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->interface());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IBOutletCollectionAttr::interface"),
-    nullptr,
-  },
-  {
-    "interface_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->interface_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::IBOutletCollectionAttr::interface_token"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -123,6 +123,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "except_handler",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->except_handler());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SEHTryStmt::except_handler"),
+    nullptr,
+  },
+  {
+    "finally_handler",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->finally_handler());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SEHTryStmt::finally_handler"),
+    nullptr,
+  },
+  {
+    "handler",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->handler());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SEHTryStmt::handler"),
+    nullptr,
+  },
+  {
+    "is_cxx_try",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_cxx_try());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SEHTryStmt::is_cxx_try"),
+    nullptr,
+  },
+  {
+    "try_block",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->try_block());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SEHTryStmt::try_block"),
+    nullptr,
+  },
+  {
+    "try_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->try_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SEHTryStmt::try_token"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,72 +401,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::SEHTryStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "except_handler",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->except_handler());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SEHTryStmt::except_handler"),
-    nullptr,
-  },
-  {
-    "finally_handler",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->finally_handler());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SEHTryStmt::finally_handler"),
-    nullptr,
-  },
-  {
-    "handler",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->handler());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SEHTryStmt::handler"),
-    nullptr,
-  },
-  {
-    "is_cxx_try",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_cxx_try());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SEHTryStmt::is_cxx_try"),
-    nullptr,
-  },
-  {
-    "try_block",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->try_block());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SEHTryStmt::try_block"),
-    nullptr,
-  },
-  {
-    "try_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->try_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SEHTryStmt::try_token"),
-    nullptr,
   },
   {}  // Sentinel.
 };

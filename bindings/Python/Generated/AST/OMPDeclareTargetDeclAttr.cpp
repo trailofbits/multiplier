@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "dev_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->dev_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareTargetDeclAttr::dev_type"),
+    nullptr,
+  },
+  {
+    "indirect",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->indirect());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareTargetDeclAttr::indirect"),
+    nullptr,
+  },
+  {
+    "indirect_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->indirect_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareTargetDeclAttr::indirect_expression"),
+    nullptr,
+  },
+  {
+    "map_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->map_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareTargetDeclAttr::map_type"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,52 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::OMPDeclareTargetDeclAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "dev_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->dev_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareTargetDeclAttr::dev_type"),
-    nullptr,
-  },
-  {
-    "indirect",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->indirect());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareTargetDeclAttr::indirect"),
-    nullptr,
-  },
-  {
-    "indirect_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->indirect_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareTargetDeclAttr::indirect_expression"),
-    nullptr,
-  },
-  {
-    "map_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->map_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareTargetDeclAttr::map_type"),
-    nullptr,
   },
   {}  // Sentinel.
 };

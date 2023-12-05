@@ -77,7 +77,13 @@ if(MX_ENABLE_INSTALL)
   set(site_packages_dir "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_LIB_DIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages")
   
   # Make sure the `site-packages` directory exists in the installation directory.
-  install(DIRECTORY DESTINATION "${site_packages_dir}")
+  # This also copies over the stubs.
+  install(
+    DIRECTORY
+      "${CMAKE_CURRENT_LIST_DIR}/multiplier-stubs"
+    DESTINATION
+      "${site_packages_dir}/multiplier-stubs"
+  )
 
   # Do the install, which creates a symlink to our main `libmultiplier.so` target.
   # We rely on the following directory hierarchy:
@@ -89,8 +95,6 @@ if(MX_ENABLE_INSTALL)
   # `libmultiplier.so` shared library.
   install(
     CODE
-      "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"../../$<TARGET_FILE_NAME:multiplier>\" \"multiplier${python_module_extension}\" WORKING_DIRECTORY \"${site_packages_dir}\")")
-
-  # Now install the type stubs.
-  # TODO
+      "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"../../$<TARGET_FILE_NAME:multiplier>\" \"multiplier${python_module_extension}\" WORKING_DIRECTORY \"${site_packages_dir}\")"
+  )
 endif()

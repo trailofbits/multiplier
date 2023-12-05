@@ -28,7 +28,7 @@ static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));
 
 class MX_EXPORT BinLAndOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::CORE_BIN_LAND;
   }
 
@@ -46,7 +46,7 @@ static_assert(sizeof(BinLAndOp) == sizeof(Operation));
 
 class MX_EXPORT BinLOrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::CORE_BIN_LOR;
   }
 
@@ -64,7 +64,7 @@ static_assert(sizeof(BinLOrOp) == sizeof(Operation));
 
 class MX_EXPORT ImplicitReturnOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::CORE_IMPLICIT_RETURN;
   }
 
@@ -80,7 +80,7 @@ static_assert(sizeof(ImplicitReturnOp) == sizeof(Operation));
 
 class MX_EXPORT LazyOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::CORE_LAZY_OP;
   }
 
@@ -97,7 +97,7 @@ static_assert(sizeof(LazyOp) == sizeof(Operation));
 
 class MX_EXPORT ScopeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::CORE_SCOPE;
   }
 
@@ -113,7 +113,7 @@ static_assert(sizeof(ScopeOp) == sizeof(Operation));
 
 class MX_EXPORT SelectOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::CORE_SELECT;
   }
 

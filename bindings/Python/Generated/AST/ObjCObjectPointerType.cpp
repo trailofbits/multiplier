@@ -123,6 +123,222 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "desugar",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->desugar());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::desugar"),
+    nullptr,
+  },
+  {
+    "interface_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->interface_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::interface_declaration"),
+    nullptr,
+  },
+  {
+    "interface_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->interface_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::interface_type"),
+    nullptr,
+  },
+  {
+    "object_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->object_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::object_type"),
+    nullptr,
+  },
+  {
+    "pointee_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->pointee_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::pointee_type"),
+    nullptr,
+  },
+  {
+    "super_class_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->super_class_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::super_class_type"),
+    nullptr,
+  },
+  {
+    "num_type_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_type_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::num_type_arguments"),
+    nullptr,
+  },
+  {
+    "type_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::type_arguments"),
+    nullptr,
+  },
+  {
+    "type_arguments_as_written",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_arguments_as_written());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::type_arguments_as_written"),
+    nullptr,
+  },
+  {
+    "is_kind_of_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_kind_of_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::is_kind_of_type"),
+    nullptr,
+  },
+  {
+    "is_obj_c_id_or_class_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_obj_c_id_or_class_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::is_obj_c_id_or_class_type"),
+    nullptr,
+  },
+  {
+    "is_specialized",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_specialized());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::is_specialized"),
+    nullptr,
+  },
+  {
+    "is_specialized_as_written",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_specialized_as_written());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::is_specialized_as_written"),
+    nullptr,
+  },
+  {
+    "is_sugared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sugared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::is_sugared"),
+    nullptr,
+  },
+  {
+    "is_unspecialized",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_unspecialized());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::is_unspecialized"),
+    nullptr,
+  },
+  {
+    "is_unspecialized_as_written",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_unspecialized_as_written());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::is_unspecialized_as_written"),
+    nullptr,
+  },
+  {
+    "num_qualifiers",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_qualifiers());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::num_qualifiers"),
+    nullptr,
+  },
+  {
+    "qualifiers",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->qualifiers());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::qualifiers"),
+    nullptr,
+  },
+  {
+    "strip_obj_c_kind_of_type_and_qualifiers",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->strip_obj_c_kind_of_type_and_qualifiers());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::strip_obj_c_kind_of_type_and_qualifiers"),
+    nullptr,
+  },
+  {
+    "num_protocols",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_protocols());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::num_protocols"),
+    nullptr,
+  },
+  {
+    "protocols",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->protocols());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::protocols"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -375,222 +591,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::nth_protocol"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::desugar"),
-    nullptr,
-  },
-  {
-    "interface_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->interface_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::interface_declaration"),
-    nullptr,
-  },
-  {
-    "interface_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->interface_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::interface_type"),
-    nullptr,
-  },
-  {
-    "object_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->object_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::object_type"),
-    nullptr,
-  },
-  {
-    "pointee_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pointee_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::pointee_type"),
-    nullptr,
-  },
-  {
-    "super_class_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->super_class_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::super_class_type"),
-    nullptr,
-  },
-  {
-    "num_type_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_type_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::num_type_arguments"),
-    nullptr,
-  },
-  {
-    "type_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::type_arguments"),
-    nullptr,
-  },
-  {
-    "type_arguments_as_written",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_arguments_as_written());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::type_arguments_as_written"),
-    nullptr,
-  },
-  {
-    "is_kind_of_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_kind_of_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::is_kind_of_type"),
-    nullptr,
-  },
-  {
-    "is_obj_c_id_or_class_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_obj_c_id_or_class_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::is_obj_c_id_or_class_type"),
-    nullptr,
-  },
-  {
-    "is_specialized",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_specialized());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::is_specialized"),
-    nullptr,
-  },
-  {
-    "is_specialized_as_written",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_specialized_as_written());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::is_specialized_as_written"),
-    nullptr,
-  },
-  {
-    "is_sugared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sugared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::is_sugared"),
-    nullptr,
-  },
-  {
-    "is_unspecialized",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_unspecialized());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::is_unspecialized"),
-    nullptr,
-  },
-  {
-    "is_unspecialized_as_written",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_unspecialized_as_written());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::is_unspecialized_as_written"),
-    nullptr,
-  },
-  {
-    "num_qualifiers",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_qualifiers());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::num_qualifiers"),
-    nullptr,
-  },
-  {
-    "qualifiers",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->qualifiers());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::qualifiers"),
-    nullptr,
-  },
-  {
-    "strip_obj_c_kind_of_type_and_qualifiers",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->strip_obj_c_kind_of_type_and_qualifiers());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::strip_obj_c_kind_of_type_and_qualifiers"),
-    nullptr,
-  },
-  {
-    "num_protocols",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_protocols());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::num_protocols"),
-    nullptr,
-  },
-  {
-    "protocols",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->protocols());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::protocols"),
-    nullptr,
   },
   {}  // Sentinel.
 };

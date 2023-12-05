@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "constructs_virtual_base",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->constructs_virtual_base());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXInheritedCtorInitExpr::constructs_virtual_base"),
+    nullptr,
+  },
+  {
+    "construction_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->construction_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXInheritedCtorInitExpr::construction_kind"),
+    nullptr,
+  },
+  {
+    "constructor",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->constructor());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXInheritedCtorInitExpr::constructor"),
+    nullptr,
+  },
+  {
+    "token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXInheritedCtorInitExpr::token"),
+    nullptr,
+  },
+  {
+    "inherited_from_virtual_base",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->inherited_from_virtual_base());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXInheritedCtorInitExpr::inherited_from_virtual_base"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,62 +391,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXInheritedCtorInitExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "constructs_virtual_base",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->constructs_virtual_base());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXInheritedCtorInitExpr::constructs_virtual_base"),
-    nullptr,
-  },
-  {
-    "construction_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->construction_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXInheritedCtorInitExpr::construction_kind"),
-    nullptr,
-  },
-  {
-    "constructor",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->constructor());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXInheritedCtorInitExpr::constructor"),
-    nullptr,
-  },
-  {
-    "token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXInheritedCtorInitExpr::token"),
-    nullptr,
-  },
-  {
-    "inherited_from_virtual_base",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->inherited_from_virtual_base());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXInheritedCtorInitExpr::inherited_from_virtual_base"),
-    nullptr,
   },
   {}  // Sentinel.
 };

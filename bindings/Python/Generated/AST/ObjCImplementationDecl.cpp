@@ -123,6 +123,132 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "instance_variable_l_brace_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->instance_variable_l_brace_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::instance_variable_l_brace_token"),
+    nullptr,
+  },
+  {
+    "instance_variable_r_brace_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->instance_variable_r_brace_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::instance_variable_r_brace_token"),
+    nullptr,
+  },
+  {
+    "obj_c_runtime_name_as_string",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->obj_c_runtime_name_as_string());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::obj_c_runtime_name_as_string"),
+    nullptr,
+  },
+  {
+    "super_class",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->super_class());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::super_class"),
+    nullptr,
+  },
+  {
+    "super_class_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->super_class_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::super_class_token"),
+    nullptr,
+  },
+  {
+    "has_destructors",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_destructors());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::has_destructors"),
+    nullptr,
+  },
+  {
+    "has_non_zero_constructors",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_non_zero_constructors());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::has_non_zero_constructors"),
+    nullptr,
+  },
+  {
+    "num_instance_variables",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_instance_variables());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::num_instance_variables"),
+    nullptr,
+  },
+  {
+    "instance_variables",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->instance_variables());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::instance_variables"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,132 +483,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::nth_instance_variable"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "instance_variable_l_brace_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instance_variable_l_brace_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::instance_variable_l_brace_token"),
-    nullptr,
-  },
-  {
-    "instance_variable_r_brace_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instance_variable_r_brace_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::instance_variable_r_brace_token"),
-    nullptr,
-  },
-  {
-    "obj_c_runtime_name_as_string",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->obj_c_runtime_name_as_string());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::obj_c_runtime_name_as_string"),
-    nullptr,
-  },
-  {
-    "super_class",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->super_class());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::super_class"),
-    nullptr,
-  },
-  {
-    "super_class_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->super_class_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::super_class_token"),
-    nullptr,
-  },
-  {
-    "has_destructors",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_destructors());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::has_destructors"),
-    nullptr,
-  },
-  {
-    "has_non_zero_constructors",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_non_zero_constructors());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::has_non_zero_constructors"),
-    nullptr,
-  },
-  {
-    "num_instance_variables",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_instance_variables());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::num_instance_variables"),
-    nullptr,
-  },
-  {
-    "instance_variables",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instance_variables());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCImplementationDecl::instance_variables"),
-    nullptr,
   },
   {}  // Sentinel.
 };

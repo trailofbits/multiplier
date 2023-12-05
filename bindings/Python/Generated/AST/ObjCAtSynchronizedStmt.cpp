@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "at_synchronized_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->at_synchronized_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCAtSynchronizedStmt::at_synchronized_token"),
+    nullptr,
+  },
+  {
+    "synch_body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->synch_body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCAtSynchronizedStmt::synch_body"),
+    nullptr,
+  },
+  {
+    "synch_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->synch_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCAtSynchronizedStmt::synch_expression"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,42 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ObjCAtSynchronizedStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "at_synchronized_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->at_synchronized_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCAtSynchronizedStmt::at_synchronized_token"),
-    nullptr,
-  },
-  {
-    "synch_body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->synch_body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCAtSynchronizedStmt::synch_body"),
-    nullptr,
-  },
-  {
-    "synch_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->synch_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCAtSynchronizedStmt::synch_expression"),
-    nullptr,
   },
   {}  // Sentinel.
 };

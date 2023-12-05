@@ -1043,7 +1043,7 @@ void CodeGenerator::RunOnOps(void) {
       hpp
           << "class MX_EXPORT " << op_name << " final : public Operation {\n"
           << " public:\n"
-          << "  inline static OperationKind static_kind(void) {\n"
+          << "  inline static constexpr OperationKind static_kind(void) {\n"
           << "    return OperationKind::" << enum_name
           << ";\n"
           << "  }\n\n"

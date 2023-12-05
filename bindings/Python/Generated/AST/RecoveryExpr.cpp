@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "num_sub_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_sub_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::RecoveryExpr::num_sub_expressions"),
+    nullptr,
+  },
+  {
+    "sub_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sub_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::RecoveryExpr::sub_expressions"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,32 +383,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::RecoveryExpr::nth_sub_expression"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "num_sub_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_sub_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RecoveryExpr::num_sub_expressions"),
-    nullptr,
-  },
-  {
-    "sub_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sub_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RecoveryExpr::sub_expressions"),
-    nullptr,
   },
   {}  // Sentinel.
 };

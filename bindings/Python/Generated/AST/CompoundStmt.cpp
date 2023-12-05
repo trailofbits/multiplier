@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "left_brace_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->left_brace_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CompoundStmt::left_brace_token"),
+    nullptr,
+  },
+  {
+    "right_brace_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->right_brace_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CompoundStmt::right_brace_token"),
+    nullptr,
+  },
+  {
+    "statement_expression_result",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->statement_expression_result());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CompoundStmt::statement_expression_result"),
+    nullptr,
+  },
+  {
+    "has_stored_fp_features",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_stored_fp_features());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CompoundStmt::has_stored_fp_features"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,52 +381,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CompoundStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "left_brace_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->left_brace_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CompoundStmt::left_brace_token"),
-    nullptr,
-  },
-  {
-    "right_brace_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->right_brace_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CompoundStmt::right_brace_token"),
-    nullptr,
-  },
-  {
-    "statement_expression_result",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->statement_expression_result());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CompoundStmt::statement_expression_result"),
-    nullptr,
-  },
-  {
-    "has_stored_fp_features",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_stored_fp_features());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CompoundStmt::has_stored_fp_features"),
-    nullptr,
   },
   {}  // Sentinel.
 };

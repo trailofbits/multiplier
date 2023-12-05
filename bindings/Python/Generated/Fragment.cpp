@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1272]) || tp >= &(gTypes[1273])) {
+  if (tp < &(gTypes[1435]) || tp >= &(gTypes[1436])) {
     return std::nullopt;
   }
 
@@ -109,6 +109,102 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
   return true;
 }
+
+namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "parent",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parent());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Fragment::parent"),
+    nullptr,
+  },
+  {
+    "parent_id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parent_id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Fragment::parent_id"),
+    nullptr,
+  },
+  {
+    "id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Fragment::id"),
+    nullptr,
+  },
+  {
+    "compilation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->compilation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Fragment::compilation"),
+    nullptr,
+  },
+  {
+    "file_tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->file_tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Fragment::file_tokens"),
+    nullptr,
+  },
+  {
+    "parsed_tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parsed_tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Fragment::parsed_tokens"),
+    nullptr,
+  },
+  {
+    "nested_fragments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->nested_fragments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Fragment::nested_fragments"),
+    nullptr,
+  },
+  {
+    "top_level_declarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->top_level_declarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Fragment::top_level_declarations"),
+    nullptr,
+  },
+  {
+    "preprocessed_code",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->preprocessed_code());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Fragment::preprocessed_code"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
 
 namespace {
 static PyMethodDef gMethods[] = {
@@ -275,105 +371,9 @@ static PyMethodDef gMethods[] = {
 }  // namespace
 
 namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "parent",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parent());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Fragment::parent"),
-    nullptr,
-  },
-  {
-    "parent_id",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parent_id());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Fragment::parent_id"),
-    nullptr,
-  },
-  {
-    "id",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->id());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Fragment::id"),
-    nullptr,
-  },
-  {
-    "compilation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->compilation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Fragment::compilation"),
-    nullptr,
-  },
-  {
-    "file_tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->file_tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Fragment::file_tokens"),
-    nullptr,
-  },
-  {
-    "parsed_tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parsed_tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Fragment::parsed_tokens"),
-    nullptr,
-  },
-  {
-    "nested_fragments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->nested_fragments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Fragment::nested_fragments"),
-    nullptr,
-  },
-  {
-    "top_level_declarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->top_level_declarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Fragment::top_level_declarations"),
-    nullptr,
-  },
-  {
-    "preprocessed_code",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->preprocessed_code());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Fragment::preprocessed_code"),
-    nullptr,
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1272]);
+  PyTypeObject * const tp = &(gTypes[1435]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

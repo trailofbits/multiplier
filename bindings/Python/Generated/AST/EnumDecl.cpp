@@ -123,6 +123,202 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "num_enumerators",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_enumerators());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::num_enumerators"),
+    nullptr,
+  },
+  {
+    "enumerators",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->enumerators());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::enumerators"),
+    nullptr,
+  },
+  {
+    "instantiated_from_member_enum",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->instantiated_from_member_enum());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::instantiated_from_member_enum"),
+    nullptr,
+  },
+  {
+    "integer_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->integer_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::integer_type"),
+    nullptr,
+  },
+  {
+    "integer_type_range",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->integer_type_range());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::integer_type_range"),
+    nullptr,
+  },
+  {
+    "odr_hash",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->odr_hash());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::odr_hash"),
+    nullptr,
+  },
+  {
+    "promotion_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->promotion_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::promotion_type"),
+    nullptr,
+  },
+  {
+    "template_instantiation_pattern",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_instantiation_pattern());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::template_instantiation_pattern"),
+    nullptr,
+  },
+  {
+    "template_specialization_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_specialization_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::template_specialization_kind"),
+    nullptr,
+  },
+  {
+    "is_closed",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_closed());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::is_closed"),
+    nullptr,
+  },
+  {
+    "is_closed_flag",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_closed_flag());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::is_closed_flag"),
+    nullptr,
+  },
+  {
+    "is_closed_non_flag",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_closed_non_flag());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::is_closed_non_flag"),
+    nullptr,
+  },
+  {
+    "is_complete",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_complete());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::is_complete"),
+    nullptr,
+  },
+  {
+    "is_fixed",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_fixed());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::is_fixed"),
+    nullptr,
+  },
+  {
+    "is_scoped",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_scoped());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::is_scoped"),
+    nullptr,
+  },
+  {
+    "is_scoped_using_class_tag",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_scoped_using_class_tag());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::EnumDecl::is_scoped_using_class_tag"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,202 +553,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::EnumDecl::nth_enumerator"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "num_enumerators",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_enumerators());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::num_enumerators"),
-    nullptr,
-  },
-  {
-    "enumerators",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->enumerators());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::enumerators"),
-    nullptr,
-  },
-  {
-    "instantiated_from_member_enum",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instantiated_from_member_enum());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::instantiated_from_member_enum"),
-    nullptr,
-  },
-  {
-    "integer_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->integer_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::integer_type"),
-    nullptr,
-  },
-  {
-    "integer_type_range",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->integer_type_range());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::integer_type_range"),
-    nullptr,
-  },
-  {
-    "odr_hash",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->odr_hash());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::odr_hash"),
-    nullptr,
-  },
-  {
-    "promotion_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->promotion_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::promotion_type"),
-    nullptr,
-  },
-  {
-    "template_instantiation_pattern",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_instantiation_pattern());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::template_instantiation_pattern"),
-    nullptr,
-  },
-  {
-    "template_specialization_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_specialization_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::template_specialization_kind"),
-    nullptr,
-  },
-  {
-    "is_closed",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_closed());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::is_closed"),
-    nullptr,
-  },
-  {
-    "is_closed_flag",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_closed_flag());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::is_closed_flag"),
-    nullptr,
-  },
-  {
-    "is_closed_non_flag",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_closed_non_flag());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::is_closed_non_flag"),
-    nullptr,
-  },
-  {
-    "is_complete",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_complete());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::is_complete"),
-    nullptr,
-  },
-  {
-    "is_fixed",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_fixed());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::is_fixed"),
-    nullptr,
-  },
-  {
-    "is_scoped",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_scoped());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::is_scoped"),
-    nullptr,
-  },
-  {
-    "is_scoped_using_class_tag",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_scoped_using_class_tag());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::is_scoped_using_class_tag"),
-    nullptr,
   },
   {}  // Sentinel.
 };

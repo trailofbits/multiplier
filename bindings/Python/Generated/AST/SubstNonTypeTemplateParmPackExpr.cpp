@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "associated_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->associated_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmPackExpr::associated_declaration"),
+    nullptr,
+  },
+  {
+    "parameter_pack",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parameter_pack());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmPackExpr::parameter_pack"),
+    nullptr,
+  },
+  {
+    "parameter_pack_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parameter_pack_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmPackExpr::parameter_pack_token"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,42 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmPackExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "associated_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->associated_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmPackExpr::associated_declaration"),
-    nullptr,
-  },
-  {
-    "parameter_pack",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameter_pack());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmPackExpr::parameter_pack"),
-    nullptr,
-  },
-  {
-    "parameter_pack_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameter_pack_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SubstNonTypeTemplateParmPackExpr::parameter_pack_token"),
-    nullptr,
   },
   {}  // Sentinel.
 };

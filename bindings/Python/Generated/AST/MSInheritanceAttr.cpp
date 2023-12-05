@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "best_case",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->best_case());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSInheritanceAttr::best_case"),
+    nullptr,
+  },
+  {
+    "inheritance_model",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->inheritance_model());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSInheritanceAttr::inheritance_model"),
+    nullptr,
+  },
+  {
+    "semantic_spelling",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->semantic_spelling());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSInheritanceAttr::semantic_spelling"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,42 +361,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::MSInheritanceAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "best_case",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->best_case());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSInheritanceAttr::best_case"),
-    nullptr,
-  },
-  {
-    "inheritance_model",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->inheritance_model());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSInheritanceAttr::inheritance_model"),
-    nullptr,
-  },
-  {
-    "semantic_spelling",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->semantic_spelling());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSInheritanceAttr::semantic_spelling"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "operator_",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXOperatorCallExpr::operator_"),
+    nullptr,
+  },
+  {
+    "operator_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXOperatorCallExpr::operator_token"),
+    nullptr,
+  },
+  {
+    "is_assignment_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_assignment_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXOperatorCallExpr::is_assignment_operation"),
+    nullptr,
+  },
+  {
+    "is_comparison_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_comparison_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXOperatorCallExpr::is_comparison_operation"),
+    nullptr,
+  },
+  {
+    "is_infix_binary_operation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_infix_binary_operation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXOperatorCallExpr::is_infix_binary_operation"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,62 +391,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXOperatorCallExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "operator_",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXOperatorCallExpr::operator_"),
-    nullptr,
-  },
-  {
-    "operator_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXOperatorCallExpr::operator_token"),
-    nullptr,
-  },
-  {
-    "is_assignment_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_assignment_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXOperatorCallExpr::is_assignment_operation"),
-    nullptr,
-  },
-  {
-    "is_comparison_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_comparison_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXOperatorCallExpr::is_comparison_operation"),
-    nullptr,
-  },
-  {
-    "is_infix_binary_operation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_infix_binary_operation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXOperatorCallExpr::is_infix_binary_operation"),
-    nullptr,
   },
   {}  // Sentinel.
 };

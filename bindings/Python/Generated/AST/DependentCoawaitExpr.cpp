@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "keyword_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->keyword_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentCoawaitExpr::keyword_token"),
+    nullptr,
+  },
+  {
+    "operand",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operand());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentCoawaitExpr::operand"),
+    nullptr,
+  },
+  {
+    "operator_coawait_lookup",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_coawait_lookup());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DependentCoawaitExpr::operator_coawait_lookup"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,42 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::DependentCoawaitExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "keyword_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->keyword_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentCoawaitExpr::keyword_token"),
-    nullptr,
-  },
-  {
-    "operand",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operand());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentCoawaitExpr::operand"),
-    nullptr,
-  },
-  {
-    "operator_coawait_lookup",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_coawait_lookup());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DependentCoawaitExpr::operator_coawait_lookup"),
-    nullptr,
   },
   {}  // Sentinel.
 };

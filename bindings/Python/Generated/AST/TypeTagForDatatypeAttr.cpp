@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "layout_compatible",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->layout_compatible());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypeTagForDatatypeAttr::layout_compatible"),
+    nullptr,
+  },
+  {
+    "matching_c_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->matching_c_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypeTagForDatatypeAttr::matching_c_type"),
+    nullptr,
+  },
+  {
+    "matching_c_type_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->matching_c_type_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypeTagForDatatypeAttr::matching_c_type_token"),
+    nullptr,
+  },
+  {
+    "must_be_null",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->must_be_null());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TypeTagForDatatypeAttr::must_be_null"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,52 +371,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::TypeTagForDatatypeAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "layout_compatible",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->layout_compatible());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypeTagForDatatypeAttr::layout_compatible"),
-    nullptr,
-  },
-  {
-    "matching_c_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->matching_c_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypeTagForDatatypeAttr::matching_c_type"),
-    nullptr,
-  },
-  {
-    "matching_c_type_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->matching_c_type_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypeTagForDatatypeAttr::matching_c_type_token"),
-    nullptr,
-  },
-  {
-    "must_be_null",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->must_be_null());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TypeTagForDatatypeAttr::must_be_null"),
-    nullptr,
   },
   {}  // Sentinel.
 };

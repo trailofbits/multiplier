@@ -123,6 +123,192 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "children_excl_body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->children_excl_body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::children_excl_body"),
+    nullptr,
+  },
+  {
+    "allocate",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->allocate());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::allocate"),
+    nullptr,
+  },
+  {
+    "body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::body"),
+    nullptr,
+  },
+  {
+    "deallocate",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->deallocate());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::deallocate"),
+    nullptr,
+  },
+  {
+    "exception_handler",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->exception_handler());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::exception_handler"),
+    nullptr,
+  },
+  {
+    "fallthrough_handler",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->fallthrough_handler());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::fallthrough_handler"),
+    nullptr,
+  },
+  {
+    "final_suspend_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->final_suspend_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::final_suspend_statement"),
+    nullptr,
+  },
+  {
+    "initializer_suspend_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer_suspend_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::initializer_suspend_statement"),
+    nullptr,
+  },
+  {
+    "num_parameter_moves",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_parameter_moves());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::num_parameter_moves"),
+    nullptr,
+  },
+  {
+    "parameter_moves",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parameter_moves());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::parameter_moves"),
+    nullptr,
+  },
+  {
+    "promise_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->promise_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::promise_declaration"),
+    nullptr,
+  },
+  {
+    "promise_declaration_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->promise_declaration_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::promise_declaration_statement"),
+    nullptr,
+  },
+  {
+    "result_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->result_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::result_declaration"),
+    nullptr,
+  },
+  {
+    "return_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->return_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::return_statement"),
+    nullptr,
+  },
+  {
+    "return_statement_on_alloc_failure",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->return_statement_on_alloc_failure());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::return_statement_on_alloc_failure"),
+    nullptr,
+  },
+  {
+    "return_value",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->return_value());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::return_value"),
+    nullptr,
+  },
+  {
+    "return_value_initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->return_value_initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::return_value_initializer"),
+    nullptr,
+  },
+  {
+    "has_dependent_promise_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_dependent_promise_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::has_dependent_promise_type"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,192 +543,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::nth_parameter_move"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "children_excl_body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->children_excl_body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::children_excl_body"),
-    nullptr,
-  },
-  {
-    "allocate",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->allocate());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::allocate"),
-    nullptr,
-  },
-  {
-    "body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::body"),
-    nullptr,
-  },
-  {
-    "deallocate",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->deallocate());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::deallocate"),
-    nullptr,
-  },
-  {
-    "exception_handler",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->exception_handler());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::exception_handler"),
-    nullptr,
-  },
-  {
-    "fallthrough_handler",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->fallthrough_handler());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::fallthrough_handler"),
-    nullptr,
-  },
-  {
-    "final_suspend_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->final_suspend_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::final_suspend_statement"),
-    nullptr,
-  },
-  {
-    "initializer_suspend_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializer_suspend_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::initializer_suspend_statement"),
-    nullptr,
-  },
-  {
-    "num_parameter_moves",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_parameter_moves());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::num_parameter_moves"),
-    nullptr,
-  },
-  {
-    "parameter_moves",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameter_moves());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::parameter_moves"),
-    nullptr,
-  },
-  {
-    "promise_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->promise_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::promise_declaration"),
-    nullptr,
-  },
-  {
-    "promise_declaration_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->promise_declaration_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::promise_declaration_statement"),
-    nullptr,
-  },
-  {
-    "result_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->result_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::result_declaration"),
-    nullptr,
-  },
-  {
-    "return_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->return_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::return_statement"),
-    nullptr,
-  },
-  {
-    "return_statement_on_alloc_failure",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->return_statement_on_alloc_failure());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::return_statement_on_alloc_failure"),
-    nullptr,
-  },
-  {
-    "return_value",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->return_value());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::return_value"),
-    nullptr,
-  },
-  {
-    "return_value_initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->return_value_initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::return_value_initializer"),
-    nullptr,
-  },
-  {
-    "has_dependent_promise_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_dependent_promise_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::has_dependent_promise_type"),
-    nullptr,
   },
   {}  // Sentinel.
 };

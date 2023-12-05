@@ -127,6 +127,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "l_angle_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->l_angle_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OverloadExpr::l_angle_token"),
+    nullptr,
+  },
+  {
+    "name_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->name_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OverloadExpr::name_token"),
+    nullptr,
+  },
+  {
+    "naming_class",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->naming_class());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OverloadExpr::naming_class"),
+    nullptr,
+  },
+  {
+    "r_angle_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_angle_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OverloadExpr::r_angle_token"),
+    nullptr,
+  },
+  {
+    "template_keyword_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_keyword_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OverloadExpr::template_keyword_token"),
+    nullptr,
+  },
+  {
+    "has_explicit_template_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_explicit_template_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OverloadExpr::has_explicit_template_arguments"),
+    nullptr,
+  },
+  {
+    "has_template_keyword",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_template_keyword());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OverloadExpr::has_template_keyword"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -321,82 +397,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::OverloadExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "l_angle_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->l_angle_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OverloadExpr::l_angle_token"),
-    nullptr,
-  },
-  {
-    "name_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->name_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OverloadExpr::name_token"),
-    nullptr,
-  },
-  {
-    "naming_class",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->naming_class());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OverloadExpr::naming_class"),
-    nullptr,
-  },
-  {
-    "r_angle_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_angle_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OverloadExpr::r_angle_token"),
-    nullptr,
-  },
-  {
-    "template_keyword_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_keyword_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OverloadExpr::template_keyword_token"),
-    nullptr,
-  },
-  {
-    "has_explicit_template_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_explicit_template_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OverloadExpr::has_explicit_template_arguments"),
-    nullptr,
-  },
-  {
-    "has_template_keyword",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_template_keyword());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OverloadExpr::has_template_keyword"),
-    nullptr,
   },
   {}  // Sentinel.
 };

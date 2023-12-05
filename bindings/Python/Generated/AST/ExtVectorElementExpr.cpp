@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "contains_duplicate_elements",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->contains_duplicate_elements());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExtVectorElementExpr::contains_duplicate_elements"),
+    nullptr,
+  },
+  {
+    "accessor_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->accessor_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExtVectorElementExpr::accessor_token"),
+    nullptr,
+  },
+  {
+    "base",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExtVectorElementExpr::base"),
+    nullptr,
+  },
+  {
+    "is_arrow",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_arrow());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExtVectorElementExpr::is_arrow"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,52 +381,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ExtVectorElementExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "contains_duplicate_elements",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->contains_duplicate_elements());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ExtVectorElementExpr::contains_duplicate_elements"),
-    nullptr,
-  },
-  {
-    "accessor_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->accessor_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ExtVectorElementExpr::accessor_token"),
-    nullptr,
-  },
-  {
-    "base",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ExtVectorElementExpr::base"),
-    nullptr,
-  },
-  {
-    "is_arrow",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_arrow());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ExtVectorElementExpr::is_arrow"),
-    nullptr,
   },
   {}  // Sentinel.
 };

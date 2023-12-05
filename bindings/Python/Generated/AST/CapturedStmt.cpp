@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "captured_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->captured_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CapturedStmt::captured_declaration"),
+    nullptr,
+  },
+  {
+    "captured_record_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->captured_record_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CapturedStmt::captured_record_declaration"),
+    nullptr,
+  },
+  {
+    "captured_region_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->captured_region_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CapturedStmt::captured_region_kind"),
+    nullptr,
+  },
+  {
+    "captured_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->captured_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CapturedStmt::captured_statement"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,52 +381,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CapturedStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "captured_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->captured_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CapturedStmt::captured_declaration"),
-    nullptr,
-  },
-  {
-    "captured_record_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->captured_record_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CapturedStmt::captured_record_declaration"),
-    nullptr,
-  },
-  {
-    "captured_region_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->captured_region_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CapturedStmt::captured_region_kind"),
-    nullptr,
-  },
-  {
-    "captured_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->captured_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CapturedStmt::captured_statement"),
-    nullptr,
   },
   {}  // Sentinel.
 };

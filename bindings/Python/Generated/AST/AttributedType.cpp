@@ -123,6 +123,122 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "desugar",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->desugar());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedType::desugar"),
+    nullptr,
+  },
+  {
+    "attribute",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->attribute());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedType::attribute"),
+    nullptr,
+  },
+  {
+    "attribute_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->attribute_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedType::attribute_kind"),
+    nullptr,
+  },
+  {
+    "equivalent_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->equivalent_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedType::equivalent_type"),
+    nullptr,
+  },
+  {
+    "modified_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->modified_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedType::modified_type"),
+    nullptr,
+  },
+  {
+    "has_attribute",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_attribute());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedType::has_attribute"),
+    nullptr,
+  },
+  {
+    "is_calling_conv",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_calling_conv());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedType::is_calling_conv"),
+    nullptr,
+  },
+  {
+    "is_ms_type_spec",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_ms_type_spec());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedType::is_ms_type_spec"),
+    nullptr,
+  },
+  {
+    "is_qualifier",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_qualifier());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedType::is_qualifier"),
+    nullptr,
+  },
+  {
+    "is_sugared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_sugared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedType::is_sugared"),
+    nullptr,
+  },
+  {
+    "is_web_assembly_funcref_spec",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_web_assembly_funcref_spec());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AttributedType::is_web_assembly_funcref_spec"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -309,122 +425,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::AttributedType::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedType::desugar"),
-    nullptr,
-  },
-  {
-    "attribute",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->attribute());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedType::attribute"),
-    nullptr,
-  },
-  {
-    "attribute_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->attribute_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedType::attribute_kind"),
-    nullptr,
-  },
-  {
-    "equivalent_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->equivalent_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedType::equivalent_type"),
-    nullptr,
-  },
-  {
-    "modified_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->modified_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedType::modified_type"),
-    nullptr,
-  },
-  {
-    "has_attribute",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_attribute());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedType::has_attribute"),
-    nullptr,
-  },
-  {
-    "is_calling_conv",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_calling_conv());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedType::is_calling_conv"),
-    nullptr,
-  },
-  {
-    "is_ms_type_spec",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_ms_type_spec());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedType::is_ms_type_spec"),
-    nullptr,
-  },
-  {
-    "is_qualifier",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_qualifier());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedType::is_qualifier"),
-    nullptr,
-  },
-  {
-    "is_sugared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_sugared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedType::is_sugared"),
-    nullptr,
-  },
-  {
-    "is_web_assembly_funcref_spec",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_web_assembly_funcref_spec());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AttributedType::is_web_assembly_funcref_spec"),
-    nullptr,
   },
   {}  // Sentinel.
 };

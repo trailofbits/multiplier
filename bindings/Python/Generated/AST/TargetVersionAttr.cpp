@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TargetVersionAttr::name"),
+    nullptr,
+  },
+  {
+    "names_string",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->names_string());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TargetVersionAttr::names_string"),
+    nullptr,
+  },
+  {
+    "is_default_version",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_default_version());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TargetVersionAttr::is_default_version"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,42 +361,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::TargetVersionAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "name",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->name());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TargetVersionAttr::name"),
-    nullptr,
-  },
-  {
-    "names_string",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->names_string());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TargetVersionAttr::names_string"),
-    nullptr,
-  },
-  {
-    "is_default_version",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_default_version());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TargetVersionAttr::is_default_version"),
-    nullptr,
   },
   {}  // Sentinel.
 };

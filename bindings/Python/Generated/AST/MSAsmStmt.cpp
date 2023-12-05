@@ -123,6 +123,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "all_constraints",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->all_constraints());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSAsmStmt::all_constraints"),
+    nullptr,
+  },
+  {
+    "num_all_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_all_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSAsmStmt::num_all_expressions"),
+    nullptr,
+  },
+  {
+    "all_expressions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->all_expressions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSAsmStmt::all_expressions"),
+    nullptr,
+  },
+  {
+    "assembly_string",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->assembly_string());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSAsmStmt::assembly_string"),
+    nullptr,
+  },
+  {
+    "l_brace_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->l_brace_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSAsmStmt::l_brace_token"),
+    nullptr,
+  },
+  {
+    "has_braces",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_braces());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSAsmStmt::has_braces"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,72 +423,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::MSAsmStmt::nth_all_expression"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "all_constraints",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->all_constraints());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSAsmStmt::all_constraints"),
-    nullptr,
-  },
-  {
-    "num_all_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_all_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSAsmStmt::num_all_expressions"),
-    nullptr,
-  },
-  {
-    "all_expressions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->all_expressions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSAsmStmt::all_expressions"),
-    nullptr,
-  },
-  {
-    "assembly_string",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->assembly_string());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSAsmStmt::assembly_string"),
-    nullptr,
-  },
-  {
-    "l_brace_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->l_brace_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSAsmStmt::l_brace_token"),
-    nullptr,
-  },
-  {
-    "has_braces",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_braces());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSAsmStmt::has_braces"),
-    nullptr,
   },
   {}  // Sentinel.
 };

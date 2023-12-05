@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "branch_state",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->branch_state());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareSimdDeclAttr::branch_state"),
+    nullptr,
+  },
+  {
+    "simdlen",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->simdlen());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareSimdDeclAttr::simdlen"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,32 +351,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::OMPDeclareSimdDeclAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "branch_state",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->branch_state());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareSimdDeclAttr::branch_state"),
-    nullptr,
-  },
-  {
-    "simdlen",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->simdlen());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareSimdDeclAttr::simdlen"),
-    nullptr,
   },
   {}  // Sentinel.
 };

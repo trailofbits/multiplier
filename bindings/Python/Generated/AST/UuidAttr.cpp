@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "guid",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->guid());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UuidAttr::guid"),
+    nullptr,
+  },
+  {
+    "guid_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->guid_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UuidAttr::guid_declaration"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,32 +351,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::UuidAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "guid",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->guid());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UuidAttr::guid"),
-    nullptr,
-  },
-  {
-    "guid_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->guid_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UuidAttr::guid_declaration"),
-    nullptr,
   },
   {}  // Sentinel.
 };

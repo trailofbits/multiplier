@@ -403,6 +403,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "associated_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->associated_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPExecutableDirective::associated_statement"),
+    nullptr,
+  },
+  {
+    "innermost_captured_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->innermost_captured_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPExecutableDirective::innermost_captured_statement"),
+    nullptr,
+  },
+  {
+    "raw_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->raw_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPExecutableDirective::raw_statement"),
+    nullptr,
+  },
+  {
+    "structured_block",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->structured_block());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPExecutableDirective::structured_block"),
+    nullptr,
+  },
+  {
+    "has_associated_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_associated_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPExecutableDirective::has_associated_statement"),
+    nullptr,
+  },
+  {
+    "is_standalone_directive",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_standalone_directive());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPExecutableDirective::is_standalone_directive"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -597,72 +663,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::OMPExecutableDirective::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "associated_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->associated_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPExecutableDirective::associated_statement"),
-    nullptr,
-  },
-  {
-    "innermost_captured_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->innermost_captured_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPExecutableDirective::innermost_captured_statement"),
-    nullptr,
-  },
-  {
-    "raw_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->raw_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPExecutableDirective::raw_statement"),
-    nullptr,
-  },
-  {
-    "structured_block",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->structured_block());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPExecutableDirective::structured_block"),
-    nullptr,
-  },
-  {
-    "has_associated_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_associated_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPExecutableDirective::has_associated_statement"),
-    nullptr,
-  },
-  {
-    "is_standalone_directive",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_standalone_directive());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPExecutableDirective::is_standalone_directive"),
-    nullptr,
   },
   {}  // Sentinel.
 };

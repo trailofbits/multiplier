@@ -123,6 +123,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "semantic_spelling",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->semantic_spelling());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TryAcquireCapabilityAttr::semantic_spelling"),
+    nullptr,
+  },
+  {
+    "success_value",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->success_value());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TryAcquireCapabilityAttr::success_value"),
+    nullptr,
+  },
+  {
+    "is_shared",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_shared());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TryAcquireCapabilityAttr::is_shared"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,42 +361,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::TryAcquireCapabilityAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "semantic_spelling",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->semantic_spelling());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TryAcquireCapabilityAttr::semantic_spelling"),
-    nullptr,
-  },
-  {
-    "success_value",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->success_value());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TryAcquireCapabilityAttr::success_value"),
-    nullptr,
-  },
-  {
-    "is_shared",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_shared());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TryAcquireCapabilityAttr::is_shared"),
-    nullptr,
   },
   {}  // Sentinel.
 };

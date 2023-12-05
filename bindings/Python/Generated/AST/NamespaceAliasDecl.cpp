@@ -123,6 +123,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "alias_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->alias_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::alias_token"),
+    nullptr,
+  },
+  {
+    "aliased_namespace",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->aliased_namespace());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::aliased_namespace"),
+    nullptr,
+  },
+  {
+    "namespace_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->namespace_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::namespace_token"),
+    nullptr,
+  },
+  {
+    "target_name_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->target_name_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::target_name_token"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,82 +411,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "alias_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->alias_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::alias_token"),
-    nullptr,
-  },
-  {
-    "aliased_namespace",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->aliased_namespace());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::aliased_namespace"),
-    nullptr,
-  },
-  {
-    "namespace_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->namespace_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::namespace_token"),
-    nullptr,
-  },
-  {
-    "target_name_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->target_name_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamespaceAliasDecl::target_name_token"),
-    nullptr,
   },
   {}  // Sentinel.
 };

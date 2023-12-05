@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "base",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPArrayShapingExpr::base"),
+    nullptr,
+  },
+  {
+    "num_dimensions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_dimensions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPArrayShapingExpr::num_dimensions"),
+    nullptr,
+  },
+  {
+    "dimensions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->dimensions());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPArrayShapingExpr::dimensions"),
+    nullptr,
+  },
+  {
+    "l_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->l_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPArrayShapingExpr::l_paren_token"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPArrayShapingExpr::r_paren_token"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,62 +413,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::OMPArrayShapingExpr::nth_dimension"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "base",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPArrayShapingExpr::base"),
-    nullptr,
-  },
-  {
-    "num_dimensions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_dimensions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPArrayShapingExpr::num_dimensions"),
-    nullptr,
-  },
-  {
-    "dimensions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->dimensions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPArrayShapingExpr::dimensions"),
-    nullptr,
-  },
-  {
-    "l_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->l_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPArrayShapingExpr::l_paren_token"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPArrayShapingExpr::r_paren_token"),
-    nullptr,
   },
   {}  // Sentinel.
 };

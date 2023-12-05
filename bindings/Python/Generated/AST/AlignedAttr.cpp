@@ -123,6 +123,122 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "alignment_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->alignment_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AlignedAttr::alignment_expression"),
+    nullptr,
+  },
+  {
+    "alignment_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->alignment_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AlignedAttr::alignment_type"),
+    nullptr,
+  },
+  {
+    "cached_alignment_value",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->cached_alignment_value());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AlignedAttr::cached_alignment_value"),
+    nullptr,
+  },
+  {
+    "semantic_spelling",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->semantic_spelling());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AlignedAttr::semantic_spelling"),
+    nullptr,
+  },
+  {
+    "is_alignas",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_alignas());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AlignedAttr::is_alignas"),
+    nullptr,
+  },
+  {
+    "is_alignment_dependent",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_alignment_dependent());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AlignedAttr::is_alignment_dependent"),
+    nullptr,
+  },
+  {
+    "is_alignment_error_dependent",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_alignment_error_dependent());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AlignedAttr::is_alignment_error_dependent"),
+    nullptr,
+  },
+  {
+    "is_alignment_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_alignment_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AlignedAttr::is_alignment_expression"),
+    nullptr,
+  },
+  {
+    "is_c11",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_c11());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AlignedAttr::is_c11"),
+    nullptr,
+  },
+  {
+    "is_declspec",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_declspec());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AlignedAttr::is_declspec"),
+    nullptr,
+  },
+  {
+    "is_gnu",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_gnu());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AlignedAttr::is_gnu"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,122 +441,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::AlignedAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "alignment_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->alignment_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AlignedAttr::alignment_expression"),
-    nullptr,
-  },
-  {
-    "alignment_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->alignment_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AlignedAttr::alignment_type"),
-    nullptr,
-  },
-  {
-    "cached_alignment_value",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->cached_alignment_value());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AlignedAttr::cached_alignment_value"),
-    nullptr,
-  },
-  {
-    "semantic_spelling",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->semantic_spelling());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AlignedAttr::semantic_spelling"),
-    nullptr,
-  },
-  {
-    "is_alignas",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_alignas());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AlignedAttr::is_alignas"),
-    nullptr,
-  },
-  {
-    "is_alignment_dependent",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_alignment_dependent());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AlignedAttr::is_alignment_dependent"),
-    nullptr,
-  },
-  {
-    "is_alignment_error_dependent",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_alignment_error_dependent());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AlignedAttr::is_alignment_error_dependent"),
-    nullptr,
-  },
-  {
-    "is_alignment_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_alignment_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AlignedAttr::is_alignment_expression"),
-    nullptr,
-  },
-  {
-    "is_c11",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_c11());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AlignedAttr::is_c11"),
-    nullptr,
-  },
-  {
-    "is_declspec",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_declspec());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AlignedAttr::is_declspec"),
-    nullptr,
-  },
-  {
-    "is_gnu",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_gnu());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AlignedAttr::is_gnu"),
-    nullptr,
   },
   {}  // Sentinel.
 };

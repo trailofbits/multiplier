@@ -123,6 +123,222 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "at_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->at_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::at_token"),
+    nullptr,
+  },
+  {
+    "getter_method_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->getter_method_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::getter_method_declaration"),
+    nullptr,
+  },
+  {
+    "getter_name_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->getter_name_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::getter_name_token"),
+    nullptr,
+  },
+  {
+    "l_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->l_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::l_paren_token"),
+    nullptr,
+  },
+  {
+    "property_implementation",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->property_implementation());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::property_implementation"),
+    nullptr,
+  },
+  {
+    "property_instance_variable_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->property_instance_variable_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::property_instance_variable_declaration"),
+    nullptr,
+  },
+  {
+    "query_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->query_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::query_kind"),
+    nullptr,
+  },
+  {
+    "setter_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->setter_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::setter_kind"),
+    nullptr,
+  },
+  {
+    "setter_method_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->setter_method_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::setter_method_declaration"),
+    nullptr,
+  },
+  {
+    "setter_name_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->setter_name_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::setter_name_token"),
+    nullptr,
+  },
+  {
+    "type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::type"),
+    nullptr,
+  },
+  {
+    "is_atomic",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_atomic());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::is_atomic"),
+    nullptr,
+  },
+  {
+    "is_class_property",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_class_property());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::is_class_property"),
+    nullptr,
+  },
+  {
+    "is_direct_property",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_direct_property());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::is_direct_property"),
+    nullptr,
+  },
+  {
+    "is_instance_property",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_instance_property());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::is_instance_property"),
+    nullptr,
+  },
+  {
+    "is_optional",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_optional());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::is_optional"),
+    nullptr,
+  },
+  {
+    "is_read_only",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_read_only());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::is_read_only"),
+    nullptr,
+  },
+  {
+    "is_retaining",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_retaining());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::is_retaining"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,222 +551,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "at_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->at_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::at_token"),
-    nullptr,
-  },
-  {
-    "getter_method_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->getter_method_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::getter_method_declaration"),
-    nullptr,
-  },
-  {
-    "getter_name_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->getter_name_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::getter_name_token"),
-    nullptr,
-  },
-  {
-    "l_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->l_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::l_paren_token"),
-    nullptr,
-  },
-  {
-    "property_implementation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->property_implementation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::property_implementation"),
-    nullptr,
-  },
-  {
-    "property_instance_variable_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->property_instance_variable_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::property_instance_variable_declaration"),
-    nullptr,
-  },
-  {
-    "query_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->query_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::query_kind"),
-    nullptr,
-  },
-  {
-    "setter_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->setter_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::setter_kind"),
-    nullptr,
-  },
-  {
-    "setter_method_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->setter_method_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::setter_method_declaration"),
-    nullptr,
-  },
-  {
-    "setter_name_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->setter_name_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::setter_name_token"),
-    nullptr,
-  },
-  {
-    "type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::type"),
-    nullptr,
-  },
-  {
-    "is_atomic",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_atomic());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::is_atomic"),
-    nullptr,
-  },
-  {
-    "is_class_property",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_class_property());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::is_class_property"),
-    nullptr,
-  },
-  {
-    "is_direct_property",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_direct_property());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::is_direct_property"),
-    nullptr,
-  },
-  {
-    "is_instance_property",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_instance_property());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::is_instance_property"),
-    nullptr,
-  },
-  {
-    "is_optional",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_optional());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::is_optional"),
-    nullptr,
-  },
-  {
-    "is_read_only",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_read_only());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::is_read_only"),
-    nullptr,
-  },
-  {
-    "is_retaining",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_retaining());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCPropertyDecl::is_retaining"),
-    nullptr,
   },
   {}  // Sentinel.
 };

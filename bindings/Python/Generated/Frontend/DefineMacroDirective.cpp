@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DefineMacroDirective::name"),
+    nullptr,
+  },
+  {
+    "body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DefineMacroDirective::body"),
+    nullptr,
+  },
+  {
+    "is_variadic",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_variadic());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DefineMacroDirective::is_variadic"),
+    nullptr,
+  },
+  {
+    "is_function_like",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_function_like());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DefineMacroDirective::is_function_like"),
+    nullptr,
+  },
+  {
+    "parameters",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parameters());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DefineMacroDirective::parameters"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -311,62 +367,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::DefineMacroDirective::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "name",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->name());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DefineMacroDirective::name"),
-    nullptr,
-  },
-  {
-    "body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DefineMacroDirective::body"),
-    nullptr,
-  },
-  {
-    "is_variadic",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_variadic());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DefineMacroDirective::is_variadic"),
-    nullptr,
-  },
-  {
-    "is_function_like",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_function_like());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DefineMacroDirective::is_function_like"),
-    nullptr,
-  },
-  {
-    "parameters",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameters());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DefineMacroDirective::parameters"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1273]) || tp >= &(gTypes[1274])) {
+  if (tp < &(gTypes[1436]) || tp >= &(gTypes[1437])) {
     return std::nullopt;
   }
 
@@ -109,6 +109,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
   return true;
 }
+
+namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "file_paths",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->file_paths());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Index::file_paths"),
+    nullptr,
+  },
+  {
+    "compilations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->compilations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Index::compilations"),
+    nullptr,
+  },
+  {
+    "files",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->files());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Index::files"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
 
 namespace {
 static PyMethodDef gMethods[] = {
@@ -715,45 +751,9 @@ static PyMethodDef gMethods[] = {
 }  // namespace
 
 namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "file_paths",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->file_paths());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Index::file_paths"),
-    nullptr,
-  },
-  {
-    "compilations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->compilations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Index::compilations"),
-    nullptr,
-  },
-  {
-    "files",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->files());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Index::files"),
-    nullptr,
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1273]);
+  PyTypeObject * const tp = &(gTypes[1436]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

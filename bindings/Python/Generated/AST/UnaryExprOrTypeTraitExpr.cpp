@@ -123,6 +123,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "argument_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->argument_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::argument_expression"),
+    nullptr,
+  },
+  {
+    "argument_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->argument_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::argument_type"),
+    nullptr,
+  },
+  {
+    "keyword_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->keyword_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::keyword_kind"),
+    nullptr,
+  },
+  {
+    "operator_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->operator_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::operator_token"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::r_paren_token"),
+    nullptr,
+  },
+  {
+    "type_of_argument",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_of_argument());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::type_of_argument"),
+    nullptr,
+  },
+  {
+    "is_argument_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_argument_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::is_argument_type"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,82 +411,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "argument_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->argument_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::argument_expression"),
-    nullptr,
-  },
-  {
-    "argument_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->argument_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::argument_type"),
-    nullptr,
-  },
-  {
-    "keyword_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->keyword_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::keyword_kind"),
-    nullptr,
-  },
-  {
-    "operator_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operator_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::operator_token"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::r_paren_token"),
-    nullptr,
-  },
-  {
-    "type_of_argument",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_of_argument());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::type_of_argument"),
-    nullptr,
-  },
-  {
-    "is_argument_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_argument_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UnaryExprOrTypeTraitExpr::is_argument_type"),
-    nullptr,
   },
   {}  // Sentinel.
 };

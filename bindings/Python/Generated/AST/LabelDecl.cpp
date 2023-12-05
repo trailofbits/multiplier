@@ -123,6 +123,92 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LabelDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LabelDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LabelDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "ms_assembly_label",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->ms_assembly_label());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LabelDecl::ms_assembly_label"),
+    nullptr,
+  },
+  {
+    "statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LabelDecl::statement"),
+    nullptr,
+  },
+  {
+    "is_gnu_local",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_gnu_local());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LabelDecl::is_gnu_local"),
+    nullptr,
+  },
+  {
+    "is_ms_assembly_label",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_ms_assembly_label());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LabelDecl::is_ms_assembly_label"),
+    nullptr,
+  },
+  {
+    "is_resolved_ms_assembly_label",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_resolved_ms_assembly_label());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LabelDecl::is_resolved_ms_assembly_label"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,92 +421,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::LabelDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LabelDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LabelDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LabelDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "ms_assembly_label",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->ms_assembly_label());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LabelDecl::ms_assembly_label"),
-    nullptr,
-  },
-  {
-    "statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LabelDecl::statement"),
-    nullptr,
-  },
-  {
-    "is_gnu_local",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_gnu_local());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LabelDecl::is_gnu_local"),
-    nullptr,
-  },
-  {
-    "is_ms_assembly_label",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_ms_assembly_label());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LabelDecl::is_ms_assembly_label"),
-    nullptr,
-  },
-  {
-    "is_resolved_ms_assembly_label",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_resolved_ms_assembly_label());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::LabelDecl::is_resolved_ms_assembly_label"),
-    nullptr,
   },
   {}  // Sentinel.
 };

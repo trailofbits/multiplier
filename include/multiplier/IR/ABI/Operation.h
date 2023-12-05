@@ -34,7 +34,7 @@ static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));
 
 class MX_EXPORT CallArgsOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::ABI_CALL_ARGS;
   }
 
@@ -51,7 +51,7 @@ static_assert(sizeof(CallArgsOp) == sizeof(Operation));
 
 class MX_EXPORT CallExecutionOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::ABI_CALL_EXEC;
   }
 
@@ -72,7 +72,7 @@ static_assert(sizeof(CallExecutionOp) == sizeof(Operation));
 
 class MX_EXPORT CallOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::ABI_CALL;
   }
 
@@ -92,7 +92,7 @@ static_assert(sizeof(CallOp) == sizeof(Operation));
 
 class MX_EXPORT CallRetsOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::ABI_CALL_RETS;
   }
 
@@ -109,7 +109,7 @@ static_assert(sizeof(CallRetsOp) == sizeof(Operation));
 
 class MX_EXPORT DirectOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::ABI_DIRECT;
   }
 
@@ -126,7 +126,7 @@ static_assert(sizeof(DirectOp) == sizeof(Operation));
 
 class MX_EXPORT EpilogueOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::ABI_EPILOGUE;
   }
 
@@ -143,7 +143,7 @@ static_assert(sizeof(EpilogueOp) == sizeof(Operation));
 
 class MX_EXPORT FuncOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::ABI_FUNC;
   }
 
@@ -173,7 +173,7 @@ static_assert(sizeof(FuncOp) == sizeof(Operation));
 
 class MX_EXPORT PrologueOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::ABI_PROLOGUE;
   }
 
@@ -190,7 +190,7 @@ static_assert(sizeof(PrologueOp) == sizeof(Operation));
 
 class MX_EXPORT RetDirectOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::ABI_RET_DIRECT;
   }
 
@@ -207,7 +207,7 @@ static_assert(sizeof(RetDirectOp) == sizeof(Operation));
 
 class MX_EXPORT TodoOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::ABI_TODO;
   }
 
@@ -224,7 +224,7 @@ static_assert(sizeof(TodoOp) == sizeof(Operation));
 
 class MX_EXPORT WrapFuncOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::ABI_WRAP_FN;
   }
 
@@ -254,7 +254,7 @@ static_assert(sizeof(WrapFuncOp) == sizeof(Operation));
 
 class MX_EXPORT YieldOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::ABI_YIELD;
   }
 

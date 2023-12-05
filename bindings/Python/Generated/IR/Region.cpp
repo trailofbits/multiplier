@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[843]) || tp >= &(gTypes[844])) {
+  if (tp < &(gTypes[1364]) || tp >= &(gTypes[1365])) {
     return std::nullopt;
   }
 
@@ -109,6 +109,72 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
   return true;
 }
+
+namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "num_blocks",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_blocks());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::Region::num_blocks"),
+    nullptr,
+  },
+  {
+    "blocks",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->blocks());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::Region::blocks"),
+    nullptr,
+  },
+  {
+    "reverse_blocks",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->reverse_blocks());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::Region::reverse_blocks"),
+    nullptr,
+  },
+  {
+    "entry_block",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->entry_block());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::Region::entry_block"),
+    nullptr,
+  },
+  {
+    "num_entry_block_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_entry_block_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::Region::num_entry_block_arguments"),
+    nullptr,
+  },
+  {
+    "entry_block_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->entry_block_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::Region::entry_block_arguments"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
 
 namespace {
 static PyMethodDef gMethods[] = {
@@ -191,75 +257,9 @@ static PyMethodDef gMethods[] = {
 }  // namespace
 
 namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "num_blocks",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_blocks());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::Region::num_blocks"),
-    nullptr,
-  },
-  {
-    "blocks",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->blocks());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::Region::blocks"),
-    nullptr,
-  },
-  {
-    "reverse_blocks",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->reverse_blocks());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::Region::reverse_blocks"),
-    nullptr,
-  },
-  {
-    "entry_block",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->entry_block());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::Region::entry_block"),
-    nullptr,
-  },
-  {
-    "num_entry_block_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_entry_block_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::Region::num_entry_block_arguments"),
-    nullptr,
-  },
-  {
-    "entry_block_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->entry_block_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::Region::entry_block_arguments"),
-    nullptr,
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[843]);
+  PyTypeObject * const tp = &(gTypes[1364]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

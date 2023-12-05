@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "base_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSPropertyRefExpr::base_expression"),
+    nullptr,
+  },
+  {
+    "member_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->member_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSPropertyRefExpr::member_token"),
+    nullptr,
+  },
+  {
+    "property_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->property_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSPropertyRefExpr::property_declaration"),
+    nullptr,
+  },
+  {
+    "is_arrow",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_arrow());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSPropertyRefExpr::is_arrow"),
+    nullptr,
+  },
+  {
+    "is_implicit_access",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_implicit_access());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MSPropertyRefExpr::is_implicit_access"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,62 +391,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::MSPropertyRefExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "base_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSPropertyRefExpr::base_expression"),
-    nullptr,
-  },
-  {
-    "member_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->member_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSPropertyRefExpr::member_token"),
-    nullptr,
-  },
-  {
-    "property_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->property_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSPropertyRefExpr::property_declaration"),
-    nullptr,
-  },
-  {
-    "is_arrow",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_arrow());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSPropertyRefExpr::is_arrow"),
-    nullptr,
-  },
-  {
-    "is_implicit_access",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_implicit_access());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MSPropertyRefExpr::is_implicit_access"),
-    nullptr,
   },
   {}  // Sentinel.
 };

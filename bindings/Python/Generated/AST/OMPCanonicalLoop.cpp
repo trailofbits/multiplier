@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "distance_func",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->distance_func());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPCanonicalLoop::distance_func"),
+    nullptr,
+  },
+  {
+    "loop_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->loop_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPCanonicalLoop::loop_statement"),
+    nullptr,
+  },
+  {
+    "loop_variable_func",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->loop_variable_func());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPCanonicalLoop::loop_variable_func"),
+    nullptr,
+  },
+  {
+    "loop_variable_reference",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->loop_variable_reference());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPCanonicalLoop::loop_variable_reference"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,52 +381,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::OMPCanonicalLoop::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "distance_func",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->distance_func());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPCanonicalLoop::distance_func"),
-    nullptr,
-  },
-  {
-    "loop_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->loop_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPCanonicalLoop::loop_statement"),
-    nullptr,
-  },
-  {
-    "loop_variable_func",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->loop_variable_func());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPCanonicalLoop::loop_variable_func"),
-    nullptr,
-  },
-  {
-    "loop_variable_reference",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->loop_variable_reference());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPCanonicalLoop::loop_variable_reference"),
-    nullptr,
   },
   {}  // Sentinel.
 };

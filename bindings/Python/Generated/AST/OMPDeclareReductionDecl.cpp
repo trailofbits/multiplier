@@ -123,6 +123,122 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "combiner",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->combiner());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::combiner"),
+    nullptr,
+  },
+  {
+    "combiner_in",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->combiner_in());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::combiner_in"),
+    nullptr,
+  },
+  {
+    "combiner_out",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->combiner_out());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::combiner_out"),
+    nullptr,
+  },
+  {
+    "initializer_original",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer_original());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::initializer_original"),
+    nullptr,
+  },
+  {
+    "initializer_private",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer_private());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::initializer_private"),
+    nullptr,
+  },
+  {
+    "initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::initializer"),
+    nullptr,
+  },
+  {
+    "initializer_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::initializer_kind"),
+    nullptr,
+  },
+  {
+    "declarations_in_context",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->declarations_in_context());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::declarations_in_context"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,122 +451,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "combiner",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->combiner());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::combiner"),
-    nullptr,
-  },
-  {
-    "combiner_in",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->combiner_in());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::combiner_in"),
-    nullptr,
-  },
-  {
-    "combiner_out",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->combiner_out());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::combiner_out"),
-    nullptr,
-  },
-  {
-    "initializer_original",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializer_original());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::initializer_original"),
-    nullptr,
-  },
-  {
-    "initializer_private",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializer_private());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::initializer_private"),
-    nullptr,
-  },
-  {
-    "initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::initializer"),
-    nullptr,
-  },
-  {
-    "initializer_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializer_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::initializer_kind"),
-    nullptr,
-  },
-  {
-    "declarations_in_context",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->declarations_in_context());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPDeclareReductionDecl::declarations_in_context"),
-    nullptr,
   },
   {}  // Sentinel.
 };

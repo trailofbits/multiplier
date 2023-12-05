@@ -123,6 +123,142 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "default_argument_was_inherited",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->default_argument_was_inherited());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::default_argument_was_inherited"),
+    nullptr,
+  },
+  {
+    "default_argument",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->default_argument());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::default_argument"),
+    nullptr,
+  },
+  {
+    "default_argument_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->default_argument_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::default_argument_token"),
+    nullptr,
+  },
+  {
+    "placeholder_type_constraint",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->placeholder_type_constraint());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::placeholder_type_constraint"),
+    nullptr,
+  },
+  {
+    "has_default_argument",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_default_argument());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::has_default_argument"),
+    nullptr,
+  },
+  {
+    "has_placeholder_type_constraint",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_placeholder_type_constraint());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::has_placeholder_type_constraint"),
+    nullptr,
+  },
+  {
+    "is_expanded_parameter_pack",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_expanded_parameter_pack());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::is_expanded_parameter_pack"),
+    nullptr,
+  },
+  {
+    "is_pack_expansion",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_pack_expansion());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::is_pack_expansion"),
+    nullptr,
+  },
+  {
+    "num_expansion_types",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_expansion_types());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::num_expansion_types"),
+    nullptr,
+  },
+  {
+    "expansion_types",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->expansion_types());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::expansion_types"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -357,142 +493,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::nth_expansion_type"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "default_argument_was_inherited",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->default_argument_was_inherited());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::default_argument_was_inherited"),
-    nullptr,
-  },
-  {
-    "default_argument",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->default_argument());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::default_argument"),
-    nullptr,
-  },
-  {
-    "default_argument_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->default_argument_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::default_argument_token"),
-    nullptr,
-  },
-  {
-    "placeholder_type_constraint",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->placeholder_type_constraint());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::placeholder_type_constraint"),
-    nullptr,
-  },
-  {
-    "has_default_argument",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_default_argument());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::has_default_argument"),
-    nullptr,
-  },
-  {
-    "has_placeholder_type_constraint",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_placeholder_type_constraint());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::has_placeholder_type_constraint"),
-    nullptr,
-  },
-  {
-    "is_expanded_parameter_pack",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_expanded_parameter_pack());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::is_expanded_parameter_pack"),
-    nullptr,
-  },
-  {
-    "is_pack_expansion",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_pack_expansion());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::is_pack_expansion"),
-    nullptr,
-  },
-  {
-    "num_expansion_types",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_expansion_types());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::num_expansion_types"),
-    nullptr,
-  },
-  {
-    "expansion_types",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->expansion_types());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NonTypeTemplateParmDecl::expansion_types"),
-    nullptr,
   },
   {}  // Sentinel.
 };

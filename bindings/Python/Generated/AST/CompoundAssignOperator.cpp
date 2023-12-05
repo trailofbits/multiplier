@@ -123,6 +123,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "computation_lhs_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->computation_lhs_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CompoundAssignOperator::computation_lhs_type"),
+    nullptr,
+  },
+  {
+    "computation_result_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->computation_result_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CompoundAssignOperator::computation_result_type"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,32 +361,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CompoundAssignOperator::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "computation_lhs_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->computation_lhs_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CompoundAssignOperator::computation_lhs_type"),
-    nullptr,
-  },
-  {
-    "computation_result_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->computation_result_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CompoundAssignOperator::computation_result_type"),
-    nullptr,
   },
   {}  // Sentinel.
 };

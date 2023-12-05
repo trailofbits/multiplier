@@ -159,6 +159,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "cast_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->cast_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CastExpr::cast_kind"),
+    nullptr,
+  },
+  {
+    "cast_kind_name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->cast_kind_name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CastExpr::cast_kind_name"),
+    nullptr,
+  },
+  {
+    "conversion_function",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->conversion_function());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CastExpr::conversion_function"),
+    nullptr,
+  },
+  {
+    "sub_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sub_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CastExpr::sub_expression"),
+    nullptr,
+  },
+  {
+    "sub_expression_as_written",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sub_expression_as_written());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CastExpr::sub_expression_as_written"),
+    nullptr,
+  },
+  {
+    "target_union_field",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->target_union_field());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CastExpr::target_union_field"),
+    nullptr,
+  },
+  {
+    "has_stored_fp_features",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_stored_fp_features());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CastExpr::has_stored_fp_features"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -353,82 +429,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CastExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "cast_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->cast_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CastExpr::cast_kind"),
-    nullptr,
-  },
-  {
-    "cast_kind_name",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->cast_kind_name());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CastExpr::cast_kind_name"),
-    nullptr,
-  },
-  {
-    "conversion_function",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->conversion_function());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CastExpr::conversion_function"),
-    nullptr,
-  },
-  {
-    "sub_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sub_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CastExpr::sub_expression"),
-    nullptr,
-  },
-  {
-    "sub_expression_as_written",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sub_expression_as_written());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CastExpr::sub_expression_as_written"),
-    nullptr,
-  },
-  {
-    "target_union_field",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->target_union_field());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CastExpr::target_union_field"),
-    nullptr,
-  },
-  {
-    "has_stored_fp_features",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_stored_fp_features());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CastExpr::has_stored_fp_features"),
-    nullptr,
   },
   {}  // Sentinel.
 };

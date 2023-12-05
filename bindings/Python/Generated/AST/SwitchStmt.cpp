@@ -123,6 +123,132 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchStmt::body"),
+    nullptr,
+  },
+  {
+    "condition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->condition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchStmt::condition"),
+    nullptr,
+  },
+  {
+    "condition_variable",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->condition_variable());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchStmt::condition_variable"),
+    nullptr,
+  },
+  {
+    "condition_variable_declaration_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->condition_variable_declaration_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchStmt::condition_variable_declaration_statement"),
+    nullptr,
+  },
+  {
+    "initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchStmt::initializer"),
+    nullptr,
+  },
+  {
+    "l_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->l_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchStmt::l_paren_token"),
+    nullptr,
+  },
+  {
+    "r_paren_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_paren_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchStmt::r_paren_token"),
+    nullptr,
+  },
+  {
+    "first_switch_case",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->first_switch_case());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchStmt::first_switch_case"),
+    nullptr,
+  },
+  {
+    "switch_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->switch_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchStmt::switch_token"),
+    nullptr,
+  },
+  {
+    "has_initializer_storage",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_initializer_storage());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchStmt::has_initializer_storage"),
+    nullptr,
+  },
+  {
+    "has_variable_storage",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_variable_storage());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchStmt::has_variable_storage"),
+    nullptr,
+  },
+  {
+    "is_all_enum_cases_covered",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_all_enum_cases_covered());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwitchStmt::is_all_enum_cases_covered"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,132 +461,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::SwitchStmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchStmt::body"),
-    nullptr,
-  },
-  {
-    "condition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->condition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchStmt::condition"),
-    nullptr,
-  },
-  {
-    "condition_variable",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->condition_variable());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchStmt::condition_variable"),
-    nullptr,
-  },
-  {
-    "condition_variable_declaration_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->condition_variable_declaration_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchStmt::condition_variable_declaration_statement"),
-    nullptr,
-  },
-  {
-    "initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchStmt::initializer"),
-    nullptr,
-  },
-  {
-    "l_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->l_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchStmt::l_paren_token"),
-    nullptr,
-  },
-  {
-    "r_paren_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_paren_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchStmt::r_paren_token"),
-    nullptr,
-  },
-  {
-    "first_switch_case",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->first_switch_case());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchStmt::first_switch_case"),
-    nullptr,
-  },
-  {
-    "switch_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->switch_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchStmt::switch_token"),
-    nullptr,
-  },
-  {
-    "has_initializer_storage",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_initializer_storage());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchStmt::has_initializer_storage"),
-    nullptr,
-  },
-  {
-    "has_variable_storage",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_variable_storage());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchStmt::has_variable_storage"),
-    nullptr,
-  },
-  {
-    "is_all_enum_cases_covered",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_all_enum_cases_covered());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::SwitchStmt::is_all_enum_cases_covered"),
-    nullptr,
   },
   {}  // Sentinel.
 };

@@ -127,6 +127,32 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "pre_initializers",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->pre_initializers());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPLoopTransformationDirective::pre_initializers"),
+    nullptr,
+  },
+  {
+    "transformed_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->transformed_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPLoopTransformationDirective::transformed_statement"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -321,32 +347,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::OMPLoopTransformationDirective::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "pre_initializers",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pre_initializers());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPLoopTransformationDirective::pre_initializers"),
-    nullptr,
-  },
-  {
-    "transformed_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->transformed_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPLoopTransformationDirective::transformed_statement"),
-    nullptr,
   },
   {}  // Sentinel.
 };

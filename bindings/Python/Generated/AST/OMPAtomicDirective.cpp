@@ -123,6 +123,112 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "condition_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->condition_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::condition_expression"),
+    nullptr,
+  },
+  {
+    "d",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->d());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::d"),
+    nullptr,
+  },
+  {
+    "expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::expression"),
+    nullptr,
+  },
+  {
+    "r",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::r"),
+    nullptr,
+  },
+  {
+    "update_expression",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->update_expression());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::update_expression"),
+    nullptr,
+  },
+  {
+    "v",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->v());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::v"),
+    nullptr,
+  },
+  {
+    "x",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->x());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::x"),
+    nullptr,
+  },
+  {
+    "is_fail_only",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_fail_only());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::is_fail_only"),
+    nullptr,
+  },
+  {
+    "is_postfix_update",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_postfix_update());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::is_postfix_update"),
+    nullptr,
+  },
+  {
+    "is_xlhs_in_rhs_part",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_xlhs_in_rhs_part());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::is_xlhs_in_rhs_part"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,112 +441,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::OMPAtomicDirective::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "condition_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->condition_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::condition_expression"),
-    nullptr,
-  },
-  {
-    "d",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->d());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::d"),
-    nullptr,
-  },
-  {
-    "expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::expression"),
-    nullptr,
-  },
-  {
-    "r",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::r"),
-    nullptr,
-  },
-  {
-    "update_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->update_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::update_expression"),
-    nullptr,
-  },
-  {
-    "v",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->v());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::v"),
-    nullptr,
-  },
-  {
-    "x",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->x());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::x"),
-    nullptr,
-  },
-  {
-    "is_fail_only",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_fail_only());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::is_fail_only"),
-    nullptr,
-  },
-  {
-    "is_postfix_update",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_postfix_update());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::is_postfix_update"),
-    nullptr,
-  },
-  {
-    "is_xlhs_in_rhs_part",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_xlhs_in_rhs_part());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::OMPAtomicDirective::is_xlhs_in_rhs_part"),
-    nullptr,
   },
   {}  // Sentinel.
 };

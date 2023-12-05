@@ -123,6 +123,92 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "constructs_virtual_base",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->constructs_virtual_base());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::constructs_virtual_base"),
+    nullptr,
+  },
+  {
+    "constructed_base_class",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->constructed_base_class());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::constructed_base_class"),
+    nullptr,
+  },
+  {
+    "constructed_base_class_shadow_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->constructed_base_class_shadow_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::constructed_base_class_shadow_declaration"),
+    nullptr,
+  },
+  {
+    "nominated_base_class",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->nominated_base_class());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::nominated_base_class"),
+    nullptr,
+  },
+  {
+    "nominated_base_class_shadow_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->nominated_base_class_shadow_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::nominated_base_class_shadow_declaration"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,92 +421,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "constructs_virtual_base",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->constructs_virtual_base());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::constructs_virtual_base"),
-    nullptr,
-  },
-  {
-    "constructed_base_class",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->constructed_base_class());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::constructed_base_class"),
-    nullptr,
-  },
-  {
-    "constructed_base_class_shadow_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->constructed_base_class_shadow_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::constructed_base_class_shadow_declaration"),
-    nullptr,
-  },
-  {
-    "nominated_base_class",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->nominated_base_class());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::nominated_base_class"),
-    nullptr,
-  },
-  {
-    "nominated_base_class_shadow_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->nominated_base_class_shadow_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ConstructorUsingShadowDecl::nominated_base_class_shadow_declaration"),
-    nullptr,
   },
   {}  // Sentinel.
 };

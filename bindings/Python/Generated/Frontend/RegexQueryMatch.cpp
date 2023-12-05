@@ -111,6 +111,42 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "data",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->data());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::RegexQueryMatch::data"),
+    nullptr,
+  },
+  {
+    "captured_variables",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->captured_variables());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::RegexQueryMatch::captured_variables"),
+    nullptr,
+  },
+  {
+    "num_captures",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_captures());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::RegexQueryMatch::num_captures"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "index_of_captured_variable",
@@ -193,42 +229,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::RegexQueryMatch::captured_data"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "data",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->data());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RegexQueryMatch::data"),
-    nullptr,
-  },
-  {
-    "captured_variables",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->captured_variables());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RegexQueryMatch::captured_variables"),
-    nullptr,
-  },
-  {
-    "num_captures",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_captures());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RegexQueryMatch::num_captures"),
-    nullptr,
   },
   {}  // Sentinel.
 };

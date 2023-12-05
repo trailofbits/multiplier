@@ -371,6 +371,172 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "formal_linkage",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->formal_linkage());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::formal_linkage"),
+    nullptr,
+  },
+  {
+    "name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::name"),
+    nullptr,
+  },
+  {
+    "qualified_name_as_string",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->qualified_name_as_string());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::qualified_name_as_string"),
+    nullptr,
+  },
+  {
+    "underlying_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->underlying_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::underlying_declaration"),
+    nullptr,
+  },
+  {
+    "visibility",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->visibility());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::visibility"),
+    nullptr,
+  },
+  {
+    "has_external_formal_linkage",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_external_formal_linkage());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::has_external_formal_linkage"),
+    nullptr,
+  },
+  {
+    "has_linkage",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_linkage());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::has_linkage"),
+    nullptr,
+  },
+  {
+    "has_linkage_been_computed",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_linkage_been_computed());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::has_linkage_been_computed"),
+    nullptr,
+  },
+  {
+    "is_cxx_class_member",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_cxx_class_member());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::is_cxx_class_member"),
+    nullptr,
+  },
+  {
+    "is_cxx_instance_member",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_cxx_instance_member());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::is_cxx_instance_member"),
+    nullptr,
+  },
+  {
+    "is_externally_declarable",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_externally_declarable());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::is_externally_declarable"),
+    nullptr,
+  },
+  {
+    "is_externally_visible",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_externally_visible());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::is_externally_visible"),
+    nullptr,
+  },
+  {
+    "is_linkage_valid",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_linkage_valid());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::is_linkage_valid"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -565,172 +731,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::NamedDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "formal_linkage",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->formal_linkage());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::formal_linkage"),
-    nullptr,
-  },
-  {
-    "name",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->name());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::name"),
-    nullptr,
-  },
-  {
-    "qualified_name_as_string",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->qualified_name_as_string());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::qualified_name_as_string"),
-    nullptr,
-  },
-  {
-    "underlying_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->underlying_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::underlying_declaration"),
-    nullptr,
-  },
-  {
-    "visibility",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->visibility());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::visibility"),
-    nullptr,
-  },
-  {
-    "has_external_formal_linkage",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_external_formal_linkage());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::has_external_formal_linkage"),
-    nullptr,
-  },
-  {
-    "has_linkage",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_linkage());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::has_linkage"),
-    nullptr,
-  },
-  {
-    "has_linkage_been_computed",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_linkage_been_computed());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::has_linkage_been_computed"),
-    nullptr,
-  },
-  {
-    "is_cxx_class_member",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_cxx_class_member());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::is_cxx_class_member"),
-    nullptr,
-  },
-  {
-    "is_cxx_instance_member",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_cxx_instance_member());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::is_cxx_instance_member"),
-    nullptr,
-  },
-  {
-    "is_externally_declarable",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_externally_declarable());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::is_externally_declarable"),
-    nullptr,
-  },
-  {
-    "is_externally_visible",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_externally_visible());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::is_externally_visible"),
-    nullptr,
-  },
-  {
-    "is_linkage_valid",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_linkage_valid());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::is_linkage_valid"),
-    nullptr,
   },
   {}  // Sentinel.
 };

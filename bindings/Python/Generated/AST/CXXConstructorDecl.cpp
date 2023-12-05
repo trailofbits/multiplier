@@ -123,6 +123,102 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->redeclarations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "target_constructor",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->target_constructor());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::target_constructor"),
+    nullptr,
+  },
+  {
+    "is_default_constructor",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_default_constructor());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::is_default_constructor"),
+    nullptr,
+  },
+  {
+    "is_delegating_constructor",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_delegating_constructor());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::is_delegating_constructor"),
+    nullptr,
+  },
+  {
+    "is_explicit",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_explicit());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::is_explicit"),
+    nullptr,
+  },
+  {
+    "is_inheriting_constructor",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_inheriting_constructor());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::is_inheriting_constructor"),
+    nullptr,
+  },
+  {
+    "is_specialization_copying_object",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_specialization_copying_object());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::is_specialization_copying_object"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,102 +431,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXConstructorDecl::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "canonical_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->canonical_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::canonical_declaration"),
-    nullptr,
-  },
-  {
-    "definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::definition"),
-    nullptr,
-  },
-  {
-    "redeclarations",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "target_constructor",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->target_constructor());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::target_constructor"),
-    nullptr,
-  },
-  {
-    "is_default_constructor",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_default_constructor());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::is_default_constructor"),
-    nullptr,
-  },
-  {
-    "is_delegating_constructor",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_delegating_constructor());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::is_delegating_constructor"),
-    nullptr,
-  },
-  {
-    "is_explicit",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_explicit());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::is_explicit"),
-    nullptr,
-  },
-  {
-    "is_inheriting_constructor",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_inheriting_constructor());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::is_inheriting_constructor"),
-    nullptr,
-  },
-  {
-    "is_specialization_copying_object",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_specialization_copying_object());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXConstructorDecl::is_specialization_copying_object"),
-    nullptr,
   },
   {}  // Sentinel.
 };

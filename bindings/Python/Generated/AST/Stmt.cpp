@@ -1051,6 +1051,112 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "parent_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parent_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Stmt::parent_declaration"),
+    nullptr,
+  },
+  {
+    "parent_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parent_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Stmt::parent_statement"),
+    nullptr,
+  },
+  {
+    "id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Stmt::id"),
+    nullptr,
+  },
+  {
+    "referenced_declaration_id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->referenced_declaration_id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Stmt::referenced_declaration_id"),
+    nullptr,
+  },
+  {
+    "referenced_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->referenced_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Stmt::referenced_declaration"),
+    nullptr,
+  },
+  {
+    "ignore_containers",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->ignore_containers());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Stmt::ignore_containers"),
+    nullptr,
+  },
+  {
+    "children",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->children());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Stmt::children"),
+    nullptr,
+  },
+  {
+    "tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Stmt::tokens"),
+    nullptr,
+  },
+  {
+    "kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Stmt::kind"),
+    nullptr,
+  },
+  {
+    "strip_label_like_statements",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->strip_label_like_statements());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Stmt::strip_label_like_statements"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "static_category",
@@ -1241,112 +1347,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::Stmt::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "parent_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parent_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Stmt::parent_declaration"),
-    nullptr,
-  },
-  {
-    "parent_statement",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parent_statement());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Stmt::parent_statement"),
-    nullptr,
-  },
-  {
-    "id",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->id());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Stmt::id"),
-    nullptr,
-  },
-  {
-    "referenced_declaration_id",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->referenced_declaration_id());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Stmt::referenced_declaration_id"),
-    nullptr,
-  },
-  {
-    "referenced_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->referenced_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Stmt::referenced_declaration"),
-    nullptr,
-  },
-  {
-    "ignore_containers",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->ignore_containers());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Stmt::ignore_containers"),
-    nullptr,
-  },
-  {
-    "children",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->children());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Stmt::children"),
-    nullptr,
-  },
-  {
-    "tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Stmt::tokens"),
-    nullptr,
-  },
-  {
-    "kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Stmt::kind"),
-    nullptr,
-  },
-  {
-    "strip_label_like_statements",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->strip_label_like_statements());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Stmt::strip_label_like_statements"),
-    nullptr,
   },
   {}  // Sentinel.
 };

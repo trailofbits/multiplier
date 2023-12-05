@@ -123,6 +123,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "argument_dependent",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->argument_dependent());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::argument_dependent"),
+    nullptr,
+  },
+  {
+    "condition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->condition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::condition"),
+    nullptr,
+  },
+  {
+    "diagnostic_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->diagnostic_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::diagnostic_type"),
+    nullptr,
+  },
+  {
+    "message",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->message());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::message"),
+    nullptr,
+  },
+  {
+    "parent",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parent());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::parent"),
+    nullptr,
+  },
+  {
+    "is_error",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_error());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::is_error"),
+    nullptr,
+  },
+  {
+    "is_warning",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_warning());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::is_warning"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -325,82 +401,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::contains"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "argument_dependent",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->argument_dependent());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::argument_dependent"),
-    nullptr,
-  },
-  {
-    "condition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->condition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::condition"),
-    nullptr,
-  },
-  {
-    "diagnostic_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->diagnostic_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::diagnostic_type"),
-    nullptr,
-  },
-  {
-    "message",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->message());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::message"),
-    nullptr,
-  },
-  {
-    "parent",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parent());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::parent"),
-    nullptr,
-  },
-  {
-    "is_error",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_error());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::is_error"),
-    nullptr,
-  },
-  {
-    "is_warning",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_warning());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::is_warning"),
-    nullptr,
   },
   {}  // Sentinel.
 };

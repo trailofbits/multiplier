@@ -123,6 +123,62 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "base",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MatrixSubscriptExpr::base"),
+    nullptr,
+  },
+  {
+    "column_index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->column_index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MatrixSubscriptExpr::column_index"),
+    nullptr,
+  },
+  {
+    "r_bracket_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_bracket_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MatrixSubscriptExpr::r_bracket_token"),
+    nullptr,
+  },
+  {
+    "row_index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->row_index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MatrixSubscriptExpr::row_index"),
+    nullptr,
+  },
+  {
+    "is_incomplete",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_incomplete());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MatrixSubscriptExpr::is_incomplete"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,62 +391,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::MatrixSubscriptExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "base",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MatrixSubscriptExpr::base"),
-    nullptr,
-  },
-  {
-    "column_index",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->column_index());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MatrixSubscriptExpr::column_index"),
-    nullptr,
-  },
-  {
-    "r_bracket_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->r_bracket_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MatrixSubscriptExpr::r_bracket_token"),
-    nullptr,
-  },
-  {
-    "row_index",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->row_index());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MatrixSubscriptExpr::row_index"),
-    nullptr,
-  },
-  {
-    "is_incomplete",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_incomplete());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MatrixSubscriptExpr::is_incomplete"),
-    nullptr,
   },
   {}  // Sentinel.
 };

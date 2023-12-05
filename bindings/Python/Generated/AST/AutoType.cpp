@@ -123,6 +123,82 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "keyword",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->keyword());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AutoType::keyword"),
+    nullptr,
+  },
+  {
+    "num_type_constraint_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_type_constraint_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AutoType::num_type_constraint_arguments"),
+    nullptr,
+  },
+  {
+    "type_constraint_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_constraint_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AutoType::type_constraint_arguments"),
+    nullptr,
+  },
+  {
+    "type_constraint_concept",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type_constraint_concept());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AutoType::type_constraint_concept"),
+    nullptr,
+  },
+  {
+    "is_constrained",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_constrained());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AutoType::is_constrained"),
+    nullptr,
+  },
+  {
+    "is_decltype_auto",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_decltype_auto());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AutoType::is_decltype_auto"),
+    nullptr,
+  },
+  {
+    "is_gnu_auto_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_gnu_auto_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AutoType::is_gnu_auto_type"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -331,82 +407,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::AutoType::nth_type_constraint_argument"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "keyword",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->keyword());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AutoType::keyword"),
-    nullptr,
-  },
-  {
-    "num_type_constraint_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_type_constraint_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AutoType::num_type_constraint_arguments"),
-    nullptr,
-  },
-  {
-    "type_constraint_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_constraint_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AutoType::type_constraint_arguments"),
-    nullptr,
-  },
-  {
-    "type_constraint_concept",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_constraint_concept());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AutoType::type_constraint_concept"),
-    nullptr,
-  },
-  {
-    "is_constrained",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_constrained());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AutoType::is_constrained"),
-    nullptr,
-  },
-  {
-    "is_decltype_auto",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_decltype_auto());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AutoType::is_decltype_auto"),
-    nullptr,
-  },
-  {
-    "is_gnu_auto_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_gnu_auto_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::AutoType::is_gnu_auto_type"),
-    nullptr,
   },
   {}  // Sentinel.
 };

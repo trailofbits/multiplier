@@ -123,6 +123,52 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "implicit_object_argument",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->implicit_object_argument());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMemberCallExpr::implicit_object_argument"),
+    nullptr,
+  },
+  {
+    "method_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->method_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMemberCallExpr::method_declaration"),
+    nullptr,
+  },
+  {
+    "object_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->object_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMemberCallExpr::object_type"),
+    nullptr,
+  },
+  {
+    "record_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->record_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMemberCallExpr::record_declaration"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -335,52 +381,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXMemberCallExpr::from"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "implicit_object_argument",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->implicit_object_argument());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMemberCallExpr::implicit_object_argument"),
-    nullptr,
-  },
-  {
-    "method_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->method_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMemberCallExpr::method_declaration"),
-    nullptr,
-  },
-  {
-    "object_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->object_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMemberCallExpr::object_type"),
-    nullptr,
-  },
-  {
-    "record_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->record_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXMemberCallExpr::record_declaration"),
-    nullptr,
   },
   {}  // Sentinel.
 };

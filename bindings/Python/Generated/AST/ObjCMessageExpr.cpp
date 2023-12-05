@@ -123,6 +123,232 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 }
 
 namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "num_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::num_arguments"),
+    nullptr,
+  },
+  {
+    "arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::arguments"),
+    nullptr,
+  },
+  {
+    "call_return_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->call_return_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::call_return_type"),
+    nullptr,
+  },
+  {
+    "class_receiver",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->class_receiver());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::class_receiver"),
+    nullptr,
+  },
+  {
+    "instance_receiver",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->instance_receiver());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::instance_receiver"),
+    nullptr,
+  },
+  {
+    "left_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->left_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::left_token"),
+    nullptr,
+  },
+  {
+    "method_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->method_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::method_declaration"),
+    nullptr,
+  },
+  {
+    "method_family",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->method_family());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::method_family"),
+    nullptr,
+  },
+  {
+    "receiver_interface",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->receiver_interface());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::receiver_interface"),
+    nullptr,
+  },
+  {
+    "receiver_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->receiver_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::receiver_kind"),
+    nullptr,
+  },
+  {
+    "receiver_range",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->receiver_range());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::receiver_range"),
+    nullptr,
+  },
+  {
+    "receiver_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->receiver_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::receiver_type"),
+    nullptr,
+  },
+  {
+    "right_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->right_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::right_token"),
+    nullptr,
+  },
+  {
+    "selector_start_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->selector_start_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::selector_start_token"),
+    nullptr,
+  },
+  {
+    "super_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->super_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::super_token"),
+    nullptr,
+  },
+  {
+    "super_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->super_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::super_type"),
+    nullptr,
+  },
+  {
+    "is_class_message",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_class_message());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::is_class_message"),
+    nullptr,
+  },
+  {
+    "is_delegate_initializer_call",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_delegate_initializer_call());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::is_delegate_initializer_call"),
+    nullptr,
+  },
+  {
+    "is_implicit",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_implicit());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::is_implicit"),
+    nullptr,
+  },
+  {
+    "is_instance_message",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_instance_message());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::is_instance_message"),
+    nullptr,
+  },
+  {
+    "num_selector_tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_selector_tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::num_selector_tokens"),
+    nullptr,
+  },
+  {
+    "selector_tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->selector_tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::selector_tokens"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
 static PyMethodDef gMethods[] = {
   {
     "IN",
@@ -379,232 +605,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::ObjCMessageExpr::nth_selector_token"),
-  },
-  {}  // Sentinel.
-};
-}  // namespace
-
-namespace {
-static PyGetSetDef gProperties[] = {
-  {
-    "num_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::num_arguments"),
-    nullptr,
-  },
-  {
-    "arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::arguments"),
-    nullptr,
-  },
-  {
-    "call_return_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->call_return_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::call_return_type"),
-    nullptr,
-  },
-  {
-    "class_receiver",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->class_receiver());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::class_receiver"),
-    nullptr,
-  },
-  {
-    "instance_receiver",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instance_receiver());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::instance_receiver"),
-    nullptr,
-  },
-  {
-    "left_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->left_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::left_token"),
-    nullptr,
-  },
-  {
-    "method_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->method_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::method_declaration"),
-    nullptr,
-  },
-  {
-    "method_family",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->method_family());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::method_family"),
-    nullptr,
-  },
-  {
-    "receiver_interface",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->receiver_interface());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::receiver_interface"),
-    nullptr,
-  },
-  {
-    "receiver_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->receiver_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::receiver_kind"),
-    nullptr,
-  },
-  {
-    "receiver_range",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->receiver_range());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::receiver_range"),
-    nullptr,
-  },
-  {
-    "receiver_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->receiver_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::receiver_type"),
-    nullptr,
-  },
-  {
-    "right_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->right_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::right_token"),
-    nullptr,
-  },
-  {
-    "selector_start_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->selector_start_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::selector_start_token"),
-    nullptr,
-  },
-  {
-    "super_token",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->super_token());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::super_token"),
-    nullptr,
-  },
-  {
-    "super_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->super_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::super_type"),
-    nullptr,
-  },
-  {
-    "is_class_message",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_class_message());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::is_class_message"),
-    nullptr,
-  },
-  {
-    "is_delegate_initializer_call",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_delegate_initializer_call());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::is_delegate_initializer_call"),
-    nullptr,
-  },
-  {
-    "is_implicit",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_implicit());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::is_implicit"),
-    nullptr,
-  },
-  {
-    "is_instance_message",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_instance_message());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::is_instance_message"),
-    nullptr,
-  },
-  {
-    "num_selector_tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_selector_tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::num_selector_tokens"),
-    nullptr,
-  },
-  {
-    "selector_tokens",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->selector_tokens());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMessageExpr::selector_tokens"),
-    nullptr,
   },
   {}  // Sentinel.
 };
