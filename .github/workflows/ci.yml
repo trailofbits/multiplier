@@ -82,6 +82,7 @@ jobs:
             -DCMAKE_CXX_COMPILER=$(which clang++-${LLVM_VER}) \
             -DClang_DIR=${LLVM_PREFIX_DIR}/lib/cmake/clang \
             -DLLVM_DIR=${LLVM_PREFIX_DIR}/lib/cmake/llvm \
+            -DMLIR_DIR=${LLVM_PREFIX_DIR}/lib/cmake/mlir \
             -DMX_USE_VENDORED_CLANG=OFF \
             -DMX_USE_VENDORED_PASTA=OFF \
             -GNinja \
