@@ -78,6 +78,9 @@ import pathlib
 """
 
 
+STUB_IMPORT = "import multiplier.{}\n"
+
+
 ENTITY_STUB = """
 
 DeclId = int
@@ -95,6 +98,7 @@ TypeTokenId = int
 
 class Entity(object, ABC):
   id: int
+
 """
 
 
@@ -1477,12 +1481,18 @@ def wrap(schemas: Iterable[Schema], renamer: Renamer):
   sorted_directories = list(directories.keys())
   sorted_directories.sort(key=len)
 
+  for dir_name in sorted_directories:
+    if len(dir_name):
+      stubs[""].append(STUB_IMPORT.format(dir_name.lower().replace("/", ".")))
+
   # Define the modules, and make lists of the wrappers.
   for rel_dir in sorted_directories:
     doc = rel_dir and f"Wrapper of {rel_dir}" or "Multiplier source code auditing API"
     dot_name = rel_dir and "." + rel_dir.replace("/", ".").lower() or ""
     upper_name = rel_dir and rel_dir.split("/")[-1] or ""
     lower_name = upper_name.lower()
+
+
 
     module_out.append(BEGIN_MODULE_CPP_DEF.format(
         dot_name=dot_name,

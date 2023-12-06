@@ -81,7 +81,7 @@ if(MX_ENABLE_INSTALL)
     DIRECTORY
       "${CMAKE_CURRENT_LIST_DIR}/multiplier-stubs"
     DESTINATION
-      "${site_packages_dir}/multiplier-stubs"
+      "${site_packages_dir}"
   )
 
   # Do the install, which creates a symlink to our main `libmultiplier.so` target.
