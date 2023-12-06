@@ -29,179 +29,179 @@ import multiplier.ir.unsupported
 class Attribute(multiplier.ir.Attribute):
 
   @staticmethod
-  def FROM(arg_0: 'multiplier.ir.Attribute') -> Optional['multiplier.ir.core.Attribute']:
+  def FROM(arg_0: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.Attribute]:
     ...
 
 class BooleanAttr(multiplier.ir.core.Attribute):
   value: bool
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.AttributeKind':
+  def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Attribute') -> Optional['multiplier.ir.core.BooleanAttr']:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.BooleanAttr]:
     ...
 
 class FloatAttr(multiplier.ir.core.Attribute):
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.AttributeKind':
+  def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Attribute') -> Optional['multiplier.ir.core.FloatAttr']:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.FloatAttr]:
     ...
 
 class IntegerAttr(multiplier.ir.core.Attribute):
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.AttributeKind':
+  def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Attribute') -> Optional['multiplier.ir.core.IntegerAttr']:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.IntegerAttr]:
     ...
 
 class SourceLanguageAttr(multiplier.ir.core.Attribute):
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.AttributeKind':
+  def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Attribute') -> Optional['multiplier.ir.core.SourceLanguageAttr']:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.SourceLanguageAttr]:
     ...
 
 class StringLiteralAttr(multiplier.ir.core.Attribute):
   value: str
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.AttributeKind':
+  def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Attribute') -> Optional['multiplier.ir.core.StringLiteralAttr']:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.StringLiteralAttr]:
     ...
 
 class VoidAttr(multiplier.ir.core.Attribute):
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.AttributeKind':
+  def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Attribute') -> Optional['multiplier.ir.core.VoidAttr']:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.VoidAttr]:
     ...
 
 class Operation(multiplier.ir.Operation):
 
   @staticmethod
-  def FROM(arg_0: 'multiplier.ir.Operation') -> Optional['multiplier.ir.core.Operation']:
+  def FROM(arg_0: multiplier.ir.Operation) -> Optional[multiplier.ir.core.Operation]:
     ...
 
 class BinLAndOp(multiplier.ir.core.Operation):
-  lhs: 'multiplier.ir.Value'
-  rhs: 'multiplier.ir.Value'
-  result: 'multiplier.ir.Value'
+  lhs: multiplier.ir.Value
+  rhs: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.OperationKind':
+  def static_kind() -> multiplier.ir.OperationKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Operation') -> Optional['multiplier.ir.core.BinLAndOp']:
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.core.BinLAndOp]:
     ...
 
   @staticmethod
-  def producing(val: 'multiplier.ir.Value') -> Optional['multiplier.ir.core.BinLAndOp']:
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.core.BinLAndOp]:
     ...
 
 class BinLOrOp(multiplier.ir.core.Operation):
-  lhs: 'multiplier.ir.Value'
-  rhs: 'multiplier.ir.Value'
-  result: 'multiplier.ir.Value'
+  lhs: multiplier.ir.Value
+  rhs: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.OperationKind':
+  def static_kind() -> multiplier.ir.OperationKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Operation') -> Optional['multiplier.ir.core.BinLOrOp']:
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.core.BinLOrOp]:
     ...
 
   @staticmethod
-  def producing(val: 'multiplier.ir.Value') -> Optional['multiplier.ir.core.BinLOrOp']:
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.core.BinLOrOp]:
     ...
 
 class ImplicitReturnOp(multiplier.ir.core.Operation):
-  result: Generator['multiplier.ir.Operand']
+  result: Generator[multiplier.ir.Operand]
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.OperationKind':
+  def static_kind() -> multiplier.ir.OperationKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Operation') -> Optional['multiplier.ir.core.ImplicitReturnOp']:
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.core.ImplicitReturnOp]:
     ...
 
   @staticmethod
-  def producing(val: 'multiplier.ir.Value') -> Optional['multiplier.ir.core.ImplicitReturnOp']:
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.core.ImplicitReturnOp]:
     ...
 
 class LazyOp(multiplier.ir.core.Operation):
-  result: 'multiplier.ir.Value'
-  lazy: 'multiplier.ir.Region'
+  result: multiplier.ir.Value
+  lazy: multiplier.ir.Region
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.OperationKind':
+  def static_kind() -> multiplier.ir.OperationKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Operation') -> Optional['multiplier.ir.core.LazyOp']:
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.core.LazyOp]:
     ...
 
   @staticmethod
-  def producing(val: 'multiplier.ir.Value') -> Optional['multiplier.ir.core.LazyOp']:
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.core.LazyOp]:
     ...
 
 class ScopeOp(multiplier.ir.core.Operation):
-  body: 'multiplier.ir.Region'
+  body: multiplier.ir.Region
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.OperationKind':
+  def static_kind() -> multiplier.ir.OperationKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Operation') -> Optional['multiplier.ir.core.ScopeOp']:
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.core.ScopeOp]:
     ...
 
   @staticmethod
-  def producing(val: 'multiplier.ir.Value') -> Optional['multiplier.ir.core.ScopeOp']:
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.core.ScopeOp]:
     ...
 
 class SelectOp(multiplier.ir.core.Operation):
-  cond: 'multiplier.ir.Value'
-  then_region: 'multiplier.ir.Value'
-  else_region: 'multiplier.ir.Value'
-  results: Generator['multiplier.ir.Result']
+  cond: multiplier.ir.Value
+  then_region: multiplier.ir.Value
+  else_region: multiplier.ir.Value
+  results: Generator[multiplier.ir.Result]
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.OperationKind':
+  def static_kind() -> multiplier.ir.OperationKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Operation') -> Optional['multiplier.ir.core.SelectOp']:
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.core.SelectOp]:
     ...
 
   @staticmethod
-  def producing(val: 'multiplier.ir.Value') -> Optional['multiplier.ir.core.SelectOp']:
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.core.SelectOp]:
     ...
 
 class Type(multiplier.ir.Type):
 
   @staticmethod
-  def FROM(arg_0: 'multiplier.ir.Type') -> Optional['multiplier.ir.core.Type']:
+  def FROM(arg_0: multiplier.ir.Type) -> Optional[multiplier.ir.core.Type]:
     ...
 
 class FunctionType(multiplier.ir.core.Type):
@@ -209,9 +209,9 @@ class FunctionType(multiplier.ir.core.Type):
   var_arg: bool
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.TypeKind':
+  def static_kind() -> multiplier.ir.TypeKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Type') -> Optional['multiplier.ir.core.FunctionType']:
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.core.FunctionType]:
     ...
