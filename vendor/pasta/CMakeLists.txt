@@ -13,12 +13,8 @@ if(NOT MX_USE_VENDORED_PASTA)
   endif()
 endif()
 
-find_package(LLVM CONFIG QUIET)
-find_package(Clang CONFIG QUIET)
-
-if(NOT LLVM_FOUND OR NOT Clang_FOUND)
-  message(FATAL_ERROR "Could not find Clang/LLVM")
-endif()
+find_package(LLVM CONFIG REQUIRED QUIET)
+find_package(Clang CONFIG REQUIRED QUIET)
 
 set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src")
 set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/build")

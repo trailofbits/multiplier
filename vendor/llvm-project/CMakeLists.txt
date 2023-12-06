@@ -18,10 +18,7 @@ if(NOT MX_USE_VENDORED_CLANG)
   endif()
 endif()
 
-find_package(zstd CONFIG QUIET)
-if(NOT zstd_FOUND)
-  message(FATAL_ERROR "Could not find ZStandard")
-endif()
+find_package(zstd CONFIG REQUIRED QUIET)
 
 set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src")
 set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/build")

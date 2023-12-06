@@ -13,6 +13,9 @@ if(NOT MX_USE_VENDORED_ROCKSDB)
   endif()
 endif()
 
+find_package(zstd CONFIG REQUIRED QUIET)
+find_package(gflags CONFIG REQUIRED QUIET)
+
 set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src")
 set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/build")
 
