@@ -30,6 +30,7 @@ TypeTokenId = int
 class Entity(object, ABC):
   id: int
 
+import multiplier
 import multiplier.ir
 import multiplier.ast
 import multiplier.ir.abi
