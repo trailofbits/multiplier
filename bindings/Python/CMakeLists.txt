@@ -60,7 +60,6 @@ target_include_directories("mx-python"
 target_link_libraries("mx-python"
   PUBLIC
     Python3::Python
-    Python3::SABIModule
   PRIVATE
     "mx-api"
 )

@@ -93,11 +93,7 @@ if(MX_ENABLE_VAST)
 endif()
 
 if(MX_ENABLE_PYTHON_BINDINGS)
-  find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed Development.SABIModule)
-
-  if(NOT TARGET Python3::SABIModule)
-    message(FATAL_ERROR "Unable to find Python3 Stable API module")
-  endif()
+  find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed)
 endif()
 
 if(MX_ENABLE_INSTALL)

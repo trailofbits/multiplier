@@ -21,8 +21,8 @@ if(NOT TARGET @PROJECT_NAME@::multiplier)
     find_dependency(gap CONFIG REQUIRED)
   endif()
 
-  if(MX_ENABLE_PYTHON_BINDINGS AND NOT TARGET Python3::SABIModule)
-    find_dependency(Python3 REQUIRED COMPONENTS Interpreter Development.Embed Development.SABIModule)
+  if(MX_ENABLE_PYTHON_BINDINGS AND NOT TARGET Python3::Python)
+    find_dependency(Python3 REQUIRED COMPONENTS Interpreter Development.Embed)
   endif()
   
   include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
