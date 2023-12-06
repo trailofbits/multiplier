@@ -68,25 +68,17 @@ static void RenderRecord(const mx::RecordDecl &record) {
   std::cout << "\n\n";
 }
 
-static int FieldTypeColor(const FieldType &field_type) {
-  unsigned ascii_color;
+static int FieldTypeColor(FieldType field_type) {
   switch (field_type) {
   case Elastic:
-    ascii_color = 43;
-    break;
+    return 43;
   case DirectSelfReferencing:
-    ascii_color = 44;
-    break;
+    return 44;
   case IndirectSelfReferencing:
-    ascii_color = 45;
-    break;
+    return 45;
   case CustomFilter:
-    ascii_color = 46;
-    break;
-  default:
-    break;
+    return 46;
   }
-  return ascii_color;
 }
 
 static void RenderRecordHighlightedFields(const mx::Index index,
@@ -251,7 +243,7 @@ extern "C" int main(int argc, char *argv[]) {
     GetInitialSelfReferences(index, self_reference_uses);
   }
 
-  for (const mx::RecordDecl record_decl : mx::RecordDecl::in(index)) {
+  for (mx::RecordDecl record_decl : mx::RecordDecl::in(index)) {
 
     // sanity: deal with repeats
     if (seen_records.contains(record_decl.id()))
