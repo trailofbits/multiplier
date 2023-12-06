@@ -78,7 +78,7 @@ import pathlib
 """
 
 
-STUB_IMPORT = "import multiplier.{}\n"
+STUB_IMPORT = "import {}\n"
 
 
 ENTITY_STUB = """
@@ -1481,9 +1481,11 @@ def wrap(schemas: Iterable[Schema], renamer: Renamer):
   sorted_directories = list(directories.keys())
   sorted_directories.sort(key=len)
 
+  # Make everything import everything. This helps with stubs.
   for dir_name in sorted_directories:
-    if len(dir_name):
-      stubs[""].append(STUB_IMPORT.format(dir_name.lower().replace("/", ".")))
+    for other_dir_name in sorted_directories:
+      stubs[dir_name].append(STUB_IMPORT.format(
+          f"multiplier.{other_dir_name}".lower().replace("/", ".").strip(".")))
 
   # Define the modules, and make lists of the wrappers.
   for rel_dir in sorted_directories:
