@@ -50,6 +50,6 @@ using NamedEntity = std::variant<NamedDecl, DefineMacroDirective, File>;
 
 // Explicit specialization to get the entity id.
 template <>
-EntityId::EntityId(const VariantEntity &);
+MX_EXPORT EntityId::EntityId(const VariantEntity &);
 
 }  // namespace mx

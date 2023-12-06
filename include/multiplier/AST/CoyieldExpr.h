@@ -27,7 +27,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class CoyieldExpr : public CoroutineSuspendExpr {
+class MX_EXPORT CoyieldExpr : public CoroutineSuspendExpr {
  private:
   friend class FragmentImpl;
   friend class CoroutineSuspendExpr;

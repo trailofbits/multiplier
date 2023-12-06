@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class InitPriorityAttr : public InheritableAttr {
+class MX_EXPORT InitPriorityAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;

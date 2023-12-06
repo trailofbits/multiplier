@@ -20,15 +20,15 @@ class LLVMTargetExtType;
 }  // namespace mlir::LLVM
 namespace mx::ir::llvm {
 
-class Type : public ::mx::ir::Type {
+class MX_EXPORT Type : public ::mx::ir::Type {
  public:
   static std::optional<Type> from(const ::mx::ir::Type &);
 };
 static_assert(sizeof(Type) == sizeof(::mx::ir::Type));
 
-class ArrayType final : public Type {
+class MX_EXPORT ArrayType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::LLVM_ARRAY;
   }
 
@@ -42,9 +42,9 @@ class ArrayType final : public Type {
 };
 static_assert(sizeof(ArrayType) == sizeof(Type));
 
-class FixedVectorType final : public Type {
+class MX_EXPORT FixedVectorType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::LLVM_FIXED_VECTOR;
   }
 
@@ -57,9 +57,9 @@ class FixedVectorType final : public Type {
 };
 static_assert(sizeof(FixedVectorType) == sizeof(Type));
 
-class FunctionType final : public Type {
+class MX_EXPORT FunctionType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::LLVM_FUNCTION;
   }
 
@@ -76,9 +76,9 @@ class FunctionType final : public Type {
 };
 static_assert(sizeof(FunctionType) == sizeof(Type));
 
-class PointerType final : public Type {
+class MX_EXPORT PointerType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::LLVM_POINTER;
   }
 
@@ -92,9 +92,9 @@ class PointerType final : public Type {
 };
 static_assert(sizeof(PointerType) == sizeof(Type));
 
-class ScalableVectorType final : public Type {
+class MX_EXPORT ScalableVectorType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::LLVM_SCALABLE_VECTOR;
   }
 
@@ -107,9 +107,9 @@ class ScalableVectorType final : public Type {
 };
 static_assert(sizeof(ScalableVectorType) == sizeof(Type));
 
-class TargetExtType final : public Type {
+class MX_EXPORT TargetExtType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::LLVM_TARGET_EXT;
   }
 

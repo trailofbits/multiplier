@@ -18,6 +18,7 @@
 #define MX_DATABASE_TEMP_STORE "MEMORY"
 #define MX_DATABASE_JOURNAL_MODE "WAL"
 
+#pragma GCC visibility push(hidden)
 namespace mx {
 class DatabaseWriterImpl;
 
@@ -507,3 +508,4 @@ class DatabaseWriter final {
 };
 
 } // namespace mx
+#pragma GCC visibility pop

@@ -27,7 +27,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ImplicitCastExpr : public CastExpr {
+class MX_EXPORT ImplicitCastExpr : public CastExpr {
  private:
   friend class FragmentImpl;
   friend class CastExpr;

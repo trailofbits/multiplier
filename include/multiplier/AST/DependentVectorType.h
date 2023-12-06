@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class DependentVectorType : public Type {
+class MX_EXPORT DependentVectorType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;

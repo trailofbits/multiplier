@@ -130,8 +130,8 @@ TypeImpl::TypeImpl(std::shared_ptr<EntityProvider> ep_,
 }
 
 // Return a reader for the type tokens associated with the type
-TokenReader::Ptr TypeImpl::TypeTokenReader(const TypeImplPtr &self) const {
-  return TokenReader::Ptr(self, &type_token_reader);
+TokenReaderPtr TypeImpl::TypeTokenReader(const TypeImplPtr &self) const {
+  return TokenReaderPtr(self, &type_token_reader);
 }
 
 TokenContextReader::Ptr

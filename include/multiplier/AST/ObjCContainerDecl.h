@@ -28,7 +28,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ObjCContainerDecl : public NamedDecl {
+class MX_EXPORT ObjCContainerDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;

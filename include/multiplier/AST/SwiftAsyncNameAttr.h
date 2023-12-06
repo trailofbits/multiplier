@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class SwiftAsyncNameAttr : public InheritableAttr {
+class MX_EXPORT SwiftAsyncNameAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;

@@ -40,7 +40,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class FunctionDecl : public DeclaratorDecl {
+class MX_EXPORT FunctionDecl : public DeclaratorDecl {
  private:
   friend class FragmentImpl;
   friend class DeclaratorDecl;

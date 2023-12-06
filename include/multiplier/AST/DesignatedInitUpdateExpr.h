@@ -27,7 +27,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class DesignatedInitUpdateExpr : public Expr {
+class MX_EXPORT DesignatedInitUpdateExpr : public Expr {
  private:
   friend class FragmentImpl;
   friend class Expr;

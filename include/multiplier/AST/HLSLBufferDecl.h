@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class HLSLBufferDecl : public NamedDecl {
+class MX_EXPORT HLSLBufferDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;

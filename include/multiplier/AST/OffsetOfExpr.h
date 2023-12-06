@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class OffsetOfExpr : public Expr {
+class MX_EXPORT OffsetOfExpr : public Expr {
  private:
   friend class FragmentImpl;
   friend class Expr;

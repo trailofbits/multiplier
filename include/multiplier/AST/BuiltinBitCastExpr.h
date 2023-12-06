@@ -28,7 +28,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class BuiltinBitCastExpr : public ExplicitCastExpr {
+class MX_EXPORT BuiltinBitCastExpr : public ExplicitCastExpr {
  private:
   friend class FragmentImpl;
   friend class ExplicitCastExpr;

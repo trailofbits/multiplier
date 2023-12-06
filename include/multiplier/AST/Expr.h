@@ -31,7 +31,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class Expr : public ValueStmt {
+class MX_EXPORT Expr : public ValueStmt {
  private:
   friend class FragmentImpl;
   friend class ValueStmt;

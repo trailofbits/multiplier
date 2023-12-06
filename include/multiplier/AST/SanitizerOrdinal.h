@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -93,6 +95,6 @@ inline static constexpr unsigned NumEnumerators(SanitizerOrdinal) {
   return 71;
 }
 
-const char *EnumeratorName(SanitizerOrdinal);
+MX_EXPORT const char *EnumeratorName(SanitizerOrdinal);
 
 } // namespace mx

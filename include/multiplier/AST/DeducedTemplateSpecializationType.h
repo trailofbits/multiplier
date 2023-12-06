@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class DeducedTemplateSpecializationType : public DeducedType {
+class MX_EXPORT DeducedTemplateSpecializationType : public DeducedType {
  private:
   friend class FragmentImpl;
   friend class DeducedType;

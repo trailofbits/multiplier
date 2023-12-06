@@ -6,7 +6,7 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.24)
 
 include("cmake/ccache.cmake")
 
@@ -22,8 +22,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   message(FATAL_ERROR "CMAKE_BUILD_TYPE must not be RelWithDebInfo")
 endif()
 
-set(CMAKE_CXX_VISIBILITY_PRESET hidden) 
-set(CMAKE_C_VISIBILITY_PRESET hidden) 
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(VISIBILITY_INLINES_HIDDEN YES)
 
 list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
@@ -31,12 +31,14 @@ list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 include("cmake/system.cmake")
 include("cmake/llvm.cmake")
 include("cmake/linker.cmake")
+include("cmake/git.cmake")
 
 if(MX_ENABLE_INSTALL)
   include("cmake/packaging.cmake")
 endif(MX_ENABLE_INSTALL)
 
 if(PLATFORM_MACOS)
+  set(CMAKE_MACOSX_RPATH 1)
   set(CMAKE_INSTALL_RPATH "@executable_path/../${MX_INSTALL_LIB_DIR}")
 elseif(PLATFORM_LINUX)
   set(CMAKE_INSTALL_RPATH "$ORIGIN/../${MX_INSTALL_LIB_DIR}")
@@ -61,7 +63,6 @@ if(NOT TARGET gflags::gflags)
 endif()
 
 find_package(Filesystem REQUIRED COMPONENTS Final Experimental)
-find_package(Python3 COMPONENTS Interpreter REQUIRED)
 find_package(CapnProto CONFIG REQUIRED)
 find_package(xxHash CONFIG REQUIRED)
 find_package(zstd CONFIG REQUIRED)
@@ -91,6 +92,10 @@ if(MX_ENABLE_VAST)
   include("cmake/vast.cmake")
 endif()
 
+if(MX_ENABLE_PYTHON_BINDINGS)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed)
+endif()
+
 if(MX_ENABLE_INSTALL)
   export(PACKAGE "${PROJECT_NAME}")
   
@@ -106,11 +111,16 @@ if(MX_ENABLE_INSTALL)
     FILES
       "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
       "${PROJECT_SOURCE_DIR}/cmake/modules/FindFilesystem.cmake"
-    DESTINATION "${cmake_install_dir}"
+    DESTINATION
+      "${cmake_install_dir}"
   )
-  install(EXPORT "${PROJECT_NAME}Targets"
-    DESTINATION "${cmake_install_dir}"
-    NAMESPACE "${PROJECT_NAME}::"
+  install(
+    EXPORT
+      "${PROJECT_NAME}Targets"
+    DESTINATION
+      "${cmake_install_dir}"
+    NAMESPACE
+      "${PROJECT_NAME}::"
   )
 endif(MX_ENABLE_INSTALL)
 
@@ -121,17 +131,102 @@ set(MX_BOOTSTRAP_INDEX_PASTA_CPP "${PROJECT_SOURCE_DIR}/bin/Index/PASTA.cpp")
 set(MX_BOOTSTRAP_INDEX_PASTA_H "${PROJECT_SOURCE_DIR}/bin/Index/PASTA.h")
 set(MX_BOOTSTRAP_LIB_DIR "${PROJECT_SOURCE_DIR}/lib")
 set(MX_BOOTSTRAP_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include/multiplier")
-set(MX_BOOTSTRAP_INCLUDE_MLIR_DIR "${PROJECT_SOURCE_DIR}/include/multiplier/IR/MLIR")
-set(MX_BOOTSTRAP_LIB_MLIR_DIR "${PROJECT_SOURCE_DIR}/lib/IR/MLIR")
-set(MX_BOOTSTRAP_INCLUDE_VAST_DIR "${PROJECT_SOURCE_DIR}/include/multiplier/IR/VAST")
-set(MX_BOOTSTRAP_LIB_VAST_DIR "${PROJECT_SOURCE_DIR}/lib/IR/VAST")
 set(MX_BOOTSTRAP_INDEX_SERIALIZE_H "${PROJECT_SOURCE_DIR}/bin/Index/Serialize.h")
 set(MX_BOOTSTRAP_INDEX_SERIALIZE_CPP "${PROJECT_SOURCE_DIR}/bin/Index/Serialize.cpp")
 set(MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H "${PROJECT_SOURCE_DIR}/include/multiplier/Visitor.inc.h")
 
+# If we're bootstrapping then stop here.
 if(MX_ENABLE_BOOTSTRAP)
   add_subdirectory("bin/Bootstrap")
-else()
-  add_subdirectory("lib")
-  add_subdirectory("bin")
+  return()
 endif()
+
+# Configure the version to include the git hash.
+#
+# TODO(pag): This only tracks the hash that was present at CMake configure time.
+get_patch_from_git(MX_GIT_HASH)
+configure_file(lib/Version.cpp.in "${PROJECT_BINARY_DIR}/Version.cpp" @ONLY)
+
+# NOTE(pag): Make the `multiplier` target visible prior to adding the
+#            `bindings` subdirectory so that the Python bindings CMakeLists.txt
+#            can be responsible for installation.
+add_library("multiplier" SHARED
+  "${PROJECT_BINARY_DIR}/Version.cpp"
+)
+
+set_target_properties("multiplier"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX
+    VISIBILITY_INLINES_HIDDEN
+      YES
+    CXX_VISIBILITY_PRESET
+      hidden
+    POSITION_INDEPENDENT_CODE
+      YES
+    COMPILE_FEATURES
+      cxx_std_20
+    INTERFACE_COMPILE_FEATURES
+      cxx_std_20
+
+    # NOTE(pag): This is important! We need to emulate the shape of the
+    #            install directories, so that install targets behave in the
+    #            same way to local build targets w.r.t. shared library
+    #            resolution. This places `libmultiplier.so` in the `lib/` sub-
+    #            directory, where we also place copies of `libLTO.so` and
+    #            `libRemarks.so`. This mirrors the organization inside of
+    #            `<install-prefix>/lib`. This same-shapedness is necessary for
+    #            how we fiddle with the RPATH, and do symlinking for Python
+    #            extensions.
+    LIBRARY_OUTPUT_DIRECTORY
+      "${PROJECT_BINARY_DIR}/lib"
+)
+
+target_include_directories("multiplier"
+  PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:${MX_INSTALL_INCLUDE_DIR}>
+)
+
+if(MX_ENABLE_INSTALL)
+  install(
+    TARGETS
+      "multiplier"
+    EXPORT
+      "${PROJECT_NAME}Targets"
+    RUNTIME
+      DESTINATION
+        "${MX_INSTALL_BIN_DIR}"
+    LIBRARY
+      DESTINATION
+        "${MX_INSTALL_LIB_DIR}"
+    ARCHIVE
+      DESTINATION
+        "${MX_INSTALL_LIB_DIR}"
+    PUBLIC_HEADER
+      DESTINATION
+        "${MX_INSTALL_INCLUDE_DIR}/multiplier"
+  )
+endif()
+
+add_subdirectory("lib")
+add_subdirectory("bin")
+add_subdirectory("bindings")
+
+if(MX_ENABLE_PYTHON_BINDINGS)
+  set(multiplier_private_lib "mx-python")
+else()
+  set(multiplier_private_lib "mx-api")
+endif()
+
+target_link_libraries("multiplier"
+  PUBLIC
+    "gap::gap"
+    "gap::gap-core"
+    "gap::gap-settings"
+    "std::coroutines"
+  PRIVATE
+    "$<LINK_LIBRARY:WHOLE_ARCHIVE,${multiplier_private_lib}>"
+)
+

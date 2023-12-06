@@ -28,7 +28,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class UserDefinedLiteral : public CallExpr {
+class MX_EXPORT UserDefinedLiteral : public CallExpr {
  private:
   friend class FragmentImpl;
   friend class CallExpr;

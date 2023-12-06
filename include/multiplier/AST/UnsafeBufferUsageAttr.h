@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class UnsafeBufferUsageAttr : public InheritableAttr {
+class MX_EXPORT UnsafeBufferUsageAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;

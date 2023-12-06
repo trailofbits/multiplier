@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class AlwaysInlineAttr : public DeclOrStmtAttr {
+class MX_EXPORT AlwaysInlineAttr : public DeclOrStmtAttr {
  private:
   friend class FragmentImpl;
   friend class DeclOrStmtAttr;

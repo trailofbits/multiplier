@@ -296,6 +296,18 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
       CheckFragOffset<mx::TemplateArgumentId>,
       0u);
 
+  // Issue #480: Index macros. Persist.cpp manages the serialization of the
+  //             macros separately, but we still need to index them here so that
+  //             we can identify uses of macros across the codebase.
+  for (const auto &[kind, entities] : pf.macros_to_serialize) {
+    for (const auto &maybe_tt : entities) {
+      if (maybe_tt) {
+        mx::RawEntityId eid = em.EntityId(maybe_tt.value());
+        db.AsyncIndexFragmentSpecificEntity(eid);
+      } 
+    }
+  }
+
   em.tm.ExitReadOnly();
 }
 

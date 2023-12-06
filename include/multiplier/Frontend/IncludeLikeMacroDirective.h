@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class IncludeLikeMacroDirective : public MacroDirective {
+class MX_EXPORT IncludeLikeMacroDirective : public MacroDirective {
  private:
   friend class FragmentImpl;
   friend class MacroDirective;

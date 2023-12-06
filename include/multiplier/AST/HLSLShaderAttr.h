@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class HLSLShaderAttr : public InheritableAttr {
+class MX_EXPORT HLSLShaderAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;

@@ -7,7 +7,11 @@
 #
 
 if(NOT MX_USE_VENDORED_GAP)
-  find_package(gap CONFIG QUIET)
+  
+  # NOTE(pag): Require that we find Gap in the installation directory. This
+  #            simplifies releases, and ensures that vendoring also installs
+  #            gap into the releases directory.
+  find_package(gap CONFIG QUIET PATHS "${CMAKE_INSTALL_PREFIX}" NO_DEFAULT_PATH)
   if(gap_FOUND)
     return()
   endif()
@@ -28,12 +32,14 @@ endif()
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${build_dir}")
 
-# (b) Nested CMake run. May need more -D... options than shown here.
+# NOTE(pag): We use `CMAKE_INSTALL_PREFIX` so that `gap` ends up inside of our
+#            installation prefix for Multiplier, so that it's easy to
+#            distribute.
 execute_process(COMMAND ${CMAKE_COMMAND}
                         -G "${CMAKE_GENERATOR}"
                         "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
                         "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
-                        "-DCMAKE_INSTALL_PREFIX=${MX_VENDOR_INSTALL_DIR}"
+                        "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
                         "-DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH}"
                         "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
@@ -41,6 +47,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_MODULE_LINKER_FLAGS_INIT=${CMAKE_MODULE_LINKER_FLAGS_INIT}"
                         "-DCMAKE_SHARED_LINKER_FLAGS_INIT=${CMAKE_SHARED_LINKER_FLAGS_INIT}"
                         -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
+                        -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
                         -DGAP_ENABLE_TESTING:BOOL=OFF
                         -DGAP_ENABLE_EXAMPLES:BOOL=OFF
                         -DGAP_ENABLE_COROUTINES:BOOL=ON
@@ -50,11 +57,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "${src_dir}"
                WORKING_DIRECTORY "${build_dir}")
 
-# (c) Build just mycomp in the nested build. Don't specify a --config
-#     because we cannot know what config the developer will be using
-#     at this point. For non-multi-config generators, we've already
-#     specified CMAKE_BUILD_TYPE above in (b).
 execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install
                 WORKING_DIRECTORY "${build_dir}")
 
-find_package(gap CONFIG REQUIRED PATHS "${MX_VENDOR_INSTALL_DIR}" NO_DEFAULT_PATH)
+find_package(gap CONFIG REQUIRED PATHS "${CMAKE_INSTALL_PREFIX}" NO_DEFAULT_PATH)

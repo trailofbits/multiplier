@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ConstantArrayType : public ArrayType {
+class MX_EXPORT ConstantArrayType : public ArrayType {
  private:
   friend class FragmentImpl;
   friend class ArrayType;

@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class HLSLSV_GroupIndexAttr : public HLSLAnnotationAttr {
+class MX_EXPORT HLSLSV_GroupIndexAttr : public HLSLAnnotationAttr {
  private:
   friend class FragmentImpl;
   friend class HLSLAnnotationAttr;

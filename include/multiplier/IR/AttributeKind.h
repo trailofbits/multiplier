@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 namespace mx {
 namespace ir {
 enum class AttributeKind : unsigned {
@@ -109,6 +111,6 @@ inline static constexpr unsigned NumEnumerators(ir::AttributeKind) {
   return 85;
 }
 
-const char *EnumeratorName(ir::AttributeKind);
+MX_EXPORT const char *EnumeratorName(ir::AttributeKind);
 
 }  // namespace mx

@@ -81,7 +81,6 @@ add_executable("${exe_name}"
 
 target_link_libraries("${exe_name}"
   PRIVATE
-    ${MX_BEGIN_FORCE_LOAD_GROUP}
     "mx-api"
     clangIndex
     glog::glog
@@ -90,8 +89,7 @@ target_link_libraries("${exe_name}"
     reproc++
     xxHash::xxhash
     RocksDB::rocksdb
-    ${MX_BEGIN_FORCE_LOAD_LIB} pasta::pasta ${MX_END_FORCE_LOAD_LIB}
-    ${MX_END_FORCE_LOAD_GROUP}
+    pasta::pasta
 )
 
 # When we're bootstrapping, we might be using a different version of Clang and
@@ -110,6 +108,8 @@ target_compile_options("${exe_name}"
 
 set_target_properties("${exe_name}" PROPERTIES LINKER_LANGUAGE CXX)
 
+find_and_link_llvm_dependencies("${exe_name}")
+
 if(MX_ENABLE_INSTALL)
   install(
     TARGETS
@@ -120,6 +120,4 @@ if(MX_ENABLE_INSTALL)
       DESTINATION
         "${CMAKE_INSTALL_BINDIR}"
   )
-
-  find_and_install_llvm_dependencies()
 endif()

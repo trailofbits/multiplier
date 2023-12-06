@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ElseMacroDirective : public ConditionalMacroDirective {
+class MX_EXPORT ElseMacroDirective : public ConditionalMacroDirective {
  private:
   friend class FragmentImpl;
   friend class ConditionalMacroDirective;

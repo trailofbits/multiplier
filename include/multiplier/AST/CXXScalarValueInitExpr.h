@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class CXXScalarValueInitExpr : public Expr {
+class MX_EXPORT CXXScalarValueInitExpr : public Expr {
  private:
   friend class FragmentImpl;
   friend class Expr;

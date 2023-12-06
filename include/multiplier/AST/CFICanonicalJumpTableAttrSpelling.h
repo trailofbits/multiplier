@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -26,6 +28,6 @@ inline static constexpr unsigned NumEnumerators(CFICanonicalJumpTableAttrSpellin
   return 4;
 }
 
-const char *EnumeratorName(CFICanonicalJumpTableAttrSpelling);
+MX_EXPORT const char *EnumeratorName(CFICanonicalJumpTableAttrSpelling);
 
 } // namespace mx

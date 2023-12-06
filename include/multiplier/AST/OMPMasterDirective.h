@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class OMPMasterDirective : public OMPExecutableDirective {
+class MX_EXPORT OMPMasterDirective : public OMPExecutableDirective {
  private:
   friend class FragmentImpl;
   friend class OMPExecutableDirective;

@@ -12,6 +12,7 @@
 #include "Frontend/File.h"
 #include "Frontend/Token.h"
 #include "Frontend/TokenTree.h"
+#include "Frontend/Query.h"
 
 #include "Frontend/TokenKind.h"
 #include "Frontend/MacroKind.h"

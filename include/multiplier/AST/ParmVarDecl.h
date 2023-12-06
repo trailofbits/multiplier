@@ -32,7 +32,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ParmVarDecl : public VarDecl {
+class MX_EXPORT ParmVarDecl : public VarDecl {
  private:
   friend class FragmentImpl;
   friend class VarDecl;

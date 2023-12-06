@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ParenExpr : public Expr {
+class MX_EXPORT ParenExpr : public Expr {
  private:
   friend class FragmentImpl;
   friend class Expr;

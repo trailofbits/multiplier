@@ -90,7 +90,7 @@ class TokenTreeImpl {
   // The list of token readers used in this fragment. There is always one
   // entry in this list. The first entry is always either a file token reader,
   // or an invalid token reader. This is indexed by a `TokenIndex`.
-  std::vector<TokenReader::Ptr> readers;
+  std::vector<TokenReaderPtr> readers;
 
   int depth{0};
 

@@ -10,6 +10,8 @@
 #include <memory>
 #include <optional>
 
+#include "../Compiler.h"
+
 namespace mlir {
 class Region;
 }  // namespace mlir
@@ -20,14 +22,24 @@ class Argument;
 class Operation;
 class SourceIRImpl;
 
-enum BasicBlockOrder {
+enum BasicBlockOrder : int {
   PRE_ORDER,
   POST_ORDER
 };
 
+inline static const char *EnumerationName(BasicBlockOrder) {
+  return "BasicBlockOrder";
+}
+
+MX_EXPORT const char *EnumeratorName(BasicBlockOrder);
+
+inline static constexpr unsigned NumEnumerators(BasicBlockOrder) {
+  return 2;
+}
+
 // A region is owned by an operation (not all operations own regions)
 // and contain one or more blocks.
-class Region final {
+class MX_EXPORT Region final {
  private:
   friend class Operation;
   friend class Block;

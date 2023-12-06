@@ -14,8 +14,8 @@ namespace mx {
 enum class StmtKind : unsigned char;
 
 template <typename ForwardIterator, typename T>
-ForwardIterator LowerBound(ForwardIterator first, ForwardIterator last,
-                           const T &val) {
+static ForwardIterator LowerBound(ForwardIterator first, ForwardIterator last,
+                                  const T &val) {
   for (auto count = last - first; count > 0; ) {
     auto step = count / 2;
     ForwardIterator it = first + step;
@@ -30,8 +30,8 @@ ForwardIterator LowerBound(ForwardIterator first, ForwardIterator last,
 }
 
 template <typename ForwardIterator, typename T>
-ForwardIterator UpperBound(ForwardIterator first, ForwardIterator last,
-                           const T &val) {
+static ForwardIterator UpperBound(ForwardIterator first, ForwardIterator last,
+                                  const T &val) {
   for (auto count = last - first; count > 0; ) {
     auto step = count / 2;
     ForwardIterator it = first + step;

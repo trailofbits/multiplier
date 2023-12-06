@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -26,6 +28,6 @@ inline static constexpr unsigned NumEnumerators(OpenMPOrderClauseModifier) {
   return 4;
 }
 
-const char *EnumeratorName(OpenMPOrderClauseModifier);
+MX_EXPORT const char *EnumeratorName(OpenMPOrderClauseModifier);
 
 } // namespace mx

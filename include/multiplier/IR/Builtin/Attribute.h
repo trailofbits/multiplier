@@ -36,15 +36,15 @@ class DenseIntElementsAttr;
 }  // namespace mlir
 namespace mx::ir::builtin {
 
-class Attribute : public ::mx::ir::Attribute {
+class MX_EXPORT Attribute : public ::mx::ir::Attribute {
  public:
   static std::optional<Attribute> from(const ::mx::ir::Attribute &);
 };
 static_assert(sizeof(Attribute) == sizeof(::mx::ir::Attribute));
 
-class TypedAttr final : public Attribute {
+class MX_EXPORT TypedAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_TYPED;
   }
 
@@ -57,9 +57,9 @@ class TypedAttr final : public Attribute {
 };
 static_assert(sizeof(TypedAttr) == sizeof(Attribute));
 
-class ElementsAttr final : public Attribute {
+class MX_EXPORT ElementsAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_ELEMENTS;
   }
 
@@ -78,9 +78,9 @@ class ElementsAttr final : public Attribute {
 };
 static_assert(sizeof(ElementsAttr) == sizeof(Attribute));
 
-class AffineMapAttr final : public Attribute {
+class MX_EXPORT AffineMapAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_AFFINE_MAP;
   }
 
@@ -94,9 +94,9 @@ class AffineMapAttr final : public Attribute {
 };
 static_assert(sizeof(AffineMapAttr) == sizeof(Attribute));
 
-class ArrayAttr final : public Attribute {
+class MX_EXPORT ArrayAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_ARRAY;
   }
 
@@ -113,9 +113,9 @@ class ArrayAttr final : public Attribute {
 };
 static_assert(sizeof(ArrayAttr) == sizeof(Attribute));
 
-class DenseArrayAttr final : public Attribute {
+class MX_EXPORT DenseArrayAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_DENSE_ARRAY;
   }
 
@@ -131,9 +131,9 @@ class DenseArrayAttr final : public Attribute {
 };
 static_assert(sizeof(DenseArrayAttr) == sizeof(Attribute));
 
-class DenseIntOrFPElementsAttr final : public Attribute {
+class MX_EXPORT DenseIntOrFPElementsAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_DENSE_INT_OR_FP_ELEMENTS;
   }
 
@@ -145,9 +145,9 @@ class DenseIntOrFPElementsAttr final : public Attribute {
 };
 static_assert(sizeof(DenseIntOrFPElementsAttr) == sizeof(Attribute));
 
-class DenseResourceElementsAttr final : public Attribute {
+class MX_EXPORT DenseResourceElementsAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_DENSE_RESOURCE_ELEMENTS;
   }
 
@@ -161,9 +161,9 @@ class DenseResourceElementsAttr final : public Attribute {
 };
 static_assert(sizeof(DenseResourceElementsAttr) == sizeof(Attribute));
 
-class DenseStringElementsAttr final : public Attribute {
+class MX_EXPORT DenseStringElementsAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_DENSE_STRING_ELEMENTS;
   }
 
@@ -175,9 +175,9 @@ class DenseStringElementsAttr final : public Attribute {
 };
 static_assert(sizeof(DenseStringElementsAttr) == sizeof(Attribute));
 
-class DictionaryAttr final : public Attribute {
+class MX_EXPORT DictionaryAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_DICTIONARY;
   }
 
@@ -194,9 +194,9 @@ class DictionaryAttr final : public Attribute {
 };
 static_assert(sizeof(DictionaryAttr) == sizeof(Attribute));
 
-class FloatAttr final : public Attribute {
+class MX_EXPORT FloatAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_FLOAT;
   }
 
@@ -211,9 +211,9 @@ class FloatAttr final : public Attribute {
 };
 static_assert(sizeof(FloatAttr) == sizeof(Attribute));
 
-class IntegerAttr final : public Attribute {
+class MX_EXPORT IntegerAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_INTEGER;
   }
 
@@ -231,9 +231,9 @@ class IntegerAttr final : public Attribute {
 };
 static_assert(sizeof(IntegerAttr) == sizeof(Attribute));
 
-class IntegerSetAttr final : public Attribute {
+class MX_EXPORT IntegerSetAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_INTEGER_SET;
   }
 
@@ -246,9 +246,9 @@ class IntegerSetAttr final : public Attribute {
 };
 static_assert(sizeof(IntegerSetAttr) == sizeof(Attribute));
 
-class OpaqueAttr final : public Attribute {
+class MX_EXPORT OpaqueAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_OPAQUE;
   }
 
@@ -263,9 +263,9 @@ class OpaqueAttr final : public Attribute {
 };
 static_assert(sizeof(OpaqueAttr) == sizeof(Attribute));
 
-class SparseElementsAttr final : public Attribute {
+class MX_EXPORT SparseElementsAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_SPARSE_ELEMENTS;
   }
 
@@ -284,9 +284,9 @@ class SparseElementsAttr final : public Attribute {
 };
 static_assert(sizeof(SparseElementsAttr) == sizeof(Attribute));
 
-class StringAttr final : public Attribute {
+class MX_EXPORT StringAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_STRING;
   }
 
@@ -307,9 +307,9 @@ class StringAttr final : public Attribute {
 };
 static_assert(sizeof(StringAttr) == sizeof(Attribute));
 
-class SymbolRefAttr final : public Attribute {
+class MX_EXPORT SymbolRefAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_SYMBOL_REF;
   }
 
@@ -324,9 +324,9 @@ class SymbolRefAttr final : public Attribute {
 };
 static_assert(sizeof(SymbolRefAttr) == sizeof(Attribute));
 
-class TypeAttr final : public Attribute {
+class MX_EXPORT TypeAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_TYPE;
   }
 
@@ -339,9 +339,9 @@ class TypeAttr final : public Attribute {
 };
 static_assert(sizeof(TypeAttr) == sizeof(Attribute));
 
-class UnitAttr final : public Attribute {
+class MX_EXPORT UnitAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_UNIT;
   }
 
@@ -353,9 +353,9 @@ class UnitAttr final : public Attribute {
 };
 static_assert(sizeof(UnitAttr) == sizeof(Attribute));
 
-class StridedLayoutAttr final : public Attribute {
+class MX_EXPORT StridedLayoutAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_STRIDED_LAYOUT;
   }
 
@@ -370,9 +370,9 @@ class StridedLayoutAttr final : public Attribute {
 };
 static_assert(sizeof(StridedLayoutAttr) == sizeof(Attribute));
 
-class BoolAttr final : public Attribute {
+class MX_EXPORT BoolAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_BOOL;
   }
 
@@ -385,9 +385,9 @@ class BoolAttr final : public Attribute {
 };
 static_assert(sizeof(BoolAttr) == sizeof(Attribute));
 
-class FlatSymbolRefAttr final : public Attribute {
+class MX_EXPORT FlatSymbolRefAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_FLAT_SYMBOL_REF;
   }
 
@@ -401,9 +401,9 @@ class FlatSymbolRefAttr final : public Attribute {
 };
 static_assert(sizeof(FlatSymbolRefAttr) == sizeof(Attribute));
 
-class DenseIntElementsAttr final : public Attribute {
+class MX_EXPORT DenseIntElementsAttr final : public Attribute {
  public:
-  inline static AttributeKind static_kind(void) {
+  inline static constexpr AttributeKind static_kind(void) {
     return AttributeKind::BUILTIN_DENSE_INT_ELEMENTS;
   }
 

@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class FixedPointLiteral : public Expr {
+class MX_EXPORT FixedPointLiteral : public Expr {
  private:
   friend class FragmentImpl;
   friend class Expr;

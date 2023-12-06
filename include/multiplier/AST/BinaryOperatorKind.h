@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -55,6 +57,6 @@ inline static constexpr unsigned NumEnumerators(BinaryOperatorKind) {
   return 33;
 }
 
-const char *EnumeratorName(BinaryOperatorKind);
+MX_EXPORT const char *EnumeratorName(BinaryOperatorKind);
 
 } // namespace mx

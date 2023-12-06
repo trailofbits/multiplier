@@ -15,15 +15,15 @@ class UnsupportedType;
 }  // namespace vast::unsup
 namespace mx::ir::unsup {
 
-class Type : public ::mx::ir::Type {
+class MX_EXPORT Type : public ::mx::ir::Type {
  public:
   static std::optional<Type> from(const ::mx::ir::Type &);
 };
 static_assert(sizeof(Type) == sizeof(::mx::ir::Type));
 
-class UnsupportedType final : public Type {
+class MX_EXPORT UnsupportedType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::UNSUP_UNSUPPORTED;
   }
 

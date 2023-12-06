@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ObjCGCAttr : public TypeAttr {
+class MX_EXPORT ObjCGCAttr : public TypeAttr {
  private:
   friend class FragmentImpl;
   friend class TypeAttr;

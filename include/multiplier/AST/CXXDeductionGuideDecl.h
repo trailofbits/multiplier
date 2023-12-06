@@ -31,7 +31,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class CXXDeductionGuideDecl : public FunctionDecl {
+class MX_EXPORT CXXDeductionGuideDecl : public FunctionDecl {
  private:
   friend class FragmentImpl;
   friend class FunctionDecl;

@@ -125,15 +125,15 @@ class UnreachableOp;
 }  // namespace vast::hl
 namespace mx::ir::hl {
 
-class Operation : public ::mx::ir::Operation {
+class MX_EXPORT Operation : public ::mx::ir::Operation {
  public:
   static std::optional<Operation> from(const ::mx::ir::Operation &);
 };
 static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));
 
-class AccessSpecifierOp final : public Operation {
+class MX_EXPORT AccessSpecifierOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ACCESS;
   }
 
@@ -147,9 +147,9 @@ class AccessSpecifierOp final : public Operation {
 };
 static_assert(sizeof(AccessSpecifierOp) == sizeof(Operation));
 
-class AddFAssignOp final : public Operation {
+class MX_EXPORT AddFAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_FADD;
   }
 
@@ -165,9 +165,9 @@ class AddFAssignOp final : public Operation {
 };
 static_assert(sizeof(AddFAssignOp) == sizeof(Operation));
 
-class AddFOp final : public Operation {
+class MX_EXPORT AddFOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_FADD;
   }
 
@@ -183,9 +183,9 @@ class AddFOp final : public Operation {
 };
 static_assert(sizeof(AddFOp) == sizeof(Operation));
 
-class AddIAssignOp final : public Operation {
+class MX_EXPORT AddIAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_ADD;
   }
 
@@ -201,9 +201,9 @@ class AddIAssignOp final : public Operation {
 };
 static_assert(sizeof(AddIAssignOp) == sizeof(Operation));
 
-class AddIOp final : public Operation {
+class MX_EXPORT AddIOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ADD;
   }
 
@@ -219,9 +219,9 @@ class AddIOp final : public Operation {
 };
 static_assert(sizeof(AddIOp) == sizeof(Operation));
 
-class AddrLabelExprOp final : public Operation {
+class MX_EXPORT AddrLabelExprOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_LABELADDR;
   }
 
@@ -236,9 +236,9 @@ class AddrLabelExprOp final : public Operation {
 };
 static_assert(sizeof(AddrLabelExprOp) == sizeof(Operation));
 
-class AddressOfOp final : public Operation {
+class MX_EXPORT AddressOfOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ADDRESSOF;
   }
 
@@ -253,9 +253,9 @@ class AddressOfOp final : public Operation {
 };
 static_assert(sizeof(AddressOfOp) == sizeof(Operation));
 
-class AlignOfExprOp final : public Operation {
+class MX_EXPORT AlignOfExprOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ALIGNOF_EXPR;
   }
 
@@ -270,9 +270,9 @@ class AlignOfExprOp final : public Operation {
 };
 static_assert(sizeof(AlignOfExprOp) == sizeof(Operation));
 
-class AlignOfTypeOp final : public Operation {
+class MX_EXPORT AlignOfTypeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ALIGNOF_TYPE;
   }
 
@@ -287,9 +287,9 @@ class AlignOfTypeOp final : public Operation {
 };
 static_assert(sizeof(AlignOfTypeOp) == sizeof(Operation));
 
-class AssignOp final : public Operation {
+class MX_EXPORT AssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN;
   }
 
@@ -305,9 +305,9 @@ class AssignOp final : public Operation {
 };
 static_assert(sizeof(AssignOp) == sizeof(Operation));
 
-class BinAShrAssignOp final : public Operation {
+class MX_EXPORT BinAShrAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_BIN_ASHR;
   }
 
@@ -323,9 +323,9 @@ class BinAShrAssignOp final : public Operation {
 };
 static_assert(sizeof(BinAShrAssignOp) == sizeof(Operation));
 
-class BinAShrOp final : public Operation {
+class MX_EXPORT BinAShrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_BIN_ASHR;
   }
 
@@ -341,9 +341,9 @@ class BinAShrOp final : public Operation {
 };
 static_assert(sizeof(BinAShrOp) == sizeof(Operation));
 
-class BinAndAssignOp final : public Operation {
+class MX_EXPORT BinAndAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_BIN_AND;
   }
 
@@ -359,9 +359,9 @@ class BinAndAssignOp final : public Operation {
 };
 static_assert(sizeof(BinAndAssignOp) == sizeof(Operation));
 
-class BinAndOp final : public Operation {
+class MX_EXPORT BinAndOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_BIN_AND;
   }
 
@@ -377,9 +377,9 @@ class BinAndOp final : public Operation {
 };
 static_assert(sizeof(BinAndOp) == sizeof(Operation));
 
-class BinCommaOp final : public Operation {
+class MX_EXPORT BinCommaOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_BIN_COMMA;
   }
 
@@ -395,9 +395,9 @@ class BinCommaOp final : public Operation {
 };
 static_assert(sizeof(BinCommaOp) == sizeof(Operation));
 
-class BinLAndOp final : public Operation {
+class MX_EXPORT BinLAndOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_BIN_LAND;
   }
 
@@ -413,9 +413,9 @@ class BinLAndOp final : public Operation {
 };
 static_assert(sizeof(BinLAndOp) == sizeof(Operation));
 
-class BinLOrOp final : public Operation {
+class MX_EXPORT BinLOrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_BIN_LOR;
   }
 
@@ -431,9 +431,9 @@ class BinLOrOp final : public Operation {
 };
 static_assert(sizeof(BinLOrOp) == sizeof(Operation));
 
-class BinLShrAssignOp final : public Operation {
+class MX_EXPORT BinLShrAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_BIN_LSHR;
   }
 
@@ -449,9 +449,9 @@ class BinLShrAssignOp final : public Operation {
 };
 static_assert(sizeof(BinLShrAssignOp) == sizeof(Operation));
 
-class BinLShrOp final : public Operation {
+class MX_EXPORT BinLShrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_BIN_LSHR;
   }
 
@@ -467,9 +467,9 @@ class BinLShrOp final : public Operation {
 };
 static_assert(sizeof(BinLShrOp) == sizeof(Operation));
 
-class BinOrAssignOp final : public Operation {
+class MX_EXPORT BinOrAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_BIN_OR;
   }
 
@@ -485,9 +485,9 @@ class BinOrAssignOp final : public Operation {
 };
 static_assert(sizeof(BinOrAssignOp) == sizeof(Operation));
 
-class BinOrOp final : public Operation {
+class MX_EXPORT BinOrOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_BIN_OR;
   }
 
@@ -503,9 +503,9 @@ class BinOrOp final : public Operation {
 };
 static_assert(sizeof(BinOrOp) == sizeof(Operation));
 
-class BinShlAssignOp final : public Operation {
+class MX_EXPORT BinShlAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_BIN_SHL;
   }
 
@@ -521,9 +521,9 @@ class BinShlAssignOp final : public Operation {
 };
 static_assert(sizeof(BinShlAssignOp) == sizeof(Operation));
 
-class BinShlOp final : public Operation {
+class MX_EXPORT BinShlOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_BIN_SHL;
   }
 
@@ -539,9 +539,9 @@ class BinShlOp final : public Operation {
 };
 static_assert(sizeof(BinShlOp) == sizeof(Operation));
 
-class BinXorAssignOp final : public Operation {
+class MX_EXPORT BinXorAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_BIN_XOR;
   }
 
@@ -557,9 +557,9 @@ class BinXorAssignOp final : public Operation {
 };
 static_assert(sizeof(BinXorAssignOp) == sizeof(Operation));
 
-class BinXorOp final : public Operation {
+class MX_EXPORT BinXorOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_BIN_XOR;
   }
 
@@ -575,9 +575,9 @@ class BinXorOp final : public Operation {
 };
 static_assert(sizeof(BinXorOp) == sizeof(Operation));
 
-class BuiltinBitCastOp final : public Operation {
+class MX_EXPORT BuiltinBitCastOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_BUILTIN_BITCAST;
   }
 
@@ -593,9 +593,9 @@ class BuiltinBitCastOp final : public Operation {
 };
 static_assert(sizeof(BuiltinBitCastOp) == sizeof(Operation));
 
-class CStyleCastOp final : public Operation {
+class MX_EXPORT CStyleCastOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_CSTYLE_CAST;
   }
 
@@ -611,9 +611,9 @@ class CStyleCastOp final : public Operation {
 };
 static_assert(sizeof(CStyleCastOp) == sizeof(Operation));
 
-class CallOp final : public Operation {
+class MX_EXPORT CallOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_CALL;
   }
 
@@ -630,9 +630,9 @@ class CallOp final : public Operation {
 };
 static_assert(sizeof(CallOp) == sizeof(Operation));
 
-class ClassDeclOp final : public Operation {
+class MX_EXPORT ClassDeclOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_CLASS;
   }
 
@@ -648,9 +648,9 @@ class ClassDeclOp final : public Operation {
 };
 static_assert(sizeof(ClassDeclOp) == sizeof(Operation));
 
-class CmpOp final : public Operation {
+class MX_EXPORT CmpOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_CMP;
   }
 
@@ -667,9 +667,9 @@ class CmpOp final : public Operation {
 };
 static_assert(sizeof(CmpOp) == sizeof(Operation));
 
-class ConstantOp final : public Operation {
+class MX_EXPORT ConstantOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_CONST;
   }
 
@@ -684,9 +684,9 @@ class ConstantOp final : public Operation {
 };
 static_assert(sizeof(ConstantOp) == sizeof(Operation));
 
-class CxxBaseSpecifierOp final : public Operation {
+class MX_EXPORT CxxBaseSpecifierOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_BASE;
   }
 
@@ -702,9 +702,9 @@ class CxxBaseSpecifierOp final : public Operation {
 };
 static_assert(sizeof(CxxBaseSpecifierOp) == sizeof(Operation));
 
-class CxxStructDeclOp final : public Operation {
+class MX_EXPORT CxxStructDeclOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_CXXSTRUCT;
   }
 
@@ -720,9 +720,9 @@ class CxxStructDeclOp final : public Operation {
 };
 static_assert(sizeof(CxxStructDeclOp) == sizeof(Operation));
 
-class DeclRefOp final : public Operation {
+class MX_EXPORT DeclRefOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_REF;
   }
 
@@ -737,9 +737,9 @@ class DeclRefOp final : public Operation {
 };
 static_assert(sizeof(DeclRefOp) == sizeof(Operation));
 
-class DerefOp final : public Operation {
+class MX_EXPORT DerefOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_DEREF;
   }
 
@@ -754,9 +754,9 @@ class DerefOp final : public Operation {
 };
 static_assert(sizeof(DerefOp) == sizeof(Operation));
 
-class DivFAssignOp final : public Operation {
+class MX_EXPORT DivFAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_FDIV;
   }
 
@@ -772,9 +772,9 @@ class DivFAssignOp final : public Operation {
 };
 static_assert(sizeof(DivFAssignOp) == sizeof(Operation));
 
-class DivFOp final : public Operation {
+class MX_EXPORT DivFOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_FDIV;
   }
 
@@ -790,9 +790,9 @@ class DivFOp final : public Operation {
 };
 static_assert(sizeof(DivFOp) == sizeof(Operation));
 
-class DivSAssignOp final : public Operation {
+class MX_EXPORT DivSAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_SDIV;
   }
 
@@ -808,9 +808,9 @@ class DivSAssignOp final : public Operation {
 };
 static_assert(sizeof(DivSAssignOp) == sizeof(Operation));
 
-class DivSOp final : public Operation {
+class MX_EXPORT DivSOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_SDIV;
   }
 
@@ -826,9 +826,9 @@ class DivSOp final : public Operation {
 };
 static_assert(sizeof(DivSOp) == sizeof(Operation));
 
-class DivUAssignOp final : public Operation {
+class MX_EXPORT DivUAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_UDIV;
   }
 
@@ -844,9 +844,9 @@ class DivUAssignOp final : public Operation {
 };
 static_assert(sizeof(DivUAssignOp) == sizeof(Operation));
 
-class DivUOp final : public Operation {
+class MX_EXPORT DivUOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_UDIV;
   }
 
@@ -862,9 +862,9 @@ class DivUOp final : public Operation {
 };
 static_assert(sizeof(DivUOp) == sizeof(Operation));
 
-class EnumConstantOp final : public Operation {
+class MX_EXPORT EnumConstantOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ENUM_CONST;
   }
 
@@ -880,9 +880,9 @@ class EnumConstantOp final : public Operation {
 };
 static_assert(sizeof(EnumConstantOp) == sizeof(Operation));
 
-class EnumDeclOp final : public Operation {
+class MX_EXPORT EnumDeclOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ENUM;
   }
 
@@ -898,9 +898,9 @@ class EnumDeclOp final : public Operation {
 };
 static_assert(sizeof(EnumDeclOp) == sizeof(Operation));
 
-class EnumRefOp final : public Operation {
+class MX_EXPORT EnumRefOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ENUMREF;
   }
 
@@ -915,9 +915,9 @@ class EnumRefOp final : public Operation {
 };
 static_assert(sizeof(EnumRefOp) == sizeof(Operation));
 
-class ExprOp final : public Operation {
+class MX_EXPORT ExprOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_EXPR;
   }
 
@@ -932,9 +932,9 @@ class ExprOp final : public Operation {
 };
 static_assert(sizeof(ExprOp) == sizeof(Operation));
 
-class ExtensionOp final : public Operation {
+class MX_EXPORT ExtensionOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_GNU_EXTENSION;
   }
 
@@ -949,9 +949,9 @@ class ExtensionOp final : public Operation {
 };
 static_assert(sizeof(ExtensionOp) == sizeof(Operation));
 
-class FCmpOp final : public Operation {
+class MX_EXPORT FCmpOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_FCMP;
   }
 
@@ -968,9 +968,9 @@ class FCmpOp final : public Operation {
 };
 static_assert(sizeof(FCmpOp) == sizeof(Operation));
 
-class FieldDeclOp final : public Operation {
+class MX_EXPORT FieldDeclOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_FIELD;
   }
 
@@ -986,9 +986,9 @@ class FieldDeclOp final : public Operation {
 };
 static_assert(sizeof(FieldDeclOp) == sizeof(Operation));
 
-class FuncRefOp final : public Operation {
+class MX_EXPORT FuncRefOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_FUNCREF;
   }
 
@@ -1003,9 +1003,9 @@ class FuncRefOp final : public Operation {
 };
 static_assert(sizeof(FuncRefOp) == sizeof(Operation));
 
-class GlobalRefOp final : public Operation {
+class MX_EXPORT GlobalRefOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_GLOBREF;
   }
 
@@ -1020,9 +1020,9 @@ class GlobalRefOp final : public Operation {
 };
 static_assert(sizeof(GlobalRefOp) == sizeof(Operation));
 
-class BreakOp final : public Operation {
+class MX_EXPORT BreakOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_BREAK;
   }
 
@@ -1035,9 +1035,9 @@ class BreakOp final : public Operation {
 };
 static_assert(sizeof(BreakOp) == sizeof(Operation));
 
-class CaseOp final : public Operation {
+class MX_EXPORT CaseOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_CASE;
   }
 
@@ -1052,9 +1052,9 @@ class CaseOp final : public Operation {
 };
 static_assert(sizeof(CaseOp) == sizeof(Operation));
 
-class CondOp final : public Operation {
+class MX_EXPORT CondOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_COND;
   }
 
@@ -1071,9 +1071,9 @@ class CondOp final : public Operation {
 };
 static_assert(sizeof(CondOp) == sizeof(Operation));
 
-class CondYieldOp final : public Operation {
+class MX_EXPORT CondYieldOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_COND_YIELD;
   }
 
@@ -1087,9 +1087,9 @@ class CondYieldOp final : public Operation {
 };
 static_assert(sizeof(CondYieldOp) == sizeof(Operation));
 
-class ContinueOp final : public Operation {
+class MX_EXPORT ContinueOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_CONTINUE;
   }
 
@@ -1102,9 +1102,9 @@ class ContinueOp final : public Operation {
 };
 static_assert(sizeof(ContinueOp) == sizeof(Operation));
 
-class DefaultOp final : public Operation {
+class MX_EXPORT DefaultOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_DEFAULT;
   }
 
@@ -1118,9 +1118,9 @@ class DefaultOp final : public Operation {
 };
 static_assert(sizeof(DefaultOp) == sizeof(Operation));
 
-class DoOp final : public Operation {
+class MX_EXPORT DoOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_DO;
   }
 
@@ -1135,9 +1135,9 @@ class DoOp final : public Operation {
 };
 static_assert(sizeof(DoOp) == sizeof(Operation));
 
-class EmptyDeclOp final : public Operation {
+class MX_EXPORT EmptyDeclOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_EMPTY_DECL;
   }
 
@@ -1150,9 +1150,9 @@ class EmptyDeclOp final : public Operation {
 };
 static_assert(sizeof(EmptyDeclOp) == sizeof(Operation));
 
-class ForOp final : public Operation {
+class MX_EXPORT ForOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_FOR;
   }
 
@@ -1168,9 +1168,9 @@ class ForOp final : public Operation {
 };
 static_assert(sizeof(ForOp) == sizeof(Operation));
 
-class FuncOp final : public Operation {
+class MX_EXPORT FuncOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_FUNC;
   }
 
@@ -1198,9 +1198,9 @@ class FuncOp final : public Operation {
 };
 static_assert(sizeof(FuncOp) == sizeof(Operation));
 
-class GotoStmtOp final : public Operation {
+class MX_EXPORT GotoStmtOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_GOTO;
   }
 
@@ -1214,9 +1214,9 @@ class GotoStmtOp final : public Operation {
 };
 static_assert(sizeof(GotoStmtOp) == sizeof(Operation));
 
-class IfOp final : public Operation {
+class MX_EXPORT IfOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_IF;
   }
 
@@ -1233,9 +1233,9 @@ class IfOp final : public Operation {
 };
 static_assert(sizeof(IfOp) == sizeof(Operation));
 
-class LabelDeclOp final : public Operation {
+class MX_EXPORT LabelDeclOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_LABEL_DECL;
   }
 
@@ -1250,9 +1250,9 @@ class LabelDeclOp final : public Operation {
 };
 static_assert(sizeof(LabelDeclOp) == sizeof(Operation));
 
-class LabelStmtOp final : public Operation {
+class MX_EXPORT LabelStmtOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_LABEL;
   }
 
@@ -1267,9 +1267,9 @@ class LabelStmtOp final : public Operation {
 };
 static_assert(sizeof(LabelStmtOp) == sizeof(Operation));
 
-class SkipStmtOp final : public Operation {
+class MX_EXPORT SkipStmtOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_SKIP;
   }
 
@@ -1282,9 +1282,9 @@ class SkipStmtOp final : public Operation {
 };
 static_assert(sizeof(SkipStmtOp) == sizeof(Operation));
 
-class SwitchOp final : public Operation {
+class MX_EXPORT SwitchOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_SWITCH;
   }
 
@@ -1299,9 +1299,9 @@ class SwitchOp final : public Operation {
 };
 static_assert(sizeof(SwitchOp) == sizeof(Operation));
 
-class TypeYieldOp final : public Operation {
+class MX_EXPORT TypeYieldOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_TYPE_YIELD;
   }
 
@@ -1316,9 +1316,9 @@ class TypeYieldOp final : public Operation {
 };
 static_assert(sizeof(TypeYieldOp) == sizeof(Operation));
 
-class ValueYieldOp final : public Operation {
+class MX_EXPORT ValueYieldOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_VALUE_YIELD;
   }
 
@@ -1332,9 +1332,9 @@ class ValueYieldOp final : public Operation {
 };
 static_assert(sizeof(ValueYieldOp) == sizeof(Operation));
 
-class VarDeclOp final : public Operation {
+class MX_EXPORT VarDeclOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_VAR;
   }
 
@@ -1365,9 +1365,9 @@ class VarDeclOp final : public Operation {
 };
 static_assert(sizeof(VarDeclOp) == sizeof(Operation));
 
-class WhileOp final : public Operation {
+class MX_EXPORT WhileOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_WHILE;
   }
 
@@ -1382,9 +1382,9 @@ class WhileOp final : public Operation {
 };
 static_assert(sizeof(WhileOp) == sizeof(Operation));
 
-class ImplicitCastOp final : public Operation {
+class MX_EXPORT ImplicitCastOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_IMPLICIT_CAST;
   }
 
@@ -1400,9 +1400,9 @@ class ImplicitCastOp final : public Operation {
 };
 static_assert(sizeof(ImplicitCastOp) == sizeof(Operation));
 
-class IndirectCallOp final : public Operation {
+class MX_EXPORT IndirectCallOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_INDIRECT_CALL;
   }
 
@@ -1419,9 +1419,9 @@ class IndirectCallOp final : public Operation {
 };
 static_assert(sizeof(IndirectCallOp) == sizeof(Operation));
 
-class InitListExprOp final : public Operation {
+class MX_EXPORT InitListExprOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_INITLIST;
   }
 
@@ -1435,9 +1435,9 @@ class InitListExprOp final : public Operation {
 };
 static_assert(sizeof(InitListExprOp) == sizeof(Operation));
 
-class LNotOp final : public Operation {
+class MX_EXPORT LNotOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_LNOT;
   }
 
@@ -1452,9 +1452,9 @@ class LNotOp final : public Operation {
 };
 static_assert(sizeof(LNotOp) == sizeof(Operation));
 
-class MinusOp final : public Operation {
+class MX_EXPORT MinusOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_MINUS;
   }
 
@@ -1469,9 +1469,9 @@ class MinusOp final : public Operation {
 };
 static_assert(sizeof(MinusOp) == sizeof(Operation));
 
-class MulFAssignOp final : public Operation {
+class MX_EXPORT MulFAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_FMUL;
   }
 
@@ -1487,9 +1487,9 @@ class MulFAssignOp final : public Operation {
 };
 static_assert(sizeof(MulFAssignOp) == sizeof(Operation));
 
-class MulFOp final : public Operation {
+class MX_EXPORT MulFOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_FMUL;
   }
 
@@ -1505,9 +1505,9 @@ class MulFOp final : public Operation {
 };
 static_assert(sizeof(MulFOp) == sizeof(Operation));
 
-class MulIAssignOp final : public Operation {
+class MX_EXPORT MulIAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_MUL;
   }
 
@@ -1523,9 +1523,9 @@ class MulIAssignOp final : public Operation {
 };
 static_assert(sizeof(MulIAssignOp) == sizeof(Operation));
 
-class MulIOp final : public Operation {
+class MX_EXPORT MulIOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_MUL;
   }
 
@@ -1541,9 +1541,9 @@ class MulIOp final : public Operation {
 };
 static_assert(sizeof(MulIOp) == sizeof(Operation));
 
-class NotOp final : public Operation {
+class MX_EXPORT NotOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_NOT;
   }
 
@@ -1558,9 +1558,9 @@ class NotOp final : public Operation {
 };
 static_assert(sizeof(NotOp) == sizeof(Operation));
 
-class PlusOp final : public Operation {
+class MX_EXPORT PlusOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_PLUS;
   }
 
@@ -1575,9 +1575,9 @@ class PlusOp final : public Operation {
 };
 static_assert(sizeof(PlusOp) == sizeof(Operation));
 
-class PostDecOp final : public Operation {
+class MX_EXPORT PostDecOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_POST_DEC;
   }
 
@@ -1592,9 +1592,9 @@ class PostDecOp final : public Operation {
 };
 static_assert(sizeof(PostDecOp) == sizeof(Operation));
 
-class PostIncOp final : public Operation {
+class MX_EXPORT PostIncOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_POST_INC;
   }
 
@@ -1609,9 +1609,9 @@ class PostIncOp final : public Operation {
 };
 static_assert(sizeof(PostIncOp) == sizeof(Operation));
 
-class PreDecOp final : public Operation {
+class MX_EXPORT PreDecOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_PRE_DEC;
   }
 
@@ -1626,9 +1626,9 @@ class PreDecOp final : public Operation {
 };
 static_assert(sizeof(PreDecOp) == sizeof(Operation));
 
-class PreIncOp final : public Operation {
+class MX_EXPORT PreIncOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_PRE_INC;
   }
 
@@ -1643,9 +1643,9 @@ class PreIncOp final : public Operation {
 };
 static_assert(sizeof(PreIncOp) == sizeof(Operation));
 
-class PredefinedExprOp final : public Operation {
+class MX_EXPORT PredefinedExprOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_PREDEFINED_EXPR;
   }
 
@@ -1661,9 +1661,9 @@ class PredefinedExprOp final : public Operation {
 };
 static_assert(sizeof(PredefinedExprOp) == sizeof(Operation));
 
-class RecordMemberOp final : public Operation {
+class MX_EXPORT RecordMemberOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_MEMBER;
   }
 
@@ -1679,9 +1679,9 @@ class RecordMemberOp final : public Operation {
 };
 static_assert(sizeof(RecordMemberOp) == sizeof(Operation));
 
-class RemFAssignOp final : public Operation {
+class MX_EXPORT RemFAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_FREM;
   }
 
@@ -1697,9 +1697,9 @@ class RemFAssignOp final : public Operation {
 };
 static_assert(sizeof(RemFAssignOp) == sizeof(Operation));
 
-class RemFOp final : public Operation {
+class MX_EXPORT RemFOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_FREM;
   }
 
@@ -1715,9 +1715,9 @@ class RemFOp final : public Operation {
 };
 static_assert(sizeof(RemFOp) == sizeof(Operation));
 
-class RemSAssignOp final : public Operation {
+class MX_EXPORT RemSAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_SREM;
   }
 
@@ -1733,9 +1733,9 @@ class RemSAssignOp final : public Operation {
 };
 static_assert(sizeof(RemSAssignOp) == sizeof(Operation));
 
-class RemSOp final : public Operation {
+class MX_EXPORT RemSOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_SREM;
   }
 
@@ -1751,9 +1751,9 @@ class RemSOp final : public Operation {
 };
 static_assert(sizeof(RemSOp) == sizeof(Operation));
 
-class RemUAssignOp final : public Operation {
+class MX_EXPORT RemUAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_UREM;
   }
 
@@ -1769,9 +1769,9 @@ class RemUAssignOp final : public Operation {
 };
 static_assert(sizeof(RemUAssignOp) == sizeof(Operation));
 
-class RemUOp final : public Operation {
+class MX_EXPORT RemUOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_UREM;
   }
 
@@ -1787,9 +1787,9 @@ class RemUOp final : public Operation {
 };
 static_assert(sizeof(RemUOp) == sizeof(Operation));
 
-class ReturnOp final : public Operation {
+class MX_EXPORT ReturnOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_RETURN;
   }
 
@@ -1803,9 +1803,9 @@ class ReturnOp final : public Operation {
 };
 static_assert(sizeof(ReturnOp) == sizeof(Operation));
 
-class SizeOfExprOp final : public Operation {
+class MX_EXPORT SizeOfExprOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_SIZEOF_EXPR;
   }
 
@@ -1820,9 +1820,9 @@ class SizeOfExprOp final : public Operation {
 };
 static_assert(sizeof(SizeOfExprOp) == sizeof(Operation));
 
-class SizeOfTypeOp final : public Operation {
+class MX_EXPORT SizeOfTypeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_SIZEOF_TYPE;
   }
 
@@ -1837,9 +1837,9 @@ class SizeOfTypeOp final : public Operation {
 };
 static_assert(sizeof(SizeOfTypeOp) == sizeof(Operation));
 
-class StmtExprOp final : public Operation {
+class MX_EXPORT StmtExprOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_STMT_EXPR;
   }
 
@@ -1854,9 +1854,9 @@ class StmtExprOp final : public Operation {
 };
 static_assert(sizeof(StmtExprOp) == sizeof(Operation));
 
-class StructDeclOp final : public Operation {
+class MX_EXPORT StructDeclOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_STRUCT;
   }
 
@@ -1871,9 +1871,9 @@ class StructDeclOp final : public Operation {
 };
 static_assert(sizeof(StructDeclOp) == sizeof(Operation));
 
-class SubFAssignOp final : public Operation {
+class MX_EXPORT SubFAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_FSUB;
   }
 
@@ -1889,9 +1889,9 @@ class SubFAssignOp final : public Operation {
 };
 static_assert(sizeof(SubFAssignOp) == sizeof(Operation));
 
-class SubFOp final : public Operation {
+class MX_EXPORT SubFOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_FSUB;
   }
 
@@ -1907,9 +1907,9 @@ class SubFOp final : public Operation {
 };
 static_assert(sizeof(SubFOp) == sizeof(Operation));
 
-class SubIAssignOp final : public Operation {
+class MX_EXPORT SubIAssignOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_ASSIGN_SUB;
   }
 
@@ -1925,9 +1925,9 @@ class SubIAssignOp final : public Operation {
 };
 static_assert(sizeof(SubIAssignOp) == sizeof(Operation));
 
-class SubIOp final : public Operation {
+class MX_EXPORT SubIOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_SUB;
   }
 
@@ -1943,9 +1943,9 @@ class SubIOp final : public Operation {
 };
 static_assert(sizeof(SubIOp) == sizeof(Operation));
 
-class SubscriptOp final : public Operation {
+class MX_EXPORT SubscriptOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_SUBSCRIPT;
   }
 
@@ -1961,9 +1961,9 @@ class SubscriptOp final : public Operation {
 };
 static_assert(sizeof(SubscriptOp) == sizeof(Operation));
 
-class ThisOp final : public Operation {
+class MX_EXPORT ThisOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_THIS;
   }
 
@@ -1977,9 +1977,9 @@ class ThisOp final : public Operation {
 };
 static_assert(sizeof(ThisOp) == sizeof(Operation));
 
-class TranslationUnitOp final : public Operation {
+class MX_EXPORT TranslationUnitOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_TRANSLATION_UNIT;
   }
 
@@ -1993,9 +1993,9 @@ class TranslationUnitOp final : public Operation {
 };
 static_assert(sizeof(TranslationUnitOp) == sizeof(Operation));
 
-class TypeDeclOp final : public Operation {
+class MX_EXPORT TypeDeclOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_TYPE;
   }
 
@@ -2009,9 +2009,9 @@ class TypeDeclOp final : public Operation {
 };
 static_assert(sizeof(TypeDeclOp) == sizeof(Operation));
 
-class TypeDefOp final : public Operation {
+class MX_EXPORT TypeDefOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_TYPEDEF;
   }
 
@@ -2026,9 +2026,9 @@ class TypeDefOp final : public Operation {
 };
 static_assert(sizeof(TypeDefOp) == sizeof(Operation));
 
-class TypeOfExprOp final : public Operation {
+class MX_EXPORT TypeOfExprOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_TYPEOF_EXPR;
   }
 
@@ -2044,9 +2044,9 @@ class TypeOfExprOp final : public Operation {
 };
 static_assert(sizeof(TypeOfExprOp) == sizeof(Operation));
 
-class TypeOfTypeOp final : public Operation {
+class MX_EXPORT TypeOfTypeOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_TYPEOF_TYPE;
   }
 
@@ -2060,9 +2060,9 @@ class TypeOfTypeOp final : public Operation {
 };
 static_assert(sizeof(TypeOfTypeOp) == sizeof(Operation));
 
-class UnionDeclOp final : public Operation {
+class MX_EXPORT UnionDeclOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_UNION;
   }
 
@@ -2077,9 +2077,9 @@ class UnionDeclOp final : public Operation {
 };
 static_assert(sizeof(UnionDeclOp) == sizeof(Operation));
 
-class UnreachableOp final : public Operation {
+class MX_EXPORT UnreachableOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::HL_UNREACHABLE;
   }
 

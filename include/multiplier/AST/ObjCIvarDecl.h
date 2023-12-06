@@ -30,7 +30,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ObjCIvarDecl : public FieldDecl {
+class MX_EXPORT ObjCIvarDecl : public FieldDecl {
  private:
   friend class FragmentImpl;
   friend class FieldDecl;

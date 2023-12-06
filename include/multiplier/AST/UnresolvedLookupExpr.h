@@ -27,7 +27,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class UnresolvedLookupExpr : public OverloadExpr {
+class MX_EXPORT UnresolvedLookupExpr : public OverloadExpr {
  private:
   friend class FragmentImpl;
   friend class OverloadExpr;

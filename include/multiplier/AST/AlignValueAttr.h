@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class AlignValueAttr : public Attr {
+class MX_EXPORT AlignValueAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;

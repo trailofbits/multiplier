@@ -26,6 +26,9 @@ endif ()
 #            tools are linked in, otherwise global constructors in tools
 #            won't be called, and then they won't get created in `ToolMain.cpp`.
 if(PLATFORM_MACOS)
+  set("MX_BEGIN_FORCE_LOAD_GROUP" "-Wl,-all_load")
+  set("MX_END_FORCE_LOAD_GROUP" "-Wl,-noall_load")
+
   set("MX_BEGIN_FORCE_LOAD_LIB" "-Wl,-force_load")
   set("MX_END_FORCE_LOAD_LIB" "")
 

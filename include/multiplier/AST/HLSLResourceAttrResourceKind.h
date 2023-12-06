@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -40,6 +42,6 @@ inline static constexpr unsigned NumEnumerators(HLSLResourceAttrResourceKind) {
   return 18;
 }
 
-const char *EnumeratorName(HLSLResourceAttrResourceKind);
+MX_EXPORT const char *EnumeratorName(HLSLResourceAttrResourceKind);
 
 } // namespace mx

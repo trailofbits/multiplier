@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class TagType : public Type {
+class MX_EXPORT TagType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;

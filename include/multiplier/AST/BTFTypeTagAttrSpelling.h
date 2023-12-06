@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -26,6 +28,6 @@ inline static constexpr unsigned NumEnumerators(BTFTypeTagAttrSpelling) {
   return 4;
 }
 
-const char *EnumeratorName(BTFTypeTagAttrSpelling);
+MX_EXPORT const char *EnumeratorName(BTFTypeTagAttrSpelling);
 
 } // namespace mx

@@ -95,7 +95,7 @@ class TypeImpl {
 
   virtual ~TypeImpl(void) = default;
 
-  TokenReader::Ptr
+  TokenReaderPtr
   TypeTokenReader(const TypeImplPtr &) const;
 
   TokenContextReader::Ptr

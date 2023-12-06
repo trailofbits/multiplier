@@ -16,15 +16,15 @@ class UnrealizedConversionCastOp;
 }  // namespace mlir
 namespace mx::ir::builtin {
 
-class Operation : public ::mx::ir::Operation {
+class MX_EXPORT Operation : public ::mx::ir::Operation {
  public:
   static std::optional<Operation> from(const ::mx::ir::Operation &);
 };
 static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));
 
-class ModuleOp final : public Operation {
+class MX_EXPORT ModuleOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::BUILTIN_MODULE;
   }
 
@@ -44,9 +44,9 @@ class ModuleOp final : public Operation {
 };
 static_assert(sizeof(ModuleOp) == sizeof(Operation));
 
-class UnrealizedConversionCastOp final : public Operation {
+class MX_EXPORT UnrealizedConversionCastOp final : public Operation {
  public:
-  inline static OperationKind static_kind(void) {
+  inline static constexpr OperationKind static_kind(void) {
     return OperationKind::BUILTIN_UNREALIZED_CONVERSION_CAST;
   }
 

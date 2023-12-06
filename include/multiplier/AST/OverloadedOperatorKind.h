@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -68,6 +70,6 @@ inline static constexpr unsigned NumEnumerators(OverloadedOperatorKind) {
   return 46;
 }
 
-const char *EnumeratorName(OverloadedOperatorKind);
+MX_EXPORT const char *EnumeratorName(OverloadedOperatorKind);
 
 } // namespace mx

@@ -29,7 +29,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ImplicitParamDecl : public VarDecl {
+class MX_EXPORT ImplicitParamDecl : public VarDecl {
  private:
   friend class FragmentImpl;
   friend class VarDecl;

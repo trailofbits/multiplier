@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -85,6 +87,6 @@ inline static constexpr unsigned NumEnumerators(AtomicExprAtomicOp) {
   return 63;
 }
 
-const char *EnumeratorName(AtomicExprAtomicOp);
+MX_EXPORT const char *EnumeratorName(AtomicExprAtomicOp);
 
 } // namespace mx

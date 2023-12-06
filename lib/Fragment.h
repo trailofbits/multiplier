@@ -156,11 +156,11 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
 
   // Return a reader for the parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
-  TokenReader::Ptr
+  TokenReaderPtr
   ParsedTokenReader(const FragmentImplPtr &) const;
 
   TokenContextReader::Ptr
-  TokenContextReader(const TokenReader::Ptr &) const;
+  TokenContextReader(const TokenReaderPtr &) const;
 
   std::string_view Data(void) const & noexcept;
 

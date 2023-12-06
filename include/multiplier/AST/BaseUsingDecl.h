@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class BaseUsingDecl : public NamedDecl {
+class MX_EXPORT BaseUsingDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;

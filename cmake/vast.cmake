@@ -7,12 +7,8 @@
 #
 
 set(VAST_LIBS
-  ${MX_BEGIN_LIBRARY_GROUP}
-
   VAST::VASTTargetLLVMIR
   VAST::VASTAliasTypeInterface
   VAST::VASTElementTypeInterface
   VAST::VASTCodeGen
-
-  ${MX_END_LIBRARY_GROUP}
 )

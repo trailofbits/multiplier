@@ -28,7 +28,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class CompoundAssignOperator : public BinaryOperator {
+class MX_EXPORT CompoundAssignOperator : public BinaryOperator {
  private:
   friend class FragmentImpl;
   friend class BinaryOperator;

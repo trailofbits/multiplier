@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ObjCAtSynchronizedStmt : public Stmt {
+class MX_EXPORT ObjCAtSynchronizedStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;

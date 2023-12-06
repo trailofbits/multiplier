@@ -27,7 +27,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class OMPTargetTeamsGenericLoopDirective : public OMPLoopDirective {
+class MX_EXPORT OMPTargetTeamsGenericLoopDirective : public OMPLoopDirective {
  private:
   friend class FragmentImpl;
   friend class OMPLoopDirective;
