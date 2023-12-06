@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class OMPDeclarativeDirectiveDecl : public Decl {
+class MX_EXPORT OMPDeclarativeDirectiveDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;

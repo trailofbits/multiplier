@@ -12,6 +12,8 @@
 #include <type_traits>
 #include <utility>
 
+#include "../Compiler.h"
+
 namespace mlir {
 class Value;
 namespace detail {
@@ -32,7 +34,7 @@ class Type;
 
 // The result of an operation, or an argument to a block. Values can
 // have an arbitrary number of users.
-class Value {
+class MX_EXPORT Value {
  protected:
   friend class Operand;
   friend class Operation;
@@ -67,7 +69,7 @@ class Value {
 
 // A value with a specific type.
 template <typename T>
-class TypedValue : public Value {
+class MX_EXPORT TypedValue : public Value {
  public:
   static_assert(std::is_base_of_v<Type, T>);
 

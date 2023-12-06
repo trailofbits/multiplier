@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class RedeclarableTemplateDecl : public TemplateDecl {
+class MX_EXPORT RedeclarableTemplateDecl : public TemplateDecl {
  private:
   friend class FragmentImpl;
   friend class TemplateDecl;

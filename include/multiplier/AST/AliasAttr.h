@@ -23,7 +23,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class AliasAttr : public Attr {
+class MX_EXPORT AliasAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;

@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class UuidAttr : public InheritableAttr {
+class MX_EXPORT UuidAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;

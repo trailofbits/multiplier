@@ -40,15 +40,15 @@ class VectorType;
 }  // namespace mlir
 namespace mx::ir::builtin {
 
-class Type : public ::mx::ir::Type {
+class MX_EXPORT Type : public ::mx::ir::Type {
  public:
   static std::optional<Type> from(const ::mx::ir::Type &);
 };
 static_assert(sizeof(Type) == sizeof(::mx::ir::Type));
 
-class ShapedType final : public Type {
+class MX_EXPORT ShapedType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_SHAPED;
   }
 
@@ -67,9 +67,9 @@ class ShapedType final : public Type {
 };
 static_assert(sizeof(ShapedType) == sizeof(Type));
 
-class FloatType final : public Type {
+class MX_EXPORT FloatType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_FLOAT;
   }
 
@@ -83,9 +83,9 @@ class FloatType final : public Type {
 };
 static_assert(sizeof(FloatType) == sizeof(Type));
 
-class BFloat16Type final : public Type {
+class MX_EXPORT BFloat16Type final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_B_FLOAT16;
   }
 
@@ -96,9 +96,9 @@ class BFloat16Type final : public Type {
 };
 static_assert(sizeof(BFloat16Type) == sizeof(Type));
 
-class ComplexType final : public Type {
+class MX_EXPORT ComplexType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_COMPLEX;
   }
 
@@ -110,9 +110,9 @@ class ComplexType final : public Type {
 };
 static_assert(sizeof(ComplexType) == sizeof(Type));
 
-class Float8E4M3B11FNUZType final : public Type {
+class MX_EXPORT Float8E4M3B11FNUZType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_FLOAT8_E4_M3_B11_FNUZ;
   }
 
@@ -123,9 +123,9 @@ class Float8E4M3B11FNUZType final : public Type {
 };
 static_assert(sizeof(Float8E4M3B11FNUZType) == sizeof(Type));
 
-class Float8E4M3FNType final : public Type {
+class MX_EXPORT Float8E4M3FNType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_FLOAT8_E4_M3_FN;
   }
 
@@ -136,9 +136,9 @@ class Float8E4M3FNType final : public Type {
 };
 static_assert(sizeof(Float8E4M3FNType) == sizeof(Type));
 
-class Float8E4M3FNUZType final : public Type {
+class MX_EXPORT Float8E4M3FNUZType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_FLOAT8_E4_M3_FNUZ;
   }
 
@@ -149,9 +149,9 @@ class Float8E4M3FNUZType final : public Type {
 };
 static_assert(sizeof(Float8E4M3FNUZType) == sizeof(Type));
 
-class Float8E5M2Type final : public Type {
+class MX_EXPORT Float8E5M2Type final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_FLOAT8_E5_M2;
   }
 
@@ -162,9 +162,9 @@ class Float8E5M2Type final : public Type {
 };
 static_assert(sizeof(Float8E5M2Type) == sizeof(Type));
 
-class Float8E5M2FNUZType final : public Type {
+class MX_EXPORT Float8E5M2FNUZType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_FLOAT8_E5_M2_FNUZ;
   }
 
@@ -175,9 +175,9 @@ class Float8E5M2FNUZType final : public Type {
 };
 static_assert(sizeof(Float8E5M2FNUZType) == sizeof(Type));
 
-class Float16Type final : public Type {
+class MX_EXPORT Float16Type final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_FLOAT16;
   }
 
@@ -188,9 +188,9 @@ class Float16Type final : public Type {
 };
 static_assert(sizeof(Float16Type) == sizeof(Type));
 
-class Float32Type final : public Type {
+class MX_EXPORT Float32Type final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_FLOAT32;
   }
 
@@ -201,9 +201,9 @@ class Float32Type final : public Type {
 };
 static_assert(sizeof(Float32Type) == sizeof(Type));
 
-class Float64Type final : public Type {
+class MX_EXPORT Float64Type final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_FLOAT64;
   }
 
@@ -214,9 +214,9 @@ class Float64Type final : public Type {
 };
 static_assert(sizeof(Float64Type) == sizeof(Type));
 
-class Float80Type final : public Type {
+class MX_EXPORT Float80Type final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_FLOAT80;
   }
 
@@ -227,9 +227,9 @@ class Float80Type final : public Type {
 };
 static_assert(sizeof(Float80Type) == sizeof(Type));
 
-class Float128Type final : public Type {
+class MX_EXPORT Float128Type final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_FLOAT128;
   }
 
@@ -240,9 +240,9 @@ class Float128Type final : public Type {
 };
 static_assert(sizeof(Float128Type) == sizeof(Type));
 
-class FloatTF32Type final : public Type {
+class MX_EXPORT FloatTF32Type final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_FLOAT_TF32;
   }
 
@@ -253,9 +253,9 @@ class FloatTF32Type final : public Type {
 };
 static_assert(sizeof(FloatTF32Type) == sizeof(Type));
 
-class FunctionType final : public Type {
+class MX_EXPORT FunctionType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_FUNCTION;
   }
 
@@ -270,9 +270,9 @@ class FunctionType final : public Type {
 };
 static_assert(sizeof(FunctionType) == sizeof(Type));
 
-class IndexType final : public Type {
+class MX_EXPORT IndexType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_INDEX;
   }
 
@@ -283,9 +283,9 @@ class IndexType final : public Type {
 };
 static_assert(sizeof(IndexType) == sizeof(Type));
 
-class IntegerType final : public Type {
+class MX_EXPORT IntegerType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_INTEGER;
   }
 
@@ -301,9 +301,9 @@ class IntegerType final : public Type {
 };
 static_assert(sizeof(IntegerType) == sizeof(Type));
 
-class MemRefType final : public Type {
+class MX_EXPORT MemRefType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_MEM_REF;
   }
 
@@ -319,9 +319,9 @@ class MemRefType final : public Type {
 };
 static_assert(sizeof(MemRefType) == sizeof(Type));
 
-class NoneType final : public Type {
+class MX_EXPORT NoneType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_NONE;
   }
 
@@ -332,9 +332,9 @@ class NoneType final : public Type {
 };
 static_assert(sizeof(NoneType) == sizeof(Type));
 
-class OpaqueType final : public Type {
+class MX_EXPORT OpaqueType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_OPAQUE;
   }
 
@@ -347,9 +347,9 @@ class OpaqueType final : public Type {
 };
 static_assert(sizeof(OpaqueType) == sizeof(Type));
 
-class RankedTensorType final : public Type {
+class MX_EXPORT RankedTensorType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_RANKED_TENSOR;
   }
 
@@ -363,9 +363,9 @@ class RankedTensorType final : public Type {
 };
 static_assert(sizeof(RankedTensorType) == sizeof(Type));
 
-class TupleType final : public Type {
+class MX_EXPORT TupleType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_TUPLE;
   }
 
@@ -380,9 +380,9 @@ class TupleType final : public Type {
 };
 static_assert(sizeof(TupleType) == sizeof(Type));
 
-class UnrankedMemRefType final : public Type {
+class MX_EXPORT UnrankedMemRefType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_UNRANKED_MEM_REF;
   }
 
@@ -397,9 +397,9 @@ class UnrankedMemRefType final : public Type {
 };
 static_assert(sizeof(UnrankedMemRefType) == sizeof(Type));
 
-class UnrankedTensorType final : public Type {
+class MX_EXPORT UnrankedTensorType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_UNRANKED_TENSOR;
   }
 
@@ -412,9 +412,9 @@ class UnrankedTensorType final : public Type {
 };
 static_assert(sizeof(UnrankedTensorType) == sizeof(Type));
 
-class VectorType final : public Type {
+class MX_EXPORT VectorType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN_VECTOR;
   }
 

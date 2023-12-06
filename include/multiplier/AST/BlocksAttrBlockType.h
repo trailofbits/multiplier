@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -23,6 +25,6 @@ inline static constexpr unsigned NumEnumerators(BlocksAttrBlockType) {
   return 1;
 }
 
-const char *EnumeratorName(BlocksAttrBlockType);
+MX_EXPORT const char *EnumeratorName(BlocksAttrBlockType);
 
 } // namespace mx

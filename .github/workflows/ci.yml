@@ -17,6 +17,7 @@ concurrency:
 env:
   LLVM_PASTA_VER: beeda8d
   LLVM_VER: 17
+  PYTHON_VER: 3.11
 
 jobs:
   build:
@@ -44,24 +45,26 @@ jobs:
           curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
           echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VER} main" | tee -a /etc/apt/sources.list > /dev/null
           echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VER} main" | tee -a /etc/apt/sources.list > /dev/null
-          apt-get update; apt-get install gh clang-${LLVM_VER} lld-${LLVM_VER} -y
+          apt-get update; apt-get install gh clang-${LLVM_VER} lld-${LLVM_VER} python${PYTHON_VER} python${PYTHON_VER}-dev -y
 
       - name: Setup cmake
-        uses: jwlawson/actions-setup-cmake@v1.13
+        uses: trail-of-forks/actions-setup-cmake@master
         with:
-          cmake-version: '3.23.x'
+          cmake-version: '3.24.x'
 
       - name: Set up variables
         run: |
           echo "RELEASE_DIR=${RUNNER_TEMP}/release" >> $GITHUB_ENV
+          echo "LLVM_PREFIX_DIR=${RUNNER_TEMP}/llvm" >> $GITHUB_ENV
           echo "VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
           echo "ARTIFACT_NAME=multiplier-$(git rev-parse --short=7 HEAD).tar.xz" >> $GITHUB_ENV
 
       - name: Install llvm-pasta
         run: |
           mkdir -p ${RELEASE_DIR}
+          mkdir -p ${LLVM_PREFIX_DIR}
           gh release download ${LLVM_PASTA_VER} --repo trail-of-forks/llvm-project --pattern 'llvm-*'
-          tar -xvJf llvm-pasta-*.tar.xz -C ${RELEASE_DIR}
+          tar -xvJf llvm-pasta-*.tar.xz -C ${LLVM_PREFIX_DIR}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -78,10 +81,12 @@ jobs:
             -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
             -DCMAKE_C_COMPILER="$(which clang-${LLVM_VER})" \
             -DCMAKE_CXX_COMPILER=$(which clang++-${LLVM_VER}) \
-            -DClang_DIR=${RELEASE_DIR}/lib/cmake/clang \
-            -DLLVM_DIR=${RELEASE_DIR}/lib/cmake/llvm \
+            -DClang_DIR=${LLVM_PREFIX_DIR}/lib/cmake/clang \
+            -DLLVM_DIR=${LLVM_PREFIX_DIR}/lib/cmake/llvm \
+            -DMLIR_DIR=${LLVM_PREFIX_DIR}/lib/cmake/mlir \
             -DMX_USE_VENDORED_CLANG=OFF \
             -DMX_USE_VENDORED_PASTA=OFF \
+            -DLLVM_ENABLE_LLD:BOOL=TRUE \
             -GNinja \
             ./
 

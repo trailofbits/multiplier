@@ -29,7 +29,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ObjCPropertyImplDecl : public Decl {
+class MX_EXPORT ObjCPropertyImplDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;

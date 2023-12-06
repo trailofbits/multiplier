@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -25,6 +27,6 @@ inline static constexpr unsigned NumEnumerators(AMDGPUWavesPerEUAttrSpelling) {
   return 3;
 }
 
-const char *EnumeratorName(AMDGPUWavesPerEUAttrSpelling);
+MX_EXPORT const char *EnumeratorName(AMDGPUWavesPerEUAttrSpelling);
 
 } // namespace mx

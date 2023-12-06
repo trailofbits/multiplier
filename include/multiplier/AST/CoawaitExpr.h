@@ -27,7 +27,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class CoawaitExpr : public CoroutineSuspendExpr {
+class MX_EXPORT CoawaitExpr : public CoroutineSuspendExpr {
  private:
   friend class FragmentImpl;
   friend class CoroutineSuspendExpr;

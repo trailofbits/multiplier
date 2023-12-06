@@ -23,7 +23,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class OMPCaptureKindAttr : public Attr {
+class MX_EXPORT OMPCaptureKindAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;

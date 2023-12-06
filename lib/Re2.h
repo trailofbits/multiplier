@@ -38,7 +38,6 @@ class RegexQueryImpl {
 };
 
 }  // namespace mx
-
 #else
 
 namespace mx {
@@ -64,5 +63,5 @@ class RegexQueryImpl {
 };
 
 }  // namespace mx
-
 #endif   // MX_DISABLE_RE2
+

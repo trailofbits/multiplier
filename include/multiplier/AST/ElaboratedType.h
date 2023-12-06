@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ElaboratedType : public TypeWithKeyword {
+class MX_EXPORT ElaboratedType : public TypeWithKeyword {
  private:
   friend class FragmentImpl;
   friend class TypeWithKeyword;

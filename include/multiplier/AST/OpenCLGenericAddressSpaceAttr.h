@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class OpenCLGenericAddressSpaceAttr : public TypeAttr {
+class MX_EXPORT OpenCLGenericAddressSpaceAttr : public TypeAttr {
  private:
   friend class FragmentImpl;
   friend class TypeAttr;

@@ -30,6 +30,9 @@ class MacroSubstitution;
 class MacroVAOpt;
 class Reference;
 class RegexQuery;
+class RegexQueryMatch;
+class RegexQueryMatchImpl;
+class RegexQueryResultImpl;
 class RegexQueryResultIterator;
 class TokenContext;
 class TokenRangeIterator;
@@ -41,8 +44,8 @@ class TypeImpl;
 
 enum class TokenKind : unsigned short;
 enum class TokenCategory : unsigned char;
-class SimpleToken;  // Defined in Index.h due to `VariantEntity`.
-using CustomToken = std::variant<SimpleToken, Token>;
+class UserToken;  // Defined in Index.h due to `VariantEntity`.
+using CustomToken = std::variant<UserToken, Token>;
 
 // A single token, e.g. from a file or from a macro expansion. There are several
 // types of tokens, and they can be distinguished by way of the token ID, when
@@ -70,7 +73,7 @@ using CustomToken = std::variant<SimpleToken, Token>;
 //        nodes. They should be the only tokens referenced by `Type`-related
 //        AST nodes, and no other AST nodes should ever reference `Type` tokens.
 //        These tokens are identified by `TypeTokenId`s.
-class Token final {
+class MX_EXPORT Token final {
  private:
   friend class Compilation;
   friend class CompilationImpl;
@@ -181,7 +184,7 @@ class Token final {
 };
 
 // Forward-only iterator over a sequence of tokens.
-class TokenRangeIterator {
+class MX_EXPORT TokenRangeIterator {
  private:
   friend class TokenRange;
   friend class TokenTree;
@@ -241,7 +244,7 @@ class TokenRangeIterator {
 };
 
 // A range of tokens.
-class TokenRange {
+class MX_EXPORT TokenRange {
  protected:
   friend class EntityProvider;
   friend class File;
@@ -249,6 +252,9 @@ class TokenRange {
   friend class FragmentImpl;
   friend class Macro;
   friend class RegexQuery;
+  friend class RegexQueryMatch;
+  friend class RegexQueryMatchImpl;
+  friend class RegexQueryResultImpl;
   friend class RegexQueryResultIterator;
   friend class TokenTree;
   friend class TokenTreeImpl;

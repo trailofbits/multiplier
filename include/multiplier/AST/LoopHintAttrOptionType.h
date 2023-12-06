@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -34,6 +36,6 @@ inline static constexpr unsigned NumEnumerators(LoopHintAttrOptionType) {
   return 12;
 }
 
-const char *EnumeratorName(LoopHintAttrOptionType);
+MX_EXPORT const char *EnumeratorName(LoopHintAttrOptionType);
 
 } // namespace mx

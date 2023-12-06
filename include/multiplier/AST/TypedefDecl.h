@@ -27,7 +27,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class TypedefDecl : public TypedefNameDecl {
+class MX_EXPORT TypedefDecl : public TypedefNameDecl {
  private:
   friend class FragmentImpl;
   friend class TypedefNameDecl;

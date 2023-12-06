@@ -33,7 +33,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ClassTemplateSpecializationDecl : public CXXRecordDecl {
+class MX_EXPORT ClassTemplateSpecializationDecl : public CXXRecordDecl {
  private:
   friend class FragmentImpl;
   friend class CXXRecordDecl;

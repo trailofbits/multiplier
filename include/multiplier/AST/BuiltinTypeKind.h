@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -490,6 +492,6 @@ inline static constexpr unsigned NumEnumerators(BuiltinTypeKind) {
   return 468;
 }
 
-const char *EnumeratorName(BuiltinTypeKind);
+MX_EXPORT const char *EnumeratorName(BuiltinTypeKind);
 
 } // namespace mx

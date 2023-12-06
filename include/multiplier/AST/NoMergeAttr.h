@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class NoMergeAttr : public DeclOrStmtAttr {
+class MX_EXPORT NoMergeAttr : public DeclOrStmtAttr {
  private:
   friend class FragmentImpl;
   friend class DeclOrStmtAttr;

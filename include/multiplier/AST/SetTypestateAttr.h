@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class SetTypestateAttr : public InheritableAttr {
+class MX_EXPORT SetTypestateAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;

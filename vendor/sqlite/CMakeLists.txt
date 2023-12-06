@@ -27,7 +27,7 @@ add_library("mx-sqlite" STATIC
 
 target_include_directories("mx-sqlite"
   PUBLIC
-    $<BUILD_INTERFACE:${sqlite_SOURCE_DIR}>
+    ${sqlite_SOURCE_DIR}
 )
 
 target_compile_definitions("mx-sqlite"
@@ -62,23 +62,3 @@ set_target_properties("mx-sqlite"
     POSITION_INDEPENDENT_CODE
       YES
 )
-
-if(MX_ENABLE_INSTALL)
-  install(
-    TARGETS
-      "mx-sqlite"
-    EXPORT "${PROJECT_NAME}Targets"
-    RUNTIME
-      DESTINATION
-        "${MX_INSTALL_BIN_DIR}"
-    LIBRARY
-      DESTINATION
-        "${MX_INSTALL_LIB_DIR}"
-    ARCHIVE
-      DESTINATION
-        "${MX_INSTALL_LIB_DIR}"
-    PUBLIC_HEADER
-      DESTINATION
-        "${MX_INSTALL_INCLUDE_DIR}"
-  )
-endif(MX_ENABLE_INSTALL)

@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -26,6 +28,6 @@ inline static constexpr unsigned NumEnumerators(ObjCPropertyDeclSetterKind) {
   return 4;
 }
 
-const char *EnumeratorName(ObjCPropertyDeclSetterKind);
+MX_EXPORT const char *EnumeratorName(ObjCPropertyDeclSetterKind);
 
 } // namespace mx

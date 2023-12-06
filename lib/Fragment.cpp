@@ -14,6 +14,7 @@
 #include <multiplier/AST/Type.h>
 #include <multiplier/Frontend/Compilation.h>
 #include <multiplier/Frontend/Macro.h>
+#include <multiplier/Frontend/Query.h>
 
 #include "Attr.h"
 #include "Pseudo.h"
@@ -61,7 +62,8 @@ std::optional<PackedFragmentId> Fragment::parent_id(void) const noexcept {
 
 // Return the fragment containing a query match.
 Fragment Fragment::containing(const RegexQueryMatch &match) {
-  return Fragment(match.frag);
+  return Fragment(
+      dynamic_cast<const RegexQueryMatchImpl *>(match.impl.get())->frag);
 }
 
 Fragment Fragment::containing(const Decl &entity) {

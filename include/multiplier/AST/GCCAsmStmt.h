@@ -27,7 +27,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class GCCAsmStmt : public AsmStmt {
+class MX_EXPORT GCCAsmStmt : public AsmStmt {
  private:
   friend class FragmentImpl;
   friend class AsmStmt;

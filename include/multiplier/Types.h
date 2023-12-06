@@ -11,10 +11,12 @@
 #include <cstdint>
 #include <functional>
 #include <iosfwd>
-#include <multiplier/AST/PseudoKind.h>
 #include <utility>
 #include <optional>
 #include <variant>
+
+#include "AST/PseudoKind.h"
+#include "Compiler.h"
 
 namespace mx {
 namespace rpc {
@@ -61,7 +63,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CLASS,
 
 using NotAnEntity = std::monostate;
 
-enum class EntityCategory {
+enum class EntityCategory : int {
   NOT_AN_ENTITY,
 #define MX_DECLARE_ENTITY_CATEGORY_ENUM(type, lower, enum_, val) enum_ = val,
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CATEGORY_ENUM,
@@ -115,10 +117,10 @@ inline static constexpr const char *EnumerationName(EntityCategory) {
   return "EntityCategory";
 }
 
-const char *EnumeratorName(EntityCategory) noexcept;
+MX_EXPORT const char *EnumeratorName(EntityCategory) noexcept;
 
 // Identifies a serialized file.
-struct FileId final {
+struct MX_EXPORT FileId final {
   RawEntityId file_id;
   
   bool operator==(const FileId &) const noexcept = default;
@@ -133,7 +135,7 @@ struct FileId final {
 
 // Identifies a serialized version of a `clang::Decl` or `pasta::Decl`
 // inside of a `Fragment`.
-struct DeclId final {
+struct MX_EXPORT DeclId final {
   RawEntityId fragment_id;
   DeclKind kind;
 
@@ -150,7 +152,7 @@ struct DeclId final {
 
 // Identifies a serialized version of a `clang::Stmt` or `pasta::Stmt`
 // inside of a `Fragment`.
-struct StmtId final {
+struct MX_EXPORT StmtId final {
   RawEntityId fragment_id;
   StmtKind kind;
 
@@ -163,7 +165,7 @@ struct StmtId final {
 };
 
 // Identifies a serialized type
-struct TypeId final {
+struct MX_EXPORT TypeId final {
   RawEntityId type_id;
   TypeKind kind;
 
@@ -178,7 +180,7 @@ struct TypeId final {
 
 // Identifies a serialized tokens of a `clang::Type`, `clang::QualType`, or
 // `pasta::Type`
-struct TypeTokenId final {
+struct MX_EXPORT TypeTokenId final {
   RawEntityId type_id;
 
   // Type kind
@@ -196,7 +198,7 @@ struct TypeTokenId final {
 
 // Identifies a serialized version of a `clang::Attr` or `pasta::Attr` inside
 // of a `Fragment`.
-struct AttrId final {
+struct MX_EXPORT AttrId final {
   RawEntityId fragment_id;
   AttrKind kind;
 
@@ -209,7 +211,7 @@ struct AttrId final {
 };
 
 // Identifies a parsed token inside of a `Fragment`.
-struct ParsedTokenId final {
+struct MX_EXPORT ParsedTokenId final {
   RawEntityId fragment_id;
   TokenKind kind;
 
@@ -222,7 +224,7 @@ struct ParsedTokenId final {
 };
 
 // Identifies a token inside of a `File`.
-struct FileTokenId final {
+struct MX_EXPORT FileTokenId final {
   RawEntityId file_id;
 
   TokenKind kind;
@@ -237,7 +239,7 @@ struct FileTokenId final {
 
 // Identifies a token inside of a `Fragment` that corresponds to a macro
 // use or macro expansion.
-struct MacroTokenId final {
+struct MX_EXPORT MacroTokenId final {
   RawEntityId fragment_id;
   TokenKind kind;
 
@@ -250,7 +252,7 @@ struct MacroTokenId final {
 };
 
 // The offset of a substitution inside of a fragment.
-struct MacroId final {
+struct MX_EXPORT MacroId final {
  public:
   RawEntityId fragment_id;
 
@@ -265,7 +267,7 @@ struct MacroId final {
 };
 
 // A template argument is
-struct TemplateArgumentId final {
+struct MX_EXPORT TemplateArgumentId final {
  public:
   RawEntityId fragment_id;
 
@@ -280,7 +282,7 @@ struct TemplateArgumentId final {
 
 // A template parameter list is used by a template declaration to describe
 // the list of template parameter declarations.
-struct TemplateParameterListId final {
+struct MX_EXPORT TemplateParameterListId final {
  public:
   RawEntityId fragment_id;
 
@@ -297,7 +299,7 @@ struct TemplateParameterListId final {
 
 // A base specifier is used by a `CXXRecordDecl` (or derived class) to
 // specify base classes.
-struct CXXBaseSpecifierId final {
+struct MX_EXPORT CXXBaseSpecifierId final {
  public:
   RawEntityId fragment_id;
 
@@ -311,7 +313,7 @@ struct CXXBaseSpecifierId final {
 };
 
 // A designator is used by a designated initializer expression.
-struct DesignatorId final {
+struct MX_EXPORT DesignatorId final {
  public:
   RawEntityId fragment_id;
 
@@ -326,7 +328,7 @@ struct DesignatorId final {
 
 // Translation units represent a compilation. From a translation unit we can
 // get the compile command, the MLIR, etc.
-struct CompilationId {
+struct MX_EXPORT CompilationId {
   // The ID of the compilation/translation unit.
   RawEntityId compilation_id;
 
@@ -343,7 +345,7 @@ struct CompilationId {
 };
 
 // Identifies a serialized fragment.
-struct FragmentId final {
+struct MX_EXPORT FragmentId final {
   RawEntityId fragment_id;
 
   bool operator==(const FragmentId &) const noexcept = default;
@@ -410,7 +412,7 @@ template <typename T>
 class SpecificEntityId;
 
 // An opaque, compressed entity id.
-class EntityId final {
+class MX_EXPORT EntityId final {
  protected:
   RawEntityId opaque{kInvalidEntityId};
 
@@ -443,8 +445,10 @@ class EntityId final {
   template <typename T>
   /* implicit */ inline EntityId(SpecificEntityId<T>);
 
+  EntityId(const VariantId &);
+
   template <typename... Types>
-  /* implicit */ EntityId(const std::variant<Types...> &) = delete;
+  /* implicit */ EntityId(const std::variant<Types...> &);
 
   inline EntityId &operator=(DeclId id) {
     EntityId self(id);
@@ -536,7 +540,7 @@ class EntityId final {
 // This contains an opaque representation of an entity ID, with the requirement
 // that it always contains that particular kind of entity.
 template <typename T>
-class SpecificEntityId final {
+class MX_EXPORT SpecificEntityId final {
  private:
   RawEntityId opaque;
 
@@ -583,7 +587,7 @@ class SpecificEntityId final {
 };
 
 template <typename T>
-EntityId::EntityId(SpecificEntityId<T> id_)
+MX_EXPORT EntityId::EntityId(SpecificEntityId<T> id_)
     : EntityId(id_.Pack()) {}
 
 using PackedFileTokenId = SpecificEntityId<FileTokenId>;
@@ -616,49 +620,49 @@ using EntityType = typename EntityTypeImpl<T>::Entity;
 namespace std {
 
 template <>
-struct hash<mx::FileId> {
+struct MX_EXPORT hash<mx::FileId> {
   inline mx::RawEntityId operator()(mx::FileId id) const noexcept {
     return id.file_id;
   }
 };
 
 template <>
-struct less<mx::FileId> {
+struct MX_EXPORT less<mx::FileId> {
   inline bool operator()(mx::FileId a, mx::FileId b) const noexcept {
     return a.file_id < b.file_id;
   }
 };
 
 template <>
-struct hash<mx::FragmentId> {
+struct MX_EXPORT hash<mx::FragmentId> {
   inline mx::RawEntityId operator()(mx::FragmentId id) const noexcept {
     return id.fragment_id;
   }
 };
 
 template <>
-struct less<mx::FragmentId> {
+struct MX_EXPORT less<mx::FragmentId> {
   inline bool operator()(mx::FragmentId a, mx::FragmentId b) const noexcept {
     return a.fragment_id < b.fragment_id;
   }
 };
 
 template <>
-struct hash<mx::TypeId> {
+struct MX_EXPORT hash<mx::TypeId> {
   inline bool operator()(mx::TypeId id) const noexcept {
     return id.type_id;
   }
 };
 
 template <>
-struct less<mx::TypeId> {
+struct MX_EXPORT less<mx::TypeId> {
   inline bool operator()(mx::TypeId a, mx::TypeId b) const noexcept {
     return a.type_id < b.type_id;
   }
 };
 
 template <>
-struct hash<mx::EntityId> {
+struct MX_EXPORT hash<mx::EntityId> {
  public:
   inline uint64_t operator()(mx::EntityId id) const noexcept {
     return id.Pack();
@@ -666,7 +670,7 @@ struct hash<mx::EntityId> {
 };
 
 template <typename T>
-struct hash<mx::SpecificEntityId<T>> {
+struct MX_EXPORT hash<mx::SpecificEntityId<T>> {
  public:
   inline uint64_t operator()(mx::SpecificEntityId<T> id) const noexcept {
     return id.Pack();
@@ -674,13 +678,13 @@ struct hash<mx::SpecificEntityId<T>> {
 };
 
 template<class _CharT, class _Traits>
-inline basic_ostream<_CharT, _Traits> &operator<<(
+inline MX_EXPORT basic_ostream<_CharT, _Traits> &operator<<(
     basic_ostream<_CharT, _Traits> &os, mx::EntityId id) {
   return os << id.Pack();
 }
 
 template<class _CharT, class _Traits, typename T>
-inline basic_ostream<_CharT, _Traits> &operator<<(
+inline MX_EXPORT basic_ostream<_CharT, _Traits> &operator<<(
     basic_ostream<_CharT, _Traits> &os, mx::SpecificEntityId<T> id) {
   return os << id.Pack();
 }

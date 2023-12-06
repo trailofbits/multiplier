@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class BuiltinTemplateDecl : public TemplateDecl {
+class MX_EXPORT BuiltinTemplateDecl : public TemplateDecl {
  private:
   friend class FragmentImpl;
   friend class TemplateDecl;

@@ -66,4 +66,27 @@ class RegexQueryResultImpl final {
   gap::generator<RegexQueryMatch> Enumerate(void) &;
 };
 
+class RegexQueryMatchImpl final : public ProxyTokenReader {
+ public:
+  virtual ~RegexQueryMatchImpl(void);
+
+  // The actual range of matched data. This is possibly a sub-sequence of
+  // `this->TokenRange::data()`.
+  std::vector<std::string_view> matched_ranges;
+
+  // Fragment with the match.
+  std::shared_ptr<const FragmentImpl> frag;
+
+  // The regular expression used.
+  std::shared_ptr<RegexQueryImpl> query;
+
+  // Translate a data capture into a token range capture.
+  std::optional<std::pair<unsigned, unsigned>> TranslateCapture(
+      const TokenRange &self, std::string_view capture) const;
+
+  RegexQueryMatchImpl(const TokenRange &range_, std::string_view data_range_,
+                      std::shared_ptr<const FragmentImpl> frag_,
+                      const RegexQuery &query_);
+};
+
 }  // namespace mx

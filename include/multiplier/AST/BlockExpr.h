@@ -28,7 +28,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class BlockExpr : public Expr {
+class MX_EXPORT BlockExpr : public Expr {
  private:
   friend class FragmentImpl;
   friend class Expr;

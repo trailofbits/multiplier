@@ -25,7 +25,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class DependentSizedMatrixType : public MatrixType {
+class MX_EXPORT DependentSizedMatrixType : public MatrixType {
  private:
   friend class FragmentImpl;
   friend class MatrixType;

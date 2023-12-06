@@ -269,7 +269,7 @@ std::optional<Token> Reference::as_token(void) const noexcept {
   }
 
   return Token(
-      TokenReader::Ptr(impl, reinterpret_cast<const TokenReader *>(impl.get())),
+      TokenReaderPtr(impl, reinterpret_cast<const TokenReader *>(impl.get())),
       offset.value());
 }
 

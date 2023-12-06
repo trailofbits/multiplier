@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ConstantMatrixType : public MatrixType {
+class MX_EXPORT ConstantMatrixType : public MatrixType {
  private:
   friend class FragmentImpl;
   friend class MatrixType;

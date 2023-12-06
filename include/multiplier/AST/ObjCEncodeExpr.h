@@ -27,7 +27,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ObjCEncodeExpr : public Expr {
+class MX_EXPORT ObjCEncodeExpr : public Expr {
  private:
   friend class FragmentImpl;
   friend class Expr;

@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 namespace mx {
 namespace ir {
 
@@ -448,6 +450,6 @@ inline static constexpr unsigned NumEnumerators(ir::OperationKind) {
   return 423;
 }
 
-const char *EnumeratorName(ir::OperationKind);
+MX_EXPORT const char *EnumeratorName(ir::OperationKind);
 
 }  // namespace mx

@@ -9,6 +9,9 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
+#include <multiplier/Fragment.h>
+#include <multiplier/Frontend/File.h>
+#include <multiplier/Frontend/Query.h>
 #include <multiplier/Index.h>
 #include <multiplier/Re2.h>
 #include <fstream>

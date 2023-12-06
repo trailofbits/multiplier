@@ -12,6 +12,7 @@
 #include <string_view>
 
 #include "../Entity.h"
+
 #include "Token.h"
 
 namespace mx {
@@ -43,7 +44,7 @@ class TokenTree;
 
 using FragmentIdList = std::vector<PackedFragmentId>;
 
-class FileLocationConfiguration {
+class MX_EXPORT FileLocationConfiguration {
  public:
   // Tab width, in terms of number of spaces.
   unsigned tab_width{4};
@@ -57,7 +58,7 @@ class FileLocationConfiguration {
 // Represents a cache of files to pre-computed line/column number locations.
 // The purpose of the cache is to allow us to configure a specific
 // interpretation of tab width, as well as tab stop behavior.
-class FileLocationCache {
+class MX_EXPORT FileLocationCache {
  private:
   friend class Token;
 
@@ -67,7 +68,7 @@ class FileLocationCache {
   ~FileLocationCache(void);
 
   FileLocationCache(
-    const FileLocationConfiguration &config=FileLocationConfiguration());
+      const FileLocationConfiguration &config=FileLocationConfiguration());
 
   // Add a file to the cache.
   void add(const File &) const;
@@ -81,7 +82,7 @@ class FileLocationCache {
 
 // Represents a file. A given file may have many associated paths. We
 // de-duplicate via a hash of the contents.
-class File {
+class MX_EXPORT File {
  private:
   friend class Compilation;
   friend class CompilationImpl;
@@ -161,7 +162,7 @@ class File {
   }
 
   // Return the entity ID of this file.
-  SpecificEntityId<FileId> id(void) const noexcept;
+  PackedFileId id(void) const noexcept;
 
   // Return a list of fragments in this file.
   gap::generator<Fragment> fragments(void) const &;

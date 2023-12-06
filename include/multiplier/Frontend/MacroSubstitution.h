@@ -23,7 +23,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class MacroSubstitution : public Macro {
+class MX_EXPORT MacroSubstitution : public Macro {
  private:
   friend class FragmentImpl;
   friend class Macro;

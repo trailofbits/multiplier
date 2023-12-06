@@ -30,7 +30,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class CXXDestructorDecl : public CXXMethodDecl {
+class MX_EXPORT CXXDestructorDecl : public CXXMethodDecl {
  private:
   friend class FragmentImpl;
   friend class CXXMethodDecl;

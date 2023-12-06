@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class TypeNullUnspecifiedAttr : public TypeAttr {
+class MX_EXPORT TypeNullUnspecifiedAttr : public TypeAttr {
  private:
   friend class FragmentImpl;
   friend class TypeAttr;

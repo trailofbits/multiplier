@@ -29,7 +29,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class CXXReinterpretCastExpr : public CXXNamedCastExpr {
+class MX_EXPORT CXXReinterpretCastExpr : public CXXNamedCastExpr {
  private:
   friend class FragmentImpl;
   friend class CXXNamedCastExpr;

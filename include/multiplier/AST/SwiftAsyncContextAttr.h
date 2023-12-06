@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class SwiftAsyncContextAttr : public ParameterABIAttr {
+class MX_EXPORT SwiftAsyncContextAttr : public ParameterABIAttr {
  private:
   friend class FragmentImpl;
   friend class ParameterABIAttr;

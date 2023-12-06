@@ -14,6 +14,14 @@
 
 namespace mx::ir {
 
+const char *EnumeratorName(BasicBlockOrder val) {
+  switch (val) {
+    case BasicBlockOrder::PRE_ORDER: return "PRE_ORDER";
+    case BasicBlockOrder::POST_ORDER: return "POST_ORDER";
+    default: return "<invalid>";
+  }
+}
+
 Region Region::containing(const Block &block) {
   return Region(block.module_, block.block_->getParent());
 }

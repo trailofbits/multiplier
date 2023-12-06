@@ -30,7 +30,6 @@
 
 #include "Fragment.h"
 #include "Iterator.h"
-#include "Query.h"
 #include "Reference.h"
 
 namespace mx {
@@ -85,10 +84,10 @@ inline constexpr unsigned NumEnumerators(IndexStatus) {
   return 3u;
 }
 
-const char *EnumeratorName(IndexStatus);
+MX_EXPORT const char *EnumeratorName(IndexStatus);
 
 // Access to the indexed code.
-class Index {
+class MX_EXPORT Index {
  private:
   friend class Reference;
   friend class ReferenceKind;
@@ -120,8 +119,15 @@ class Index {
   /* implicit */ inline Index(EntityProviderPtr impl_)
       : impl(std::move(impl_)) {}
 
-  // Create an in-memory caching index provider.
-  static Index in_memory_cache(Index next, unsigned timeout_s=1u);
+  // Create an in-memory caching index provider using the default timeout (1s).
+  static Index in_memory_cache(Index next);
+
+  // Create an in-memory caching index provider using a custom timeout in
+  // seconds.
+  static Index in_memory_cache(Index next, unsigned timeout_s);
+  
+  // Create an index that opens a database produced by Multiplier's indexer
+  // by specifying the path to that database.
   static Index from_database(std::filesystem::path path);
 
   static Index containing(const Fragment &entity);
@@ -240,7 +246,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_REFERENCE_AS,
 }
 #endif  // __CDT_PARSER__
 
-class SimpleToken {
+class MX_EXPORT UserToken {
  public:
   // The kind of this token.
   TokenKind kind{TokenKind::UNKNOWN};

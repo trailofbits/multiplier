@@ -11,6 +11,7 @@
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/Designator.h>
 #include <multiplier/AST/Type.h>
+#include <multiplier/Frontend/TokenContext.h>
 
 #include "Type.h"
 #include "Types.h"
@@ -95,10 +96,6 @@ TypeTokenContextReader::TokenContextOffsets(EntityOffset offset) const {
     return std::nullopt;
   }
   return tagged_offset;
-}
-
-std::optional<TokenContext> TokenContext::of(const Token &tok) {
-  return tok.context();
 }
 
 // Return the context node that identifies how this token relates to the AST.

@@ -23,7 +23,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class RenderScriptKernelAttr : public Attr {
+class MX_EXPORT RenderScriptKernelAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;

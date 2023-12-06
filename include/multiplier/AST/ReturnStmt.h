@@ -26,7 +26,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class ReturnStmt : public Stmt {
+class MX_EXPORT ReturnStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;

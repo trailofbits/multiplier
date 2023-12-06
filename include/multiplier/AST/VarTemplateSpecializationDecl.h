@@ -32,7 +32,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class VarTemplateSpecializationDecl : public VarDecl {
+class MX_EXPORT VarTemplateSpecializationDecl : public VarDecl {
  private:
   friend class FragmentImpl;
   friend class VarDecl;

@@ -8,12 +8,7 @@
 
 find_package(Git REQUIRED)
 
-if(MX_ENABLE_INSTALL)
-  set(MX_VENDOR_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}")
-else()
-  set(MX_VENDOR_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/install")
-  execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${MX_VENDOR_INSTALL_DIR}")
-endif()
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${MX_VENDOR_INSTALL_DIR}")
 
 add_subdirectory(capnproto)
 add_subdirectory(gflags)
@@ -35,8 +30,4 @@ endif()
 if(MX_ENABLE_RE2)
   add_subdirectory(abseil)
   add_subdirectory(re2)  # Depends on abseil
-endif()
-
-if(MX_ENABLE_PYTHON_BINDINGS)
-  add_subdirectory(nanobind)
 endif()

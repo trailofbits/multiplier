@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../Compiler.h"
+
 #include <cstdint>
 
 namespace mx {
@@ -29,6 +31,6 @@ inline static constexpr unsigned NumEnumerators(PragmaFloatControlKind) {
   return 7;
 }
 
-const char *EnumeratorName(PragmaFloatControlKind);
+MX_EXPORT const char *EnumeratorName(PragmaFloatControlKind);
 
 } // namespace mx

@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class Ptr32Attr : public TypeAttr {
+class MX_EXPORT Ptr32Attr : public TypeAttr {
  private:
   friend class FragmentImpl;
   friend class TypeAttr;

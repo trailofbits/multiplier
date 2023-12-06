@@ -17,8 +17,10 @@
 #include <span>
 #include <vector>
 
+#include "../Compiler.h"
 #include "../Entity.h"
 #include "../Iterator.h"
+#include "../Frontend/TokenContext.h"
 
 #include <multiplier/AST/PseudoKind.h>
 
@@ -39,7 +41,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class Designator {
+class MX_EXPORT Designator {
  public:
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;

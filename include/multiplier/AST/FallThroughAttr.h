@@ -24,7 +24,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class FallThroughAttr : public StmtAttr {
+class MX_EXPORT FallThroughAttr : public StmtAttr {
  private:
   friend class FragmentImpl;
   friend class StmtAttr;

@@ -44,15 +44,15 @@ class VoidType;
 }  // namespace vast::hl
 namespace mx::ir::hl {
 
-class Type : public ::mx::ir::Type {
+class MX_EXPORT Type : public ::mx::ir::Type {
  public:
   static std::optional<Type> from(const ::mx::ir::Type &);
 };
 static_assert(sizeof(Type) == sizeof(::mx::ir::Type));
 
-class AdjustedType final : public Type {
+class MX_EXPORT AdjustedType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_ADJUSTED;
   }
 
@@ -65,9 +65,9 @@ class AdjustedType final : public Type {
 };
 static_assert(sizeof(AdjustedType) == sizeof(Type));
 
-class ArrayType final : public Type {
+class MX_EXPORT ArrayType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_ARRAY;
   }
 
@@ -83,9 +83,9 @@ class ArrayType final : public Type {
 };
 static_assert(sizeof(ArrayType) == sizeof(Type));
 
-class AttributedType final : public Type {
+class MX_EXPORT AttributedType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_ATTRIBUTED;
   }
 
@@ -97,9 +97,9 @@ class AttributedType final : public Type {
 };
 static_assert(sizeof(AttributedType) == sizeof(Type));
 
-class BFloat16Type final : public Type {
+class MX_EXPORT BFloat16Type final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_B_FLOAT16;
   }
 
@@ -111,9 +111,9 @@ class BFloat16Type final : public Type {
 };
 static_assert(sizeof(BFloat16Type) == sizeof(Type));
 
-class BoolType final : public Type {
+class MX_EXPORT BoolType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_BOOL;
   }
 
@@ -125,9 +125,9 @@ class BoolType final : public Type {
 };
 static_assert(sizeof(BoolType) == sizeof(Type));
 
-class CharType final : public Type {
+class MX_EXPORT CharType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_CHAR;
   }
 
@@ -139,9 +139,9 @@ class CharType final : public Type {
 };
 static_assert(sizeof(CharType) == sizeof(Type));
 
-class DecayedType final : public Type {
+class MX_EXPORT DecayedType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_DECAYED;
   }
 
@@ -153,9 +153,9 @@ class DecayedType final : public Type {
 };
 static_assert(sizeof(DecayedType) == sizeof(Type));
 
-class DoubleType final : public Type {
+class MX_EXPORT DoubleType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_DOUBLE;
   }
 
@@ -167,9 +167,9 @@ class DoubleType final : public Type {
 };
 static_assert(sizeof(DoubleType) == sizeof(Type));
 
-class ElaboratedType final : public Type {
+class MX_EXPORT ElaboratedType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_ELABORATED;
   }
 
@@ -182,9 +182,9 @@ class ElaboratedType final : public Type {
 };
 static_assert(sizeof(ElaboratedType) == sizeof(Type));
 
-class EnumType final : public Type {
+class MX_EXPORT EnumType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_ENUM;
   }
 
@@ -197,9 +197,9 @@ class EnumType final : public Type {
 };
 static_assert(sizeof(EnumType) == sizeof(Type));
 
-class Float128Type final : public Type {
+class MX_EXPORT Float128Type final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_FLOAT128;
   }
 
@@ -211,9 +211,9 @@ class Float128Type final : public Type {
 };
 static_assert(sizeof(Float128Type) == sizeof(Type));
 
-class FloatType final : public Type {
+class MX_EXPORT FloatType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_FLOAT;
   }
 
@@ -225,9 +225,9 @@ class FloatType final : public Type {
 };
 static_assert(sizeof(FloatType) == sizeof(Type));
 
-class HalfType final : public Type {
+class MX_EXPORT HalfType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_HALF;
   }
 
@@ -239,9 +239,9 @@ class HalfType final : public Type {
 };
 static_assert(sizeof(HalfType) == sizeof(Type));
 
-class Int128Type final : public Type {
+class MX_EXPORT Int128Type final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_INT128;
   }
 
@@ -253,9 +253,9 @@ class Int128Type final : public Type {
 };
 static_assert(sizeof(Int128Type) == sizeof(Type));
 
-class IntType final : public Type {
+class MX_EXPORT IntType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_INT;
   }
 
@@ -267,9 +267,9 @@ class IntType final : public Type {
 };
 static_assert(sizeof(IntType) == sizeof(Type));
 
-class LValueType final : public Type {
+class MX_EXPORT LValueType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_L_VALUE;
   }
 
@@ -281,9 +281,9 @@ class LValueType final : public Type {
 };
 static_assert(sizeof(LValueType) == sizeof(Type));
 
-class LabelType final : public Type {
+class MX_EXPORT LabelType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_LABEL;
   }
 
@@ -294,9 +294,9 @@ class LabelType final : public Type {
 };
 static_assert(sizeof(LabelType) == sizeof(Type));
 
-class LongDoubleType final : public Type {
+class MX_EXPORT LongDoubleType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_LONG_DOUBLE;
   }
 
@@ -308,9 +308,9 @@ class LongDoubleType final : public Type {
 };
 static_assert(sizeof(LongDoubleType) == sizeof(Type));
 
-class LongLongType final : public Type {
+class MX_EXPORT LongLongType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_LONG_LONG;
   }
 
@@ -322,9 +322,9 @@ class LongLongType final : public Type {
 };
 static_assert(sizeof(LongLongType) == sizeof(Type));
 
-class LongType final : public Type {
+class MX_EXPORT LongType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_LONG;
   }
 
@@ -336,9 +336,9 @@ class LongType final : public Type {
 };
 static_assert(sizeof(LongType) == sizeof(Type));
 
-class ParenType final : public Type {
+class MX_EXPORT ParenType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_PAREN;
   }
 
@@ -350,9 +350,9 @@ class ParenType final : public Type {
 };
 static_assert(sizeof(ParenType) == sizeof(Type));
 
-class PointerType final : public Type {
+class MX_EXPORT PointerType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_POINTER;
   }
 
@@ -365,9 +365,9 @@ class PointerType final : public Type {
 };
 static_assert(sizeof(PointerType) == sizeof(Type));
 
-class RValueType final : public Type {
+class MX_EXPORT RValueType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_R_VALUE;
   }
 
@@ -379,9 +379,9 @@ class RValueType final : public Type {
 };
 static_assert(sizeof(RValueType) == sizeof(Type));
 
-class RecordType final : public Type {
+class MX_EXPORT RecordType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_RECORD;
   }
 
@@ -394,9 +394,9 @@ class RecordType final : public Type {
 };
 static_assert(sizeof(RecordType) == sizeof(Type));
 
-class ReferenceType final : public Type {
+class MX_EXPORT ReferenceType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_REFERENCE;
   }
 
@@ -408,9 +408,9 @@ class ReferenceType final : public Type {
 };
 static_assert(sizeof(ReferenceType) == sizeof(Type));
 
-class ShortType final : public Type {
+class MX_EXPORT ShortType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_SHORT;
   }
 
@@ -422,9 +422,9 @@ class ShortType final : public Type {
 };
 static_assert(sizeof(ShortType) == sizeof(Type));
 
-class TypeOfExprType final : public Type {
+class MX_EXPORT TypeOfExprType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_TYPE_OF_EXPR;
   }
 
@@ -437,9 +437,9 @@ class TypeOfExprType final : public Type {
 };
 static_assert(sizeof(TypeOfExprType) == sizeof(Type));
 
-class TypeOfTypeType final : public Type {
+class MX_EXPORT TypeOfTypeType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_TYPE_OF_TYPE;
   }
 
@@ -452,9 +452,9 @@ class TypeOfTypeType final : public Type {
 };
 static_assert(sizeof(TypeOfTypeType) == sizeof(Type));
 
-class TypedefType final : public Type {
+class MX_EXPORT TypedefType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_TYPEDEF;
   }
 
@@ -467,9 +467,9 @@ class TypedefType final : public Type {
 };
 static_assert(sizeof(TypedefType) == sizeof(Type));
 
-class VoidType final : public Type {
+class MX_EXPORT VoidType final : public Type {
  public:
-  inline static TypeKind static_kind(void) {
+  inline static constexpr TypeKind static_kind(void) {
     return TypeKind::HL_VOID;
   }
 

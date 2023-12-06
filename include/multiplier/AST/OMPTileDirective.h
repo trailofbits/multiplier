@@ -27,7 +27,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class OMPTileDirective : public OMPLoopTransformationDirective {
+class MX_EXPORT OMPTileDirective : public OMPLoopTransformationDirective {
  private:
   friend class FragmentImpl;
   friend class OMPLoopTransformationDirective;
