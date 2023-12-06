@@ -30,6 +30,19 @@ TypeTokenId = int
 class Entity(object, ABC):
   id: int
 
+import multiplier.ir
+import multiplier.ast
+import multiplier.ir.abi
+import multiplier.ir.llvm
+import multiplier.ir.core
+import multiplier.ir.meta
+import multiplier.frontend
+import multiplier.ir.memref
+import multiplier.ir.builtin
+import multiplier.ir.lowlevel
+import multiplier.ir.highlevel
+import multiplier.ir.unsupported
+
 class EntityCategory(IntEnum):
   NOT_AN_ENTITY = 0
   FRAGMENT = 1
