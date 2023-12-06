@@ -52,6 +52,9 @@ jobs:
         with:
           cmake-version: '3.24.x'
 
+      - name: Use cmake
+        run: cmake --version
+
       - name: Set up variables
         run: |
           echo "RELEASE_DIR=${RUNNER_TEMP}/release" >> $GITHUB_ENV
