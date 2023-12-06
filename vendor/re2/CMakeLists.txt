@@ -23,7 +23,7 @@ if(NOT EXISTS "${src_dir}/CMakeLists.txt")
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 endif()
 
-find_package(absl CONFIG REQUIRED)
+find_package(absl CONFIG REQUIRED QUITE HINTS "${MX_VENDOR_INSTALL_DIR}")
 
 # This is the main build, setup and execute the nested build
 # to ensure the re2 library exists before continuing

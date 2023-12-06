@@ -13,10 +13,7 @@ if(NOT MX_USE_VENDORED_GLOG)
   endif()
 endif()
 
-find_package(gflags CONFIG)
-if(NOT gflags_FOUND)
-  message(FATAL_ERROR "Could not find gflags depedency for glog.")
-endif()
+find_package(gflags CONFIG REQUIRED QUITE HINTS "${MX_VENDOR_INSTALL_DIR}")
 
 set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src")
 set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/build")

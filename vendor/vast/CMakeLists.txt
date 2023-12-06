@@ -13,14 +13,10 @@ if(NOT MX_USE_VENDORED_VAST)
   endif()
 endif()
 
-find_package(gap CONFIG QUIET)
-find_package(LLVM CONFIG QUIET)
-find_package(MLIR CONFIG QUIET)
-find_package(Clang CONFIG QUIET)
-
-if(NOT gap_FOUND OR NOT LLVM_FOUND OR NOT MLIR_FOUND OR NOT Clang_FOUND)
-  message(FATAL_ERROR "Could not find gap/Clang/LLVM/MLIR")
-endif()
+find_package(gap CONFIG REQUIRED QUIET)
+find_package(LLVM CONFIG REQUIRED QUIET HINTS "${MX_VENDOR_INSTALL_DIR}")
+find_package(MLIR CONFIG REQUIRED QUIET HINTS "${MX_VENDOR_INSTALL_DIR}")
+find_package(Clang CONFIG REQUIRED QUIET HINTS "${MX_VENDOR_INSTALL_DIR}")
 
 set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src")
 set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/build")

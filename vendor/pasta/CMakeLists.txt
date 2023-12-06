@@ -13,8 +13,8 @@ if(NOT MX_USE_VENDORED_PASTA)
   endif()
 endif()
 
-find_package(LLVM CONFIG REQUIRED QUIET)
-find_package(Clang CONFIG REQUIRED QUIET)
+find_package(LLVM CONFIG REQUIRED QUIET HINTS "${MX_VENDOR_INSTALL_DIR}")
+find_package(Clang CONFIG REQUIRED QUIET HINTS "${MX_VENDOR_INSTALL_DIR}")
 
 set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src")
 set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/build")
