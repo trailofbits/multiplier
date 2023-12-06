@@ -612,131 +612,131 @@ class TypeKind(IntEnum):
   UNSUP_UNSUPPORTED = 64
 
 class Attribute(object):
-  kind: 'multiplier.ir.AttributeKind'
+  kind: multiplier.ir.AttributeKind
 
 class Value(object):
-  type: 'multiplier.ir.Type'
-  uses: Generator['multiplier.ir.Operand']
+  type: multiplier.ir.Type
+  uses: Generator[multiplier.ir.Operand]
 
 class Argument(multiplier.ir.Value):
   index: int
 
   @staticmethod
-  def FROM(val: 'multiplier.ir.Value') -> Optional['multiplier.ir.Argument']:
+  def FROM(val: multiplier.ir.Value) -> Optional[multiplier.ir.Argument]:
     ...
 
 class Result(multiplier.ir.Value):
-  operation: 'multiplier.ir.Operation'
+  operation: multiplier.ir.Operation
   index: int
 
   @staticmethod
-  def of(arg_0: 'multiplier.ir.Operation') -> Optional['multiplier.ir.Result']:
+  def of(arg_0: multiplier.ir.Operation) -> Optional[multiplier.ir.Result]:
     ...
 
   @staticmethod
-  def FROM(arg_0: 'multiplier.ir.Value') -> Optional['multiplier.ir.Result']:
+  def FROM(arg_0: multiplier.ir.Value) -> Optional[multiplier.ir.Result]:
     ...
 
 class Block(object):
   num_arguments: int
-  arguments: Generator['multiplier.ir.Argument']
-  operations: Generator['multiplier.ir.Operation']
-  reverse_operations: Generator['multiplier.ir.Operation']
-  uses: Generator['multiplier.ir.Label']
-  terminator: 'multiplier.ir.Operation'
+  arguments: Generator[multiplier.ir.Argument]
+  operations: Generator[multiplier.ir.Operation]
+  reverse_operations: Generator[multiplier.ir.Operation]
+  uses: Generator[multiplier.ir.Label]
+  terminator: multiplier.ir.Operation
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.ir.Argument') -> 'multiplier.ir.Block':
+  def containing(arg_0: multiplier.ir.Argument) -> multiplier.ir.Block:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.ir.Operation') -> Optional['multiplier.ir.Block']:
+  def containing(arg_0: multiplier.ir.Operation) -> Optional[multiplier.ir.Block]:
     ...
 
-  def nth_argument(self, arg_0: int) -> Optional['multiplier.ir.Argument']:
+  def nth_argument(self, arg_0: int) -> Optional[multiplier.ir.Argument]:
     ...
 
 class Label(object):
-  operation: 'multiplier.ir.Operation'
-  block: 'multiplier.ir.Block'
+  operation: multiplier.ir.Operation
+  block: multiplier.ir.Block
   index: int
 
 class Operation(object):
   kind_name: str
-  kind: 'multiplier.ir.OperationKind'
+  kind: multiplier.ir.OperationKind
   num_operands: int
-  operands: Generator['multiplier.ir.Operand']
+  operands: Generator[multiplier.ir.Operand]
   num_results: int
-  results: Generator['multiplier.ir.Result']
+  results: Generator[multiplier.ir.Result]
   num_regions: int
-  regions: Generator['multiplier.ir.Region']
-  only_region: Optional['multiplier.ir.Region']
-  only_region_blocks: Generator['multiplier.ir.Block']
-  uses: Generator['multiplier.ir.Operand']
+  regions: Generator[multiplier.ir.Region]
+  only_region: Optional[multiplier.ir.Region]
+  only_region_blocks: Generator[multiplier.ir.Block]
+  uses: Generator[multiplier.ir.Operand]
 
   @staticmethod
-  def classify(arg_0: str) -> 'multiplier.ir.OperationKind':
+  def classify(arg_0: str) -> multiplier.ir.OperationKind:
     ...
 
   @overload
   @staticmethod
-  def producing(val: 'multiplier.ir.Result') -> 'multiplier.ir.Operation':
+  def producing(val: multiplier.ir.Result) -> multiplier.ir.Operation:
     ...
 
   @overload
   @staticmethod
-  def producing(val: 'multiplier.ir.Value') -> Optional['multiplier.ir.Operation']:
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.Operation]:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.ir.Region') -> 'multiplier.ir.Operation':
+  def containing(arg_0: multiplier.ir.Region) -> multiplier.ir.Operation:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.ir.Block') -> 'multiplier.ir.Operation':
+  def containing(arg_0: multiplier.ir.Block) -> multiplier.ir.Operation:
     ...
 
-  def nth_operand(self, arg_0: int) -> Optional['multiplier.ir.Operand']:
+  def nth_operand(self, arg_0: int) -> Optional[multiplier.ir.Operand]:
     ...
 
-  def nth_result(self, arg_0: int) -> Optional['multiplier.ir.Result']:
+  def nth_result(self, arg_0: int) -> Optional[multiplier.ir.Result]:
     ...
 
-  def nth_region(self, arg_0: int) -> Optional['multiplier.ir.Region']:
+  def nth_region(self, arg_0: int) -> Optional[multiplier.ir.Region]:
     ...
 
 class Operand(object):
-  operation: 'multiplier.ir.Operation'
+  operation: multiplier.ir.Operation
   index: int
-  value: 'multiplier.ir.Value'
+  value: multiplier.ir.Value
 
 class Region(object):
   num_blocks: int
-  blocks: Generator['multiplier.ir.Block']
-  reverse_blocks: Generator['multiplier.ir.Block']
-  entry_block: 'multiplier.ir.Block'
+  blocks: Generator[multiplier.ir.Block]
+  reverse_blocks: Generator[multiplier.ir.Block]
+  entry_block: multiplier.ir.Block
   num_entry_block_arguments: int
-  entry_block_arguments: Generator['multiplier.ir.Argument']
+  entry_block_arguments: Generator[multiplier.ir.Argument]
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.ir.Block') -> 'multiplier.ir.Region':
+  def containing(arg_0: multiplier.ir.Block) -> multiplier.ir.Region:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.ir.Operation') -> Optional['multiplier.ir.Region']:
+  def containing(arg_0: multiplier.ir.Operation) -> Optional[multiplier.ir.Region]:
     ...
 
-  def nth_block(self, arg_0: int) -> Optional['multiplier.ir.Block']:
+  def nth_block(self, arg_0: int) -> Optional[multiplier.ir.Block]:
     ...
 
-  def nth_entry_block_argument(self, arg_0: int) -> Optional['multiplier.ir.Argument']:
+  def nth_entry_block_argument(self, arg_0: int) -> Optional[multiplier.ir.Argument]:
     ...
 
 class Type(object):
-  kind: 'multiplier.ir.TypeKind'
+  kind: multiplier.ir.TypeKind

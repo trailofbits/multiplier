@@ -612,23 +612,23 @@ class TokenContext(object):
   has_parent: bool
   is_alias: bool
   index_in_fragment: int
-  as_declaration: Optional['multiplier.ast.Decl']
-  as_statement: Optional['multiplier.ast.Stmt']
-  as_attribute: Optional['multiplier.ast.Attr']
-  as_macro: Optional['multiplier.frontend.Macro']
-  as_type: Optional['multiplier.ast.Type']
-  as_template_argument: Optional['multiplier.ast.TemplateArgument']
-  as_template_parameter_list: Optional['multiplier.ast.TemplateParameterList']
-  as_cxx_base_specifier: Optional['multiplier.ast.CXXBaseSpecifier']
-  as_designator: Optional['multiplier.ast.Designator']
-  aliasee: Optional['multiplier.frontend.TokenContext']
-  parent: Optional['multiplier.frontend.TokenContext']
+  as_declaration: Optional[multiplier.ast.Decl]
+  as_statement: Optional[multiplier.ast.Stmt]
+  as_attribute: Optional[multiplier.ast.Attr]
+  as_macro: Optional[multiplier.frontend.Macro]
+  as_type: Optional[multiplier.ast.Type]
+  as_template_argument: Optional[multiplier.ast.TemplateArgument]
+  as_template_parameter_list: Optional[multiplier.ast.TemplateParameterList]
+  as_cxx_base_specifier: Optional[multiplier.ast.CXXBaseSpecifier]
+  as_designator: Optional[multiplier.ast.Designator]
+  aliasee: Optional[multiplier.frontend.TokenContext]
+  parent: Optional[multiplier.frontend.TokenContext]
 
-class Compilation(Entity):
-  ir: Optional['multiplier.ir.builtin.ModuleOp']
-  fragments: Generator['multiplier.Fragment']
-  files: Generator['multiplier.frontend.File']
-  main_source_file: 'multiplier.frontend.File'
+class Compilation(multiplier.Entity):
+  ir: Optional[multiplier.ir.builtin.ModuleOp]
+  fragments: Generator[multiplier.Fragment]
+  files: Generator[multiplier.frontend.File]
+  main_source_file: multiplier.frontend.File
   main_source_file_path: pathlib.PurePath
   compiler_executable_path: pathlib.PurePath
   compiler_installation_directory: pathlib.PurePath
@@ -642,107 +642,119 @@ class Compilation(Entity):
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.Fragment') -> 'multiplier.frontend.Compilation':
+  def containing(arg_0: multiplier.Fragment) -> multiplier.frontend.Compilation:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: Optional['multiplier.Fragment']) -> Optional['multiplier.frontend.Compilation']:
+  def containing(arg_0: Optional[multiplier.Fragment]) -> Optional[multiplier.frontend.Compilation]:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.ast.Decl') -> 'multiplier.frontend.Compilation':
+  def containing(arg_0: multiplier.ast.Decl) -> multiplier.frontend.Compilation:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.ast.Stmt') -> 'multiplier.frontend.Compilation':
+  def containing(arg_0: multiplier.ast.Stmt) -> multiplier.frontend.Compilation:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.ast.Attr') -> 'multiplier.frontend.Compilation':
+  def containing(arg_0: multiplier.ast.Attr) -> multiplier.frontend.Compilation:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.ast.TemplateArgument') -> 'multiplier.frontend.Compilation':
+  def containing(arg_0: multiplier.ast.TemplateArgument) -> multiplier.frontend.Compilation:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.ast.TemplateParameterList') -> 'multiplier.frontend.Compilation':
+  def containing(arg_0: multiplier.ast.TemplateParameterList) -> multiplier.frontend.Compilation:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.ast.CXXBaseSpecifier') -> 'multiplier.frontend.Compilation':
+  def containing(arg_0: multiplier.ast.CXXBaseSpecifier) -> multiplier.frontend.Compilation:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.ast.Designator') -> 'multiplier.frontend.Compilation':
+  def containing(arg_0: multiplier.ast.Designator) -> multiplier.frontend.Compilation:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.frontend.Token') -> Optional['multiplier.frontend.Compilation']:
+  def containing(arg_0: multiplier.frontend.Token) -> Optional[multiplier.frontend.Compilation]:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: 'multiplier.frontend.Macro') -> 'multiplier.frontend.Compilation':
+  def containing(arg_0: multiplier.frontend.Macro) -> multiplier.frontend.Compilation:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.Compilation']:
+  def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.Compilation]:
     ...
 
-class Token(Entity):
-  kind: 'multiplier.frontend.TokenKind'
+class Token(multiplier.Entity):
+  kind: multiplier.frontend.TokenKind
   data: str
-  context: Optional['multiplier.frontend.TokenContext']
-  parsed_token: 'multiplier.frontend.Token'
-  derived_token: 'multiplier.frontend.Token'
-  file_token: 'multiplier.frontend.Token'
-  nearest_file_token: 'multiplier.frontend.Token'
+  context: Optional[multiplier.frontend.TokenContext]
+  parsed_token: multiplier.frontend.Token
+  derived_token: multiplier.frontend.Token
+  file_token: multiplier.frontend.Token
+  nearest_file_token: multiplier.frontend.Token
   related_entity: 'multiplier.Entity'
   related_entity_id: 'multiplier.EntityId'
-  category: 'multiplier.frontend.TokenCategory'
-  containing_macro: Optional['multiplier.frontend.Macro']
+  category: multiplier.frontend.TokenCategory
+  containing_macro: Optional[multiplier.frontend.Macro]
 
   @staticmethod
-  def entity_category() -> 'multiplier.EntityCategory':
+  def entity_category() -> multiplier.EntityCategory:
     ...
 
-  def location(self, arg_0: 'multiplier.frontend.FileLocationCache') -> Optional[Tuple[int, int]]:
+  def location(self, arg_0: multiplier.frontend.FileLocationCache) -> Optional[Tuple[int, int]]:
     ...
 
-  def next_location(self, arg_0: 'multiplier.frontend.FileLocationCache') -> Optional[Tuple[int, int]]:
+  def next_location(self, arg_0: multiplier.frontend.FileLocationCache) -> Optional[Tuple[int, int]]:
     ...
 
-  def nearest_location(self, cache: 'multiplier.frontend.FileLocationCache') -> Optional[Tuple[int, int]]:
+  def nearest_location(self, cache: multiplier.frontend.FileLocationCache) -> Optional[Tuple[int, int]]:
     ...
 
-class TokenRange(object, Sequence[Token]):
+  def __bool__(self) -> bool:
+    ...
+
+class TokenRange(object, Sequence[Token], Iterable[Token]):
   empty: bool
   size: int
-  front: 'multiplier.frontend.Token'
-  back: 'multiplier.frontend.Token'
+  front: multiplier.frontend.Token
+  back: multiplier.frontend.Token
   data: str
-  file_tokens: 'multiplier.frontend.TokenRange'
-  strip_whitespace: 'multiplier.frontend.TokenRange'
+  file_tokens: multiplier.frontend.TokenRange
+  strip_whitespace: multiplier.frontend.TokenRange
 
   @staticmethod
-  def create(tokens: Sequence['multiplier.frontend.UserToken' | 'multiplier.frontend.Token']) -> 'multiplier.frontend.TokenRange':
+  def create(tokens: Sequence[multiplier.frontend.UserToken | multiplier.frontend.Token]) -> multiplier.frontend.TokenRange:
     ...
 
-  def slice(self, start_index: int, end_index: int) -> 'multiplier.frontend.TokenRange':
+  def slice(self, start_index: int, end_index: int) -> multiplier.frontend.TokenRange:
     ...
 
-  def index_of(self, that: 'multiplier.frontend.Token') -> Optional[int]:
+  def index_of(self, that: multiplier.frontend.Token) -> Optional[int]:
+    ...
+
+  def __bool__(self) -> bool:
+    ...
+
+  def __getitem__(self, index: int) -> Token:
+    ...
+
+  def __iter__(self) -> Iterable[Token]:
     ...
 
 class RegexQueryMatch(multiplier.frontend.TokenRange):
@@ -754,11 +766,11 @@ class RegexQueryMatch(multiplier.frontend.TokenRange):
     ...
 
   @overload
-  def captured_tokens(self, var: str) -> Optional['multiplier.frontend.TokenRange']:
+  def captured_tokens(self, var: str) -> Optional[multiplier.frontend.TokenRange]:
     ...
 
   @overload
-  def captured_tokens(self, catpture_index: int) -> Optional['multiplier.frontend.TokenRange']:
+  def captured_tokens(self, catpture_index: int) -> Optional[multiplier.frontend.TokenRange]:
     ...
 
   @overload
@@ -769,242 +781,242 @@ class RegexQueryMatch(multiplier.frontend.TokenRange):
   def captured_data(self, capture_index: int) -> Optional[str]:
     ...
 
-class File(Entity):
-  fragments: Generator['multiplier.Fragment']
+class File(multiplier.Entity):
+  fragments: Generator[multiplier.Fragment]
   paths: Generator[pathlib.PurePath]
   fragment_ids: FragmentIdList
-  tokens: 'multiplier.frontend.TokenRange'
+  tokens: multiplier.frontend.TokenRange
   data: str
 
   @overload
   @staticmethod
-  def containing(match: 'multiplier.frontend.RegexQueryMatch') -> Optional['multiplier.frontend.File']:
+  def containing(match: multiplier.frontend.RegexQueryMatch) -> Optional[multiplier.frontend.File]:
     ...
 
   @overload
   @staticmethod
-  def containing(file: 'multiplier.frontend.File') -> 'multiplier.frontend.File':
+  def containing(file: multiplier.frontend.File) -> multiplier.frontend.File:
     ...
 
   @overload
   @staticmethod
-  def containing(entity: 'multiplier.Fragment') -> Optional['multiplier.frontend.File']:
+  def containing(entity: multiplier.Fragment) -> Optional[multiplier.frontend.File]:
     ...
 
   @overload
   @staticmethod
-  def containing(entity: 'multiplier.ast.Decl') -> Optional['multiplier.frontend.File']:
+  def containing(entity: multiplier.ast.Decl) -> Optional[multiplier.frontend.File]:
     ...
 
   @overload
   @staticmethod
-  def containing(entity: 'multiplier.ast.Stmt') -> Optional['multiplier.frontend.File']:
+  def containing(entity: multiplier.ast.Stmt) -> Optional[multiplier.frontend.File]:
     ...
 
   @overload
   @staticmethod
-  def containing(entity: 'multiplier.ast.Attr') -> Optional['multiplier.frontend.File']:
+  def containing(entity: multiplier.ast.Attr) -> Optional[multiplier.frontend.File]:
     ...
 
   @overload
   @staticmethod
-  def containing(entity: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.File']:
+  def containing(entity: multiplier.frontend.Macro) -> Optional[multiplier.frontend.File]:
     ...
 
   @overload
   @staticmethod
-  def containing(entity: 'multiplier.ast.TemplateArgument') -> Optional['multiplier.frontend.File']:
+  def containing(entity: multiplier.ast.TemplateArgument) -> Optional[multiplier.frontend.File]:
     ...
 
   @overload
   @staticmethod
-  def containing(entity: 'multiplier.ast.TemplateParameterList') -> Optional['multiplier.frontend.File']:
+  def containing(entity: multiplier.ast.TemplateParameterList) -> Optional[multiplier.frontend.File]:
     ...
 
   @overload
   @staticmethod
-  def containing(entity: 'multiplier.ast.CXXBaseSpecifier') -> Optional['multiplier.frontend.File']:
+  def containing(entity: multiplier.ast.CXXBaseSpecifier) -> Optional[multiplier.frontend.File]:
     ...
 
   @overload
   @staticmethod
-  def containing(entity: 'multiplier.ast.Designator') -> Optional['multiplier.frontend.File']:
+  def containing(entity: multiplier.ast.Designator) -> Optional[multiplier.frontend.File]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Optional['multiplier.frontend.File']:
+  def containing(token: multiplier.frontend.Token) -> Optional[multiplier.frontend.File]:
     ...
 
   @overload
   @staticmethod
-  def containing(tokens: 'multiplier.frontend.TokenRange') -> Optional['multiplier.frontend.File']:
+  def containing(tokens: multiplier.frontend.TokenRange) -> Optional[multiplier.frontend.File]:
     ...
 
   @overload
   @staticmethod
-  def containing(tokens: 'multiplier.frontend.TokenTree') -> Optional['multiplier.frontend.File']:
+  def containing(tokens: multiplier.frontend.TokenTree) -> Optional[multiplier.frontend.File]:
     ...
 
   @overload
   @staticmethod
-  def containing(arg_0: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.File']:
+  def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.File]:
     ...
 
   @staticmethod
-  def entity_category() -> 'multiplier.EntityCategory':
+  def entity_category() -> multiplier.EntityCategory:
     ...
 
 class TokenTree(object):
 
   @overload
   @staticmethod
-  def FROM(arg_0: 'multiplier.frontend.File') -> 'multiplier.frontend.TokenTree':
+  def FROM(arg_0: multiplier.frontend.File) -> multiplier.frontend.TokenTree:
     ...
 
   @overload
   @staticmethod
-  def FROM(arg_0: 'multiplier.Fragment') -> 'multiplier.frontend.TokenTree':
+  def FROM(arg_0: multiplier.Fragment) -> multiplier.frontend.TokenTree:
     ...
 
   @overload
   @staticmethod
-  def FROM(arg_0: 'multiplier.frontend.TokenRange') -> Optional['multiplier.frontend.TokenTree']:
+  def FROM(arg_0: multiplier.frontend.TokenRange) -> Optional[multiplier.frontend.TokenTree]:
     ...
 
-  def serialize(self, vis: 'multiplier.frontend.TokenTreeVisitor') -> 'multiplier.frontend.TokenRange':
+  def serialize(self, vis: multiplier.frontend.TokenTreeVisitor) -> multiplier.frontend.TokenRange:
     ...
 
-class Macro(Entity):
-  root: 'multiplier.frontend.Macro'
-  use_tokens: 'multiplier.frontend.TokenRange'
-  generate_use_tokens: Generator['multiplier.frontend.Token']
-  expansion_tokens: 'multiplier.frontend.TokenRange'
-  generate_expansion_tokens: Generator['multiplier.frontend.Token']
-  kind: 'multiplier.frontend.MacroKind'
-  parent: Optional['multiplier.frontend.Macro']
-  children: Generator['multiplier.frontend.Macro' | 'multiplier.frontend.Token']
+class Macro(multiplier.Entity):
+  root: multiplier.frontend.Macro
+  use_tokens: multiplier.frontend.TokenRange
+  generate_use_tokens: Generator[multiplier.frontend.Token]
+  expansion_tokens: multiplier.frontend.TokenRange
+  generate_expansion_tokens: Generator[multiplier.frontend.Token]
+  kind: multiplier.frontend.MacroKind
+  parent: Optional[multiplier.frontend.Macro]
+  children: Generator[multiplier.frontend.Macro | multiplier.frontend.Token]
 
   @staticmethod
-  def static_category() -> 'multiplier.EntityCategory':
+  def static_category() -> multiplier.EntityCategory:
     ...
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.Macro']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.Macro']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.Macro']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.Macro]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.Macro']:
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.Macro']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.Macro']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
-  def FROM(self: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.Macro']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
-  def FROM(self: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.Macro']:
+  def FROM(self: multiplier.frontend.Macro) -> Optional[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.Macro']:
+  def FROM(self: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.Macro']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.Macro']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.Macro]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.Macro]:
     ...
 
 class MacroVAOptArgument(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.MacroVAOptArgument']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.MacroVAOptArgument']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.MacroVAOptArgument']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.MacroVAOptArgument']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.MacroVAOptArgument']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.MacroVAOptArgument']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroVAOptArgument']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroVAOptArgument']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.MacroVAOptArgument']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.MacroVAOptArgument']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.MacroVAOptArgument']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.MacroVAOptArgument']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroVAOptArgument]:
     ...
 
 class MacroVAOpt(multiplier.frontend.Macro):
@@ -1012,399 +1024,399 @@ class MacroVAOpt(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.MacroVAOpt']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroVAOpt]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.MacroVAOpt']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroVAOpt]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.MacroVAOpt']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroVAOpt]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.MacroVAOpt']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroVAOpt]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.MacroVAOpt']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.MacroVAOpt']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroVAOpt']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroVAOpt]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroVAOpt']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroVAOpt]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.MacroVAOpt']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroVAOpt]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.MacroVAOpt']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.MacroVAOpt]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.MacroVAOpt']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.MacroVAOpt]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.MacroVAOpt']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroVAOpt]:
     ...
 
 class MacroSubstitution(multiplier.frontend.Macro):
-  replacement_children: Generator['multiplier.frontend.Macro' | 'multiplier.frontend.Token']
-  first_fully_substituted_token: 'multiplier.frontend.Token'
-  last_fully_substituted_token: 'multiplier.frontend.Token'
-  name_or_operator: 'multiplier.frontend.Token'
+  replacement_children: Generator[multiplier.frontend.Macro | multiplier.frontend.Token]
+  first_fully_substituted_token: multiplier.frontend.Token
+  last_fully_substituted_token: multiplier.frontend.Token
+  name_or_operator: multiplier.frontend.Token
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.MacroSubstitution']:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.MacroSubstitution']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.MacroSubstitution']:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.MacroSubstitution']:
-    ...
-
-  @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.MacroSubstitution']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroSubstitution]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroSubstitution]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.MacroSubstitution']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroSubstitution']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroSubstitution']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroSubstitution]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.MacroSubstitution']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.MacroSubstitution']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.MacroSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.MacroSubstitution']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.MacroSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.MacroSubstitution']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroSubstitution]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroSubstitution]:
     ...
 
 class MacroConcatenate(multiplier.frontend.MacroSubstitution):
-  pasted_token: 'multiplier.frontend.Token'
+  pasted_token: multiplier.frontend.Token
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.MacroConcatenate']:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.MacroConcatenate']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroConcatenate]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.MacroConcatenate']:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.MacroConcatenate']:
-    ...
-
-  @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroConcatenate]:
     ...
 
   @overload
   @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.MacroConcatenate']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroConcatenate]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroConcatenate]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.MacroConcatenate']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroConcatenate']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroConcatenate]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroConcatenate']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroConcatenate]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroConcatenate]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.MacroConcatenate']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroConcatenate]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.MacroConcatenate']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.MacroConcatenate]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.MacroConcatenate']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.MacroConcatenate]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.MacroConcatenate']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroConcatenate]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroConcatenate]:
     ...
 
 class MacroStringify(multiplier.frontend.MacroSubstitution):
-  stringified_token: 'multiplier.frontend.Token'
+  stringified_token: multiplier.frontend.Token
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.MacroStringify']:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.MacroStringify']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroStringify]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.MacroStringify']:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.MacroStringify']:
-    ...
-
-  @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroStringify]:
     ...
 
   @overload
   @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.MacroStringify']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroStringify]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroStringify]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.MacroStringify']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroStringify']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroStringify]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroStringify']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroStringify]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroStringify]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.MacroStringify']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroStringify]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.MacroStringify']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.MacroStringify]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.MacroStringify']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.MacroStringify]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.MacroStringify']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroStringify]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroStringify]:
     ...
 
 class MacroExpansion(multiplier.frontend.MacroSubstitution):
-  intermediate_children: Generator['multiplier.frontend.Macro' | 'multiplier.frontend.Token']
-  definition: Optional['multiplier.frontend.DefineMacroDirective']
+  intermediate_children: Generator[multiplier.frontend.Macro | multiplier.frontend.Token]
+  definition: Optional[multiplier.frontend.DefineMacroDirective]
   num_arguments: int
-  arguments: Generator['multiplier.frontend.MacroArgument']
+  arguments: Generator[multiplier.frontend.MacroArgument]
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.MacroExpansion']:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.MacroExpansion']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroExpansion]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.MacroExpansion']:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.MacroExpansion']:
-    ...
-
-  @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroExpansion]:
     ...
 
   @overload
   @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.MacroExpansion']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroExpansion]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroExpansion]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.MacroExpansion']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroExpansion']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroExpansion]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroExpansion']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroExpansion]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroExpansion]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.MacroExpansion']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroExpansion]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.MacroExpansion']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.MacroExpansion]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.MacroExpansion']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.MacroExpansion]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.MacroExpansion']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroExpansion]:
     ...
 
-  def nth_argument(self, n: int) -> Optional['multiplier.frontend.MacroArgument']:
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroExpansion]:
+    ...
+
+  def nth_argument(self, n: int) -> Optional[multiplier.frontend.MacroArgument]:
     ...
 
 class MacroParameterSubstitution(multiplier.frontend.MacroSubstitution):
-  parameter: 'multiplier.frontend.MacroParameter'
-  parameter_use: 'multiplier.frontend.Token'
+  parameter: multiplier.frontend.MacroParameter
+  parameter_use: multiplier.frontend.Token
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.MacroParameterSubstitution']:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.MacroParameterSubstitution']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.MacroParameterSubstitution']:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.MacroParameterSubstitution']:
-    ...
-
-  @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.MacroParameterSubstitution']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroParameterSubstitution]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroParameterSubstitution]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.MacroParameterSubstitution']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroParameterSubstitution']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroParameterSubstitution']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroParameterSubstitution]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.MacroParameterSubstitution']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.MacroParameterSubstitution']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.MacroParameterSubstitution']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.MacroParameterSubstitution']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroParameterSubstitution]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
 class MacroArgument(multiplier.frontend.Macro):
@@ -1413,1341 +1425,1341 @@ class MacroArgument(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.MacroArgument']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroArgument]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.MacroArgument']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroArgument]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.MacroArgument']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroArgument]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.MacroArgument']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroArgument]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.MacroArgument']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.MacroArgument']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroArgument']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroArgument]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroArgument']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroArgument]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroArgument]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.MacroArgument']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroArgument]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.MacroArgument']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.MacroArgument]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.MacroArgument']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.MacroArgument]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.MacroArgument']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroArgument]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroArgument]:
     ...
 
 class MacroParameter(multiplier.frontend.Macro):
-  variadic_dots: 'multiplier.frontend.Token'
-  name: 'multiplier.frontend.Token'
+  variadic_dots: multiplier.frontend.Token
+  name: multiplier.frontend.Token
   index: int
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.MacroParameter']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroParameter]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.MacroParameter']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroParameter]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.MacroParameter']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroParameter]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.MacroParameter']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroParameter]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.MacroParameter']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.MacroParameter']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroParameter']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroParameter]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroParameter']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroParameter]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroParameter]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.MacroParameter']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroParameter]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.MacroParameter']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.MacroParameter]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.MacroParameter']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.MacroParameter]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.MacroParameter']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroParameter]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroParameter]:
     ...
 
 class MacroDirective(multiplier.frontend.Macro):
-  hash: 'multiplier.frontend.Token'
-  directive_name: 'multiplier.frontend.Token'
+  hash: multiplier.frontend.Token
+  directive_name: multiplier.frontend.Token
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.MacroDirective']:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.MacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.MacroDirective']:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.MacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.MacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.MacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.MacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.MacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.MacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.MacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.MacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroDirective]:
     ...
 
 class DefineMacroDirective(multiplier.frontend.MacroDirective):
-  name: 'multiplier.frontend.Token'
-  body: Generator['multiplier.frontend.Macro' | 'multiplier.frontend.Token']
+  name: multiplier.frontend.Token
+  body: Generator[multiplier.frontend.Macro | multiplier.frontend.Token]
   is_variadic: bool
   is_function_like: bool
-  parameters: Generator['multiplier.frontend.Macro' | 'multiplier.frontend.Token']
+  parameters: Generator[multiplier.frontend.Macro | multiplier.frontend.Token]
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.DefineMacroDirective']:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.DefineMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.DefineMacroDirective']:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.DefineMacroDirective']:
-    ...
-
-  @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.DefineMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.DefineMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.DefineMacroDirective]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.DefineMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.DefineMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.DefineMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.DefineMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.DefineMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.DefineMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.DefineMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.DefineMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.DefineMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.DefineMacroDirective]:
     ...
 
 class PragmaMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.PragmaMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.PragmaMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.PragmaMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.PragmaMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.PragmaMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.PragmaMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.PragmaMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.PragmaMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.PragmaMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.PragmaMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.PragmaMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.PragmaMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.PragmaMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.PragmaMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.PragmaMacroDirective]:
     ...
 
 class UndefineMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.UndefineMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.UndefineMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.UndefineMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.UndefineMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.UndefineMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.UndefineMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.UndefineMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.UndefineMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.UndefineMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.UndefineMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.UndefineMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.UndefineMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.UndefineMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.UndefineMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.UndefineMacroDirective]:
     ...
 
 class OtherMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.OtherMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.OtherMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.OtherMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.OtherMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.OtherMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.OtherMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.OtherMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.OtherMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.OtherMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.OtherMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.OtherMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.OtherMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.OtherMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.OtherMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.OtherMacroDirective]:
     ...
 
 class ConditionalMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.ConditionalMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.ConditionalMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.ConditionalMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.ConditionalMacroDirective']:
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.ConditionalMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.ConditionalMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.ConditionalMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.ConditionalMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.ConditionalMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.ConditionalMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.ConditionalMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.ConditionalMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.ConditionalMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.ConditionalMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
 class EndIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.EndIfMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.EndIfMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.EndIfMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.EndIfMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.EndIfMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.EndIfMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.EndIfMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.EndIfMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.EndIfMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.EndIfMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.EndIfMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.EndIfMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.EndIfMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.EndIfMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.EndIfMacroDirective]:
     ...
 
 class ElseMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.ElseMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.ElseMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.ElseMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.ElseMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.ElseMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.ElseMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.ElseMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.ElseMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.ElseMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.ElseMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.ElseMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.ElseMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.ElseMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.ElseMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.ElseMacroDirective]:
     ...
 
 class ElseIfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.ElseIfNotDefinedMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.ElseIfNotDefinedMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.ElseIfNotDefinedMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.ElseIfNotDefinedMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.ElseIfNotDefinedMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.ElseIfNotDefinedMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.ElseIfNotDefinedMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.ElseIfNotDefinedMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.ElseIfNotDefinedMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.ElseIfNotDefinedMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.ElseIfNotDefinedMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.ElseIfNotDefinedMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
 class ElseIfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.ElseIfDefinedMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.ElseIfDefinedMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.ElseIfDefinedMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.ElseIfDefinedMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.ElseIfDefinedMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.ElseIfDefinedMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.ElseIfDefinedMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.ElseIfDefinedMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.ElseIfDefinedMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.ElseIfDefinedMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.ElseIfDefinedMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.ElseIfDefinedMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.ElseIfDefinedMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
 class ElseIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.ElseIfMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.ElseIfMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.ElseIfMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.ElseIfMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.ElseIfMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.ElseIfMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.ElseIfMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.ElseIfMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.ElseIfMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.ElseIfMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.ElseIfMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.ElseIfMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.ElseIfMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.ElseIfMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
 class IfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.IfNotDefinedMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.IfNotDefinedMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.IfNotDefinedMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.IfNotDefinedMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.IfNotDefinedMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.IfNotDefinedMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.IfNotDefinedMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.IfNotDefinedMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.IfNotDefinedMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.IfNotDefinedMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.IfNotDefinedMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.IfNotDefinedMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.IfNotDefinedMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
 class IfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.IfDefinedMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.IfDefinedMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.IfDefinedMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.IfDefinedMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.IfDefinedMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.IfDefinedMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.IfDefinedMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.IfDefinedMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.IfDefinedMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.IfDefinedMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.IfDefinedMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.IfDefinedMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.IfDefinedMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
 class IfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.IfMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.IfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.IfMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.IfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.IfMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.IfMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.IfMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.IfMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.IfMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.IfMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.IfMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.IfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.IfMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.IfMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.IfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.IfMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.IfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.IfMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.IfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.IfMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.IfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.IfMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.IfMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.IfMacroDirective]:
     ...
 
 class IncludeLikeMacroDirective(multiplier.frontend.MacroDirective):
-  included_file: Optional['multiplier.frontend.File']
+  included_file: Optional[multiplier.frontend.File]
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.IncludeLikeMacroDirective']:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.IncludeLikeMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.IncludeLikeMacroDirective']:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.IncludeLikeMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.IncludeLikeMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.IncludeLikeMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.IncludeLikeMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.IncludeLikeMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.IncludeLikeMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.IncludeLikeMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.IncludeLikeMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.IncludeLikeMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.IncludeLikeMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.IncludeLikeMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
 class ImportMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.ImportMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.ImportMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.ImportMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.ImportMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.ImportMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.ImportMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.ImportMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.ImportMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.ImportMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.ImportMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.ImportMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.ImportMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.ImportMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.ImportMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.ImportMacroDirective]:
     ...
 
 class IncludeMacrosMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.IncludeMacrosMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.IncludeMacrosMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.IncludeMacrosMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.IncludeMacrosMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.IncludeMacrosMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.IncludeMacrosMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.IncludeMacrosMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.IncludeMacrosMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.IncludeMacrosMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.IncludeMacrosMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.IncludeMacrosMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.IncludeMacrosMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.IncludeMacrosMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
 class IncludeNextMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.IncludeNextMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.IncludeNextMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.IncludeNextMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.IncludeNextMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.IncludeNextMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.IncludeNextMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.IncludeNextMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.IncludeNextMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.IncludeNextMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.IncludeNextMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.IncludeNextMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.IncludeNextMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.IncludeNextMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
 class IncludeMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: 'multiplier.Fragment') -> Generator['multiplier.frontend.IncludeMacroDirective']:
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: 'multiplier.frontend.File') -> Generator['multiplier.frontend.IncludeMacroDirective']:
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: 'multiplier.Index') -> Generator['multiplier.frontend.IncludeMacroDirective']:
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @staticmethod
-  def by_id(arg_0: 'multiplier.Index', arg_1: 'multiplier.EntityId') -> Optional['multiplier.frontend.IncludeMacroDirective']:
+  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @staticmethod
-  def static_kind() -> 'multiplier.frontend.MacroKind':
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: 'multiplier.frontend.Macro') -> Generator['multiplier.frontend.IncludeMacroDirective']:
+  def static_kind() -> multiplier.frontend.MacroKind:
     ...
 
   @overload
   @staticmethod
-  def containing(token: 'multiplier.frontend.Token') -> Generator['multiplier.frontend.IncludeMacroDirective']:
-    ...
-
-  @staticmethod
-  def from_base(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.IncludeMacroDirective']:
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: 'multiplier.frontend.Macro') -> Optional['multiplier.frontend.IncludeMacroDirective']:
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.IncludeMacroDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(parent: Optional['multiplier.frontend.Macro']) -> Optional['multiplier.frontend.IncludeMacroDirective']:
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(r: 'multiplier.Reference') -> Optional['multiplier.frontend.IncludeMacroDirective']:
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(e: Optional['multiplier.Fragment' | 'multiplier.ast.Decl' | 'multiplier.ast.Stmt' | 'multiplier.ast.Attr' | 'multiplier.frontend.Macro' | 'multiplier.ast.Type' | 'multiplier.frontend.File' | 'multiplier.frontend.Token' | 'multiplier.ast.TemplateArgument' | 'multiplier.ast.TemplateParameterList' | 'multiplier.ast.CXXBaseSpecifier' | 'multiplier.ast.Designator' | 'multiplier.frontend.Compilation']) -> Optional['multiplier.frontend.IncludeMacroDirective']:
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def FROM(t: 'multiplier.frontend.TokenContext') -> Optional['multiplier.frontend.IncludeMacroDirective']:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.IncludeMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.IncludeMacroDirective]:
     ...

@@ -29,54 +29,54 @@ import multiplier.ir.unsupported
 class Operation(multiplier.ir.Operation):
 
   @staticmethod
-  def FROM(arg_0: 'multiplier.ir.Operation') -> Optional['multiplier.ir.unsupported.Operation']:
+  def FROM(arg_0: multiplier.ir.Operation) -> Optional[multiplier.ir.unsupported.Operation]:
     ...
 
 class UnsupportedDeclOp(multiplier.ir.unsupported.Operation):
-  body: 'multiplier.ir.Region'
+  body: multiplier.ir.Region
   name: str
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.OperationKind':
+  def static_kind() -> multiplier.ir.OperationKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Operation') -> Optional['multiplier.ir.unsupported.UnsupportedDeclOp']:
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.unsupported.UnsupportedDeclOp]:
     ...
 
   @staticmethod
-  def producing(val: 'multiplier.ir.Value') -> Optional['multiplier.ir.unsupported.UnsupportedDeclOp']:
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.unsupported.UnsupportedDeclOp]:
     ...
 
 class UnsupportedStmtOp(multiplier.ir.unsupported.Operation):
-  result: 'multiplier.ir.Value'
+  result: multiplier.ir.Value
   name: str
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.OperationKind':
+  def static_kind() -> multiplier.ir.OperationKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Operation') -> Optional['multiplier.ir.unsupported.UnsupportedStmtOp']:
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.unsupported.UnsupportedStmtOp]:
     ...
 
   @staticmethod
-  def producing(val: 'multiplier.ir.Value') -> Optional['multiplier.ir.unsupported.UnsupportedStmtOp']:
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.unsupported.UnsupportedStmtOp]:
     ...
 
 class Type(multiplier.ir.Type):
 
   @staticmethod
-  def FROM(arg_0: 'multiplier.ir.Type') -> Optional['multiplier.ir.unsupported.Type']:
+  def FROM(arg_0: multiplier.ir.Type) -> Optional[multiplier.ir.unsupported.Type]:
     ...
 
 class UnsupportedType(multiplier.ir.unsupported.Type):
   origin_name: str
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.TypeKind':
+  def static_kind() -> multiplier.ir.TypeKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Type') -> Optional['multiplier.ir.unsupported.UnsupportedType']:
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.unsupported.UnsupportedType]:
     ...

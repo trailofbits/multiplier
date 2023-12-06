@@ -129,6 +129,24 @@ CLASS_METHOD_STUB = """
 """
 
 
+BOOL_STUB = """
+  def __bool__(self) -> bool:
+    ...
+"""
+
+
+ITER_STUB = """
+  def __iter__(self) -> Iterable[{}]:
+    ...
+"""
+
+
+SEQUENCE_STUB = """
+  def __getitem__(self, index: int) -> {}:
+    ...
+"""
+
+
 CLASS_STUB_FOOTER = "  pass\n"
 
 
@@ -864,7 +882,7 @@ class UserTokenSchema(Schema):
 
   @property
   def python_value_name(self):
-    return "'multiplier.frontend.UserToken'"
+    return "multiplier.frontend.UserToken"
 
   @property
   def cxx_value_name(self):
@@ -877,7 +895,7 @@ class FileLocationCacheSchema(Schema):
 
   @property
   def python_value_name(self):
-    return "'multiplier.frontend.FileLocationCache'"
+    return "multiplier.frontend.FileLocationCache"
 
   @property
   def cxx_value_name(self):
@@ -890,7 +908,7 @@ class TokenTreeVisitorSchema(Schema):
 
   @property
   def python_value_name(self):
-    return "'multiplier.frontend.TokenTreeVisitor'"
+    return "multiplier.frontend.TokenTreeVisitor"
 
   @property
   def cxx_value_name(self):
@@ -1177,7 +1195,7 @@ def wrap_class(schema: ClassSchema,
   # In the Python API, we give all of the entities a common base class.
   elif is_entity_type:
     base_class = "PythonBinding<VariantEntity>::type()";
-    py_base_class = "Entity"
+    py_base_class = "multiplier.Entity"
 
   has_unique_generated_type = schema.generated_type and \
      (not schema.indexed_type or 
@@ -1188,9 +1206,9 @@ def wrap_class(schema: ClassSchema,
   iterable_stub = ""
 
   if schema.indexed_type:
-    sequence_stub = ", Sequence[{}]".format(_strip_optional_const_ref(schema.indexed_type))
+    sequence_stub = ", Sequence[{}]".format(schema.indexed_type)
 
-  if has_unique_generated_type:
+  if schema.generated_type:
     iterable_stub = ", Iterable[{}]".format(schema.generated_type)
 
   stubs_out.append(CLASS_STUB_HEADER.format(
@@ -1262,6 +1280,13 @@ def wrap_class(schema: ClassSchema,
 
   if schema.has_boolean_conversion:
     out.append(NUMBER_METHODS)
+    stubs_out.append(BOOL_STUB)
+
+  if schema.indexed_type:
+    stubs_out.append(SEQUENCE_STUB.format(schema.indexed_type))
+
+  if schema.generated_type:
+    stubs_out.append(ITER_STUB.format(schema.indexed_type))
 
   if schema.indexed_type:
     size_name: Optional[str] = None

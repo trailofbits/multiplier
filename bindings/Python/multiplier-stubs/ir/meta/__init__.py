@@ -29,15 +29,15 @@ import multiplier.ir.unsupported
 class Attribute(multiplier.ir.Attribute):
 
   @staticmethod
-  def FROM(arg_0: 'multiplier.ir.Attribute') -> Optional['multiplier.ir.meta.Attribute']:
+  def FROM(arg_0: multiplier.ir.Attribute) -> Optional[multiplier.ir.meta.Attribute]:
     ...
 
 class IdentifierAttr(multiplier.ir.meta.Attribute):
 
   @staticmethod
-  def static_kind() -> 'multiplier.ir.AttributeKind':
+  def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: 'multiplier.ir.Attribute') -> Optional['multiplier.ir.meta.IdentifierAttr']:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.meta.IdentifierAttr]:
     ...
