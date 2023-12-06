@@ -1545,7 +1545,7 @@ def wrap(schemas: Iterable[Schema], renamer: Renamer):
   # Save the stubs.
   for rel_dir, stubs_out in stubs.items():
     init_path = os.path.join(MX_BINDINGS_PYTHON_DIR, "multiplier-stubs",
-                             rel_dir.lower(), "__init__.pyi")
+                             rel_dir.lower(), "__init__.py")
     _save_output_file(init_path, stubs_out)
 
 
