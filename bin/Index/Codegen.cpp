@@ -113,7 +113,7 @@ static vast::cg::source_language GetSourceLanguage(
       opts.CPlusPlus26) {
     return vast::cg::source_language::CXX;
   }
-  
+
   if (opts.C99 || opts.C11 || opts.C17 || opts.C2x ||
       opts.LangStd == ClangStd::lang_c89) {
     return vast::cg::source_language::C;

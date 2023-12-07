@@ -28,7 +28,23 @@ function(define_example exe_name source_file)
       "mx-example-index"
   )
 
-  set_target_properties("${exe_name}" PROPERTIES LINKER_LANGUAGE CXX)
+  set_target_properties("${exe_name}"
+    PROPERTIES
+      LINKER_LANGUAGE
+        CXX
+
+      # NOTE(pag): This is important! We need to emulate the shape of the
+      #            install directories, so that install targets behave in the
+      #            same way to local build targets w.r.t. shared library
+      #            resolution. This places `libmultiplier.so` in the `lib/` sub-
+      #            directory, where we also place copies of `libLTO.so` and
+      #            `libRemarks.so`. This mirrors the organization inside of
+      #            `<install-prefix>/lib`. This same-shapedness is necessary for
+      #            how we fiddle with the RPATH, and do symlinking for Python
+      #            extensions.
+      RUNTIME_OUTPUT_DIRECTORY
+        "${PROJECT_BINARY_DIR}/bin"
+  )
 
   if(MX_ENABLE_INSTALL)
     install(

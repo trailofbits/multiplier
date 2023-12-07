@@ -26,6 +26,10 @@ if(NOT EXISTS "${src_dir}/CMakeLists.txt")
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" submodule update --init vendor/vast/src
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+
+  execute_process(
+    COMMAND "${GIT_EXECUTABLE}" submodule set-branch --branch mx_codegen vendor/vast/src
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 endif()
 
 # This is the main build, setup and execute the nested build

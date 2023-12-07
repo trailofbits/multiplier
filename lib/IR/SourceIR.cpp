@@ -103,15 +103,18 @@ class MLIRInitializer {
   inline mlir::MLIRContext &Context(void) const noexcept {
     return context;
   }
+
+  ~MLIRInitializer(void);
 };
 
 MLIRInitializer::MLIRInitializer(int)
     : registry(),
       registry_initializer(registry),
-      context(registry, mlir::MLIRContext::Threading::DISABLED),
+      context(registry, mlir::MLIRContext::Threading::ENABLED),
       op_name_to_kind(MX_IR_NUM_MLIR_OPS),
       op_type_to_kind(MX_IR_NUM_MLIR_OPS) {
 
+  context.disableMultithreading();
   context.loadAllAvailableDialects();
   context.enableMultithreading();
 
@@ -148,6 +151,10 @@ MLIRInitializer::MLIRInitializer(int)
 #undef MAP_OP_TYPE
 #undef MAP_ATTR_TYPE
 #undef MAP_TYPE_TYPE
+}
+
+MLIRInitializer::~MLIRInitializer(void) {
+  context.disableMultithreading();
 }
 
 static const MLIRInitializer kMLIR(0);
