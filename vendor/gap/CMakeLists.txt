@@ -60,4 +60,4 @@ execute_process(COMMAND ${CMAKE_COMMAND}
 execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install
                 WORKING_DIRECTORY "${build_dir}")
 
-find_package(gap CONFIG REQUIRED PATHS "${CMAKE_INSTALL_PREFIX}" NO_DEFAULT_PATH)
+find_package(gap CONFIG REQUIRED HINTS "${CMAKE_INSTALL_PREFIX}" NO_DEFAULT_PATH)
