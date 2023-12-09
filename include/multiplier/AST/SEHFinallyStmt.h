@@ -37,6 +37,9 @@ class MX_EXPORT SEHFinallyStmt : public Stmt {
   static gap::generator<SEHFinallyStmt> in(const Fragment &frag);
   static gap::generator<SEHFinallyStmt> in(const File &file);
 
+  static std::optional<SEHFinallyStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<SEHFinallyStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_FINALLY_STMT;
   }

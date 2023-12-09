@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kObjCInertUnsafeUnretainedAttrDerivedKinds[] = {
+    ObjCInertUnsafeUnretainedAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<ObjCInertUnsafeUnretainedAttr> ObjCInertUnsafeUnretainedAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ObjCInertUnsafeUnretainedAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<ObjCInertUnsafeUnretainedAttr> ObjCInertUnsafeUnretainedAttr::from
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kObjCInertUnsafeUnretainedAttrDerivedKinds[] = {
-    ObjCInertUnsafeUnretainedAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ObjCInertUnsafeUnretainedAttr> ObjCInertUnsafeUnretainedAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

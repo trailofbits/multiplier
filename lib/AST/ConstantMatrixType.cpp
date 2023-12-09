@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kConstantMatrixTypeDerivedKinds[] = {
+    ConstantMatrixType::static_kind(),
+};
+}  // namespace
+
 gap::generator<ConstantMatrixType> ConstantMatrixType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ConstantMatrixType::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<ConstantMatrixType> ConstantMatrixType::from(const std::optional<T
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kConstantMatrixTypeDerivedKinds[] = {
-    ConstantMatrixType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ConstantMatrixType> ConstantMatrixType::from_base(const Type &parent) {
   switch (parent.kind()) {

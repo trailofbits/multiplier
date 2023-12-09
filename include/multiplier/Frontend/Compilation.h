@@ -18,32 +18,23 @@
 namespace mx {
 namespace ir {
 class SourceIRImpl;
+namespace hl {
+class Operation;
+}  // namespace hl
 namespace builtin {
-#ifdef MX_DISABLE_VAST
-class MX_EXPORT ModuleOp {};
-#else
 class ModuleOp;
-#endif  // MX_DISABLE_VAST
 }  // namespace builtin
 }  // namespace ir
 
 class CompilationImpl;
+class Decl;
 class EntityProvider;
+class File;
+class Fragment;
 class FragmentImpl;
 class Index;
 class Reference;
-
-#define MX_FORWARD_DECLARE(type_name, ln, e, c) \
-    class type_name;
-
-  MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE,
-                              MX_FORWARD_DECLARE,
-                              MX_FORWARD_DECLARE,
-                              MX_FORWARD_DECLARE,
-                              MX_FORWARD_DECLARE,
-                              MX_FORWARD_DECLARE,
-                              MX_FORWARD_DECLARE)
-#undef MX_FORWARD_DECLARE
+class Stmt;
 
 using CompilationImplPtr = std::shared_ptr<const CompilationImpl>;
 
@@ -53,13 +44,16 @@ enum class IncludePathLocation : unsigned char;
 class MX_EXPORT Compilation {
  private:
   friend class CompilationImpl;
+  friend class Decl;
   friend class EntityProvider;
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
   friend class Reference;
+  friend class Stmt;
   friend class ir::SourceIRImpl;
+  friend class ir::hl::Operation;
 
   CompilationImplPtr impl;
 
@@ -85,8 +79,11 @@ class MX_EXPORT Compilation {
   // Return the unique ID of this compilation.
   PackedCompilationId id(void) const noexcept;
 
+#ifndef MX_DISABLE_VAST
   // Returns source IR for the compilation.
   std::optional<ir::builtin::ModuleOp> ir(void) const noexcept;
+
+#endif  // MX_DISABLE_VAST
 
   // The fragments owned by this compilation. This will be a subset of all
   // observable fragments by this compilation, because some of them may be

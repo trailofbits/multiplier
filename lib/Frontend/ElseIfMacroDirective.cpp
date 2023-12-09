@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const MacroKind kElseIfMacroDirectiveDerivedKinds[] = {
+    ElseIfMacroDirective::static_kind(),
+};
+}  // namespace
+
 gap::generator<ElseIfMacroDirective> ElseIfMacroDirective::containing(const Macro &macro) {
   for (auto impl = macro.parent(); impl; impl = impl->parent()) {
     if (auto d = ElseIfMacroDirective::from(*impl)) {
@@ -69,13 +75,6 @@ std::optional<ElseIfMacroDirective> ElseIfMacroDirective::from(const std::option
   }
   return std::nullopt;
 }
-
-namespace {
-static const MacroKind kElseIfMacroDirectiveDerivedKinds[] = {
-    ElseIfMacroDirective::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ElseIfMacroDirective> ElseIfMacroDirective::from_base(const Macro &parent) {
   switch (parent.kind()) {

@@ -16,6 +16,8 @@
 #include <multiplier/AST/TemplateParameterList.h>
 #include <multiplier/Frontend/Token.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../File.h"
 #include "../Fragment.h"
@@ -143,7 +145,7 @@ gap::generator<Decl> Decl::in(const Index &index) {
   }
 }
 
-gap::generator<Decl> Decl::in(const Index &index, std::span<DeclKind> kinds) {
+gap::generator<Decl> Decl::in(const Index &index, std::span<const DeclKind> kinds) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
@@ -170,7 +172,7 @@ gap::generator<Decl> Decl::in(const Fragment &frag) {
   }
 }
 
-gap::generator<Decl> Decl::in(const Fragment &frag, std::span<DeclKind> kinds) {
+gap::generator<Decl> Decl::in(const Fragment &frag, std::span<const DeclKind> kinds) {
   const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kinds) {
@@ -180,7 +182,7 @@ gap::generator<Decl> Decl::in(const Fragment &frag, std::span<DeclKind> kinds) {
   }
 }
 
-gap::generator<Decl> Decl::in(const File &file, std::span<DeclKind> kinds) {
+gap::generator<Decl> Decl::in(const File &file, std::span<const DeclKind> kinds) {
   const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {

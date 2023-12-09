@@ -880,6 +880,9 @@ class UserTokenSchema(Schema):
   def __init__(self, *args):
     super().__init__()
 
+  def __str__(self) -> str:
+    return f"UserToken"
+
   @property
   def python_value_name(self):
     return "multiplier.frontend.UserToken"
@@ -892,6 +895,9 @@ class UserTokenSchema(Schema):
 class FileLocationCacheSchema(Schema):
   def __init__(self, *args):
     super().__init__()
+
+  def __str__(self) -> str:
+    return f"FileLocationCache"
 
   @property
   def python_value_name(self):
@@ -906,6 +912,9 @@ class TokenTreeVisitorSchema(Schema):
   def __init__(self, *args):
     super().__init__()
 
+  def __str__(self) -> str:
+    return f"TokenTreeVisitor"
+
   @property
   def python_value_name(self):
     return "multiplier.frontend.TokenTreeVisitor"
@@ -916,12 +925,35 @@ class TokenTreeVisitorSchema(Schema):
 
 
 class EntityIdSchema(Schema):
-  def __init__(self, *args):
+  def __init__(self):
     super().__init__()
+
+  def __str__(self) -> str:
+    return f"EntityId"
 
   @property
   def python_value_name(self):
     return "int"
+
+  @property
+  def cxx_value_name(self):
+    return "EntityId"
+
+
+class RawEntityIdSchema(EntityIdSchema):
+  def __init__(self):
+    super().__init__()
+
+  def __str__(self) -> str:
+    return f"RawEntityId"
+
+  @property
+  def python_value_name(self):
+    return "int"
+
+  @property
+  def cxx_value_name(self):
+    return "RawEntityId"
 
 
 class SpecificEntityIdSchema(EntityIdSchema):
@@ -930,6 +962,9 @@ class SpecificEntityIdSchema(EntityIdSchema):
   def __init__(self, specific_type: Schema):
     super().__init__()
     self.specific_type = specific_type
+
+  def __str__(self) -> str:
+    return f"SpecificEntityId[{self.specific_type}]"
 
   @property
   def python_value_name(self):
@@ -940,41 +975,20 @@ class SpecificEntityIdSchema(EntityIdSchema):
     return "SpecificEntityId<{}>".format(self.specific_type.cxx_name)
 
 
-def make_entity_id_schema(name, py_name) -> Tuple[str, type[Schema]]:
-  class SpecificEntityIdSchema(EntityIdSchema):
+def make_schema(cxx_name, py_name, base) -> Tuple[str, type[Schema]]:
+  class NamedEntitySchema(base):
     def __init__(self, *args):
-      super().__init__()
-    
+      super().__init__(*args)
+
     @property
     def python_value_name(self):
-      return f"'multiplier.{py_name}'"
-    
+      return f"multiplier.{py_name}"
+
     @property
     def cxx_value_name(self):
-      return name
+      return f"{cxx_name}"
 
-  return name, SpecificEntityIdSchema
-
-
-class EntitySchema(Schema):
-  def __init__(self, *args):
-    super().__init__()
-  
-  @property
-  def python_value_name(self):
-    return "'multiplier.Entity'"
-
-  @property
-  def cxx_value_name(self):
-    return "mx::VariantEntity"
-
-
-def cxx_type_name(schema: Schema) -> str:
-  pass
-
-
-def py_type_name(schema: Schema) -> str:
-  pass
+  return f"mx::{cxx_name}", NamedEntitySchema
 
 
 class Renamer:
@@ -994,6 +1008,7 @@ class BasicRenamer(Renamer):
   METHOD_RENAMES = {
     "from": "FROM",
     "in": "IN",
+    "as": "AS",
   }
 
   def rename_method(self, class_schema: ClassSchema,
@@ -1248,6 +1263,9 @@ def wrap_class(schema: ClassSchema,
   out.append(PROPERTY_LIST_PREFIX)
 
   for method in schema.methods.values():
+    if isinstance(method, OverloadSetSchema):
+      method = method.overloads[0]
+
     if not isinstance(method, MethodSchema) or \
        not method.is_const or \
        0 < method.max_num_parameters:
@@ -1598,17 +1616,17 @@ def run_on_ast(ast: AST, ns_name: str):
   lifter.add_lifter("mx::FileLocationCache", FileLocationCacheSchema)
   lifter.add_lifter("mx::TokenTreeVisitor", TokenTreeVisitorSchema)
   lifter.add_lifter("mx::UserToken", UserTokenSchema)
-  lifter.add_lifter("mx::VariantEntity", EntitySchema)
-  lifter.add_lifter(*make_entity_id_schema("mx::EntityId", "EntityId"))
-  lifter.add_lifter(*make_entity_id_schema("mx::RawEntityId", "EntityId"))
-  lifter.add_lifter(*make_entity_id_schema("mx::FileTokenId", "FileTokenId"))
-  lifter.add_lifter(*make_entity_id_schema("mx::MacroTokenId", "MacroTokenId"))
-  lifter.add_lifter(*make_entity_id_schema("mx::ParsedTokenId", "ParsedTokenId"))
-  lifter.add_lifter(*make_entity_id_schema("mx::VariantId", "EntityId"))
+  lifter.add_lifter(*make_schema("VariantEntity", "Entity", Schema))
+  lifter.add_lifter("mx::EntityId", EntityIdSchema)
+  lifter.add_lifter("mx::RawEntityId", RawEntityIdSchema)
+  lifter.add_lifter(*make_schema("FileTokenId", "FileTokenId", EntityIdSchema))
+  lifter.add_lifter(*make_schema("MacroTokenId", "MacroTokenId", EntityIdSchema))
+  lifter.add_lifter(*make_schema("ParsedTokenId", "ParsedTokenId", EntityIdSchema))
+  lifter.add_lifter(*make_schema("VariantId", "EntityId", EntityIdSchema))
 
   for entity in ENTITY_KINDS:
-    lifter.add_lifter(*make_entity_id_schema(f"mx::{entity}Id", f"{entity}Id"))
-    lifter.add_lifter(*make_entity_id_schema(f"mx::Packed{entity}Id", f"{entity}Id"))
+    lifter.add_lifter(*make_schema(f"{entity}Id", f"{entity}Id", EntityIdSchema))
+    lifter.add_lifter(*make_schema(f"Packed{entity}Id", f"{entity}Id", EntityIdSchema))
 
   lifter.add_parameterized_lifter("mx::SpecificEntityId", 1,
                                   SpecificEntityIdSchema)
@@ -1630,6 +1648,8 @@ if __name__ == "__main__":
   parser.add_argument('--system_include_dir', required=True)
   parser.add_argument('--working_dir', default=MX_BIN_BOOSTRAP_DIR)
   parser.add_argument('--source_file', default="Python.cpp")
+  parser.add_argument('--dump_only', default=False, action='store_true')
+  parser.add_argument('--pickle_file', default='')
   args = parser.parse_args()
   fs: FileSystem = FileSystem.create_native()
   fm: FileManager = FileManager(fs)
@@ -1659,4 +1679,19 @@ if __name__ == "__main__":
       sys.exit(1)
 
     elif isinstance(maybe_ast, AST):
-      wrap(run_on_ast(maybe_ast, args.namespace), renamer)
+      schemas = run_on_ast(maybe_ast, args.namespace)
+      if args.dump_only:
+        pickle_schemas = []
+        for schema in schemas:
+          schema.dump("")
+          print()
+          if args.pickle_file:
+            pickle_schemas.append(schema)
+
+        if args.pickle_file:
+          with open(args.pickle_file, "wb") as f:
+            import pickle
+            pickle.dump(pickle_schemas, f)
+
+      else:
+        wrap(schemas, renamer)

@@ -24,6 +24,15 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kParameterABIAttrDerivedKinds[] = {
+    SwiftAsyncContextAttr::static_kind(),
+    SwiftContextAttr::static_kind(),
+    SwiftErrorResultAttr::static_kind(),
+    SwiftIndirectResultAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<ParameterABIAttr> ParameterABIAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ParameterABIAttr::from(*ctx)) {
@@ -58,16 +67,6 @@ std::optional<ParameterABIAttr> ParameterABIAttr::from(const std::optional<Attr>
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kParameterABIAttrDerivedKinds[] = {
-    SwiftAsyncContextAttr::static_kind(),
-    SwiftContextAttr::static_kind(),
-    SwiftErrorResultAttr::static_kind(),
-    SwiftIndirectResultAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ParameterABIAttr> ParameterABIAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

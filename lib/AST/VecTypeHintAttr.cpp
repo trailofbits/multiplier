@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kVecTypeHintAttrDerivedKinds[] = {
+    VecTypeHintAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<VecTypeHintAttr> VecTypeHintAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = VecTypeHintAttr::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<VecTypeHintAttr> VecTypeHintAttr::from(const std::optional<Attr> &
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kVecTypeHintAttrDerivedKinds[] = {
-    VecTypeHintAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<VecTypeHintAttr> VecTypeHintAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

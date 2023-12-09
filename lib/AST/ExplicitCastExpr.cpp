@@ -24,6 +24,8 @@
 #include <multiplier/AST/CXXStaticCastExpr.h>
 #include <multiplier/AST/ObjCBridgedCastExpr.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -31,6 +33,20 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kExplicitCastExprDerivedKinds[] = {
+    ObjCBridgedCastExpr::static_kind(),
+    BuiltinBitCastExpr::static_kind(),
+    CStyleCastExpr::static_kind(),
+    CXXFunctionalCastExpr::static_kind(),
+    CXXReinterpretCastExpr::static_kind(),
+    CXXStaticCastExpr::static_kind(),
+    CXXAddrspaceCastExpr::static_kind(),
+    CXXConstCastExpr::static_kind(),
+    CXXDynamicCastExpr::static_kind(),
+};
+}  // namespace
 
 gap::generator<ExplicitCastExpr> ExplicitCastExpr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -46,6 +62,21 @@ bool ExplicitCastExpr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<ExplicitCastExpr, ir::hl::Operation>> ExplicitCastExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kExplicitCastExprDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<ExplicitCastExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<ExplicitCastExpr> ExplicitCastExpr::containing(const Decl &decl) {
@@ -114,21 +145,6 @@ std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const std::optional<Stmt>
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kExplicitCastExprDerivedKinds[] = {
-    ObjCBridgedCastExpr::static_kind(),
-    BuiltinBitCastExpr::static_kind(),
-    CStyleCastExpr::static_kind(),
-    CXXFunctionalCastExpr::static_kind(),
-    CXXReinterpretCastExpr::static_kind(),
-    CXXStaticCastExpr::static_kind(),
-    CXXAddrspaceCastExpr::static_kind(),
-    CXXConstCastExpr::static_kind(),
-    CXXDynamicCastExpr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ExplicitCastExpr> ExplicitCastExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {

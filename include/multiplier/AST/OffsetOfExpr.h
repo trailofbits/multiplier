@@ -40,6 +40,9 @@ class MX_EXPORT OffsetOfExpr : public Expr {
   static gap::generator<OffsetOfExpr> in(const Fragment &frag);
   static gap::generator<OffsetOfExpr> in(const File &file);
 
+  static std::optional<OffsetOfExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OffsetOfExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OFFSET_OF_EXPR;
   }

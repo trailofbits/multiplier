@@ -38,6 +38,9 @@ class MX_EXPORT OMPDepobjDirective : public OMPExecutableDirective {
   static gap::generator<OMPDepobjDirective> in(const Fragment &frag);
   static gap::generator<OMPDepobjDirective> in(const File &file);
 
+  static std::optional<OMPDepobjDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPDepobjDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_DEPOBJ_DIRECTIVE;
   }

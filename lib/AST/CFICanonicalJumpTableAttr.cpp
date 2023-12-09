@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kCFICanonicalJumpTableAttrDerivedKinds[] = {
+    CFICanonicalJumpTableAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<CFICanonicalJumpTableAttr> CFICanonicalJumpTableAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = CFICanonicalJumpTableAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<CFICanonicalJumpTableAttr> CFICanonicalJumpTableAttr::from(const s
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kCFICanonicalJumpTableAttrDerivedKinds[] = {
-    CFICanonicalJumpTableAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<CFICanonicalJumpTableAttr> CFICanonicalJumpTableAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

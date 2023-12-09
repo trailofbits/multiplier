@@ -51,8 +51,13 @@ class EntityMapper final {
   EntityParentMap parent_decls;
   EntityParentMap parent_stmts;
 
-  inline explicit EntityMapper(TypeMapper &tm_)
-      : tm(tm_) {}
+  // If we're in a mode where we're generating source IR then we need the
+  // entity IDs for all `Decl`s and `Stmt`s and such to be global.
+  const bool generate_source_ir;
+
+  inline explicit EntityMapper(TypeMapper &tm_, bool generate_source_ir_)
+      : tm(tm_),
+        generate_source_ir(generate_source_ir_) {}
 
   mx::RawEntityId ParentDeclId(const void *) const;
   mx::RawEntityId ParentStmtId(const void *) const;
@@ -87,6 +92,14 @@ class EntityMapper final {
   mx::RawEntityId EntityId(const pasta::TemplateParameterList &pseudo) const;
   mx::RawEntityId EntityId(const pasta::CXXBaseSpecifier &pseudo) const;
   mx::RawEntityId EntityId(const pasta::Designator &pseudo) const;
+
+  inline mx::RawEntityId SelectiveEntityId(const void *entity) const {
+    if (generate_source_ir) {
+      return EntityId(entity);
+    } else {
+      return PerFragmentEntityId(entity);
+    }
+  }
 
   mx::RawEntityId EntityIdOfType(const void *type, uint32_t quals=0u) const;
 

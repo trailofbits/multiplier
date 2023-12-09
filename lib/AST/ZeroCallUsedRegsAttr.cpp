@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kZeroCallUsedRegsAttrDerivedKinds[] = {
+    ZeroCallUsedRegsAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<ZeroCallUsedRegsAttr> ZeroCallUsedRegsAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ZeroCallUsedRegsAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<ZeroCallUsedRegsAttr> ZeroCallUsedRegsAttr::from(const std::option
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kZeroCallUsedRegsAttrDerivedKinds[] = {
-    ZeroCallUsedRegsAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ZeroCallUsedRegsAttr> ZeroCallUsedRegsAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

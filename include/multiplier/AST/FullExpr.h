@@ -40,6 +40,9 @@ class MX_EXPORT FullExpr : public Expr {
   static gap::generator<FullExpr> in(const Fragment &frag);
   static gap::generator<FullExpr> in(const File &file);
 
+  static std::optional<FullExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<FullExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   static gap::generator<FullExpr> containing(const Decl &decl);
   static gap::generator<FullExpr> containing(const std::optional<Decl> &decl);
 

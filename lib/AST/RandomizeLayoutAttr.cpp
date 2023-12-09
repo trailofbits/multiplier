@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kRandomizeLayoutAttrDerivedKinds[] = {
+    RandomizeLayoutAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<RandomizeLayoutAttr> RandomizeLayoutAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = RandomizeLayoutAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<RandomizeLayoutAttr> RandomizeLayoutAttr::from(const std::optional
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kRandomizeLayoutAttrDerivedKinds[] = {
-    RandomizeLayoutAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<RandomizeLayoutAttr> RandomizeLayoutAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

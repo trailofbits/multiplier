@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kOMPAllocateDeclAttrDerivedKinds[] = {
+    OMPAllocateDeclAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<OMPAllocateDeclAttr> OMPAllocateDeclAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = OMPAllocateDeclAttr::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<OMPAllocateDeclAttr> OMPAllocateDeclAttr::from(const std::optional
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kOMPAllocateDeclAttrDerivedKinds[] = {
-    OMPAllocateDeclAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<OMPAllocateDeclAttr> OMPAllocateDeclAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

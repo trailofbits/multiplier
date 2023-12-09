@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kBTFTagAttributedTypeDerivedKinds[] = {
+    BTFTagAttributedType::static_kind(),
+};
+}  // namespace
+
 gap::generator<BTFTagAttributedType> BTFTagAttributedType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = BTFTagAttributedType::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<BTFTagAttributedType> BTFTagAttributedType::from(const std::option
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kBTFTagAttributedTypeDerivedKinds[] = {
-    BTFTagAttributedType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<BTFTagAttributedType> BTFTagAttributedType::from_base(const Type &parent) {
   switch (parent.kind()) {

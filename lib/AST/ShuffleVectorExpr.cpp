@@ -13,6 +13,8 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueStmt.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -20,6 +22,12 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kShuffleVectorExprDerivedKinds[] = {
+    ShuffleVectorExpr::static_kind(),
+};
+}  // namespace
 
 gap::generator<ShuffleVectorExpr> ShuffleVectorExpr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -35,6 +43,21 @@ bool ShuffleVectorExpr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<ShuffleVectorExpr, ir::hl::Operation>> ShuffleVectorExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kShuffleVectorExprDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<ShuffleVectorExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<ShuffleVectorExpr> ShuffleVectorExpr::containing(const Decl &decl) {
@@ -103,13 +126,6 @@ std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const std::optional<Stm
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kShuffleVectorExprDerivedKinds[] = {
-    ShuffleVectorExpr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {

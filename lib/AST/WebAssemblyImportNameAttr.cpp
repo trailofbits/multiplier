@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kWebAssemblyImportNameAttrDerivedKinds[] = {
+    WebAssemblyImportNameAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = WebAssemblyImportNameAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::from(const s
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kWebAssemblyImportNameAttrDerivedKinds[] = {
-    WebAssemblyImportNameAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

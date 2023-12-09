@@ -15,11 +15,10 @@
 
 namespace mx::ir::unsup {
 std::optional<Type> Type::from(const ::mx::ir::Type &that) {
-  switch (that.kind()) {
-    default: return std::nullopt;
-    case mx::ir::TypeKind::UNSUP_UNSUPPORTED:
-      return reinterpret_cast<const Type &>(that);
+  if (IsUnsupportedTypeKind(that.kind())) {
+    return reinterpret_cast<const Type &>(that);
   }
+  return std::nullopt;
 }
 
 std::optional<UnsupportedType> UnsupportedType::from(const ::mx::ir::Type &that) {

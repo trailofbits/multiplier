@@ -2113,6 +2113,7 @@ static LoaderFunc * const gHighLevelLoaders[] = {
   PythonBinding<mx::ir::hl::AddressOfOp>::load,
   PythonBinding<mx::ir::hl::AlignOfExprOp>::load,
   PythonBinding<mx::ir::hl::AlignOfTypeOp>::load,
+  PythonBinding<mx::ir::hl::AsmOp>::load,
   PythonBinding<mx::ir::hl::AssignOp>::load,
   PythonBinding<mx::ir::hl::BinAShrAssignOp>::load,
   PythonBinding<mx::ir::hl::BinAShrOp>::load,

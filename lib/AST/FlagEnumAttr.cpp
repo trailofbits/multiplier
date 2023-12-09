@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kFlagEnumAttrDerivedKinds[] = {
+    FlagEnumAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<FlagEnumAttr> FlagEnumAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = FlagEnumAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<FlagEnumAttr> FlagEnumAttr::from(const std::optional<Attr> &parent
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kFlagEnumAttrDerivedKinds[] = {
-    FlagEnumAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<FlagEnumAttr> FlagEnumAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

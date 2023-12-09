@@ -39,6 +39,9 @@ class MX_EXPORT CXXForRangeStmt : public Stmt {
   static gap::generator<CXXForRangeStmt> in(const Fragment &frag);
   static gap::generator<CXXForRangeStmt> in(const File &file);
 
+  static std::optional<CXXForRangeStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<CXXForRangeStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_FOR_RANGE_STMT;
   }

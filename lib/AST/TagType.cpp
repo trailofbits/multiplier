@@ -21,6 +21,13 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kTagTypeDerivedKinds[] = {
+    EnumType::static_kind(),
+    RecordType::static_kind(),
+};
+}  // namespace
+
 gap::generator<TagType> TagType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = TagType::from(*ctx)) {
@@ -55,14 +62,6 @@ std::optional<TagType> TagType::from(const std::optional<Type> &parent) {
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kTagTypeDerivedKinds[] = {
-    EnumType::static_kind(),
-    RecordType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<TagType> TagType::from_base(const Type &parent) {
   switch (parent.kind()) {

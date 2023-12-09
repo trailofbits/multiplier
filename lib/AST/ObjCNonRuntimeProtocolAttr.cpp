@@ -18,6 +18,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kObjCNonRuntimeProtocolAttrDerivedKinds[] = {
+    ObjCNonRuntimeProtocolAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<ObjCNonRuntimeProtocolAttr> ObjCNonRuntimeProtocolAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ObjCNonRuntimeProtocolAttr::from(*ctx)) {
@@ -52,13 +58,6 @@ std::optional<ObjCNonRuntimeProtocolAttr> ObjCNonRuntimeProtocolAttr::from(const
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kObjCNonRuntimeProtocolAttrDerivedKinds[] = {
-    ObjCNonRuntimeProtocolAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ObjCNonRuntimeProtocolAttr> ObjCNonRuntimeProtocolAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

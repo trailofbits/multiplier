@@ -26,6 +26,8 @@
 #include <multiplier/AST/ClassTemplatePartialSpecializationDecl.h>
 #include <multiplier/AST/ClassTemplateSpecializationDecl.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -33,6 +35,14 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const DeclKind kCXXRecordDeclDerivedKinds[] = {
+    CXXRecordDecl::static_kind(),
+    ClassTemplateSpecializationDecl::static_kind(),
+    ClassTemplatePartialSpecializationDecl::static_kind(),
+};
+}  // namespace
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -48,6 +58,21 @@ bool CXXRecordDecl::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CXXRecordDecl> CXXRecordDecl::from(const ir::hl::Operation &op) {
+  if (auto val = Decl::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<CXXRecordDecl, ir::hl::Operation>> CXXRecordDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kCXXRecordDeclDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<CXXRecordDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::containing(const Decl &decl) {
@@ -145,15 +170,6 @@ std::optional<CXXRecordDecl> CXXRecordDecl::from(const std::optional<Decl> &pare
   }
   return std::nullopt;
 }
-
-namespace {
-static const DeclKind kCXXRecordDeclDerivedKinds[] = {
-    CXXRecordDecl::static_kind(),
-    ClassTemplateSpecializationDecl::static_kind(),
-    ClassTemplatePartialSpecializationDecl::static_kind(),
-};
-
-}  // namespace
 
 std::optional<CXXRecordDecl> CXXRecordDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {

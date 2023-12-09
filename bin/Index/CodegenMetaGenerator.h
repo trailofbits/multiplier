@@ -80,45 +80,11 @@ class MetaGenerator final : public vast::cg::meta_generator {
   }
 
  private:
-  // Get mlir Location from the clang source location.
-  //
-  // TODO(pag): Use a named MLIR location for the file?
-  mlir::Location Location(clang::SourceLocation loc) const {
-    auto file_token = ast.Adopt(loc).FileLocation();
-
-    // Return unknown location if file_token is not valid
-    if (!file_token) {
-      return unknown_location;
-    }
-
-    auto file = pasta::File::Containing(file_token);
-    if (!file) {
-      assert(false);
-      return unknown_location; 
-    }
-
-    auto name = file->Path().generic_string();
-    auto line = file_token->Line();
-    auto col  = file_token->Column();
-    return { mlir::FileLineColLoc::get(mctx, name, line, col) };
-  }
-
   mlir::Location Location(const clang::Decl *decl) const {
     if (auto raw_entity_id = em.EntityId(decl);
         raw_entity_id != mx::kInvalidEntityId) {
       auto attr = vast::meta::IdentifierAttr::get(mctx, raw_entity_id);
-      auto loc = decl->getLocation();
-      return mlir::FusedLoc::get({Location(loc)}, attr, mctx);
-    }
-    return unknown_location;
-  }
-
-  mlir::Location Location(const clang::Expr *expr) const {
-    if (auto raw_entity_id = em.EntityId(expr);
-        raw_entity_id != mx::kInvalidEntityId) {
-      auto attr = vast::meta::IdentifierAttr::get(mctx, raw_entity_id);
-      auto loc = expr->getExprLoc();
-      return mlir::FusedLoc::get({Location(loc)}, attr, mctx);
+      return mlir::FusedLoc::get({}, attr, mctx);
     }
     return unknown_location;
   }
@@ -127,8 +93,7 @@ class MetaGenerator final : public vast::cg::meta_generator {
     if (auto raw_entity_id = em.EntityId(stmt);
         raw_entity_id != mx::kInvalidEntityId) {
       auto attr = vast::meta::IdentifierAttr::get(mctx, raw_entity_id);
-      auto loc = stmt->getBeginLoc();
-      return mlir::FusedLoc::get({Location(loc)}, attr, mctx);
+      return mlir::FusedLoc::get({}, attr, mctx);
     }
     return unknown_location;
   }
@@ -137,8 +102,7 @@ class MetaGenerator final : public vast::cg::meta_generator {
     if (auto raw_entity_id = em.EntityId(attr_);
         raw_entity_id != mx::kInvalidEntityId) {
       auto attr = vast::meta::IdentifierAttr::get(mctx, raw_entity_id);
-      auto loc = attr_->getLocation();
-      return mlir::FusedLoc::get({Location(loc)}, attr, mctx);
+      return mlir::FusedLoc::get({}, attr, mctx);
     }
     return unknown_location;
   }
@@ -147,9 +111,6 @@ class MetaGenerator final : public vast::cg::meta_generator {
     if (auto raw_entity_id = em.EntityIdOfType(type);
         raw_entity_id != mx::kInvalidEntityId) {
       auto attr = vast::meta::IdentifierAttr::get(mctx, raw_entity_id);
-
-      // clang::Type does not have source location; Leave it empty and
-      // only fuse the attribute metadata
       return mlir::FusedLoc::get({}, attr, mctx);
     }
     return unknown_location;

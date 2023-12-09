@@ -41,6 +41,9 @@ class MX_EXPORT BinaryOperator : public Expr {
   static gap::generator<BinaryOperator> in(const Fragment &frag);
   static gap::generator<BinaryOperator> in(const File &file);
 
+  static std::optional<BinaryOperator> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<BinaryOperator, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BINARY_OPERATOR;
   }

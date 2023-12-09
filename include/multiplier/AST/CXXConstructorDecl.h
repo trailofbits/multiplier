@@ -46,6 +46,9 @@ class MX_EXPORT CXXConstructorDecl : public CXXMethodDecl {
   static gap::generator<CXXConstructorDecl> in(const Fragment &frag);
   static gap::generator<CXXConstructorDecl> in(const File &file);
 
+  static std::optional<CXXConstructorDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<CXXConstructorDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_CONSTRUCTOR;
   }

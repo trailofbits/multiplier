@@ -42,6 +42,9 @@ class MX_EXPORT PredefinedExpr : public Expr {
   static gap::generator<PredefinedExpr> in(const Fragment &frag);
   static gap::generator<PredefinedExpr> in(const File &file);
 
+  static std::optional<PredefinedExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<PredefinedExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::PREDEFINED_EXPR;
   }

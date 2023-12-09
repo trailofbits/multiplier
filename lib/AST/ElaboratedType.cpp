@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kElaboratedTypeDerivedKinds[] = {
+    ElaboratedType::static_kind(),
+};
+}  // namespace
+
 gap::generator<ElaboratedType> ElaboratedType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ElaboratedType::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<ElaboratedType> ElaboratedType::from(const std::optional<Type> &pa
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kElaboratedTypeDerivedKinds[] = {
-    ElaboratedType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ElaboratedType> ElaboratedType::from_base(const Type &parent) {
   switch (parent.kind()) {

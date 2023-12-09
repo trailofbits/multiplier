@@ -22,6 +22,14 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kDeclOrStmtAttrDerivedKinds[] = {
+    NoInlineAttr::static_kind(),
+    NoMergeAttr::static_kind(),
+    AlwaysInlineAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<DeclOrStmtAttr> DeclOrStmtAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DeclOrStmtAttr::from(*ctx)) {
@@ -56,15 +64,6 @@ std::optional<DeclOrStmtAttr> DeclOrStmtAttr::from(const std::optional<Attr> &pa
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kDeclOrStmtAttrDerivedKinds[] = {
-    NoInlineAttr::static_kind(),
-    NoMergeAttr::static_kind(),
-    AlwaysInlineAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<DeclOrStmtAttr> DeclOrStmtAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

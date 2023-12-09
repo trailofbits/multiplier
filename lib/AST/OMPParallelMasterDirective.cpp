@@ -13,6 +13,8 @@
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -20,6 +22,12 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kOMPParallelMasterDirectiveDerivedKinds[] = {
+    OMPParallelMasterDirective::static_kind(),
+};
+}  // namespace
 
 gap::generator<OMPParallelMasterDirective> OMPParallelMasterDirective::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -35,6 +43,21 @@ bool OMPParallelMasterDirective::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OMPParallelMasterDirective> OMPParallelMasterDirective::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<OMPParallelMasterDirective, ir::hl::Operation>> OMPParallelMasterDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPParallelMasterDirectiveDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<OMPParallelMasterDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<OMPParallelMasterDirective> OMPParallelMasterDirective::containing(const Decl &decl) {
@@ -103,13 +126,6 @@ std::optional<OMPParallelMasterDirective> OMPParallelMasterDirective::from(const
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kOMPParallelMasterDirectiveDerivedKinds[] = {
-    OMPParallelMasterDirective::static_kind(),
-};
-
-}  // namespace
 
 std::optional<OMPParallelMasterDirective> OMPParallelMasterDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {

@@ -890,7 +890,14 @@ void CodeGenerator::RunOnOps(void) {
       << "inline static constexpr unsigned NumEnumerators(ir::OperationKind) {\n"
       << "  return " << num_ops << ";\n"
       << "}\n\n"
-      << "MX_EXPORT const char *EnumeratorName(ir::OperationKind);\n\n"
+      << "MX_EXPORT const char *EnumeratorName(ir::OperationKind);\n\n";
+
+  for (Dialect &dialect : gDialects) {
+    hpp
+        << "MX_EXPORT bool Is" << dialect.name << "OperationKind(ir::OperationKind);\n\n";
+  }
+
+  hpp
       << "}  // namespace mx\n";
 
   cpp
@@ -945,7 +952,33 @@ void CodeGenerator::RunOnOps(void) {
   }
 
   cpp << "  }\n"
-      << "}\n\n"
+      << "}\n\n";
+
+  for (Dialect &dialect : gDialects) {
+    cpp
+        << "bool Is" << dialect.name << "OperationKind(ir::OperationKind kind) {\n"
+        << "  switch (kind) {\n"
+        << "    default:\n"
+        << "      return false;\n";
+
+    bool any = false;
+    for (Op *op : dialect.ops) {
+      std::string enum_name = OpNameToEnumCase(op->op_name);
+      cpp << "    case mx::ir::OperationKind::" << enum_name << ":\n";
+      any = true;
+    }
+
+    if (any) {
+      cpp
+          << "      return true;\n";
+    }
+    
+    cpp
+        << "  }\n"
+        << "}\n\n";
+  }
+
+  cpp
       << "}  // namespace mx\n";
 
   for (Dialect &dialect : gDialects) {
@@ -983,7 +1016,21 @@ void CodeGenerator::RunOnOps(void) {
         << "namespace mx::ir::" << dialect.our_ns_name << " {\n\n"
         << "class MX_EXPORT Operation : public ::mx::ir::Operation {\n"
         << " public:\n"
-        << "  static std::optional<Operation> from(const ::mx::ir::Operation &);\n"
+        << "  static std::optional<Operation> from(const ::mx::ir::Operation &);\n";
+    
+    // These are manually implemented.
+    if (dialect.name == "HighLevel") {
+      hpp
+          << '\n'
+          << "  static std::optional<Operation> first_from(const ::mx::Decl &that);\n"
+          << "  static std::optional<Operation> first_from(const ::mx::Decl &that, OperationKind);\n"
+          << "  static gap::generator<Operation> all_from(const ::mx::Decl &that);\n\n"
+          << "  static std::optional<Operation> first_from(const ::mx::Stmt &that);\n"
+          << "  static std::optional<Operation> first_from(const ::mx::Stmt &that, OperationKind);\n"
+          << "  static gap::generator<Operation> all_from(const ::mx::Stmt &that);\n";
+    }
+
+    hpp
         << "};\n"
         << "static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));\n\n";
 
@@ -1016,23 +1063,10 @@ void CodeGenerator::RunOnOps(void) {
         << '\n'
         << "namespace mx::ir::" << dialect.our_ns_name << " {\n"
         << "std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {\n"
-        << "  switch (that.kind()) {\n"
-        << "    default: return std::nullopt;\n";
-
-    auto any = false;
-    for (Op *op : dialect.ops) {
-      std::string enum_name = OpNameToEnumCase(op->op_name);
-      cpp << "    case mx::ir::OperationKind::" << enum_name << ":\n";
-      any = true;
-    }
-
-    if (any) {
-      cpp
-          << "      return reinterpret_cast<const Operation &>(that);\n";
-    }
-
-    cpp
+        << "  if (Is" << dialect.name << "OperationKind(that.kind())) {\n"
+        << "    return reinterpret_cast<const Operation &>(that);\n"
         << "  }\n"
+        << "  return std::nullopt;\n"
         << "}\n\n";
 
     for (Op *op : dialect.ops) {
@@ -1172,7 +1206,14 @@ void CodeGenerator::RunOnTypes(void) {
       << "inline static constexpr unsigned NumEnumerators(ir::TypeKind) {\n"
       << "  return " << num_types << ";\n"
       << "}\n\n"
-      << "MX_EXPORT const char *EnumeratorName(ir::TypeKind);\n\n"
+      << "MX_EXPORT const char *EnumeratorName(ir::TypeKind);\n\n";
+
+  for (Dialect &dialect : gDialects) {
+    hpp
+        << "MX_EXPORT bool Is" << dialect.name << "TypeKind(ir::TypeKind);\n\n";
+  }
+
+  hpp
       << "}  // namespace mx\n";
 
   cpp
@@ -1227,7 +1268,33 @@ void CodeGenerator::RunOnTypes(void) {
   }
 
   cpp << "  }\n"
-      << "}\n\n"
+      << "}\n\n";
+
+  for (Dialect &dialect : gDialects) {
+    cpp
+        << "bool Is" << dialect.name << "TypeKind(ir::TypeKind kind) {\n"
+        << "  switch (kind) {\n"
+        << "    default:\n"
+        << "      return false;\n";
+
+    bool any = false;
+    for (Type *type : dialect.types) {
+      std::string enum_name = TypeNameToEnumCase(dialect, type->name);
+      cpp << "    case mx::ir::TypeKind::" << enum_name << ":\n";
+      any = true;
+    }
+
+    if (any) {
+      cpp
+          << "      return true;\n";
+    }
+    
+    cpp
+        << "  }\n"
+        << "}\n\n";
+  }
+
+  cpp
       << "}  // namespace mx\n";
 
   for (const Dialect &dialect : gDialects) {
@@ -1288,23 +1355,10 @@ void CodeGenerator::RunOnTypes(void) {
         << '\n'
         << "namespace mx::ir::" << dialect.our_ns_name << " {\n"
         << "std::optional<Type> Type::from(const ::mx::ir::Type &that) {\n"
-        << "  switch (that.kind()) {\n"
-        << "    default: return std::nullopt;\n";
-
-    auto any = false;
-    for (Type *type : dialect.types) {
-      std::string enum_name = TypeNameToEnumCase(dialect, type->name);
-      cpp << "    case mx::ir::TypeKind::" << enum_name << ":\n";
-      any = true;
-    }
-
-    if (any) {
-      cpp
-          << "      return reinterpret_cast<const Type &>(that);\n";
-    }
-
-    cpp
+        << "  if (Is" << dialect.name << "TypeKind(that.kind())) {\n"
+        << "    return reinterpret_cast<const Type &>(that);\n"
         << "  }\n"
+        << "  return std::nullopt;\n"
         << "}\n\n";
 
     for (Type *type : dialect.types) {
@@ -1439,7 +1493,14 @@ void CodeGenerator::RunOnAttrs(void) {
       << "inline static constexpr unsigned NumEnumerators(ir::AttributeKind) {\n"
       << "  return " << num_attrs << ";\n"
       << "}\n\n"
-      << "MX_EXPORT const char *EnumeratorName(ir::AttributeKind);\n\n"
+      << "MX_EXPORT const char *EnumeratorName(ir::AttributeKind);\n\n";
+
+  for (Dialect &dialect : gDialects) {
+    hpp
+        << "MX_EXPORT bool Is" << dialect.name << "AttributeKind(ir::AttributeKind);\n\n";
+  }
+
+  hpp
       << "}  // namespace mx\n";
 
   cpp
@@ -1495,7 +1556,33 @@ void CodeGenerator::RunOnAttrs(void) {
   }
 
   cpp << "  }\n"
-      << "}\n\n"
+      << "}\n\n";
+
+  for (Dialect &dialect : gDialects) {
+    cpp
+        << "bool Is" << dialect.name << "AttributeKind(ir::AttributeKind kind) {\n"
+        << "  switch (kind) {\n"
+        << "    default:\n"
+        << "      return false;\n";
+
+    bool any = false;
+    for (Attr *attr : dialect.attrs) {
+      std::string enum_name = AttrNameToEnumCase(dialect, attr->name);
+      cpp << "    case mx::ir::AttributeKind::" << enum_name << ":\n";
+      any = true;
+    }
+
+    if (any) {
+      cpp
+          << "      return true;\n";
+    }
+    
+    cpp
+        << "  }\n"
+        << "}\n\n";
+  }
+
+  cpp
       << "}  // namespace mx\n";
 
   for (Dialect &dialect : gDialects) {
@@ -1560,23 +1647,10 @@ void CodeGenerator::RunOnAttrs(void) {
         << '\n'
         << "namespace mx::ir::" << dialect.our_ns_name << " {\n"
         << "std::optional<Attribute> Attribute::from(const ::mx::ir::Attribute &that) {\n"
-        << "  switch (that.kind()) {\n"
-        << "    default: return std::nullopt;\n";
-
-    auto any = false;
-    for (Attr *attr : dialect.attrs) {
-      std::string enum_name = AttrNameToEnumCase(dialect, attr->name);
-      cpp << "    case mx::ir::AttributeKind::" << enum_name << ":\n";
-      any = true;
-    }
-
-    if (any) {
-      cpp
-          << "      return reinterpret_cast<const Attribute &>(that);\n";
-    }
-
-    cpp
+        << "  if (Is" << dialect.name << "AttributeKind(that.kind())) {\n"
+        << "    return reinterpret_cast<const Attribute &>(that);\n"
         << "  }\n"
+        << "  return std::nullopt;\n"
         << "}\n\n";
 
     for (Attr *attr : dialect.attrs) {

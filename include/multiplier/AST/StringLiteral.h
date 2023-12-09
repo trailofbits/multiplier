@@ -41,6 +41,9 @@ class MX_EXPORT StringLiteral : public Expr {
   static gap::generator<StringLiteral> in(const Fragment &frag);
   static gap::generator<StringLiteral> in(const File &file);
 
+  static std::optional<StringLiteral> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<StringLiteral, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::STRING_LITERAL;
   }

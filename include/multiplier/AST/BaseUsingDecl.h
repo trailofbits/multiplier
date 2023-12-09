@@ -39,6 +39,9 @@ class MX_EXPORT BaseUsingDecl : public NamedDecl {
   static gap::generator<BaseUsingDecl> in(const Fragment &frag);
   static gap::generator<BaseUsingDecl> in(const File &file);
 
+  static std::optional<BaseUsingDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<BaseUsingDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   static gap::generator<BaseUsingDecl> containing(const Decl &decl);
   static gap::generator<BaseUsingDecl> containing(const std::optional<Decl> &decl);
 

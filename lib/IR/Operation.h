@@ -320,6 +320,7 @@
    _hl("hl.addressof", OperationKind::HL_ADDRESSOF, vast::hl::AddressOf) \
    _hl("hl.alignof.expr", OperationKind::HL_ALIGNOF_EXPR, vast::hl::AlignOfExprOp) \
    _hl("hl.alignof.type", OperationKind::HL_ALIGNOF_TYPE, vast::hl::AlignOfTypeOp) \
+   _hl("hl.asm", OperationKind::HL_ASM, vast::hl::AsmOp) \
    _hl("hl.assign", OperationKind::HL_ASSIGN, vast::hl::AssignOp) \
    _hl("hl.assign.bin.ashr", OperationKind::HL_ASSIGN_BIN_ASHR, vast::hl::BinAShrAssignOp) \
    _hl("hl.bin.ashr", OperationKind::HL_BIN_ASHR, vast::hl::BinAShrOp) \
@@ -431,5 +432,5 @@
    _unsup("unsup.decl", OperationKind::UNSUP_DECL, vast::unsup::UnsupportedDecl) \
    _unsup("unsup.stmt", OperationKind::UNSUP_STMT, vast::unsup::UnsupportedStmt)
 
-#define MX_IR_NUM_MLIR_OPS 423
+#define MX_IR_NUM_MLIR_OPS 424
 

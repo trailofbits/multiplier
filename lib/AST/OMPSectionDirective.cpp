@@ -12,6 +12,8 @@
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -19,6 +21,12 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kOMPSectionDirectiveDerivedKinds[] = {
+    OMPSectionDirective::static_kind(),
+};
+}  // namespace
 
 gap::generator<OMPSectionDirective> OMPSectionDirective::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -34,6 +42,21 @@ bool OMPSectionDirective::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OMPSectionDirective> OMPSectionDirective::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<OMPSectionDirective, ir::hl::Operation>> OMPSectionDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPSectionDirectiveDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<OMPSectionDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<OMPSectionDirective> OMPSectionDirective::containing(const Decl &decl) {
@@ -102,13 +125,6 @@ std::optional<OMPSectionDirective> OMPSectionDirective::from(const std::optional
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kOMPSectionDirectiveDerivedKinds[] = {
-    OMPSectionDirective::static_kind(),
-};
-
-}  // namespace
 
 std::optional<OMPSectionDirective> OMPSectionDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {

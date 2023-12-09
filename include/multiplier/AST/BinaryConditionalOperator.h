@@ -43,6 +43,9 @@ class MX_EXPORT BinaryConditionalOperator : public AbstractConditionalOperator {
   static gap::generator<BinaryConditionalOperator> in(const Fragment &frag);
   static gap::generator<BinaryConditionalOperator> in(const File &file);
 
+  static std::optional<BinaryConditionalOperator> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<BinaryConditionalOperator, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BINARY_CONDITIONAL_OPERATOR;
   }

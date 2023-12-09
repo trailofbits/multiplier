@@ -42,6 +42,9 @@ class MX_EXPORT ExprWithCleanups : public FullExpr {
   static gap::generator<ExprWithCleanups> in(const Fragment &frag);
   static gap::generator<ExprWithCleanups> in(const File &file);
 
+  static std::optional<ExprWithCleanups> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ExprWithCleanups, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::EXPR_WITH_CLEANUPS;
   }

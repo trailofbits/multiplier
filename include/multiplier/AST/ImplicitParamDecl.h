@@ -45,6 +45,9 @@ class MX_EXPORT ImplicitParamDecl : public VarDecl {
   static gap::generator<ImplicitParamDecl> in(const Fragment &frag);
   static gap::generator<ImplicitParamDecl> in(const File &file);
 
+  static std::optional<ImplicitParamDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ImplicitParamDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::IMPLICIT_PARAM;
   }

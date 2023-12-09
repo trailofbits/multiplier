@@ -18,6 +18,7 @@
 #include <multiplier/AST/Type.h>
 #include <multiplier/Frontend/Macro.h>
 #include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/HighLevel/Operation.h>
 #include <multiplier/IR/Operation.h>
 #include <multiplier/IR/Type.h>
 
@@ -54,6 +55,7 @@
 #include <vast/CodeGen/CodeGenContext.hpp>
 #include <vast/CodeGen/CodeGenBuilder.hpp>
 
+#include "../Compilation.h"
 #include "../Fragment.h"
 #include "Attribute.h"
 #include "Operation.h"
@@ -64,14 +66,14 @@ namespace ir {
 namespace {
 
 // Get the entity id from the location. It is embedded as `meta.id<>`
-static EntityId MetaIdFromLocation(mlir::Location loc) {
+static RawEntityId MetaIdFromLocation(mlir::Location loc) {
   if (loc.isa<mlir::FusedLoc>()) {
     mlir::Attribute meta = loc.cast<mlir::FusedLoc>().getMetadata();
     if (meta.isa<vast::meta::IdentifierAttr>()) {
-      return EntityId(meta.cast<const vast::meta::IdentifierAttr>().getValue());
+      return meta.cast<const vast::meta::IdentifierAttr>().getValue();
     }
   }
-  return {};
+  return kInvalidEntityId;
 }
 
 // Register all dialects.
@@ -221,25 +223,28 @@ SourceIRImpl::SourceIRImpl(PackedCompilationId compilation_id_,
   // Index the entities / operations in the module.
   auto result = mod->walk<mlir::WalkOrder::PreOrder>(
       [this] (mlir::Operation *child) {
-        operations[ir::Operation::classify(child)].push_back(child);
+        auto op_kind = ir::Operation::classify(child);
+        operations[op_kind].push_back(child);
 
-        EntityId eid = ir::MetaIdFromLocation(child->getLoc());
-        VariantId vid = eid.Unpack();
+        if (!IsHighLevelOperationKind(op_kind)) {
+          return mlir::WalkResult::advance();
+        }
+
+        RawEntityId eid = MetaIdFromLocation(child->getLoc());
+        VariantId vid = EntityId(eid).Unpack();
+
         if (std::holds_alternative<InvalidId>(vid)) {
           return mlir::WalkResult::advance();
         }
 
         if (std::holds_alternative<DeclId>(vid)) {
-          declarations[std::get<DeclId>(vid).kind].push_back(child);
+          declarations[std::get<DeclId>(vid).kind].emplace_back(eid, child);
 
         } else if (std::holds_alternative<StmtId>(vid)) {
-          statements[std::get<StmtId>(vid).kind].push_back(child);
-
-        } else if (std::holds_alternative<TypeId>(vid)) {
-          types[std::get<TypeId>(vid).kind].push_back(child);
+          statements[std::get<StmtId>(vid).kind].emplace_back(eid, child);
         }
 
-        entities[eid.Pack()].push_back(child);
+        entities[eid].emplace_back(op_kind, child);
 
         return mlir::WalkResult::advance();
       });
@@ -259,72 +264,256 @@ mlir::Operation *SourceIRImpl::scope(void) const {
   }
 }
 
-//const OperationRange::OpVec *
-//SourceIRImpl::ForDecl(const Decl &decl) const {
-//  auto id = decl.id().Pack();
-//  // NOTE(kumarak): A decl can have multiple redeclaration. If the entity id of
-//  //                the decl is not available in the source ir, it will fall
-//  //                back to checking for the entity ids of redeclarations.
-//  auto found_item = deserialized_ops.find(id);
-//  if (found_item != deserialized_ops.end()) {
-//    return &found_item->second;
-//  }
-//
-//  for (auto raw_id : frag->ep->Redeclarations(frag->ep, id)) {
-//    auto item = deserialized_ops.find(raw_id);
-//    if (item != deserialized_ops.end()) {
-//      return &item->second;
-//    }
-//  }
-//
-//  return {};
-//}
-//
-//const OperationRange::OpVec *
-//SourceIRImpl::ForStmt(const Stmt &stmt) const {
-//  auto id = stmt.id().Pack();
-//  auto found_item = deserialized_ops.find(id);
-//  if (found_item != deserialized_ops.end()) {
-//    return &found_item->second;
-//  }
-//  return {};
-//}
-//
-//const OperationRange::OpVec *
-//SourceIRImpl::ForType(const Type &) const {
-//  return {};
-//}
-//
-//const OperationRange::OpVec *
-//SourceIRImpl::ForAttr(const Attr &) const {
-//  return {};
-//}
-//
-//const OperationRange::OpVec *
-//SourceIRImpl::ForMacro(const Macro &) const {
-//  return {};
-//}
-//
-//#define MX_DEFINE_ENTITY_FUNCTION(type_name, lower_name, e, v) \
-//	const OperationRange::OpVec * \
-//	SourceIRImpl::For##type_name(const type_name &lower_name) const { \
-//    return {}; \
-//  }
-//
-//MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
-//                            MX_IGNORE_ENTITY_CATEGORY,
-//                            MX_IGNORE_ENTITY_CATEGORY,
-//                            MX_IGNORE_ENTITY_CATEGORY,
-//                            MX_IGNORE_ENTITY_CATEGORY,
-//                            MX_DEFINE_ENTITY_FUNCTION)
-//
-//#undef MX_DEFINE_ENTITY_FUNCTION
-//
-//
-//VariantEntity SourceIRImpl::EntityFor(EntityId eid) const {
-//  Fragment f(frag);
-//  return Index::containing(f).entity(eid);
-//}
-
 }  // namespace ir
+
+std::optional<Decl> Decl::from(const ir::hl::Operation &op) {
+  RawEntityId eid = ir::MetaIdFromLocation(op.op_->getLoc());
+  VariantId vid = EntityId(eid).Unpack();
+  if (!std::holds_alternative<DeclId>(vid)) {
+    return std::nullopt;
+  }
+
+  const auto &ep = op.module_->ep;
+  auto eptr = ep->DeclFor(ep, eid);
+  if (!eptr) {
+    return std::nullopt;
+  }
+
+  return Decl(std::move(eptr));
+}
+
+gap::generator<std::pair<Decl, ir::hl::Operation>>
+Decl::in(const Compilation &tu) {
+  auto source_ir = tu.impl->SourceIRPtr(tu.id());
+  if (!source_ir) {
+    co_return;
+  }
+
+  const auto &ep = source_ir->ep;
+  for (auto &[kind, eid_ops_pairs] : source_ir->declarations) {
+    for (auto [eid, op_ptr] : eid_ops_pairs) {
+      if (auto eptr = ep->DeclFor(ep, eid)) {
+        ir::Operation op(source_ir, op_ptr);
+        co_yield std::pair<Decl, ir::hl::Operation>(
+            Decl(std::move(eptr)),
+            std::move(reinterpret_cast<ir::hl::Operation &>(op)));
+      }
+    }
+  }
+}
+
+gap::generator<std::pair<Decl, ir::hl::Operation>> Decl::in(
+  const Compilation &tu, std::span<const DeclKind> kinds) {
+  if (kinds.empty()) {
+    co_return;
+  }
+
+  auto source_ir = tu.impl->SourceIRPtr(tu.id());
+  if (!source_ir) {
+    co_return;
+  }
+
+  const auto &ep = source_ir->ep;
+  const auto it_end = source_ir->declarations.end();
+  for (auto kind : kinds) {
+    auto it = source_ir->declarations.find(kind);
+    if (it == it_end) {
+      continue;
+    }
+
+    for (auto [eid, op_ptr] : it->second) {
+      if (auto eptr = ep->DeclFor(ep, eid)) {
+        ir::Operation op(source_ir, op_ptr);
+        co_yield std::pair<Decl, ir::hl::Operation>(
+            Decl(std::move(eptr)),
+            std::move(reinterpret_cast<ir::hl::Operation &>(op)));
+      }
+    }
+  }
+}
+
+std::optional<Stmt> Stmt::from(const ir::hl::Operation &op) {
+  RawEntityId eid = ir::MetaIdFromLocation(op.op_->getLoc());
+  VariantId vid = EntityId(eid).Unpack();
+  if (!std::holds_alternative<StmtId>(vid)) {
+    return std::nullopt;
+  }
+
+  const auto &ep = op.module_->ep;
+  auto eptr = ep->StmtFor(ep, eid);
+  if (!eptr) {
+    return std::nullopt;
+  }
+
+  return Stmt(std::move(eptr));
+}
+
+gap::generator<std::pair<Stmt, ir::hl::Operation>>
+Stmt::in(const Compilation &tu) {
+  auto source_ir = tu.impl->SourceIRPtr(tu.id());
+  if (!source_ir) {
+    co_return;
+  }
+
+  const auto &ep = source_ir->ep;
+  for (auto &[kind, eid_ops_pairs] : source_ir->statements) {
+    for (auto [eid, op_ptr] : eid_ops_pairs) {
+      if (auto eptr = ep->StmtFor(ep, eid)) {
+        ir::Operation op(source_ir, op_ptr);
+        co_yield std::pair<Stmt, ir::hl::Operation>(
+            Stmt(std::move(eptr)),
+            std::move(reinterpret_cast<ir::hl::Operation &>(op)));
+      }
+    }
+  }
+}
+
+gap::generator<std::pair<Stmt, ir::hl::Operation>> Stmt::in(
+  const Compilation &tu, std::span<const StmtKind> kinds) {
+    if (kinds.empty()) {
+    co_return;
+  }
+
+  auto source_ir = tu.impl->SourceIRPtr(tu.id());
+  if (!source_ir) {
+    co_return;
+  }
+
+  const auto &ep = source_ir->ep;
+  const auto it_end = source_ir->statements.end();
+  for (auto kind : kinds) {
+    auto it = source_ir->statements.find(kind);
+    if (it == it_end) {
+      continue;
+    }
+
+    for (auto [eid, op_ptr] : it->second) {
+      if (auto eptr = ep->StmtFor(ep, eid)) {
+        ir::Operation op(source_ir, op_ptr);
+        co_yield std::pair<Stmt, ir::hl::Operation>(
+            Stmt(std::move(eptr)),
+            std::move(reinterpret_cast<ir::hl::Operation &>(op)));
+      }
+    }
+  }
+}
+
+namespace ir {
+namespace hl {
+namespace {
+
+static std::optional<Operation> FirstFrom(
+    std::shared_ptr<const SourceIRImpl> source_ir, RawEntityId eid) {
+
+  if (!source_ir) {
+    return std::nullopt;
+  }
+
+  auto it = source_ir->entities.find(eid);
+  if (it == source_ir->entities.end()) {
+    return std::nullopt;
+  }
+
+  for (auto [op_kind, op_ptr] : it->second) {
+    ::mx::ir::Operation op(std::move(source_ir), op_ptr, op_kind);
+    return reinterpret_cast<Operation &&>(op);
+  }
+
+  return std::nullopt;
+}
+
+static std::optional<Operation> FirstFromOfKind(
+    std::shared_ptr<const SourceIRImpl> source_ir, RawEntityId eid,
+    OperationKind kind) {
+
+  if (!source_ir) {
+    return std::nullopt;
+  }
+
+  auto it = source_ir->entities.find(eid);
+  if (it == source_ir->entities.end()) {
+    return std::nullopt;
+  }
+
+  for (auto [op_kind, op_ptr] : it->second) {
+    if (op_kind != kind) {
+      continue;
+    }
+
+    ::mx::ir::Operation op(std::move(source_ir), op_ptr, op_kind);
+    return reinterpret_cast<Operation &&>(op);
+  }
+
+  return std::nullopt;
+}
+
+static gap::generator<Operation> AllFrom(
+    std::shared_ptr<const SourceIRImpl> source_ir, RawEntityId eid) {
+
+  if (!source_ir) {
+    co_return;
+  }
+
+  auto it = source_ir->entities.find(eid);
+  if (it == source_ir->entities.end()) {
+    co_return;
+  }
+
+  for (auto [op_kind, op_ptr] : it->second) {
+    ::mx::ir::Operation op(std::move(source_ir), op_ptr, op_kind);
+    co_yield reinterpret_cast<Operation &&>(op);
+  }
+}
+
+}  // namespace
+
+std::optional<Operation> Operation::first_from(const ::mx::Decl &that) {
+  auto compilation = Compilation::containing(that);
+  return FirstFrom(
+      compilation.impl->SourceIRPtr(compilation.id()),
+      that.id().Pack());
+}
+
+std::optional<Operation> Operation::first_from(const ::mx::Decl &that,
+                                               OperationKind op_kind) {
+  auto compilation = Compilation::containing(that);
+  return FirstFromOfKind(
+      compilation.impl->SourceIRPtr(compilation.id()),
+      that.id().Pack(),
+      op_kind);
+}
+
+gap::generator<Operation> Operation::all_from(const ::mx::Decl &that) {
+  auto compilation = Compilation::containing(that);
+  return AllFrom(
+      compilation.impl->SourceIRPtr(compilation.id()),
+      that.id().Pack());
+}
+
+std::optional<Operation> Operation::first_from(const ::mx::Stmt &that) {
+  auto compilation = Compilation::containing(that);
+  return FirstFrom(
+      compilation.impl->SourceIRPtr(compilation.id()),
+      that.id().Pack());
+}
+
+std::optional<Operation> Operation::first_from(const ::mx::Stmt &that,
+                                               OperationKind op_kind) {
+  auto compilation = Compilation::containing(that);
+  return FirstFromOfKind(
+      compilation.impl->SourceIRPtr(compilation.id()),
+      that.id().Pack(),
+      op_kind);
+}
+
+gap::generator<Operation> Operation::all_from(const ::mx::Stmt &that) {
+  auto compilation = Compilation::containing(that);
+  return AllFrom(
+      compilation.impl->SourceIRPtr(compilation.id()),
+      that.id().Pack());
+}
+
+}  // namespace hl
+}  // namespace ir
+
 }  // namespace mx

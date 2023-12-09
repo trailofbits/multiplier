@@ -43,6 +43,9 @@ class MX_EXPORT OMPForDirective : public OMPLoopDirective {
   static gap::generator<OMPForDirective> in(const Fragment &frag);
   static gap::generator<OMPForDirective> in(const File &file);
 
+  static std::optional<OMPForDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPForDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_FOR_DIRECTIVE;
   }

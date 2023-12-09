@@ -40,6 +40,9 @@ class MX_EXPORT OMPArraySectionExpr : public Expr {
   static gap::generator<OMPArraySectionExpr> in(const Fragment &frag);
   static gap::generator<OMPArraySectionExpr> in(const File &file);
 
+  static std::optional<OMPArraySectionExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPArraySectionExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ARRAY_SECTION_EXPR;
   }

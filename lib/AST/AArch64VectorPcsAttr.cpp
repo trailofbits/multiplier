@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kAArch64VectorPcsAttrDerivedKinds[] = {
+    AArch64VectorPcsAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<AArch64VectorPcsAttr> AArch64VectorPcsAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AArch64VectorPcsAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<AArch64VectorPcsAttr> AArch64VectorPcsAttr::from(const std::option
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kAArch64VectorPcsAttrDerivedKinds[] = {
-    AArch64VectorPcsAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<AArch64VectorPcsAttr> AArch64VectorPcsAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

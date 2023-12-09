@@ -125,6 +125,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
+    "can_throw",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->can_throw());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::can_throw"),
+    nullptr,
+  },
+  {
     "desugar",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -405,7 +415,7 @@ static PyMethodDef gMethods[] = {
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = PythonBinding<mx::EntityId>::from_python(args[1]);
+            auto arg_1 = PythonBinding<EntityId>::from_python(args[1]);
             if (!arg_1.has_value()) {
               break;
             }

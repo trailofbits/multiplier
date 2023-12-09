@@ -36,6 +36,9 @@ class MX_EXPORT ExportDecl : public Decl {
   static gap::generator<ExportDecl> in(const Fragment &frag);
   static gap::generator<ExportDecl> in(const File &file);
 
+  static std::optional<ExportDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ExportDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::EXPORT;
   }

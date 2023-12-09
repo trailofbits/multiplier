@@ -23,6 +23,15 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const MacroKind kIncludeLikeMacroDirectiveDerivedKinds[] = {
+    IncludeMacroDirective::static_kind(),
+    IncludeNextMacroDirective::static_kind(),
+    IncludeMacrosMacroDirective::static_kind(),
+    ImportMacroDirective::static_kind(),
+};
+}  // namespace
+
 gap::generator<IncludeLikeMacroDirective> IncludeLikeMacroDirective::containing(const Macro &macro) {
   for (auto impl = macro.parent(); impl; impl = impl->parent()) {
     if (auto d = IncludeLikeMacroDirective::from(*impl)) {
@@ -73,16 +82,6 @@ std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from(const s
   }
   return std::nullopt;
 }
-
-namespace {
-static const MacroKind kIncludeLikeMacroDirectiveDerivedKinds[] = {
-    IncludeMacroDirective::static_kind(),
-    IncludeNextMacroDirective::static_kind(),
-    IncludeMacrosMacroDirective::static_kind(),
-    ImportMacroDirective::static_kind(),
-};
-
-}  // namespace
 
 std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from_base(const Macro &parent) {
   switch (parent.kind()) {

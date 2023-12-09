@@ -21,6 +21,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kVariableArrayTypeDerivedKinds[] = {
+    VariableArrayType::static_kind(),
+};
+}  // namespace
+
 gap::generator<VariableArrayType> VariableArrayType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = VariableArrayType::from(*ctx)) {
@@ -55,13 +61,6 @@ std::optional<VariableArrayType> VariableArrayType::from(const std::optional<Typ
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kVariableArrayTypeDerivedKinds[] = {
-    VariableArrayType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<VariableArrayType> VariableArrayType::from_base(const Type &parent) {
   switch (parent.kind()) {

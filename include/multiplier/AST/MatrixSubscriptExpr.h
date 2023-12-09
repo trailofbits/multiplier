@@ -40,6 +40,9 @@ class MX_EXPORT MatrixSubscriptExpr : public Expr {
   static gap::generator<MatrixSubscriptExpr> in(const Fragment &frag);
   static gap::generator<MatrixSubscriptExpr> in(const File &file);
 
+  static std::optional<MatrixSubscriptExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<MatrixSubscriptExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MATRIX_SUBSCRIPT_EXPR;
   }

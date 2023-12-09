@@ -18,6 +18,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const MacroKind kUndefineMacroDirectiveDerivedKinds[] = {
+    UndefineMacroDirective::static_kind(),
+};
+}  // namespace
+
 gap::generator<UndefineMacroDirective> UndefineMacroDirective::containing(const Macro &macro) {
   for (auto impl = macro.parent(); impl; impl = impl->parent()) {
     if (auto d = UndefineMacroDirective::from(*impl)) {
@@ -68,13 +74,6 @@ std::optional<UndefineMacroDirective> UndefineMacroDirective::from(const std::op
   }
   return std::nullopt;
 }
-
-namespace {
-static const MacroKind kUndefineMacroDirectiveDerivedKinds[] = {
-    UndefineMacroDirective::static_kind(),
-};
-
-}  // namespace
 
 std::optional<UndefineMacroDirective> UndefineMacroDirective::from_base(const Macro &parent) {
   switch (parent.kind()) {

@@ -40,6 +40,9 @@ class MX_EXPORT MSGuidDecl : public ValueDecl {
   static gap::generator<MSGuidDecl> in(const Fragment &frag);
   static gap::generator<MSGuidDecl> in(const File &file);
 
+  static std::optional<MSGuidDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<MSGuidDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::MS_GUID;
   }

@@ -40,6 +40,9 @@ class MX_EXPORT ChooseExpr : public Expr {
   static gap::generator<ChooseExpr> in(const Fragment &frag);
   static gap::generator<ChooseExpr> in(const File &file);
 
+  static std::optional<ChooseExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ChooseExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CHOOSE_EXPR;
   }

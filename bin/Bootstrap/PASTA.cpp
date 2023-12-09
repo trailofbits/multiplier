@@ -2153,6 +2153,33 @@ MethodListPtr CodeGenerator::RunOnClass(
     abort();
   }
 
+  std::vector<const ClassHierarchy *> wl;
+  wl.push_back(cls);
+
+  if (is_declaration || is_statement || is_attribute || is_type || is_macro) {
+    if (class_name != base_name) {
+      lib_cpp_os
+          << "namespace {\n"
+          << "static const " << base_name << "Kind k"
+          << class_name << "DerivedKinds[] = {\n";
+
+      for (auto i = 0u; i < wl.size(); ++i) {
+        const ClassHierarchy *c = wl[i];
+        std::string c_name = c->record.Name();
+        if (gConcreteClassNames.count(c_name)) {
+          derived_decls.insert(c_name);
+          lib_cpp_os << "    " << c_name << "::static_kind(),\n";
+        }
+        for (const ClassHierarchy *d : c->derived) {
+          wl.push_back(d);
+        }
+      }
+      lib_cpp_os
+          << "};\n"
+          << "}  // namespace\n\n";
+    }
+  }
+
   class_os
       << "class MX_EXPORT " << class_name;
 
@@ -2476,22 +2503,21 @@ MethodListPtr CodeGenerator::RunOnClass(
     abort();
   }
 
-  // TODO(pag): Probably remove `is_type` eventually.
-  if (is_declaration || is_statement || is_attribute || is_type || is_macro) {
+  if (is_declaration || is_statement || is_attribute || is_macro || is_type) {
     if (class_name == base_name) {
       forward_decls.insert("File");
       class_os
           << "  static gap::generator<"
-          << class_name << "> in(const Index &index, std::span<"
+          << class_name << "> in(const Index &index, std::span<const "
           << class_name << "Kind> kinds);\n";
 
       if (!is_type) {
         class_os
             << "  static gap::generator<"
-            << class_name << "> in(const Fragment &frag, std::span<"
+            << class_name << "> in(const Fragment &frag, std::span<const "
             << class_name << "Kind> kinds);\n"
             << "  static gap::generator<"
-            << class_name << "> in(const File &file, std::span<"
+            << class_name << "> in(const File &file, std::span<const "
             << class_name << "Kind> kinds);\n";
       }
     }
@@ -2544,6 +2570,50 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  static gap::generator<"
         << class_name << "> in(const Index &index);\n"
         << "  static std::optional<" << class_name << "> by_id(const Index &, EntityId);\n\n";
+  }
+
+  if (is_declaration || is_statement) {
+    class_os
+        << "#ifndef MX_DISABLE_VAST\n"
+        << "  static std::optional<" << class_name
+        << "> from(const ir::hl::Operation &op);\n"
+        << "  static gap::generator<std::pair<" << class_name
+        << ", ir::hl::Operation>> in(const Compilation &tu);\n";
+
+    // The base class methods are all manually implemented.
+    if (class_name == base_name) {
+      class_os
+          << "  static gap::generator<std::pair<" << class_name
+          << ", ir::hl::Operation>> in(const Compilation &tu, std::span<const "
+          << base_name << "Kind> kinds);\n"
+          << "#endif  // MX_DISABLE_VAST\n\n";
+    
+    } else {
+      class_os
+          << "#endif  // MX_DISABLE_VAST\n\n";
+
+      lib_cpp_os
+          << "#ifndef MX_DISABLE_VAST\n"
+          << "std::optional<" << class_name
+          << "> " << class_name << "::from(const ir::hl::Operation &op) {\n"
+          << "  if (auto val = " << base_name << "::from(op)) {\n"
+          << "    return from_base(val.value());\n"
+          << "  }\n"
+          << "  return std::nullopt;\n"
+          << "}\n\n"
+          << "gap::generator<std::pair<" << class_name << ", ir::hl::Operation>> "
+          << class_name << "::in(const Compilation &tu) {\n"
+          << "  for (std::pair<" << base_name << ", ir::hl::Operation> res : "
+          << base_name << "::in(tu, k" << class_name
+          << "DerivedKinds)) {\n"
+          << "    if (auto val = from_base(res.first)) {\n"
+          << "      co_yield std::pair<" << class_name << ", ir::hl::Operation>("
+          << "std::move(val.value()), std::move(res.second));\n"
+          << "    }\n"
+          << "  }\n"
+          << "}\n\n"
+          << "#endif  // MX_DISABLE_VAST\n\n";
+    }
   }
 
   if (is_declaration) {
@@ -2855,7 +2925,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  }\n"
           << "}\n\n"
           << "gap::generator<" << base_name << "> " << base_name
-          << "::in(const Index &index, std::span<" << base_name << "Kind> kinds) {\n"
+          << "::in(const Index &index, std::span<const " << base_name << "Kind> kinds) {\n"
           << "  const EntityProviderPtr ep = entity_provider_of(index);\n"
           << "  for (" << base_name << "Kind k : kinds) {\n"
           << "    for (" << base_name << "ImplPtr eptr : ep->"
@@ -2888,7 +2958,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  }\n"
             << "}\n\n"
             << "gap::generator<" << base_name << "> " << base_name
-            << "::in(const Fragment &frag, std::span<" << base_name << "Kind> kinds) {\n"
+            << "::in(const Fragment &frag, std::span<const " << base_name << "Kind> kinds) {\n"
             << "  const EntityProviderPtr ep = entity_provider_of(frag);\n"
             << "  PackedFragmentId frag_id = frag.id();\n"
             << "  for (" << base_name << "Kind k : kinds) {\n"
@@ -2899,7 +2969,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  }\n"
             << "}\n\n"
             << "gap::generator<" << base_name << "> " << base_name
-            << "::in(const File &file, std::span<" << base_name << "Kind> kinds) {\n"
+            << "::in(const File &file, std::span<const " << base_name << "Kind> kinds) {\n"
             << "  const EntityProviderPtr ep = entity_provider_of(file);\n"
             << "  PackedFileId file_id = file.id();\n"
             << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
@@ -2936,27 +3006,6 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  }\n"
           << "  return std::nullopt;\n"
           << "}\n\n"
-          << "namespace {\n"
-          << "static const " << base_name << "Kind k"
-          << class_name << "DerivedKinds[] = {\n";
-
-      std::vector<const ClassHierarchy *> wl;
-      wl.push_back(cls);
-
-      for (auto i = 0u; i < wl.size(); ++i) {
-        const ClassHierarchy *c = wl[i];
-        std::string c_name = c->record.Name();
-        if (gConcreteClassNames.count(c_name)) {
-          derived_decls.insert(c_name);
-          lib_cpp_os << "    " << c_name << "::static_kind(),\n";
-        }
-        for (const ClassHierarchy *d : c->derived) {
-          wl.push_back(d);
-        }
-      }
-      lib_cpp_os
-          << "};\n\n"
-          << "}  // namespace\n\n"
           << "std::optional<" << class_name << "> " << class_name
           << "::from_base(const " << base_name << " &parent) {\n"
           << "  switch (parent.kind()) {\n";
@@ -4080,6 +4129,10 @@ void CodeGenerator::RunOnClassHierarchies(void) {
           fs << "#include <multiplier/AST/" << derived_name << ".h>\n";
         }
       }
+    }
+
+    if (gDeclNames.count(name) || gStmtNames.count(name)) {
+      fs << "\n#include <multiplier/IR/HighLevel/Operation.h>\n"; 
     }
 
     if (!is_enum) {

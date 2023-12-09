@@ -44,6 +44,9 @@ class MX_EXPORT NonTypeTemplateParmDecl : public DeclaratorDecl {
   static gap::generator<NonTypeTemplateParmDecl> in(const Fragment &frag);
   static gap::generator<NonTypeTemplateParmDecl> in(const File &file);
 
+  static std::optional<NonTypeTemplateParmDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<NonTypeTemplateParmDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::NON_TYPE_TEMPLATE_PARM;
   }

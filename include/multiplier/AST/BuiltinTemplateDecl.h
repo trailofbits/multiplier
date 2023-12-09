@@ -40,6 +40,9 @@ class MX_EXPORT BuiltinTemplateDecl : public TemplateDecl {
   static gap::generator<BuiltinTemplateDecl> in(const Fragment &frag);
   static gap::generator<BuiltinTemplateDecl> in(const File &file);
 
+  static std::optional<BuiltinTemplateDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<BuiltinTemplateDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BUILTIN_TEMPLATE;
   }

@@ -20,12 +20,10 @@
 
 namespace mx::ir::builtin {
 std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
-  switch (that.kind()) {
-    default: return std::nullopt;
-    case mx::ir::OperationKind::BUILTIN_MODULE:
-    case mx::ir::OperationKind::BUILTIN_UNREALIZED_CONVERSION_CAST:
-      return reinterpret_cast<const Operation &>(that);
+  if (IsBuiltinOperationKind(that.kind())) {
+    return reinterpret_cast<const Operation &>(that);
   }
+  return std::nullopt;
 }
 
 std::optional<ModuleOp> ModuleOp::from(const ::mx::ir::Operation &that) {

@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1353]) || tp >= &(gTypes[1360])) {
+  if (tp < &(gTypes[1354]) || tp >= &(gTypes[1361])) {
     return std::nullopt;
   }
 
@@ -90,27 +90,27 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::core::BinLAndOp::static_kind():
-      tp = &(gTypes[1354]);
-      break;
-
-    case mx::ir::core::BinLOrOp::static_kind():
       tp = &(gTypes[1355]);
       break;
 
-    case mx::ir::core::ImplicitReturnOp::static_kind():
+    case mx::ir::core::BinLOrOp::static_kind():
       tp = &(gTypes[1356]);
       break;
 
-    case mx::ir::core::LazyOp::static_kind():
+    case mx::ir::core::ImplicitReturnOp::static_kind():
       tp = &(gTypes[1357]);
       break;
 
-    case mx::ir::core::ScopeOp::static_kind():
+    case mx::ir::core::LazyOp::static_kind():
       tp = &(gTypes[1358]);
       break;
 
-    case mx::ir::core::SelectOp::static_kind():
+    case mx::ir::core::ScopeOp::static_kind():
       tp = &(gTypes[1359]);
+      break;
+
+    case mx::ir::core::SelectOp::static_kind():
+      tp = &(gTypes[1360]);
       break;
 
   }
@@ -179,7 +179,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1353]);
+  PyTypeObject * const tp = &(gTypes[1354]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

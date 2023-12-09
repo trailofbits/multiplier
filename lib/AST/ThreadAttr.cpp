@@ -18,6 +18,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kThreadAttrDerivedKinds[] = {
+    ThreadAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<ThreadAttr> ThreadAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ThreadAttr::from(*ctx)) {
@@ -52,13 +58,6 @@ std::optional<ThreadAttr> ThreadAttr::from(const std::optional<Attr> &parent) {
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kThreadAttrDerivedKinds[] = {
-    ThreadAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ThreadAttr> ThreadAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

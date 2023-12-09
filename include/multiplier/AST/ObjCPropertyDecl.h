@@ -44,6 +44,9 @@ class MX_EXPORT ObjCPropertyDecl : public NamedDecl {
   static gap::generator<ObjCPropertyDecl> in(const Fragment &frag);
   static gap::generator<ObjCPropertyDecl> in(const File &file);
 
+  static std::optional<ObjCPropertyDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ObjCPropertyDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROPERTY;
   }

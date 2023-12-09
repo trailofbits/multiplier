@@ -80,4 +80,136 @@ const char *EnumeratorName(ir::TypeKind kind) {
   }
 }
 
+bool IsBuiltinTypeKind(ir::TypeKind kind) {
+  switch (kind) {
+    default:
+      return false;
+    case mx::ir::TypeKind::BUILTIN_SHAPED:
+    case mx::ir::TypeKind::BUILTIN_FLOAT:
+    case mx::ir::TypeKind::BUILTIN_B_FLOAT16:
+    case mx::ir::TypeKind::BUILTIN_COMPLEX:
+    case mx::ir::TypeKind::BUILTIN_FLOAT8_E4_M3_B11_FNUZ:
+    case mx::ir::TypeKind::BUILTIN_FLOAT8_E4_M3_FN:
+    case mx::ir::TypeKind::BUILTIN_FLOAT8_E4_M3_FNUZ:
+    case mx::ir::TypeKind::BUILTIN_FLOAT8_E5_M2:
+    case mx::ir::TypeKind::BUILTIN_FLOAT8_E5_M2_FNUZ:
+    case mx::ir::TypeKind::BUILTIN_FLOAT16:
+    case mx::ir::TypeKind::BUILTIN_FLOAT32:
+    case mx::ir::TypeKind::BUILTIN_FLOAT64:
+    case mx::ir::TypeKind::BUILTIN_FLOAT80:
+    case mx::ir::TypeKind::BUILTIN_FLOAT128:
+    case mx::ir::TypeKind::BUILTIN_FLOAT_TF32:
+    case mx::ir::TypeKind::BUILTIN_FUNCTION:
+    case mx::ir::TypeKind::BUILTIN_INDEX:
+    case mx::ir::TypeKind::BUILTIN_INTEGER:
+    case mx::ir::TypeKind::BUILTIN_MEM_REF:
+    case mx::ir::TypeKind::BUILTIN_NONE:
+    case mx::ir::TypeKind::BUILTIN_OPAQUE:
+    case mx::ir::TypeKind::BUILTIN_RANKED_TENSOR:
+    case mx::ir::TypeKind::BUILTIN_TUPLE:
+    case mx::ir::TypeKind::BUILTIN_UNRANKED_MEM_REF:
+    case mx::ir::TypeKind::BUILTIN_UNRANKED_TENSOR:
+    case mx::ir::TypeKind::BUILTIN_VECTOR:
+      return true;
+  }
+}
+
+bool IsLLVMIRTypeKind(ir::TypeKind kind) {
+  switch (kind) {
+    default:
+      return false;
+    case mx::ir::TypeKind::LLVM_ARRAY:
+    case mx::ir::TypeKind::LLVM_FIXED_VECTOR:
+    case mx::ir::TypeKind::LLVM_FUNCTION:
+    case mx::ir::TypeKind::LLVM_POINTER:
+    case mx::ir::TypeKind::LLVM_SCALABLE_VECTOR:
+    case mx::ir::TypeKind::LLVM_TARGET_EXT:
+      return true;
+  }
+}
+
+bool IsMemRefTypeKind(ir::TypeKind kind) {
+  switch (kind) {
+    default:
+      return false;
+  }
+}
+
+bool IsABITypeKind(ir::TypeKind kind) {
+  switch (kind) {
+    default:
+      return false;
+  }
+}
+
+bool IsLowLevelTypeKind(ir::TypeKind kind) {
+  switch (kind) {
+    default:
+      return false;
+  }
+}
+
+bool IsHighLevelTypeKind(ir::TypeKind kind) {
+  switch (kind) {
+    default:
+      return false;
+    case mx::ir::TypeKind::HL_ADJUSTED:
+    case mx::ir::TypeKind::HL_ARRAY:
+    case mx::ir::TypeKind::HL_ATTRIBUTED:
+    case mx::ir::TypeKind::HL_B_FLOAT16:
+    case mx::ir::TypeKind::HL_BOOL:
+    case mx::ir::TypeKind::HL_CHAR:
+    case mx::ir::TypeKind::HL_DECAYED:
+    case mx::ir::TypeKind::HL_DOUBLE:
+    case mx::ir::TypeKind::HL_ELABORATED:
+    case mx::ir::TypeKind::HL_ENUM:
+    case mx::ir::TypeKind::HL_FLOAT128:
+    case mx::ir::TypeKind::HL_FLOAT:
+    case mx::ir::TypeKind::HL_HALF:
+    case mx::ir::TypeKind::HL_INT128:
+    case mx::ir::TypeKind::HL_INT:
+    case mx::ir::TypeKind::HL_L_VALUE:
+    case mx::ir::TypeKind::HL_LABEL:
+    case mx::ir::TypeKind::HL_LONG_DOUBLE:
+    case mx::ir::TypeKind::HL_LONG_LONG:
+    case mx::ir::TypeKind::HL_LONG:
+    case mx::ir::TypeKind::HL_PAREN:
+    case mx::ir::TypeKind::HL_POINTER:
+    case mx::ir::TypeKind::HL_R_VALUE:
+    case mx::ir::TypeKind::HL_RECORD:
+    case mx::ir::TypeKind::HL_REFERENCE:
+    case mx::ir::TypeKind::HL_SHORT:
+    case mx::ir::TypeKind::HL_TYPE_OF_EXPR:
+    case mx::ir::TypeKind::HL_TYPE_OF_TYPE:
+    case mx::ir::TypeKind::HL_TYPEDEF:
+    case mx::ir::TypeKind::HL_VOID:
+      return true;
+  }
+}
+
+bool IsCoreTypeKind(ir::TypeKind kind) {
+  switch (kind) {
+    default:
+      return false;
+    case mx::ir::TypeKind::CORE_FUNCTION:
+      return true;
+  }
+}
+
+bool IsMetaTypeKind(ir::TypeKind kind) {
+  switch (kind) {
+    default:
+      return false;
+  }
+}
+
+bool IsUnsupportedTypeKind(ir::TypeKind kind) {
+  switch (kind) {
+    default:
+      return false;
+    case mx::ir::TypeKind::UNSUP_UNSUPPORTED:
+      return true;
+  }
+}
+
 }  // namespace mx

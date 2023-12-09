@@ -42,6 +42,9 @@ class MX_EXPORT UsingEnumDecl : public BaseUsingDecl {
   static gap::generator<UsingEnumDecl> in(const Fragment &frag);
   static gap::generator<UsingEnumDecl> in(const File &file);
 
+  static std::optional<UsingEnumDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<UsingEnumDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_ENUM;
   }

@@ -18,6 +18,8 @@
 #include <multiplier/AST/TypeAliasDecl.h>
 #include <multiplier/AST/TypedefDecl.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -25,6 +27,14 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const DeclKind kTypedefNameDeclDerivedKinds[] = {
+    ObjCTypeParamDecl::static_kind(),
+    TypeAliasDecl::static_kind(),
+    TypedefDecl::static_kind(),
+};
+}  // namespace
 
 gap::generator<TypedefNameDecl> TypedefNameDecl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -40,6 +50,21 @@ bool TypedefNameDecl::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<TypedefNameDecl> TypedefNameDecl::from(const ir::hl::Operation &op) {
+  if (auto val = Decl::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<TypedefNameDecl, ir::hl::Operation>> TypedefNameDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kTypedefNameDeclDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<TypedefNameDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<TypedefNameDecl> TypedefNameDecl::containing(const Decl &decl) {
@@ -137,15 +162,6 @@ std::optional<TypedefNameDecl> TypedefNameDecl::from(const std::optional<Decl> &
   }
   return std::nullopt;
 }
-
-namespace {
-static const DeclKind kTypedefNameDeclDerivedKinds[] = {
-    ObjCTypeParamDecl::static_kind(),
-    TypeAliasDecl::static_kind(),
-    TypedefDecl::static_kind(),
-};
-
-}  // namespace
 
 std::optional<TypedefNameDecl> TypedefNameDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {

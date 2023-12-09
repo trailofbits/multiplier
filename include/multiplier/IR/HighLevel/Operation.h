@@ -20,6 +20,7 @@ class AddrLabelExpr;
 class AddressOf;
 class AlignOfExprOp;
 class AlignOfTypeOp;
+class AsmOp;
 class AssignOp;
 class BinAShrAssignOp;
 class BinAShrOp;
@@ -128,6 +129,14 @@ namespace mx::ir::hl {
 class MX_EXPORT Operation : public ::mx::ir::Operation {
  public:
   static std::optional<Operation> from(const ::mx::ir::Operation &);
+
+  static std::optional<Operation> first_from(const ::mx::Decl &that);
+  static std::optional<Operation> first_from(const ::mx::Decl &that, OperationKind);
+  static gap::generator<Operation> all_from(const ::mx::Decl &that);
+
+  static std::optional<Operation> first_from(const ::mx::Stmt &that);
+  static std::optional<Operation> first_from(const ::mx::Stmt &that, OperationKind);
+  static gap::generator<Operation> all_from(const ::mx::Stmt &that);
 };
 static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));
 
@@ -286,6 +295,32 @@ class MX_EXPORT AlignOfTypeOp final : public Operation {
   //::mlir::Type arg(void) const;
 };
 static_assert(sizeof(AlignOfTypeOp) == sizeof(Operation));
+
+class MX_EXPORT AsmOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::HL_ASM;
+  }
+
+  static std::optional<AsmOp> from(const ::mx::ir::Operation &that);
+  static std::optional<AsmOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::hl::AsmOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  gap::generator<::mx::ir::Operand> asm_outputs(void) const;
+  gap::generator<::mx::ir::Operand> asm_inputs(void) const;
+  gap::generator<::mx::ir::Operand> labels(void) const;
+  //::mlir::Attribute asm_template(void) const;
+  bool is_volatile(void) const;
+  bool has_goto(void) const;
+  //::std::optional<::mlir::ArrayAttr> output_names(void) const;
+  //::std::optional<::mlir::ArrayAttr> input_names(void) const;
+  //::std::optional<::mlir::ArrayAttr> output_constraints(void) const;
+  //::std::optional<::mlir::ArrayAttr> input_constraints(void) const;
+  //::std::optional<::mlir::ArrayAttr> clobbers(void) const;
+};
+static_assert(sizeof(AsmOp) == sizeof(Operation));
 
 class MX_EXPORT AssignOp final : public Operation {
  public:

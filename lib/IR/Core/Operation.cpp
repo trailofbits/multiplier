@@ -21,16 +21,10 @@
 
 namespace mx::ir::core {
 std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
-  switch (that.kind()) {
-    default: return std::nullopt;
-    case mx::ir::OperationKind::CORE_BIN_LAND:
-    case mx::ir::OperationKind::CORE_BIN_LOR:
-    case mx::ir::OperationKind::CORE_IMPLICIT_RETURN:
-    case mx::ir::OperationKind::CORE_LAZY_OP:
-    case mx::ir::OperationKind::CORE_SCOPE:
-    case mx::ir::OperationKind::CORE_SELECT:
-      return reinterpret_cast<const Operation &>(that);
+  if (IsCoreOperationKind(that.kind())) {
+    return reinterpret_cast<const Operation &>(that);
   }
+  return std::nullopt;
 }
 
 std::optional<BinLAndOp> BinLAndOp::from(const ::mx::ir::Operation &that) {

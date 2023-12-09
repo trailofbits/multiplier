@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kAnyX86NoCfCheckAttrDerivedKinds[] = {
+    AnyX86NoCfCheckAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<AnyX86NoCfCheckAttr> AnyX86NoCfCheckAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AnyX86NoCfCheckAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<AnyX86NoCfCheckAttr> AnyX86NoCfCheckAttr::from(const std::optional
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kAnyX86NoCfCheckAttrDerivedKinds[] = {
-    AnyX86NoCfCheckAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<AnyX86NoCfCheckAttr> AnyX86NoCfCheckAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

@@ -18,6 +18,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kComplexTypeDerivedKinds[] = {
+    ComplexType::static_kind(),
+};
+}  // namespace
+
 gap::generator<ComplexType> ComplexType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ComplexType::from(*ctx)) {
@@ -52,13 +58,6 @@ std::optional<ComplexType> ComplexType::from(const std::optional<Type> &parent) 
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kComplexTypeDerivedKinds[] = {
-    ComplexType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ComplexType> ComplexType::from_base(const Type &parent) {
   switch (parent.kind()) {

@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kPtr64AttrDerivedKinds[] = {
+    Ptr64Attr::static_kind(),
+};
+}  // namespace
+
 gap::generator<Ptr64Attr> Ptr64Attr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = Ptr64Attr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<Ptr64Attr> Ptr64Attr::from(const std::optional<Attr> &parent) {
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kPtr64AttrDerivedKinds[] = {
-    Ptr64Attr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<Ptr64Attr> Ptr64Attr::from_base(const Attr &parent) {
   switch (parent.kind()) {

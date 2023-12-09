@@ -6,6 +6,10 @@
 
 #pragma once
 
+#ifdef MX_DISABLE_VAST
+# error "VAST is disabled; this shouldn't be compiled."
+#endif
+
 #include <memory>
 #include <string>
 
@@ -29,8 +33,10 @@ enum class DeclKind : unsigned char;
 enum class StmtKind : unsigned char;
 enum class TypeKind : unsigned char;
 
+class Decl;
 class Fragment;
 class FragmentImpl;
+class Stmt;
 
 namespace ir {
 
@@ -39,51 +45,44 @@ enum class OperationKind : unsigned;
 enum class TypeKind : unsigned;
 
 class SourceIRImpl {
- private:
-  friend class Fragment;
-  friend class FragmentImpl;
+ public:
+  friend class ::mx::Decl;
+  friend class ::mx::Fragment;
+  friend class ::mx::FragmentImpl;
+  friend class ::mx::Stmt;
 
   const PackedCompilationId compilation_id;
   const EntityProviderPtr ep;
 
   mlir::OwningOpRef<mlir::ModuleOp> mod;
 
+  using IdOpPair = std::pair<mx::RawEntityId, mlir::Operation *>;
+  using IdOpPairList = std::vector<IdOpPair>;
+
+  template <typename T>
+  using IdOpPairListMap = std::unordered_map<T, IdOpPairList>;
+
+  // All operations.
   std::unordered_map<ir::OperationKind, std::vector<mlir::Operation *>>
       operations;
 
-  std::unordered_map<::mx::DeclKind, std::vector<mlir::Operation *>>
-      declarations;
+  // Operations that belong to the high-level dialect, and have a corresponding
+  // entity ID.
+  IdOpPairListMap<::mx::DeclKind> declarations;
+  IdOpPairListMap<::mx::StmtKind> statements;
 
-  std::unordered_map<::mx::StmtKind, std::vector<mlir::Operation *>>
-      statements;
-
-  std::unordered_map<::mx::TypeKind, std::vector<mlir::Operation *>>
-      types;
-
-  std::unordered_map<RawEntityId, std::vector<mlir::Operation *>>
+  // High-level operations that have an entity id.
+  std::unordered_map<
+      mx::RawEntityId,
+      std::vector<std::pair<OperationKind, mlir::Operation *>>>
       entities;
 
- public:
   virtual ~SourceIRImpl(void);
 
   explicit SourceIRImpl(PackedCompilationId compilation_id_, EntityProviderPtr ep_,
                         std::string_view mlir);
 
   mlir::Operation *scope(void) const;
-
-//  VariantEntity EntityFor(EntityId id) const;
-//
-//#define MX_DECLARE_ENTITY_FUNCTION(type_name, lower_name, e, v) \
-//	const OperationRange::OpVec *For##type_name(const type_name &lower_name) const; \
-//
-//  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
-//                              MX_IGNORE_ENTITY_CATEGORY,
-//                              MX_DECLARE_ENTITY_FUNCTION,
-//                              MX_IGNORE_ENTITY_CATEGORY,
-//                              MX_DECLARE_ENTITY_FUNCTION,
-//                              MX_DECLARE_ENTITY_FUNCTION)
-//#undef MX_DECLARE_ENTITY_FUNCTION
-
 };
 
 }  // namespace ir

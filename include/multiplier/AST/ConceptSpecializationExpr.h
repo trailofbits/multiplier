@@ -42,6 +42,9 @@ class MX_EXPORT ConceptSpecializationExpr : public Expr {
   static gap::generator<ConceptSpecializationExpr> in(const Fragment &frag);
   static gap::generator<ConceptSpecializationExpr> in(const File &file);
 
+  static std::optional<ConceptSpecializationExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ConceptSpecializationExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONCEPT_SPECIALIZATION_EXPR;
   }

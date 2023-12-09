@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kBPFPreserveAccessIndexAttrDerivedKinds[] = {
+    BPFPreserveAccessIndexAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<BPFPreserveAccessIndexAttr> BPFPreserveAccessIndexAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = BPFPreserveAccessIndexAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<BPFPreserveAccessIndexAttr> BPFPreserveAccessIndexAttr::from(const
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kBPFPreserveAccessIndexAttrDerivedKinds[] = {
-    BPFPreserveAccessIndexAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<BPFPreserveAccessIndexAttr> BPFPreserveAccessIndexAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

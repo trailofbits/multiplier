@@ -43,6 +43,9 @@ class MX_EXPORT OMPTeamsDistributeParallelForDirective : public OMPLoopDirective
   static gap::generator<OMPTeamsDistributeParallelForDirective> in(const Fragment &frag);
   static gap::generator<OMPTeamsDistributeParallelForDirective> in(const File &file);
 
+  static std::optional<OMPTeamsDistributeParallelForDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPTeamsDistributeParallelForDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
   }

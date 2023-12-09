@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kInjectedClassNameTypeDerivedKinds[] = {
+    InjectedClassNameType::static_kind(),
+};
+}  // namespace
+
 gap::generator<InjectedClassNameType> InjectedClassNameType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = InjectedClassNameType::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<InjectedClassNameType> InjectedClassNameType::from(const std::opti
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kInjectedClassNameTypeDerivedKinds[] = {
-    InjectedClassNameType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<InjectedClassNameType> InjectedClassNameType::from_base(const Type &parent) {
   switch (parent.kind()) {

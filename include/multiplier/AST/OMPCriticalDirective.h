@@ -38,6 +38,9 @@ class MX_EXPORT OMPCriticalDirective : public OMPExecutableDirective {
   static gap::generator<OMPCriticalDirective> in(const Fragment &frag);
   static gap::generator<OMPCriticalDirective> in(const File &file);
 
+  static std::optional<OMPCriticalDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPCriticalDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_CRITICAL_DIRECTIVE;
   }

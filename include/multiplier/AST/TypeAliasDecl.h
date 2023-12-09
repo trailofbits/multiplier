@@ -43,6 +43,9 @@ class MX_EXPORT TypeAliasDecl : public TypedefNameDecl {
   static gap::generator<TypeAliasDecl> in(const Fragment &frag);
   static gap::generator<TypeAliasDecl> in(const File &file);
 
+  static std::optional<TypeAliasDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<TypeAliasDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TYPE_ALIAS;
   }

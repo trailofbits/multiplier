@@ -15,40 +15,10 @@
 
 namespace mx::ir::hl {
 std::optional<Type> Type::from(const ::mx::ir::Type &that) {
-  switch (that.kind()) {
-    default: return std::nullopt;
-    case mx::ir::TypeKind::HL_ADJUSTED:
-    case mx::ir::TypeKind::HL_ARRAY:
-    case mx::ir::TypeKind::HL_ATTRIBUTED:
-    case mx::ir::TypeKind::HL_B_FLOAT16:
-    case mx::ir::TypeKind::HL_BOOL:
-    case mx::ir::TypeKind::HL_CHAR:
-    case mx::ir::TypeKind::HL_DECAYED:
-    case mx::ir::TypeKind::HL_DOUBLE:
-    case mx::ir::TypeKind::HL_ELABORATED:
-    case mx::ir::TypeKind::HL_ENUM:
-    case mx::ir::TypeKind::HL_FLOAT128:
-    case mx::ir::TypeKind::HL_FLOAT:
-    case mx::ir::TypeKind::HL_HALF:
-    case mx::ir::TypeKind::HL_INT128:
-    case mx::ir::TypeKind::HL_INT:
-    case mx::ir::TypeKind::HL_L_VALUE:
-    case mx::ir::TypeKind::HL_LABEL:
-    case mx::ir::TypeKind::HL_LONG_DOUBLE:
-    case mx::ir::TypeKind::HL_LONG_LONG:
-    case mx::ir::TypeKind::HL_LONG:
-    case mx::ir::TypeKind::HL_PAREN:
-    case mx::ir::TypeKind::HL_POINTER:
-    case mx::ir::TypeKind::HL_R_VALUE:
-    case mx::ir::TypeKind::HL_RECORD:
-    case mx::ir::TypeKind::HL_REFERENCE:
-    case mx::ir::TypeKind::HL_SHORT:
-    case mx::ir::TypeKind::HL_TYPE_OF_EXPR:
-    case mx::ir::TypeKind::HL_TYPE_OF_TYPE:
-    case mx::ir::TypeKind::HL_TYPEDEF:
-    case mx::ir::TypeKind::HL_VOID:
-      return reinterpret_cast<const Type &>(that);
+  if (IsHighLevelTypeKind(that.kind())) {
+    return reinterpret_cast<const Type &>(that);
   }
+  return std::nullopt;
 }
 
 std::optional<AdjustedType> AdjustedType::from(const ::mx::ir::Type &that) {

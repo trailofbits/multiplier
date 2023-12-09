@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kAllocSizeAttrDerivedKinds[] = {
+    AllocSizeAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<AllocSizeAttr> AllocSizeAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AllocSizeAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<AllocSizeAttr> AllocSizeAttr::from(const std::optional<Attr> &pare
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kAllocSizeAttrDerivedKinds[] = {
-    AllocSizeAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<AllocSizeAttr> AllocSizeAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kOpenCLIntelReqdSubGroupSizeAttrDerivedKinds[] = {
+    OpenCLIntelReqdSubGroupSizeAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<OpenCLIntelReqdSubGroupSizeAttr> OpenCLIntelReqdSubGroupSizeAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = OpenCLIntelReqdSubGroupSizeAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<OpenCLIntelReqdSubGroupSizeAttr> OpenCLIntelReqdSubGroupSizeAttr::
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kOpenCLIntelReqdSubGroupSizeAttrDerivedKinds[] = {
-    OpenCLIntelReqdSubGroupSizeAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<OpenCLIntelReqdSubGroupSizeAttr> OpenCLIntelReqdSubGroupSizeAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

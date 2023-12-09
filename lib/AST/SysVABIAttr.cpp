@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kSysVABIAttrDerivedKinds[] = {
+    SysVABIAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<SysVABIAttr> SysVABIAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = SysVABIAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<SysVABIAttr> SysVABIAttr::from(const std::optional<Attr> &parent) 
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kSysVABIAttrDerivedKinds[] = {
-    SysVABIAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<SysVABIAttr> SysVABIAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

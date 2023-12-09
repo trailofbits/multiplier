@@ -37,6 +37,9 @@ class MX_EXPORT StaticAssertDecl : public Decl {
   static gap::generator<StaticAssertDecl> in(const Fragment &frag);
   static gap::generator<StaticAssertDecl> in(const File &file);
 
+  static std::optional<StaticAssertDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<StaticAssertDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::STATIC_ASSERT;
   }

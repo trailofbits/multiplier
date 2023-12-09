@@ -39,6 +39,9 @@ class MX_EXPORT CaseStmt : public SwitchCase {
   static gap::generator<CaseStmt> in(const Fragment &frag);
   static gap::generator<CaseStmt> in(const File &file);
 
+  static std::optional<CaseStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<CaseStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CASE_STMT;
   }

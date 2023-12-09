@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kOpenCLKernelAttrDerivedKinds[] = {
+    OpenCLKernelAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<OpenCLKernelAttr> OpenCLKernelAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = OpenCLKernelAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<OpenCLKernelAttr> OpenCLKernelAttr::from(const std::optional<Attr>
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kOpenCLKernelAttrDerivedKinds[] = {
-    OpenCLKernelAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<OpenCLKernelAttr> OpenCLKernelAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kNoSpeculativeLoadHardeningAttrDerivedKinds[] = {
+    NoSpeculativeLoadHardeningAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<NoSpeculativeLoadHardeningAttr> NoSpeculativeLoadHardeningAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = NoSpeculativeLoadHardeningAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<NoSpeculativeLoadHardeningAttr> NoSpeculativeLoadHardeningAttr::fr
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kNoSpeculativeLoadHardeningAttrDerivedKinds[] = {
-    NoSpeculativeLoadHardeningAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<NoSpeculativeLoadHardeningAttr> NoSpeculativeLoadHardeningAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

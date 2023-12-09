@@ -14,6 +14,8 @@
 #include <multiplier/AST/OMPRequiresDecl.h>
 #include <multiplier/AST/OMPThreadPrivateDecl.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -21,6 +23,14 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const DeclKind kOMPDeclarativeDirectiveDeclDerivedKinds[] = {
+    OMPAllocateDecl::static_kind(),
+    OMPRequiresDecl::static_kind(),
+    OMPThreadPrivateDecl::static_kind(),
+};
+}  // namespace
 
 gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -36,6 +46,21 @@ bool OMPDeclarativeDirectiveDecl::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from(const ir::hl::Operation &op) {
+  if (auto val = Decl::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<OMPDeclarativeDirectiveDecl, ir::hl::Operation>> OMPDeclarativeDirectiveDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kOMPDeclarativeDirectiveDeclDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<OMPDeclarativeDirectiveDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::containing(const Decl &decl) {
@@ -133,15 +158,6 @@ std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from(con
   }
   return std::nullopt;
 }
-
-namespace {
-static const DeclKind kOMPDeclarativeDirectiveDeclDerivedKinds[] = {
-    OMPAllocateDecl::static_kind(),
-    OMPRequiresDecl::static_kind(),
-    OMPThreadPrivateDecl::static_kind(),
-};
-
-}  // namespace
 
 std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {

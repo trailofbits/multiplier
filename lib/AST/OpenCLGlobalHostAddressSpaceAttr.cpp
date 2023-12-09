@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kOpenCLGlobalHostAddressSpaceAttrDerivedKinds[] = {
+    OpenCLGlobalHostAddressSpaceAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<OpenCLGlobalHostAddressSpaceAttr> OpenCLGlobalHostAddressSpaceAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = OpenCLGlobalHostAddressSpaceAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<OpenCLGlobalHostAddressSpaceAttr> OpenCLGlobalHostAddressSpaceAttr
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kOpenCLGlobalHostAddressSpaceAttrDerivedKinds[] = {
-    OpenCLGlobalHostAddressSpaceAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<OpenCLGlobalHostAddressSpaceAttr> OpenCLGlobalHostAddressSpaceAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

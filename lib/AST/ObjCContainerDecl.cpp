@@ -19,6 +19,8 @@
 #include <multiplier/AST/ObjCInterfaceDecl.h>
 #include <multiplier/AST/ObjCProtocolDecl.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Decl.h"
@@ -27,6 +29,16 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const DeclKind kObjCContainerDeclDerivedKinds[] = {
+    ObjCInterfaceDecl::static_kind(),
+    ObjCProtocolDecl::static_kind(),
+    ObjCCategoryDecl::static_kind(),
+    ObjCImplementationDecl::static_kind(),
+    ObjCCategoryImplDecl::static_kind(),
+};
+}  // namespace
 
 gap::generator<ObjCContainerDecl> ObjCContainerDecl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -42,6 +54,21 @@ bool ObjCContainerDecl::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const ir::hl::Operation &op) {
+  if (auto val = Decl::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<ObjCContainerDecl, ir::hl::Operation>> ObjCContainerDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kObjCContainerDeclDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<ObjCContainerDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<ObjCContainerDecl> ObjCContainerDecl::containing(const Decl &decl) {
@@ -139,17 +166,6 @@ std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const std::optional<Dec
   }
   return std::nullopt;
 }
-
-namespace {
-static const DeclKind kObjCContainerDeclDerivedKinds[] = {
-    ObjCInterfaceDecl::static_kind(),
-    ObjCProtocolDecl::static_kind(),
-    ObjCCategoryDecl::static_kind(),
-    ObjCImplementationDecl::static_kind(),
-    ObjCCategoryImplDecl::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ObjCContainerDecl> ObjCContainerDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {

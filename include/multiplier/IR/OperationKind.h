@@ -328,6 +328,7 @@ enum class OperationKind : unsigned {
   HL_ADDRESSOF,  // hl.addressof
   HL_ALIGNOF_EXPR,  // hl.alignof.expr
   HL_ALIGNOF_TYPE,  // hl.alignof.type
+  HL_ASM,  // hl.asm
   HL_ASSIGN,  // hl.assign
   HL_ASSIGN_BIN_ASHR,  // hl.assign.bin.ashr
   HL_BIN_ASHR,  // hl.bin.ashr
@@ -447,9 +448,27 @@ inline static const char *EnumerationName(ir::OperationKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::OperationKind) {
-  return 423;
+  return 424;
 }
 
 MX_EXPORT const char *EnumeratorName(ir::OperationKind);
+
+MX_EXPORT bool IsBuiltinOperationKind(ir::OperationKind);
+
+MX_EXPORT bool IsLLVMIROperationKind(ir::OperationKind);
+
+MX_EXPORT bool IsMemRefOperationKind(ir::OperationKind);
+
+MX_EXPORT bool IsABIOperationKind(ir::OperationKind);
+
+MX_EXPORT bool IsLowLevelOperationKind(ir::OperationKind);
+
+MX_EXPORT bool IsHighLevelOperationKind(ir::OperationKind);
+
+MX_EXPORT bool IsCoreOperationKind(ir::OperationKind);
+
+MX_EXPORT bool IsMetaOperationKind(ir::OperationKind);
+
+MX_EXPORT bool IsUnsupportedOperationKind(ir::OperationKind);
 
 }  // namespace mx

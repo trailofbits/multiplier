@@ -41,6 +41,9 @@ class MX_EXPORT ConstructorUsingShadowDecl : public UsingShadowDecl {
   static gap::generator<ConstructorUsingShadowDecl> in(const Fragment &frag);
   static gap::generator<ConstructorUsingShadowDecl> in(const File &file);
 
+  static std::optional<ConstructorUsingShadowDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ConstructorUsingShadowDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CONSTRUCTOR_USING_SHADOW;
   }

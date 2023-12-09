@@ -41,6 +41,9 @@ class MX_EXPORT FunctionParmPackExpr : public Expr {
   static gap::generator<FunctionParmPackExpr> in(const Fragment &frag);
   static gap::generator<FunctionParmPackExpr> in(const File &file);
 
+  static std::optional<FunctionParmPackExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<FunctionParmPackExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FUNCTION_PARM_PACK_EXPR;
   }

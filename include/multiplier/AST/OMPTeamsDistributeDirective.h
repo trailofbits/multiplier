@@ -42,6 +42,9 @@ class MX_EXPORT OMPTeamsDistributeDirective : public OMPLoopDirective {
   static gap::generator<OMPTeamsDistributeDirective> in(const Fragment &frag);
   static gap::generator<OMPTeamsDistributeDirective> in(const File &file);
 
+  static std::optional<OMPTeamsDistributeDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPTeamsDistributeDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TEAMS_DISTRIBUTE_DIRECTIVE;
   }

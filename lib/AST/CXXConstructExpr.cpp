@@ -15,6 +15,8 @@
 #include <multiplier/AST/ValueStmt.h>
 #include <multiplier/AST/CXXTemporaryObjectExpr.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Stmt.h"
@@ -23,6 +25,13 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kCXXConstructExprDerivedKinds[] = {
+    CXXConstructExpr::static_kind(),
+    CXXTemporaryObjectExpr::static_kind(),
+};
+}  // namespace
 
 gap::generator<CXXConstructExpr> CXXConstructExpr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -38,6 +47,21 @@ bool CXXConstructExpr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CXXConstructExpr> CXXConstructExpr::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<CXXConstructExpr, ir::hl::Operation>> CXXConstructExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCXXConstructExprDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<CXXConstructExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<CXXConstructExpr> CXXConstructExpr::containing(const Decl &decl) {
@@ -106,14 +130,6 @@ std::optional<CXXConstructExpr> CXXConstructExpr::from(const std::optional<Stmt>
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kCXXConstructExprDerivedKinds[] = {
-    CXXConstructExpr::static_kind(),
-    CXXTemporaryObjectExpr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<CXXConstructExpr> CXXConstructExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {

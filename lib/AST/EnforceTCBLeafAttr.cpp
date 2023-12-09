@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kEnforceTCBLeafAttrDerivedKinds[] = {
+    EnforceTCBLeafAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<EnforceTCBLeafAttr> EnforceTCBLeafAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = EnforceTCBLeafAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::from(const std::optional<A
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kEnforceTCBLeafAttrDerivedKinds[] = {
-    EnforceTCBLeafAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

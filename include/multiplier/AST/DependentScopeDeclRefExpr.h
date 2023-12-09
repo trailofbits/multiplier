@@ -40,6 +40,9 @@ class MX_EXPORT DependentScopeDeclRefExpr : public Expr {
   static gap::generator<DependentScopeDeclRefExpr> in(const Fragment &frag);
   static gap::generator<DependentScopeDeclRefExpr> in(const File &file);
 
+  static std::optional<DependentScopeDeclRefExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<DependentScopeDeclRefExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DEPENDENT_SCOPE_DECL_REF_EXPR;
   }

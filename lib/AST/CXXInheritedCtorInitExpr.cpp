@@ -14,6 +14,8 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueStmt.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -21,6 +23,12 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kCXXInheritedCtorInitExprDerivedKinds[] = {
+    CXXInheritedCtorInitExpr::static_kind(),
+};
+}  // namespace
 
 gap::generator<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -36,6 +44,21 @@ bool CXXInheritedCtorInitExpr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<CXXInheritedCtorInitExpr, ir::hl::Operation>> CXXInheritedCtorInitExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCXXInheritedCtorInitExprDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<CXXInheritedCtorInitExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::containing(const Decl &decl) {
@@ -104,13 +127,6 @@ std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const std
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kCXXInheritedCtorInitExprDerivedKinds[] = {
-    CXXInheritedCtorInitExpr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {

@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kHLSLSV_DispatchThreadIDAttrDerivedKinds[] = {
+    HLSLSV_DispatchThreadIDAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<HLSLSV_DispatchThreadIDAttr> HLSLSV_DispatchThreadIDAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = HLSLSV_DispatchThreadIDAttr::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<HLSLSV_DispatchThreadIDAttr> HLSLSV_DispatchThreadIDAttr::from(con
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kHLSLSV_DispatchThreadIDAttrDerivedKinds[] = {
-    HLSLSV_DispatchThreadIDAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<HLSLSV_DispatchThreadIDAttr> HLSLSV_DispatchThreadIDAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

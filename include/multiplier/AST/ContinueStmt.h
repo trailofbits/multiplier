@@ -36,6 +36,9 @@ class MX_EXPORT ContinueStmt : public Stmt {
   static gap::generator<ContinueStmt> in(const Fragment &frag);
   static gap::generator<ContinueStmt> in(const File &file);
 
+  static std::optional<ContinueStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ContinueStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONTINUE_STMT;
   }

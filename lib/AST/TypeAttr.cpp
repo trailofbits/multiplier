@@ -45,6 +45,38 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kTypeAttrDerivedKinds[] = {
+    TypeNonNullAttr::static_kind(),
+    TypeNullUnspecifiedAttr::static_kind(),
+    TypeNullableAttr::static_kind(),
+    TypeNullableResultAttr::static_kind(),
+    UPtrAttr::static_kind(),
+    WebAssemblyFuncrefAttr::static_kind(),
+    AddressSpaceAttr::static_kind(),
+    AnnotateTypeAttr::static_kind(),
+    ArmMveStrictPolymorphismAttr::static_kind(),
+    ArmStreamingAttr::static_kind(),
+    BTFTypeTagAttr::static_kind(),
+    CmseNSCallAttr::static_kind(),
+    HLSLGroupSharedAddressSpaceAttr::static_kind(),
+    NoDerefAttr::static_kind(),
+    ObjCGCAttr::static_kind(),
+    ObjCInertUnsafeUnretainedAttr::static_kind(),
+    ObjCKindOfAttr::static_kind(),
+    OpenCLConstantAddressSpaceAttr::static_kind(),
+    OpenCLGenericAddressSpaceAttr::static_kind(),
+    OpenCLGlobalAddressSpaceAttr::static_kind(),
+    OpenCLGlobalDeviceAddressSpaceAttr::static_kind(),
+    OpenCLGlobalHostAddressSpaceAttr::static_kind(),
+    OpenCLLocalAddressSpaceAttr::static_kind(),
+    OpenCLPrivateAddressSpaceAttr::static_kind(),
+    Ptr32Attr::static_kind(),
+    Ptr64Attr::static_kind(),
+    SPtrAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<TypeAttr> TypeAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = TypeAttr::from(*ctx)) {
@@ -79,39 +111,6 @@ std::optional<TypeAttr> TypeAttr::from(const std::optional<Attr> &parent) {
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kTypeAttrDerivedKinds[] = {
-    TypeNonNullAttr::static_kind(),
-    TypeNullUnspecifiedAttr::static_kind(),
-    TypeNullableAttr::static_kind(),
-    TypeNullableResultAttr::static_kind(),
-    UPtrAttr::static_kind(),
-    WebAssemblyFuncrefAttr::static_kind(),
-    AddressSpaceAttr::static_kind(),
-    AnnotateTypeAttr::static_kind(),
-    ArmMveStrictPolymorphismAttr::static_kind(),
-    ArmStreamingAttr::static_kind(),
-    BTFTypeTagAttr::static_kind(),
-    CmseNSCallAttr::static_kind(),
-    HLSLGroupSharedAddressSpaceAttr::static_kind(),
-    NoDerefAttr::static_kind(),
-    ObjCGCAttr::static_kind(),
-    ObjCInertUnsafeUnretainedAttr::static_kind(),
-    ObjCKindOfAttr::static_kind(),
-    OpenCLConstantAddressSpaceAttr::static_kind(),
-    OpenCLGenericAddressSpaceAttr::static_kind(),
-    OpenCLGlobalAddressSpaceAttr::static_kind(),
-    OpenCLGlobalDeviceAddressSpaceAttr::static_kind(),
-    OpenCLGlobalHostAddressSpaceAttr::static_kind(),
-    OpenCLLocalAddressSpaceAttr::static_kind(),
-    OpenCLPrivateAddressSpaceAttr::static_kind(),
-    Ptr32Attr::static_kind(),
-    Ptr64Attr::static_kind(),
-    SPtrAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<TypeAttr> TypeAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

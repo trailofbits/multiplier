@@ -38,6 +38,9 @@ class MX_EXPORT OMPTaskwaitDirective : public OMPExecutableDirective {
   static gap::generator<OMPTaskwaitDirective> in(const Fragment &frag);
   static gap::generator<OMPTaskwaitDirective> in(const File &file);
 
+  static std::optional<OMPTaskwaitDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPTaskwaitDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TASKWAIT_DIRECTIVE;
   }

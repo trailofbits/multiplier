@@ -38,6 +38,9 @@ class MX_EXPORT UsingPackDecl : public NamedDecl {
   static gap::generator<UsingPackDecl> in(const Fragment &frag);
   static gap::generator<UsingPackDecl> in(const File &file);
 
+  static std::optional<UsingPackDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<UsingPackDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_PACK;
   }

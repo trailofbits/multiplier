@@ -26,6 +26,19 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const MacroKind kConditionalMacroDirectiveDerivedKinds[] = {
+    IfMacroDirective::static_kind(),
+    IfDefinedMacroDirective::static_kind(),
+    IfNotDefinedMacroDirective::static_kind(),
+    ElseIfMacroDirective::static_kind(),
+    ElseIfDefinedMacroDirective::static_kind(),
+    ElseIfNotDefinedMacroDirective::static_kind(),
+    ElseMacroDirective::static_kind(),
+    EndIfMacroDirective::static_kind(),
+};
+}  // namespace
+
 gap::generator<ConditionalMacroDirective> ConditionalMacroDirective::containing(const Macro &macro) {
   for (auto impl = macro.parent(); impl; impl = impl->parent()) {
     if (auto d = ConditionalMacroDirective::from(*impl)) {
@@ -76,20 +89,6 @@ std::optional<ConditionalMacroDirective> ConditionalMacroDirective::from(const s
   }
   return std::nullopt;
 }
-
-namespace {
-static const MacroKind kConditionalMacroDirectiveDerivedKinds[] = {
-    IfMacroDirective::static_kind(),
-    IfDefinedMacroDirective::static_kind(),
-    IfNotDefinedMacroDirective::static_kind(),
-    ElseIfMacroDirective::static_kind(),
-    ElseIfDefinedMacroDirective::static_kind(),
-    ElseIfNotDefinedMacroDirective::static_kind(),
-    ElseMacroDirective::static_kind(),
-    EndIfMacroDirective::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ConditionalMacroDirective> ConditionalMacroDirective::from_base(const Macro &parent) {
   switch (parent.kind()) {

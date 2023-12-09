@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kExclusiveTrylockFunctionAttrDerivedKinds[] = {
+    ExclusiveTrylockFunctionAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<ExclusiveTrylockFunctionAttr> ExclusiveTrylockFunctionAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ExclusiveTrylockFunctionAttr::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<ExclusiveTrylockFunctionAttr> ExclusiveTrylockFunctionAttr::from(c
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kExclusiveTrylockFunctionAttrDerivedKinds[] = {
-    ExclusiveTrylockFunctionAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ExclusiveTrylockFunctionAttr> ExclusiveTrylockFunctionAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

@@ -39,6 +39,9 @@ class MX_EXPORT WhileStmt : public Stmt {
   static gap::generator<WhileStmt> in(const Fragment &frag);
   static gap::generator<WhileStmt> in(const File &file);
 
+  static std::optional<WhileStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<WhileStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::WHILE_STMT;
   }

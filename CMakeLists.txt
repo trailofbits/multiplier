@@ -96,7 +96,7 @@ if(MX_ENABLE_PYTHON_BINDINGS)
   find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed)
 endif()
 
-if(MX_ENABLE_INSTALL)
+if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
   export(PACKAGE "${PROJECT_NAME}")
   
   set(cmake_install_dir "${MX_INSTALL_LIB_DIR}/cmake/${PROJECT_NAME}")
@@ -139,7 +139,7 @@ set(MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H "${PROJECT_SOURCE_DIR}/include/multiplier
 if(MX_ENABLE_BOOTSTRAP)
   add_subdirectory("bin/Bootstrap")
   return()
-endif()
+endif(MX_ENABLE_BOOTSTRAP)
 
 # Configure the version to include the git hash.
 #
@@ -201,7 +201,7 @@ target_include_directories("multiplier"
     $<INSTALL_INTERFACE:${MX_INSTALL_INCLUDE_DIR}>
 )
 
-if(MX_ENABLE_INSTALL)
+if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
   install(
     TARGETS
       "multiplier"

@@ -40,6 +40,9 @@ class MX_EXPORT SYCLUniqueStableNameExpr : public Expr {
   static gap::generator<SYCLUniqueStableNameExpr> in(const Fragment &frag);
   static gap::generator<SYCLUniqueStableNameExpr> in(const File &file);
 
+  static std::optional<SYCLUniqueStableNameExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<SYCLUniqueStableNameExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SYCL_UNIQUE_STABLE_NAME_EXPR;
   }

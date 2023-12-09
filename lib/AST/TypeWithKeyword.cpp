@@ -21,6 +21,14 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kTypeWithKeywordDerivedKinds[] = {
+    DependentNameType::static_kind(),
+    DependentTemplateSpecializationType::static_kind(),
+    ElaboratedType::static_kind(),
+};
+}  // namespace
+
 gap::generator<TypeWithKeyword> TypeWithKeyword::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = TypeWithKeyword::from(*ctx)) {
@@ -55,15 +63,6 @@ std::optional<TypeWithKeyword> TypeWithKeyword::from(const std::optional<Type> &
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kTypeWithKeywordDerivedKinds[] = {
-    DependentNameType::static_kind(),
-    DependentTemplateSpecializationType::static_kind(),
-    ElaboratedType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<TypeWithKeyword> TypeWithKeyword::from_base(const Type &parent) {
   switch (parent.kind()) {

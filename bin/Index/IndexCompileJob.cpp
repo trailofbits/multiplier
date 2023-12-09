@@ -2243,7 +2243,7 @@ void IndexCompileJobAction::Run(void) {
   }
 
   TypeMapper tm(context.id_store);
-  EntityMapper em(tm);
+  EntityMapper em(tm, context.codegen.IsEnabled());
 
   pasta::AST ast = std::move(maybe_ast.value());
   pasta::File main_file = ast.MainFile();

@@ -40,6 +40,9 @@ class MX_EXPORT SwitchStmt : public Stmt {
   static gap::generator<SwitchStmt> in(const Fragment &frag);
   static gap::generator<SwitchStmt> in(const File &file);
 
+  static std::optional<SwitchStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<SwitchStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SWITCH_STMT;
   }

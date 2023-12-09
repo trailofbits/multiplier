@@ -12,46 +12,10 @@
 
 namespace mx::ir::llvm {
 std::optional<Attribute> Attribute::from(const ::mx::ir::Attribute &that) {
-  switch (that.kind()) {
-    default: return std::nullopt;
-    case mx::ir::AttributeKind::LLVM_C_CONV:
-    case mx::ir::AttributeKind::LLVM_COMDAT:
-    case mx::ir::AttributeKind::LLVM_ACCESS_GROUP:
-    case mx::ir::AttributeKind::LLVM_ALIAS_SCOPE:
-    case mx::ir::AttributeKind::LLVM_ALIAS_SCOPE_DOMAIN:
-    case mx::ir::AttributeKind::LLVM_DI_BASIC_TYPE:
-    case mx::ir::AttributeKind::LLVM_DI_COMPILE_UNIT:
-    case mx::ir::AttributeKind::LLVM_DI_COMPOSITE_TYPE:
-    case mx::ir::AttributeKind::LLVM_DI_DERIVED_TYPE:
-    case mx::ir::AttributeKind::LLVM_DI_FILE:
-    case mx::ir::AttributeKind::LLVM_DI_LABEL:
-    case mx::ir::AttributeKind::LLVM_DI_LEXICAL_BLOCK:
-    case mx::ir::AttributeKind::LLVM_DI_LEXICAL_BLOCK_FILE:
-    case mx::ir::AttributeKind::LLVM_DI_LOCAL_VARIABLE:
-    case mx::ir::AttributeKind::LLVM_DI_NAMESPACE:
-    case mx::ir::AttributeKind::LLVM_DI_NULL_TYPE:
-    case mx::ir::AttributeKind::LLVM_DI_SUBPROGRAM:
-    case mx::ir::AttributeKind::LLVM_DI_SUBRANGE:
-    case mx::ir::AttributeKind::LLVM_DI_SUBROUTINE_TYPE:
-    case mx::ir::AttributeKind::LLVM_FASTMATH_FLAGS:
-    case mx::ir::AttributeKind::LLVM_MEMORY_EFFECTS:
-    case mx::ir::AttributeKind::LLVM_TBAA_MEMBER:
-    case mx::ir::AttributeKind::LLVM_TBAA_ROOT:
-    case mx::ir::AttributeKind::LLVM_TBAA_TAG:
-    case mx::ir::AttributeKind::LLVM_TBAA_TYPE_DESCRIPTOR:
-    case mx::ir::AttributeKind::LLVM_LINKAGE:
-    case mx::ir::AttributeKind::LLVM_LOOP_ANNOTATION:
-    case mx::ir::AttributeKind::LLVM_LOOP_DISTRIBUTE:
-    case mx::ir::AttributeKind::LLVM_LOOP_INTERLEAVE:
-    case mx::ir::AttributeKind::LLVM_LOOP_LICM:
-    case mx::ir::AttributeKind::LLVM_LOOP_PEELED:
-    case mx::ir::AttributeKind::LLVM_LOOP_PIPELINE:
-    case mx::ir::AttributeKind::LLVM_LOOP_UNROLL_AND_JAM:
-    case mx::ir::AttributeKind::LLVM_LOOP_UNROLL:
-    case mx::ir::AttributeKind::LLVM_LOOP_UNSWITCH:
-    case mx::ir::AttributeKind::LLVM_LOOP_VECTORIZE:
-      return reinterpret_cast<const Attribute &>(that);
+  if (IsLLVMIRAttributeKind(that.kind())) {
+    return reinterpret_cast<const Attribute &>(that);
   }
+  return std::nullopt;
 }
 
 std::optional<CConvAttr> CConvAttr::from(const ::mx::ir::Attribute &that) {

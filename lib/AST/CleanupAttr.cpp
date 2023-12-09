@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kCleanupAttrDerivedKinds[] = {
+    CleanupAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<CleanupAttr> CleanupAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = CleanupAttr::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<CleanupAttr> CleanupAttr::from(const std::optional<Attr> &parent) 
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kCleanupAttrDerivedKinds[] = {
-    CleanupAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<CleanupAttr> CleanupAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

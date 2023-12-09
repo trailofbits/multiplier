@@ -40,6 +40,9 @@ class MX_EXPORT IntegerLiteral : public Expr {
   static gap::generator<IntegerLiteral> in(const Fragment &frag);
   static gap::generator<IntegerLiteral> in(const File &file);
 
+  static std::optional<IntegerLiteral> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<IntegerLiteral, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::INTEGER_LITERAL;
   }

@@ -40,6 +40,9 @@ class MX_EXPORT OMPIteratorExpr : public Expr {
   static gap::generator<OMPIteratorExpr> in(const Fragment &frag);
   static gap::generator<OMPIteratorExpr> in(const File &file);
 
+  static std::optional<OMPIteratorExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPIteratorExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ITERATOR_EXPR;
   }

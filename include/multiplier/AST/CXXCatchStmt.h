@@ -38,6 +38,9 @@ class MX_EXPORT CXXCatchStmt : public Stmt {
   static gap::generator<CXXCatchStmt> in(const Fragment &frag);
   static gap::generator<CXXCatchStmt> in(const File &file);
 
+  static std::optional<CXXCatchStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<CXXCatchStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_CATCH_STMT;
   }

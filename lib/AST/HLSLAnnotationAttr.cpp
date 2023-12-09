@@ -21,6 +21,13 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kHLSLAnnotationAttrDerivedKinds[] = {
+    HLSLSV_DispatchThreadIDAttr::static_kind(),
+    HLSLSV_GroupIndexAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<HLSLAnnotationAttr> HLSLAnnotationAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = HLSLAnnotationAttr::from(*ctx)) {
@@ -55,14 +62,6 @@ std::optional<HLSLAnnotationAttr> HLSLAnnotationAttr::from(const std::optional<A
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kHLSLAnnotationAttrDerivedKinds[] = {
-    HLSLSV_DispatchThreadIDAttr::static_kind(),
-    HLSLSV_GroupIndexAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<HLSLAnnotationAttr> HLSLAnnotationAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

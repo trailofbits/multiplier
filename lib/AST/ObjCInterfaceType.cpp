@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kObjCInterfaceTypeDerivedKinds[] = {
+    ObjCInterfaceType::static_kind(),
+};
+}  // namespace
+
 gap::generator<ObjCInterfaceType> ObjCInterfaceType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ObjCInterfaceType::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const std::optional<Typ
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kObjCInterfaceTypeDerivedKinds[] = {
-    ObjCInterfaceType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ObjCInterfaceType> ObjCInterfaceType::from_base(const Type &parent) {
   switch (parent.kind()) {

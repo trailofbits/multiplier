@@ -346,6 +346,16 @@ struct PythonBinding<std::span<T>> {
   }
 };
 
+// Conversions for spans.
+template <typename T>
+struct PythonBinding<std::span<const T>> {
+ public:
+  static std::optional<std::vector<T>> from_python(
+      BorrowedPyObject *obj) noexcept {
+    return PythonBinding<std::vector<T>>::from_python(obj);
+  }
+};
+
 // Conversions for maps.
 template <typename KVMap, typename K, typename V>
 struct MapPythonBinding {

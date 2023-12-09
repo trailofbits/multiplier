@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kPragmaClangRodataSectionAttrDerivedKinds[] = {
+    PragmaClangRodataSectionAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<PragmaClangRodataSectionAttr> PragmaClangRodataSectionAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = PragmaClangRodataSectionAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<PragmaClangRodataSectionAttr> PragmaClangRodataSectionAttr::from(c
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kPragmaClangRodataSectionAttrDerivedKinds[] = {
-    PragmaClangRodataSectionAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<PragmaClangRodataSectionAttr> PragmaClangRodataSectionAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

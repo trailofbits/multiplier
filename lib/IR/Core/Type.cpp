@@ -15,11 +15,10 @@
 
 namespace mx::ir::core {
 std::optional<Type> Type::from(const ::mx::ir::Type &that) {
-  switch (that.kind()) {
-    default: return std::nullopt;
-    case mx::ir::TypeKind::CORE_FUNCTION:
-      return reinterpret_cast<const Type &>(that);
+  if (IsCoreTypeKind(that.kind())) {
+    return reinterpret_cast<const Type &>(that);
   }
+  return std::nullopt;
 }
 
 std::optional<FunctionType> FunctionType::from(const ::mx::ir::Type &that) {

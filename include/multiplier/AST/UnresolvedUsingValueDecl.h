@@ -40,6 +40,9 @@ class MX_EXPORT UnresolvedUsingValueDecl : public ValueDecl {
   static gap::generator<UnresolvedUsingValueDecl> in(const Fragment &frag);
   static gap::generator<UnresolvedUsingValueDecl> in(const File &file);
 
+  static std::optional<UnresolvedUsingValueDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<UnresolvedUsingValueDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_VALUE;
   }

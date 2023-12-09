@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kCUDADeviceBuiltinTextureTypeAttrDerivedKinds[] = {
+    CUDADeviceBuiltinTextureTypeAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<CUDADeviceBuiltinTextureTypeAttr> CUDADeviceBuiltinTextureTypeAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = CUDADeviceBuiltinTextureTypeAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<CUDADeviceBuiltinTextureTypeAttr> CUDADeviceBuiltinTextureTypeAttr
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kCUDADeviceBuiltinTextureTypeAttrDerivedKinds[] = {
-    CUDADeviceBuiltinTextureTypeAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<CUDADeviceBuiltinTextureTypeAttr> CUDADeviceBuiltinTextureTypeAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

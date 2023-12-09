@@ -41,6 +41,9 @@ class MX_EXPORT AddrLabelExpr : public Expr {
   static gap::generator<AddrLabelExpr> in(const Fragment &frag);
   static gap::generator<AddrLabelExpr> in(const File &file);
 
+  static std::optional<AddrLabelExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<AddrLabelExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ADDR_LABEL_EXPR;
   }

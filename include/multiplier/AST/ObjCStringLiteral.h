@@ -41,6 +41,9 @@ class MX_EXPORT ObjCStringLiteral : public Expr {
   static gap::generator<ObjCStringLiteral> in(const Fragment &frag);
   static gap::generator<ObjCStringLiteral> in(const File &file);
 
+  static std::optional<ObjCStringLiteral> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ObjCStringLiteral, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_STRING_LITERAL;
   }

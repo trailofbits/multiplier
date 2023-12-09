@@ -43,6 +43,9 @@ class MX_EXPORT UserDefinedLiteral : public CallExpr {
   static gap::generator<UserDefinedLiteral> in(const Fragment &frag);
   static gap::generator<UserDefinedLiteral> in(const File &file);
 
+  static std::optional<UserDefinedLiteral> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<UserDefinedLiteral, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::USER_DEFINED_LITERAL;
   }

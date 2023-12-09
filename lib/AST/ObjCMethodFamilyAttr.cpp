@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kObjCMethodFamilyAttrDerivedKinds[] = {
+    ObjCMethodFamilyAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<ObjCMethodFamilyAttr> ObjCMethodFamilyAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ObjCMethodFamilyAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<ObjCMethodFamilyAttr> ObjCMethodFamilyAttr::from(const std::option
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kObjCMethodFamilyAttrDerivedKinds[] = {
-    ObjCMethodFamilyAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ObjCMethodFamilyAttr> ObjCMethodFamilyAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

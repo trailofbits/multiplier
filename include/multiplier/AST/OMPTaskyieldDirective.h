@@ -38,6 +38,9 @@ class MX_EXPORT OMPTaskyieldDirective : public OMPExecutableDirective {
   static gap::generator<OMPTaskyieldDirective> in(const Fragment &frag);
   static gap::generator<OMPTaskyieldDirective> in(const File &file);
 
+  static std::optional<OMPTaskyieldDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPTaskyieldDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TASKYIELD_DIRECTIVE;
   }

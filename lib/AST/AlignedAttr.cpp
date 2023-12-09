@@ -21,6 +21,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kAlignedAttrDerivedKinds[] = {
+    AlignedAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<AlignedAttr> AlignedAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AlignedAttr::from(*ctx)) {
@@ -55,13 +61,6 @@ std::optional<AlignedAttr> AlignedAttr::from(const std::optional<Attr> &parent) 
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kAlignedAttrDerivedKinds[] = {
-    AlignedAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<AlignedAttr> AlignedAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

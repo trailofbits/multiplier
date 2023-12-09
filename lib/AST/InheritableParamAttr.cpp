@@ -32,6 +32,24 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kInheritableParamAttrDerivedKinds[] = {
+    NSConsumedAttr::static_kind(),
+    NonNullAttr::static_kind(),
+    OSConsumedAttr::static_kind(),
+    PassObjectSizeAttr::static_kind(),
+    ReleaseHandleAttr::static_kind(),
+    UseHandleAttr::static_kind(),
+    AnnotateAttr::static_kind(),
+    CFConsumedAttr::static_kind(),
+    CarriesDependencyAttr::static_kind(),
+    SwiftAsyncContextAttr::static_kind(),
+    SwiftContextAttr::static_kind(),
+    SwiftErrorResultAttr::static_kind(),
+    SwiftIndirectResultAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<InheritableParamAttr> InheritableParamAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = InheritableParamAttr::from(*ctx)) {
@@ -66,25 +84,6 @@ std::optional<InheritableParamAttr> InheritableParamAttr::from(const std::option
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kInheritableParamAttrDerivedKinds[] = {
-    NSConsumedAttr::static_kind(),
-    NonNullAttr::static_kind(),
-    OSConsumedAttr::static_kind(),
-    PassObjectSizeAttr::static_kind(),
-    ReleaseHandleAttr::static_kind(),
-    UseHandleAttr::static_kind(),
-    AnnotateAttr::static_kind(),
-    CFConsumedAttr::static_kind(),
-    CarriesDependencyAttr::static_kind(),
-    SwiftAsyncContextAttr::static_kind(),
-    SwiftContextAttr::static_kind(),
-    SwiftErrorResultAttr::static_kind(),
-    SwiftIndirectResultAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<InheritableParamAttr> InheritableParamAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

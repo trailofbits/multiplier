@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kFunctionReturnThunksAttrDerivedKinds[] = {
+    FunctionReturnThunksAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<FunctionReturnThunksAttr> FunctionReturnThunksAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = FunctionReturnThunksAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<FunctionReturnThunksAttr> FunctionReturnThunksAttr::from(const std
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kFunctionReturnThunksAttrDerivedKinds[] = {
-    FunctionReturnThunksAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<FunctionReturnThunksAttr> FunctionReturnThunksAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

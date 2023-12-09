@@ -36,6 +36,9 @@ class MX_EXPORT SEHLeaveStmt : public Stmt {
   static gap::generator<SEHLeaveStmt> in(const Fragment &frag);
   static gap::generator<SEHLeaveStmt> in(const File &file);
 
+  static std::optional<SEHLeaveStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<SEHLeaveStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_LEAVE_STMT;
   }

@@ -15,6 +15,8 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/VarDecl.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -22,6 +24,12 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kSwitchStmtDerivedKinds[] = {
+    SwitchStmt::static_kind(),
+};
+}  // namespace
 
 gap::generator<SwitchStmt> SwitchStmt::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -37,6 +45,21 @@ bool SwitchStmt::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<SwitchStmt> SwitchStmt::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<SwitchStmt, ir::hl::Operation>> SwitchStmt::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kSwitchStmtDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<SwitchStmt, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<SwitchStmt> SwitchStmt::containing(const Decl &decl) {
@@ -105,13 +128,6 @@ std::optional<SwitchStmt> SwitchStmt::from(const std::optional<Stmt> &parent) {
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kSwitchStmtDerivedKinds[] = {
-    SwitchStmt::static_kind(),
-};
-
-}  // namespace
 
 std::optional<SwitchStmt> SwitchStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {

@@ -82,7 +82,7 @@ gap::generator<Macro> Macro::in(const Index &index) {
   }
 }
 
-gap::generator<Macro> Macro::in(const Index &index, std::span<MacroKind> kinds) {
+gap::generator<Macro> Macro::in(const Index &index, std::span<const MacroKind> kinds) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroKind k : kinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
@@ -109,7 +109,7 @@ gap::generator<Macro> Macro::in(const Fragment &frag) {
   }
 }
 
-gap::generator<Macro> Macro::in(const Fragment &frag, std::span<MacroKind> kinds) {
+gap::generator<Macro> Macro::in(const Fragment &frag, std::span<const MacroKind> kinds) {
   const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (MacroKind k : kinds) {
@@ -119,7 +119,7 @@ gap::generator<Macro> Macro::in(const Fragment &frag, std::span<MacroKind> kinds
   }
 }
 
-gap::generator<Macro> Macro::in(const File &file, std::span<MacroKind> kinds) {
+gap::generator<Macro> Macro::in(const File &file, std::span<const MacroKind> kinds) {
   const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {

@@ -66,7 +66,7 @@ gap::generator<Type> Type::in(const Index &index) {
   }
 }
 
-gap::generator<Type> Type::in(const Index &index, std::span<TypeKind> kinds) {
+gap::generator<Type> Type::in(const Index &index, std::span<const TypeKind> kinds) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {

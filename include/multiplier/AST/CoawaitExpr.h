@@ -42,6 +42,9 @@ class MX_EXPORT CoawaitExpr : public CoroutineSuspendExpr {
   static gap::generator<CoawaitExpr> in(const Fragment &frag);
   static gap::generator<CoawaitExpr> in(const File &file);
 
+  static std::optional<CoawaitExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<CoawaitExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COAWAIT_EXPR;
   }

@@ -37,6 +37,9 @@ class MX_EXPORT ClassScopeFunctionSpecializationDecl : public Decl {
   static gap::generator<ClassScopeFunctionSpecializationDecl> in(const Fragment &frag);
   static gap::generator<ClassScopeFunctionSpecializationDecl> in(const File &file);
 
+  static std::optional<ClassScopeFunctionSpecializationDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ClassScopeFunctionSpecializationDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION;
   }

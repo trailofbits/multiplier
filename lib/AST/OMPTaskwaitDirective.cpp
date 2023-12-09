@@ -12,6 +12,8 @@
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -19,6 +21,12 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kOMPTaskwaitDirectiveDerivedKinds[] = {
+    OMPTaskwaitDirective::static_kind(),
+};
+}  // namespace
 
 gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -34,6 +42,21 @@ bool OMPTaskwaitDirective::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<OMPTaskwaitDirective, ir::hl::Operation>> OMPTaskwaitDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPTaskwaitDirectiveDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<OMPTaskwaitDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::containing(const Decl &decl) {
@@ -102,13 +125,6 @@ std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from(const std::option
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kOMPTaskwaitDirectiveDerivedKinds[] = {
-    OMPTaskwaitDirective::static_kind(),
-};
-
-}  // namespace
 
 std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {

@@ -23,6 +23,8 @@
 #include <multiplier/AST/CXXDestructorDecl.h>
 #include <multiplier/AST/CXXMethodDecl.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Decl.h"
@@ -31,6 +33,17 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const DeclKind kFunctionDeclDerivedKinds[] = {
+    FunctionDecl::static_kind(),
+    CXXDeductionGuideDecl::static_kind(),
+    CXXMethodDecl::static_kind(),
+    CXXConstructorDecl::static_kind(),
+    CXXConversionDecl::static_kind(),
+    CXXDestructorDecl::static_kind(),
+};
+}  // namespace
 
 gap::generator<FunctionDecl> FunctionDecl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -46,6 +59,21 @@ bool FunctionDecl::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<FunctionDecl> FunctionDecl::from(const ir::hl::Operation &op) {
+  if (auto val = Decl::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<FunctionDecl, ir::hl::Operation>> FunctionDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kFunctionDeclDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<FunctionDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<FunctionDecl> FunctionDecl::containing(const Decl &decl) {
@@ -143,18 +171,6 @@ std::optional<FunctionDecl> FunctionDecl::from(const std::optional<Decl> &parent
   }
   return std::nullopt;
 }
-
-namespace {
-static const DeclKind kFunctionDeclDerivedKinds[] = {
-    FunctionDecl::static_kind(),
-    CXXDeductionGuideDecl::static_kind(),
-    CXXMethodDecl::static_kind(),
-    CXXConstructorDecl::static_kind(),
-    CXXConversionDecl::static_kind(),
-    CXXDestructorDecl::static_kind(),
-};
-
-}  // namespace
 
 std::optional<FunctionDecl> FunctionDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {

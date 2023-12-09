@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kOMPCaptureNoInitAttrDerivedKinds[] = {
+    OMPCaptureNoInitAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<OMPCaptureNoInitAttr> OMPCaptureNoInitAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = OMPCaptureNoInitAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<OMPCaptureNoInitAttr> OMPCaptureNoInitAttr::from(const std::option
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kOMPCaptureNoInitAttrDerivedKinds[] = {
-    OMPCaptureNoInitAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<OMPCaptureNoInitAttr> OMPCaptureNoInitAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

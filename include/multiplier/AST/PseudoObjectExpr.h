@@ -40,6 +40,9 @@ class MX_EXPORT PseudoObjectExpr : public Expr {
   static gap::generator<PseudoObjectExpr> in(const Fragment &frag);
   static gap::generator<PseudoObjectExpr> in(const File &file);
 
+  static std::optional<PseudoObjectExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<PseudoObjectExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::PSEUDO_OBJECT_EXPR;
   }

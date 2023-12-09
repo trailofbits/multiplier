@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kNSErrorDomainAttrDerivedKinds[] = {
+    NSErrorDomainAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<NSErrorDomainAttr> NSErrorDomainAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = NSErrorDomainAttr::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from(const std::optional<Att
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kNSErrorDomainAttrDerivedKinds[] = {
-    NSErrorDomainAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

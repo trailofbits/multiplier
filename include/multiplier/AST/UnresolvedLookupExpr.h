@@ -42,6 +42,9 @@ class MX_EXPORT UnresolvedLookupExpr : public OverloadExpr {
   static gap::generator<UnresolvedLookupExpr> in(const Fragment &frag);
   static gap::generator<UnresolvedLookupExpr> in(const File &file);
 
+  static std::optional<UnresolvedLookupExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<UnresolvedLookupExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNRESOLVED_LOOKUP_EXPR;
   }

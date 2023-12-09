@@ -11,6 +11,8 @@
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -18,6 +20,12 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kBreakStmtDerivedKinds[] = {
+    BreakStmt::static_kind(),
+};
+}  // namespace
 
 gap::generator<BreakStmt> BreakStmt::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -33,6 +41,21 @@ bool BreakStmt::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<BreakStmt> BreakStmt::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<BreakStmt, ir::hl::Operation>> BreakStmt::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kBreakStmtDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<BreakStmt, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<BreakStmt> BreakStmt::containing(const Decl &decl) {
@@ -101,13 +124,6 @@ std::optional<BreakStmt> BreakStmt::from(const std::optional<Stmt> &parent) {
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kBreakStmtDerivedKinds[] = {
-    BreakStmt::static_kind(),
-};
-
-}  // namespace
 
 std::optional<BreakStmt> BreakStmt::from_base(const Stmt &parent) {
   switch (parent.kind()) {

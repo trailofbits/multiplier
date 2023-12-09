@@ -11,20 +11,13 @@
 #include <mlir/Dialect/MemRef/IR/MemRef.h>
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <vast/Dialect/Dialects.hpp>
-#include <vast/Dialect/ABI/ABIOps.hpp>
 
 namespace mx::ir::core {
 std::optional<Attribute> Attribute::from(const ::mx::ir::Attribute &that) {
-  switch (that.kind()) {
-    default: return std::nullopt;
-    case mx::ir::AttributeKind::CORE_BOOLEAN:
-    case mx::ir::AttributeKind::CORE_FLOAT:
-    case mx::ir::AttributeKind::CORE_INTEGER:
-    case mx::ir::AttributeKind::CORE_SOURCE_LANGUAGE:
-    case mx::ir::AttributeKind::CORE_STRING_LITERAL:
-    case mx::ir::AttributeKind::CORE_VOID:
-      return reinterpret_cast<const Attribute &>(that);
+  if (IsCoreAttributeKind(that.kind())) {
+    return reinterpret_cast<const Attribute &>(that);
   }
+  return std::nullopt;
 }
 
 std::optional<BooleanAttr> BooleanAttr::from(const ::mx::ir::Attribute &that) {

@@ -326,6 +326,7 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_ADDRESSOF: return "HL_ADDRESSOF";
     case ir::OperationKind::HL_ALIGNOF_EXPR: return "HL_ALIGNOF_EXPR";
     case ir::OperationKind::HL_ALIGNOF_TYPE: return "HL_ALIGNOF_TYPE";
+    case ir::OperationKind::HL_ASM: return "HL_ASM";
     case ir::OperationKind::HL_ASSIGN: return "HL_ASSIGN";
     case ir::OperationKind::HL_ASSIGN_BIN_ASHR: return "HL_ASSIGN_BIN_ASHR";
     case ir::OperationKind::HL_BIN_ASHR: return "HL_BIN_ASHR";
@@ -436,6 +437,501 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::CORE_SELECT: return "CORE_SELECT";
     case ir::OperationKind::UNSUP_DECL: return "UNSUP_DECL";
     case ir::OperationKind::UNSUP_STMT: return "UNSUP_STMT";
+  }
+}
+
+bool IsBuiltinOperationKind(ir::OperationKind kind) {
+  switch (kind) {
+    default:
+      return false;
+    case mx::ir::OperationKind::BUILTIN_MODULE:
+    case mx::ir::OperationKind::BUILTIN_UNREALIZED_CONVERSION_CAST:
+      return true;
+  }
+}
+
+bool IsLLVMIROperationKind(ir::OperationKind kind) {
+  switch (kind) {
+    default:
+      return false;
+    case mx::ir::OperationKind::LLVM_ASHR:
+    case mx::ir::OperationKind::LLVM_ADD:
+    case mx::ir::OperationKind::LLVM_ADDRSPACECAST:
+    case mx::ir::OperationKind::LLVM_MLIR_ADDRESSOF:
+    case mx::ir::OperationKind::LLVM_ALLOCA:
+    case mx::ir::OperationKind::LLVM_AND:
+    case mx::ir::OperationKind::LLVM_CMPXCHG:
+    case mx::ir::OperationKind::LLVM_ATOMICRMW:
+    case mx::ir::OperationKind::LLVM_BITCAST:
+    case mx::ir::OperationKind::LLVM_BR:
+    case mx::ir::OperationKind::LLVM_CALL:
+    case mx::ir::OperationKind::LLVM_COMDAT:
+    case mx::ir::OperationKind::LLVM_COMDAT_SELECTOR:
+    case mx::ir::OperationKind::LLVM_COND_BR:
+    case mx::ir::OperationKind::LLVM_MLIR_CONSTANT:
+    case mx::ir::OperationKind::LLVM_EXTRACTELEMENT:
+    case mx::ir::OperationKind::LLVM_EXTRACTVALUE:
+    case mx::ir::OperationKind::LLVM_FADD:
+    case mx::ir::OperationKind::LLVM_FCMP:
+    case mx::ir::OperationKind::LLVM_FDIV:
+    case mx::ir::OperationKind::LLVM_FMUL:
+    case mx::ir::OperationKind::LLVM_FNEG:
+    case mx::ir::OperationKind::LLVM_FPEXT:
+    case mx::ir::OperationKind::LLVM_FPTOSI:
+    case mx::ir::OperationKind::LLVM_FPTOUI:
+    case mx::ir::OperationKind::LLVM_FPTRUNC:
+    case mx::ir::OperationKind::LLVM_FREM:
+    case mx::ir::OperationKind::LLVM_FSUB:
+    case mx::ir::OperationKind::LLVM_FENCE:
+    case mx::ir::OperationKind::LLVM_FREEZE:
+    case mx::ir::OperationKind::LLVM_GETELEMENTPTR:
+    case mx::ir::OperationKind::LLVM_MLIR_GLOBAL_CTORS:
+    case mx::ir::OperationKind::LLVM_MLIR_GLOBAL_DTORS:
+    case mx::ir::OperationKind::LLVM_MLIR_GLOBAL:
+    case mx::ir::OperationKind::LLVM_ICMP:
+    case mx::ir::OperationKind::LLVM_INLINE_ASM:
+    case mx::ir::OperationKind::LLVM_INSERTELEMENT:
+    case mx::ir::OperationKind::LLVM_INSERTVALUE:
+    case mx::ir::OperationKind::LLVM_INTTOPTR:
+    case mx::ir::OperationKind::LLVM_INVOKE:
+    case mx::ir::OperationKind::LLVM_FUNC:
+    case mx::ir::OperationKind::LLVM_LSHR:
+    case mx::ir::OperationKind::LLVM_LANDINGPAD:
+    case mx::ir::OperationKind::LLVM_LOAD:
+    case mx::ir::OperationKind::LLVM_METADATA:
+    case mx::ir::OperationKind::LLVM_MUL:
+    case mx::ir::OperationKind::LLVM_MLIR_NULL:
+    case mx::ir::OperationKind::LLVM_OR:
+    case mx::ir::OperationKind::LLVM_MLIR_POISON:
+    case mx::ir::OperationKind::LLVM_PTRTOINT:
+    case mx::ir::OperationKind::LLVM_RESUME:
+    case mx::ir::OperationKind::LLVM_RETURN:
+    case mx::ir::OperationKind::LLVM_SDIV:
+    case mx::ir::OperationKind::LLVM_SEXT:
+    case mx::ir::OperationKind::LLVM_SITOFP:
+    case mx::ir::OperationKind::LLVM_SREM:
+    case mx::ir::OperationKind::LLVM_SELECT:
+    case mx::ir::OperationKind::LLVM_SHL:
+    case mx::ir::OperationKind::LLVM_SHUFFLEVECTOR:
+    case mx::ir::OperationKind::LLVM_STORE:
+    case mx::ir::OperationKind::LLVM_SUB:
+    case mx::ir::OperationKind::LLVM_SWITCH:
+    case mx::ir::OperationKind::LLVM_TRUNC:
+    case mx::ir::OperationKind::LLVM_UDIV:
+    case mx::ir::OperationKind::LLVM_UITOFP:
+    case mx::ir::OperationKind::LLVM_UREM:
+    case mx::ir::OperationKind::LLVM_MLIR_UNDEF:
+    case mx::ir::OperationKind::LLVM_UNREACHABLE:
+    case mx::ir::OperationKind::LLVM_XOR:
+    case mx::ir::OperationKind::LLVM_ZEXT:
+    case mx::ir::OperationKind::LLVM_INTR_ABS:
+    case mx::ir::OperationKind::LLVM_INTR_ANNOTATION:
+    case mx::ir::OperationKind::LLVM_INTR_ASSUME:
+    case mx::ir::OperationKind::LLVM_INTR_BITREVERSE:
+    case mx::ir::OperationKind::LLVM_INTR_BSWAP:
+    case mx::ir::OperationKind::LLVM_CALL_INTRINSIC:
+    case mx::ir::OperationKind::LLVM_INTR_COPYSIGN:
+    case mx::ir::OperationKind::LLVM_INTR_CORO_ALIGN:
+    case mx::ir::OperationKind::LLVM_INTR_CORO_BEGIN:
+    case mx::ir::OperationKind::LLVM_INTR_CORO_END:
+    case mx::ir::OperationKind::LLVM_INTR_CORO_FREE:
+    case mx::ir::OperationKind::LLVM_INTR_CORO_ID:
+    case mx::ir::OperationKind::LLVM_INTR_CORO_RESUME:
+    case mx::ir::OperationKind::LLVM_INTR_CORO_SAVE:
+    case mx::ir::OperationKind::LLVM_INTR_CORO_SIZE:
+    case mx::ir::OperationKind::LLVM_INTR_CORO_SUSPEND:
+    case mx::ir::OperationKind::LLVM_INTR_COS:
+    case mx::ir::OperationKind::LLVM_INTR_CTLZ:
+    case mx::ir::OperationKind::LLVM_INTR_CTTZ:
+    case mx::ir::OperationKind::LLVM_INTR_CTPOP:
+    case mx::ir::OperationKind::LLVM_INTR_DBG_DECLARE:
+    case mx::ir::OperationKind::LLVM_INTR_DBG_LABEL:
+    case mx::ir::OperationKind::LLVM_INTR_DBG_VALUE:
+    case mx::ir::OperationKind::LLVM_INTR_DEBUGTRAP:
+    case mx::ir::OperationKind::LLVM_INTR_EH_TYPEID_FOR:
+    case mx::ir::OperationKind::LLVM_INTR_EXP2:
+    case mx::ir::OperationKind::LLVM_INTR_EXP:
+    case mx::ir::OperationKind::LLVM_INTR_EXPECT:
+    case mx::ir::OperationKind::LLVM_INTR_EXPECT_WITH_PROBABILITY:
+    case mx::ir::OperationKind::LLVM_INTR_FABS:
+    case mx::ir::OperationKind::LLVM_INTR_CEIL:
+    case mx::ir::OperationKind::LLVM_INTR_FLOOR:
+    case mx::ir::OperationKind::LLVM_INTR_FMA:
+    case mx::ir::OperationKind::LLVM_INTR_FMULADD:
+    case mx::ir::OperationKind::LLVM_INTR_TRUNC:
+    case mx::ir::OperationKind::LLVM_INTR_FSHL:
+    case mx::ir::OperationKind::LLVM_INTR_FSHR:
+    case mx::ir::OperationKind::LLVM_INTR_GET_ACTIVE_LANE_MASK:
+    case mx::ir::OperationKind::LLVM_INTR_IS_CONSTANT:
+    case mx::ir::OperationKind::LLVM_INTR_IS_FPCLASS:
+    case mx::ir::OperationKind::LLVM_INTR_LIFETIME_END:
+    case mx::ir::OperationKind::LLVM_INTR_LIFETIME_START:
+    case mx::ir::OperationKind::LLVM_INTR_LLRINT:
+    case mx::ir::OperationKind::LLVM_INTR_LLROUND:
+    case mx::ir::OperationKind::LLVM_INTR_LOG10:
+    case mx::ir::OperationKind::LLVM_INTR_LOG2:
+    case mx::ir::OperationKind::LLVM_INTR_LOG:
+    case mx::ir::OperationKind::LLVM_INTR_LRINT:
+    case mx::ir::OperationKind::LLVM_INTR_LROUND:
+    case mx::ir::OperationKind::LLVM_INTR_MASKED_LOAD:
+    case mx::ir::OperationKind::LLVM_INTR_MASKED_STORE:
+    case mx::ir::OperationKind::LLVM_INTR_MATRIX_COLUMN_MAJOR_LOAD:
+    case mx::ir::OperationKind::LLVM_INTR_MATRIX_COLUMN_MAJOR_STORE:
+    case mx::ir::OperationKind::LLVM_INTR_MATRIX_MULTIPLY:
+    case mx::ir::OperationKind::LLVM_INTR_MATRIX_TRANSPOSE:
+    case mx::ir::OperationKind::LLVM_INTR_MAXNUM:
+    case mx::ir::OperationKind::LLVM_INTR_MAXIMUM:
+    case mx::ir::OperationKind::LLVM_INTR_MEMCPY_INLINE:
+    case mx::ir::OperationKind::LLVM_INTR_MEMCPY:
+    case mx::ir::OperationKind::LLVM_INTR_MEMMOVE:
+    case mx::ir::OperationKind::LLVM_INTR_MEMSET:
+    case mx::ir::OperationKind::LLVM_INTR_MINNUM:
+    case mx::ir::OperationKind::LLVM_INTR_MINIMUM:
+    case mx::ir::OperationKind::LLVM_INTR_NEARBYINT:
+    case mx::ir::OperationKind::LLVM_INTR_EXPERIMENTAL_NOALIAS_SCOPE_DECL:
+    case mx::ir::OperationKind::LLVM_INTR_POWI:
+    case mx::ir::OperationKind::LLVM_INTR_POW:
+    case mx::ir::OperationKind::LLVM_INTR_PREFETCH:
+    case mx::ir::OperationKind::LLVM_INTR_PTR_ANNOTATION:
+    case mx::ir::OperationKind::LLVM_INTR_RINT:
+    case mx::ir::OperationKind::LLVM_INTR_ROUNDEVEN:
+    case mx::ir::OperationKind::LLVM_INTR_ROUND:
+    case mx::ir::OperationKind::LLVM_INTR_SADD_SAT:
+    case mx::ir::OperationKind::LLVM_INTR_SADD_WITH_OVERFLOW:
+    case mx::ir::OperationKind::LLVM_INTR_SMAX:
+    case mx::ir::OperationKind::LLVM_INTR_SMIN:
+    case mx::ir::OperationKind::LLVM_INTR_SMUL_WITH_OVERFLOW:
+    case mx::ir::OperationKind::LLVM_INTR_SSA_COPY:
+    case mx::ir::OperationKind::LLVM_INTR_SSHL_SAT:
+    case mx::ir::OperationKind::LLVM_INTR_SSUB_SAT:
+    case mx::ir::OperationKind::LLVM_INTR_SSUB_WITH_OVERFLOW:
+    case mx::ir::OperationKind::LLVM_INTR_SIN:
+    case mx::ir::OperationKind::LLVM_INTR_SQRT:
+    case mx::ir::OperationKind::LLVM_INTR_STACKRESTORE:
+    case mx::ir::OperationKind::LLVM_INTR_STACKSAVE:
+    case mx::ir::OperationKind::LLVM_INTR_EXPERIMENTAL_STEPVECTOR:
+    case mx::ir::OperationKind::LLVM_INTR_THREADLOCAL_ADDRESS:
+    case mx::ir::OperationKind::LLVM_INTR_TRAP:
+    case mx::ir::OperationKind::LLVM_INTR_UADD_SAT:
+    case mx::ir::OperationKind::LLVM_INTR_UADD_WITH_OVERFLOW:
+    case mx::ir::OperationKind::LLVM_INTR_UBSANTRAP:
+    case mx::ir::OperationKind::LLVM_INTR_UMAX:
+    case mx::ir::OperationKind::LLVM_INTR_UMIN:
+    case mx::ir::OperationKind::LLVM_INTR_UMUL_WITH_OVERFLOW:
+    case mx::ir::OperationKind::LLVM_INTR_USHL_SAT:
+    case mx::ir::OperationKind::LLVM_INTR_USUB_SAT:
+    case mx::ir::OperationKind::LLVM_INTR_USUB_WITH_OVERFLOW:
+    case mx::ir::OperationKind::LLVM_INTR_VP_ASHR:
+    case mx::ir::OperationKind::LLVM_INTR_VP_ADD:
+    case mx::ir::OperationKind::LLVM_INTR_VP_AND:
+    case mx::ir::OperationKind::LLVM_INTR_VP_FADD:
+    case mx::ir::OperationKind::LLVM_INTR_VP_FDIV:
+    case mx::ir::OperationKind::LLVM_INTR_VP_FMULADD:
+    case mx::ir::OperationKind::LLVM_INTR_VP_FMUL:
+    case mx::ir::OperationKind::LLVM_INTR_VP_FNEG:
+    case mx::ir::OperationKind::LLVM_INTR_VP_FPEXT:
+    case mx::ir::OperationKind::LLVM_INTR_VP_FPTOSI:
+    case mx::ir::OperationKind::LLVM_INTR_VP_FPTOUI:
+    case mx::ir::OperationKind::LLVM_INTR_VP_FPTRUNC:
+    case mx::ir::OperationKind::LLVM_INTR_VP_FREM:
+    case mx::ir::OperationKind::LLVM_INTR_VP_FSUB:
+    case mx::ir::OperationKind::LLVM_INTR_VP_FMA:
+    case mx::ir::OperationKind::LLVM_INTR_VP_INTTOPTR:
+    case mx::ir::OperationKind::LLVM_INTR_VP_LSHR:
+    case mx::ir::OperationKind::LLVM_INTR_VP_LOAD:
+    case mx::ir::OperationKind::LLVM_INTR_VP_MERGE:
+    case mx::ir::OperationKind::LLVM_INTR_VP_MUL:
+    case mx::ir::OperationKind::LLVM_INTR_VP_OR:
+    case mx::ir::OperationKind::LLVM_INTR_VP_PTRTOINT:
+    case mx::ir::OperationKind::LLVM_INTR_VP_REDUCE_ADD:
+    case mx::ir::OperationKind::LLVM_INTR_VP_REDUCE_AND:
+    case mx::ir::OperationKind::LLVM_INTR_VP_REDUCE_FADD:
+    case mx::ir::OperationKind::LLVM_INTR_VP_REDUCE_FMAX:
+    case mx::ir::OperationKind::LLVM_INTR_VP_REDUCE_FMIN:
+    case mx::ir::OperationKind::LLVM_INTR_VP_REDUCE_FMUL:
+    case mx::ir::OperationKind::LLVM_INTR_VP_REDUCE_MUL:
+    case mx::ir::OperationKind::LLVM_INTR_VP_REDUCE_OR:
+    case mx::ir::OperationKind::LLVM_INTR_VP_REDUCE_SMAX:
+    case mx::ir::OperationKind::LLVM_INTR_VP_REDUCE_SMIN:
+    case mx::ir::OperationKind::LLVM_INTR_VP_REDUCE_UMAX:
+    case mx::ir::OperationKind::LLVM_INTR_VP_REDUCE_UMIN:
+    case mx::ir::OperationKind::LLVM_INTR_VP_REDUCE_XOR:
+    case mx::ir::OperationKind::LLVM_INTR_VP_SDIV:
+    case mx::ir::OperationKind::LLVM_INTR_VP_SEXT:
+    case mx::ir::OperationKind::LLVM_INTR_VP_SITOFP:
+    case mx::ir::OperationKind::LLVM_INTR_VP_SREM:
+    case mx::ir::OperationKind::LLVM_INTR_VP_SELECT:
+    case mx::ir::OperationKind::LLVM_INTR_VP_SHL:
+    case mx::ir::OperationKind::LLVM_INTR_VP_STORE:
+    case mx::ir::OperationKind::LLVM_INTR_EXPERIMENTAL_VP_STRIDED_LOAD:
+    case mx::ir::OperationKind::LLVM_INTR_EXPERIMENTAL_VP_STRIDED_STORE:
+    case mx::ir::OperationKind::LLVM_INTR_VP_SUB:
+    case mx::ir::OperationKind::LLVM_INTR_VP_TRUNC:
+    case mx::ir::OperationKind::LLVM_INTR_VP_UDIV:
+    case mx::ir::OperationKind::LLVM_INTR_VP_UITOFP:
+    case mx::ir::OperationKind::LLVM_INTR_VP_UREM:
+    case mx::ir::OperationKind::LLVM_INTR_VP_XOR:
+    case mx::ir::OperationKind::LLVM_INTR_VP_ZEXT:
+    case mx::ir::OperationKind::LLVM_INTR_VACOPY:
+    case mx::ir::OperationKind::LLVM_INTR_VAEND:
+    case mx::ir::OperationKind::LLVM_INTR_VASTART:
+    case mx::ir::OperationKind::LLVM_INTR_VAR_ANNOTATION:
+    case mx::ir::OperationKind::LLVM_INTR_MASKED_COMPRESSSTORE:
+    case mx::ir::OperationKind::LLVM_INTR_MASKED_EXPANDLOAD:
+    case mx::ir::OperationKind::LLVM_INTR_MASKED_GATHER:
+    case mx::ir::OperationKind::LLVM_INTR_MASKED_SCATTER:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_EXTRACT:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_INSERT:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_ADD:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_AND:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_FADD:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_FMAX:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_FMAXIMUM:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_FMIN:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_FMINIMUM:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_FMUL:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_MUL:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_OR:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_SMAX:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_SMIN:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_UMAX:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_UMIN:
+    case mx::ir::OperationKind::LLVM_INTR_VECTOR_REDUCE_XOR:
+    case mx::ir::OperationKind::LLVM_INTR_VSCALE:
+      return true;
+  }
+}
+
+bool IsMemRefOperationKind(ir::OperationKind kind) {
+  switch (kind) {
+    default:
+      return false;
+    case mx::ir::OperationKind::MEMREF_ASSUME_ALIGNMENT:
+    case mx::ir::OperationKind::MEMREF_ATOMIC_RMW:
+    case mx::ir::OperationKind::MEMREF_ATOMIC_YIELD:
+    case mx::ir::OperationKind::MEMREF_COPY:
+    case mx::ir::OperationKind::MEMREF_GENERIC_ATOMIC_RMW:
+    case mx::ir::OperationKind::MEMREF_LOAD:
+    case mx::ir::OperationKind::MEMREF_ALLOC:
+    case mx::ir::OperationKind::MEMREF_ALLOCA:
+    case mx::ir::OperationKind::MEMREF_ALLOCA_SCOPE:
+    case mx::ir::OperationKind::MEMREF_ALLOCA_SCOPE_RETURN:
+    case mx::ir::OperationKind::MEMREF_CAST:
+    case mx::ir::OperationKind::MEMREF_COLLAPSE_SHAPE:
+    case mx::ir::OperationKind::MEMREF_DEALLOC:
+    case mx::ir::OperationKind::MEMREF_DIM:
+    case mx::ir::OperationKind::MEMREF_DMA_START:
+    case mx::ir::OperationKind::MEMREF_DMA_WAIT:
+    case mx::ir::OperationKind::MEMREF_EXPAND_SHAPE:
+    case mx::ir::OperationKind::MEMREF_EXTRACT_ALIGNED_POINTER_AS_INDEX:
+    case mx::ir::OperationKind::MEMREF_EXTRACT_STRIDED_METADATA:
+    case mx::ir::OperationKind::MEMREF_GET_GLOBAL:
+    case mx::ir::OperationKind::MEMREF_GLOBAL:
+    case mx::ir::OperationKind::MEMREF_MEMORY_SPACE_CAST:
+    case mx::ir::OperationKind::MEMREF_PREFETCH:
+    case mx::ir::OperationKind::MEMREF_RANK:
+    case mx::ir::OperationKind::MEMREF_REALLOC:
+    case mx::ir::OperationKind::MEMREF_REINTERPRET_CAST:
+    case mx::ir::OperationKind::MEMREF_RESHAPE:
+    case mx::ir::OperationKind::MEMREF_STORE:
+    case mx::ir::OperationKind::MEMREF_TRANSPOSE:
+    case mx::ir::OperationKind::MEMREF_VIEW:
+    case mx::ir::OperationKind::MEMREF_SUBVIEW:
+    case mx::ir::OperationKind::MEMREF_TENSOR_STORE:
+      return true;
+  }
+}
+
+bool IsABIOperationKind(ir::OperationKind kind) {
+  switch (kind) {
+    default:
+      return false;
+    case mx::ir::OperationKind::ABI_CALL_ARGS:
+    case mx::ir::OperationKind::ABI_CALL_EXEC:
+    case mx::ir::OperationKind::ABI_CALL:
+    case mx::ir::OperationKind::ABI_CALL_RETS:
+    case mx::ir::OperationKind::ABI_DIRECT:
+    case mx::ir::OperationKind::ABI_EPILOGUE:
+    case mx::ir::OperationKind::ABI_FUNC:
+    case mx::ir::OperationKind::ABI_PROLOGUE:
+    case mx::ir::OperationKind::ABI_RET_DIRECT:
+    case mx::ir::OperationKind::ABI_TODO:
+    case mx::ir::OperationKind::ABI_WRAP_FN:
+    case mx::ir::OperationKind::ABI_YIELD:
+      return true;
+  }
+}
+
+bool IsLowLevelOperationKind(ir::OperationKind kind) {
+  switch (kind) {
+    default:
+      return false;
+    case mx::ir::OperationKind::LL_BR:
+    case mx::ir::OperationKind::LL_CONCAT:
+    case mx::ir::OperationKind::LL_COND_BR:
+    case mx::ir::OperationKind::LL_COND_SCOPE_RET:
+    case mx::ir::OperationKind::LL_EXTRACT:
+    case mx::ir::OperationKind::LL_INITIALIZE:
+    case mx::ir::OperationKind::LL_INLINE_SCOPE:
+    case mx::ir::OperationKind::LL_FUNC:
+    case mx::ir::OperationKind::LL_GEP:
+    case mx::ir::OperationKind::LL_RETURN:
+    case mx::ir::OperationKind::LL_SCOPE:
+    case mx::ir::OperationKind::LL_SCOPE_RECURSE:
+    case mx::ir::OperationKind::LL_SCOPE_RET:
+    case mx::ir::OperationKind::LL_UNINITIALIZED_VAR:
+      return true;
+  }
+}
+
+bool IsHighLevelOperationKind(ir::OperationKind kind) {
+  switch (kind) {
+    default:
+      return false;
+    case mx::ir::OperationKind::HL_ACCESS:
+    case mx::ir::OperationKind::HL_ASSIGN_FADD:
+    case mx::ir::OperationKind::HL_FADD:
+    case mx::ir::OperationKind::HL_ASSIGN_ADD:
+    case mx::ir::OperationKind::HL_ADD:
+    case mx::ir::OperationKind::HL_LABELADDR:
+    case mx::ir::OperationKind::HL_ADDRESSOF:
+    case mx::ir::OperationKind::HL_ALIGNOF_EXPR:
+    case mx::ir::OperationKind::HL_ALIGNOF_TYPE:
+    case mx::ir::OperationKind::HL_ASM:
+    case mx::ir::OperationKind::HL_ASSIGN:
+    case mx::ir::OperationKind::HL_ASSIGN_BIN_ASHR:
+    case mx::ir::OperationKind::HL_BIN_ASHR:
+    case mx::ir::OperationKind::HL_ASSIGN_BIN_AND:
+    case mx::ir::OperationKind::HL_BIN_AND:
+    case mx::ir::OperationKind::HL_BIN_COMMA:
+    case mx::ir::OperationKind::HL_BIN_LAND:
+    case mx::ir::OperationKind::HL_BIN_LOR:
+    case mx::ir::OperationKind::HL_ASSIGN_BIN_LSHR:
+    case mx::ir::OperationKind::HL_BIN_LSHR:
+    case mx::ir::OperationKind::HL_ASSIGN_BIN_OR:
+    case mx::ir::OperationKind::HL_BIN_OR:
+    case mx::ir::OperationKind::HL_ASSIGN_BIN_SHL:
+    case mx::ir::OperationKind::HL_BIN_SHL:
+    case mx::ir::OperationKind::HL_ASSIGN_BIN_XOR:
+    case mx::ir::OperationKind::HL_BIN_XOR:
+    case mx::ir::OperationKind::HL_BUILTIN_BITCAST:
+    case mx::ir::OperationKind::HL_CSTYLE_CAST:
+    case mx::ir::OperationKind::HL_CALL:
+    case mx::ir::OperationKind::HL_CLASS:
+    case mx::ir::OperationKind::HL_CMP:
+    case mx::ir::OperationKind::HL_CONST:
+    case mx::ir::OperationKind::HL_BASE:
+    case mx::ir::OperationKind::HL_CXXSTRUCT:
+    case mx::ir::OperationKind::HL_REF:
+    case mx::ir::OperationKind::HL_DEREF:
+    case mx::ir::OperationKind::HL_ASSIGN_FDIV:
+    case mx::ir::OperationKind::HL_FDIV:
+    case mx::ir::OperationKind::HL_ASSIGN_SDIV:
+    case mx::ir::OperationKind::HL_SDIV:
+    case mx::ir::OperationKind::HL_ASSIGN_UDIV:
+    case mx::ir::OperationKind::HL_UDIV:
+    case mx::ir::OperationKind::HL_ENUM_CONST:
+    case mx::ir::OperationKind::HL_ENUM:
+    case mx::ir::OperationKind::HL_ENUMREF:
+    case mx::ir::OperationKind::HL_EXPR:
+    case mx::ir::OperationKind::HL_GNU_EXTENSION:
+    case mx::ir::OperationKind::HL_FCMP:
+    case mx::ir::OperationKind::HL_FIELD:
+    case mx::ir::OperationKind::HL_FUNCREF:
+    case mx::ir::OperationKind::HL_GLOBREF:
+    case mx::ir::OperationKind::HL_BREAK:
+    case mx::ir::OperationKind::HL_CASE:
+    case mx::ir::OperationKind::HL_COND:
+    case mx::ir::OperationKind::HL_COND_YIELD:
+    case mx::ir::OperationKind::HL_CONTINUE:
+    case mx::ir::OperationKind::HL_DEFAULT:
+    case mx::ir::OperationKind::HL_DO:
+    case mx::ir::OperationKind::HL_EMPTY_DECL:
+    case mx::ir::OperationKind::HL_FOR:
+    case mx::ir::OperationKind::HL_FUNC:
+    case mx::ir::OperationKind::HL_GOTO:
+    case mx::ir::OperationKind::HL_IF:
+    case mx::ir::OperationKind::HL_LABEL_DECL:
+    case mx::ir::OperationKind::HL_LABEL:
+    case mx::ir::OperationKind::HL_SKIP:
+    case mx::ir::OperationKind::HL_SWITCH:
+    case mx::ir::OperationKind::HL_TYPE_YIELD:
+    case mx::ir::OperationKind::HL_VALUE_YIELD:
+    case mx::ir::OperationKind::HL_VAR:
+    case mx::ir::OperationKind::HL_WHILE:
+    case mx::ir::OperationKind::HL_IMPLICIT_CAST:
+    case mx::ir::OperationKind::HL_INDIRECT_CALL:
+    case mx::ir::OperationKind::HL_INITLIST:
+    case mx::ir::OperationKind::HL_LNOT:
+    case mx::ir::OperationKind::HL_MINUS:
+    case mx::ir::OperationKind::HL_ASSIGN_FMUL:
+    case mx::ir::OperationKind::HL_FMUL:
+    case mx::ir::OperationKind::HL_ASSIGN_MUL:
+    case mx::ir::OperationKind::HL_MUL:
+    case mx::ir::OperationKind::HL_NOT:
+    case mx::ir::OperationKind::HL_PLUS:
+    case mx::ir::OperationKind::HL_POST_DEC:
+    case mx::ir::OperationKind::HL_POST_INC:
+    case mx::ir::OperationKind::HL_PRE_DEC:
+    case mx::ir::OperationKind::HL_PRE_INC:
+    case mx::ir::OperationKind::HL_PREDEFINED_EXPR:
+    case mx::ir::OperationKind::HL_MEMBER:
+    case mx::ir::OperationKind::HL_ASSIGN_FREM:
+    case mx::ir::OperationKind::HL_FREM:
+    case mx::ir::OperationKind::HL_ASSIGN_SREM:
+    case mx::ir::OperationKind::HL_SREM:
+    case mx::ir::OperationKind::HL_ASSIGN_UREM:
+    case mx::ir::OperationKind::HL_UREM:
+    case mx::ir::OperationKind::HL_RETURN:
+    case mx::ir::OperationKind::HL_SIZEOF_EXPR:
+    case mx::ir::OperationKind::HL_SIZEOF_TYPE:
+    case mx::ir::OperationKind::HL_STMT_EXPR:
+    case mx::ir::OperationKind::HL_STRUCT:
+    case mx::ir::OperationKind::HL_ASSIGN_FSUB:
+    case mx::ir::OperationKind::HL_FSUB:
+    case mx::ir::OperationKind::HL_ASSIGN_SUB:
+    case mx::ir::OperationKind::HL_SUB:
+    case mx::ir::OperationKind::HL_SUBSCRIPT:
+    case mx::ir::OperationKind::HL_THIS:
+    case mx::ir::OperationKind::HL_TRANSLATION_UNIT:
+    case mx::ir::OperationKind::HL_TYPE:
+    case mx::ir::OperationKind::HL_TYPEDEF:
+    case mx::ir::OperationKind::HL_TYPEOF_EXPR:
+    case mx::ir::OperationKind::HL_TYPEOF_TYPE:
+    case mx::ir::OperationKind::HL_UNION:
+    case mx::ir::OperationKind::HL_UNREACHABLE:
+      return true;
+  }
+}
+
+bool IsCoreOperationKind(ir::OperationKind kind) {
+  switch (kind) {
+    default:
+      return false;
+    case mx::ir::OperationKind::CORE_BIN_LAND:
+    case mx::ir::OperationKind::CORE_BIN_LOR:
+    case mx::ir::OperationKind::CORE_IMPLICIT_RETURN:
+    case mx::ir::OperationKind::CORE_LAZY_OP:
+    case mx::ir::OperationKind::CORE_SCOPE:
+    case mx::ir::OperationKind::CORE_SELECT:
+      return true;
+  }
+}
+
+bool IsMetaOperationKind(ir::OperationKind kind) {
+  switch (kind) {
+    default:
+      return false;
+  }
+}
+
+bool IsUnsupportedOperationKind(ir::OperationKind kind) {
+  switch (kind) {
+    default:
+      return false;
+    case mx::ir::OperationKind::UNSUP_DECL:
+    case mx::ir::OperationKind::UNSUP_STMT:
+      return true;
   }
 }
 

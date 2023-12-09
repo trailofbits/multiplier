@@ -40,6 +40,9 @@ class MX_EXPORT ObjCIndirectCopyRestoreExpr : public Expr {
   static gap::generator<ObjCIndirectCopyRestoreExpr> in(const Fragment &frag);
   static gap::generator<ObjCIndirectCopyRestoreExpr> in(const File &file);
 
+  static std::optional<ObjCIndirectCopyRestoreExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ObjCIndirectCopyRestoreExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_INDIRECT_COPY_RESTORE_EXPR;
   }

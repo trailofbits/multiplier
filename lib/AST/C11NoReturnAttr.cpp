@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kC11NoReturnAttrDerivedKinds[] = {
+    C11NoReturnAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<C11NoReturnAttr> C11NoReturnAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = C11NoReturnAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<C11NoReturnAttr> C11NoReturnAttr::from(const std::optional<Attr> &
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kC11NoReturnAttrDerivedKinds[] = {
-    C11NoReturnAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<C11NoReturnAttr> C11NoReturnAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

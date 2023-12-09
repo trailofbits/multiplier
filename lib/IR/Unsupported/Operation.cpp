@@ -22,12 +22,10 @@
 
 namespace mx::ir::unsup {
 std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
-  switch (that.kind()) {
-    default: return std::nullopt;
-    case mx::ir::OperationKind::UNSUP_DECL:
-    case mx::ir::OperationKind::UNSUP_STMT:
-      return reinterpret_cast<const Operation &>(that);
+  if (IsUnsupportedOperationKind(that.kind())) {
+    return reinterpret_cast<const Operation &>(that);
   }
+  return std::nullopt;
 }
 
 std::optional<UnsupportedDeclOp> UnsupportedDeclOp::from(const ::mx::ir::Operation &that) {

@@ -39,6 +39,9 @@ class MX_EXPORT OMPParallelSectionsDirective : public OMPExecutableDirective {
   static gap::generator<OMPParallelSectionsDirective> in(const Fragment &frag);
   static gap::generator<OMPParallelSectionsDirective> in(const File &file);
 
+  static std::optional<OMPParallelSectionsDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPParallelSectionsDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_SECTIONS_DIRECTIVE;
   }

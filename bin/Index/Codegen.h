@@ -35,6 +35,8 @@ class CodeGenerator {
 
   void Disable(void);
 
+  bool IsEnabled(void) const noexcept;
+
   // Generate Source IR from the top-level declarations. It uses vast
   // emit_module API to lower the top-level declarations and save them
   // to the persistent map with code ids.

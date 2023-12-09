@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kObjCExternallyRetainedAttrDerivedKinds[] = {
+    ObjCExternallyRetainedAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<ObjCExternallyRetainedAttr> ObjCExternallyRetainedAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ObjCExternallyRetainedAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<ObjCExternallyRetainedAttr> ObjCExternallyRetainedAttr::from(const
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kObjCExternallyRetainedAttrDerivedKinds[] = {
-    ObjCExternallyRetainedAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ObjCExternallyRetainedAttr> ObjCExternallyRetainedAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

@@ -39,6 +39,9 @@ class MX_EXPORT TemplateDecl : public NamedDecl {
   static gap::generator<TemplateDecl> in(const Fragment &frag);
   static gap::generator<TemplateDecl> in(const File &file);
 
+  static std::optional<TemplateDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<TemplateDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   static gap::generator<TemplateDecl> containing(const Decl &decl);
   static gap::generator<TemplateDecl> containing(const std::optional<Decl> &decl);
 

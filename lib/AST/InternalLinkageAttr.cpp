@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kInternalLinkageAttrDerivedKinds[] = {
+    InternalLinkageAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<InternalLinkageAttr> InternalLinkageAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = InternalLinkageAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<InternalLinkageAttr> InternalLinkageAttr::from(const std::optional
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kInternalLinkageAttrDerivedKinds[] = {
-    InternalLinkageAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<InternalLinkageAttr> InternalLinkageAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

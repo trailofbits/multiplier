@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kDependentTemplateSpecializationTypeDerivedKinds[] = {
+    DependentTemplateSpecializationType::static_kind(),
+};
+}  // namespace
+
 gap::generator<DependentTemplateSpecializationType> DependentTemplateSpecializationType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DependentTemplateSpecializationType::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializati
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kDependentTemplateSpecializationTypeDerivedKinds[] = {
-    DependentTemplateSpecializationType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializationType::from_base(const Type &parent) {
   switch (parent.kind()) {

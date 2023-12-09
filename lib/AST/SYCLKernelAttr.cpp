@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kSYCLKernelAttrDerivedKinds[] = {
+    SYCLKernelAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<SYCLKernelAttr> SYCLKernelAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = SYCLKernelAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<SYCLKernelAttr> SYCLKernelAttr::from(const std::optional<Attr> &pa
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kSYCLKernelAttrDerivedKinds[] = {
-    SYCLKernelAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<SYCLKernelAttr> SYCLKernelAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

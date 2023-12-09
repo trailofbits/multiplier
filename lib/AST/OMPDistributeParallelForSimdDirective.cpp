@@ -14,6 +14,8 @@
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -21,6 +23,12 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kOMPDistributeParallelForSimdDirectiveDerivedKinds[] = {
+    OMPDistributeParallelForSimdDirective::static_kind(),
+};
+}  // namespace
 
 gap::generator<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -36,6 +44,21 @@ bool OMPDistributeParallelForSimdDirective::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<OMPDistributeParallelForSimdDirective, ir::hl::Operation>> OMPDistributeParallelForSimdDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPDistributeParallelForSimdDirectiveDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<OMPDistributeParallelForSimdDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::containing(const Decl &decl) {
@@ -104,13 +127,6 @@ std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSim
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kOMPDistributeParallelForSimdDirectiveDerivedKinds[] = {
-    OMPDistributeParallelForSimdDirective::static_kind(),
-};
-
-}  // namespace
 
 std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {

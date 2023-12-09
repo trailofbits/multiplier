@@ -41,6 +41,9 @@ class MX_EXPORT UnaryOperator : public Expr {
   static gap::generator<UnaryOperator> in(const Fragment &frag);
   static gap::generator<UnaryOperator> in(const File &file);
 
+  static std::optional<UnaryOperator> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<UnaryOperator, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNARY_OPERATOR;
   }

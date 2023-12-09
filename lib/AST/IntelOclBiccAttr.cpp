@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kIntelOclBiccAttrDerivedKinds[] = {
+    IntelOclBiccAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<IntelOclBiccAttr> IntelOclBiccAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = IntelOclBiccAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<IntelOclBiccAttr> IntelOclBiccAttr::from(const std::optional<Attr>
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kIntelOclBiccAttrDerivedKinds[] = {
-    IntelOclBiccAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<IntelOclBiccAttr> IntelOclBiccAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

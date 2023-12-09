@@ -42,6 +42,9 @@ class MX_EXPORT BlockExpr : public Expr {
   static gap::generator<BlockExpr> in(const Fragment &frag);
   static gap::generator<BlockExpr> in(const File &file);
 
+  static std::optional<BlockExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<BlockExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BLOCK_EXPR;
   }

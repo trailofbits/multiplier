@@ -40,6 +40,9 @@ class MX_EXPORT ExtVectorElementExpr : public Expr {
   static gap::generator<ExtVectorElementExpr> in(const Fragment &frag);
   static gap::generator<ExtVectorElementExpr> in(const File &file);
 
+  static std::optional<ExtVectorElementExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ExtVectorElementExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::EXT_VECTOR_ELEMENT_EXPR;
   }

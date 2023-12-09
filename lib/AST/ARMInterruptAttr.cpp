@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kARMInterruptAttrDerivedKinds[] = {
+    ARMInterruptAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<ARMInterruptAttr> ARMInterruptAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ARMInterruptAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<ARMInterruptAttr> ARMInterruptAttr::from(const std::optional<Attr>
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kARMInterruptAttrDerivedKinds[] = {
-    ARMInterruptAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ARMInterruptAttr> ARMInterruptAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

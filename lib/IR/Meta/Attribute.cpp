@@ -14,11 +14,10 @@
 
 namespace mx::ir::meta {
 std::optional<Attribute> Attribute::from(const ::mx::ir::Attribute &that) {
-  switch (that.kind()) {
-    default: return std::nullopt;
-    case mx::ir::AttributeKind::META_IDENTIFIER:
-      return reinterpret_cast<const Attribute &>(that);
+  if (IsMetaAttributeKind(that.kind())) {
+    return reinterpret_cast<const Attribute &>(that);
   }
+  return std::nullopt;
 }
 
 std::optional<IdentifierAttr> IdentifierAttr::from(const ::mx::ir::Attribute &that) {

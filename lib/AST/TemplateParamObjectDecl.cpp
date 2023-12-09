@@ -13,6 +13,8 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueDecl.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -20,6 +22,12 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const DeclKind kTemplateParamObjectDeclDerivedKinds[] = {
+    TemplateParamObjectDecl::static_kind(),
+};
+}  // namespace
 
 gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -35,6 +43,21 @@ bool TemplateParamObjectDecl::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::from(const ir::hl::Operation &op) {
+  if (auto val = Decl::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<TemplateParamObjectDecl, ir::hl::Operation>> TemplateParamObjectDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kTemplateParamObjectDeclDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<TemplateParamObjectDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::containing(const Decl &decl) {
@@ -132,13 +155,6 @@ std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::from(const std::
   }
   return std::nullopt;
 }
-
-namespace {
-static const DeclKind kTemplateParamObjectDeclDerivedKinds[] = {
-    TemplateParamObjectDecl::static_kind(),
-};
-
-}  // namespace
 
 std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {

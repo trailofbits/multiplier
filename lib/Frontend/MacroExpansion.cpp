@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const MacroKind kMacroExpansionDerivedKinds[] = {
+    MacroExpansion::static_kind(),
+};
+}  // namespace
+
 gap::generator<MacroExpansion> MacroExpansion::containing(const Macro &macro) {
   for (auto impl = macro.parent(); impl; impl = impl->parent()) {
     if (auto d = MacroExpansion::from(*impl)) {
@@ -70,13 +76,6 @@ std::optional<MacroExpansion> MacroExpansion::from(const std::optional<Macro> &p
   }
   return std::nullopt;
 }
-
-namespace {
-static const MacroKind kMacroExpansionDerivedKinds[] = {
-    MacroExpansion::static_kind(),
-};
-
-}  // namespace
 
 std::optional<MacroExpansion> MacroExpansion::from_base(const Macro &parent) {
   switch (parent.kind()) {
