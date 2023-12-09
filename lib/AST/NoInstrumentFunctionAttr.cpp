@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kNoInstrumentFunctionAttrDerivedKinds[] = {
+    NoInstrumentFunctionAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<NoInstrumentFunctionAttr> NoInstrumentFunctionAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = NoInstrumentFunctionAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<NoInstrumentFunctionAttr> NoInstrumentFunctionAttr::from(const std
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kNoInstrumentFunctionAttrDerivedKinds[] = {
-    NoInstrumentFunctionAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<NoInstrumentFunctionAttr> NoInstrumentFunctionAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

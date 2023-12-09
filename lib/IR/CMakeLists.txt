@@ -98,7 +98,7 @@ target_link_libraries("mx-mlir"
     "mx-serialize"
 )
 
-if(MX_ENABLE_INSTALL)
+if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
   install(
     DIRECTORY
       "${ir_source_include_dir}"

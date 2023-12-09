@@ -39,6 +39,9 @@ class MX_EXPORT OMPParallelMaskedDirective : public OMPExecutableDirective {
   static gap::generator<OMPParallelMaskedDirective> in(const Fragment &frag);
   static gap::generator<OMPParallelMaskedDirective> in(const File &file);
 
+  static std::optional<OMPParallelMaskedDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPParallelMaskedDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_MASKED_DIRECTIVE;
   }

@@ -40,6 +40,9 @@ class MX_EXPORT ObjCBoolLiteralExpr : public Expr {
   static gap::generator<ObjCBoolLiteralExpr> in(const Fragment &frag);
   static gap::generator<ObjCBoolLiteralExpr> in(const File &file);
 
+  static std::optional<ObjCBoolLiteralExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ObjCBoolLiteralExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_BOOL_LITERAL_EXPR;
   }

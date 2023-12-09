@@ -14,6 +14,8 @@
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -21,6 +23,12 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kOMPForSimdDirectiveDerivedKinds[] = {
+    OMPForSimdDirective::static_kind(),
+};
+}  // namespace
 
 gap::generator<OMPForSimdDirective> OMPForSimdDirective::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -36,6 +44,21 @@ bool OMPForSimdDirective::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OMPForSimdDirective> OMPForSimdDirective::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<OMPForSimdDirective, ir::hl::Operation>> OMPForSimdDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPForSimdDirectiveDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<OMPForSimdDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<OMPForSimdDirective> OMPForSimdDirective::containing(const Decl &decl) {
@@ -104,13 +127,6 @@ std::optional<OMPForSimdDirective> OMPForSimdDirective::from(const std::optional
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kOMPForSimdDirectiveDerivedKinds[] = {
-    OMPForSimdDirective::static_kind(),
-};
-
-}  // namespace
 
 std::optional<OMPForSimdDirective> OMPForSimdDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {

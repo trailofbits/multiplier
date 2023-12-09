@@ -328,41 +328,6 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
-gap::generator<InheritableAttr> InheritableAttr::containing(const Token &tok) {
-  for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-    if (auto d = InheritableAttr::from(*ctx)) {
-      co_yield *d;
-    }
-  }
-}
-
-bool InheritableAttr::contains(const Token &tok) const {
-  auto id_ = id();
-  for (auto &parent : InheritableAttr::containing(tok)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-std::optional<InheritableAttr> InheritableAttr::by_id(const Index &index, EntityId eid) {
-  VariantId vid = eid.Unpack();
-  if (std::holds_alternative<AttrId>(vid)) {
-    if (auto base = index.attribute(eid.Pack())) {
-      return from_base(base.value());
-    }
-  } else if (std::holds_alternative<InvalidId>(vid)) {
-    assert(eid.Pack() == kInvalidEntityId);
-  }
-  return std::nullopt;
-}
-
-std::optional<InheritableAttr> InheritableAttr::from(const std::optional<Attr> &parent) {
-  if (parent) {
-    return from_base(parent.value());
-  }
-  return std::nullopt;
-}
-
 namespace {
 static const AttrKind kInheritableAttrDerivedKinds[] = {
     InitPriorityAttr::static_kind(),
@@ -676,8 +641,42 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     SwiftErrorResultAttr::static_kind(),
     SwiftIndirectResultAttr::static_kind(),
 };
-
 }  // namespace
+
+gap::generator<InheritableAttr> InheritableAttr::containing(const Token &tok) {
+  for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+    if (auto d = InheritableAttr::from(*ctx)) {
+      co_yield *d;
+    }
+  }
+}
+
+bool InheritableAttr::contains(const Token &tok) const {
+  auto id_ = id();
+  for (auto &parent : InheritableAttr::containing(tok)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+std::optional<InheritableAttr> InheritableAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    if (auto base = index.attribute(eid.Pack())) {
+      return from_base(base.value());
+    }
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
+std::optional<InheritableAttr> InheritableAttr::from(const std::optional<Attr> &parent) {
+  if (parent) {
+    return from_base(parent.value());
+  }
+  return std::nullopt;
+}
 
 std::optional<InheritableAttr> InheritableAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

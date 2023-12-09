@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kArgumentWithTypeTagAttrDerivedKinds[] = {
+    ArgumentWithTypeTagAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<ArgumentWithTypeTagAttr> ArgumentWithTypeTagAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ArgumentWithTypeTagAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<ArgumentWithTypeTagAttr> ArgumentWithTypeTagAttr::from(const std::
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kArgumentWithTypeTagAttrDerivedKinds[] = {
-    ArgumentWithTypeTagAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ArgumentWithTypeTagAttr> ArgumentWithTypeTagAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

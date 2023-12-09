@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kNSReturnsNotRetainedAttrDerivedKinds[] = {
+    NSReturnsNotRetainedAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = NSReturnsNotRetainedAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::from(const std
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kNSReturnsNotRetainedAttrDerivedKinds[] = {
-    NSReturnsNotRetainedAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

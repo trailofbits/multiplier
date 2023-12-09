@@ -13,32 +13,10 @@
 
 namespace mx::ir::builtin {
 std::optional<Attribute> Attribute::from(const ::mx::ir::Attribute &that) {
-  switch (that.kind()) {
-    default: return std::nullopt;
-    case mx::ir::AttributeKind::BUILTIN_TYPED:
-    case mx::ir::AttributeKind::BUILTIN_ELEMENTS:
-    case mx::ir::AttributeKind::BUILTIN_AFFINE_MAP:
-    case mx::ir::AttributeKind::BUILTIN_ARRAY:
-    case mx::ir::AttributeKind::BUILTIN_DENSE_ARRAY:
-    case mx::ir::AttributeKind::BUILTIN_DENSE_INT_OR_FP_ELEMENTS:
-    case mx::ir::AttributeKind::BUILTIN_DENSE_RESOURCE_ELEMENTS:
-    case mx::ir::AttributeKind::BUILTIN_DENSE_STRING_ELEMENTS:
-    case mx::ir::AttributeKind::BUILTIN_DICTIONARY:
-    case mx::ir::AttributeKind::BUILTIN_FLOAT:
-    case mx::ir::AttributeKind::BUILTIN_INTEGER:
-    case mx::ir::AttributeKind::BUILTIN_INTEGER_SET:
-    case mx::ir::AttributeKind::BUILTIN_OPAQUE:
-    case mx::ir::AttributeKind::BUILTIN_SPARSE_ELEMENTS:
-    case mx::ir::AttributeKind::BUILTIN_STRING:
-    case mx::ir::AttributeKind::BUILTIN_SYMBOL_REF:
-    case mx::ir::AttributeKind::BUILTIN_TYPE:
-    case mx::ir::AttributeKind::BUILTIN_UNIT:
-    case mx::ir::AttributeKind::BUILTIN_STRIDED_LAYOUT:
-    case mx::ir::AttributeKind::BUILTIN_BOOL:
-    case mx::ir::AttributeKind::BUILTIN_FLAT_SYMBOL_REF:
-    case mx::ir::AttributeKind::BUILTIN_DENSE_INT_ELEMENTS:
-      return reinterpret_cast<const Attribute &>(that);
+  if (IsBuiltinAttributeKind(that.kind())) {
+    return reinterpret_cast<const Attribute &>(that);
   }
+  return std::nullopt;
 }
 
 std::optional<TypedAttr> TypedAttr::from(const ::mx::ir::Attribute &that) {

@@ -40,6 +40,9 @@ class MX_EXPORT ParenListExpr : public Expr {
   static gap::generator<ParenListExpr> in(const Fragment &frag);
   static gap::generator<ParenListExpr> in(const File &file);
 
+  static std::optional<ParenListExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ParenListExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::PAREN_LIST_EXPR;
   }

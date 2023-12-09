@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kAMDGPUNumVGPRAttrDerivedKinds[] = {
+    AMDGPUNumVGPRAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<AMDGPUNumVGPRAttr> AMDGPUNumVGPRAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AMDGPUNumVGPRAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<AMDGPUNumVGPRAttr> AMDGPUNumVGPRAttr::from(const std::optional<Att
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kAMDGPUNumVGPRAttrDerivedKinds[] = {
-    AMDGPUNumVGPRAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<AMDGPUNumVGPRAttr> AMDGPUNumVGPRAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

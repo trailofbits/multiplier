@@ -41,6 +41,9 @@ class MX_EXPORT ObjCArrayLiteral : public Expr {
   static gap::generator<ObjCArrayLiteral> in(const Fragment &frag);
   static gap::generator<ObjCArrayLiteral> in(const File &file);
 
+  static std::optional<ObjCArrayLiteral> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ObjCArrayLiteral, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_ARRAY_LITERAL;
   }

@@ -18,6 +18,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const MacroKind kMacroStringifyDerivedKinds[] = {
+    MacroStringify::static_kind(),
+};
+}  // namespace
+
 gap::generator<MacroStringify> MacroStringify::containing(const Macro &macro) {
   for (auto impl = macro.parent(); impl; impl = impl->parent()) {
     if (auto d = MacroStringify::from(*impl)) {
@@ -68,13 +74,6 @@ std::optional<MacroStringify> MacroStringify::from(const std::optional<Macro> &p
   }
   return std::nullopt;
 }
-
-namespace {
-static const MacroKind kMacroStringifyDerivedKinds[] = {
-    MacroStringify::static_kind(),
-};
-
-}  // namespace
 
 std::optional<MacroStringify> MacroStringify::from_base(const Macro &parent) {
   switch (parent.kind()) {

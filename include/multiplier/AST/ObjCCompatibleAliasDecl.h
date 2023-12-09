@@ -39,6 +39,9 @@ class MX_EXPORT ObjCCompatibleAliasDecl : public NamedDecl {
   static gap::generator<ObjCCompatibleAliasDecl> in(const Fragment &frag);
   static gap::generator<ObjCCompatibleAliasDecl> in(const File &file);
 
+  static std::optional<ObjCCompatibleAliasDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ObjCCompatibleAliasDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_COMPATIBLE_ALIAS;
   }

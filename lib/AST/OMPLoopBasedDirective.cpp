@@ -49,6 +49,8 @@
 #include <multiplier/AST/OMPTileDirective.h>
 #include <multiplier/AST/OMPUnrollDirective.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -56,6 +58,48 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kOMPLoopBasedDirectiveDerivedKinds[] = {
+    OMPMaskedTaskLoopDirective::static_kind(),
+    OMPMaskedTaskLoopSimdDirective::static_kind(),
+    OMPMasterTaskLoopDirective::static_kind(),
+    OMPMasterTaskLoopSimdDirective::static_kind(),
+    OMPParallelForDirective::static_kind(),
+    OMPParallelForSimdDirective::static_kind(),
+    OMPParallelGenericLoopDirective::static_kind(),
+    OMPParallelMaskedTaskLoopDirective::static_kind(),
+    OMPParallelMaskedTaskLoopSimdDirective::static_kind(),
+    OMPParallelMasterTaskLoopDirective::static_kind(),
+    OMPParallelMasterTaskLoopSimdDirective::static_kind(),
+    OMPSimdDirective::static_kind(),
+    OMPTargetParallelForDirective::static_kind(),
+    OMPTargetParallelForSimdDirective::static_kind(),
+    OMPTargetParallelGenericLoopDirective::static_kind(),
+    OMPTargetSimdDirective::static_kind(),
+    OMPTargetTeamsDistributeDirective::static_kind(),
+    OMPTargetTeamsDistributeParallelForDirective::static_kind(),
+    OMPTargetTeamsDistributeParallelForSimdDirective::static_kind(),
+    OMPTargetTeamsDistributeSimdDirective::static_kind(),
+    OMPTargetTeamsGenericLoopDirective::static_kind(),
+    OMPTaskLoopDirective::static_kind(),
+    OMPTaskLoopSimdDirective::static_kind(),
+    OMPTeamsDistributeDirective::static_kind(),
+    OMPTeamsDistributeParallelForDirective::static_kind(),
+    OMPTeamsDistributeParallelForSimdDirective::static_kind(),
+    OMPTeamsDistributeSimdDirective::static_kind(),
+    OMPTeamsGenericLoopDirective::static_kind(),
+    OMPDistributeDirective::static_kind(),
+    OMPDistributeParallelForDirective::static_kind(),
+    OMPDistributeParallelForSimdDirective::static_kind(),
+    OMPDistributeSimdDirective::static_kind(),
+    OMPForDirective::static_kind(),
+    OMPForSimdDirective::static_kind(),
+    OMPGenericLoopDirective::static_kind(),
+    OMPTileDirective::static_kind(),
+    OMPUnrollDirective::static_kind(),
+};
+}  // namespace
 
 gap::generator<OMPLoopBasedDirective> OMPLoopBasedDirective::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -71,6 +115,21 @@ bool OMPLoopBasedDirective::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OMPLoopBasedDirective> OMPLoopBasedDirective::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<OMPLoopBasedDirective, ir::hl::Operation>> OMPLoopBasedDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPLoopBasedDirectiveDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<OMPLoopBasedDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<OMPLoopBasedDirective> OMPLoopBasedDirective::containing(const Decl &decl) {
@@ -139,49 +198,6 @@ std::optional<OMPLoopBasedDirective> OMPLoopBasedDirective::from(const std::opti
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kOMPLoopBasedDirectiveDerivedKinds[] = {
-    OMPMaskedTaskLoopDirective::static_kind(),
-    OMPMaskedTaskLoopSimdDirective::static_kind(),
-    OMPMasterTaskLoopDirective::static_kind(),
-    OMPMasterTaskLoopSimdDirective::static_kind(),
-    OMPParallelForDirective::static_kind(),
-    OMPParallelForSimdDirective::static_kind(),
-    OMPParallelGenericLoopDirective::static_kind(),
-    OMPParallelMaskedTaskLoopDirective::static_kind(),
-    OMPParallelMaskedTaskLoopSimdDirective::static_kind(),
-    OMPParallelMasterTaskLoopDirective::static_kind(),
-    OMPParallelMasterTaskLoopSimdDirective::static_kind(),
-    OMPSimdDirective::static_kind(),
-    OMPTargetParallelForDirective::static_kind(),
-    OMPTargetParallelForSimdDirective::static_kind(),
-    OMPTargetParallelGenericLoopDirective::static_kind(),
-    OMPTargetSimdDirective::static_kind(),
-    OMPTargetTeamsDistributeDirective::static_kind(),
-    OMPTargetTeamsDistributeParallelForDirective::static_kind(),
-    OMPTargetTeamsDistributeParallelForSimdDirective::static_kind(),
-    OMPTargetTeamsDistributeSimdDirective::static_kind(),
-    OMPTargetTeamsGenericLoopDirective::static_kind(),
-    OMPTaskLoopDirective::static_kind(),
-    OMPTaskLoopSimdDirective::static_kind(),
-    OMPTeamsDistributeDirective::static_kind(),
-    OMPTeamsDistributeParallelForDirective::static_kind(),
-    OMPTeamsDistributeParallelForSimdDirective::static_kind(),
-    OMPTeamsDistributeSimdDirective::static_kind(),
-    OMPTeamsGenericLoopDirective::static_kind(),
-    OMPDistributeDirective::static_kind(),
-    OMPDistributeParallelForDirective::static_kind(),
-    OMPDistributeParallelForSimdDirective::static_kind(),
-    OMPDistributeSimdDirective::static_kind(),
-    OMPForDirective::static_kind(),
-    OMPForSimdDirective::static_kind(),
-    OMPGenericLoopDirective::static_kind(),
-    OMPTileDirective::static_kind(),
-    OMPUnrollDirective::static_kind(),
-};
-
-}  // namespace
 
 std::optional<OMPLoopBasedDirective> OMPLoopBasedDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {

@@ -37,6 +37,9 @@ class MX_EXPORT FileScopeAsmDecl : public Decl {
   static gap::generator<FileScopeAsmDecl> in(const Fragment &frag);
   static gap::generator<FileScopeAsmDecl> in(const File &file);
 
+  static std::optional<FileScopeAsmDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<FileScopeAsmDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FILE_SCOPE_ASM;
   }

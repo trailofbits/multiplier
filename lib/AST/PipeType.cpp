@@ -18,6 +18,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kPipeTypeDerivedKinds[] = {
+    PipeType::static_kind(),
+};
+}  // namespace
+
 gap::generator<PipeType> PipeType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = PipeType::from(*ctx)) {
@@ -52,13 +58,6 @@ std::optional<PipeType> PipeType::from(const std::optional<Type> &parent) {
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kPipeTypeDerivedKinds[] = {
-    PipeType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<PipeType> PipeType::from_base(const Type &parent) {
   switch (parent.kind()) {

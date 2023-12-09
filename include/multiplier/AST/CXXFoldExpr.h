@@ -42,6 +42,9 @@ class MX_EXPORT CXXFoldExpr : public Expr {
   static gap::generator<CXXFoldExpr> in(const Fragment &frag);
   static gap::generator<CXXFoldExpr> in(const File &file);
 
+  static std::optional<CXXFoldExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<CXXFoldExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_FOLD_EXPR;
   }

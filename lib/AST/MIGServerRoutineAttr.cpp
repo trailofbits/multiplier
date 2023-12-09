@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kMIGServerRoutineAttrDerivedKinds[] = {
+    MIGServerRoutineAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<MIGServerRoutineAttr> MIGServerRoutineAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = MIGServerRoutineAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<MIGServerRoutineAttr> MIGServerRoutineAttr::from(const std::option
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kMIGServerRoutineAttrDerivedKinds[] = {
-    MIGServerRoutineAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<MIGServerRoutineAttr> MIGServerRoutineAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

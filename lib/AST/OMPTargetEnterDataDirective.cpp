@@ -12,6 +12,8 @@
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -19,6 +21,12 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kOMPTargetEnterDataDirectiveDerivedKinds[] = {
+    OMPTargetEnterDataDirective::static_kind(),
+};
+}  // namespace
 
 gap::generator<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -34,6 +42,21 @@ bool OMPTargetEnterDataDirective::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<OMPTargetEnterDataDirective, ir::hl::Operation>> OMPTargetEnterDataDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPTargetEnterDataDirectiveDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<OMPTargetEnterDataDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::containing(const Decl &decl) {
@@ -102,13 +125,6 @@ std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from(con
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kOMPTargetEnterDataDirectiveDerivedKinds[] = {
-    OMPTargetEnterDataDirective::static_kind(),
-};
-
-}  // namespace
 
 std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from_base(const Stmt &parent) {
   switch (parent.kind()) {

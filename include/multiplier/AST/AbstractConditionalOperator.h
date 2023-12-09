@@ -40,6 +40,9 @@ class MX_EXPORT AbstractConditionalOperator : public Expr {
   static gap::generator<AbstractConditionalOperator> in(const Fragment &frag);
   static gap::generator<AbstractConditionalOperator> in(const File &file);
 
+  static std::optional<AbstractConditionalOperator> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<AbstractConditionalOperator, ir::hl::Operation>> in(const Compilation &tu);
+
   static gap::generator<AbstractConditionalOperator> containing(const Decl &decl);
   static gap::generator<AbstractConditionalOperator> containing(const std::optional<Decl> &decl);
 

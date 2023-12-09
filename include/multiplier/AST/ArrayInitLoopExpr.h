@@ -41,6 +41,9 @@ class MX_EXPORT ArrayInitLoopExpr : public Expr {
   static gap::generator<ArrayInitLoopExpr> in(const Fragment &frag);
   static gap::generator<ArrayInitLoopExpr> in(const File &file);
 
+  static std::optional<ArrayInitLoopExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ArrayInitLoopExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_INIT_LOOP_EXPR;
   }

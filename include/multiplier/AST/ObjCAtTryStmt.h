@@ -38,6 +38,9 @@ class MX_EXPORT ObjCAtTryStmt : public Stmt {
   static gap::generator<ObjCAtTryStmt> in(const Fragment &frag);
   static gap::generator<ObjCAtTryStmt> in(const File &file);
 
+  static std::optional<ObjCAtTryStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ObjCAtTryStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_TRY_STMT;
   }

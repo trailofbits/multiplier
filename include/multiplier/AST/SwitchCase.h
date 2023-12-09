@@ -36,6 +36,9 @@ class MX_EXPORT SwitchCase : public Stmt {
   static gap::generator<SwitchCase> in(const Fragment &frag);
   static gap::generator<SwitchCase> in(const File &file);
 
+  static std::optional<SwitchCase> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<SwitchCase, ir::hl::Operation>> in(const Compilation &tu);
+
   static gap::generator<SwitchCase> containing(const Decl &decl);
   static gap::generator<SwitchCase> containing(const std::optional<Decl> &decl);
 

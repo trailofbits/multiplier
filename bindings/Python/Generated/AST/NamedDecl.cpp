@@ -423,6 +423,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "obj_cf_string_formatting_family",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->obj_cf_string_formatting_family());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamedDecl::obj_cf_string_formatting_family"),
+    nullptr,
+  },
+  {
     "qualified_name_as_string",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -568,6 +578,14 @@ static PyMethodDef gMethods[] = {
 
             return ::mx::to_python(obj->in(arg_0.value()));
           }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Compilation>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->in(arg_0.value()));
+          }
 
           PyErrorStreamer(PyExc_TypeError)
               << "Invalid arguments passed to 'IN'";
@@ -641,7 +659,7 @@ static PyMethodDef gMethods[] = {
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = PythonBinding<mx::EntityId>::from_python(args[1]);
+            auto arg_1 = PythonBinding<EntityId>::from_python(args[1]);
             if (!arg_1.has_value()) {
               break;
             }
@@ -657,33 +675,19 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::NamedDecl::by_id"),
   },
   {
-    "from_base",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Decl>::from_python(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->from_base(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'from_base'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::NamedDecl::from_base"),
-  },
-  {
     "FROM",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           auto obj = T_cast(self);
           (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::ir::hl::Operation>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from(arg_0.value()));
+          }
           while (num_args == 1) {
             auto arg_0 = PythonBinding<mx::Decl>::from_python(args[0]);
             if (!arg_0.has_value()) {
@@ -731,6 +735,28 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::NamedDecl::from"),
+  },
+  {
+    "from_base",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Decl>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->from_base(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'from_base'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::NamedDecl::from_base"),
   },
   {}  // Sentinel.
 };

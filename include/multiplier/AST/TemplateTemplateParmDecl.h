@@ -40,6 +40,9 @@ class MX_EXPORT TemplateTemplateParmDecl : public TemplateDecl {
   static gap::generator<TemplateTemplateParmDecl> in(const Fragment &frag);
   static gap::generator<TemplateTemplateParmDecl> in(const File &file);
 
+  static std::optional<TemplateTemplateParmDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<TemplateTemplateParmDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TEMPLATE_TEMPLATE_PARM;
   }

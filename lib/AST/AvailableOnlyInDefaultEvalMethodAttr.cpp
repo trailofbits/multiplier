@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kAvailableOnlyInDefaultEvalMethodAttrDerivedKinds[] = {
+    AvailableOnlyInDefaultEvalMethodAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<AvailableOnlyInDefaultEvalMethodAttr> AvailableOnlyInDefaultEvalMethodAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AvailableOnlyInDefaultEvalMethodAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<AvailableOnlyInDefaultEvalMethodAttr> AvailableOnlyInDefaultEvalMe
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kAvailableOnlyInDefaultEvalMethodAttrDerivedKinds[] = {
-    AvailableOnlyInDefaultEvalMethodAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<AvailableOnlyInDefaultEvalMethodAttr> AvailableOnlyInDefaultEvalMethodAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

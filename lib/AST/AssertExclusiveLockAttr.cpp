@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kAssertExclusiveLockAttrDerivedKinds[] = {
+    AssertExclusiveLockAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<AssertExclusiveLockAttr> AssertExclusiveLockAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AssertExclusiveLockAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::from(const std::
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kAssertExclusiveLockAttrDerivedKinds[] = {
-    AssertExclusiveLockAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

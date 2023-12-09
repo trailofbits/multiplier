@@ -40,6 +40,9 @@ class MX_EXPORT FixedPointLiteral : public Expr {
   static gap::generator<FixedPointLiteral> in(const Fragment &frag);
   static gap::generator<FixedPointLiteral> in(const File &file);
 
+  static std::optional<FixedPointLiteral> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<FixedPointLiteral, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FIXED_POINT_LITERAL;
   }

@@ -13,30 +13,10 @@
 
 namespace mx::ir::hl {
 std::optional<Attribute> Attribute::from(const ::mx::ir::Attribute &that) {
-  switch (that.kind()) {
-    default: return std::nullopt;
-    case mx::ir::AttributeKind::HL_ALLOC_ALIGN:
-    case mx::ir::AttributeKind::HL_ALLOC_SIZE:
-    case mx::ir::AttributeKind::HL_ANNOTATION:
-    case mx::ir::AttributeKind::HL_ASM_LABEL:
-    case mx::ir::AttributeKind::HL_BUILTIN:
-    case mx::ir::AttributeKind::HL_CV_QUALIFIERS:
-    case mx::ir::AttributeKind::HL_CVR_QUALIFIERS:
-    case mx::ir::AttributeKind::HL_CONST:
-    case mx::ir::AttributeKind::HL_FORMAT:
-    case mx::ir::AttributeKind::HL_LOADER_UNINITIALIZED:
-    case mx::ir::AttributeKind::HL_MODE:
-    case mx::ir::AttributeKind::HL_NO_INSTRUMENT_FUNCTION:
-    case mx::ir::AttributeKind::HL_NO_THROW:
-    case mx::ir::AttributeKind::HL_NON_NULL:
-    case mx::ir::AttributeKind::HL_PACKED:
-    case mx::ir::AttributeKind::HL_PURE:
-    case mx::ir::AttributeKind::HL_RESTRICT:
-    case mx::ir::AttributeKind::HL_SECTION:
-    case mx::ir::AttributeKind::HL_UCV_QUALIFIERS:
-    case mx::ir::AttributeKind::HL_WARN_UNUSED_RESULT:
-      return reinterpret_cast<const Attribute &>(that);
+  if (IsHighLevelAttributeKind(that.kind())) {
+    return reinterpret_cast<const Attribute &>(that);
   }
+  return std::nullopt;
 }
 
 std::optional<AllocAlignAttr> AllocAlignAttr::from(const ::mx::ir::Attribute &that) {

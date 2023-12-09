@@ -46,7 +46,7 @@ function(define_example exe_name source_file)
         "${PROJECT_BINARY_DIR}/bin"
   )
 
-  if(MX_ENABLE_INSTALL)
+  if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
     install(
       TARGETS
         "${exe_name}"

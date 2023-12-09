@@ -142,6 +142,10 @@ void CodeGenerator::Disable(void) {
   impl->disabled = true;
 }
 
+bool CodeGenerator::IsEnabled(void) const noexcept {
+  return !impl->disabled;
+}
+
 CodeGenerator::~CodeGenerator(void) {}
 
 std::string CodeGenerator::GenerateSourceIR(

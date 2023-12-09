@@ -38,6 +38,9 @@ class MX_EXPORT NamespaceAliasDecl : public NamedDecl {
   static gap::generator<NamespaceAliasDecl> in(const Fragment &frag);
   static gap::generator<NamespaceAliasDecl> in(const File &file);
 
+  static std::optional<NamespaceAliasDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<NamespaceAliasDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::NAMESPACE_ALIAS;
   }

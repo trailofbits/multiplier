@@ -123,6 +123,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "builtin_reference_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->builtin_reference_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Reference::builtin_reference_kind"),
+    nullptr,
+  },
+  {
     "referenced_entity_id",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

@@ -22,6 +22,15 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kArrayTypeDerivedKinds[] = {
+    ConstantArrayType::static_kind(),
+    DependentSizedArrayType::static_kind(),
+    IncompleteArrayType::static_kind(),
+    VariableArrayType::static_kind(),
+};
+}  // namespace
+
 gap::generator<ArrayType> ArrayType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ArrayType::from(*ctx)) {
@@ -56,16 +65,6 @@ std::optional<ArrayType> ArrayType::from(const std::optional<Type> &parent) {
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kArrayTypeDerivedKinds[] = {
-    ConstantArrayType::static_kind(),
-    DependentSizedArrayType::static_kind(),
-    IncompleteArrayType::static_kind(),
-    VariableArrayType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ArrayType> ArrayType::from_base(const Type &parent) {
   switch (parent.kind()) {

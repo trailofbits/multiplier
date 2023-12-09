@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kUsingIfExistsAttrDerivedKinds[] = {
+    UsingIfExistsAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<UsingIfExistsAttr> UsingIfExistsAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = UsingIfExistsAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<UsingIfExistsAttr> UsingIfExistsAttr::from(const std::optional<Att
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kUsingIfExistsAttrDerivedKinds[] = {
-    UsingIfExistsAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<UsingIfExistsAttr> UsingIfExistsAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

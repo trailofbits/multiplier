@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kDependentSizedMatrixTypeDerivedKinds[] = {
+    DependentSizedMatrixType::static_kind(),
+};
+}  // namespace
+
 gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DependentSizedMatrixType::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const std
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kDependentSizedMatrixTypeDerivedKinds[] = {
-    DependentSizedMatrixType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from_base(const Type &parent) {
   switch (parent.kind()) {

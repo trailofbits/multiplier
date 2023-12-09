@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kCFUnknownTransferAttrDerivedKinds[] = {
+    CFUnknownTransferAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<CFUnknownTransferAttr> CFUnknownTransferAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = CFUnknownTransferAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::from(const std::opti
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kCFUnknownTransferAttrDerivedKinds[] = {
-    CFUnknownTransferAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

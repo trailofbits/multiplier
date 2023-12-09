@@ -21,6 +21,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kSwiftErrorResultAttrDerivedKinds[] = {
+    SwiftErrorResultAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<SwiftErrorResultAttr> SwiftErrorResultAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = SwiftErrorResultAttr::from(*ctx)) {
@@ -55,13 +61,6 @@ std::optional<SwiftErrorResultAttr> SwiftErrorResultAttr::from(const std::option
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kSwiftErrorResultAttrDerivedKinds[] = {
-    SwiftErrorResultAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<SwiftErrorResultAttr> SwiftErrorResultAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

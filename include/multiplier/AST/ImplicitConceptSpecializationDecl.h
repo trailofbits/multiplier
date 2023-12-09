@@ -37,6 +37,9 @@ class MX_EXPORT ImplicitConceptSpecializationDecl : public Decl {
   static gap::generator<ImplicitConceptSpecializationDecl> in(const Fragment &frag);
   static gap::generator<ImplicitConceptSpecializationDecl> in(const File &file);
 
+  static std::optional<ImplicitConceptSpecializationDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ImplicitConceptSpecializationDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::IMPLICIT_CONCEPT_SPECIALIZATION;
   }

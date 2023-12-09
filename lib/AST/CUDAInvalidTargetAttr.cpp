@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kCUDAInvalidTargetAttrDerivedKinds[] = {
+    CUDAInvalidTargetAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<CUDAInvalidTargetAttr> CUDAInvalidTargetAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = CUDAInvalidTargetAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<CUDAInvalidTargetAttr> CUDAInvalidTargetAttr::from(const std::opti
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kCUDAInvalidTargetAttrDerivedKinds[] = {
-    CUDAInvalidTargetAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<CUDAInvalidTargetAttr> CUDAInvalidTargetAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

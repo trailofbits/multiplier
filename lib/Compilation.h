@@ -7,12 +7,22 @@
 #pragma once
 
 #include <multiplier/Frontend/Compilation.h>
+#include <mutex>
 
 #include "EntityProvider.h"
 
 namespace mx {
+namespace ir {
+class SourceIRImpl;
+}  // namespace ir
 
 class CompilationImpl final : public EntityImpl<rpc::Compilation> {
+ private:
+  friend class ir::SourceIRImpl;
+
+  mutable std::mutex source_ir_lock;
+  mutable std::weak_ptr<const ir::SourceIRImpl> source_ir;
+
  public:
   using Ptr = CompilationImplPtr;
   using WeakPtr = WeakCompilationImplPtr;
@@ -28,6 +38,14 @@ class CompilationImpl final : public EntityImpl<rpc::Compilation> {
 
   // Return the source ir for the compilation.
   std::string_view SourceIR(void) const & noexcept;
+
+#ifndef MX_DISABLE_VAST
+
+  // Return a pointer to the source IR object.
+  std::shared_ptr<const ir::SourceIRImpl> SourceIRPtr(
+      PackedCompilationId id) const & noexcept;
+
+#endif  // MX_DISABLE_VAST
 };
 
 }  // namespace mx

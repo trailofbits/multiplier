@@ -42,6 +42,9 @@ class MX_EXPORT OMPTileDirective : public OMPLoopTransformationDirective {
   static gap::generator<OMPTileDirective> in(const Fragment &frag);
   static gap::generator<OMPTileDirective> in(const File &file);
 
+  static std::optional<OMPTileDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPTileDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TILE_DIRECTIVE;
   }

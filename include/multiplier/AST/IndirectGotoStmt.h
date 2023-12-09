@@ -38,6 +38,9 @@ class MX_EXPORT IndirectGotoStmt : public Stmt {
   static gap::generator<IndirectGotoStmt> in(const Fragment &frag);
   static gap::generator<IndirectGotoStmt> in(const File &file);
 
+  static std::optional<IndirectGotoStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<IndirectGotoStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::INDIRECT_GOTO_STMT;
   }

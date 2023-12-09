@@ -17,6 +17,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const MacroKind kMacroVAOptArgumentDerivedKinds[] = {
+    MacroVAOptArgument::static_kind(),
+};
+}  // namespace
+
 gap::generator<MacroVAOptArgument> MacroVAOptArgument::containing(const Macro &macro) {
   for (auto impl = macro.parent(); impl; impl = impl->parent()) {
     if (auto d = MacroVAOptArgument::from(*impl)) {
@@ -67,13 +73,6 @@ std::optional<MacroVAOptArgument> MacroVAOptArgument::from(const std::optional<M
   }
   return std::nullopt;
 }
-
-namespace {
-static const MacroKind kMacroVAOptArgumentDerivedKinds[] = {
-    MacroVAOptArgument::static_kind(),
-};
-
-}  // namespace
 
 std::optional<MacroVAOptArgument> MacroVAOptArgument::from_base(const Macro &parent) {
   switch (parent.kind()) {

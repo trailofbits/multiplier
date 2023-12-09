@@ -21,6 +21,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kDiagnoseIfAttrDerivedKinds[] = {
+    DiagnoseIfAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<DiagnoseIfAttr> DiagnoseIfAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DiagnoseIfAttr::from(*ctx)) {
@@ -55,13 +61,6 @@ std::optional<DiagnoseIfAttr> DiagnoseIfAttr::from(const std::optional<Attr> &pa
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kDiagnoseIfAttrDerivedKinds[] = {
-    DiagnoseIfAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<DiagnoseIfAttr> DiagnoseIfAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

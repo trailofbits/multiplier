@@ -18,6 +18,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kRenderScriptKernelAttrDerivedKinds[] = {
+    RenderScriptKernelAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<RenderScriptKernelAttr> RenderScriptKernelAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = RenderScriptKernelAttr::from(*ctx)) {
@@ -52,13 +58,6 @@ std::optional<RenderScriptKernelAttr> RenderScriptKernelAttr::from(const std::op
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kRenderScriptKernelAttrDerivedKinds[] = {
-    RenderScriptKernelAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<RenderScriptKernelAttr> RenderScriptKernelAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

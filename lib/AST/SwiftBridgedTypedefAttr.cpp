@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kSwiftBridgedTypedefAttrDerivedKinds[] = {
+    SwiftBridgedTypedefAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<SwiftBridgedTypedefAttr> SwiftBridgedTypedefAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = SwiftBridgedTypedefAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<SwiftBridgedTypedefAttr> SwiftBridgedTypedefAttr::from(const std::
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kSwiftBridgedTypedefAttrDerivedKinds[] = {
-    SwiftBridgedTypedefAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<SwiftBridgedTypedefAttr> SwiftBridgedTypedefAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

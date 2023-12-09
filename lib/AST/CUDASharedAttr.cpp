@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kCUDASharedAttrDerivedKinds[] = {
+    CUDASharedAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<CUDASharedAttr> CUDASharedAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = CUDASharedAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<CUDASharedAttr> CUDASharedAttr::from(const std::optional<Attr> &pa
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kCUDASharedAttrDerivedKinds[] = {
-    CUDASharedAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<CUDASharedAttr> CUDASharedAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

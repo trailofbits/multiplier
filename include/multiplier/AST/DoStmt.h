@@ -37,6 +37,9 @@ class MX_EXPORT DoStmt : public Stmt {
   static gap::generator<DoStmt> in(const Fragment &frag);
   static gap::generator<DoStmt> in(const File &file);
 
+  static std::optional<DoStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<DoStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DO_STMT;
   }

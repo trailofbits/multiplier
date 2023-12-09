@@ -38,6 +38,9 @@ class MX_EXPORT DefaultStmt : public SwitchCase {
   static gap::generator<DefaultStmt> in(const Fragment &frag);
   static gap::generator<DefaultStmt> in(const File &file);
 
+  static std::optional<DefaultStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<DefaultStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DEFAULT_STMT;
   }

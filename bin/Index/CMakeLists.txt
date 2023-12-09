@@ -126,7 +126,7 @@ set_target_properties("${exe_name}"
 
 find_and_link_llvm_dependencies("${exe_name}")
 
-if(MX_ENABLE_INSTALL)
+if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
   install(
     TARGETS
       "${exe_name}"

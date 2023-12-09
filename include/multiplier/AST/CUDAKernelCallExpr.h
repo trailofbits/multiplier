@@ -42,6 +42,9 @@ class MX_EXPORT CUDAKernelCallExpr : public CallExpr {
   static gap::generator<CUDAKernelCallExpr> in(const Fragment &frag);
   static gap::generator<CUDAKernelCallExpr> in(const File &file);
 
+  static std::optional<CUDAKernelCallExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<CUDAKernelCallExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CUDA_KERNEL_CALL_EXPR;
   }

@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kWorkGroupSizeHintAttrDerivedKinds[] = {
+    WorkGroupSizeHintAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<WorkGroupSizeHintAttr> WorkGroupSizeHintAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = WorkGroupSizeHintAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<WorkGroupSizeHintAttr> WorkGroupSizeHintAttr::from(const std::opti
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kWorkGroupSizeHintAttrDerivedKinds[] = {
-    WorkGroupSizeHintAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<WorkGroupSizeHintAttr> WorkGroupSizeHintAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

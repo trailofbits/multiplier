@@ -146,7 +146,9 @@ FilePathMap Index::file_paths(void) const {
 
 // Generate all compilation units in the index.
 gap::generator<Compilation> Index::compilations(void) const & {
-  co_return;  // TODO(pag): Implement me!
+  for (auto eptr : impl->CompilationsFor(impl)) {
+    co_yield Compilation(std::move(eptr));
+  }
 }
 
 gap::generator<File> Index::files(void) const & {

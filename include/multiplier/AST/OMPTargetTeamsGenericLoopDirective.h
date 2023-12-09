@@ -42,6 +42,9 @@ class MX_EXPORT OMPTargetTeamsGenericLoopDirective : public OMPLoopDirective {
   static gap::generator<OMPTargetTeamsGenericLoopDirective> in(const Fragment &frag);
   static gap::generator<OMPTargetTeamsGenericLoopDirective> in(const File &file);
 
+  static std::optional<OMPTargetTeamsGenericLoopDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPTargetTeamsGenericLoopDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_TEAMS_GENERIC_LOOP_DIRECTIVE;
   }

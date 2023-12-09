@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kSubstTemplateTypeParmPackTypeDerivedKinds[] = {
+    SubstTemplateTypeParmPackType::static_kind(),
+};
+}  // namespace
+
 gap::generator<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = SubstTemplateTypeParmPackType::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kSubstTemplateTypeParmPackTypeDerivedKinds[] = {
-    SubstTemplateTypeParmPackType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from_base(const Type &parent) {
   switch (parent.kind()) {

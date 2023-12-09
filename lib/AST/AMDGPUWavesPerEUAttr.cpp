@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kAMDGPUWavesPerEUAttrDerivedKinds[] = {
+    AMDGPUWavesPerEUAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<AMDGPUWavesPerEUAttr> AMDGPUWavesPerEUAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AMDGPUWavesPerEUAttr::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<AMDGPUWavesPerEUAttr> AMDGPUWavesPerEUAttr::from(const std::option
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kAMDGPUWavesPerEUAttrDerivedKinds[] = {
-    AMDGPUWavesPerEUAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<AMDGPUWavesPerEUAttr> AMDGPUWavesPerEUAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

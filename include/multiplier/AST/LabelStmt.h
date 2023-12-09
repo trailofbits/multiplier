@@ -39,6 +39,9 @@ class MX_EXPORT LabelStmt : public ValueStmt {
   static gap::generator<LabelStmt> in(const Fragment &frag);
   static gap::generator<LabelStmt> in(const File &file);
 
+  static std::optional<LabelStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<LabelStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::LABEL_STMT;
   }

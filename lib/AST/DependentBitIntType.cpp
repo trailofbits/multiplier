@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kDependentBitIntTypeDerivedKinds[] = {
+    DependentBitIntType::static_kind(),
+};
+}  // namespace
+
 gap::generator<DependentBitIntType> DependentBitIntType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DependentBitIntType::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<DependentBitIntType> DependentBitIntType::from(const std::optional
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kDependentBitIntTypeDerivedKinds[] = {
-    DependentBitIntType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<DependentBitIntType> DependentBitIntType::from_base(const Type &parent) {
   switch (parent.kind()) {

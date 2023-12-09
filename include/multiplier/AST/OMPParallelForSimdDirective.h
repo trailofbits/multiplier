@@ -42,6 +42,9 @@ class MX_EXPORT OMPParallelForSimdDirective : public OMPLoopDirective {
   static gap::generator<OMPParallelForSimdDirective> in(const Fragment &frag);
   static gap::generator<OMPParallelForSimdDirective> in(const File &file);
 
+  static std::optional<OMPParallelForSimdDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPParallelForSimdDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_FOR_SIMD_DIRECTIVE;
   }

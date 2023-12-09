@@ -40,6 +40,9 @@ class MX_EXPORT OMPLoopTransformationDirective : public OMPLoopBasedDirective {
   static gap::generator<OMPLoopTransformationDirective> in(const Fragment &frag);
   static gap::generator<OMPLoopTransformationDirective> in(const File &file);
 
+  static std::optional<OMPLoopTransformationDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPLoopTransformationDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   static gap::generator<OMPLoopTransformationDirective> containing(const Decl &decl);
   static gap::generator<OMPLoopTransformationDirective> containing(const std::optional<Decl> &decl);
 

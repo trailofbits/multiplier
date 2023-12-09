@@ -43,6 +43,9 @@ class MX_EXPORT MaterializeTemporaryExpr : public Expr {
   static gap::generator<MaterializeTemporaryExpr> in(const Fragment &frag);
   static gap::generator<MaterializeTemporaryExpr> in(const File &file);
 
+  static std::optional<MaterializeTemporaryExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<MaterializeTemporaryExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MATERIALIZE_TEMPORARY_EXPR;
   }

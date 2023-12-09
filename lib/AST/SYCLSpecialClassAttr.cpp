@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kSYCLSpecialClassAttrDerivedKinds[] = {
+    SYCLSpecialClassAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<SYCLSpecialClassAttr> SYCLSpecialClassAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = SYCLSpecialClassAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<SYCLSpecialClassAttr> SYCLSpecialClassAttr::from(const std::option
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kSYCLSpecialClassAttrDerivedKinds[] = {
-    SYCLSpecialClassAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<SYCLSpecialClassAttr> SYCLSpecialClassAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

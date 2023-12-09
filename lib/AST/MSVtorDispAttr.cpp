@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kMSVtorDispAttrDerivedKinds[] = {
+    MSVtorDispAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<MSVtorDispAttr> MSVtorDispAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = MSVtorDispAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<MSVtorDispAttr> MSVtorDispAttr::from(const std::optional<Attr> &pa
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kMSVtorDispAttrDerivedKinds[] = {
-    MSVtorDispAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<MSVtorDispAttr> MSVtorDispAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1436]) || tp >= &(gTypes[1437])) {
+  if (tp < &(gTypes[1437]) || tp >= &(gTypes[1438])) {
     return std::nullopt;
   }
 
@@ -327,7 +327,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::EntityId>::from_python(args[0]);
+            auto arg_0 = PythonBinding<EntityId>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -357,7 +357,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->fragment(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::PackedFragmentId>::from_python(args[0]);
+            auto arg_0 = PythonBinding<PackedFragmentId>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -387,7 +387,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->declaration(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::PackedDeclId>::from_python(args[0]);
+            auto arg_0 = PythonBinding<PackedDeclId>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -417,7 +417,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->statement(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::PackedStmtId>::from_python(args[0]);
+            auto arg_0 = PythonBinding<PackedStmtId>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -447,7 +447,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->attribute(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::PackedAttrId>::from_python(args[0]);
+            auto arg_0 = PythonBinding<PackedAttrId>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -477,7 +477,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->macro(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::PackedMacroId>::from_python(args[0]);
+            auto arg_0 = PythonBinding<PackedMacroId>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -507,7 +507,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->type(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::PackedTypeId>::from_python(args[0]);
+            auto arg_0 = PythonBinding<PackedTypeId>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -537,7 +537,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->file(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::PackedFileId>::from_python(args[0]);
+            auto arg_0 = PythonBinding<PackedFileId>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -567,7 +567,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->template_argument(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::PackedTemplateArgumentId>::from_python(args[0]);
+            auto arg_0 = PythonBinding<PackedTemplateArgumentId>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -597,7 +597,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->template_parameter_list(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::PackedTemplateParameterListId>::from_python(args[0]);
+            auto arg_0 = PythonBinding<PackedTemplateParameterListId>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -627,7 +627,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->cxx_base_specifier(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::PackedCXXBaseSpecifierId>::from_python(args[0]);
+            auto arg_0 = PythonBinding<PackedCXXBaseSpecifierId>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -657,7 +657,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->designator(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::PackedDesignatorId>::from_python(args[0]);
+            auto arg_0 = PythonBinding<PackedDesignatorId>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -687,7 +687,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->compilation(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::PackedCompilationId>::from_python(args[0]);
+            auto arg_0 = PythonBinding<PackedCompilationId>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -709,7 +709,7 @@ static PyMethodDef gMethods[] = {
           auto obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::EntityId>::from_python(args[0]);
+            auto arg_0 = PythonBinding<EntityId>::from_python(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -753,7 +753,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1436]);
+  PyTypeObject * const tp = &(gTypes[1437]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

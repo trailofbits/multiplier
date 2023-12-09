@@ -66,7 +66,7 @@ gap::generator<Attr> Attr::in(const Index &index) {
   }
 }
 
-gap::generator<Attr> Attr::in(const Index &index, std::span<AttrKind> kinds) {
+gap::generator<Attr> Attr::in(const Index &index, std::span<const AttrKind> kinds) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
@@ -93,7 +93,7 @@ gap::generator<Attr> Attr::in(const Fragment &frag) {
   }
 }
 
-gap::generator<Attr> Attr::in(const Fragment &frag, std::span<AttrKind> kinds) {
+gap::generator<Attr> Attr::in(const Fragment &frag, std::span<const AttrKind> kinds) {
   const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kinds) {
@@ -103,7 +103,7 @@ gap::generator<Attr> Attr::in(const Fragment &frag, std::span<AttrKind> kinds) {
   }
 }
 
-gap::generator<Attr> Attr::in(const File &file, std::span<AttrKind> kinds) {
+gap::generator<Attr> Attr::in(const File &file, std::span<const AttrKind> kinds) {
   const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {

@@ -46,6 +46,9 @@ class MX_EXPORT ObjCInterfaceDecl : public ObjCContainerDecl {
   static gap::generator<ObjCInterfaceDecl> in(const Fragment &frag);
   static gap::generator<ObjCInterfaceDecl> in(const File &file);
 
+  static std::optional<ObjCInterfaceDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ObjCInterfaceDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_INTERFACE;
   }

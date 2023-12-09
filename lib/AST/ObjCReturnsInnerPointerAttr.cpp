@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kObjCReturnsInnerPointerAttrDerivedKinds[] = {
+    ObjCReturnsInnerPointerAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ObjCReturnsInnerPointerAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::from(con
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kObjCReturnsInnerPointerAttrDerivedKinds[] = {
-    ObjCReturnsInnerPointerAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

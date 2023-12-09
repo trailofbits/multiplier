@@ -42,6 +42,9 @@ class MX_EXPORT TypedefDecl : public TypedefNameDecl {
   static gap::generator<TypedefDecl> in(const Fragment &frag);
   static gap::generator<TypedefDecl> in(const File &file);
 
+  static std::optional<TypedefDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<TypedefDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TYPEDEF;
   }

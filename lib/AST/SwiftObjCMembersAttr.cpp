@@ -18,6 +18,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kSwiftObjCMembersAttrDerivedKinds[] = {
+    SwiftObjCMembersAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<SwiftObjCMembersAttr> SwiftObjCMembersAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = SwiftObjCMembersAttr::from(*ctx)) {
@@ -52,13 +58,6 @@ std::optional<SwiftObjCMembersAttr> SwiftObjCMembersAttr::from(const std::option
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kSwiftObjCMembersAttrDerivedKinds[] = {
-    SwiftObjCMembersAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<SwiftObjCMembersAttr> SwiftObjCMembersAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

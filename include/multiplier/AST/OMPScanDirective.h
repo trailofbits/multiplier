@@ -38,6 +38,9 @@ class MX_EXPORT OMPScanDirective : public OMPExecutableDirective {
   static gap::generator<OMPScanDirective> in(const Fragment &frag);
   static gap::generator<OMPScanDirective> in(const File &file);
 
+  static std::optional<OMPScanDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPScanDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_SCAN_DIRECTIVE;
   }

@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kDependentAddressSpaceTypeDerivedKinds[] = {
+    DependentAddressSpaceType::static_kind(),
+};
+}  // namespace
+
 gap::generator<DependentAddressSpaceType> DependentAddressSpaceType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DependentAddressSpaceType::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const s
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kDependentAddressSpaceTypeDerivedKinds[] = {
-    DependentAddressSpaceType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from_base(const Type &parent) {
   switch (parent.kind()) {

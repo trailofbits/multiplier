@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kIncompleteArrayTypeDerivedKinds[] = {
+    IncompleteArrayType::static_kind(),
+};
+}  // namespace
+
 gap::generator<IncompleteArrayType> IncompleteArrayType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = IncompleteArrayType::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<IncompleteArrayType> IncompleteArrayType::from(const std::optional
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kIncompleteArrayTypeDerivedKinds[] = {
-    IncompleteArrayType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<IncompleteArrayType> IncompleteArrayType::from_base(const Type &parent) {
   switch (parent.kind()) {

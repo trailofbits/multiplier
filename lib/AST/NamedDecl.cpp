@@ -74,6 +74,8 @@
 #include <multiplier/AST/VarTemplatePartialSpecializationDecl.h>
 #include <multiplier/AST/VarTemplateSpecializationDecl.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -81,6 +83,74 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const DeclKind kNamedDeclDerivedKinds[] = {
+    NamespaceAliasDecl::static_kind(),
+    NamespaceDecl::static_kind(),
+    ObjCCompatibleAliasDecl::static_kind(),
+    ObjCMethodDecl::static_kind(),
+    ObjCPropertyDecl::static_kind(),
+    UnresolvedUsingIfExistsDecl::static_kind(),
+    UsingDirectiveDecl::static_kind(),
+    UsingPackDecl::static_kind(),
+    UsingShadowDecl::static_kind(),
+    HLSLBufferDecl::static_kind(),
+    LabelDecl::static_kind(),
+    ObjCInterfaceDecl::static_kind(),
+    ObjCProtocolDecl::static_kind(),
+    ObjCCategoryDecl::static_kind(),
+    TemplateTemplateParmDecl::static_kind(),
+    BuiltinTemplateDecl::static_kind(),
+    ConceptDecl::static_kind(),
+    UnresolvedUsingTypenameDecl::static_kind(),
+    TemplateTypeParmDecl::static_kind(),
+    ConstructorUsingShadowDecl::static_kind(),
+    BindingDecl::static_kind(),
+    EnumConstantDecl::static_kind(),
+    IndirectFieldDecl::static_kind(),
+    MSGuidDecl::static_kind(),
+    OMPDeclareReductionDecl::static_kind(),
+    TemplateParamObjectDecl::static_kind(),
+    UnnamedGlobalConstantDecl::static_kind(),
+    UnresolvedUsingValueDecl::static_kind(),
+    UsingDecl::static_kind(),
+    UsingEnumDecl::static_kind(),
+    ObjCImplementationDecl::static_kind(),
+    ObjCCategoryImplDecl::static_kind(),
+    TypeAliasTemplateDecl::static_kind(),
+    VarTemplateDecl::static_kind(),
+    ClassTemplateDecl::static_kind(),
+    FunctionTemplateDecl::static_kind(),
+    ObjCTypeParamDecl::static_kind(),
+    TypeAliasDecl::static_kind(),
+    TypedefDecl::static_kind(),
+    EnumDecl::static_kind(),
+    RecordDecl::static_kind(),
+    OMPDeclareMapperDecl::static_kind(),
+    FieldDecl::static_kind(),
+    FunctionDecl::static_kind(),
+    MSPropertyDecl::static_kind(),
+    NonTypeTemplateParmDecl::static_kind(),
+    VarDecl::static_kind(),
+    CXXRecordDecl::static_kind(),
+    ObjCAtDefsFieldDecl::static_kind(),
+    ObjCIvarDecl::static_kind(),
+    CXXDeductionGuideDecl::static_kind(),
+    CXXMethodDecl::static_kind(),
+    VarTemplateSpecializationDecl::static_kind(),
+    DecompositionDecl::static_kind(),
+    ImplicitParamDecl::static_kind(),
+    OMPCapturedExprDecl::static_kind(),
+    ParmVarDecl::static_kind(),
+    ClassTemplateSpecializationDecl::static_kind(),
+    CXXConstructorDecl::static_kind(),
+    CXXConversionDecl::static_kind(),
+    CXXDestructorDecl::static_kind(),
+    VarTemplatePartialSpecializationDecl::static_kind(),
+    ClassTemplatePartialSpecializationDecl::static_kind(),
+};
+}  // namespace
 
 gap::generator<NamedDecl> NamedDecl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -96,6 +166,21 @@ bool NamedDecl::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NamedDecl> NamedDecl::from(const ir::hl::Operation &op) {
+  if (auto val = Decl::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<NamedDecl, ir::hl::Operation>> NamedDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kNamedDeclDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<NamedDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<NamedDecl> NamedDecl::containing(const Decl &decl) {
@@ -193,75 +278,6 @@ std::optional<NamedDecl> NamedDecl::from(const std::optional<Decl> &parent) {
   }
   return std::nullopt;
 }
-
-namespace {
-static const DeclKind kNamedDeclDerivedKinds[] = {
-    NamespaceAliasDecl::static_kind(),
-    NamespaceDecl::static_kind(),
-    ObjCCompatibleAliasDecl::static_kind(),
-    ObjCMethodDecl::static_kind(),
-    ObjCPropertyDecl::static_kind(),
-    UnresolvedUsingIfExistsDecl::static_kind(),
-    UsingDirectiveDecl::static_kind(),
-    UsingPackDecl::static_kind(),
-    UsingShadowDecl::static_kind(),
-    HLSLBufferDecl::static_kind(),
-    LabelDecl::static_kind(),
-    ObjCInterfaceDecl::static_kind(),
-    ObjCProtocolDecl::static_kind(),
-    ObjCCategoryDecl::static_kind(),
-    TemplateTemplateParmDecl::static_kind(),
-    BuiltinTemplateDecl::static_kind(),
-    ConceptDecl::static_kind(),
-    UnresolvedUsingTypenameDecl::static_kind(),
-    TemplateTypeParmDecl::static_kind(),
-    ConstructorUsingShadowDecl::static_kind(),
-    BindingDecl::static_kind(),
-    EnumConstantDecl::static_kind(),
-    IndirectFieldDecl::static_kind(),
-    MSGuidDecl::static_kind(),
-    OMPDeclareReductionDecl::static_kind(),
-    TemplateParamObjectDecl::static_kind(),
-    UnnamedGlobalConstantDecl::static_kind(),
-    UnresolvedUsingValueDecl::static_kind(),
-    UsingDecl::static_kind(),
-    UsingEnumDecl::static_kind(),
-    ObjCImplementationDecl::static_kind(),
-    ObjCCategoryImplDecl::static_kind(),
-    TypeAliasTemplateDecl::static_kind(),
-    VarTemplateDecl::static_kind(),
-    ClassTemplateDecl::static_kind(),
-    FunctionTemplateDecl::static_kind(),
-    ObjCTypeParamDecl::static_kind(),
-    TypeAliasDecl::static_kind(),
-    TypedefDecl::static_kind(),
-    EnumDecl::static_kind(),
-    RecordDecl::static_kind(),
-    OMPDeclareMapperDecl::static_kind(),
-    FieldDecl::static_kind(),
-    FunctionDecl::static_kind(),
-    MSPropertyDecl::static_kind(),
-    NonTypeTemplateParmDecl::static_kind(),
-    VarDecl::static_kind(),
-    CXXRecordDecl::static_kind(),
-    ObjCAtDefsFieldDecl::static_kind(),
-    ObjCIvarDecl::static_kind(),
-    CXXDeductionGuideDecl::static_kind(),
-    CXXMethodDecl::static_kind(),
-    VarTemplateSpecializationDecl::static_kind(),
-    DecompositionDecl::static_kind(),
-    ImplicitParamDecl::static_kind(),
-    OMPCapturedExprDecl::static_kind(),
-    ParmVarDecl::static_kind(),
-    ClassTemplateSpecializationDecl::static_kind(),
-    CXXConstructorDecl::static_kind(),
-    CXXConversionDecl::static_kind(),
-    CXXDestructorDecl::static_kind(),
-    VarTemplatePartialSpecializationDecl::static_kind(),
-    ClassTemplatePartialSpecializationDecl::static_kind(),
-};
-
-}  // namespace
 
 std::optional<NamedDecl> NamedDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {

@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kCUDALaunchBoundsAttrDerivedKinds[] = {
+    CUDALaunchBoundsAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = CUDALaunchBoundsAttr::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from(const std::option
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kCUDALaunchBoundsAttrDerivedKinds[] = {
-    CUDALaunchBoundsAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

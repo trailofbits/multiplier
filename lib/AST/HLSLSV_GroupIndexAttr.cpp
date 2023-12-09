@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kHLSLSV_GroupIndexAttrDerivedKinds[] = {
+    HLSLSV_GroupIndexAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = HLSLSV_GroupIndexAttr::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from(const std::opti
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kHLSLSV_GroupIndexAttrDerivedKinds[] = {
-    HLSLSV_GroupIndexAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

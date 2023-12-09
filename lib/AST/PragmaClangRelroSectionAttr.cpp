@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kPragmaClangRelroSectionAttrDerivedKinds[] = {
+    PragmaClangRelroSectionAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = PragmaClangRelroSectionAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::from(con
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kPragmaClangRelroSectionAttrDerivedKinds[] = {
-    PragmaClangRelroSectionAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

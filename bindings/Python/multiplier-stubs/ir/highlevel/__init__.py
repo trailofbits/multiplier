@@ -250,6 +250,36 @@ class Operation(multiplier.ir.Operation):
   def FROM(arg_0: multiplier.ir.Operation) -> Optional[multiplier.ir.highlevel.Operation]:
     ...
 
+  @overload
+  @staticmethod
+  def first_from(that: multiplier.ast.Decl) -> Optional[multiplier.ir.highlevel.Operation]:
+    ...
+
+  @overload
+  @staticmethod
+  def first_from(that: multiplier.ast.Decl, arg_1: multiplier.ir.OperationKind) -> Optional[multiplier.ir.highlevel.Operation]:
+    ...
+
+  @overload
+  @staticmethod
+  def first_from(that: multiplier.ast.Stmt) -> Optional[multiplier.ir.highlevel.Operation]:
+    ...
+
+  @overload
+  @staticmethod
+  def first_from(that: multiplier.ast.Stmt, arg_1: multiplier.ir.OperationKind) -> Optional[multiplier.ir.highlevel.Operation]:
+    ...
+
+  @overload
+  @staticmethod
+  def all_from(that: multiplier.ast.Decl) -> Generator[multiplier.ir.highlevel.Operation]:
+    ...
+
+  @overload
+  @staticmethod
+  def all_from(that: multiplier.ast.Stmt) -> Generator[multiplier.ir.highlevel.Operation]:
+    ...
+
 class AccessSpecifierOp(multiplier.ir.highlevel.Operation):
 
   @staticmethod
@@ -392,6 +422,25 @@ class AlignOfTypeOp(multiplier.ir.highlevel.Operation):
 
   @staticmethod
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.highlevel.AlignOfTypeOp]:
+    ...
+
+class AsmOp(multiplier.ir.highlevel.Operation):
+  asm_outputs: Generator[multiplier.ir.Operand]
+  asm_inputs: Generator[multiplier.ir.Operand]
+  labels: Generator[multiplier.ir.Operand]
+  is_volatile: bool
+  has_goto: bool
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.highlevel.AsmOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.highlevel.AsmOp]:
     ...
 
 class AssignOp(multiplier.ir.highlevel.Operation):

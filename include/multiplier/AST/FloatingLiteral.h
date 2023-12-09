@@ -40,6 +40,9 @@ class MX_EXPORT FloatingLiteral : public Expr {
   static gap::generator<FloatingLiteral> in(const Fragment &frag);
   static gap::generator<FloatingLiteral> in(const File &file);
 
+  static std::optional<FloatingLiteral> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<FloatingLiteral, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FLOATING_LITERAL;
   }

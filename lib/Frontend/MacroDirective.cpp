@@ -34,6 +34,27 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const MacroKind kMacroDirectiveDerivedKinds[] = {
+    OtherMacroDirective::static_kind(),
+    UndefineMacroDirective::static_kind(),
+    PragmaMacroDirective::static_kind(),
+    DefineMacroDirective::static_kind(),
+    IncludeMacroDirective::static_kind(),
+    IncludeNextMacroDirective::static_kind(),
+    IncludeMacrosMacroDirective::static_kind(),
+    ImportMacroDirective::static_kind(),
+    IfMacroDirective::static_kind(),
+    IfDefinedMacroDirective::static_kind(),
+    IfNotDefinedMacroDirective::static_kind(),
+    ElseIfMacroDirective::static_kind(),
+    ElseIfDefinedMacroDirective::static_kind(),
+    ElseIfNotDefinedMacroDirective::static_kind(),
+    ElseMacroDirective::static_kind(),
+    EndIfMacroDirective::static_kind(),
+};
+}  // namespace
+
 gap::generator<MacroDirective> MacroDirective::containing(const Macro &macro) {
   for (auto impl = macro.parent(); impl; impl = impl->parent()) {
     if (auto d = MacroDirective::from(*impl)) {
@@ -84,28 +105,6 @@ std::optional<MacroDirective> MacroDirective::from(const std::optional<Macro> &p
   }
   return std::nullopt;
 }
-
-namespace {
-static const MacroKind kMacroDirectiveDerivedKinds[] = {
-    OtherMacroDirective::static_kind(),
-    UndefineMacroDirective::static_kind(),
-    PragmaMacroDirective::static_kind(),
-    DefineMacroDirective::static_kind(),
-    IncludeMacroDirective::static_kind(),
-    IncludeNextMacroDirective::static_kind(),
-    IncludeMacrosMacroDirective::static_kind(),
-    ImportMacroDirective::static_kind(),
-    IfMacroDirective::static_kind(),
-    IfDefinedMacroDirective::static_kind(),
-    IfNotDefinedMacroDirective::static_kind(),
-    ElseIfMacroDirective::static_kind(),
-    ElseIfDefinedMacroDirective::static_kind(),
-    ElseIfNotDefinedMacroDirective::static_kind(),
-    ElseMacroDirective::static_kind(),
-    EndIfMacroDirective::static_kind(),
-};
-
-}  // namespace
 
 std::optional<MacroDirective> MacroDirective::from_base(const Macro &parent) {
   switch (parent.kind()) {

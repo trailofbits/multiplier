@@ -42,6 +42,9 @@ class MX_EXPORT OMPParallelMaskedTaskLoopSimdDirective : public OMPLoopDirective
   static gap::generator<OMPParallelMaskedTaskLoopSimdDirective> in(const Fragment &frag);
   static gap::generator<OMPParallelMaskedTaskLoopSimdDirective> in(const File &file);
 
+  static std::optional<OMPParallelMaskedTaskLoopSimdDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPParallelMaskedTaskLoopSimdDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_MASKED_TASK_LOOP_SIMD_DIRECTIVE;
   }

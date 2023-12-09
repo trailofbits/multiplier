@@ -39,6 +39,9 @@ class MX_EXPORT CoroutineBodyStmt : public Stmt {
   static gap::generator<CoroutineBodyStmt> in(const Fragment &frag);
   static gap::generator<CoroutineBodyStmt> in(const File &file);
 
+  static std::optional<CoroutineBodyStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<CoroutineBodyStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COROUTINE_BODY_STMT;
   }

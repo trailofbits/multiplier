@@ -5572,6 +5572,21 @@ class Attr(multiplier.Entity):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index, kinds: Sequence[multiplier.ast.AttrKind]) -> Generator[multiplier.ast.Attr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment, kinds: Sequence[multiplier.ast.AttrKind]) -> Generator[multiplier.ast.Attr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File, kinds: Sequence[multiplier.ast.AttrKind]) -> Generator[multiplier.ast.Attr]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(index: multiplier.Index) -> Generator[multiplier.ast.Attr]:
     ...
 
@@ -5590,7 +5605,7 @@ class Attr(multiplier.Entity):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.Attr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Attr]:
     ...
 
   @overload
@@ -5644,7 +5659,7 @@ class AlignValueAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AlignValueAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlignValueAttr]:
     ...
 
   @staticmethod
@@ -5706,7 +5721,7 @@ class AliasAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AliasAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AliasAttr]:
     ...
 
   @staticmethod
@@ -5767,7 +5782,7 @@ class AbiTagAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AbiTagAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AbiTagAttr]:
     ...
 
   @staticmethod
@@ -5828,7 +5843,7 @@ class TypeAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeAttr]:
     ...
 
   @staticmethod
@@ -5885,7 +5900,7 @@ class SPtrAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SPtrAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SPtrAttr]:
     ...
 
   @staticmethod
@@ -5946,7 +5961,7 @@ class Ptr64Attr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.Ptr64Attr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Ptr64Attr]:
     ...
 
   @staticmethod
@@ -6007,7 +6022,7 @@ class Ptr32Attr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.Ptr32Attr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Ptr32Attr]:
     ...
 
   @staticmethod
@@ -6069,7 +6084,7 @@ class OpenCLPrivateAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OpenCLPrivateAddressSpaceAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLPrivateAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6131,7 +6146,7 @@ class OpenCLLocalAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OpenCLLocalAddressSpaceAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLLocalAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6192,7 +6207,7 @@ class OpenCLGlobalHostAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OpenCLGlobalHostAddressSpaceAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLGlobalHostAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6253,7 +6268,7 @@ class OpenCLGlobalDeviceAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OpenCLGlobalDeviceAddressSpaceAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLGlobalDeviceAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6315,7 +6330,7 @@ class OpenCLGlobalAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OpenCLGlobalAddressSpaceAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLGlobalAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6377,7 +6392,7 @@ class OpenCLGenericAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OpenCLGenericAddressSpaceAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLGenericAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6439,7 +6454,7 @@ class OpenCLConstantAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OpenCLConstantAddressSpaceAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLConstantAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6500,7 +6515,7 @@ class ObjCKindOfAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCKindOfAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCKindOfAttr]:
     ...
 
   @staticmethod
@@ -6561,7 +6576,7 @@ class ObjCInertUnsafeUnretainedAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCInertUnsafeUnretainedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCInertUnsafeUnretainedAttr]:
     ...
 
   @staticmethod
@@ -6622,7 +6637,7 @@ class ObjCGCAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCGCAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCGCAttr]:
     ...
 
   @staticmethod
@@ -6683,7 +6698,7 @@ class NoDerefAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoDerefAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoDerefAttr]:
     ...
 
   @staticmethod
@@ -6744,7 +6759,7 @@ class HLSLGroupSharedAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.HLSLGroupSharedAddressSpaceAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLGroupSharedAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6805,7 +6820,7 @@ class CmseNSCallAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CmseNSCallAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CmseNSCallAttr]:
     ...
 
   @staticmethod
@@ -6867,7 +6882,7 @@ class BTFTypeTagAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BTFTypeTagAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BTFTypeTagAttr]:
     ...
 
   @staticmethod
@@ -6928,7 +6943,7 @@ class ArmStreamingAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ArmStreamingAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmStreamingAttr]:
     ...
 
   @staticmethod
@@ -6989,7 +7004,7 @@ class ArmMveStrictPolymorphismAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ArmMveStrictPolymorphismAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmMveStrictPolymorphismAttr]:
     ...
 
   @staticmethod
@@ -7051,7 +7066,7 @@ class AnnotateTypeAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AnnotateTypeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnnotateTypeAttr]:
     ...
 
   @staticmethod
@@ -7112,7 +7127,7 @@ class AddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AddressSpaceAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -7173,7 +7188,7 @@ class WebAssemblyFuncrefAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.WebAssemblyFuncrefAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WebAssemblyFuncrefAttr]:
     ...
 
   @staticmethod
@@ -7234,7 +7249,7 @@ class UPtrAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UPtrAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UPtrAttr]:
     ...
 
   @staticmethod
@@ -7295,7 +7310,7 @@ class TypeNullableResultAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypeNullableResultAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeNullableResultAttr]:
     ...
 
   @staticmethod
@@ -7356,7 +7371,7 @@ class TypeNullableAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypeNullableAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeNullableAttr]:
     ...
 
   @staticmethod
@@ -7417,7 +7432,7 @@ class TypeNullUnspecifiedAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypeNullUnspecifiedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeNullUnspecifiedAttr]:
     ...
 
   @staticmethod
@@ -7478,7 +7493,7 @@ class TypeNonNullAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypeNonNullAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeNonNullAttr]:
     ...
 
   @staticmethod
@@ -7539,7 +7554,7 @@ class ThreadAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ThreadAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ThreadAttr]:
     ...
 
   @staticmethod
@@ -7600,7 +7615,7 @@ class SwiftObjCMembersAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftObjCMembersAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftObjCMembersAttr]:
     ...
 
   @staticmethod
@@ -7661,7 +7676,7 @@ class StmtAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.StmtAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StmtAttr]:
     ...
 
   @staticmethod
@@ -7718,7 +7733,7 @@ class OpenCLUnrollHintAttr(multiplier.ast.StmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OpenCLUnrollHintAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLUnrollHintAttr]:
     ...
 
   @staticmethod
@@ -7779,7 +7794,7 @@ class MustTailAttr(multiplier.ast.StmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MustTailAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MustTailAttr]:
     ...
 
   @staticmethod
@@ -7840,7 +7855,7 @@ class LikelyAttr(multiplier.ast.StmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LikelyAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LikelyAttr]:
     ...
 
   @staticmethod
@@ -7901,7 +7916,7 @@ class FallThroughAttr(multiplier.ast.StmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FallThroughAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FallThroughAttr]:
     ...
 
   @staticmethod
@@ -7962,7 +7977,7 @@ class UnlikelyAttr(multiplier.ast.StmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UnlikelyAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnlikelyAttr]:
     ...
 
   @staticmethod
@@ -8023,7 +8038,7 @@ class SuppressAttr(multiplier.ast.StmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SuppressAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SuppressAttr]:
     ...
 
   @staticmethod
@@ -8084,7 +8099,7 @@ class RenderScriptKernelAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.RenderScriptKernelAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RenderScriptKernelAttr]:
     ...
 
   @staticmethod
@@ -8145,7 +8160,7 @@ class OverloadableAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OverloadableAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OverloadableAttr]:
     ...
 
   @staticmethod
@@ -8210,7 +8225,7 @@ class OpenCLAccessAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OpenCLAccessAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLAccessAttr]:
     ...
 
   @staticmethod
@@ -8271,7 +8286,7 @@ class ObjCRuntimeVisibleAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCRuntimeVisibleAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRuntimeVisibleAttr]:
     ...
 
   @staticmethod
@@ -8333,7 +8348,7 @@ class ObjCRuntimeNameAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCRuntimeNameAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRuntimeNameAttr]:
     ...
 
   @staticmethod
@@ -8394,7 +8409,7 @@ class ObjCNonRuntimeProtocolAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCNonRuntimeProtocolAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCNonRuntimeProtocolAttr]:
     ...
 
   @staticmethod
@@ -8455,7 +8470,7 @@ class ObjCNonLazyClassAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCNonLazyClassAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCNonLazyClassAttr]:
     ...
 
   @staticmethod
@@ -8516,7 +8531,7 @@ class ObjCDirectMembersAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCDirectMembersAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCDirectMembersAttr]:
     ...
 
   @staticmethod
@@ -8577,7 +8592,7 @@ class ObjCDirectAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCDirectAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCDirectAttr]:
     ...
 
   @staticmethod
@@ -8638,7 +8653,7 @@ class ObjCDesignatedInitializerAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCDesignatedInitializerAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCDesignatedInitializerAttr]:
     ...
 
   @staticmethod
@@ -8699,7 +8714,7 @@ class ObjCClassStubAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCClassStubAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCClassStubAttr]:
     ...
 
   @staticmethod
@@ -8760,7 +8775,7 @@ class ObjCBoxableAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCBoxableAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBoxableAttr]:
     ...
 
   @staticmethod
@@ -8822,7 +8837,7 @@ class OMPReferencedVarAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPReferencedVarAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPReferencedVarAttr]:
     ...
 
   @staticmethod
@@ -8885,7 +8900,7 @@ class OMPDeclareSimdDeclAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPDeclareSimdDeclAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareSimdDeclAttr]:
     ...
 
   @staticmethod
@@ -8946,7 +8961,7 @@ class OMPCaptureKindAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPCaptureKindAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCaptureKindAttr]:
     ...
 
   @staticmethod
@@ -9007,7 +9022,7 @@ class NoEscapeAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoEscapeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoEscapeAttr]:
     ...
 
   @staticmethod
@@ -9068,7 +9083,7 @@ class NoBuiltinAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoBuiltinAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoBuiltinAttr]:
     ...
 
   @staticmethod
@@ -9129,7 +9144,7 @@ class ModeAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ModeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ModeAttr]:
     ...
 
   @staticmethod
@@ -9194,7 +9209,7 @@ class LoopHintAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LoopHintAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LoopHintAttr]:
     ...
 
   @staticmethod
@@ -9255,7 +9270,7 @@ class LoaderUninitializedAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LoaderUninitializedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LoaderUninitializedAttr]:
     ...
 
   @staticmethod
@@ -9317,7 +9332,7 @@ class InitSegAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.InitSegAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InitSegAttr]:
     ...
 
   @staticmethod
@@ -9379,7 +9394,7 @@ class InheritableAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.InheritableAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InheritableAttr]:
     ...
 
   @staticmethod
@@ -9438,7 +9453,7 @@ class IBOutletCollectionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.IBOutletCollectionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IBOutletCollectionAttr]:
     ...
 
   @staticmethod
@@ -9499,7 +9514,7 @@ class IBOutletAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.IBOutletAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IBOutletAttr]:
     ...
 
   @staticmethod
@@ -9560,7 +9575,7 @@ class IBActionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.IBActionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IBActionAttr]:
     ...
 
   @staticmethod
@@ -9621,7 +9636,7 @@ class HotAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.HotAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HotAttr]:
     ...
 
   @staticmethod
@@ -9683,7 +9698,7 @@ class HLSLShaderAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.HLSLShaderAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLShaderAttr]:
     ...
 
   @staticmethod
@@ -9746,7 +9761,7 @@ class HLSLResourceBindingAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.HLSLResourceBindingAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLResourceBindingAttr]:
     ...
 
   @staticmethod
@@ -9809,7 +9824,7 @@ class HLSLResourceAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.HLSLResourceAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLResourceAttr]:
     ...
 
   @staticmethod
@@ -9870,7 +9885,7 @@ class HLSLNumThreadsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.HLSLNumThreadsAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLNumThreadsAttr]:
     ...
 
   @staticmethod
@@ -9931,7 +9946,7 @@ class HLSLAnnotationAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.HLSLAnnotationAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLAnnotationAttr]:
     ...
 
   @staticmethod
@@ -9988,7 +10003,7 @@ class HLSLSV_GroupIndexAttr(multiplier.ast.HLSLAnnotationAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.HLSLSV_GroupIndexAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLSV_GroupIndexAttr]:
     ...
 
   @staticmethod
@@ -10049,7 +10064,7 @@ class HLSLSV_DispatchThreadIDAttr(multiplier.ast.HLSLAnnotationAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.HLSLSV_DispatchThreadIDAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLSV_DispatchThreadIDAttr]:
     ...
 
   @staticmethod
@@ -10110,7 +10125,7 @@ class HIPManagedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.HIPManagedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HIPManagedAttr]:
     ...
 
   @staticmethod
@@ -10171,7 +10186,7 @@ class GuardedVarAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.GuardedVarAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GuardedVarAttr]:
     ...
 
   @staticmethod
@@ -10233,7 +10248,7 @@ class GuardedByAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.GuardedByAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GuardedByAttr]:
     ...
 
   @staticmethod
@@ -10294,7 +10309,7 @@ class GNUInlineAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.GNUInlineAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GNUInlineAttr]:
     ...
 
   @staticmethod
@@ -10356,7 +10371,7 @@ class FunctionReturnThunksAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FunctionReturnThunksAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionReturnThunksAttr]:
     ...
 
   @staticmethod
@@ -10417,7 +10432,7 @@ class FormatAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FormatAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FormatAttr]:
     ...
 
   @staticmethod
@@ -10478,7 +10493,7 @@ class FormatArgAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FormatArgAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FormatArgAttr]:
     ...
 
   @staticmethod
@@ -10539,7 +10554,7 @@ class FlattenAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FlattenAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FlattenAttr]:
     ...
 
   @staticmethod
@@ -10600,7 +10615,7 @@ class FlagEnumAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FlagEnumAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FlagEnumAttr]:
     ...
 
   @staticmethod
@@ -10663,7 +10678,7 @@ class FinalAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FinalAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FinalAttr]:
     ...
 
   @staticmethod
@@ -10724,7 +10739,7 @@ class FastCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FastCallAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FastCallAttr]:
     ...
 
   @staticmethod
@@ -10789,7 +10804,7 @@ class ExternalSourceSymbolAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ExternalSourceSymbolAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExternalSourceSymbolAttr]:
     ...
 
   @staticmethod
@@ -10851,7 +10866,7 @@ class ExclusiveTrylockFunctionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ExclusiveTrylockFunctionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExclusiveTrylockFunctionAttr]:
     ...
 
   @staticmethod
@@ -10912,7 +10927,7 @@ class ExcludeFromExplicitInstantiationAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ExcludeFromExplicitInstantiationAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExcludeFromExplicitInstantiationAttr]:
     ...
 
   @staticmethod
@@ -10977,7 +10992,7 @@ class ErrorAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ErrorAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ErrorAttr]:
     ...
 
   @staticmethod
@@ -11039,7 +11054,7 @@ class EnumExtensibilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.EnumExtensibilityAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnumExtensibilityAttr]:
     ...
 
   @staticmethod
@@ -11101,7 +11116,7 @@ class EnforceTCBLeafAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.EnforceTCBLeafAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnforceTCBLeafAttr]:
     ...
 
   @staticmethod
@@ -11163,7 +11178,7 @@ class EnforceTCBAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.EnforceTCBAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnforceTCBAttr]:
     ...
 
   @staticmethod
@@ -11226,7 +11241,7 @@ class EnableIfAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.EnableIfAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnableIfAttr]:
     ...
 
   @staticmethod
@@ -11287,7 +11302,7 @@ class EmptyBasesAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.EmptyBasesAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EmptyBasesAttr]:
     ...
 
   @staticmethod
@@ -11348,7 +11363,7 @@ class DisableTailCallsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DisableTailCallsAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DisableTailCallsAttr]:
     ...
 
   @staticmethod
@@ -11409,7 +11424,7 @@ class DisableSanitizerInstrumentationAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DisableSanitizerInstrumentationAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DisableSanitizerInstrumentationAttr]:
     ...
 
   @staticmethod
@@ -11477,7 +11492,7 @@ class DiagnoseIfAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DiagnoseIfAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DiagnoseIfAttr]:
     ...
 
   @staticmethod
@@ -11539,7 +11554,7 @@ class DiagnoseAsBuiltinAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DiagnoseAsBuiltinAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DiagnoseAsBuiltinAttr]:
     ...
 
   @staticmethod
@@ -11600,7 +11615,7 @@ class DestructorAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DestructorAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DestructorAttr]:
     ...
 
   @staticmethod
@@ -11663,7 +11678,7 @@ class DeprecatedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DeprecatedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeprecatedAttr]:
     ...
 
   @staticmethod
@@ -11724,7 +11739,7 @@ class DeclOrStmtAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DeclOrStmtAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeclOrStmtAttr]:
     ...
 
   @staticmethod
@@ -11783,7 +11798,7 @@ class AlwaysInlineAttr(multiplier.ast.DeclOrStmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AlwaysInlineAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlwaysInlineAttr]:
     ...
 
   @staticmethod
@@ -11844,7 +11859,7 @@ class NoMergeAttr(multiplier.ast.DeclOrStmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoMergeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoMergeAttr]:
     ...
 
   @staticmethod
@@ -11906,7 +11921,7 @@ class NoInlineAttr(multiplier.ast.DeclOrStmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoInlineAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoInlineAttr]:
     ...
 
   @staticmethod
@@ -11967,7 +11982,7 @@ class DLLImportStaticLocalAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DLLImportStaticLocalAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DLLImportStaticLocalAttr]:
     ...
 
   @staticmethod
@@ -12028,7 +12043,7 @@ class DLLImportAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DLLImportAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DLLImportAttr]:
     ...
 
   @staticmethod
@@ -12089,7 +12104,7 @@ class DLLExportStaticLocalAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DLLExportStaticLocalAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DLLExportStaticLocalAttr]:
     ...
 
   @staticmethod
@@ -12150,7 +12165,7 @@ class DLLExportAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DLLExportAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DLLExportAttr]:
     ...
 
   @staticmethod
@@ -12211,7 +12226,7 @@ class ConvergentAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConvergentAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConvergentAttr]:
     ...
 
   @staticmethod
@@ -12272,7 +12287,7 @@ class ConsumableSetOnReadAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConsumableSetOnReadAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConsumableSetOnReadAttr]:
     ...
 
   @staticmethod
@@ -12333,7 +12348,7 @@ class ConsumableAutoCastAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConsumableAutoCastAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConsumableAutoCastAttr]:
     ...
 
   @staticmethod
@@ -12395,7 +12410,7 @@ class ConsumableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConsumableAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConsumableAttr]:
     ...
 
   @staticmethod
@@ -12456,7 +12471,7 @@ class ConstructorAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConstructorAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstructorAttr]:
     ...
 
   @staticmethod
@@ -12519,7 +12534,7 @@ class ConstInitAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConstInitAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstInitAttr]:
     ...
 
   @staticmethod
@@ -12580,7 +12595,7 @@ class ConstAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConstAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstAttr]:
     ...
 
   @staticmethod
@@ -12641,7 +12656,7 @@ class CommonAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CommonAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CommonAttr]:
     ...
 
   @staticmethod
@@ -12702,7 +12717,7 @@ class ColdAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ColdAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ColdAttr]:
     ...
 
   @staticmethod
@@ -12764,7 +12779,7 @@ class CodeSegAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CodeSegAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CodeSegAttr]:
     ...
 
   @staticmethod
@@ -12825,7 +12840,7 @@ class CmseNSEntryAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CmseNSEntryAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CmseNSEntryAttr]:
     ...
 
   @staticmethod
@@ -12887,7 +12902,7 @@ class CleanupAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CleanupAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CleanupAttr]:
     ...
 
   @staticmethod
@@ -12948,7 +12963,7 @@ class CapturedRecordAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CapturedRecordAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CapturedRecordAttr]:
     ...
 
   @staticmethod
@@ -13012,7 +13027,7 @@ class CapabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CapabilityAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CapabilityAttr]:
     ...
 
   @staticmethod
@@ -13073,7 +13088,7 @@ class CallbackAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CallbackAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CallbackAttr]:
     ...
 
   @staticmethod
@@ -13134,7 +13149,7 @@ class CallableWhenAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CallableWhenAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CallableWhenAttr]:
     ...
 
   @staticmethod
@@ -13196,7 +13211,7 @@ class CXX11NoReturnAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXX11NoReturnAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXX11NoReturnAttr]:
     ...
 
   @staticmethod
@@ -13257,7 +13272,7 @@ class CUDASharedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CUDASharedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDASharedAttr]:
     ...
 
   @staticmethod
@@ -13320,7 +13335,7 @@ class CUDALaunchBoundsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CUDALaunchBoundsAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDALaunchBoundsAttr]:
     ...
 
   @staticmethod
@@ -13381,7 +13396,7 @@ class CUDAInvalidTargetAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CUDAInvalidTargetAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAInvalidTargetAttr]:
     ...
 
   @staticmethod
@@ -13442,7 +13457,7 @@ class CUDAHostAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CUDAHostAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAHostAttr]:
     ...
 
   @staticmethod
@@ -13503,7 +13518,7 @@ class CUDAGlobalAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CUDAGlobalAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAGlobalAttr]:
     ...
 
   @staticmethod
@@ -13564,7 +13579,7 @@ class CUDADeviceBuiltinTextureTypeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CUDADeviceBuiltinTextureTypeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDADeviceBuiltinTextureTypeAttr]:
     ...
 
   @staticmethod
@@ -13625,7 +13640,7 @@ class CUDADeviceBuiltinSurfaceTypeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CUDADeviceBuiltinSurfaceTypeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDADeviceBuiltinSurfaceTypeAttr]:
     ...
 
   @staticmethod
@@ -13686,7 +13701,7 @@ class CUDADeviceAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CUDADeviceAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDADeviceAttr]:
     ...
 
   @staticmethod
@@ -13747,7 +13762,7 @@ class CUDAConstantAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CUDAConstantAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAConstantAttr]:
     ...
 
   @staticmethod
@@ -13808,7 +13823,7 @@ class CPUSpecificAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CPUSpecificAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CPUSpecificAttr]:
     ...
 
   @staticmethod
@@ -13869,7 +13884,7 @@ class CPUDispatchAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CPUDispatchAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CPUDispatchAttr]:
     ...
 
   @staticmethod
@@ -13930,7 +13945,7 @@ class CFUnknownTransferAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CFUnknownTransferAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFUnknownTransferAttr]:
     ...
 
   @staticmethod
@@ -13991,7 +14006,7 @@ class CFReturnsRetainedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CFReturnsRetainedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFReturnsRetainedAttr]:
     ...
 
   @staticmethod
@@ -14052,7 +14067,7 @@ class CFReturnsNotRetainedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CFReturnsNotRetainedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFReturnsNotRetainedAttr]:
     ...
 
   @staticmethod
@@ -14113,7 +14128,7 @@ class CFICanonicalJumpTableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CFICanonicalJumpTableAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFICanonicalJumpTableAttr]:
     ...
 
   @staticmethod
@@ -14175,7 +14190,7 @@ class CFGuardAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CFGuardAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFGuardAttr]:
     ...
 
   @staticmethod
@@ -14236,7 +14251,7 @@ class CFAuditedTransferAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CFAuditedTransferAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFAuditedTransferAttr]:
     ...
 
   @staticmethod
@@ -14297,7 +14312,7 @@ class CDeclAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CDeclAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CDeclAttr]:
     ...
 
   @staticmethod
@@ -14358,7 +14373,7 @@ class C11NoReturnAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.C11NoReturnAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.C11NoReturnAttr]:
     ...
 
   @staticmethod
@@ -14419,7 +14434,7 @@ class BuiltinAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BuiltinAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinAttr]:
     ...
 
   @staticmethod
@@ -14481,7 +14496,7 @@ class BlocksAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BlocksAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BlocksAttr]:
     ...
 
   @staticmethod
@@ -14543,7 +14558,7 @@ class BTFDeclTagAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BTFDeclTagAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BTFDeclTagAttr]:
     ...
 
   @staticmethod
@@ -14604,7 +14619,7 @@ class BPFPreserveAccessIndexAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BPFPreserveAccessIndexAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BPFPreserveAccessIndexAttr]:
     ...
 
   @staticmethod
@@ -14665,7 +14680,7 @@ class AvailableOnlyInDefaultEvalMethodAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AvailableOnlyInDefaultEvalMethodAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AvailableOnlyInDefaultEvalMethodAttr]:
     ...
 
   @staticmethod
@@ -14730,7 +14745,7 @@ class AvailabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AvailabilityAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AvailabilityAttr]:
     ...
 
   @staticmethod
@@ -14792,7 +14807,7 @@ class AssumptionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AssumptionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssumptionAttr]:
     ...
 
   @staticmethod
@@ -14855,7 +14870,7 @@ class AssumeAlignedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AssumeAlignedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssumeAlignedAttr]:
     ...
 
   @staticmethod
@@ -14916,7 +14931,7 @@ class AssertSharedLockAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AssertSharedLockAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssertSharedLockAttr]:
     ...
 
   @staticmethod
@@ -14977,7 +14992,7 @@ class AssertExclusiveLockAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AssertExclusiveLockAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssertExclusiveLockAttr]:
     ...
 
   @staticmethod
@@ -15040,7 +15055,7 @@ class AssertCapabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AssertCapabilityAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssertCapabilityAttr]:
     ...
 
   @staticmethod
@@ -15103,7 +15118,7 @@ class AsmLabelAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AsmLabelAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AsmLabelAttr]:
     ...
 
   @staticmethod
@@ -15164,7 +15179,7 @@ class ArtificialAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ArtificialAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArtificialAttr]:
     ...
 
   @staticmethod
@@ -15225,7 +15240,7 @@ class ArmBuiltinAliasAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ArmBuiltinAliasAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmBuiltinAliasAttr]:
     ...
 
   @staticmethod
@@ -15288,7 +15303,7 @@ class ArgumentWithTypeTagAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ArgumentWithTypeTagAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArgumentWithTypeTagAttr]:
     ...
 
   @staticmethod
@@ -15349,7 +15364,7 @@ class ArcWeakrefUnavailableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ArcWeakrefUnavailableAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArcWeakrefUnavailableAttr]:
     ...
 
   @staticmethod
@@ -15410,7 +15425,7 @@ class AnyX86NoCfCheckAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AnyX86NoCfCheckAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnyX86NoCfCheckAttr]:
     ...
 
   @staticmethod
@@ -15471,7 +15486,7 @@ class AnyX86NoCallerSavedRegistersAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AnyX86NoCallerSavedRegistersAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnyX86NoCallerSavedRegistersAttr]:
     ...
 
   @staticmethod
@@ -15532,7 +15547,7 @@ class AnyX86InterruptAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AnyX86InterruptAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnyX86InterruptAttr]:
     ...
 
   @staticmethod
@@ -15593,7 +15608,7 @@ class AnalyzerNoReturnAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AnalyzerNoReturnAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnalyzerNoReturnAttr]:
     ...
 
   @staticmethod
@@ -15654,7 +15669,7 @@ class AlwaysDestroyAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AlwaysDestroyAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlwaysDestroyAttr]:
     ...
 
   @staticmethod
@@ -15715,7 +15730,7 @@ class AllocSizeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AllocSizeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AllocSizeAttr]:
     ...
 
   @staticmethod
@@ -15776,7 +15791,7 @@ class AllocAlignAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AllocAlignAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AllocAlignAttr]:
     ...
 
   @staticmethod
@@ -15848,7 +15863,7 @@ class AlignedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AlignedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlignedAttr]:
     ...
 
   @staticmethod
@@ -15909,7 +15924,7 @@ class AlignNaturalAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AlignNaturalAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlignNaturalAttr]:
     ...
 
   @staticmethod
@@ -15970,7 +15985,7 @@ class AlignMac68kAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AlignMac68kAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlignMac68kAttr]:
     ...
 
   @staticmethod
@@ -16031,7 +16046,7 @@ class AcquiredBeforeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AcquiredBeforeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AcquiredBeforeAttr]:
     ...
 
   @staticmethod
@@ -16092,7 +16107,7 @@ class AcquiredAfterAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AcquiredAfterAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AcquiredAfterAttr]:
     ...
 
   @staticmethod
@@ -16154,7 +16169,7 @@ class AcquireHandleAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AcquireHandleAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AcquireHandleAttr]:
     ...
 
   @staticmethod
@@ -16217,7 +16232,7 @@ class AcquireCapabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AcquireCapabilityAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AcquireCapabilityAttr]:
     ...
 
   @staticmethod
@@ -16278,7 +16293,7 @@ class AVRSignalAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AVRSignalAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AVRSignalAttr]:
     ...
 
   @staticmethod
@@ -16339,7 +16354,7 @@ class AVRInterruptAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AVRInterruptAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AVRInterruptAttr]:
     ...
 
   @staticmethod
@@ -16401,7 +16416,7 @@ class ARMInterruptAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ARMInterruptAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ARMInterruptAttr]:
     ...
 
   @staticmethod
@@ -16464,7 +16479,7 @@ class AMDGPUWavesPerEUAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AMDGPUWavesPerEUAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUWavesPerEUAttr]:
     ...
 
   @staticmethod
@@ -16525,7 +16540,7 @@ class AMDGPUNumVGPRAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AMDGPUNumVGPRAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUNumVGPRAttr]:
     ...
 
   @staticmethod
@@ -16586,7 +16601,7 @@ class AMDGPUNumSGPRAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AMDGPUNumSGPRAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUNumSGPRAttr]:
     ...
 
   @staticmethod
@@ -16647,7 +16662,7 @@ class AMDGPUKernelCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AMDGPUKernelCallAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUKernelCallAttr]:
     ...
 
   @staticmethod
@@ -16710,7 +16725,7 @@ class AMDGPUFlatWorkGroupSizeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AMDGPUFlatWorkGroupSizeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUFlatWorkGroupSizeAttr]:
     ...
 
   @staticmethod
@@ -16771,7 +16786,7 @@ class AArch64VectorPcsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AArch64VectorPcsAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AArch64VectorPcsAttr]:
     ...
 
   @staticmethod
@@ -16832,7 +16847,7 @@ class AArch64SVEPcsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AArch64SVEPcsAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AArch64SVEPcsAttr]:
     ...
 
   @staticmethod
@@ -16894,7 +16909,7 @@ class ZeroCallUsedRegsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ZeroCallUsedRegsAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ZeroCallUsedRegsAttr]:
     ...
 
   @staticmethod
@@ -16955,7 +16970,7 @@ class XRayLogArgsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.XRayLogArgsAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.XRayLogArgsAttr]:
     ...
 
   @staticmethod
@@ -17019,7 +17034,7 @@ class XRayInstrumentAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.XRayInstrumentAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.XRayInstrumentAttr]:
     ...
 
   @staticmethod
@@ -17080,7 +17095,7 @@ class X86ForceAlignArgPointerAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.X86ForceAlignArgPointerAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.X86ForceAlignArgPointerAttr]:
     ...
 
   @staticmethod
@@ -17141,7 +17156,7 @@ class WorkGroupSizeHintAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.WorkGroupSizeHintAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WorkGroupSizeHintAttr]:
     ...
 
   @staticmethod
@@ -17203,7 +17218,7 @@ class WebAssemblyImportNameAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.WebAssemblyImportNameAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WebAssemblyImportNameAttr]:
     ...
 
   @staticmethod
@@ -17265,7 +17280,7 @@ class WebAssemblyImportModuleAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.WebAssemblyImportModuleAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WebAssemblyImportModuleAttr]:
     ...
 
   @staticmethod
@@ -17327,7 +17342,7 @@ class WebAssemblyExportNameAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.WebAssemblyExportNameAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WebAssemblyExportNameAttr]:
     ...
 
   @staticmethod
@@ -17389,7 +17404,7 @@ class WeakRefAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.WeakRefAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WeakRefAttr]:
     ...
 
   @staticmethod
@@ -17450,7 +17465,7 @@ class WeakImportAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.WeakImportAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WeakImportAttr]:
     ...
 
   @staticmethod
@@ -17511,7 +17526,7 @@ class WeakAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.WeakAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WeakAttr]:
     ...
 
   @staticmethod
@@ -17575,7 +17590,7 @@ class WarnUnusedResultAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.WarnUnusedResultAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WarnUnusedResultAttr]:
     ...
 
   @staticmethod
@@ -17636,7 +17651,7 @@ class WarnUnusedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.WarnUnusedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WarnUnusedAttr]:
     ...
 
   @staticmethod
@@ -17698,7 +17713,7 @@ class VisibilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.VisibilityAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VisibilityAttr]:
     ...
 
   @staticmethod
@@ -17759,7 +17774,7 @@ class VectorCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.VectorCallAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VectorCallAttr]:
     ...
 
   @staticmethod
@@ -17822,7 +17837,7 @@ class VecTypeHintAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.VecTypeHintAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VecTypeHintAttr]:
     ...
 
   @staticmethod
@@ -17883,7 +17898,7 @@ class VecReturnAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.VecReturnAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VecReturnAttr]:
     ...
 
   @staticmethod
@@ -17946,7 +17961,7 @@ class UuidAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UuidAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UuidAttr]:
     ...
 
   @staticmethod
@@ -18007,7 +18022,7 @@ class UsingIfExistsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UsingIfExistsAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingIfExistsAttr]:
     ...
 
   @staticmethod
@@ -18068,7 +18083,7 @@ class UsedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UsedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsedAttr]:
     ...
 
   @staticmethod
@@ -18130,7 +18145,7 @@ class UnusedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UnusedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnusedAttr]:
     ...
 
   @staticmethod
@@ -18191,7 +18206,7 @@ class UnsafeBufferUsageAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UnsafeBufferUsageAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnsafeBufferUsageAttr]:
     ...
 
   @staticmethod
@@ -18252,7 +18267,7 @@ class UninitializedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UninitializedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UninitializedAttr]:
     ...
 
   @staticmethod
@@ -18315,7 +18330,7 @@ class UnavailableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UnavailableAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnavailableAttr]:
     ...
 
   @staticmethod
@@ -18377,7 +18392,7 @@ class TypeVisibilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypeVisibilityAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeVisibilityAttr]:
     ...
 
   @staticmethod
@@ -18442,7 +18457,7 @@ class TypeTagForDatatypeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypeTagForDatatypeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeTagForDatatypeAttr]:
     ...
 
   @staticmethod
@@ -18506,7 +18521,7 @@ class TryAcquireCapabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TryAcquireCapabilityAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TryAcquireCapabilityAttr]:
     ...
 
   @staticmethod
@@ -18567,7 +18582,7 @@ class TrivialABIAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TrivialABIAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TrivialABIAttr]:
     ...
 
   @staticmethod
@@ -18628,7 +18643,7 @@ class TransparentUnionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TransparentUnionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TransparentUnionAttr]:
     ...
 
   @staticmethod
@@ -18689,7 +18704,7 @@ class ThisCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ThisCallAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ThisCallAttr]:
     ...
 
   @staticmethod
@@ -18751,7 +18766,7 @@ class TestTypestateAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TestTypestateAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TestTypestateAttr]:
     ...
 
   @staticmethod
@@ -18815,7 +18830,7 @@ class TargetVersionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TargetVersionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TargetVersionAttr]:
     ...
 
   @staticmethod
@@ -18876,7 +18891,7 @@ class TargetClonesAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TargetClonesAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TargetClonesAttr]:
     ...
 
   @staticmethod
@@ -18940,7 +18955,7 @@ class TargetAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TargetAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TargetAttr]:
     ...
 
   @staticmethod
@@ -19002,7 +19017,7 @@ class TLSModelAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TLSModelAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TLSModelAttr]:
     ...
 
   @staticmethod
@@ -19063,7 +19078,7 @@ class SysVABIAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SysVABIAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SysVABIAttr]:
     ...
 
   @staticmethod
@@ -19124,7 +19139,7 @@ class SwiftPrivateAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftPrivateAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftPrivateAttr]:
     ...
 
   @staticmethod
@@ -19187,7 +19202,7 @@ class SwiftNewTypeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftNewTypeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftNewTypeAttr]:
     ...
 
   @staticmethod
@@ -19249,7 +19264,7 @@ class SwiftNameAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftNameAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftNameAttr]:
     ...
 
   @staticmethod
@@ -19311,7 +19326,7 @@ class SwiftErrorAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftErrorAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftErrorAttr]:
     ...
 
   @staticmethod
@@ -19372,7 +19387,7 @@ class SwiftCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftCallAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftCallAttr]:
     ...
 
   @staticmethod
@@ -19433,7 +19448,7 @@ class SwiftBridgedTypedefAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftBridgedTypedefAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftBridgedTypedefAttr]:
     ...
 
   @staticmethod
@@ -19495,7 +19510,7 @@ class SwiftBridgeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftBridgeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftBridgeAttr]:
     ...
 
   @staticmethod
@@ -19557,7 +19572,7 @@ class SwiftAttrAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftAttrAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAttrAttr]:
     ...
 
   @staticmethod
@@ -19619,7 +19634,7 @@ class SwiftAsyncNameAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftAsyncNameAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncNameAttr]:
     ...
 
   @staticmethod
@@ -19681,7 +19696,7 @@ class SwiftAsyncErrorAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftAsyncErrorAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncErrorAttr]:
     ...
 
   @staticmethod
@@ -19742,7 +19757,7 @@ class SwiftAsyncCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftAsyncCallAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncCallAttr]:
     ...
 
   @staticmethod
@@ -19804,7 +19819,7 @@ class SwiftAsyncAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftAsyncAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncAttr]:
     ...
 
   @staticmethod
@@ -19865,7 +19880,7 @@ class StrictGuardStackCheckAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.StrictGuardStackCheckAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StrictGuardStackCheckAttr]:
     ...
 
   @staticmethod
@@ -19926,7 +19941,7 @@ class StrictFPAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.StrictFPAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StrictFPAttr]:
     ...
 
   @staticmethod
@@ -19987,7 +20002,7 @@ class StdCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.StdCallAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StdCallAttr]:
     ...
 
   @staticmethod
@@ -20048,7 +20063,7 @@ class StandaloneDebugAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.StandaloneDebugAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StandaloneDebugAttr]:
     ...
 
   @staticmethod
@@ -20109,7 +20124,7 @@ class SpeculativeLoadHardeningAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SpeculativeLoadHardeningAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SpeculativeLoadHardeningAttr]:
     ...
 
   @staticmethod
@@ -20171,7 +20186,7 @@ class SharedTrylockFunctionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SharedTrylockFunctionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SharedTrylockFunctionAttr]:
     ...
 
   @staticmethod
@@ -20233,7 +20248,7 @@ class SetTypestateAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SetTypestateAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SetTypestateAttr]:
     ...
 
   @staticmethod
@@ -20294,7 +20309,7 @@ class SentinelAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SentinelAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SentinelAttr]:
     ...
 
   @staticmethod
@@ -20355,7 +20370,7 @@ class SelectAnyAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SelectAnyAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SelectAnyAttr]:
     ...
 
   @staticmethod
@@ -20418,7 +20433,7 @@ class SectionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SectionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SectionAttr]:
     ...
 
   @staticmethod
@@ -20479,7 +20494,7 @@ class ScopedLockableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ScopedLockableAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ScopedLockableAttr]:
     ...
 
   @staticmethod
@@ -20540,7 +20555,7 @@ class SYCLSpecialClassAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SYCLSpecialClassAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SYCLSpecialClassAttr]:
     ...
 
   @staticmethod
@@ -20601,7 +20616,7 @@ class SYCLKernelAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SYCLKernelAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SYCLKernelAttr]:
     ...
 
   @staticmethod
@@ -20662,7 +20677,7 @@ class ReturnsTwiceAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ReturnsTwiceAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReturnsTwiceAttr]:
     ...
 
   @staticmethod
@@ -20723,7 +20738,7 @@ class ReturnsNonNullAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ReturnsNonNullAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReturnsNonNullAttr]:
     ...
 
   @staticmethod
@@ -20785,7 +20800,7 @@ class ReturnTypestateAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ReturnTypestateAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReturnTypestateAttr]:
     ...
 
   @staticmethod
@@ -20846,7 +20861,7 @@ class RetainAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.RetainAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RetainAttr]:
     ...
 
   @staticmethod
@@ -20908,7 +20923,7 @@ class RestrictAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.RestrictAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RestrictAttr]:
     ...
 
   @staticmethod
@@ -20971,7 +20986,7 @@ class RequiresCapabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.RequiresCapabilityAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RequiresCapabilityAttr]:
     ...
 
   @staticmethod
@@ -21032,7 +21047,7 @@ class ReqdWorkGroupSizeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ReqdWorkGroupSizeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReqdWorkGroupSizeAttr]:
     ...
 
   @staticmethod
@@ -21096,7 +21111,7 @@ class ReleaseCapabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ReleaseCapabilityAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReleaseCapabilityAttr]:
     ...
 
   @staticmethod
@@ -21157,7 +21172,7 @@ class ReinitializesAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ReinitializesAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReinitializesAttr]:
     ...
 
   @staticmethod
@@ -21218,7 +21233,7 @@ class RegCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.RegCallAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RegCallAttr]:
     ...
 
   @staticmethod
@@ -21279,7 +21294,7 @@ class ReadOnlyPlacementAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ReadOnlyPlacementAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReadOnlyPlacementAttr]:
     ...
 
   @staticmethod
@@ -21340,7 +21355,7 @@ class RandomizeLayoutAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.RandomizeLayoutAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RandomizeLayoutAttr]:
     ...
 
   @staticmethod
@@ -21402,7 +21417,7 @@ class RISCVInterruptAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.RISCVInterruptAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RISCVInterruptAttr]:
     ...
 
   @staticmethod
@@ -21463,7 +21478,7 @@ class PureAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PureAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PureAttr]:
     ...
 
   @staticmethod
@@ -21524,7 +21539,7 @@ class PtGuardedVarAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PtGuardedVarAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PtGuardedVarAttr]:
     ...
 
   @staticmethod
@@ -21586,7 +21601,7 @@ class PtGuardedByAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PtGuardedByAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PtGuardedByAttr]:
     ...
 
   @staticmethod
@@ -21647,7 +21662,7 @@ class PreserveMostAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PreserveMostAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PreserveMostAttr]:
     ...
 
   @staticmethod
@@ -21708,7 +21723,7 @@ class PreserveAllAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PreserveAllAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PreserveAllAttr]:
     ...
 
   @staticmethod
@@ -21771,7 +21786,7 @@ class PreferredNameAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PreferredNameAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PreferredNameAttr]:
     ...
 
   @staticmethod
@@ -21833,7 +21848,7 @@ class PragmaClangTextSectionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PragmaClangTextSectionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangTextSectionAttr]:
     ...
 
   @staticmethod
@@ -21895,7 +21910,7 @@ class PragmaClangRodataSectionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PragmaClangRodataSectionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangRodataSectionAttr]:
     ...
 
   @staticmethod
@@ -21957,7 +21972,7 @@ class PragmaClangRelroSectionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PragmaClangRelroSectionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangRelroSectionAttr]:
     ...
 
   @staticmethod
@@ -22019,7 +22034,7 @@ class PragmaClangDataSectionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PragmaClangDataSectionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangDataSectionAttr]:
     ...
 
   @staticmethod
@@ -22081,7 +22096,7 @@ class PragmaClangBSSSectionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PragmaClangBSSSectionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangBSSSectionAttr]:
     ...
 
   @staticmethod
@@ -22144,7 +22159,7 @@ class PointerAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PointerAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PointerAttr]:
     ...
 
   @staticmethod
@@ -22206,7 +22221,7 @@ class PcsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PcsAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PcsAttr]:
     ...
 
   @staticmethod
@@ -22267,7 +22282,7 @@ class PatchableFunctionEntryAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PatchableFunctionEntryAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PatchableFunctionEntryAttr]:
     ...
 
   @staticmethod
@@ -22328,7 +22343,7 @@ class PascalAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PascalAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PascalAttr]:
     ...
 
   @staticmethod
@@ -22390,7 +22405,7 @@ class ParamTypestateAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ParamTypestateAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParamTypestateAttr]:
     ...
 
   @staticmethod
@@ -22451,7 +22466,7 @@ class PackedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PackedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PackedAttr]:
     ...
 
   @staticmethod
@@ -22517,7 +22532,7 @@ class OwnershipAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OwnershipAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OwnershipAttr]:
     ...
 
   @staticmethod
@@ -22580,7 +22595,7 @@ class OwnerAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OwnerAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OwnerAttr]:
     ...
 
   @staticmethod
@@ -22641,7 +22656,7 @@ class OverrideAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OverrideAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OverrideAttr]:
     ...
 
   @staticmethod
@@ -22702,7 +22717,7 @@ class OptimizeNoneAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OptimizeNoneAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OptimizeNoneAttr]:
     ...
 
   @staticmethod
@@ -22763,7 +22778,7 @@ class OpenCLKernelAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OpenCLKernelAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLKernelAttr]:
     ...
 
   @staticmethod
@@ -22824,7 +22839,7 @@ class OpenCLIntelReqdSubGroupSizeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OpenCLIntelReqdSubGroupSizeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLIntelReqdSubGroupSizeAttr]:
     ...
 
   @staticmethod
@@ -22885,7 +22900,7 @@ class ObjCSubclassingRestrictedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCSubclassingRestrictedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCSubclassingRestrictedAttr]:
     ...
 
   @staticmethod
@@ -22946,7 +22961,7 @@ class ObjCRootClassAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCRootClassAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRootClassAttr]:
     ...
 
   @staticmethod
@@ -23007,7 +23022,7 @@ class ObjCReturnsInnerPointerAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCReturnsInnerPointerAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCReturnsInnerPointerAttr]:
     ...
 
   @staticmethod
@@ -23068,7 +23083,7 @@ class ObjCRequiresSuperAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCRequiresSuperAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRequiresSuperAttr]:
     ...
 
   @staticmethod
@@ -23129,7 +23144,7 @@ class ObjCRequiresPropertyDefsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCRequiresPropertyDefsAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRequiresPropertyDefsAttr]:
     ...
 
   @staticmethod
@@ -23190,7 +23205,7 @@ class ObjCPreciseLifetimeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCPreciseLifetimeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCPreciseLifetimeAttr]:
     ...
 
   @staticmethod
@@ -23251,7 +23266,7 @@ class ObjCOwnershipAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCOwnershipAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCOwnershipAttr]:
     ...
 
   @staticmethod
@@ -23312,7 +23327,7 @@ class ObjCNSObjectAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCNSObjectAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCNSObjectAttr]:
     ...
 
   @staticmethod
@@ -23374,7 +23389,7 @@ class ObjCMethodFamilyAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCMethodFamilyAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCMethodFamilyAttr]:
     ...
 
   @staticmethod
@@ -23435,7 +23450,7 @@ class ObjCIndependentClassAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCIndependentClassAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIndependentClassAttr]:
     ...
 
   @staticmethod
@@ -23496,7 +23511,7 @@ class ObjCExternallyRetainedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCExternallyRetainedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCExternallyRetainedAttr]:
     ...
 
   @staticmethod
@@ -23557,7 +23572,7 @@ class ObjCExplicitProtocolImplAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCExplicitProtocolImplAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCExplicitProtocolImplAttr]:
     ...
 
   @staticmethod
@@ -23618,7 +23633,7 @@ class ObjCExceptionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCExceptionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCExceptionAttr]:
     ...
 
   @staticmethod
@@ -23679,7 +23694,7 @@ class ObjCBridgeRelatedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCBridgeRelatedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBridgeRelatedAttr]:
     ...
 
   @staticmethod
@@ -23740,7 +23755,7 @@ class ObjCBridgeMutableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCBridgeMutableAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBridgeMutableAttr]:
     ...
 
   @staticmethod
@@ -23801,7 +23816,7 @@ class ObjCBridgeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCBridgeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBridgeAttr]:
     ...
 
   @staticmethod
@@ -23862,7 +23877,7 @@ class OSReturnsRetainedOnZeroAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OSReturnsRetainedOnZeroAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSReturnsRetainedOnZeroAttr]:
     ...
 
   @staticmethod
@@ -23923,7 +23938,7 @@ class OSReturnsRetainedOnNonZeroAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OSReturnsRetainedOnNonZeroAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSReturnsRetainedOnNonZeroAttr]:
     ...
 
   @staticmethod
@@ -23984,7 +23999,7 @@ class OSReturnsRetainedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OSReturnsRetainedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSReturnsRetainedAttr]:
     ...
 
   @staticmethod
@@ -24045,7 +24060,7 @@ class OSReturnsNotRetainedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OSReturnsNotRetainedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSReturnsNotRetainedAttr]:
     ...
 
   @staticmethod
@@ -24106,7 +24121,7 @@ class OSConsumesThisAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OSConsumesThisAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSConsumesThisAttr]:
     ...
 
   @staticmethod
@@ -24167,7 +24182,7 @@ class OMPThreadPrivateDeclAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPThreadPrivateDeclAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPThreadPrivateDeclAttr]:
     ...
 
   @staticmethod
@@ -24229,7 +24244,7 @@ class OMPDeclareVariantAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPDeclareVariantAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareVariantAttr]:
     ...
 
   @staticmethod
@@ -24294,7 +24309,7 @@ class OMPDeclareTargetDeclAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPDeclareTargetDeclAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareTargetDeclAttr]:
     ...
 
   @staticmethod
@@ -24355,7 +24370,7 @@ class OMPCaptureNoInitAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPCaptureNoInitAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCaptureNoInitAttr]:
     ...
 
   @staticmethod
@@ -24419,7 +24434,7 @@ class OMPAllocateDeclAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPAllocateDeclAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPAllocateDeclAttr]:
     ...
 
   @staticmethod
@@ -24480,7 +24495,7 @@ class NotTailCalledAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NotTailCalledAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NotTailCalledAttr]:
     ...
 
   @staticmethod
@@ -24541,7 +24556,7 @@ class NoUwtableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoUwtableAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoUwtableAttr]:
     ...
 
   @staticmethod
@@ -24602,7 +24617,7 @@ class NoUniqueAddressAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoUniqueAddressAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoUniqueAddressAttr]:
     ...
 
   @staticmethod
@@ -24663,7 +24678,7 @@ class NoThrowAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoThrowAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoThrowAttr]:
     ...
 
   @staticmethod
@@ -24724,7 +24739,7 @@ class NoThreadSafetyAnalysisAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoThreadSafetyAnalysisAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoThreadSafetyAnalysisAttr]:
     ...
 
   @staticmethod
@@ -24786,7 +24801,7 @@ class NoStackProtectorAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoStackProtectorAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoStackProtectorAttr]:
     ...
 
   @staticmethod
@@ -24847,7 +24862,7 @@ class NoSplitStackAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoSplitStackAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoSplitStackAttr]:
     ...
 
   @staticmethod
@@ -24908,7 +24923,7 @@ class NoSpeculativeLoadHardeningAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoSpeculativeLoadHardeningAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoSpeculativeLoadHardeningAttr]:
     ...
 
   @staticmethod
@@ -24970,7 +24985,7 @@ class NoSanitizeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoSanitizeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoSanitizeAttr]:
     ...
 
   @staticmethod
@@ -25031,7 +25046,7 @@ class NoReturnAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoReturnAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoReturnAttr]:
     ...
 
   @staticmethod
@@ -25092,7 +25107,7 @@ class NoRandomizeLayoutAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoRandomizeLayoutAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoRandomizeLayoutAttr]:
     ...
 
   @staticmethod
@@ -25153,7 +25168,7 @@ class NoProfileFunctionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoProfileFunctionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoProfileFunctionAttr]:
     ...
 
   @staticmethod
@@ -25214,7 +25229,7 @@ class NoMips16Attr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoMips16Attr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoMips16Attr]:
     ...
 
   @staticmethod
@@ -25275,7 +25290,7 @@ class NoMicroMipsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoMicroMipsAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoMicroMipsAttr]:
     ...
 
   @staticmethod
@@ -25336,7 +25351,7 @@ class NoInstrumentFunctionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoInstrumentFunctionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoInstrumentFunctionAttr]:
     ...
 
   @staticmethod
@@ -25397,7 +25412,7 @@ class NoDuplicateAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoDuplicateAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoDuplicateAttr]:
     ...
 
   @staticmethod
@@ -25458,7 +25473,7 @@ class NoDestroyAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoDestroyAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoDestroyAttr]:
     ...
 
   @staticmethod
@@ -25519,7 +25534,7 @@ class NoDebugAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoDebugAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoDebugAttr]:
     ...
 
   @staticmethod
@@ -25580,7 +25595,7 @@ class NoCommonAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoCommonAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoCommonAttr]:
     ...
 
   @staticmethod
@@ -25641,7 +25656,7 @@ class NoAliasAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoAliasAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoAliasAttr]:
     ...
 
   @staticmethod
@@ -25702,7 +25717,7 @@ class NakedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NakedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NakedAttr]:
     ...
 
   @staticmethod
@@ -25763,7 +25778,7 @@ class NVPTXKernelAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NVPTXKernelAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NVPTXKernelAttr]:
     ...
 
   @staticmethod
@@ -25824,7 +25839,7 @@ class NSReturnsRetainedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NSReturnsRetainedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSReturnsRetainedAttr]:
     ...
 
   @staticmethod
@@ -25885,7 +25900,7 @@ class NSReturnsNotRetainedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NSReturnsNotRetainedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSReturnsNotRetainedAttr]:
     ...
 
   @staticmethod
@@ -25946,7 +25961,7 @@ class NSReturnsAutoreleasedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NSReturnsAutoreleasedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSReturnsAutoreleasedAttr]:
     ...
 
   @staticmethod
@@ -26008,7 +26023,7 @@ class NSErrorDomainAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NSErrorDomainAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSErrorDomainAttr]:
     ...
 
   @staticmethod
@@ -26069,7 +26084,7 @@ class NSConsumesSelfAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NSConsumesSelfAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSConsumesSelfAttr]:
     ...
 
   @staticmethod
@@ -26131,7 +26146,7 @@ class MipsShortCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MipsShortCallAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MipsShortCallAttr]:
     ...
 
   @staticmethod
@@ -26193,7 +26208,7 @@ class MipsLongCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MipsLongCallAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MipsLongCallAttr]:
     ...
 
   @staticmethod
@@ -26255,7 +26270,7 @@ class MipsInterruptAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MipsInterruptAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MipsInterruptAttr]:
     ...
 
   @staticmethod
@@ -26316,7 +26331,7 @@ class Mips16Attr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.Mips16Attr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Mips16Attr]:
     ...
 
   @staticmethod
@@ -26377,7 +26392,7 @@ class MinVectorWidthAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MinVectorWidthAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MinVectorWidthAttr]:
     ...
 
   @staticmethod
@@ -26438,7 +26453,7 @@ class MinSizeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MinSizeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MinSizeAttr]:
     ...
 
   @staticmethod
@@ -26499,7 +26514,7 @@ class MicroMipsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MicroMipsAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MicroMipsAttr]:
     ...
 
   @staticmethod
@@ -26560,7 +26575,7 @@ class MaybeUndefAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MaybeUndefAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MaybeUndefAttr]:
     ...
 
   @staticmethod
@@ -26621,7 +26636,7 @@ class MayAliasAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MayAliasAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MayAliasAttr]:
     ...
 
   @staticmethod
@@ -26682,7 +26697,7 @@ class MaxFieldAlignmentAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MaxFieldAlignmentAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MaxFieldAlignmentAttr]:
     ...
 
   @staticmethod
@@ -26744,7 +26759,7 @@ class MSVtorDispAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MSVtorDispAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSVtorDispAttr]:
     ...
 
   @staticmethod
@@ -26805,7 +26820,7 @@ class MSStructAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MSStructAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSStructAttr]:
     ...
 
   @staticmethod
@@ -26866,7 +26881,7 @@ class MSP430InterruptAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MSP430InterruptAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSP430InterruptAttr]:
     ...
 
   @staticmethod
@@ -26927,7 +26942,7 @@ class MSNoVTableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MSNoVTableAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSNoVTableAttr]:
     ...
 
   @staticmethod
@@ -26991,7 +27006,7 @@ class MSInheritanceAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MSInheritanceAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSInheritanceAttr]:
     ...
 
   @staticmethod
@@ -27052,7 +27067,7 @@ class MSAllocatorAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MSAllocatorAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSAllocatorAttr]:
     ...
 
   @staticmethod
@@ -27113,7 +27128,7 @@ class MSABIAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MSABIAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSABIAttr]:
     ...
 
   @staticmethod
@@ -27174,7 +27189,7 @@ class MIGServerRoutineAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MIGServerRoutineAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MIGServerRoutineAttr]:
     ...
 
   @staticmethod
@@ -27235,7 +27250,7 @@ class M68kInterruptAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.M68kInterruptAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.M68kInterruptAttr]:
     ...
 
   @staticmethod
@@ -27296,7 +27311,7 @@ class LocksExcludedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LocksExcludedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LocksExcludedAttr]:
     ...
 
   @staticmethod
@@ -27358,7 +27373,7 @@ class LockReturnedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LockReturnedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LockReturnedAttr]:
     ...
 
   @staticmethod
@@ -27419,7 +27434,7 @@ class LifetimeBoundAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LifetimeBoundAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LifetimeBoundAttr]:
     ...
 
   @staticmethod
@@ -27480,7 +27495,7 @@ class LeafAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LeafAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LeafAttr]:
     ...
 
   @staticmethod
@@ -27541,7 +27556,7 @@ class LayoutVersionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LayoutVersionAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LayoutVersionAttr]:
     ...
 
   @staticmethod
@@ -27602,7 +27617,7 @@ class LTOVisibilityPublicAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LTOVisibilityPublicAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LTOVisibilityPublicAttr]:
     ...
 
   @staticmethod
@@ -27663,7 +27678,7 @@ class InternalLinkageAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.InternalLinkageAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InternalLinkageAttr]:
     ...
 
   @staticmethod
@@ -27724,7 +27739,7 @@ class IntelOclBiccAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.IntelOclBiccAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IntelOclBiccAttr]:
     ...
 
   @staticmethod
@@ -27785,7 +27800,7 @@ class InitPriorityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.InitPriorityAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InitPriorityAttr]:
     ...
 
   @staticmethod
@@ -27846,7 +27861,7 @@ class InheritableParamAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.InheritableParamAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InheritableParamAttr]:
     ...
 
   @staticmethod
@@ -27903,7 +27918,7 @@ class CarriesDependencyAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CarriesDependencyAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CarriesDependencyAttr]:
     ...
 
   @staticmethod
@@ -27964,7 +27979,7 @@ class CFConsumedAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CFConsumedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFConsumedAttr]:
     ...
 
   @staticmethod
@@ -28026,7 +28041,7 @@ class AnnotateAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AnnotateAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnnotateAttr]:
     ...
 
   @staticmethod
@@ -28088,7 +28103,7 @@ class UseHandleAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UseHandleAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UseHandleAttr]:
     ...
 
   @staticmethod
@@ -28150,7 +28165,7 @@ class ReleaseHandleAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ReleaseHandleAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReleaseHandleAttr]:
     ...
 
   @staticmethod
@@ -28213,7 +28228,7 @@ class PassObjectSizeAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PassObjectSizeAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PassObjectSizeAttr]:
     ...
 
   @staticmethod
@@ -28275,7 +28290,7 @@ class ParameterABIAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ParameterABIAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParameterABIAttr]:
     ...
 
   @staticmethod
@@ -28332,7 +28347,7 @@ class SwiftIndirectResultAttr(multiplier.ast.ParameterABIAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftIndirectResultAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftIndirectResultAttr]:
     ...
 
   @staticmethod
@@ -28393,7 +28408,7 @@ class SwiftErrorResultAttr(multiplier.ast.ParameterABIAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftErrorResultAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftErrorResultAttr]:
     ...
 
   @staticmethod
@@ -28454,7 +28469,7 @@ class SwiftContextAttr(multiplier.ast.ParameterABIAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftContextAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftContextAttr]:
     ...
 
   @staticmethod
@@ -28515,7 +28530,7 @@ class SwiftAsyncContextAttr(multiplier.ast.ParameterABIAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwiftAsyncContextAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncContextAttr]:
     ...
 
   @staticmethod
@@ -28576,7 +28591,7 @@ class OSConsumedAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OSConsumedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSConsumedAttr]:
     ...
 
   @staticmethod
@@ -28637,7 +28652,7 @@ class NonNullAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NonNullAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NonNullAttr]:
     ...
 
   @staticmethod
@@ -28698,7 +28713,7 @@ class NSConsumedAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NSConsumedAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSConsumedAttr]:
     ...
 
   @staticmethod
@@ -28760,7 +28775,7 @@ class IFuncAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.IFuncAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IFuncAttr]:
     ...
 
   @staticmethod
@@ -28821,7 +28836,7 @@ class CalledOnceAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CalledOnceAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CalledOnceAttr]:
     ...
 
   @staticmethod
@@ -28883,7 +28898,7 @@ class BuiltinAliasAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BuiltinAliasAttr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinAliasAttr]:
     ...
 
   @staticmethod
@@ -28945,6 +28960,12 @@ class Type(multiplier.Entity):
   def static_category() -> multiplier.EntityCategory:
     ...
 
+  @overload
+  @staticmethod
+  def IN(index: multiplier.Index, kinds: Sequence[multiplier.ast.TypeKind]) -> Generator[multiplier.ast.Type]:
+    ...
+
+  @overload
   @staticmethod
   def IN(index: multiplier.Index) -> Generator[multiplier.ast.Type]:
     ...
@@ -28954,7 +28975,7 @@ class Type(multiplier.Entity):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.Type]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Type]:
     ...
 
   @overload
@@ -29000,7 +29021,7 @@ class TemplateTypeParmType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TemplateTypeParmType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateTypeParmType]:
     ...
 
   @staticmethod
@@ -29057,7 +29078,7 @@ class TemplateSpecializationType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TemplateSpecializationType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateSpecializationType]:
     ...
 
   @staticmethod
@@ -29112,7 +29133,7 @@ class TagType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TagType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TagType]:
     ...
 
   @staticmethod
@@ -29161,7 +29182,7 @@ class RecordType(multiplier.ast.TagType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.RecordType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RecordType]:
     ...
 
   @staticmethod
@@ -29213,7 +29234,7 @@ class EnumType(multiplier.ast.TagType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.EnumType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnumType]:
     ...
 
   @staticmethod
@@ -29269,7 +29290,7 @@ class SubstTemplateTypeParmType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SubstTemplateTypeParmType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SubstTemplateTypeParmType]:
     ...
 
   @staticmethod
@@ -29324,7 +29345,7 @@ class SubstTemplateTypeParmPackType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SubstTemplateTypeParmPackType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SubstTemplateTypeParmPackType]:
     ...
 
   @staticmethod
@@ -29378,7 +29399,7 @@ class ReferenceType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ReferenceType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReferenceType]:
     ...
 
   @staticmethod
@@ -29426,7 +29447,7 @@ class RValueReferenceType(multiplier.ast.ReferenceType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.RValueReferenceType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RValueReferenceType]:
     ...
 
   @staticmethod
@@ -29478,7 +29499,7 @@ class LValueReferenceType(multiplier.ast.ReferenceType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LValueReferenceType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LValueReferenceType]:
     ...
 
   @staticmethod
@@ -29563,7 +29584,7 @@ class QualifiedType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.QualifiedType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.QualifiedType]:
     ...
 
   @staticmethod
@@ -29616,7 +29637,7 @@ class PointerType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PointerType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PointerType]:
     ...
 
   @staticmethod
@@ -29670,7 +29691,7 @@ class PipeType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PipeType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PipeType]:
     ...
 
   @staticmethod
@@ -29723,7 +29744,7 @@ class ParenType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ParenType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParenType]:
     ...
 
   @staticmethod
@@ -29776,7 +29797,7 @@ class PackExpansionType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PackExpansionType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PackExpansionType]:
     ...
 
   @staticmethod
@@ -29829,7 +29850,7 @@ class ObjCTypeParamType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCTypeParamType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCTypeParamType]:
     ...
 
   @staticmethod
@@ -29901,7 +29922,7 @@ class ObjCObjectType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCObjectType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCObjectType]:
     ...
 
   @staticmethod
@@ -29955,7 +29976,7 @@ class ObjCInterfaceType(multiplier.ast.ObjCObjectType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCInterfaceType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCInterfaceType]:
     ...
 
   @staticmethod
@@ -30026,7 +30047,7 @@ class ObjCObjectPointerType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCObjectPointerType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCObjectPointerType]:
     ...
 
   @staticmethod
@@ -30092,7 +30113,7 @@ class MemberPointerType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MemberPointerType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MemberPointerType]:
     ...
 
   @staticmethod
@@ -30145,7 +30166,7 @@ class MatrixType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MatrixType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MatrixType]:
     ...
 
   @staticmethod
@@ -30194,7 +30215,7 @@ class DependentSizedMatrixType(multiplier.ast.MatrixType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DependentSizedMatrixType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentSizedMatrixType]:
     ...
 
   @staticmethod
@@ -30244,7 +30265,7 @@ class ConstantMatrixType(multiplier.ast.MatrixType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConstantMatrixType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstantMatrixType]:
     ...
 
   @staticmethod
@@ -30298,7 +30319,7 @@ class MacroQualifiedType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MacroQualifiedType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MacroQualifiedType]:
     ...
 
   @staticmethod
@@ -30353,7 +30374,7 @@ class InjectedClassNameType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.InjectedClassNameType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InjectedClassNameType]:
     ...
 
   @staticmethod
@@ -30412,7 +30433,7 @@ class FunctionType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FunctionType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionType]:
     ...
 
   @staticmethod
@@ -30448,6 +30469,7 @@ class FunctionType(multiplier.ast.Type):
     ...
 
 class FunctionProtoType(multiplier.ast.FunctionType):
+  can_throw: Optional[multiplier.ast.CanThrowResult]
   desugar: multiplier.ast.Type
   ellipsis_token: multiplier.frontend.Token
   exception_spec_declaration: Optional[multiplier.ast.FunctionDecl]
@@ -30480,7 +30502,7 @@ class FunctionProtoType(multiplier.ast.FunctionType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FunctionProtoType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionProtoType]:
     ...
 
   @staticmethod
@@ -30538,7 +30560,7 @@ class FunctionNoProtoType(multiplier.ast.FunctionType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FunctionNoProtoType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionNoProtoType]:
     ...
 
   @staticmethod
@@ -30594,7 +30616,7 @@ class DependentVectorType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DependentVectorType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentVectorType]:
     ...
 
   @staticmethod
@@ -30649,7 +30671,7 @@ class DependentSizedExtVectorType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DependentSizedExtVectorType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentSizedExtVectorType]:
     ...
 
   @staticmethod
@@ -30704,7 +30726,7 @@ class DependentBitIntType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DependentBitIntType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentBitIntType]:
     ...
 
   @staticmethod
@@ -30759,7 +30781,7 @@ class DependentAddressSpaceType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DependentAddressSpaceType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentAddressSpaceType]:
     ...
 
   @staticmethod
@@ -30813,7 +30835,7 @@ class DeducedType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DeducedType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeducedType]:
     ...
 
   @staticmethod
@@ -30859,7 +30881,7 @@ class DeducedTemplateSpecializationType(multiplier.ast.DeducedType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DeducedTemplateSpecializationType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeducedTemplateSpecializationType]:
     ...
 
   @staticmethod
@@ -30916,7 +30938,7 @@ class AutoType(multiplier.ast.DeducedType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AutoType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AutoType]:
     ...
 
   @staticmethod
@@ -30973,7 +30995,7 @@ class DecltypeType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DecltypeType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DecltypeType]:
     ...
 
   @staticmethod
@@ -31026,7 +31048,7 @@ class ComplexType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ComplexType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ComplexType]:
     ...
 
   @staticmethod
@@ -31085,7 +31107,7 @@ class BuiltinType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BuiltinType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinType]:
     ...
 
   @staticmethod
@@ -31138,7 +31160,7 @@ class BlockPointerType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BlockPointerType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BlockPointerType]:
     ...
 
   @staticmethod
@@ -31192,7 +31214,7 @@ class BitIntType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BitIntType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BitIntType]:
     ...
 
   @staticmethod
@@ -31246,7 +31268,7 @@ class BTFTagAttributedType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BTFTagAttributedType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BTFTagAttributedType]:
     ...
 
   @staticmethod
@@ -31290,6 +31312,7 @@ class AttributedType(multiplier.ast.Type):
   attribute: Optional[multiplier.ast.Attr]
   attribute_kind: multiplier.ast.AttrKind
   equivalent_type: multiplier.ast.Type
+  immediate_nullability: Optional[multiplier.ast.NullabilityKind]
   modified_type: multiplier.ast.Type
   has_attribute: bool
   is_calling_conv: bool
@@ -31307,7 +31330,7 @@ class AttributedType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AttributedType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AttributedType]:
     ...
 
   @staticmethod
@@ -31360,7 +31383,7 @@ class AtomicType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AtomicType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AtomicType]:
     ...
 
   @staticmethod
@@ -31412,7 +31435,7 @@ class ArrayType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ArrayType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArrayType]:
     ...
 
   @staticmethod
@@ -31464,7 +31487,7 @@ class VariableArrayType(multiplier.ast.ArrayType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.VariableArrayType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VariableArrayType]:
     ...
 
   @staticmethod
@@ -31516,7 +31539,7 @@ class IncompleteArrayType(multiplier.ast.ArrayType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.IncompleteArrayType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IncompleteArrayType]:
     ...
 
   @staticmethod
@@ -31572,7 +31595,7 @@ class DependentSizedArrayType(multiplier.ast.ArrayType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DependentSizedArrayType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentSizedArrayType]:
     ...
 
   @staticmethod
@@ -31625,7 +31648,7 @@ class ConstantArrayType(multiplier.ast.ArrayType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConstantArrayType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstantArrayType]:
     ...
 
   @staticmethod
@@ -31679,7 +31702,7 @@ class AdjustedType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AdjustedType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AdjustedType]:
     ...
 
   @staticmethod
@@ -31730,7 +31753,7 @@ class DecayedType(multiplier.ast.AdjustedType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DecayedType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DecayedType]:
     ...
 
   @staticmethod
@@ -31781,7 +31804,7 @@ class TypeWithKeyword(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypeWithKeyword]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeWithKeyword]:
     ...
 
   @staticmethod
@@ -31831,7 +31854,7 @@ class ElaboratedType(multiplier.ast.TypeWithKeyword):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ElaboratedType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ElaboratedType]:
     ...
 
   @staticmethod
@@ -31885,7 +31908,7 @@ class DependentTemplateSpecializationType(multiplier.ast.TypeWithKeyword):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DependentTemplateSpecializationType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentTemplateSpecializationType]:
     ...
 
   @staticmethod
@@ -31940,7 +31963,7 @@ class DependentNameType(multiplier.ast.TypeWithKeyword):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DependentNameType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentNameType]:
     ...
 
   @staticmethod
@@ -31994,7 +32017,7 @@ class VectorType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.VectorType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VectorType]:
     ...
 
   @staticmethod
@@ -32044,7 +32067,7 @@ class ExtVectorType(multiplier.ast.VectorType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ExtVectorType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExtVectorType]:
     ...
 
   @staticmethod
@@ -32099,7 +32122,7 @@ class UsingType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UsingType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingType]:
     ...
 
   @staticmethod
@@ -32152,7 +32175,7 @@ class UnresolvedUsingType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UnresolvedUsingType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedUsingType]:
     ...
 
   @staticmethod
@@ -32207,7 +32230,7 @@ class UnaryTransformType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UnaryTransformType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnaryTransformType]:
     ...
 
   @staticmethod
@@ -32261,7 +32284,7 @@ class TypedefType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypedefType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypedefType]:
     ...
 
   @staticmethod
@@ -32315,7 +32338,7 @@ class TypeOfType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypeOfType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeOfType]:
     ...
 
   @staticmethod
@@ -32369,7 +32392,7 @@ class TypeOfExprType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypeOfExprType]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeOfExprType]:
     ...
 
   @staticmethod
@@ -32411,7 +32434,7 @@ class TypeOfExprType(multiplier.ast.Type):
 class Stmt(multiplier.Entity):
   parent_declaration: Optional[multiplier.ast.Decl]
   parent_statement: Optional[multiplier.ast.Stmt]
-  referenced_declaration_id: Optional['multiplier.DeclId']
+  referenced_declaration_id: Optional[multiplier.DeclId]
   referenced_declaration: Optional[multiplier.ast.Decl]
   ignore_containers: multiplier.ast.Stmt
   children: Generator[multiplier.ast.Stmt]
@@ -32421,6 +32444,21 @@ class Stmt(multiplier.Entity):
 
   @staticmethod
   def static_category() -> multiplier.EntityCategory:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(index: multiplier.Index, kinds: Sequence[multiplier.ast.StmtKind]) -> Generator[multiplier.ast.Stmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment, kinds: Sequence[multiplier.ast.StmtKind]) -> Generator[multiplier.ast.Stmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File, kinds: Sequence[multiplier.ast.StmtKind]) -> Generator[multiplier.ast.Stmt]:
     ...
 
   @overload
@@ -32436,6 +32474,16 @@ class Stmt(multiplier.Entity):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.Stmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.Stmt, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation, kinds: Sequence[multiplier.ast.StmtKind]) -> Generator[Tuple[multiplier.ast.Stmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -32464,7 +32512,12 @@ class Stmt(multiplier.Entity):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.Stmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Stmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.Stmt]:
     ...
 
   @overload
@@ -32517,6 +32570,11 @@ class SEHTryStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.SEHTryStmt, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.SEHTryStmt]:
     ...
 
@@ -32541,15 +32599,12 @@ class SEHTryStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SEHTryStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SEHTryStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SEHTryStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.SEHTryStmt]:
     ...
 
   @overload
@@ -32577,6 +32632,14 @@ class SEHTryStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.SEHTryStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SEHTryStmt]:
+    ...
+
 class SEHLeaveStmt(multiplier.ast.Stmt):
   leave_token: multiplier.frontend.Token
 
@@ -32593,6 +32656,11 @@ class SEHLeaveStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.SEHLeaveStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.SEHLeaveStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -32621,15 +32689,12 @@ class SEHLeaveStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SEHLeaveStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SEHLeaveStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SEHLeaveStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.SEHLeaveStmt]:
     ...
 
   @overload
@@ -32657,6 +32722,14 @@ class SEHLeaveStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.SEHLeaveStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SEHLeaveStmt]:
+    ...
+
 class SEHFinallyStmt(multiplier.ast.Stmt):
   block: multiplier.ast.CompoundStmt
   finally_token: multiplier.frontend.Token
@@ -32674,6 +32747,11 @@ class SEHFinallyStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.SEHFinallyStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.SEHFinallyStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -32702,15 +32780,12 @@ class SEHFinallyStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SEHFinallyStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SEHFinallyStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SEHFinallyStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.SEHFinallyStmt]:
     ...
 
   @overload
@@ -32738,6 +32813,14 @@ class SEHFinallyStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.SEHFinallyStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SEHFinallyStmt]:
+    ...
+
 class SEHExceptStmt(multiplier.ast.Stmt):
   block: multiplier.ast.CompoundStmt
   except_token: multiplier.frontend.Token
@@ -32756,6 +32839,11 @@ class SEHExceptStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.SEHExceptStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.SEHExceptStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -32784,15 +32872,12 @@ class SEHExceptStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SEHExceptStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SEHExceptStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SEHExceptStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.SEHExceptStmt]:
     ...
 
   @overload
@@ -32820,6 +32905,14 @@ class SEHExceptStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.SEHExceptStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SEHExceptStmt]:
+    ...
+
 class ReturnStmt(multiplier.ast.Stmt):
   nrvo_candidate: Optional[multiplier.ast.VarDecl]
   return_value: Optional[multiplier.ast.Expr]
@@ -32838,6 +32931,11 @@ class ReturnStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ReturnStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ReturnStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -32866,15 +32964,12 @@ class ReturnStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ReturnStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReturnStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ReturnStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ReturnStmt]:
     ...
 
   @overload
@@ -32902,6 +32997,14 @@ class ReturnStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ReturnStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ReturnStmt]:
+    ...
+
 class ObjCForCollectionStmt(multiplier.ast.Stmt):
   body: multiplier.ast.Stmt
   collection: multiplier.ast.Expr
@@ -32922,6 +33025,11 @@ class ObjCForCollectionStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCForCollectionStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCForCollectionStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -32950,15 +33058,12 @@ class ObjCForCollectionStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCForCollectionStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCForCollectionStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCForCollectionStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCForCollectionStmt]:
     ...
 
   @overload
@@ -32986,6 +33091,14 @@ class ObjCForCollectionStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCForCollectionStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCForCollectionStmt]:
+    ...
+
 class ObjCAutoreleasePoolStmt(multiplier.ast.Stmt):
   at_token: multiplier.frontend.Token
   sub_statement: multiplier.ast.Stmt
@@ -33003,6 +33116,11 @@ class ObjCAutoreleasePoolStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCAutoreleasePoolStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCAutoreleasePoolStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -33031,15 +33149,12 @@ class ObjCAutoreleasePoolStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCAutoreleasePoolStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAutoreleasePoolStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCAutoreleasePoolStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCAutoreleasePoolStmt]:
     ...
 
   @overload
@@ -33067,6 +33182,14 @@ class ObjCAutoreleasePoolStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCAutoreleasePoolStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCAutoreleasePoolStmt]:
+    ...
+
 class ObjCAtTryStmt(multiplier.ast.Stmt):
   at_try_token: multiplier.frontend.Token
   finally_statement: multiplier.ast.ObjCAtFinallyStmt
@@ -33087,6 +33210,11 @@ class ObjCAtTryStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCAtTryStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCAtTryStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -33115,15 +33243,12 @@ class ObjCAtTryStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCAtTryStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtTryStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCAtTryStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCAtTryStmt]:
     ...
 
   @overload
@@ -33151,6 +33276,14 @@ class ObjCAtTryStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCAtTryStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCAtTryStmt]:
+    ...
+
   def nth_catch_statement(self, n: int) -> Optional[multiplier.ast.ObjCAtCatchStmt]:
     ...
 
@@ -33171,6 +33304,11 @@ class ObjCAtThrowStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCAtThrowStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCAtThrowStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -33199,15 +33337,12 @@ class ObjCAtThrowStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCAtThrowStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtThrowStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCAtThrowStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCAtThrowStmt]:
     ...
 
   @overload
@@ -33235,6 +33370,14 @@ class ObjCAtThrowStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCAtThrowStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCAtThrowStmt]:
+    ...
+
 class ObjCAtSynchronizedStmt(multiplier.ast.Stmt):
   at_synchronized_token: multiplier.frontend.Token
   synch_body: multiplier.ast.CompoundStmt
@@ -33253,6 +33396,11 @@ class ObjCAtSynchronizedStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCAtSynchronizedStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCAtSynchronizedStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -33281,15 +33429,12 @@ class ObjCAtSynchronizedStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCAtSynchronizedStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtSynchronizedStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCAtSynchronizedStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCAtSynchronizedStmt]:
     ...
 
   @overload
@@ -33317,6 +33462,14 @@ class ObjCAtSynchronizedStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCAtSynchronizedStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCAtSynchronizedStmt]:
+    ...
+
 class ObjCAtFinallyStmt(multiplier.ast.Stmt):
   at_finally_token: multiplier.frontend.Token
   finally_body: multiplier.ast.Stmt
@@ -33334,6 +33487,11 @@ class ObjCAtFinallyStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCAtFinallyStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCAtFinallyStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -33362,15 +33520,12 @@ class ObjCAtFinallyStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCAtFinallyStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtFinallyStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCAtFinallyStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCAtFinallyStmt]:
     ...
 
   @overload
@@ -33398,6 +33553,14 @@ class ObjCAtFinallyStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCAtFinallyStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCAtFinallyStmt]:
+    ...
+
 class ObjCAtCatchStmt(multiplier.ast.Stmt):
   at_catch_token: multiplier.frontend.Token
   catch_body: multiplier.ast.Stmt
@@ -33418,6 +33581,11 @@ class ObjCAtCatchStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCAtCatchStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCAtCatchStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -33446,15 +33614,12 @@ class ObjCAtCatchStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCAtCatchStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtCatchStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCAtCatchStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCAtCatchStmt]:
     ...
 
   @overload
@@ -33482,6 +33647,14 @@ class ObjCAtCatchStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCAtCatchStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCAtCatchStmt]:
+    ...
+
 class OMPExecutableDirective(multiplier.ast.Stmt):
   associated_statement: multiplier.ast.Stmt
   innermost_captured_statement: multiplier.ast.CapturedStmt
@@ -33503,6 +33676,11 @@ class OMPExecutableDirective(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPExecutableDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPExecutableDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -33531,11 +33709,12 @@ class OMPExecutableDirective(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPExecutableDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPExecutableDirective]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPExecutableDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPExecutableDirective]:
     ...
 
   @overload
@@ -33563,6 +33742,10 @@ class OMPExecutableDirective(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPExecutableDirective]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPExecutableDirective]:
+    ...
+
 class OMPErrorDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -33578,6 +33761,11 @@ class OMPErrorDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPErrorDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPErrorDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -33606,15 +33794,12 @@ class OMPErrorDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPErrorDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPErrorDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPErrorDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPErrorDirective]:
     ...
 
   @overload
@@ -33642,6 +33827,14 @@ class OMPErrorDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPErrorDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPErrorDirective]:
+    ...
+
 class OMPDispatchDirective(multiplier.ast.OMPExecutableDirective):
   target_call_token: multiplier.frontend.Token
 
@@ -33658,6 +33851,11 @@ class OMPDispatchDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPDispatchDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPDispatchDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -33686,15 +33884,12 @@ class OMPDispatchDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPDispatchDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDispatchDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPDispatchDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPDispatchDirective]:
     ...
 
   @overload
@@ -33722,6 +33917,14 @@ class OMPDispatchDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPDispatchDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPDispatchDirective]:
+    ...
+
 class OMPDepobjDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -33737,6 +33940,11 @@ class OMPDepobjDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPDepobjDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPDepobjDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -33765,15 +33973,12 @@ class OMPDepobjDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPDepobjDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDepobjDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPDepobjDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPDepobjDirective]:
     ...
 
   @overload
@@ -33801,6 +34006,14 @@ class OMPDepobjDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPDepobjDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPDepobjDirective]:
+    ...
+
 class OMPCriticalDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -33816,6 +34029,11 @@ class OMPCriticalDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPCriticalDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPCriticalDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -33844,15 +34062,12 @@ class OMPCriticalDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPCriticalDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCriticalDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPCriticalDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPCriticalDirective]:
     ...
 
   @overload
@@ -33880,6 +34095,14 @@ class OMPCriticalDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPCriticalDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPCriticalDirective]:
+    ...
+
 class OMPCancellationPointDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -33895,6 +34118,11 @@ class OMPCancellationPointDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPCancellationPointDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPCancellationPointDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -33923,15 +34151,12 @@ class OMPCancellationPointDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPCancellationPointDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCancellationPointDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPCancellationPointDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPCancellationPointDirective]:
     ...
 
   @overload
@@ -33959,6 +34184,14 @@ class OMPCancellationPointDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPCancellationPointDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPCancellationPointDirective]:
+    ...
+
 class OMPCancelDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -33974,6 +34207,11 @@ class OMPCancelDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPCancelDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPCancelDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -34002,15 +34240,12 @@ class OMPCancelDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPCancelDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCancelDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPCancelDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPCancelDirective]:
     ...
 
   @overload
@@ -34038,6 +34273,14 @@ class OMPCancelDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPCancelDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPCancelDirective]:
+    ...
+
 class OMPBarrierDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -34053,6 +34296,11 @@ class OMPBarrierDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPBarrierDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPBarrierDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -34081,15 +34329,12 @@ class OMPBarrierDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPBarrierDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPBarrierDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPBarrierDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPBarrierDirective]:
     ...
 
   @overload
@@ -34115,6 +34360,14 @@ class OMPBarrierDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPBarrierDirective]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPBarrierDirective]:
     ...
 
 class OMPAtomicDirective(multiplier.ast.OMPExecutableDirective):
@@ -34146,6 +34399,11 @@ class OMPAtomicDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPAtomicDirective, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.OMPAtomicDirective]:
     ...
 
@@ -34170,15 +34428,12 @@ class OMPAtomicDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPAtomicDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPAtomicDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPAtomicDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPAtomicDirective]:
     ...
 
   @overload
@@ -34206,6 +34461,14 @@ class OMPAtomicDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPAtomicDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPAtomicDirective]:
+    ...
+
 class OMPTeamsDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -34221,6 +34484,11 @@ class OMPTeamsDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTeamsDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTeamsDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -34249,15 +34517,12 @@ class OMPTeamsDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTeamsDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTeamsDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTeamsDirective]:
     ...
 
   @overload
@@ -34285,6 +34550,14 @@ class OMPTeamsDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTeamsDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTeamsDirective]:
+    ...
+
 class OMPTaskyieldDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -34300,6 +34573,11 @@ class OMPTaskyieldDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTaskyieldDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTaskyieldDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -34328,15 +34606,12 @@ class OMPTaskyieldDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTaskyieldDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskyieldDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTaskyieldDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTaskyieldDirective]:
     ...
 
   @overload
@@ -34364,6 +34639,14 @@ class OMPTaskyieldDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTaskyieldDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTaskyieldDirective]:
+    ...
+
 class OMPTaskwaitDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -34379,6 +34662,11 @@ class OMPTaskwaitDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTaskwaitDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTaskwaitDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -34407,15 +34695,12 @@ class OMPTaskwaitDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTaskwaitDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskwaitDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTaskwaitDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTaskwaitDirective]:
     ...
 
   @overload
@@ -34443,6 +34728,14 @@ class OMPTaskwaitDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTaskwaitDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTaskwaitDirective]:
+    ...
+
 class OMPTaskgroupDirective(multiplier.ast.OMPExecutableDirective):
   reduction_reference: multiplier.ast.Expr
 
@@ -34459,6 +34752,11 @@ class OMPTaskgroupDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTaskgroupDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTaskgroupDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -34487,15 +34785,12 @@ class OMPTaskgroupDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTaskgroupDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskgroupDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTaskgroupDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTaskgroupDirective]:
     ...
 
   @overload
@@ -34523,6 +34818,14 @@ class OMPTaskgroupDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTaskgroupDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTaskgroupDirective]:
+    ...
+
 class OMPTaskDirective(multiplier.ast.OMPExecutableDirective):
   has_cancel: bool
 
@@ -34539,6 +34842,11 @@ class OMPTaskDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTaskDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTaskDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -34567,15 +34875,12 @@ class OMPTaskDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTaskDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTaskDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTaskDirective]:
     ...
 
   @overload
@@ -34603,6 +34908,14 @@ class OMPTaskDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTaskDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTaskDirective]:
+    ...
+
 class OMPTargetUpdateDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -34618,6 +34931,11 @@ class OMPTargetUpdateDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetUpdateDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetUpdateDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -34646,15 +34964,12 @@ class OMPTargetUpdateDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetUpdateDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetUpdateDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetUpdateDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetUpdateDirective]:
     ...
 
   @overload
@@ -34682,6 +34997,14 @@ class OMPTargetUpdateDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetUpdateDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetUpdateDirective]:
+    ...
+
 class OMPTargetTeamsDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -34697,6 +35020,11 @@ class OMPTargetTeamsDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetTeamsDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetTeamsDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -34725,15 +35053,12 @@ class OMPTargetTeamsDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetTeamsDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetTeamsDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetTeamsDirective]:
     ...
 
   @overload
@@ -34761,6 +35086,14 @@ class OMPTargetTeamsDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetTeamsDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetTeamsDirective]:
+    ...
+
 class OMPTargetParallelDirective(multiplier.ast.OMPExecutableDirective):
   task_reduction_reference_expression: multiplier.ast.Expr
   has_cancel: bool
@@ -34778,6 +35111,11 @@ class OMPTargetParallelDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetParallelDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetParallelDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -34806,15 +35144,12 @@ class OMPTargetParallelDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetParallelDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetParallelDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetParallelDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetParallelDirective]:
     ...
 
   @overload
@@ -34842,6 +35177,14 @@ class OMPTargetParallelDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetParallelDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetParallelDirective]:
+    ...
+
 class OMPTargetExitDataDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -34857,6 +35200,11 @@ class OMPTargetExitDataDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetExitDataDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetExitDataDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -34885,15 +35233,12 @@ class OMPTargetExitDataDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetExitDataDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetExitDataDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetExitDataDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetExitDataDirective]:
     ...
 
   @overload
@@ -34921,6 +35266,14 @@ class OMPTargetExitDataDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetExitDataDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetExitDataDirective]:
+    ...
+
 class OMPTargetEnterDataDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -34936,6 +35289,11 @@ class OMPTargetEnterDataDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetEnterDataDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetEnterDataDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -34964,15 +35322,12 @@ class OMPTargetEnterDataDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetEnterDataDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetEnterDataDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetEnterDataDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetEnterDataDirective]:
     ...
 
   @overload
@@ -35000,6 +35355,14 @@ class OMPTargetEnterDataDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetEnterDataDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetEnterDataDirective]:
+    ...
+
 class OMPTargetDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -35015,6 +35378,11 @@ class OMPTargetDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -35043,15 +35411,12 @@ class OMPTargetDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetDirective]:
     ...
 
   @overload
@@ -35079,6 +35444,14 @@ class OMPTargetDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetDirective]:
+    ...
+
 class OMPTargetDataDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -35094,6 +35467,11 @@ class OMPTargetDataDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetDataDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetDataDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -35122,15 +35500,12 @@ class OMPTargetDataDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetDataDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetDataDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetDataDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetDataDirective]:
     ...
 
   @overload
@@ -35158,6 +35533,14 @@ class OMPTargetDataDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetDataDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetDataDirective]:
+    ...
+
 class OMPSingleDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -35173,6 +35556,11 @@ class OMPSingleDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPSingleDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPSingleDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -35201,15 +35589,12 @@ class OMPSingleDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPSingleDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPSingleDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPSingleDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPSingleDirective]:
     ...
 
   @overload
@@ -35237,6 +35622,14 @@ class OMPSingleDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPSingleDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPSingleDirective]:
+    ...
+
 class OMPSectionsDirective(multiplier.ast.OMPExecutableDirective):
   task_reduction_reference_expression: multiplier.ast.Expr
   has_cancel: bool
@@ -35254,6 +35647,11 @@ class OMPSectionsDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPSectionsDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPSectionsDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -35282,15 +35680,12 @@ class OMPSectionsDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPSectionsDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPSectionsDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPSectionsDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPSectionsDirective]:
     ...
 
   @overload
@@ -35318,6 +35713,14 @@ class OMPSectionsDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPSectionsDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPSectionsDirective]:
+    ...
+
 class OMPSectionDirective(multiplier.ast.OMPExecutableDirective):
   has_cancel: bool
 
@@ -35334,6 +35737,11 @@ class OMPSectionDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPSectionDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPSectionDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -35362,15 +35770,12 @@ class OMPSectionDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPSectionDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPSectionDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPSectionDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPSectionDirective]:
     ...
 
   @overload
@@ -35398,6 +35803,14 @@ class OMPSectionDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPSectionDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPSectionDirective]:
+    ...
+
 class OMPScanDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -35413,6 +35826,11 @@ class OMPScanDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPScanDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPScanDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -35441,15 +35859,12 @@ class OMPScanDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPScanDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPScanDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPScanDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPScanDirective]:
     ...
 
   @overload
@@ -35477,6 +35892,14 @@ class OMPScanDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPScanDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPScanDirective]:
+    ...
+
 class OMPParallelSectionsDirective(multiplier.ast.OMPExecutableDirective):
   task_reduction_reference_expression: multiplier.ast.Expr
   has_cancel: bool
@@ -35494,6 +35917,11 @@ class OMPParallelSectionsDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPParallelSectionsDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPParallelSectionsDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -35522,15 +35950,12 @@ class OMPParallelSectionsDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPParallelSectionsDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelSectionsDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelSectionsDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPParallelSectionsDirective]:
     ...
 
   @overload
@@ -35558,6 +35983,14 @@ class OMPParallelSectionsDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPParallelSectionsDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelSectionsDirective]:
+    ...
+
 class OMPParallelMasterDirective(multiplier.ast.OMPExecutableDirective):
   task_reduction_reference_expression: multiplier.ast.Expr
 
@@ -35574,6 +36007,11 @@ class OMPParallelMasterDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPParallelMasterDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPParallelMasterDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -35602,15 +36040,12 @@ class OMPParallelMasterDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPParallelMasterDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMasterDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelMasterDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPParallelMasterDirective]:
     ...
 
   @overload
@@ -35638,6 +36073,14 @@ class OMPParallelMasterDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPParallelMasterDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelMasterDirective]:
+    ...
+
 class OMPParallelMaskedDirective(multiplier.ast.OMPExecutableDirective):
   task_reduction_reference_expression: multiplier.ast.Expr
 
@@ -35654,6 +36097,11 @@ class OMPParallelMaskedDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPParallelMaskedDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPParallelMaskedDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -35682,15 +36130,12 @@ class OMPParallelMaskedDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPParallelMaskedDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMaskedDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelMaskedDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPParallelMaskedDirective]:
     ...
 
   @overload
@@ -35718,6 +36163,14 @@ class OMPParallelMaskedDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPParallelMaskedDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelMaskedDirective]:
+    ...
+
 class OMPParallelDirective(multiplier.ast.OMPExecutableDirective):
   task_reduction_reference_expression: multiplier.ast.Expr
   has_cancel: bool
@@ -35735,6 +36188,11 @@ class OMPParallelDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPParallelDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPParallelDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -35763,15 +36221,12 @@ class OMPParallelDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPParallelDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPParallelDirective]:
     ...
 
   @overload
@@ -35799,6 +36254,14 @@ class OMPParallelDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPParallelDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelDirective]:
+    ...
+
 class OMPOrderedDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -35814,6 +36277,11 @@ class OMPOrderedDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPOrderedDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPOrderedDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -35842,15 +36310,12 @@ class OMPOrderedDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPOrderedDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPOrderedDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPOrderedDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPOrderedDirective]:
     ...
 
   @overload
@@ -35878,6 +36343,14 @@ class OMPOrderedDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPOrderedDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPOrderedDirective]:
+    ...
+
 class OMPMetaDirective(multiplier.ast.OMPExecutableDirective):
   if_statement: multiplier.ast.Stmt
 
@@ -35894,6 +36367,11 @@ class OMPMetaDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPMetaDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPMetaDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -35922,15 +36400,12 @@ class OMPMetaDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPMetaDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMetaDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPMetaDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPMetaDirective]:
     ...
 
   @overload
@@ -35958,6 +36433,14 @@ class OMPMetaDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPMetaDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPMetaDirective]:
+    ...
+
 class OMPMasterDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -35973,6 +36456,11 @@ class OMPMasterDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPMasterDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPMasterDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -36001,15 +36489,12 @@ class OMPMasterDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPMasterDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMasterDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPMasterDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPMasterDirective]:
     ...
 
   @overload
@@ -36037,6 +36522,14 @@ class OMPMasterDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPMasterDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPMasterDirective]:
+    ...
+
 class OMPMaskedDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -36052,6 +36545,11 @@ class OMPMaskedDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPMaskedDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPMaskedDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -36080,15 +36578,12 @@ class OMPMaskedDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPMaskedDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMaskedDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPMaskedDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPMaskedDirective]:
     ...
 
   @overload
@@ -36116,6 +36611,14 @@ class OMPMaskedDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPMaskedDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPMaskedDirective]:
+    ...
+
 class OMPLoopBasedDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -36131,6 +36634,11 @@ class OMPLoopBasedDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPLoopBasedDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPLoopBasedDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -36159,11 +36667,12 @@ class OMPLoopBasedDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPLoopBasedDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPLoopBasedDirective]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPLoopBasedDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPLoopBasedDirective]:
     ...
 
   @overload
@@ -36191,6 +36700,10 @@ class OMPLoopBasedDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPLoopBasedDirective]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPLoopBasedDirective]:
+    ...
+
 class OMPLoopTransformationDirective(multiplier.ast.OMPLoopBasedDirective):
   pre_initializers: multiplier.ast.Stmt
   transformed_statement: multiplier.ast.Stmt
@@ -36208,6 +36721,11 @@ class OMPLoopTransformationDirective(multiplier.ast.OMPLoopBasedDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPLoopTransformationDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPLoopTransformationDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -36236,11 +36754,12 @@ class OMPLoopTransformationDirective(multiplier.ast.OMPLoopBasedDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPLoopTransformationDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPLoopTransformationDirective]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPLoopTransformationDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPLoopTransformationDirective]:
     ...
 
   @overload
@@ -36268,6 +36787,10 @@ class OMPLoopTransformationDirective(multiplier.ast.OMPLoopBasedDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPLoopTransformationDirective]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPLoopTransformationDirective]:
+    ...
+
 class OMPUnrollDirective(multiplier.ast.OMPLoopTransformationDirective):
 
   @overload
@@ -36283,6 +36806,11 @@ class OMPUnrollDirective(multiplier.ast.OMPLoopTransformationDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPUnrollDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPUnrollDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -36311,15 +36839,12 @@ class OMPUnrollDirective(multiplier.ast.OMPLoopTransformationDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPUnrollDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPUnrollDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPUnrollDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPUnrollDirective]:
     ...
 
   @overload
@@ -36347,6 +36872,14 @@ class OMPUnrollDirective(multiplier.ast.OMPLoopTransformationDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPUnrollDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPUnrollDirective]:
+    ...
+
 class OMPTileDirective(multiplier.ast.OMPLoopTransformationDirective):
 
   @overload
@@ -36362,6 +36895,11 @@ class OMPTileDirective(multiplier.ast.OMPLoopTransformationDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTileDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTileDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -36390,15 +36928,12 @@ class OMPTileDirective(multiplier.ast.OMPLoopTransformationDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTileDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTileDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTileDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTileDirective]:
     ...
 
   @overload
@@ -36424,6 +36959,14 @@ class OMPTileDirective(multiplier.ast.OMPLoopTransformationDirective):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTileDirective]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTileDirective]:
     ...
 
 class OMPLoopDirective(multiplier.ast.OMPLoopBasedDirective):
@@ -36490,6 +37033,11 @@ class OMPLoopDirective(multiplier.ast.OMPLoopBasedDirective):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPLoopDirective, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.OMPLoopDirective]:
     ...
 
@@ -36514,11 +37062,12 @@ class OMPLoopDirective(multiplier.ast.OMPLoopBasedDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPLoopDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPLoopDirective]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPLoopDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPLoopDirective]:
     ...
 
   @overload
@@ -36544,6 +37093,10 @@ class OMPLoopDirective(multiplier.ast.OMPLoopBasedDirective):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPLoopDirective]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPLoopDirective]:
     ...
 
   def nth_counter(self, n: int) -> Optional[multiplier.ast.Expr]:
@@ -36589,6 +37142,11 @@ class OMPGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPGenericLoopDirective, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.OMPGenericLoopDirective]:
     ...
 
@@ -36613,15 +37171,12 @@ class OMPGenericLoopDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPGenericLoopDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPGenericLoopDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPGenericLoopDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPGenericLoopDirective]:
     ...
 
   @overload
@@ -36649,6 +37204,14 @@ class OMPGenericLoopDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPGenericLoopDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPGenericLoopDirective]:
+    ...
+
 class OMPForSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -36664,6 +37227,11 @@ class OMPForSimdDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPForSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPForSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -36692,15 +37260,12 @@ class OMPForSimdDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPForSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPForSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPForSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPForSimdDirective]:
     ...
 
   @overload
@@ -36728,6 +37293,14 @@ class OMPForSimdDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPForSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPForSimdDirective]:
+    ...
+
 class OMPForDirective(multiplier.ast.OMPLoopDirective):
   task_reduction_reference_expression: multiplier.ast.Expr
   has_cancel: bool
@@ -36745,6 +37318,11 @@ class OMPForDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPForDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPForDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -36773,15 +37351,12 @@ class OMPForDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPForDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPForDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPForDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPForDirective]:
     ...
 
   @overload
@@ -36809,6 +37384,14 @@ class OMPForDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPForDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPForDirective]:
+    ...
+
 class OMPDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -36824,6 +37407,11 @@ class OMPDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPDistributeSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPDistributeSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -36852,15 +37440,12 @@ class OMPDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPDistributeSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDistributeSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPDistributeSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPDistributeSimdDirective]:
     ...
 
   @overload
@@ -36888,6 +37473,14 @@ class OMPDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPDistributeSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPDistributeSimdDirective]:
+    ...
+
 class OMPDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -36903,6 +37496,11 @@ class OMPDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPDistributeParallelForSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPDistributeParallelForSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -36931,15 +37529,12 @@ class OMPDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPDistributeParallelForSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDistributeParallelForSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPDistributeParallelForSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPDistributeParallelForSimdDirective]:
     ...
 
   @overload
@@ -36967,6 +37562,14 @@ class OMPDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPDistributeParallelForSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPDistributeParallelForSimdDirective]:
+    ...
+
 class OMPDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
   task_reduction_reference_expression: multiplier.ast.Expr
   has_cancel: bool
@@ -36984,6 +37587,11 @@ class OMPDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPDistributeParallelForDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPDistributeParallelForDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -37012,15 +37620,12 @@ class OMPDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPDistributeParallelForDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDistributeParallelForDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPDistributeParallelForDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPDistributeParallelForDirective]:
     ...
 
   @overload
@@ -37048,6 +37653,14 @@ class OMPDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPDistributeParallelForDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPDistributeParallelForDirective]:
+    ...
+
 class OMPDistributeDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -37063,6 +37676,11 @@ class OMPDistributeDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPDistributeDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPDistributeDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -37091,15 +37709,12 @@ class OMPDistributeDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPDistributeDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDistributeDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPDistributeDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPDistributeDirective]:
     ...
 
   @overload
@@ -37127,6 +37742,14 @@ class OMPDistributeDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPDistributeDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPDistributeDirective]:
+    ...
+
 class OMPTeamsGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -37142,6 +37765,11 @@ class OMPTeamsGenericLoopDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTeamsGenericLoopDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTeamsGenericLoopDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -37170,15 +37798,12 @@ class OMPTeamsGenericLoopDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTeamsGenericLoopDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsGenericLoopDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTeamsGenericLoopDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTeamsGenericLoopDirective]:
     ...
 
   @overload
@@ -37206,6 +37831,14 @@ class OMPTeamsGenericLoopDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTeamsGenericLoopDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTeamsGenericLoopDirective]:
+    ...
+
 class OMPTeamsDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -37221,6 +37854,11 @@ class OMPTeamsDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTeamsDistributeSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTeamsDistributeSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -37249,15 +37887,12 @@ class OMPTeamsDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTeamsDistributeSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDistributeSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTeamsDistributeSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTeamsDistributeSimdDirective]:
     ...
 
   @overload
@@ -37285,6 +37920,14 @@ class OMPTeamsDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTeamsDistributeSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTeamsDistributeSimdDirective]:
+    ...
+
 class OMPTeamsDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -37300,6 +37943,11 @@ class OMPTeamsDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTeamsDistributeParallelForSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTeamsDistributeParallelForSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -37328,15 +37976,12 @@ class OMPTeamsDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTeamsDistributeParallelForSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForSimdDirective]:
     ...
 
   @overload
@@ -37364,6 +38009,14 @@ class OMPTeamsDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForSimdDirective]:
+    ...
+
 class OMPTeamsDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
   task_reduction_reference_expression: multiplier.ast.Expr
   has_cancel: bool
@@ -37381,6 +38034,11 @@ class OMPTeamsDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTeamsDistributeParallelForDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTeamsDistributeParallelForDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -37409,15 +38067,12 @@ class OMPTeamsDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTeamsDistributeParallelForDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForDirective]:
     ...
 
   @overload
@@ -37445,6 +38100,14 @@ class OMPTeamsDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForDirective]:
+    ...
+
 class OMPTeamsDistributeDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -37460,6 +38123,11 @@ class OMPTeamsDistributeDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTeamsDistributeDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTeamsDistributeDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -37488,15 +38156,12 @@ class OMPTeamsDistributeDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTeamsDistributeDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDistributeDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTeamsDistributeDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTeamsDistributeDirective]:
     ...
 
   @overload
@@ -37524,6 +38189,14 @@ class OMPTeamsDistributeDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTeamsDistributeDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTeamsDistributeDirective]:
+    ...
+
 class OMPTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -37539,6 +38212,11 @@ class OMPTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTaskLoopSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTaskLoopSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -37567,15 +38245,12 @@ class OMPTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTaskLoopSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskLoopSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTaskLoopSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTaskLoopSimdDirective]:
     ...
 
   @overload
@@ -37603,6 +38278,14 @@ class OMPTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTaskLoopSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTaskLoopSimdDirective]:
+    ...
+
 class OMPTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   has_cancel: bool
 
@@ -37619,6 +38302,11 @@ class OMPTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTaskLoopDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTaskLoopDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -37647,15 +38335,12 @@ class OMPTaskLoopDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTaskLoopDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskLoopDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTaskLoopDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTaskLoopDirective]:
     ...
 
   @overload
@@ -37683,6 +38368,14 @@ class OMPTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTaskLoopDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTaskLoopDirective]:
+    ...
+
 class OMPTargetTeamsGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -37698,6 +38391,11 @@ class OMPTargetTeamsGenericLoopDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetTeamsGenericLoopDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetTeamsGenericLoopDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -37726,15 +38424,12 @@ class OMPTargetTeamsGenericLoopDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetTeamsGenericLoopDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsGenericLoopDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetTeamsGenericLoopDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetTeamsGenericLoopDirective]:
     ...
 
   @overload
@@ -37762,6 +38457,14 @@ class OMPTargetTeamsGenericLoopDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetTeamsGenericLoopDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetTeamsGenericLoopDirective]:
+    ...
+
 class OMPTargetTeamsDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -37777,6 +38480,11 @@ class OMPTargetTeamsDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetTeamsDistributeSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetTeamsDistributeSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -37805,15 +38513,12 @@ class OMPTargetTeamsDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetTeamsDistributeSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDistributeSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetTeamsDistributeSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetTeamsDistributeSimdDirective]:
     ...
 
   @overload
@@ -37841,6 +38546,14 @@ class OMPTargetTeamsDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetTeamsDistributeSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetTeamsDistributeSimdDirective]:
+    ...
+
 class OMPTargetTeamsDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -37856,6 +38569,11 @@ class OMPTargetTeamsDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDir
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetTeamsDistributeParallelForSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetTeamsDistributeParallelForSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -37884,15 +38602,12 @@ class OMPTargetTeamsDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDir
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForSimdDirective]:
     ...
 
   @overload
@@ -37920,6 +38635,14 @@ class OMPTargetTeamsDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDir
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForSimdDirective]:
+    ...
+
 class OMPTargetTeamsDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
   task_reduction_reference_expression: multiplier.ast.Expr
   has_cancel: bool
@@ -37937,6 +38660,11 @@ class OMPTargetTeamsDistributeParallelForDirective(multiplier.ast.OMPLoopDirecti
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetTeamsDistributeParallelForDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetTeamsDistributeParallelForDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -37965,15 +38693,12 @@ class OMPTargetTeamsDistributeParallelForDirective(multiplier.ast.OMPLoopDirecti
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForDirective]:
     ...
 
   @overload
@@ -38001,6 +38726,14 @@ class OMPTargetTeamsDistributeParallelForDirective(multiplier.ast.OMPLoopDirecti
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForDirective]:
+    ...
+
 class OMPTargetTeamsDistributeDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -38016,6 +38749,11 @@ class OMPTargetTeamsDistributeDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetTeamsDistributeDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetTeamsDistributeDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -38044,15 +38782,12 @@ class OMPTargetTeamsDistributeDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetTeamsDistributeDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDistributeDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetTeamsDistributeDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetTeamsDistributeDirective]:
     ...
 
   @overload
@@ -38080,6 +38815,14 @@ class OMPTargetTeamsDistributeDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetTeamsDistributeDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetTeamsDistributeDirective]:
+    ...
+
 class OMPTargetSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -38095,6 +38838,11 @@ class OMPTargetSimdDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -38123,15 +38871,12 @@ class OMPTargetSimdDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetSimdDirective]:
     ...
 
   @overload
@@ -38159,6 +38904,14 @@ class OMPTargetSimdDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetSimdDirective]:
+    ...
+
 class OMPTargetParallelGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -38174,6 +38927,11 @@ class OMPTargetParallelGenericLoopDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetParallelGenericLoopDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetParallelGenericLoopDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -38202,15 +38960,12 @@ class OMPTargetParallelGenericLoopDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetParallelGenericLoopDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetParallelGenericLoopDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetParallelGenericLoopDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetParallelGenericLoopDirective]:
     ...
 
   @overload
@@ -38238,6 +38993,14 @@ class OMPTargetParallelGenericLoopDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetParallelGenericLoopDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetParallelGenericLoopDirective]:
+    ...
+
 class OMPTargetParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -38253,6 +39016,11 @@ class OMPTargetParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetParallelForSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetParallelForSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -38281,15 +39049,12 @@ class OMPTargetParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetParallelForSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetParallelForSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetParallelForSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetParallelForSimdDirective]:
     ...
 
   @overload
@@ -38317,6 +39082,14 @@ class OMPTargetParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetParallelForSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetParallelForSimdDirective]:
+    ...
+
 class OMPTargetParallelForDirective(multiplier.ast.OMPLoopDirective):
   task_reduction_reference_expression: multiplier.ast.Expr
   has_cancel: bool
@@ -38334,6 +39107,11 @@ class OMPTargetParallelForDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPTargetParallelForDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPTargetParallelForDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -38362,15 +39140,12 @@ class OMPTargetParallelForDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPTargetParallelForDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetParallelForDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetParallelForDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPTargetParallelForDirective]:
     ...
 
   @overload
@@ -38398,6 +39173,14 @@ class OMPTargetParallelForDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPTargetParallelForDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPTargetParallelForDirective]:
+    ...
+
 class OMPSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -38413,6 +39196,11 @@ class OMPSimdDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -38441,15 +39229,12 @@ class OMPSimdDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPSimdDirective]:
     ...
 
   @overload
@@ -38477,6 +39262,14 @@ class OMPSimdDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPSimdDirective]:
+    ...
+
 class OMPParallelMasterTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -38492,6 +39285,11 @@ class OMPParallelMasterTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPParallelMasterTaskLoopSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPParallelMasterTaskLoopSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -38520,15 +39318,12 @@ class OMPParallelMasterTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPParallelMasterTaskLoopSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopSimdDirective]:
     ...
 
   @overload
@@ -38556,6 +39351,14 @@ class OMPParallelMasterTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopSimdDirective]:
+    ...
+
 class OMPParallelMasterTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   has_cancel: bool
 
@@ -38572,6 +39375,11 @@ class OMPParallelMasterTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPParallelMasterTaskLoopDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPParallelMasterTaskLoopDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -38600,15 +39408,12 @@ class OMPParallelMasterTaskLoopDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPParallelMasterTaskLoopDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopDirective]:
     ...
 
   @overload
@@ -38636,6 +39441,14 @@ class OMPParallelMasterTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopDirective]:
+    ...
+
 class OMPParallelMaskedTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -38651,6 +39464,11 @@ class OMPParallelMaskedTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPParallelMaskedTaskLoopSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPParallelMaskedTaskLoopSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -38679,15 +39497,12 @@ class OMPParallelMaskedTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopSimdDirective]:
     ...
 
   @overload
@@ -38715,6 +39530,14 @@ class OMPParallelMaskedTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopSimdDirective]:
+    ...
+
 class OMPParallelMaskedTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   has_cancel: bool
 
@@ -38731,6 +39554,11 @@ class OMPParallelMaskedTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPParallelMaskedTaskLoopDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPParallelMaskedTaskLoopDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -38759,15 +39587,12 @@ class OMPParallelMaskedTaskLoopDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopDirective]:
     ...
 
   @overload
@@ -38795,6 +39620,14 @@ class OMPParallelMaskedTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopDirective]:
+    ...
+
 class OMPParallelGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -38810,6 +39643,11 @@ class OMPParallelGenericLoopDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPParallelGenericLoopDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPParallelGenericLoopDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -38838,15 +39676,12 @@ class OMPParallelGenericLoopDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPParallelGenericLoopDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelGenericLoopDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelGenericLoopDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPParallelGenericLoopDirective]:
     ...
 
   @overload
@@ -38874,6 +39709,14 @@ class OMPParallelGenericLoopDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPParallelGenericLoopDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelGenericLoopDirective]:
+    ...
+
 class OMPParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -38889,6 +39732,11 @@ class OMPParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPParallelForSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPParallelForSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -38917,15 +39765,12 @@ class OMPParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPParallelForSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelForSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelForSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPParallelForSimdDirective]:
     ...
 
   @overload
@@ -38953,6 +39798,14 @@ class OMPParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPParallelForSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelForSimdDirective]:
+    ...
+
 class OMPParallelForDirective(multiplier.ast.OMPLoopDirective):
   task_reduction_reference_expression: multiplier.ast.Expr
   has_cancel: bool
@@ -38970,6 +39823,11 @@ class OMPParallelForDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPParallelForDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPParallelForDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -38998,15 +39856,12 @@ class OMPParallelForDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPParallelForDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelForDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelForDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPParallelForDirective]:
     ...
 
   @overload
@@ -39034,6 +39889,14 @@ class OMPParallelForDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPParallelForDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPParallelForDirective]:
+    ...
+
 class OMPMasterTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -39049,6 +39912,11 @@ class OMPMasterTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPMasterTaskLoopSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPMasterTaskLoopSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -39077,15 +39945,12 @@ class OMPMasterTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPMasterTaskLoopSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMasterTaskLoopSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPMasterTaskLoopSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPMasterTaskLoopSimdDirective]:
     ...
 
   @overload
@@ -39113,6 +39978,14 @@ class OMPMasterTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPMasterTaskLoopSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPMasterTaskLoopSimdDirective]:
+    ...
+
 class OMPMasterTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   has_cancel: bool
 
@@ -39129,6 +40002,11 @@ class OMPMasterTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPMasterTaskLoopDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPMasterTaskLoopDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -39157,15 +40035,12 @@ class OMPMasterTaskLoopDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPMasterTaskLoopDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMasterTaskLoopDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPMasterTaskLoopDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPMasterTaskLoopDirective]:
     ...
 
   @overload
@@ -39193,6 +40068,14 @@ class OMPMasterTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPMasterTaskLoopDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPMasterTaskLoopDirective]:
+    ...
+
 class OMPMaskedTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
@@ -39208,6 +40091,11 @@ class OMPMaskedTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPMaskedTaskLoopSimdDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPMaskedTaskLoopSimdDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -39236,15 +40124,12 @@ class OMPMaskedTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPMaskedTaskLoopSimdDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMaskedTaskLoopSimdDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPMaskedTaskLoopSimdDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPMaskedTaskLoopSimdDirective]:
     ...
 
   @overload
@@ -39272,6 +40157,14 @@ class OMPMaskedTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPMaskedTaskLoopSimdDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPMaskedTaskLoopSimdDirective]:
+    ...
+
 class OMPMaskedTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   has_cancel: bool
 
@@ -39288,6 +40181,11 @@ class OMPMaskedTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPMaskedTaskLoopDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPMaskedTaskLoopDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -39316,15 +40214,12 @@ class OMPMaskedTaskLoopDirective(multiplier.ast.OMPLoopDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPMaskedTaskLoopDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMaskedTaskLoopDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPMaskedTaskLoopDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPMaskedTaskLoopDirective]:
     ...
 
   @overload
@@ -39352,6 +40247,14 @@ class OMPMaskedTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPMaskedTaskLoopDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPMaskedTaskLoopDirective]:
+    ...
+
 class OMPInteropDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -39367,6 +40270,11 @@ class OMPInteropDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPInteropDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPInteropDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -39395,15 +40303,12 @@ class OMPInteropDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPInteropDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPInteropDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPInteropDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPInteropDirective]:
     ...
 
   @overload
@@ -39431,6 +40336,14 @@ class OMPInteropDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPInteropDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPInteropDirective]:
+    ...
+
 class OMPFlushDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
@@ -39446,6 +40359,11 @@ class OMPFlushDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPFlushDirective]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPFlushDirective, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -39474,15 +40392,12 @@ class OMPFlushDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPFlushDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPFlushDirective]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPFlushDirective]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPFlushDirective]:
     ...
 
   @overload
@@ -39510,6 +40425,14 @@ class OMPFlushDirective(multiplier.ast.OMPExecutableDirective):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPFlushDirective]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPFlushDirective]:
+    ...
+
 class OMPCanonicalLoop(multiplier.ast.Stmt):
   distance_func: multiplier.ast.CapturedStmt
   loop_statement: multiplier.ast.Stmt
@@ -39529,6 +40452,11 @@ class OMPCanonicalLoop(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPCanonicalLoop]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPCanonicalLoop, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -39557,15 +40485,12 @@ class OMPCanonicalLoop(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPCanonicalLoop]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCanonicalLoop]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPCanonicalLoop]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPCanonicalLoop]:
     ...
 
   @overload
@@ -39593,6 +40518,14 @@ class OMPCanonicalLoop(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPCanonicalLoop]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPCanonicalLoop]:
+    ...
+
 class NullStmt(multiplier.ast.Stmt):
   semi_token: multiplier.frontend.Token
   has_leading_empty_macro: bool
@@ -39610,6 +40543,11 @@ class NullStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.NullStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.NullStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -39638,15 +40576,12 @@ class NullStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NullStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NullStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.NullStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.NullStmt]:
     ...
 
   @overload
@@ -39674,6 +40609,14 @@ class NullStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.NullStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.NullStmt]:
+    ...
+
 class MSDependentExistsStmt(multiplier.ast.Stmt):
   keyword_token: multiplier.frontend.Token
   sub_statement: multiplier.ast.CompoundStmt
@@ -39693,6 +40636,11 @@ class MSDependentExistsStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.MSDependentExistsStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.MSDependentExistsStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -39721,15 +40669,12 @@ class MSDependentExistsStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MSDependentExistsStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSDependentExistsStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.MSDependentExistsStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.MSDependentExistsStmt]:
     ...
 
   @overload
@@ -39757,6 +40702,14 @@ class MSDependentExistsStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.MSDependentExistsStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.MSDependentExistsStmt]:
+    ...
+
 class IndirectGotoStmt(multiplier.ast.Stmt):
   constant_target: Optional[multiplier.ast.LabelDecl]
   goto_token: multiplier.frontend.Token
@@ -39776,6 +40729,11 @@ class IndirectGotoStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.IndirectGotoStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.IndirectGotoStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -39804,15 +40762,12 @@ class IndirectGotoStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.IndirectGotoStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IndirectGotoStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.IndirectGotoStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.IndirectGotoStmt]:
     ...
 
   @overload
@@ -39838,6 +40793,14 @@ class IndirectGotoStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.IndirectGotoStmt]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.IndirectGotoStmt]:
     ...
 
 class IfStmt(multiplier.ast.Stmt):
@@ -39879,6 +40842,11 @@ class IfStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.IfStmt, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.IfStmt]:
     ...
 
@@ -39903,15 +40871,12 @@ class IfStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.IfStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IfStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.IfStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.IfStmt]:
     ...
 
   @overload
@@ -39939,6 +40904,14 @@ class IfStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.IfStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.IfStmt]:
+    ...
+
 class GotoStmt(multiplier.ast.Stmt):
   goto_token: multiplier.frontend.Token
   label: multiplier.ast.LabelDecl
@@ -39957,6 +40930,11 @@ class GotoStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.GotoStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.GotoStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -39985,15 +40963,12 @@ class GotoStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.GotoStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GotoStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.GotoStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.GotoStmt]:
     ...
 
   @overload
@@ -40019,6 +40994,14 @@ class GotoStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.GotoStmt]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.GotoStmt]:
     ...
 
 class ForStmt(multiplier.ast.Stmt):
@@ -40049,6 +41032,11 @@ class ForStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ForStmt, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ForStmt]:
     ...
 
@@ -40073,15 +41061,12 @@ class ForStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ForStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ForStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ForStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ForStmt]:
     ...
 
   @overload
@@ -40109,6 +41094,14 @@ class ForStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ForStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ForStmt]:
+    ...
+
 class DoStmt(multiplier.ast.Stmt):
   body: multiplier.ast.Stmt
   condition: multiplier.ast.Expr
@@ -40129,6 +41122,11 @@ class DoStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.DoStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.DoStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -40157,15 +41155,12 @@ class DoStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DoStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DoStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DoStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.DoStmt]:
     ...
 
   @overload
@@ -40193,6 +41188,14 @@ class DoStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.DoStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DoStmt]:
+    ...
+
 class DeclStmt(multiplier.ast.Stmt):
   num_declarations: int
   declarations: Generator[multiplier.ast.Decl]
@@ -40212,6 +41215,11 @@ class DeclStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.DeclStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.DeclStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -40240,15 +41248,12 @@ class DeclStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DeclStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeclStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DeclStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.DeclStmt]:
     ...
 
   @overload
@@ -40274,6 +41279,14 @@ class DeclStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.DeclStmt]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DeclStmt]:
     ...
 
   def nth_declaration(self, n: int) -> Optional[multiplier.ast.Decl]:
@@ -40316,6 +41329,11 @@ class CoroutineBodyStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CoroutineBodyStmt, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CoroutineBodyStmt]:
     ...
 
@@ -40340,15 +41358,12 @@ class CoroutineBodyStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CoroutineBodyStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroutineBodyStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CoroutineBodyStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CoroutineBodyStmt]:
     ...
 
   @overload
@@ -40374,6 +41389,14 @@ class CoroutineBodyStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CoroutineBodyStmt]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CoroutineBodyStmt]:
     ...
 
   def nth_parameter_move(self, n: int) -> Optional[multiplier.ast.Stmt]:
@@ -40402,6 +41425,11 @@ class CoreturnStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CoreturnStmt, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CoreturnStmt]:
     ...
 
@@ -40426,15 +41454,12 @@ class CoreturnStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CoreturnStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoreturnStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CoreturnStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CoreturnStmt]:
     ...
 
   @overload
@@ -40462,6 +41487,14 @@ class CoreturnStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CoreturnStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CoreturnStmt]:
+    ...
+
 class ContinueStmt(multiplier.ast.Stmt):
   continue_token: multiplier.frontend.Token
 
@@ -40478,6 +41511,11 @@ class ContinueStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ContinueStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ContinueStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -40506,15 +41544,12 @@ class ContinueStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ContinueStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ContinueStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ContinueStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ContinueStmt]:
     ...
 
   @overload
@@ -40542,6 +41577,14 @@ class ContinueStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ContinueStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ContinueStmt]:
+    ...
+
 class CompoundStmt(multiplier.ast.Stmt):
   left_brace_token: multiplier.frontend.Token
   right_brace_token: multiplier.frontend.Token
@@ -40561,6 +41604,11 @@ class CompoundStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CompoundStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CompoundStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -40589,15 +41637,12 @@ class CompoundStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CompoundStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CompoundStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CompoundStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CompoundStmt]:
     ...
 
   @overload
@@ -40625,6 +41670,14 @@ class CompoundStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CompoundStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CompoundStmt]:
+    ...
+
 class CapturedStmt(multiplier.ast.Stmt):
   captured_declaration: multiplier.ast.CapturedDecl
   captured_record_declaration: multiplier.ast.RecordDecl
@@ -40644,6 +41697,11 @@ class CapturedStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CapturedStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CapturedStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -40672,15 +41730,12 @@ class CapturedStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CapturedStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CapturedStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CapturedStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CapturedStmt]:
     ...
 
   @overload
@@ -40708,6 +41763,14 @@ class CapturedStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CapturedStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CapturedStmt]:
+    ...
+
 class CXXTryStmt(multiplier.ast.Stmt):
   try_block: multiplier.ast.CompoundStmt
   try_token: multiplier.frontend.Token
@@ -40727,6 +41790,11 @@ class CXXTryStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXTryStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXTryStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -40755,15 +41823,12 @@ class CXXTryStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXTryStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXTryStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXTryStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXTryStmt]:
     ...
 
   @overload
@@ -40789,6 +41854,14 @@ class CXXTryStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXTryStmt]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXTryStmt]:
     ...
 
   def nth_handler(self, n: int) -> Optional[multiplier.ast.CXXCatchStmt]:
@@ -40827,6 +41900,11 @@ class CXXForRangeStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXForRangeStmt, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXForRangeStmt]:
     ...
 
@@ -40851,15 +41929,12 @@ class CXXForRangeStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXForRangeStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXForRangeStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXForRangeStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXForRangeStmt]:
     ...
 
   @overload
@@ -40887,6 +41962,14 @@ class CXXForRangeStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXForRangeStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXForRangeStmt]:
+    ...
+
 class CXXCatchStmt(multiplier.ast.Stmt):
   catch_token: multiplier.frontend.Token
   caught_type: multiplier.ast.Type
@@ -40906,6 +41989,11 @@ class CXXCatchStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXCatchStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXCatchStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -40934,15 +42022,12 @@ class CXXCatchStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXCatchStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXCatchStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXCatchStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXCatchStmt]:
     ...
 
   @overload
@@ -40970,6 +42055,14 @@ class CXXCatchStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXCatchStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXCatchStmt]:
+    ...
+
 class BreakStmt(multiplier.ast.Stmt):
   break_token: multiplier.frontend.Token
 
@@ -40986,6 +42079,11 @@ class BreakStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.BreakStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.BreakStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -41014,15 +42112,12 @@ class BreakStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BreakStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BreakStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.BreakStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.BreakStmt]:
     ...
 
   @overload
@@ -41048,6 +42143,14 @@ class BreakStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.BreakStmt]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.BreakStmt]:
     ...
 
 class AsmStmt(multiplier.ast.Stmt):
@@ -41084,6 +42187,11 @@ class AsmStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.AsmStmt, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.AsmStmt]:
     ...
 
@@ -41108,11 +42216,12 @@ class AsmStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AsmStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AsmStmt]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.AsmStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.AsmStmt]:
     ...
 
   @overload
@@ -41138,6 +42247,10 @@ class AsmStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.AsmStmt]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.AsmStmt]:
     ...
 
   def nth_input(self, n: int) -> Optional[multiplier.ast.Expr]:
@@ -41177,6 +42290,11 @@ class MSAsmStmt(multiplier.ast.AsmStmt):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.MSAsmStmt, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.MSAsmStmt]:
     ...
 
@@ -41201,15 +42319,12 @@ class MSAsmStmt(multiplier.ast.AsmStmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MSAsmStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSAsmStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.MSAsmStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.MSAsmStmt]:
     ...
 
   @overload
@@ -41235,6 +42350,14 @@ class MSAsmStmt(multiplier.ast.AsmStmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.MSAsmStmt]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.MSAsmStmt]:
     ...
 
   def nth_all_expression(self, n: int) -> Optional[multiplier.ast.Expr]:
@@ -41275,6 +42398,11 @@ class GCCAsmStmt(multiplier.ast.AsmStmt):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.GCCAsmStmt, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.GCCAsmStmt]:
     ...
 
@@ -41299,15 +42427,12 @@ class GCCAsmStmt(multiplier.ast.AsmStmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.GCCAsmStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GCCAsmStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.GCCAsmStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.GCCAsmStmt]:
     ...
 
   @overload
@@ -41333,6 +42458,14 @@ class GCCAsmStmt(multiplier.ast.AsmStmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.GCCAsmStmt]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.GCCAsmStmt]:
     ...
 
   def nth_label(self, n: int) -> Optional[multiplier.ast.AddrLabelExpr]:
@@ -41377,6 +42510,11 @@ class WhileStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.WhileStmt, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.WhileStmt]:
     ...
 
@@ -41401,15 +42539,12 @@ class WhileStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.WhileStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WhileStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.WhileStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.WhileStmt]:
     ...
 
   @overload
@@ -41437,6 +42572,14 @@ class WhileStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.WhileStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.WhileStmt]:
+    ...
+
 class ValueStmt(multiplier.ast.Stmt):
   expression_statement: Optional[multiplier.ast.Expr]
 
@@ -41453,6 +42596,11 @@ class ValueStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ValueStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ValueStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -41481,11 +42629,12 @@ class ValueStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ValueStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ValueStmt]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ValueStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ValueStmt]:
     ...
 
   @overload
@@ -41513,6 +42662,10 @@ class ValueStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ValueStmt]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ValueStmt]:
+    ...
+
 class LabelStmt(multiplier.ast.ValueStmt):
   declaration: multiplier.ast.LabelDecl
   identifier_token: multiplier.frontend.Token
@@ -41533,6 +42686,11 @@ class LabelStmt(multiplier.ast.ValueStmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.LabelStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.LabelStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -41561,15 +42719,12 @@ class LabelStmt(multiplier.ast.ValueStmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LabelStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LabelStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.LabelStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.LabelStmt]:
     ...
 
   @overload
@@ -41595,6 +42750,14 @@ class LabelStmt(multiplier.ast.ValueStmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.LabelStmt]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.LabelStmt]:
     ...
 
 class Expr(multiplier.ast.ValueStmt):
@@ -41659,6 +42822,11 @@ class Expr(multiplier.ast.ValueStmt):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.Expr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.Expr]:
     ...
 
@@ -41683,11 +42851,12 @@ class Expr(multiplier.ast.ValueStmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.Expr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Expr]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.Expr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.Expr]:
     ...
 
   @overload
@@ -41715,6 +42884,10 @@ class Expr(multiplier.ast.ValueStmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.Expr]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.Expr]:
+    ...
+
 class DesignatedInitUpdateExpr(multiplier.ast.Expr):
   base: multiplier.ast.Expr
   updater: multiplier.ast.InitListExpr
@@ -41732,6 +42905,11 @@ class DesignatedInitUpdateExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.DesignatedInitUpdateExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.DesignatedInitUpdateExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -41760,15 +42938,12 @@ class DesignatedInitUpdateExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DesignatedInitUpdateExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DesignatedInitUpdateExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DesignatedInitUpdateExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.DesignatedInitUpdateExpr]:
     ...
 
   @overload
@@ -41794,6 +42969,14 @@ class DesignatedInitUpdateExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.DesignatedInitUpdateExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DesignatedInitUpdateExpr]:
     ...
 
 class DesignatedInitExpr(multiplier.ast.Expr):
@@ -41824,6 +43007,11 @@ class DesignatedInitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.DesignatedInitExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.DesignatedInitExpr]:
     ...
 
@@ -41848,15 +43036,12 @@ class DesignatedInitExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DesignatedInitExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DesignatedInitExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DesignatedInitExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.DesignatedInitExpr]:
     ...
 
   @overload
@@ -41882,6 +43067,14 @@ class DesignatedInitExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.DesignatedInitExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DesignatedInitExpr]:
     ...
 
   def nth_designator(self, n: int) -> Optional[multiplier.ast.Designator]:
@@ -41914,6 +43107,11 @@ class DependentScopeDeclRefExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.DependentScopeDeclRefExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.DependentScopeDeclRefExpr]:
     ...
 
@@ -41938,15 +43136,12 @@ class DependentScopeDeclRefExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DependentScopeDeclRefExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentScopeDeclRefExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DependentScopeDeclRefExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.DependentScopeDeclRefExpr]:
     ...
 
   @overload
@@ -41974,6 +43169,14 @@ class DependentScopeDeclRefExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.DependentScopeDeclRefExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DependentScopeDeclRefExpr]:
+    ...
+
 class DependentCoawaitExpr(multiplier.ast.Expr):
   keyword_token: multiplier.frontend.Token
   operand: multiplier.ast.Expr
@@ -41992,6 +43195,11 @@ class DependentCoawaitExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.DependentCoawaitExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.DependentCoawaitExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -42020,15 +43228,12 @@ class DependentCoawaitExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DependentCoawaitExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentCoawaitExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DependentCoawaitExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.DependentCoawaitExpr]:
     ...
 
   @overload
@@ -42054,6 +43259,14 @@ class DependentCoawaitExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.DependentCoawaitExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DependentCoawaitExpr]:
     ...
 
 class DeclRefExpr(multiplier.ast.Expr):
@@ -42088,6 +43301,11 @@ class DeclRefExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.DeclRefExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.DeclRefExpr]:
     ...
 
@@ -42112,15 +43330,12 @@ class DeclRefExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DeclRefExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeclRefExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DeclRefExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.DeclRefExpr]:
     ...
 
   @overload
@@ -42146,6 +43361,14 @@ class DeclRefExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.DeclRefExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DeclRefExpr]:
     ...
 
 class CoroutineSuspendExpr(multiplier.ast.Expr):
@@ -42174,6 +43397,11 @@ class CoroutineSuspendExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CoroutineSuspendExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CoroutineSuspendExpr]:
     ...
 
@@ -42198,11 +43426,12 @@ class CoroutineSuspendExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CoroutineSuspendExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroutineSuspendExpr]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CoroutineSuspendExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CoroutineSuspendExpr]:
     ...
 
   @overload
@@ -42230,6 +43459,10 @@ class CoroutineSuspendExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CoroutineSuspendExpr]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CoroutineSuspendExpr]:
+    ...
+
 class CoawaitExpr(multiplier.ast.CoroutineSuspendExpr):
   is_implicit: bool
 
@@ -42246,6 +43479,11 @@ class CoawaitExpr(multiplier.ast.CoroutineSuspendExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CoawaitExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CoawaitExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -42274,15 +43512,12 @@ class CoawaitExpr(multiplier.ast.CoroutineSuspendExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CoawaitExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoawaitExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CoawaitExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CoawaitExpr]:
     ...
 
   @overload
@@ -42310,6 +43545,14 @@ class CoawaitExpr(multiplier.ast.CoroutineSuspendExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CoawaitExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CoawaitExpr]:
+    ...
+
 class CoyieldExpr(multiplier.ast.CoroutineSuspendExpr):
 
   @overload
@@ -42325,6 +43568,11 @@ class CoyieldExpr(multiplier.ast.CoroutineSuspendExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CoyieldExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CoyieldExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -42353,15 +43601,12 @@ class CoyieldExpr(multiplier.ast.CoroutineSuspendExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CoyieldExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoyieldExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CoyieldExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CoyieldExpr]:
     ...
 
   @overload
@@ -42389,6 +43634,14 @@ class CoyieldExpr(multiplier.ast.CoroutineSuspendExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CoyieldExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CoyieldExpr]:
+    ...
+
 class ConvertVectorExpr(multiplier.ast.Expr):
   builtin_token: multiplier.frontend.Token
   r_paren_token: multiplier.frontend.Token
@@ -42407,6 +43660,11 @@ class ConvertVectorExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ConvertVectorExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ConvertVectorExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -42435,15 +43693,12 @@ class ConvertVectorExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConvertVectorExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConvertVectorExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ConvertVectorExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ConvertVectorExpr]:
     ...
 
   @overload
@@ -42471,6 +43726,14 @@ class ConvertVectorExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ConvertVectorExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ConvertVectorExpr]:
+    ...
+
 class ConceptSpecializationExpr(multiplier.ast.Expr):
   specialization_declaration: multiplier.ast.ImplicitConceptSpecializationDecl
   num_template_arguments: int
@@ -42490,6 +43753,11 @@ class ConceptSpecializationExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ConceptSpecializationExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ConceptSpecializationExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -42518,15 +43786,12 @@ class ConceptSpecializationExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConceptSpecializationExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConceptSpecializationExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ConceptSpecializationExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ConceptSpecializationExpr]:
     ...
 
   @overload
@@ -42554,6 +43819,14 @@ class ConceptSpecializationExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ConceptSpecializationExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ConceptSpecializationExpr]:
+    ...
+
   def nth_template_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
     ...
 
@@ -42575,6 +43848,11 @@ class CompoundLiteralExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CompoundLiteralExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CompoundLiteralExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -42603,15 +43881,12 @@ class CompoundLiteralExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CompoundLiteralExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CompoundLiteralExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CompoundLiteralExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CompoundLiteralExpr]:
     ...
 
   @overload
@@ -42637,6 +43912,14 @@ class CompoundLiteralExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CompoundLiteralExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CompoundLiteralExpr]:
     ...
 
 class ChooseExpr(multiplier.ast.Expr):
@@ -42666,6 +43949,11 @@ class ChooseExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ChooseExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ChooseExpr]:
     ...
 
@@ -42690,15 +43978,12 @@ class ChooseExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ChooseExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ChooseExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ChooseExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ChooseExpr]:
     ...
 
   @overload
@@ -42726,6 +44011,14 @@ class ChooseExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ChooseExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ChooseExpr]:
+    ...
+
 class CharacterLiteral(multiplier.ast.Expr):
   literal_kind: multiplier.ast.CharacterLiteralCharacterKind
   token: multiplier.frontend.Token
@@ -42743,6 +44036,11 @@ class CharacterLiteral(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CharacterLiteral]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CharacterLiteral, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -42771,15 +44069,12 @@ class CharacterLiteral(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CharacterLiteral]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CharacterLiteral]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CharacterLiteral]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CharacterLiteral]:
     ...
 
   @overload
@@ -42805,6 +44100,14 @@ class CharacterLiteral(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CharacterLiteral]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CharacterLiteral]:
     ...
 
 class CastExpr(multiplier.ast.Expr):
@@ -42833,6 +44136,11 @@ class CastExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CastExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CastExpr]:
     ...
 
@@ -42857,11 +44165,12 @@ class CastExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CastExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CastExpr]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CastExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CastExpr]:
     ...
 
   @overload
@@ -42889,6 +44198,10 @@ class CastExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CastExpr]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CastExpr]:
+    ...
+
 class ImplicitCastExpr(multiplier.ast.CastExpr):
   is_part_of_explicit_cast: bool
 
@@ -42905,6 +44218,11 @@ class ImplicitCastExpr(multiplier.ast.CastExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ImplicitCastExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ImplicitCastExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -42933,15 +44251,12 @@ class ImplicitCastExpr(multiplier.ast.CastExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ImplicitCastExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImplicitCastExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ImplicitCastExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ImplicitCastExpr]:
     ...
 
   @overload
@@ -42969,6 +44284,14 @@ class ImplicitCastExpr(multiplier.ast.CastExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ImplicitCastExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ImplicitCastExpr]:
+    ...
+
 class ExplicitCastExpr(multiplier.ast.CastExpr):
   type_as_written: multiplier.ast.Type
 
@@ -42985,6 +44308,11 @@ class ExplicitCastExpr(multiplier.ast.CastExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ExplicitCastExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ExplicitCastExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -43013,11 +44341,12 @@ class ExplicitCastExpr(multiplier.ast.CastExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ExplicitCastExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExplicitCastExpr]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ExplicitCastExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ExplicitCastExpr]:
     ...
 
   @overload
@@ -43045,6 +44374,10 @@ class ExplicitCastExpr(multiplier.ast.CastExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ExplicitCastExpr]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ExplicitCastExpr]:
+    ...
+
 class CXXNamedCastExpr(multiplier.ast.ExplicitCastExpr):
   angle_brackets: multiplier.frontend.TokenRange
   cast_name: str
@@ -43064,6 +44397,11 @@ class CXXNamedCastExpr(multiplier.ast.ExplicitCastExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXNamedCastExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXNamedCastExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -43092,11 +44430,12 @@ class CXXNamedCastExpr(multiplier.ast.ExplicitCastExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXNamedCastExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXNamedCastExpr]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXNamedCastExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXNamedCastExpr]:
     ...
 
   @overload
@@ -43124,6 +44463,10 @@ class CXXNamedCastExpr(multiplier.ast.ExplicitCastExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXNamedCastExpr]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXNamedCastExpr]:
+    ...
+
 class CXXDynamicCastExpr(multiplier.ast.CXXNamedCastExpr):
   is_always_null: bool
 
@@ -43140,6 +44483,11 @@ class CXXDynamicCastExpr(multiplier.ast.CXXNamedCastExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXDynamicCastExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXDynamicCastExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -43168,15 +44516,12 @@ class CXXDynamicCastExpr(multiplier.ast.CXXNamedCastExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXDynamicCastExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDynamicCastExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXDynamicCastExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXDynamicCastExpr]:
     ...
 
   @overload
@@ -43204,6 +44549,14 @@ class CXXDynamicCastExpr(multiplier.ast.CXXNamedCastExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXDynamicCastExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXDynamicCastExpr]:
+    ...
+
 class CXXConstCastExpr(multiplier.ast.CXXNamedCastExpr):
 
   @overload
@@ -43219,6 +44572,11 @@ class CXXConstCastExpr(multiplier.ast.CXXNamedCastExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXConstCastExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXConstCastExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -43247,15 +44605,12 @@ class CXXConstCastExpr(multiplier.ast.CXXNamedCastExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXConstCastExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXConstCastExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXConstCastExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXConstCastExpr]:
     ...
 
   @overload
@@ -43283,6 +44638,14 @@ class CXXConstCastExpr(multiplier.ast.CXXNamedCastExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXConstCastExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXConstCastExpr]:
+    ...
+
 class CXXAddrspaceCastExpr(multiplier.ast.CXXNamedCastExpr):
 
   @overload
@@ -43298,6 +44661,11 @@ class CXXAddrspaceCastExpr(multiplier.ast.CXXNamedCastExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXAddrspaceCastExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXAddrspaceCastExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -43326,15 +44694,12 @@ class CXXAddrspaceCastExpr(multiplier.ast.CXXNamedCastExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXAddrspaceCastExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXAddrspaceCastExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXAddrspaceCastExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXAddrspaceCastExpr]:
     ...
 
   @overload
@@ -43362,6 +44727,14 @@ class CXXAddrspaceCastExpr(multiplier.ast.CXXNamedCastExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXAddrspaceCastExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXAddrspaceCastExpr]:
+    ...
+
 class CXXStaticCastExpr(multiplier.ast.CXXNamedCastExpr):
 
   @overload
@@ -43377,6 +44750,11 @@ class CXXStaticCastExpr(multiplier.ast.CXXNamedCastExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXStaticCastExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXStaticCastExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -43405,15 +44783,12 @@ class CXXStaticCastExpr(multiplier.ast.CXXNamedCastExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXStaticCastExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXStaticCastExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXStaticCastExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXStaticCastExpr]:
     ...
 
   @overload
@@ -43441,6 +44816,14 @@ class CXXStaticCastExpr(multiplier.ast.CXXNamedCastExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXStaticCastExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXStaticCastExpr]:
+    ...
+
 class CXXReinterpretCastExpr(multiplier.ast.CXXNamedCastExpr):
 
   @overload
@@ -43456,6 +44839,11 @@ class CXXReinterpretCastExpr(multiplier.ast.CXXNamedCastExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXReinterpretCastExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXReinterpretCastExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -43484,15 +44872,12 @@ class CXXReinterpretCastExpr(multiplier.ast.CXXNamedCastExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXReinterpretCastExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXReinterpretCastExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXReinterpretCastExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXReinterpretCastExpr]:
     ...
 
   @overload
@@ -43520,6 +44905,14 @@ class CXXReinterpretCastExpr(multiplier.ast.CXXNamedCastExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXReinterpretCastExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXReinterpretCastExpr]:
+    ...
+
 class CXXFunctionalCastExpr(multiplier.ast.ExplicitCastExpr):
   l_paren_token: multiplier.frontend.Token
   r_paren_token: multiplier.frontend.Token
@@ -43538,6 +44931,11 @@ class CXXFunctionalCastExpr(multiplier.ast.ExplicitCastExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXFunctionalCastExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXFunctionalCastExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -43566,15 +44964,12 @@ class CXXFunctionalCastExpr(multiplier.ast.ExplicitCastExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXFunctionalCastExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXFunctionalCastExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXFunctionalCastExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXFunctionalCastExpr]:
     ...
 
   @overload
@@ -43602,6 +44997,14 @@ class CXXFunctionalCastExpr(multiplier.ast.ExplicitCastExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXFunctionalCastExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXFunctionalCastExpr]:
+    ...
+
 class CStyleCastExpr(multiplier.ast.ExplicitCastExpr):
   l_paren_token: multiplier.frontend.Token
   r_paren_token: multiplier.frontend.Token
@@ -43619,6 +45022,11 @@ class CStyleCastExpr(multiplier.ast.ExplicitCastExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CStyleCastExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CStyleCastExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -43647,15 +45055,12 @@ class CStyleCastExpr(multiplier.ast.ExplicitCastExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CStyleCastExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CStyleCastExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CStyleCastExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CStyleCastExpr]:
     ...
 
   @overload
@@ -43683,6 +45088,14 @@ class CStyleCastExpr(multiplier.ast.ExplicitCastExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CStyleCastExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CStyleCastExpr]:
+    ...
+
 class BuiltinBitCastExpr(multiplier.ast.ExplicitCastExpr):
 
   @overload
@@ -43698,6 +45111,11 @@ class BuiltinBitCastExpr(multiplier.ast.ExplicitCastExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.BuiltinBitCastExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.BuiltinBitCastExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -43726,15 +45144,12 @@ class BuiltinBitCastExpr(multiplier.ast.ExplicitCastExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BuiltinBitCastExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinBitCastExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.BuiltinBitCastExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.BuiltinBitCastExpr]:
     ...
 
   @overload
@@ -43762,6 +45177,14 @@ class BuiltinBitCastExpr(multiplier.ast.ExplicitCastExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.BuiltinBitCastExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.BuiltinBitCastExpr]:
+    ...
+
 class ObjCBridgedCastExpr(multiplier.ast.ExplicitCastExpr):
   bridge_keyword_token: multiplier.frontend.Token
   bridge_kind: multiplier.ast.ObjCBridgeCastKind
@@ -43781,6 +45204,11 @@ class ObjCBridgedCastExpr(multiplier.ast.ExplicitCastExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCBridgedCastExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCBridgedCastExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -43809,15 +45237,12 @@ class ObjCBridgedCastExpr(multiplier.ast.ExplicitCastExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCBridgedCastExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBridgedCastExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCBridgedCastExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCBridgedCastExpr]:
     ...
 
   @overload
@@ -43843,6 +45268,14 @@ class ObjCBridgedCastExpr(multiplier.ast.ExplicitCastExpr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCBridgedCastExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCBridgedCastExpr]:
     ...
 
 class CallExpr(multiplier.ast.Expr):
@@ -43880,6 +45313,11 @@ class CallExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CallExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CallExpr]:
     ...
 
@@ -43904,15 +45342,12 @@ class CallExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CallExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CallExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CallExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CallExpr]:
     ...
 
   @overload
@@ -43938,6 +45373,14 @@ class CallExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CallExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CallExpr]:
     ...
 
   def nth_argument(self, n: int) -> Optional[multiplier.ast.Expr]:
@@ -43967,6 +45410,11 @@ class CXXOperatorCallExpr(multiplier.ast.CallExpr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXOperatorCallExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXOperatorCallExpr]:
     ...
 
@@ -43991,15 +45439,12 @@ class CXXOperatorCallExpr(multiplier.ast.CallExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXOperatorCallExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXOperatorCallExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXOperatorCallExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXOperatorCallExpr]:
     ...
 
   @overload
@@ -44027,6 +45472,14 @@ class CXXOperatorCallExpr(multiplier.ast.CallExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXOperatorCallExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXOperatorCallExpr]:
+    ...
+
 class CXXMemberCallExpr(multiplier.ast.CallExpr):
   implicit_object_argument: multiplier.ast.Expr
   method_declaration: Optional[multiplier.ast.CXXMethodDecl]
@@ -44046,6 +45499,11 @@ class CXXMemberCallExpr(multiplier.ast.CallExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXMemberCallExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXMemberCallExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -44074,15 +45532,12 @@ class CXXMemberCallExpr(multiplier.ast.CallExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXMemberCallExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXMemberCallExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXMemberCallExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXMemberCallExpr]:
     ...
 
   @overload
@@ -44110,6 +45565,14 @@ class CXXMemberCallExpr(multiplier.ast.CallExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXMemberCallExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXMemberCallExpr]:
+    ...
+
 class CUDAKernelCallExpr(multiplier.ast.CallExpr):
   config: multiplier.ast.CallExpr
 
@@ -44126,6 +45589,11 @@ class CUDAKernelCallExpr(multiplier.ast.CallExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CUDAKernelCallExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CUDAKernelCallExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -44154,15 +45622,12 @@ class CUDAKernelCallExpr(multiplier.ast.CallExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CUDAKernelCallExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAKernelCallExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CUDAKernelCallExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CUDAKernelCallExpr]:
     ...
 
   @overload
@@ -44190,6 +45655,14 @@ class CUDAKernelCallExpr(multiplier.ast.CallExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CUDAKernelCallExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CUDAKernelCallExpr]:
+    ...
+
 class UserDefinedLiteral(multiplier.ast.CallExpr):
   cooked_literal: multiplier.ast.Expr
   literal_operator_kind: multiplier.ast.UserDefinedLiteralLiteralOperatorKind
@@ -44208,6 +45681,11 @@ class UserDefinedLiteral(multiplier.ast.CallExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.UserDefinedLiteral]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.UserDefinedLiteral, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -44236,15 +45714,12 @@ class UserDefinedLiteral(multiplier.ast.CallExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UserDefinedLiteral]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UserDefinedLiteral]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.UserDefinedLiteral]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.UserDefinedLiteral]:
     ...
 
   @overload
@@ -44272,6 +45747,14 @@ class UserDefinedLiteral(multiplier.ast.CallExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.UserDefinedLiteral]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.UserDefinedLiteral]:
+    ...
+
 class CXXUuidofExpr(multiplier.ast.Expr):
   expression_operand: Optional[multiplier.ast.Expr]
   guid_declaration: multiplier.ast.MSGuidDecl
@@ -44292,6 +45775,11 @@ class CXXUuidofExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXUuidofExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXUuidofExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -44320,15 +45808,12 @@ class CXXUuidofExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXUuidofExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXUuidofExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXUuidofExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXUuidofExpr]:
     ...
 
   @overload
@@ -44356,6 +45841,14 @@ class CXXUuidofExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXUuidofExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXUuidofExpr]:
+    ...
+
 class CXXUnresolvedConstructExpr(multiplier.ast.Expr):
   num_arguments: int
   arguments: Generator[multiplier.ast.Expr]
@@ -44377,6 +45870,11 @@ class CXXUnresolvedConstructExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXUnresolvedConstructExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXUnresolvedConstructExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -44405,15 +45903,12 @@ class CXXUnresolvedConstructExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXUnresolvedConstructExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXUnresolvedConstructExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXUnresolvedConstructExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXUnresolvedConstructExpr]:
     ...
 
   @overload
@@ -44439,6 +45934,14 @@ class CXXUnresolvedConstructExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXUnresolvedConstructExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXUnresolvedConstructExpr]:
     ...
 
   def nth_argument(self, n: int) -> Optional[multiplier.ast.Expr]:
@@ -44469,6 +45972,11 @@ class CXXTypeidExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXTypeidExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXTypeidExpr]:
     ...
 
@@ -44493,15 +46001,12 @@ class CXXTypeidExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXTypeidExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXTypeidExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXTypeidExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXTypeidExpr]:
     ...
 
   @overload
@@ -44529,6 +46034,14 @@ class CXXTypeidExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXTypeidExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXTypeidExpr]:
+    ...
+
 class CXXThrowExpr(multiplier.ast.Expr):
   sub_expression: Optional[multiplier.ast.Expr]
   throw_token: multiplier.frontend.Token
@@ -44547,6 +46060,11 @@ class CXXThrowExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXThrowExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXThrowExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -44575,15 +46093,12 @@ class CXXThrowExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXThrowExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXThrowExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXThrowExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXThrowExpr]:
     ...
 
   @overload
@@ -44611,6 +46126,14 @@ class CXXThrowExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXThrowExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXThrowExpr]:
+    ...
+
 class CXXThisExpr(multiplier.ast.Expr):
   token: multiplier.frontend.Token
   is_implicit: bool
@@ -44628,6 +46151,11 @@ class CXXThisExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXThisExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXThisExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -44656,15 +46184,12 @@ class CXXThisExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXThisExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXThisExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXThisExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXThisExpr]:
     ...
 
   @overload
@@ -44692,6 +46217,14 @@ class CXXThisExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXThisExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXThisExpr]:
+    ...
+
 class CXXStdInitializerListExpr(multiplier.ast.Expr):
   sub_expression: multiplier.ast.Expr
 
@@ -44708,6 +46241,11 @@ class CXXStdInitializerListExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXStdInitializerListExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXStdInitializerListExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -44736,15 +46274,12 @@ class CXXStdInitializerListExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXStdInitializerListExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXStdInitializerListExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXStdInitializerListExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXStdInitializerListExpr]:
     ...
 
   @overload
@@ -44772,6 +46307,14 @@ class CXXStdInitializerListExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXStdInitializerListExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXStdInitializerListExpr]:
+    ...
+
 class CXXScalarValueInitExpr(multiplier.ast.Expr):
   r_paren_token: multiplier.frontend.Token
 
@@ -44788,6 +46331,11 @@ class CXXScalarValueInitExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXScalarValueInitExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXScalarValueInitExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -44816,15 +46364,12 @@ class CXXScalarValueInitExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXScalarValueInitExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXScalarValueInitExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXScalarValueInitExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXScalarValueInitExpr]:
     ...
 
   @overload
@@ -44850,6 +46395,14 @@ class CXXScalarValueInitExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXScalarValueInitExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXScalarValueInitExpr]:
     ...
 
 class CXXRewrittenBinaryOperator(multiplier.ast.Expr):
@@ -44881,6 +46434,11 @@ class CXXRewrittenBinaryOperator(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXRewrittenBinaryOperator, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXRewrittenBinaryOperator]:
     ...
 
@@ -44905,15 +46463,12 @@ class CXXRewrittenBinaryOperator(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXRewrittenBinaryOperator]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXRewrittenBinaryOperator]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXRewrittenBinaryOperator]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXRewrittenBinaryOperator]:
     ...
 
   @overload
@@ -44939,6 +46494,14 @@ class CXXRewrittenBinaryOperator(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXRewrittenBinaryOperator]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXRewrittenBinaryOperator]:
     ...
 
 class CXXPseudoDestructorExpr(multiplier.ast.Expr):
@@ -44968,6 +46531,11 @@ class CXXPseudoDestructorExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXPseudoDestructorExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXPseudoDestructorExpr]:
     ...
 
@@ -44992,15 +46560,12 @@ class CXXPseudoDestructorExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXPseudoDestructorExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXPseudoDestructorExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXPseudoDestructorExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXPseudoDestructorExpr]:
     ...
 
   @overload
@@ -45028,6 +46593,14 @@ class CXXPseudoDestructorExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXPseudoDestructorExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXPseudoDestructorExpr]:
+    ...
+
 class CXXParenListInitExpr(multiplier.ast.Expr):
   array_filler: multiplier.ast.Expr
   initializer_token: multiplier.frontend.Token
@@ -45046,6 +46619,11 @@ class CXXParenListInitExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXParenListInitExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXParenListInitExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -45074,15 +46652,12 @@ class CXXParenListInitExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXParenListInitExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXParenListInitExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXParenListInitExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXParenListInitExpr]:
     ...
 
   @overload
@@ -45110,6 +46685,14 @@ class CXXParenListInitExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXParenListInitExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXParenListInitExpr]:
+    ...
+
 class CXXNullPtrLiteralExpr(multiplier.ast.Expr):
   token: multiplier.frontend.Token
 
@@ -45126,6 +46709,11 @@ class CXXNullPtrLiteralExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXNullPtrLiteralExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXNullPtrLiteralExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -45154,15 +46742,12 @@ class CXXNullPtrLiteralExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXNullPtrLiteralExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXNullPtrLiteralExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXNullPtrLiteralExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXNullPtrLiteralExpr]:
     ...
 
   @overload
@@ -45190,6 +46775,14 @@ class CXXNullPtrLiteralExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXNullPtrLiteralExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXNullPtrLiteralExpr]:
+    ...
+
 class CXXNoexceptExpr(multiplier.ast.Expr):
   operand: multiplier.ast.Expr
   value: bool
@@ -45207,6 +46800,11 @@ class CXXNoexceptExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXNoexceptExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXNoexceptExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -45235,15 +46833,12 @@ class CXXNoexceptExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXNoexceptExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXNoexceptExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXNoexceptExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXNoexceptExpr]:
     ...
 
   @overload
@@ -45269,6 +46864,14 @@ class CXXNoexceptExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXNoexceptExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXNoexceptExpr]:
     ...
 
 class CXXNewExpr(multiplier.ast.Expr):
@@ -45308,6 +46911,11 @@ class CXXNewExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXNewExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXNewExpr]:
     ...
 
@@ -45332,15 +46940,12 @@ class CXXNewExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXNewExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXNewExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXNewExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXNewExpr]:
     ...
 
   @overload
@@ -45366,6 +46971,14 @@ class CXXNewExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXNewExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXNewExpr]:
     ...
 
   def nth_placement_argument(self, n: int) -> Optional[multiplier.ast.Expr]:
@@ -45395,6 +47008,11 @@ class CXXInheritedCtorInitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXInheritedCtorInitExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXInheritedCtorInitExpr]:
     ...
 
@@ -45419,15 +47037,12 @@ class CXXInheritedCtorInitExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXInheritedCtorInitExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXInheritedCtorInitExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXInheritedCtorInitExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXInheritedCtorInitExpr]:
     ...
 
   @overload
@@ -45453,6 +47068,14 @@ class CXXInheritedCtorInitExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXInheritedCtorInitExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXInheritedCtorInitExpr]:
     ...
 
 class CXXFoldExpr(multiplier.ast.Expr):
@@ -45485,6 +47108,11 @@ class CXXFoldExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXFoldExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXFoldExpr]:
     ...
 
@@ -45509,15 +47137,12 @@ class CXXFoldExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXFoldExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXFoldExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXFoldExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXFoldExpr]:
     ...
 
   @overload
@@ -45543,6 +47168,14 @@ class CXXFoldExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXFoldExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXFoldExpr]:
     ...
 
 class CXXDependentScopeMemberExpr(multiplier.ast.Expr):
@@ -45576,6 +47209,11 @@ class CXXDependentScopeMemberExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXDependentScopeMemberExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXDependentScopeMemberExpr]:
     ...
 
@@ -45600,15 +47238,12 @@ class CXXDependentScopeMemberExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXDependentScopeMemberExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDependentScopeMemberExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXDependentScopeMemberExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXDependentScopeMemberExpr]:
     ...
 
   @overload
@@ -45634,6 +47269,14 @@ class CXXDependentScopeMemberExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXDependentScopeMemberExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXDependentScopeMemberExpr]:
     ...
 
 class CXXDeleteExpr(multiplier.ast.Expr):
@@ -45662,6 +47305,11 @@ class CXXDeleteExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXDeleteExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXDeleteExpr]:
     ...
 
@@ -45686,15 +47334,12 @@ class CXXDeleteExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXDeleteExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDeleteExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXDeleteExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXDeleteExpr]:
     ...
 
   @overload
@@ -45722,6 +47367,14 @@ class CXXDeleteExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXDeleteExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXDeleteExpr]:
+    ...
+
 class CXXDefaultInitExpr(multiplier.ast.Expr):
   expression: Optional[multiplier.ast.Expr]
   field: multiplier.ast.FieldDecl
@@ -45742,6 +47395,11 @@ class CXXDefaultInitExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXDefaultInitExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXDefaultInitExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -45770,15 +47428,12 @@ class CXXDefaultInitExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXDefaultInitExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDefaultInitExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXDefaultInitExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXDefaultInitExpr]:
     ...
 
   @overload
@@ -45806,6 +47461,14 @@ class CXXDefaultInitExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXDefaultInitExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXDefaultInitExpr]:
+    ...
+
 class CXXDefaultArgExpr(multiplier.ast.Expr):
   adjusted_rewritten_expression: multiplier.ast.Expr
   expression: multiplier.ast.Expr
@@ -45827,6 +47490,11 @@ class CXXDefaultArgExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXDefaultArgExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXDefaultArgExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -45855,15 +47523,12 @@ class CXXDefaultArgExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXDefaultArgExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDefaultArgExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXDefaultArgExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXDefaultArgExpr]:
     ...
 
   @overload
@@ -45889,6 +47554,14 @@ class CXXDefaultArgExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXDefaultArgExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXDefaultArgExpr]:
     ...
 
 class CXXConstructExpr(multiplier.ast.Expr):
@@ -45922,6 +47595,11 @@ class CXXConstructExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXConstructExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXConstructExpr]:
     ...
 
@@ -45946,15 +47624,12 @@ class CXXConstructExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXConstructExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXConstructExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXConstructExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXConstructExpr]:
     ...
 
   @overload
@@ -45982,6 +47657,14 @@ class CXXConstructExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXConstructExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXConstructExpr]:
+    ...
+
   def nth_argument(self, n: int) -> Optional[multiplier.ast.Expr]:
     ...
 
@@ -46000,6 +47683,11 @@ class CXXTemporaryObjectExpr(multiplier.ast.CXXConstructExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXTemporaryObjectExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXTemporaryObjectExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -46028,15 +47716,12 @@ class CXXTemporaryObjectExpr(multiplier.ast.CXXConstructExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXTemporaryObjectExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXTemporaryObjectExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXTemporaryObjectExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXTemporaryObjectExpr]:
     ...
 
   @overload
@@ -46064,6 +47749,14 @@ class CXXTemporaryObjectExpr(multiplier.ast.CXXConstructExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXTemporaryObjectExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXTemporaryObjectExpr]:
+    ...
+
 class CXXBoolLiteralExpr(multiplier.ast.Expr):
   token: multiplier.frontend.Token
   value: bool
@@ -46081,6 +47774,11 @@ class CXXBoolLiteralExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXBoolLiteralExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXBoolLiteralExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -46109,15 +47807,12 @@ class CXXBoolLiteralExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXBoolLiteralExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXBoolLiteralExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXBoolLiteralExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXBoolLiteralExpr]:
     ...
 
   @overload
@@ -46145,6 +47840,14 @@ class CXXBoolLiteralExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXBoolLiteralExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXBoolLiteralExpr]:
+    ...
+
 class CXXBindTemporaryExpr(multiplier.ast.Expr):
   sub_expression: multiplier.ast.Expr
 
@@ -46161,6 +47864,11 @@ class CXXBindTemporaryExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXBindTemporaryExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXBindTemporaryExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -46189,15 +47897,12 @@ class CXXBindTemporaryExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXBindTemporaryExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXBindTemporaryExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXBindTemporaryExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXBindTemporaryExpr]:
     ...
 
   @overload
@@ -46225,6 +47930,14 @@ class CXXBindTemporaryExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXBindTemporaryExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CXXBindTemporaryExpr]:
+    ...
+
 class BlockExpr(multiplier.ast.Expr):
   block_declaration: multiplier.ast.BlockDecl
   body: multiplier.ast.Stmt
@@ -46244,6 +47957,11 @@ class BlockExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.BlockExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.BlockExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -46272,15 +47990,12 @@ class BlockExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BlockExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BlockExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.BlockExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.BlockExpr]:
     ...
 
   @overload
@@ -46306,6 +48021,14 @@ class BlockExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.BlockExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.BlockExpr]:
     ...
 
 class BinaryOperator(multiplier.ast.Expr):
@@ -46346,6 +48069,11 @@ class BinaryOperator(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.BinaryOperator, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.BinaryOperator]:
     ...
 
@@ -46370,15 +48098,12 @@ class BinaryOperator(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BinaryOperator]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BinaryOperator]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.BinaryOperator]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.BinaryOperator]:
     ...
 
   @overload
@@ -46406,6 +48131,14 @@ class BinaryOperator(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.BinaryOperator]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.BinaryOperator]:
+    ...
+
 class CompoundAssignOperator(multiplier.ast.BinaryOperator):
   computation_lhs_type: multiplier.ast.Type
   computation_result_type: multiplier.ast.Type
@@ -46423,6 +48156,11 @@ class CompoundAssignOperator(multiplier.ast.BinaryOperator):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CompoundAssignOperator]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CompoundAssignOperator, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -46451,15 +48189,12 @@ class CompoundAssignOperator(multiplier.ast.BinaryOperator):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CompoundAssignOperator]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CompoundAssignOperator]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CompoundAssignOperator]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CompoundAssignOperator]:
     ...
 
   @overload
@@ -46485,6 +48220,14 @@ class CompoundAssignOperator(multiplier.ast.BinaryOperator):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CompoundAssignOperator]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CompoundAssignOperator]:
     ...
 
 class AtomicExpr(multiplier.ast.Expr):
@@ -46522,6 +48265,11 @@ class AtomicExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.AtomicExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.AtomicExpr]:
     ...
 
@@ -46546,15 +48294,12 @@ class AtomicExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AtomicExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AtomicExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.AtomicExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.AtomicExpr]:
     ...
 
   @overload
@@ -46582,6 +48327,14 @@ class AtomicExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.AtomicExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.AtomicExpr]:
+    ...
+
   def nth_sub_expression(self, n: int) -> Optional[multiplier.ast.Expr]:
     ...
 
@@ -46603,6 +48356,11 @@ class AsTypeExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.AsTypeExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.AsTypeExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -46631,15 +48389,12 @@ class AsTypeExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AsTypeExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AsTypeExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.AsTypeExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.AsTypeExpr]:
     ...
 
   @overload
@@ -46667,6 +48422,14 @@ class AsTypeExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.AsTypeExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.AsTypeExpr]:
+    ...
+
 class ArrayTypeTraitExpr(multiplier.ast.Expr):
   dimension_expression: multiplier.ast.Expr
   queried_type: multiplier.ast.Type
@@ -46685,6 +48448,11 @@ class ArrayTypeTraitExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ArrayTypeTraitExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ArrayTypeTraitExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -46713,15 +48481,12 @@ class ArrayTypeTraitExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ArrayTypeTraitExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArrayTypeTraitExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ArrayTypeTraitExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ArrayTypeTraitExpr]:
     ...
 
   @overload
@@ -46749,6 +48514,14 @@ class ArrayTypeTraitExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ArrayTypeTraitExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ArrayTypeTraitExpr]:
+    ...
+
 class ArraySubscriptExpr(multiplier.ast.Expr):
   base: multiplier.ast.Expr
   index: multiplier.ast.Expr
@@ -46769,6 +48542,11 @@ class ArraySubscriptExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ArraySubscriptExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ArraySubscriptExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -46797,15 +48575,12 @@ class ArraySubscriptExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ArraySubscriptExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArraySubscriptExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ArraySubscriptExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ArraySubscriptExpr]:
     ...
 
   @overload
@@ -46833,6 +48608,14 @@ class ArraySubscriptExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ArraySubscriptExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ArraySubscriptExpr]:
+    ...
+
 class ArrayInitLoopExpr(multiplier.ast.Expr):
   common_expression: multiplier.ast.OpaqueValueExpr
   sub_expression: multiplier.ast.Expr
@@ -46850,6 +48633,11 @@ class ArrayInitLoopExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ArrayInitLoopExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ArrayInitLoopExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -46878,15 +48666,12 @@ class ArrayInitLoopExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ArrayInitLoopExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArrayInitLoopExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ArrayInitLoopExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ArrayInitLoopExpr]:
     ...
 
   @overload
@@ -46914,6 +48699,14 @@ class ArrayInitLoopExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ArrayInitLoopExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ArrayInitLoopExpr]:
+    ...
+
 class ArrayInitIndexExpr(multiplier.ast.Expr):
 
   @overload
@@ -46929,6 +48722,11 @@ class ArrayInitIndexExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ArrayInitIndexExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ArrayInitIndexExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -46957,15 +48755,12 @@ class ArrayInitIndexExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ArrayInitIndexExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArrayInitIndexExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ArrayInitIndexExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ArrayInitIndexExpr]:
     ...
 
   @overload
@@ -46993,6 +48788,14 @@ class ArrayInitIndexExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ArrayInitIndexExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ArrayInitIndexExpr]:
+    ...
+
 class AddrLabelExpr(multiplier.ast.Expr):
   amp_amp_token: multiplier.frontend.Token
   label: multiplier.ast.LabelDecl
@@ -47011,6 +48814,11 @@ class AddrLabelExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.AddrLabelExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.AddrLabelExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -47039,15 +48847,12 @@ class AddrLabelExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AddrLabelExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AddrLabelExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.AddrLabelExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.AddrLabelExpr]:
     ...
 
   @overload
@@ -47075,6 +48880,14 @@ class AddrLabelExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.AddrLabelExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.AddrLabelExpr]:
+    ...
+
 class AbstractConditionalOperator(multiplier.ast.Expr):
   colon_token: multiplier.frontend.Token
   condition: multiplier.ast.Expr
@@ -47095,6 +48908,11 @@ class AbstractConditionalOperator(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.AbstractConditionalOperator]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.AbstractConditionalOperator, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -47123,11 +48941,12 @@ class AbstractConditionalOperator(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AbstractConditionalOperator]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AbstractConditionalOperator]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.AbstractConditionalOperator]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.AbstractConditionalOperator]:
     ...
 
   @overload
@@ -47155,6 +48974,10 @@ class AbstractConditionalOperator(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.AbstractConditionalOperator]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.AbstractConditionalOperator]:
+    ...
+
 class ConditionalOperator(multiplier.ast.AbstractConditionalOperator):
   lhs: multiplier.ast.Expr
   rhs: multiplier.ast.Expr
@@ -47172,6 +48995,11 @@ class ConditionalOperator(multiplier.ast.AbstractConditionalOperator):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ConditionalOperator]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ConditionalOperator, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -47200,15 +49028,12 @@ class ConditionalOperator(multiplier.ast.AbstractConditionalOperator):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConditionalOperator]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConditionalOperator]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ConditionalOperator]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ConditionalOperator]:
     ...
 
   @overload
@@ -47236,6 +49061,14 @@ class ConditionalOperator(multiplier.ast.AbstractConditionalOperator):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ConditionalOperator]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ConditionalOperator]:
+    ...
+
 class BinaryConditionalOperator(multiplier.ast.AbstractConditionalOperator):
   common: multiplier.ast.Expr
   opaque_value: multiplier.ast.OpaqueValueExpr
@@ -47253,6 +49086,11 @@ class BinaryConditionalOperator(multiplier.ast.AbstractConditionalOperator):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.BinaryConditionalOperator]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.BinaryConditionalOperator, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -47281,15 +49119,12 @@ class BinaryConditionalOperator(multiplier.ast.AbstractConditionalOperator):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BinaryConditionalOperator]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BinaryConditionalOperator]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.BinaryConditionalOperator]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.BinaryConditionalOperator]:
     ...
 
   @overload
@@ -47317,6 +49152,14 @@ class BinaryConditionalOperator(multiplier.ast.AbstractConditionalOperator):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.BinaryConditionalOperator]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.BinaryConditionalOperator]:
+    ...
+
 class VAArgExpr(multiplier.ast.Expr):
   builtin_token: multiplier.frontend.Token
   r_paren_token: multiplier.frontend.Token
@@ -47336,6 +49179,11 @@ class VAArgExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.VAArgExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.VAArgExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -47364,15 +49212,12 @@ class VAArgExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.VAArgExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VAArgExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.VAArgExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.VAArgExpr]:
     ...
 
   @overload
@@ -47398,6 +49243,14 @@ class VAArgExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.VAArgExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.VAArgExpr]:
     ...
 
 class UnaryOperator(multiplier.ast.Expr):
@@ -47430,6 +49283,11 @@ class UnaryOperator(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.UnaryOperator, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.UnaryOperator]:
     ...
 
@@ -47454,15 +49312,12 @@ class UnaryOperator(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UnaryOperator]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnaryOperator]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.UnaryOperator]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.UnaryOperator]:
     ...
 
   @overload
@@ -47488,6 +49343,14 @@ class UnaryOperator(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.UnaryOperator]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.UnaryOperator]:
     ...
 
 class UnaryExprOrTypeTraitExpr(multiplier.ast.Expr):
@@ -47516,6 +49379,11 @@ class UnaryExprOrTypeTraitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.UnaryExprOrTypeTraitExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.UnaryExprOrTypeTraitExpr]:
     ...
 
@@ -47540,15 +49408,12 @@ class UnaryExprOrTypeTraitExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UnaryExprOrTypeTraitExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnaryExprOrTypeTraitExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.UnaryExprOrTypeTraitExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.UnaryExprOrTypeTraitExpr]:
     ...
 
   @overload
@@ -47576,6 +49441,14 @@ class UnaryExprOrTypeTraitExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.UnaryExprOrTypeTraitExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.UnaryExprOrTypeTraitExpr]:
+    ...
+
 class TypoExpr(multiplier.ast.Expr):
 
   @overload
@@ -47591,6 +49464,11 @@ class TypoExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.TypoExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.TypoExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -47619,15 +49497,12 @@ class TypoExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypoExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypoExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.TypoExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.TypoExpr]:
     ...
 
   @overload
@@ -47655,6 +49530,14 @@ class TypoExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TypoExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.TypoExpr]:
+    ...
+
 class TypeTraitExpr(multiplier.ast.Expr):
   trait: multiplier.ast.TypeTrait
   value: Optional[bool]
@@ -47674,6 +49557,11 @@ class TypeTraitExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.TypeTraitExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.TypeTraitExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -47702,15 +49590,12 @@ class TypeTraitExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypeTraitExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeTraitExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.TypeTraitExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.TypeTraitExpr]:
     ...
 
   @overload
@@ -47738,6 +49623,14 @@ class TypeTraitExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TypeTraitExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.TypeTraitExpr]:
+    ...
+
   def nth_argument(self, n: int) -> Optional[multiplier.ast.Type]:
     ...
 
@@ -47759,6 +49652,11 @@ class SubstNonTypeTemplateParmPackExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.SubstNonTypeTemplateParmPackExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.SubstNonTypeTemplateParmPackExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -47787,15 +49685,12 @@ class SubstNonTypeTemplateParmPackExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SubstNonTypeTemplateParmPackExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SubstNonTypeTemplateParmPackExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SubstNonTypeTemplateParmPackExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.SubstNonTypeTemplateParmPackExpr]:
     ...
 
   @overload
@@ -47821,6 +49716,14 @@ class SubstNonTypeTemplateParmPackExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.SubstNonTypeTemplateParmPackExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SubstNonTypeTemplateParmPackExpr]:
     ...
 
 class SubstNonTypeTemplateParmExpr(multiplier.ast.Expr):
@@ -47849,6 +49752,11 @@ class SubstNonTypeTemplateParmExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.SubstNonTypeTemplateParmExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.SubstNonTypeTemplateParmExpr]:
     ...
 
@@ -47873,15 +49781,12 @@ class SubstNonTypeTemplateParmExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SubstNonTypeTemplateParmExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SubstNonTypeTemplateParmExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SubstNonTypeTemplateParmExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.SubstNonTypeTemplateParmExpr]:
     ...
 
   @overload
@@ -47907,6 +49812,14 @@ class SubstNonTypeTemplateParmExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.SubstNonTypeTemplateParmExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SubstNonTypeTemplateParmExpr]:
     ...
 
 class StringLiteral(multiplier.ast.Expr):
@@ -47940,6 +49853,11 @@ class StringLiteral(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.StringLiteral, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.StringLiteral]:
     ...
 
@@ -47964,15 +49882,12 @@ class StringLiteral(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.StringLiteral]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StringLiteral]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.StringLiteral]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.StringLiteral]:
     ...
 
   @overload
@@ -48000,6 +49915,14 @@ class StringLiteral(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.StringLiteral]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.StringLiteral]:
+    ...
+
 class StmtExpr(multiplier.ast.Expr):
   l_paren_token: multiplier.frontend.Token
   r_paren_token: multiplier.frontend.Token
@@ -48018,6 +49941,11 @@ class StmtExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.StmtExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.StmtExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -48046,15 +49974,12 @@ class StmtExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.StmtExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StmtExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.StmtExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.StmtExpr]:
     ...
 
   @overload
@@ -48082,6 +50007,14 @@ class StmtExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.StmtExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.StmtExpr]:
+    ...
+
 class SourceLocExpr(multiplier.ast.Expr):
   builtin_string: str
   identifier_kind: multiplier.ast.SourceLocExprIdentKind
@@ -48101,6 +50034,11 @@ class SourceLocExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.SourceLocExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.SourceLocExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -48129,15 +50067,12 @@ class SourceLocExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SourceLocExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SourceLocExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SourceLocExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.SourceLocExpr]:
     ...
 
   @overload
@@ -48163,6 +50098,14 @@ class SourceLocExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.SourceLocExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SourceLocExpr]:
     ...
 
 class SizeOfPackExpr(multiplier.ast.Expr):
@@ -48191,6 +50134,11 @@ class SizeOfPackExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.SizeOfPackExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.SizeOfPackExpr]:
     ...
 
@@ -48215,15 +50163,12 @@ class SizeOfPackExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SizeOfPackExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SizeOfPackExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SizeOfPackExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.SizeOfPackExpr]:
     ...
 
   @overload
@@ -48251,6 +50196,14 @@ class SizeOfPackExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.SizeOfPackExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SizeOfPackExpr]:
+    ...
+
 class ShuffleVectorExpr(multiplier.ast.Expr):
   builtin_token: multiplier.frontend.Token
   r_paren_token: multiplier.frontend.Token
@@ -48268,6 +50221,11 @@ class ShuffleVectorExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ShuffleVectorExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ShuffleVectorExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -48296,15 +50254,12 @@ class ShuffleVectorExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ShuffleVectorExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ShuffleVectorExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ShuffleVectorExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ShuffleVectorExpr]:
     ...
 
   @overload
@@ -48332,6 +50287,14 @@ class ShuffleVectorExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ShuffleVectorExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ShuffleVectorExpr]:
+    ...
+
 class SYCLUniqueStableNameExpr(multiplier.ast.Expr):
   compute_name: str
   l_paren_token: multiplier.frontend.Token
@@ -48351,6 +50314,11 @@ class SYCLUniqueStableNameExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.SYCLUniqueStableNameExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.SYCLUniqueStableNameExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -48379,15 +50347,12 @@ class SYCLUniqueStableNameExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SYCLUniqueStableNameExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SYCLUniqueStableNameExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SYCLUniqueStableNameExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.SYCLUniqueStableNameExpr]:
     ...
 
   @overload
@@ -48415,6 +50380,14 @@ class SYCLUniqueStableNameExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.SYCLUniqueStableNameExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SYCLUniqueStableNameExpr]:
+    ...
+
 class RequiresExpr(multiplier.ast.Expr):
   body: multiplier.ast.RequiresExprBodyDecl
   num_local_parameters: int
@@ -48436,6 +50409,11 @@ class RequiresExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.RequiresExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.RequiresExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -48464,15 +50442,12 @@ class RequiresExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.RequiresExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RequiresExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.RequiresExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.RequiresExpr]:
     ...
 
   @overload
@@ -48500,6 +50475,14 @@ class RequiresExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.RequiresExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.RequiresExpr]:
+    ...
+
   def nth_local_parameter(self, n: int) -> Optional[multiplier.ast.ParmVarDecl]:
     ...
 
@@ -48520,6 +50503,11 @@ class RecoveryExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.RecoveryExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.RecoveryExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -48548,15 +50536,12 @@ class RecoveryExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.RecoveryExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RecoveryExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.RecoveryExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.RecoveryExpr]:
     ...
 
   @overload
@@ -48582,6 +50567,14 @@ class RecoveryExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.RecoveryExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.RecoveryExpr]:
     ...
 
   def nth_sub_expression(self, n: int) -> Optional[multiplier.ast.Expr]:
@@ -48612,6 +50605,11 @@ class PseudoObjectExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.PseudoObjectExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.PseudoObjectExpr]:
     ...
 
@@ -48636,15 +50634,12 @@ class PseudoObjectExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PseudoObjectExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PseudoObjectExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.PseudoObjectExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.PseudoObjectExpr]:
     ...
 
   @overload
@@ -48670,6 +50665,14 @@ class PseudoObjectExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.PseudoObjectExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.PseudoObjectExpr]:
     ...
 
   def nth_semantic(self, n: int) -> Optional[multiplier.ast.Expr]:
@@ -48702,6 +50705,11 @@ class PredefinedExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.PredefinedExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.PredefinedExpr]:
     ...
 
@@ -48726,15 +50734,12 @@ class PredefinedExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PredefinedExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PredefinedExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.PredefinedExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.PredefinedExpr]:
     ...
 
   @overload
@@ -48762,6 +50767,14 @@ class PredefinedExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.PredefinedExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.PredefinedExpr]:
+    ...
+
 class ParenListExpr(multiplier.ast.Expr):
   l_paren_token: multiplier.frontend.Token
   r_paren_token: multiplier.frontend.Token
@@ -48781,6 +50794,11 @@ class ParenListExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ParenListExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ParenListExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -48809,15 +50827,12 @@ class ParenListExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ParenListExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParenListExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ParenListExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ParenListExpr]:
     ...
 
   @overload
@@ -48845,6 +50860,14 @@ class ParenListExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ParenListExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ParenListExpr]:
+    ...
+
   def nth_expression(self, n: int) -> Optional[multiplier.ast.Expr]:
     ...
 
@@ -48866,6 +50889,11 @@ class ParenExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ParenExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ParenExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -48894,15 +50922,12 @@ class ParenExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ParenExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParenExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ParenExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ParenExpr]:
     ...
 
   @overload
@@ -48930,6 +50955,14 @@ class ParenExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ParenExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ParenExpr]:
+    ...
+
 class PackExpansionExpr(multiplier.ast.Expr):
   ellipsis_token: multiplier.frontend.Token
   pattern: multiplier.ast.Expr
@@ -48947,6 +50980,11 @@ class PackExpansionExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.PackExpansionExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.PackExpansionExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -48975,15 +51013,12 @@ class PackExpansionExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PackExpansionExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PackExpansionExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.PackExpansionExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.PackExpansionExpr]:
     ...
 
   @overload
@@ -49009,6 +51044,14 @@ class PackExpansionExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.PackExpansionExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.PackExpansionExpr]:
     ...
 
 class OverloadExpr(multiplier.ast.Expr):
@@ -49037,6 +51080,11 @@ class OverloadExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OverloadExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.OverloadExpr]:
     ...
 
@@ -49061,11 +51109,12 @@ class OverloadExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OverloadExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OverloadExpr]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OverloadExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OverloadExpr]:
     ...
 
   @overload
@@ -49091,6 +51140,10 @@ class OverloadExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OverloadExpr]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OverloadExpr]:
     ...
 
 class UnresolvedMemberExpr(multiplier.ast.OverloadExpr):
@@ -49119,6 +51172,11 @@ class UnresolvedMemberExpr(multiplier.ast.OverloadExpr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.UnresolvedMemberExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.UnresolvedMemberExpr]:
     ...
 
@@ -49143,15 +51201,12 @@ class UnresolvedMemberExpr(multiplier.ast.OverloadExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UnresolvedMemberExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedMemberExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.UnresolvedMemberExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.UnresolvedMemberExpr]:
     ...
 
   @overload
@@ -49179,6 +51234,14 @@ class UnresolvedMemberExpr(multiplier.ast.OverloadExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.UnresolvedMemberExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.UnresolvedMemberExpr]:
+    ...
+
 class UnresolvedLookupExpr(multiplier.ast.OverloadExpr):
   is_overloaded: bool
   requires_adl: bool
@@ -49196,6 +51259,11 @@ class UnresolvedLookupExpr(multiplier.ast.OverloadExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.UnresolvedLookupExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.UnresolvedLookupExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -49224,15 +51292,12 @@ class UnresolvedLookupExpr(multiplier.ast.OverloadExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UnresolvedLookupExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedLookupExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.UnresolvedLookupExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.UnresolvedLookupExpr]:
     ...
 
   @overload
@@ -49260,6 +51325,14 @@ class UnresolvedLookupExpr(multiplier.ast.OverloadExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.UnresolvedLookupExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.UnresolvedLookupExpr]:
+    ...
+
 class OpaqueValueExpr(multiplier.ast.Expr):
   token: multiplier.frontend.Token
   source_expression: multiplier.ast.Expr
@@ -49278,6 +51351,11 @@ class OpaqueValueExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OpaqueValueExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OpaqueValueExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -49306,15 +51384,12 @@ class OpaqueValueExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OpaqueValueExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpaqueValueExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OpaqueValueExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OpaqueValueExpr]:
     ...
 
   @overload
@@ -49342,6 +51417,14 @@ class OpaqueValueExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OpaqueValueExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OpaqueValueExpr]:
+    ...
+
 class OffsetOfExpr(multiplier.ast.Expr):
   operator_token: multiplier.frontend.Token
   r_paren_token: multiplier.frontend.Token
@@ -49359,6 +51442,11 @@ class OffsetOfExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OffsetOfExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OffsetOfExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -49387,15 +51475,12 @@ class OffsetOfExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OffsetOfExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OffsetOfExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OffsetOfExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OffsetOfExpr]:
     ...
 
   @overload
@@ -49423,6 +51508,14 @@ class OffsetOfExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OffsetOfExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OffsetOfExpr]:
+    ...
+
 class ObjCSubscriptRefExpr(multiplier.ast.Expr):
   at_index_method_declaration: multiplier.ast.ObjCMethodDecl
   base_expression: multiplier.ast.Expr
@@ -49443,6 +51536,11 @@ class ObjCSubscriptRefExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCSubscriptRefExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCSubscriptRefExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -49471,15 +51569,12 @@ class ObjCSubscriptRefExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCSubscriptRefExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCSubscriptRefExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCSubscriptRefExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCSubscriptRefExpr]:
     ...
 
   @overload
@@ -49507,6 +51602,14 @@ class ObjCSubscriptRefExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCSubscriptRefExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCSubscriptRefExpr]:
+    ...
+
 class ObjCStringLiteral(multiplier.ast.Expr):
   at_token: multiplier.frontend.Token
   string: multiplier.ast.StringLiteral
@@ -49524,6 +51627,11 @@ class ObjCStringLiteral(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCStringLiteral]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCStringLiteral, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -49552,15 +51660,12 @@ class ObjCStringLiteral(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCStringLiteral]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCStringLiteral]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCStringLiteral]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCStringLiteral]:
     ...
 
   @overload
@@ -49588,6 +51693,14 @@ class ObjCStringLiteral(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCStringLiteral]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCStringLiteral]:
+    ...
+
 class ObjCSelectorExpr(multiplier.ast.Expr):
   at_token: multiplier.frontend.Token
   r_paren_token: multiplier.frontend.Token
@@ -49605,6 +51718,11 @@ class ObjCSelectorExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCSelectorExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCSelectorExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -49633,15 +51751,12 @@ class ObjCSelectorExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCSelectorExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCSelectorExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCSelectorExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCSelectorExpr]:
     ...
 
   @overload
@@ -49669,6 +51784,14 @@ class ObjCSelectorExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCSelectorExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCSelectorExpr]:
+    ...
+
 class ObjCProtocolExpr(multiplier.ast.Expr):
   at_token: multiplier.frontend.Token
   protocol: multiplier.ast.ObjCProtocolDecl
@@ -49688,6 +51811,11 @@ class ObjCProtocolExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCProtocolExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCProtocolExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -49716,15 +51844,12 @@ class ObjCProtocolExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCProtocolExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCProtocolExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCProtocolExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCProtocolExpr]:
     ...
 
   @overload
@@ -49750,6 +51875,14 @@ class ObjCProtocolExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCProtocolExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCProtocolExpr]:
     ...
 
 class ObjCPropertyRefExpr(multiplier.ast.Expr):
@@ -49787,6 +51920,11 @@ class ObjCPropertyRefExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCPropertyRefExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCPropertyRefExpr]:
     ...
 
@@ -49811,15 +51949,12 @@ class ObjCPropertyRefExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCPropertyRefExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCPropertyRefExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCPropertyRefExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCPropertyRefExpr]:
     ...
 
   @overload
@@ -49845,6 +51980,14 @@ class ObjCPropertyRefExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCPropertyRefExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCPropertyRefExpr]:
     ...
 
 class ObjCMessageExpr(multiplier.ast.Expr):
@@ -49888,6 +52031,11 @@ class ObjCMessageExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCMessageExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCMessageExpr]:
     ...
 
@@ -49912,15 +52060,12 @@ class ObjCMessageExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCMessageExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCMessageExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCMessageExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCMessageExpr]:
     ...
 
   @overload
@@ -49946,6 +52091,14 @@ class ObjCMessageExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCMessageExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCMessageExpr]:
     ...
 
   def nth_argument(self, n: int) -> Optional[multiplier.ast.Expr]:
@@ -49979,6 +52132,11 @@ class ObjCIvarRefExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCIvarRefExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCIvarRefExpr]:
     ...
 
@@ -50003,15 +52161,12 @@ class ObjCIvarRefExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCIvarRefExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIvarRefExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCIvarRefExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCIvarRefExpr]:
     ...
 
   @overload
@@ -50039,6 +52194,14 @@ class ObjCIvarRefExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCIvarRefExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCIvarRefExpr]:
+    ...
+
 class ObjCIsaExpr(multiplier.ast.Expr):
   base: multiplier.ast.Expr
   base_token_end: multiplier.frontend.Token
@@ -50059,6 +52222,11 @@ class ObjCIsaExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCIsaExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCIsaExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -50087,15 +52255,12 @@ class ObjCIsaExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCIsaExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIsaExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCIsaExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCIsaExpr]:
     ...
 
   @overload
@@ -50123,6 +52288,14 @@ class ObjCIsaExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCIsaExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCIsaExpr]:
+    ...
+
 class ObjCIndirectCopyRestoreExpr(multiplier.ast.Expr):
   sub_expression: multiplier.ast.Expr
   should_copy: bool
@@ -50140,6 +52313,11 @@ class ObjCIndirectCopyRestoreExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCIndirectCopyRestoreExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCIndirectCopyRestoreExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -50168,15 +52346,12 @@ class ObjCIndirectCopyRestoreExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCIndirectCopyRestoreExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIndirectCopyRestoreExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCIndirectCopyRestoreExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCIndirectCopyRestoreExpr]:
     ...
 
   @overload
@@ -50204,6 +52379,14 @@ class ObjCIndirectCopyRestoreExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCIndirectCopyRestoreExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCIndirectCopyRestoreExpr]:
+    ...
+
 class ObjCEncodeExpr(multiplier.ast.Expr):
   at_token: multiplier.frontend.Token
   encoded_type: multiplier.ast.Type
@@ -50222,6 +52405,11 @@ class ObjCEncodeExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCEncodeExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCEncodeExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -50250,15 +52438,12 @@ class ObjCEncodeExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCEncodeExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCEncodeExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCEncodeExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCEncodeExpr]:
     ...
 
   @overload
@@ -50286,6 +52471,14 @@ class ObjCEncodeExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCEncodeExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCEncodeExpr]:
+    ...
+
 class ObjCDictionaryLiteral(multiplier.ast.Expr):
   dictionary_with_objects_method: multiplier.ast.ObjCMethodDecl
 
@@ -50302,6 +52495,11 @@ class ObjCDictionaryLiteral(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCDictionaryLiteral]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCDictionaryLiteral, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -50330,15 +52528,12 @@ class ObjCDictionaryLiteral(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCDictionaryLiteral]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCDictionaryLiteral]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCDictionaryLiteral]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCDictionaryLiteral]:
     ...
 
   @overload
@@ -50366,6 +52561,14 @@ class ObjCDictionaryLiteral(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCDictionaryLiteral]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCDictionaryLiteral]:
+    ...
+
 class ObjCBoxedExpr(multiplier.ast.Expr):
   at_token: multiplier.frontend.Token
   boxing_method: multiplier.ast.ObjCMethodDecl
@@ -50385,6 +52588,11 @@ class ObjCBoxedExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCBoxedExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCBoxedExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -50413,15 +52621,12 @@ class ObjCBoxedExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCBoxedExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBoxedExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCBoxedExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCBoxedExpr]:
     ...
 
   @overload
@@ -50449,6 +52654,14 @@ class ObjCBoxedExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCBoxedExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCBoxedExpr]:
+    ...
+
 class ObjCBoolLiteralExpr(multiplier.ast.Expr):
   token: multiplier.frontend.Token
   value: bool
@@ -50466,6 +52679,11 @@ class ObjCBoolLiteralExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCBoolLiteralExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCBoolLiteralExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -50494,15 +52712,12 @@ class ObjCBoolLiteralExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCBoolLiteralExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBoolLiteralExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCBoolLiteralExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCBoolLiteralExpr]:
     ...
 
   @overload
@@ -50530,6 +52745,14 @@ class ObjCBoolLiteralExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCBoolLiteralExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCBoolLiteralExpr]:
+    ...
+
 class ObjCAvailabilityCheckExpr(multiplier.ast.Expr):
   has_version: bool
 
@@ -50546,6 +52769,11 @@ class ObjCAvailabilityCheckExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCAvailabilityCheckExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCAvailabilityCheckExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -50574,15 +52802,12 @@ class ObjCAvailabilityCheckExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCAvailabilityCheckExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAvailabilityCheckExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCAvailabilityCheckExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCAvailabilityCheckExpr]:
     ...
 
   @overload
@@ -50610,6 +52835,14 @@ class ObjCAvailabilityCheckExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCAvailabilityCheckExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCAvailabilityCheckExpr]:
+    ...
+
 class ObjCArrayLiteral(multiplier.ast.Expr):
   array_with_objects_method: multiplier.ast.ObjCMethodDecl
   num_elements: int
@@ -50628,6 +52861,11 @@ class ObjCArrayLiteral(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCArrayLiteral]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCArrayLiteral, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -50656,15 +52894,12 @@ class ObjCArrayLiteral(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCArrayLiteral]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCArrayLiteral]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCArrayLiteral]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCArrayLiteral]:
     ...
 
   @overload
@@ -50692,6 +52927,14 @@ class ObjCArrayLiteral(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCArrayLiteral]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ObjCArrayLiteral]:
+    ...
+
   def nth_element(self, n: int) -> Optional[multiplier.ast.Expr]:
     ...
 
@@ -50713,6 +52956,11 @@ class OMPIteratorExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPIteratorExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPIteratorExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -50741,15 +52989,12 @@ class OMPIteratorExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPIteratorExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPIteratorExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPIteratorExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPIteratorExpr]:
     ...
 
   @overload
@@ -50777,6 +53022,14 @@ class OMPIteratorExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPIteratorExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPIteratorExpr]:
+    ...
+
 class OMPArrayShapingExpr(multiplier.ast.Expr):
   base: multiplier.ast.Expr
   num_dimensions: int
@@ -50797,6 +53050,11 @@ class OMPArrayShapingExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPArrayShapingExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPArrayShapingExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -50825,15 +53083,12 @@ class OMPArrayShapingExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPArrayShapingExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPArrayShapingExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPArrayShapingExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPArrayShapingExpr]:
     ...
 
   @overload
@@ -50859,6 +53114,14 @@ class OMPArrayShapingExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPArrayShapingExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPArrayShapingExpr]:
     ...
 
   def nth_dimension(self, n: int) -> Optional[multiplier.ast.Expr]:
@@ -50890,6 +53153,11 @@ class OMPArraySectionExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPArraySectionExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.OMPArraySectionExpr]:
     ...
 
@@ -50914,15 +53182,12 @@ class OMPArraySectionExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPArraySectionExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPArraySectionExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPArraySectionExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPArraySectionExpr]:
     ...
 
   @overload
@@ -50950,6 +53215,14 @@ class OMPArraySectionExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPArraySectionExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OMPArraySectionExpr]:
+    ...
+
 class NoInitExpr(multiplier.ast.Expr):
 
   @overload
@@ -50965,6 +53238,11 @@ class NoInitExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.NoInitExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.NoInitExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -50993,15 +53271,12 @@ class NoInitExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NoInitExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoInitExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.NoInitExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.NoInitExpr]:
     ...
 
   @overload
@@ -51027,6 +53302,14 @@ class NoInitExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.NoInitExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.NoInitExpr]:
     ...
 
 class MemberExpr(multiplier.ast.Expr):
@@ -51062,6 +53345,11 @@ class MemberExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.MemberExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.MemberExpr]:
     ...
 
@@ -51086,15 +53374,12 @@ class MemberExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MemberExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MemberExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.MemberExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.MemberExpr]:
     ...
 
   @overload
@@ -51122,6 +53407,14 @@ class MemberExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.MemberExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.MemberExpr]:
+    ...
+
 class MatrixSubscriptExpr(multiplier.ast.Expr):
   base: multiplier.ast.Expr
   column_index: multiplier.ast.Expr
@@ -51142,6 +53435,11 @@ class MatrixSubscriptExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.MatrixSubscriptExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.MatrixSubscriptExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -51170,15 +53468,12 @@ class MatrixSubscriptExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MatrixSubscriptExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MatrixSubscriptExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.MatrixSubscriptExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.MatrixSubscriptExpr]:
     ...
 
   @overload
@@ -51206,6 +53501,14 @@ class MatrixSubscriptExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.MatrixSubscriptExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.MatrixSubscriptExpr]:
+    ...
+
 class MaterializeTemporaryExpr(multiplier.ast.Expr):
   extending_declaration: Optional[multiplier.ast.ValueDecl]
   lifetime_extended_temporary_declaration: Optional[multiplier.ast.LifetimeExtendedTemporaryDecl]
@@ -51227,6 +53530,11 @@ class MaterializeTemporaryExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.MaterializeTemporaryExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.MaterializeTemporaryExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -51255,15 +53563,12 @@ class MaterializeTemporaryExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MaterializeTemporaryExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MaterializeTemporaryExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.MaterializeTemporaryExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.MaterializeTemporaryExpr]:
     ...
 
   @overload
@@ -51291,6 +53596,14 @@ class MaterializeTemporaryExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.MaterializeTemporaryExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.MaterializeTemporaryExpr]:
+    ...
+
 class MSPropertySubscriptExpr(multiplier.ast.Expr):
   base: multiplier.ast.Expr
   index: multiplier.ast.Expr
@@ -51309,6 +53622,11 @@ class MSPropertySubscriptExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.MSPropertySubscriptExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.MSPropertySubscriptExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -51337,15 +53655,12 @@ class MSPropertySubscriptExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MSPropertySubscriptExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSPropertySubscriptExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.MSPropertySubscriptExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.MSPropertySubscriptExpr]:
     ...
 
   @overload
@@ -51373,6 +53688,14 @@ class MSPropertySubscriptExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.MSPropertySubscriptExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.MSPropertySubscriptExpr]:
+    ...
+
 class MSPropertyRefExpr(multiplier.ast.Expr):
   base_expression: multiplier.ast.Expr
   member_token: multiplier.frontend.Token
@@ -51393,6 +53716,11 @@ class MSPropertyRefExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.MSPropertyRefExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.MSPropertyRefExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -51421,15 +53749,12 @@ class MSPropertyRefExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MSPropertyRefExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSPropertyRefExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.MSPropertyRefExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.MSPropertyRefExpr]:
     ...
 
   @overload
@@ -51455,6 +53780,14 @@ class MSPropertyRefExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.MSPropertyRefExpr]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.MSPropertyRefExpr]:
     ...
 
 class LambdaExpr(multiplier.ast.Expr):
@@ -51492,6 +53825,11 @@ class LambdaExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.LambdaExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.LambdaExpr]:
     ...
 
@@ -51516,15 +53854,12 @@ class LambdaExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LambdaExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LambdaExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.LambdaExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.LambdaExpr]:
     ...
 
   @overload
@@ -51552,6 +53887,14 @@ class LambdaExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.LambdaExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.LambdaExpr]:
+    ...
+
   def nth_explicit_template_parameter(self, n: int) -> Optional[multiplier.ast.NamedDecl]:
     ...
 
@@ -51571,6 +53914,11 @@ class IntegerLiteral(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.IntegerLiteral]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.IntegerLiteral, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -51599,15 +53947,12 @@ class IntegerLiteral(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.IntegerLiteral]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IntegerLiteral]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.IntegerLiteral]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.IntegerLiteral]:
     ...
 
   @overload
@@ -51633,6 +53978,14 @@ class IntegerLiteral(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.IntegerLiteral]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.IntegerLiteral]:
     ...
 
 class InitListExpr(multiplier.ast.Expr):
@@ -51670,6 +54023,11 @@ class InitListExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.InitListExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.InitListExpr]:
     ...
 
@@ -51694,15 +54052,12 @@ class InitListExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.InitListExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InitListExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.InitListExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.InitListExpr]:
     ...
 
   @overload
@@ -51730,6 +54085,14 @@ class InitListExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.InitListExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.InitListExpr]:
+    ...
+
   def nth_initializer(self, n: int) -> Optional[multiplier.ast.Expr]:
     ...
 
@@ -51748,6 +54111,11 @@ class ImplicitValueInitExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ImplicitValueInitExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ImplicitValueInitExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -51776,15 +54144,12 @@ class ImplicitValueInitExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ImplicitValueInitExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImplicitValueInitExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ImplicitValueInitExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ImplicitValueInitExpr]:
     ...
 
   @overload
@@ -51812,6 +54177,14 @@ class ImplicitValueInitExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ImplicitValueInitExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ImplicitValueInitExpr]:
+    ...
+
 class ImaginaryLiteral(multiplier.ast.Expr):
   sub_expression: multiplier.ast.Expr
 
@@ -51828,6 +54201,11 @@ class ImaginaryLiteral(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ImaginaryLiteral]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ImaginaryLiteral, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -51856,15 +54234,12 @@ class ImaginaryLiteral(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ImaginaryLiteral]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImaginaryLiteral]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ImaginaryLiteral]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ImaginaryLiteral]:
     ...
 
   @overload
@@ -51890,6 +54265,14 @@ class ImaginaryLiteral(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ImaginaryLiteral]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ImaginaryLiteral]:
     ...
 
 class GenericSelectionExpr(multiplier.ast.Expr):
@@ -51922,6 +54305,11 @@ class GenericSelectionExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.GenericSelectionExpr, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.GenericSelectionExpr]:
     ...
 
@@ -51946,15 +54334,12 @@ class GenericSelectionExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.GenericSelectionExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GenericSelectionExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.GenericSelectionExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.GenericSelectionExpr]:
     ...
 
   @overload
@@ -51982,6 +54367,14 @@ class GenericSelectionExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.GenericSelectionExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.GenericSelectionExpr]:
+    ...
+
   def nth_association_expression(self, n: int) -> Optional[multiplier.ast.Expr]:
     ...
 
@@ -52001,6 +54394,11 @@ class GNUNullExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.GNUNullExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.GNUNullExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -52029,15 +54427,12 @@ class GNUNullExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.GNUNullExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GNUNullExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.GNUNullExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.GNUNullExpr]:
     ...
 
   @overload
@@ -52065,6 +54460,14 @@ class GNUNullExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.GNUNullExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.GNUNullExpr]:
+    ...
+
 class FunctionParmPackExpr(multiplier.ast.Expr):
   parameter_pack: multiplier.ast.VarDecl
   parameter_pack_token: multiplier.frontend.Token
@@ -52084,6 +54487,11 @@ class FunctionParmPackExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.FunctionParmPackExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.FunctionParmPackExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -52112,15 +54520,12 @@ class FunctionParmPackExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FunctionParmPackExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionParmPackExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.FunctionParmPackExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.FunctionParmPackExpr]:
     ...
 
   @overload
@@ -52148,6 +54553,14 @@ class FunctionParmPackExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.FunctionParmPackExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.FunctionParmPackExpr]:
+    ...
+
   def nth_expansion(self, n: int) -> Optional[multiplier.ast.VarDecl]:
     ...
 
@@ -52167,6 +54580,11 @@ class FullExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.FullExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.FullExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -52195,11 +54613,12 @@ class FullExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FullExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FullExpr]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.FullExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.FullExpr]:
     ...
 
   @overload
@@ -52227,6 +54646,10 @@ class FullExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.FullExpr]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.FullExpr]:
+    ...
+
 class ExprWithCleanups(multiplier.ast.FullExpr):
   cleanups_have_side_effects: bool
 
@@ -52243,6 +54666,11 @@ class ExprWithCleanups(multiplier.ast.FullExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ExprWithCleanups]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ExprWithCleanups, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -52271,15 +54699,12 @@ class ExprWithCleanups(multiplier.ast.FullExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ExprWithCleanups]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExprWithCleanups]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ExprWithCleanups]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ExprWithCleanups]:
     ...
 
   @overload
@@ -52307,6 +54732,14 @@ class ExprWithCleanups(multiplier.ast.FullExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ExprWithCleanups]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ExprWithCleanups]:
+    ...
+
 class ConstantExpr(multiplier.ast.FullExpr):
   result_storage_kind: multiplier.ast.ConstantExprResultStorageKind
   has_ap_value_result: bool
@@ -52325,6 +54758,11 @@ class ConstantExpr(multiplier.ast.FullExpr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ConstantExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ConstantExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -52353,15 +54791,12 @@ class ConstantExpr(multiplier.ast.FullExpr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConstantExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstantExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ConstantExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ConstantExpr]:
     ...
 
   @overload
@@ -52389,6 +54824,14 @@ class ConstantExpr(multiplier.ast.FullExpr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ConstantExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ConstantExpr]:
+    ...
+
 class FloatingLiteral(multiplier.ast.Expr):
   token: multiplier.frontend.Token
   is_exact: bool
@@ -52406,6 +54849,11 @@ class FloatingLiteral(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.FloatingLiteral]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.FloatingLiteral, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -52434,15 +54882,12 @@ class FloatingLiteral(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FloatingLiteral]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FloatingLiteral]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.FloatingLiteral]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.FloatingLiteral]:
     ...
 
   @overload
@@ -52470,6 +54915,14 @@ class FloatingLiteral(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.FloatingLiteral]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.FloatingLiteral]:
+    ...
+
 class FixedPointLiteral(multiplier.ast.Expr):
   token: multiplier.frontend.Token
 
@@ -52486,6 +54939,11 @@ class FixedPointLiteral(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.FixedPointLiteral]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.FixedPointLiteral, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -52514,15 +54972,12 @@ class FixedPointLiteral(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FixedPointLiteral]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FixedPointLiteral]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.FixedPointLiteral]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.FixedPointLiteral]:
     ...
 
   @overload
@@ -52550,6 +55005,14 @@ class FixedPointLiteral(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.FixedPointLiteral]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.FixedPointLiteral]:
+    ...
+
 class ExtVectorElementExpr(multiplier.ast.Expr):
   contains_duplicate_elements: bool
   accessor_token: multiplier.frontend.Token
@@ -52569,6 +55032,11 @@ class ExtVectorElementExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ExtVectorElementExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ExtVectorElementExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -52597,15 +55065,12 @@ class ExtVectorElementExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ExtVectorElementExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExtVectorElementExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ExtVectorElementExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ExtVectorElementExpr]:
     ...
 
   @overload
@@ -52633,6 +55098,14 @@ class ExtVectorElementExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ExtVectorElementExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ExtVectorElementExpr]:
+    ...
+
 class ExpressionTraitExpr(multiplier.ast.Expr):
   queried_expression: multiplier.ast.Expr
   trait: multiplier.ast.ExpressionTrait
@@ -52651,6 +55124,11 @@ class ExpressionTraitExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ExpressionTraitExpr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ExpressionTraitExpr, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -52679,15 +55157,12 @@ class ExpressionTraitExpr(multiplier.ast.Expr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ExpressionTraitExpr]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExpressionTraitExpr]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ExpressionTraitExpr]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ExpressionTraitExpr]:
     ...
 
   @overload
@@ -52715,6 +55190,14 @@ class ExpressionTraitExpr(multiplier.ast.Expr):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ExpressionTraitExpr]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.ExpressionTraitExpr]:
+    ...
+
 class AttributedStmt(multiplier.ast.ValueStmt):
   attribute_token: multiplier.frontend.Token
   num_attributes: int
@@ -52734,6 +55217,11 @@ class AttributedStmt(multiplier.ast.ValueStmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.AttributedStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.AttributedStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -52762,15 +55250,12 @@ class AttributedStmt(multiplier.ast.ValueStmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AttributedStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AttributedStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.AttributedStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.AttributedStmt]:
     ...
 
   @overload
@@ -52796,6 +55281,14 @@ class AttributedStmt(multiplier.ast.ValueStmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.AttributedStmt]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.AttributedStmt]:
     ...
 
   def nth_attribute(self, n: int) -> Optional[multiplier.ast.Attr]:
@@ -52832,6 +55325,11 @@ class SwitchStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.SwitchStmt, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.SwitchStmt]:
     ...
 
@@ -52856,15 +55354,12 @@ class SwitchStmt(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwitchStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwitchStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SwitchStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.SwitchStmt]:
     ...
 
   @overload
@@ -52892,6 +55387,14 @@ class SwitchStmt(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.SwitchStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SwitchStmt]:
+    ...
+
 class SwitchCase(multiplier.ast.Stmt):
   colon_token: multiplier.frontend.Token
   keyword_token: multiplier.frontend.Token
@@ -52911,6 +55414,11 @@ class SwitchCase(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.SwitchCase]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.SwitchCase, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -52939,11 +55447,12 @@ class SwitchCase(multiplier.ast.Stmt):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.SwitchCase]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwitchCase]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SwitchCase]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.SwitchCase]:
     ...
 
   @overload
@@ -52971,6 +55480,10 @@ class SwitchCase(multiplier.ast.Stmt):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.SwitchCase]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.SwitchCase]:
+    ...
+
 class DefaultStmt(multiplier.ast.SwitchCase):
   default_token: multiplier.frontend.Token
 
@@ -52987,6 +55500,11 @@ class DefaultStmt(multiplier.ast.SwitchCase):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.DefaultStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.DefaultStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -53015,15 +55533,12 @@ class DefaultStmt(multiplier.ast.SwitchCase):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DefaultStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DefaultStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DefaultStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.DefaultStmt]:
     ...
 
   @overload
@@ -53051,6 +55566,14 @@ class DefaultStmt(multiplier.ast.SwitchCase):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.DefaultStmt]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.DefaultStmt]:
+    ...
+
 class CaseStmt(multiplier.ast.SwitchCase):
   case_statement_is_gnu_range: bool
   case_token: multiplier.frontend.Token
@@ -53071,6 +55594,11 @@ class CaseStmt(multiplier.ast.SwitchCase):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CaseStmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CaseStmt, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -53099,15 +55627,12 @@ class CaseStmt(multiplier.ast.SwitchCase):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CaseStmt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CaseStmt]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.StmtKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CaseStmt]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CaseStmt]:
     ...
 
   @overload
@@ -53133,6 +55658,14 @@ class CaseStmt(multiplier.ast.SwitchCase):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CaseStmt]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.CaseStmt]:
     ...
 
 class Decl(multiplier.Entity):
@@ -53193,6 +55726,21 @@ class Decl(multiplier.Entity):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index, kinds: Sequence[multiplier.ast.DeclKind]) -> Generator[multiplier.ast.Decl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment, kinds: Sequence[multiplier.ast.DeclKind]) -> Generator[multiplier.ast.Decl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File, kinds: Sequence[multiplier.ast.DeclKind]) -> Generator[multiplier.ast.Decl]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(index: multiplier.Index) -> Generator[multiplier.ast.Decl]:
     ...
 
@@ -53204,6 +55752,16 @@ class Decl(multiplier.Entity):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.Decl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.Decl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation, kinds: Sequence[multiplier.ast.DeclKind]) -> Generator[Tuple[multiplier.ast.Decl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -53232,7 +55790,12 @@ class Decl(multiplier.Entity):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.Decl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Decl]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.Decl]:
     ...
 
   @overload
@@ -53287,6 +55850,11 @@ class ClassScopeFunctionSpecializationDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ClassScopeFunctionSpecializationDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ClassScopeFunctionSpecializationDecl]:
     ...
 
@@ -53311,15 +55879,12 @@ class ClassScopeFunctionSpecializationDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ClassScopeFunctionSpecializationDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ClassScopeFunctionSpecializationDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ClassScopeFunctionSpecializationDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ClassScopeFunctionSpecializationDecl]:
     ...
 
   @overload
@@ -53345,6 +55910,14 @@ class ClassScopeFunctionSpecializationDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ClassScopeFunctionSpecializationDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ClassScopeFunctionSpecializationDecl]:
     ...
 
 class CapturedDecl(multiplier.ast.Decl):
@@ -53374,6 +55947,11 @@ class CapturedDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CapturedDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CapturedDecl]:
     ...
 
@@ -53398,15 +55976,12 @@ class CapturedDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CapturedDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CapturedDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.CapturedDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CapturedDecl]:
     ...
 
   @overload
@@ -53432,6 +56007,14 @@ class CapturedDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CapturedDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.CapturedDecl]:
     ...
 
   def nth_parameter(self, n: int) -> Optional[multiplier.ast.ImplicitParamDecl]:
@@ -53475,6 +56058,11 @@ class BlockDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.BlockDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.BlockDecl]:
     ...
 
@@ -53499,15 +56087,12 @@ class BlockDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BlockDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BlockDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.BlockDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.BlockDecl]:
     ...
 
   @overload
@@ -53533,6 +56118,14 @@ class BlockDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.BlockDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.BlockDecl]:
     ...
 
   def nth_parameter(self, n: int) -> Optional[multiplier.ast.ParmVarDecl]:
@@ -53565,6 +56158,11 @@ class AccessSpecDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.AccessSpecDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.AccessSpecDecl]:
     ...
 
@@ -53589,15 +56187,12 @@ class AccessSpecDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.AccessSpecDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AccessSpecDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.AccessSpecDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.AccessSpecDecl]:
     ...
 
   @overload
@@ -53625,6 +56220,14 @@ class AccessSpecDecl(multiplier.ast.Decl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.AccessSpecDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.AccessSpecDecl]:
+    ...
+
 class OMPDeclarativeDirectiveDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.OMPDeclarativeDirectiveDecl
   definition: Optional[multiplier.ast.OMPDeclarativeDirectiveDecl]
@@ -53643,6 +56246,11 @@ class OMPDeclarativeDirectiveDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPDeclarativeDirectiveDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPDeclarativeDirectiveDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -53671,11 +56279,12 @@ class OMPDeclarativeDirectiveDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPDeclarativeDirectiveDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclarativeDirectiveDecl]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPDeclarativeDirectiveDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPDeclarativeDirectiveDecl]:
     ...
 
   @overload
@@ -53703,6 +56312,10 @@ class OMPDeclarativeDirectiveDecl(multiplier.ast.Decl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPDeclarativeDirectiveDecl]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPDeclarativeDirectiveDecl]:
+    ...
+
 class OMPThreadPrivateDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
   canonical_declaration: multiplier.ast.OMPThreadPrivateDecl
   definition: Optional[multiplier.ast.OMPThreadPrivateDecl]
@@ -53723,6 +56336,11 @@ class OMPThreadPrivateDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPThreadPrivateDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPThreadPrivateDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -53751,15 +56369,12 @@ class OMPThreadPrivateDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPThreadPrivateDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPThreadPrivateDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPThreadPrivateDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPThreadPrivateDecl]:
     ...
 
   @overload
@@ -53787,6 +56402,14 @@ class OMPThreadPrivateDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPThreadPrivateDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPThreadPrivateDecl]:
+    ...
+
   def nth_varlist(self, n: int) -> Optional[multiplier.ast.Expr]:
     ...
 
@@ -53808,6 +56431,11 @@ class OMPRequiresDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPRequiresDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPRequiresDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -53836,15 +56464,12 @@ class OMPRequiresDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPRequiresDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPRequiresDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPRequiresDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPRequiresDecl]:
     ...
 
   @overload
@@ -53872,6 +56497,14 @@ class OMPRequiresDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPRequiresDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPRequiresDecl]:
+    ...
+
 class OMPAllocateDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
   canonical_declaration: multiplier.ast.OMPAllocateDecl
   definition: Optional[multiplier.ast.OMPAllocateDecl]
@@ -53892,6 +56525,11 @@ class OMPAllocateDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPAllocateDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPAllocateDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -53920,15 +56558,12 @@ class OMPAllocateDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPAllocateDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPAllocateDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPAllocateDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPAllocateDecl]:
     ...
 
   @overload
@@ -53954,6 +56589,14 @@ class OMPAllocateDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPAllocateDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPAllocateDecl]:
     ...
 
   def nth_varlist(self, n: int) -> Optional[multiplier.ast.Expr]:
@@ -53982,6 +56625,11 @@ class TranslationUnitDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.TranslationUnitDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.TranslationUnitDecl]:
     ...
 
@@ -54006,15 +56654,12 @@ class TranslationUnitDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TranslationUnitDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TranslationUnitDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TranslationUnitDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.TranslationUnitDecl]:
     ...
 
   @overload
@@ -54042,6 +56687,14 @@ class TranslationUnitDecl(multiplier.ast.Decl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TranslationUnitDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TranslationUnitDecl]:
+    ...
+
 class TopLevelStmtDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.TopLevelStmtDecl
   definition: Optional[multiplier.ast.TopLevelStmtDecl]
@@ -54062,6 +56715,11 @@ class TopLevelStmtDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.TopLevelStmtDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.TopLevelStmtDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -54090,15 +56748,12 @@ class TopLevelStmtDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TopLevelStmtDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TopLevelStmtDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TopLevelStmtDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.TopLevelStmtDecl]:
     ...
 
   @overload
@@ -54124,6 +56779,14 @@ class TopLevelStmtDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TopLevelStmtDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TopLevelStmtDecl]:
     ...
 
 class StaticAssertDecl(multiplier.ast.Decl):
@@ -54152,6 +56815,11 @@ class StaticAssertDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.StaticAssertDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.StaticAssertDecl]:
     ...
 
@@ -54176,15 +56844,12 @@ class StaticAssertDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.StaticAssertDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StaticAssertDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.StaticAssertDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.StaticAssertDecl]:
     ...
 
   @overload
@@ -54212,6 +56877,14 @@ class StaticAssertDecl(multiplier.ast.Decl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.StaticAssertDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.StaticAssertDecl]:
+    ...
+
 class RequiresExprBodyDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.RequiresExprBodyDecl
   definition: Optional[multiplier.ast.RequiresExprBodyDecl]
@@ -54231,6 +56904,11 @@ class RequiresExprBodyDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.RequiresExprBodyDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.RequiresExprBodyDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -54259,15 +56937,12 @@ class RequiresExprBodyDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.RequiresExprBodyDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RequiresExprBodyDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.RequiresExprBodyDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.RequiresExprBodyDecl]:
     ...
 
   @overload
@@ -54295,6 +56970,14 @@ class RequiresExprBodyDecl(multiplier.ast.Decl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.RequiresExprBodyDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.RequiresExprBodyDecl]:
+    ...
+
 class PragmaDetectMismatchDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.PragmaDetectMismatchDecl
   definition: Optional[multiplier.ast.PragmaDetectMismatchDecl]
@@ -54315,6 +56998,11 @@ class PragmaDetectMismatchDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.PragmaDetectMismatchDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.PragmaDetectMismatchDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -54343,15 +57031,12 @@ class PragmaDetectMismatchDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PragmaDetectMismatchDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaDetectMismatchDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.PragmaDetectMismatchDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.PragmaDetectMismatchDecl]:
     ...
 
   @overload
@@ -54379,6 +57064,14 @@ class PragmaDetectMismatchDecl(multiplier.ast.Decl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.PragmaDetectMismatchDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.PragmaDetectMismatchDecl]:
+    ...
+
 class PragmaCommentDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.PragmaCommentDecl
   definition: Optional[multiplier.ast.PragmaCommentDecl]
@@ -54399,6 +57092,11 @@ class PragmaCommentDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.PragmaCommentDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.PragmaCommentDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -54427,15 +57125,12 @@ class PragmaCommentDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.PragmaCommentDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaCommentDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.PragmaCommentDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.PragmaCommentDecl]:
     ...
 
   @overload
@@ -54461,6 +57156,14 @@ class PragmaCommentDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.PragmaCommentDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.PragmaCommentDecl]:
     ...
 
 class ObjCPropertyImplDecl(multiplier.ast.Decl):
@@ -54494,6 +57197,11 @@ class ObjCPropertyImplDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCPropertyImplDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCPropertyImplDecl]:
     ...
 
@@ -54518,15 +57226,12 @@ class ObjCPropertyImplDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCPropertyImplDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCPropertyImplDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCPropertyImplDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCPropertyImplDecl]:
     ...
 
   @overload
@@ -54554,12 +57259,21 @@ class ObjCPropertyImplDecl(multiplier.ast.Decl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCPropertyImplDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCPropertyImplDecl]:
+    ...
+
 class NamedDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.NamedDecl
   definition: Optional[multiplier.ast.NamedDecl]
   redeclarations: Generator[multiplier.ast.NamedDecl]
   formal_linkage: multiplier.ast.Linkage
   name: str
+  obj_cf_string_formatting_family: Optional[multiplier.ast.ObjCStringFormatFamily]
   qualified_name_as_string: str
   underlying_declaration: multiplier.ast.NamedDecl
   visibility: multiplier.ast.Visibility
@@ -54589,6 +57303,11 @@ class NamedDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.NamedDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.NamedDecl]:
     ...
 
@@ -54613,11 +57332,12 @@ class NamedDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NamedDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NamedDecl]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.NamedDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.NamedDecl]:
     ...
 
   @overload
@@ -54643,6 +57363,10 @@ class NamedDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.NamedDecl]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.NamedDecl]:
     ...
 
 class LabelDecl(multiplier.ast.NamedDecl):
@@ -54672,6 +57396,11 @@ class LabelDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.LabelDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.LabelDecl]:
     ...
 
@@ -54696,15 +57425,12 @@ class LabelDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LabelDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LabelDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.LabelDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.LabelDecl]:
     ...
 
   @overload
@@ -54730,6 +57456,14 @@ class LabelDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.LabelDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.LabelDecl]:
     ...
 
 class HLSLBufferDecl(multiplier.ast.NamedDecl):
@@ -54758,6 +57492,11 @@ class HLSLBufferDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.HLSLBufferDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.HLSLBufferDecl]:
     ...
 
@@ -54782,15 +57521,12 @@ class HLSLBufferDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.HLSLBufferDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLBufferDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.HLSLBufferDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.HLSLBufferDecl]:
     ...
 
   @overload
@@ -54818,6 +57554,14 @@ class HLSLBufferDecl(multiplier.ast.NamedDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.HLSLBufferDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.HLSLBufferDecl]:
+    ...
+
 class BaseUsingDecl(multiplier.ast.NamedDecl):
   canonical_declaration: multiplier.ast.BaseUsingDecl
   definition: Optional[multiplier.ast.BaseUsingDecl]
@@ -54838,6 +57582,11 @@ class BaseUsingDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.BaseUsingDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.BaseUsingDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -54866,11 +57615,12 @@ class BaseUsingDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BaseUsingDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BaseUsingDecl]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.BaseUsingDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.BaseUsingDecl]:
     ...
 
   @overload
@@ -54896,6 +57646,10 @@ class BaseUsingDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.BaseUsingDecl]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.BaseUsingDecl]:
     ...
 
   def nth_shadow(self, n: int) -> Optional[multiplier.ast.UsingShadowDecl]:
@@ -54927,6 +57681,11 @@ class UsingEnumDecl(multiplier.ast.BaseUsingDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.UsingEnumDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.UsingEnumDecl]:
     ...
 
@@ -54951,15 +57710,12 @@ class UsingEnumDecl(multiplier.ast.BaseUsingDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UsingEnumDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingEnumDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UsingEnumDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.UsingEnumDecl]:
     ...
 
   @overload
@@ -54987,6 +57743,14 @@ class UsingEnumDecl(multiplier.ast.BaseUsingDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.UsingEnumDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UsingEnumDecl]:
+    ...
+
 class UsingDecl(multiplier.ast.BaseUsingDecl):
   canonical_declaration: multiplier.ast.UsingDecl
   definition: Optional[multiplier.ast.UsingDecl]
@@ -55008,6 +57772,11 @@ class UsingDecl(multiplier.ast.BaseUsingDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.UsingDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.UsingDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -55036,15 +57805,12 @@ class UsingDecl(multiplier.ast.BaseUsingDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UsingDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UsingDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.UsingDecl]:
     ...
 
   @overload
@@ -55070,6 +57836,14 @@ class UsingDecl(multiplier.ast.BaseUsingDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.UsingDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UsingDecl]:
     ...
 
 class ValueDecl(multiplier.ast.NamedDecl):
@@ -55098,6 +57872,11 @@ class ValueDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ValueDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ValueDecl]:
     ...
 
@@ -55122,11 +57901,12 @@ class ValueDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ValueDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ValueDecl]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ValueDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ValueDecl]:
     ...
 
   @overload
@@ -55152,6 +57932,10 @@ class ValueDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ValueDecl]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ValueDecl]:
     ...
 
 class UnresolvedUsingValueDecl(multiplier.ast.ValueDecl):
@@ -55180,6 +57964,11 @@ class UnresolvedUsingValueDecl(multiplier.ast.ValueDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.UnresolvedUsingValueDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.UnresolvedUsingValueDecl]:
     ...
 
@@ -55204,15 +57993,12 @@ class UnresolvedUsingValueDecl(multiplier.ast.ValueDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UnresolvedUsingValueDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedUsingValueDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UnresolvedUsingValueDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.UnresolvedUsingValueDecl]:
     ...
 
   @overload
@@ -55240,6 +58026,14 @@ class UnresolvedUsingValueDecl(multiplier.ast.ValueDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.UnresolvedUsingValueDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UnresolvedUsingValueDecl]:
+    ...
+
 class UnnamedGlobalConstantDecl(multiplier.ast.ValueDecl):
   canonical_declaration: multiplier.ast.UnnamedGlobalConstantDecl
   definition: Optional[multiplier.ast.UnnamedGlobalConstantDecl]
@@ -55258,6 +58052,11 @@ class UnnamedGlobalConstantDecl(multiplier.ast.ValueDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.UnnamedGlobalConstantDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.UnnamedGlobalConstantDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -55286,15 +58085,12 @@ class UnnamedGlobalConstantDecl(multiplier.ast.ValueDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UnnamedGlobalConstantDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnnamedGlobalConstantDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UnnamedGlobalConstantDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.UnnamedGlobalConstantDecl]:
     ...
 
   @overload
@@ -55322,6 +58118,14 @@ class UnnamedGlobalConstantDecl(multiplier.ast.ValueDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.UnnamedGlobalConstantDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UnnamedGlobalConstantDecl]:
+    ...
+
 class TemplateParamObjectDecl(multiplier.ast.ValueDecl):
   canonical_declaration: multiplier.ast.TemplateParamObjectDecl
   definition: Optional[multiplier.ast.TemplateParamObjectDecl]
@@ -55340,6 +58144,11 @@ class TemplateParamObjectDecl(multiplier.ast.ValueDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.TemplateParamObjectDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.TemplateParamObjectDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -55368,15 +58177,12 @@ class TemplateParamObjectDecl(multiplier.ast.ValueDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TemplateParamObjectDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateParamObjectDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TemplateParamObjectDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.TemplateParamObjectDecl]:
     ...
 
   @overload
@@ -55402,6 +58208,14 @@ class TemplateParamObjectDecl(multiplier.ast.ValueDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TemplateParamObjectDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TemplateParamObjectDecl]:
     ...
 
 class OMPDeclareReductionDecl(multiplier.ast.ValueDecl):
@@ -55434,6 +58248,11 @@ class OMPDeclareReductionDecl(multiplier.ast.ValueDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPDeclareReductionDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.OMPDeclareReductionDecl]:
     ...
 
@@ -55458,15 +58277,12 @@ class OMPDeclareReductionDecl(multiplier.ast.ValueDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPDeclareReductionDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareReductionDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPDeclareReductionDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPDeclareReductionDecl]:
     ...
 
   @overload
@@ -55494,6 +58310,14 @@ class OMPDeclareReductionDecl(multiplier.ast.ValueDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPDeclareReductionDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPDeclareReductionDecl]:
+    ...
+
 class MSGuidDecl(multiplier.ast.ValueDecl):
   canonical_declaration: multiplier.ast.MSGuidDecl
   definition: Optional[multiplier.ast.MSGuidDecl]
@@ -55512,6 +58336,11 @@ class MSGuidDecl(multiplier.ast.ValueDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.MSGuidDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.MSGuidDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -55540,15 +58369,12 @@ class MSGuidDecl(multiplier.ast.ValueDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MSGuidDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSGuidDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.MSGuidDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.MSGuidDecl]:
     ...
 
   @overload
@@ -55576,6 +58402,14 @@ class MSGuidDecl(multiplier.ast.ValueDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.MSGuidDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.MSGuidDecl]:
+    ...
+
 class IndirectFieldDecl(multiplier.ast.ValueDecl):
   canonical_declaration: multiplier.ast.IndirectFieldDecl
   definition: Optional[multiplier.ast.IndirectFieldDecl]
@@ -55597,6 +58431,11 @@ class IndirectFieldDecl(multiplier.ast.ValueDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.IndirectFieldDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.IndirectFieldDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -55625,15 +58464,12 @@ class IndirectFieldDecl(multiplier.ast.ValueDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.IndirectFieldDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IndirectFieldDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.IndirectFieldDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.IndirectFieldDecl]:
     ...
 
   @overload
@@ -55661,6 +58497,14 @@ class IndirectFieldDecl(multiplier.ast.ValueDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.IndirectFieldDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.IndirectFieldDecl]:
+    ...
+
 class EnumConstantDecl(multiplier.ast.ValueDecl):
   canonical_declaration: multiplier.ast.EnumConstantDecl
   definition: Optional[multiplier.ast.EnumConstantDecl]
@@ -55680,6 +58524,11 @@ class EnumConstantDecl(multiplier.ast.ValueDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.EnumConstantDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.EnumConstantDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -55708,15 +58557,12 @@ class EnumConstantDecl(multiplier.ast.ValueDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.EnumConstantDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnumConstantDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.EnumConstantDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.EnumConstantDecl]:
     ...
 
   @overload
@@ -55742,6 +58588,14 @@ class EnumConstantDecl(multiplier.ast.ValueDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.EnumConstantDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.EnumConstantDecl]:
     ...
 
 class DeclaratorDecl(multiplier.ast.ValueDecl):
@@ -55773,6 +58627,11 @@ class DeclaratorDecl(multiplier.ast.ValueDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.DeclaratorDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.DeclaratorDecl]:
     ...
 
@@ -55797,11 +58656,12 @@ class DeclaratorDecl(multiplier.ast.ValueDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DeclaratorDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeclaratorDecl]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.DeclaratorDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.DeclaratorDecl]:
     ...
 
   @overload
@@ -55827,6 +58687,10 @@ class DeclaratorDecl(multiplier.ast.ValueDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.DeclaratorDecl]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.DeclaratorDecl]:
     ...
 
   def nth_template_parameter_list(self, n: int) -> Optional[multiplier.ast.TemplateParameterList]:
@@ -55903,6 +58767,11 @@ class VarDecl(multiplier.ast.DeclaratorDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.VarDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.VarDecl]:
     ...
 
@@ -55927,15 +58796,12 @@ class VarDecl(multiplier.ast.DeclaratorDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.VarDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VarDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.VarDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.VarDecl]:
     ...
 
   @overload
@@ -55961,6 +58827,14 @@ class VarDecl(multiplier.ast.DeclaratorDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.VarDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.VarDecl]:
     ...
 
 class ParmVarDecl(multiplier.ast.VarDecl):
@@ -55997,6 +58871,11 @@ class ParmVarDecl(multiplier.ast.VarDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ParmVarDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ParmVarDecl]:
     ...
 
@@ -56021,15 +58900,12 @@ class ParmVarDecl(multiplier.ast.VarDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ParmVarDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParmVarDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ParmVarDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ParmVarDecl]:
     ...
 
   @overload
@@ -56057,6 +58933,14 @@ class ParmVarDecl(multiplier.ast.VarDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ParmVarDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ParmVarDecl]:
+    ...
+
 class OMPCapturedExprDecl(multiplier.ast.VarDecl):
   canonical_declaration: multiplier.ast.OMPCapturedExprDecl
   definition: Optional[multiplier.ast.OMPCapturedExprDecl]
@@ -56075,6 +58959,11 @@ class OMPCapturedExprDecl(multiplier.ast.VarDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPCapturedExprDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPCapturedExprDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -56103,15 +58992,12 @@ class OMPCapturedExprDecl(multiplier.ast.VarDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPCapturedExprDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCapturedExprDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPCapturedExprDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPCapturedExprDecl]:
     ...
 
   @overload
@@ -56139,6 +59025,14 @@ class OMPCapturedExprDecl(multiplier.ast.VarDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPCapturedExprDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPCapturedExprDecl]:
+    ...
+
 class ImplicitParamDecl(multiplier.ast.VarDecl):
   canonical_declaration: multiplier.ast.ImplicitParamDecl
   definition: Optional[multiplier.ast.ImplicitParamDecl]
@@ -56158,6 +59052,11 @@ class ImplicitParamDecl(multiplier.ast.VarDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ImplicitParamDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ImplicitParamDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -56186,15 +59085,12 @@ class ImplicitParamDecl(multiplier.ast.VarDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ImplicitParamDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImplicitParamDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ImplicitParamDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ImplicitParamDecl]:
     ...
 
   @overload
@@ -56222,6 +59118,14 @@ class ImplicitParamDecl(multiplier.ast.VarDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ImplicitParamDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ImplicitParamDecl]:
+    ...
+
 class DecompositionDecl(multiplier.ast.VarDecl):
   canonical_declaration: multiplier.ast.DecompositionDecl
   definition: Optional[multiplier.ast.DecompositionDecl]
@@ -56242,6 +59146,11 @@ class DecompositionDecl(multiplier.ast.VarDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.DecompositionDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.DecompositionDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -56270,15 +59179,12 @@ class DecompositionDecl(multiplier.ast.VarDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.DecompositionDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DecompositionDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.DecompositionDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.DecompositionDecl]:
     ...
 
   @overload
@@ -56304,6 +59210,14 @@ class DecompositionDecl(multiplier.ast.VarDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.DecompositionDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.DecompositionDecl]:
     ...
 
   def nth_binding(self, n: int) -> Optional[multiplier.ast.BindingDecl]:
@@ -56343,6 +59257,11 @@ class VarTemplateSpecializationDecl(multiplier.ast.VarDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.VarTemplateSpecializationDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.VarTemplateSpecializationDecl]:
     ...
 
@@ -56367,15 +59286,12 @@ class VarTemplateSpecializationDecl(multiplier.ast.VarDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.VarTemplateSpecializationDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VarTemplateSpecializationDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.VarTemplateSpecializationDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.VarTemplateSpecializationDecl]:
     ...
 
   @overload
@@ -56401,6 +59317,14 @@ class VarTemplateSpecializationDecl(multiplier.ast.VarDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.VarTemplateSpecializationDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.VarTemplateSpecializationDecl]:
     ...
 
   def nth_template_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
@@ -56434,6 +59358,11 @@ class VarTemplatePartialSpecializationDecl(multiplier.ast.VarTemplateSpecializat
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.VarTemplatePartialSpecializationDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.VarTemplatePartialSpecializationDecl]:
     ...
 
@@ -56458,15 +59387,12 @@ class VarTemplatePartialSpecializationDecl(multiplier.ast.VarTemplateSpecializat
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]:
     ...
 
   @overload
@@ -56492,6 +59418,14 @@ class VarTemplatePartialSpecializationDecl(multiplier.ast.VarTemplateSpecializat
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]:
     ...
 
 class NonTypeTemplateParmDecl(multiplier.ast.DeclaratorDecl):
@@ -56526,6 +59460,11 @@ class NonTypeTemplateParmDecl(multiplier.ast.DeclaratorDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.NonTypeTemplateParmDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.NonTypeTemplateParmDecl]:
     ...
 
@@ -56550,15 +59489,12 @@ class NonTypeTemplateParmDecl(multiplier.ast.DeclaratorDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NonTypeTemplateParmDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NonTypeTemplateParmDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.NonTypeTemplateParmDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.NonTypeTemplateParmDecl]:
     ...
 
   @overload
@@ -56584,6 +59520,14 @@ class NonTypeTemplateParmDecl(multiplier.ast.DeclaratorDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.NonTypeTemplateParmDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.NonTypeTemplateParmDecl]:
     ...
 
   def nth_expansion_type(self, n: int) -> Optional[multiplier.ast.Type]:
@@ -56613,6 +59557,11 @@ class MSPropertyDecl(multiplier.ast.DeclaratorDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.MSPropertyDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.MSPropertyDecl]:
     ...
 
@@ -56637,15 +59586,12 @@ class MSPropertyDecl(multiplier.ast.DeclaratorDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.MSPropertyDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSPropertyDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.MSPropertyDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.MSPropertyDecl]:
     ...
 
   @overload
@@ -56671,6 +59617,14 @@ class MSPropertyDecl(multiplier.ast.DeclaratorDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.MSPropertyDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.MSPropertyDecl]:
     ...
 
 class FunctionDecl(multiplier.ast.DeclaratorDecl):
@@ -56783,6 +59737,11 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.FunctionDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.FunctionDecl]:
     ...
 
@@ -56807,15 +59766,12 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FunctionDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.FunctionDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.FunctionDecl]:
     ...
 
   @overload
@@ -56841,6 +59797,14 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.FunctionDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.FunctionDecl]:
     ...
 
   def nth_parameter(self, n: int) -> Optional[multiplier.ast.ParmVarDecl]:
@@ -56881,6 +59845,11 @@ class CXXMethodDecl(multiplier.ast.FunctionDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXMethodDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXMethodDecl]:
     ...
 
@@ -56905,15 +59874,12 @@ class CXXMethodDecl(multiplier.ast.FunctionDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXMethodDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXMethodDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.CXXMethodDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXMethodDecl]:
     ...
 
   @overload
@@ -56939,6 +59905,14 @@ class CXXMethodDecl(multiplier.ast.FunctionDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXMethodDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.CXXMethodDecl]:
     ...
 
   def nth_overridden_method(self, n: int) -> Optional[multiplier.ast.CXXMethodDecl]:
@@ -56968,6 +59942,11 @@ class CXXDestructorDecl(multiplier.ast.CXXMethodDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXDestructorDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXDestructorDecl]:
     ...
 
@@ -56992,15 +59971,12 @@ class CXXDestructorDecl(multiplier.ast.CXXMethodDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXDestructorDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDestructorDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.CXXDestructorDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXDestructorDecl]:
     ...
 
   @overload
@@ -57028,6 +60004,14 @@ class CXXDestructorDecl(multiplier.ast.CXXMethodDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXDestructorDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.CXXDestructorDecl]:
+    ...
+
 class CXXConversionDecl(multiplier.ast.CXXMethodDecl):
   canonical_declaration: multiplier.ast.CXXConversionDecl
   definition: Optional[multiplier.ast.CXXConversionDecl]
@@ -57049,6 +60033,11 @@ class CXXConversionDecl(multiplier.ast.CXXMethodDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.CXXConversionDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXConversionDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -57077,15 +60066,12 @@ class CXXConversionDecl(multiplier.ast.CXXMethodDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXConversionDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXConversionDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.CXXConversionDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXConversionDecl]:
     ...
 
   @overload
@@ -57111,6 +60097,14 @@ class CXXConversionDecl(multiplier.ast.CXXMethodDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXConversionDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.CXXConversionDecl]:
     ...
 
 class CXXConstructorDecl(multiplier.ast.CXXMethodDecl):
@@ -57141,6 +60135,11 @@ class CXXConstructorDecl(multiplier.ast.CXXMethodDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXConstructorDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXConstructorDecl]:
     ...
 
@@ -57165,15 +60164,12 @@ class CXXConstructorDecl(multiplier.ast.CXXMethodDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXConstructorDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXConstructorDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.CXXConstructorDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXConstructorDecl]:
     ...
 
   @overload
@@ -57199,6 +60195,14 @@ class CXXConstructorDecl(multiplier.ast.CXXMethodDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXConstructorDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.CXXConstructorDecl]:
     ...
 
 class CXXDeductionGuideDecl(multiplier.ast.FunctionDecl):
@@ -57227,6 +60231,11 @@ class CXXDeductionGuideDecl(multiplier.ast.FunctionDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXDeductionGuideDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXDeductionGuideDecl]:
     ...
 
@@ -57251,15 +60260,12 @@ class CXXDeductionGuideDecl(multiplier.ast.FunctionDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXDeductionGuideDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDeductionGuideDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.CXXDeductionGuideDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXDeductionGuideDecl]:
     ...
 
   @overload
@@ -57285,6 +60291,14 @@ class CXXDeductionGuideDecl(multiplier.ast.FunctionDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXDeductionGuideDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.CXXDeductionGuideDecl]:
     ...
 
 class FieldDecl(multiplier.ast.DeclaratorDecl):
@@ -57324,6 +60338,11 @@ class FieldDecl(multiplier.ast.DeclaratorDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.FieldDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.FieldDecl]:
     ...
 
@@ -57348,15 +60367,12 @@ class FieldDecl(multiplier.ast.DeclaratorDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FieldDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FieldDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.FieldDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.FieldDecl]:
     ...
 
   @overload
@@ -57382,6 +60398,14 @@ class FieldDecl(multiplier.ast.DeclaratorDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.FieldDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.FieldDecl]:
     ...
 
 class ObjCIvarDecl(multiplier.ast.FieldDecl):
@@ -57411,6 +60435,11 @@ class ObjCIvarDecl(multiplier.ast.FieldDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCIvarDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCIvarDecl]:
     ...
 
@@ -57435,15 +60464,12 @@ class ObjCIvarDecl(multiplier.ast.FieldDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCIvarDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIvarDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCIvarDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCIvarDecl]:
     ...
 
   @overload
@@ -57471,6 +60497,14 @@ class ObjCIvarDecl(multiplier.ast.FieldDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCIvarDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCIvarDecl]:
+    ...
+
 class ObjCAtDefsFieldDecl(multiplier.ast.FieldDecl):
   canonical_declaration: multiplier.ast.ObjCAtDefsFieldDecl
   definition: Optional[multiplier.ast.ObjCAtDefsFieldDecl]
@@ -57489,6 +60523,11 @@ class ObjCAtDefsFieldDecl(multiplier.ast.FieldDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ObjCAtDefsFieldDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCAtDefsFieldDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -57517,15 +60556,12 @@ class ObjCAtDefsFieldDecl(multiplier.ast.FieldDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCAtDefsFieldDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtDefsFieldDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCAtDefsFieldDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCAtDefsFieldDecl]:
     ...
 
   @overload
@@ -57553,6 +60589,14 @@ class ObjCAtDefsFieldDecl(multiplier.ast.FieldDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCAtDefsFieldDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCAtDefsFieldDecl]:
+    ...
+
 class BindingDecl(multiplier.ast.ValueDecl):
   canonical_declaration: multiplier.ast.BindingDecl
   definition: Optional[multiplier.ast.BindingDecl]
@@ -57574,6 +60618,11 @@ class BindingDecl(multiplier.ast.ValueDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.BindingDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.BindingDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -57602,15 +60651,12 @@ class BindingDecl(multiplier.ast.ValueDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BindingDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BindingDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.BindingDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.BindingDecl]:
     ...
 
   @overload
@@ -57638,6 +60684,14 @@ class BindingDecl(multiplier.ast.ValueDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.BindingDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.BindingDecl]:
+    ...
+
 class OMPDeclarativeDirectiveValueDecl(multiplier.ast.ValueDecl):
   canonical_declaration: multiplier.ast.OMPDeclarativeDirectiveValueDecl
   definition: Optional[multiplier.ast.OMPDeclarativeDirectiveValueDecl]
@@ -57656,6 +60710,11 @@ class OMPDeclarativeDirectiveValueDecl(multiplier.ast.ValueDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPDeclarativeDirectiveValueDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPDeclarativeDirectiveValueDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -57684,11 +60743,12 @@ class OMPDeclarativeDirectiveValueDecl(multiplier.ast.ValueDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPDeclarativeDirectiveValueDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclarativeDirectiveValueDecl]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPDeclarativeDirectiveValueDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPDeclarativeDirectiveValueDecl]:
     ...
 
   @overload
@@ -57716,6 +60776,10 @@ class OMPDeclarativeDirectiveValueDecl(multiplier.ast.ValueDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPDeclarativeDirectiveValueDecl]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPDeclarativeDirectiveValueDecl]:
+    ...
+
 class OMPDeclareMapperDecl(multiplier.ast.OMPDeclarativeDirectiveValueDecl):
   canonical_declaration: multiplier.ast.OMPDeclareMapperDecl
   definition: Optional[multiplier.ast.OMPDeclareMapperDecl]
@@ -57736,6 +60800,11 @@ class OMPDeclareMapperDecl(multiplier.ast.OMPDeclarativeDirectiveValueDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.OMPDeclareMapperDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.OMPDeclareMapperDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -57764,15 +60833,12 @@ class OMPDeclareMapperDecl(multiplier.ast.OMPDeclarativeDirectiveValueDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.OMPDeclareMapperDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareMapperDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPDeclareMapperDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.OMPDeclareMapperDecl]:
     ...
 
   @overload
@@ -57800,6 +60866,14 @@ class OMPDeclareMapperDecl(multiplier.ast.OMPDeclarativeDirectiveValueDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPDeclareMapperDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.OMPDeclareMapperDecl]:
+    ...
+
 class UsingShadowDecl(multiplier.ast.NamedDecl):
   canonical_declaration: multiplier.ast.UsingShadowDecl
   definition: Optional[multiplier.ast.UsingShadowDecl]
@@ -57821,6 +60895,11 @@ class UsingShadowDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.UsingShadowDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.UsingShadowDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -57849,15 +60928,12 @@ class UsingShadowDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UsingShadowDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingShadowDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UsingShadowDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.UsingShadowDecl]:
     ...
 
   @overload
@@ -57883,6 +60959,14 @@ class UsingShadowDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.UsingShadowDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UsingShadowDecl]:
     ...
 
 class ConstructorUsingShadowDecl(multiplier.ast.UsingShadowDecl):
@@ -57912,6 +60996,11 @@ class ConstructorUsingShadowDecl(multiplier.ast.UsingShadowDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ConstructorUsingShadowDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ConstructorUsingShadowDecl]:
     ...
 
@@ -57936,15 +61025,12 @@ class ConstructorUsingShadowDecl(multiplier.ast.UsingShadowDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConstructorUsingShadowDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstructorUsingShadowDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ConstructorUsingShadowDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ConstructorUsingShadowDecl]:
     ...
 
   @overload
@@ -57972,6 +61058,14 @@ class ConstructorUsingShadowDecl(multiplier.ast.UsingShadowDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ConstructorUsingShadowDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ConstructorUsingShadowDecl]:
+    ...
+
 class UsingPackDecl(multiplier.ast.NamedDecl):
   canonical_declaration: multiplier.ast.UsingPackDecl
   definition: Optional[multiplier.ast.UsingPackDecl]
@@ -57993,6 +61087,11 @@ class UsingPackDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.UsingPackDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.UsingPackDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -58021,15 +61120,12 @@ class UsingPackDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UsingPackDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingPackDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UsingPackDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.UsingPackDecl]:
     ...
 
   @overload
@@ -58055,6 +61151,14 @@ class UsingPackDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.UsingPackDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UsingPackDecl]:
     ...
 
   def nth_expansion(self, n: int) -> Optional[multiplier.ast.NamedDecl]:
@@ -58086,6 +61190,11 @@ class UsingDirectiveDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.UsingDirectiveDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.UsingDirectiveDecl]:
     ...
 
@@ -58110,15 +61219,12 @@ class UsingDirectiveDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UsingDirectiveDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingDirectiveDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UsingDirectiveDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.UsingDirectiveDecl]:
     ...
 
   @overload
@@ -58146,6 +61252,14 @@ class UsingDirectiveDecl(multiplier.ast.NamedDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.UsingDirectiveDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UsingDirectiveDecl]:
+    ...
+
 class UnresolvedUsingIfExistsDecl(multiplier.ast.NamedDecl):
   canonical_declaration: multiplier.ast.UnresolvedUsingIfExistsDecl
   definition: Optional[multiplier.ast.UnresolvedUsingIfExistsDecl]
@@ -58164,6 +61278,11 @@ class UnresolvedUsingIfExistsDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.UnresolvedUsingIfExistsDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.UnresolvedUsingIfExistsDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -58192,15 +61311,12 @@ class UnresolvedUsingIfExistsDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UnresolvedUsingIfExistsDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedUsingIfExistsDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UnresolvedUsingIfExistsDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.UnresolvedUsingIfExistsDecl]:
     ...
 
   @overload
@@ -58228,6 +61344,14 @@ class UnresolvedUsingIfExistsDecl(multiplier.ast.NamedDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.UnresolvedUsingIfExistsDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UnresolvedUsingIfExistsDecl]:
+    ...
+
 class TypeDecl(multiplier.ast.NamedDecl):
   canonical_declaration: multiplier.ast.TypeDecl
   definition: Optional[multiplier.ast.TypeDecl]
@@ -58247,6 +61371,11 @@ class TypeDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.TypeDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.TypeDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -58275,11 +61404,12 @@ class TypeDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypeDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeDecl]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TypeDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.TypeDecl]:
     ...
 
   @overload
@@ -58305,6 +61435,10 @@ class TypeDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TypeDecl]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TypeDecl]:
     ...
 
 class TemplateTypeParmDecl(multiplier.ast.TypeDecl):
@@ -58338,6 +61472,11 @@ class TemplateTypeParmDecl(multiplier.ast.TypeDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.TemplateTypeParmDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.TemplateTypeParmDecl]:
     ...
 
@@ -58362,15 +61501,12 @@ class TemplateTypeParmDecl(multiplier.ast.TypeDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TemplateTypeParmDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateTypeParmDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TemplateTypeParmDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.TemplateTypeParmDecl]:
     ...
 
   @overload
@@ -58396,6 +61532,14 @@ class TemplateTypeParmDecl(multiplier.ast.TypeDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TemplateTypeParmDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TemplateTypeParmDecl]:
     ...
 
 class TagDecl(multiplier.ast.TypeDecl):
@@ -58442,6 +61586,11 @@ class TagDecl(multiplier.ast.TypeDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.TagDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.TagDecl]:
     ...
 
@@ -58466,11 +61615,12 @@ class TagDecl(multiplier.ast.TypeDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TagDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TagDecl]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TagDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.TagDecl]:
     ...
 
   @overload
@@ -58496,6 +61646,10 @@ class TagDecl(multiplier.ast.TypeDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TagDecl]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TagDecl]:
     ...
 
   def nth_template_parameter_list(self, n: int) -> Optional[multiplier.ast.TemplateParameterList]:
@@ -58549,6 +61703,11 @@ class RecordDecl(multiplier.ast.TagDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.RecordDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.RecordDecl]:
     ...
 
@@ -58573,15 +61732,12 @@ class RecordDecl(multiplier.ast.TagDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.RecordDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RecordDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.RecordDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.RecordDecl]:
     ...
 
   @overload
@@ -58609,6 +61765,14 @@ class RecordDecl(multiplier.ast.TagDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.RecordDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.RecordDecl]:
+    ...
+
   def nth_field(self, n: int) -> Optional[multiplier.ast.FieldDecl]:
     ...
 
@@ -58618,6 +61782,7 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   redeclarations: Generator[multiplier.ast.CXXRecordDecl]
   allow_const_default_initializer: Optional[bool]
   bases: Optional[Sequence[multiplier.ast.CXXBaseSpecifier]]
+  calculate_inheritance_model: Optional[multiplier.ast.MSInheritanceModel]
   num_constructors: int
   constructors: Generator[multiplier.ast.CXXConstructorDecl]
   friends: Optional[Sequence[multiplier.ast.FriendDecl]]
@@ -58627,9 +61792,11 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   generic_lambda_template_parameter_list: Optional[multiplier.ast.TemplateParameterList]
   instantiated_from_member_class: Optional[multiplier.ast.CXXRecordDecl]
   lambda_call_operator: Optional[multiplier.ast.CXXMethodDecl]
+  lambda_capture_default: Optional[multiplier.ast.LambdaCaptureDefault]
   lambda_context_declaration: Optional[multiplier.ast.Decl]
   lambda_explicit_template_parameters: Optional[Sequence[multiplier.ast.NamedDecl]]
   lambda_mangling_number: Optional[int]
+  ms_inheritance_model: Optional[multiplier.ast.MSInheritanceModel]
   ms_vtor_disp_mode: multiplier.ast.MSVtorDispMode
   odr_hash: Optional[int]
   template_instantiation_pattern: Optional[multiplier.ast.CXXRecordDecl]
@@ -58753,6 +61920,11 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.CXXRecordDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.CXXRecordDecl]:
     ...
 
@@ -58777,15 +61949,12 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.CXXRecordDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXRecordDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.CXXRecordDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.CXXRecordDecl]:
     ...
 
   @overload
@@ -58811,6 +61980,14 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXRecordDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.CXXRecordDecl]:
     ...
 
   def nth_constructor(self, n: int) -> Optional[multiplier.ast.CXXConstructorDecl]:
@@ -58851,6 +62028,11 @@ class ClassTemplateSpecializationDecl(multiplier.ast.CXXRecordDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ClassTemplateSpecializationDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ClassTemplateSpecializationDecl]:
     ...
 
@@ -58875,15 +62057,12 @@ class ClassTemplateSpecializationDecl(multiplier.ast.CXXRecordDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ClassTemplateSpecializationDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ClassTemplateSpecializationDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ClassTemplateSpecializationDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ClassTemplateSpecializationDecl]:
     ...
 
   @overload
@@ -58909,6 +62088,14 @@ class ClassTemplateSpecializationDecl(multiplier.ast.CXXRecordDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ClassTemplateSpecializationDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ClassTemplateSpecializationDecl]:
     ...
 
   def nth_template_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
@@ -58944,6 +62131,11 @@ class ClassTemplatePartialSpecializationDecl(multiplier.ast.ClassTemplateSpecial
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ClassTemplatePartialSpecializationDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ClassTemplatePartialSpecializationDecl]:
     ...
 
@@ -58968,15 +62160,12 @@ class ClassTemplatePartialSpecializationDecl(multiplier.ast.ClassTemplateSpecial
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]:
     ...
 
   @overload
@@ -59002,6 +62191,14 @@ class ClassTemplatePartialSpecializationDecl(multiplier.ast.ClassTemplateSpecial
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]:
     ...
 
 class EnumDecl(multiplier.ast.TagDecl):
@@ -59042,6 +62239,11 @@ class EnumDecl(multiplier.ast.TagDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.EnumDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.EnumDecl]:
     ...
 
@@ -59066,15 +62268,12 @@ class EnumDecl(multiplier.ast.TagDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.EnumDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnumDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.EnumDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.EnumDecl]:
     ...
 
   @overload
@@ -59100,6 +62299,14 @@ class EnumDecl(multiplier.ast.TagDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.EnumDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.EnumDecl]:
     ...
 
   def nth_enumerator(self, n: int) -> Optional[multiplier.ast.EnumConstantDecl]:
@@ -59131,6 +62338,11 @@ class UnresolvedUsingTypenameDecl(multiplier.ast.TypeDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.UnresolvedUsingTypenameDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.UnresolvedUsingTypenameDecl]:
     ...
 
@@ -59155,15 +62367,12 @@ class UnresolvedUsingTypenameDecl(multiplier.ast.TypeDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.UnresolvedUsingTypenameDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedUsingTypenameDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UnresolvedUsingTypenameDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.UnresolvedUsingTypenameDecl]:
     ...
 
   @overload
@@ -59189,6 +62398,14 @@ class UnresolvedUsingTypenameDecl(multiplier.ast.TypeDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.UnresolvedUsingTypenameDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.UnresolvedUsingTypenameDecl]:
     ...
 
 class TypedefNameDecl(multiplier.ast.TypeDecl):
@@ -59217,6 +62434,11 @@ class TypedefNameDecl(multiplier.ast.TypeDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.TypedefNameDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.TypedefNameDecl]:
     ...
 
@@ -59241,11 +62463,12 @@ class TypedefNameDecl(multiplier.ast.TypeDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypedefNameDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypedefNameDecl]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TypedefNameDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.TypedefNameDecl]:
     ...
 
   @overload
@@ -59273,6 +62496,10 @@ class TypedefNameDecl(multiplier.ast.TypeDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TypedefNameDecl]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TypedefNameDecl]:
+    ...
+
 class TypedefDecl(multiplier.ast.TypedefNameDecl):
   canonical_declaration: multiplier.ast.TypedefDecl
   definition: Optional[multiplier.ast.TypedefDecl]
@@ -59291,6 +62518,11 @@ class TypedefDecl(multiplier.ast.TypedefNameDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.TypedefDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.TypedefDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -59319,15 +62551,12 @@ class TypedefDecl(multiplier.ast.TypedefNameDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypedefDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypedefDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TypedefDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.TypedefDecl]:
     ...
 
   @overload
@@ -59355,6 +62584,14 @@ class TypedefDecl(multiplier.ast.TypedefNameDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TypedefDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TypedefDecl]:
+    ...
+
 class TypeAliasDecl(multiplier.ast.TypedefNameDecl):
   canonical_declaration: multiplier.ast.TypeAliasDecl
   definition: Optional[multiplier.ast.TypeAliasDecl]
@@ -59374,6 +62611,11 @@ class TypeAliasDecl(multiplier.ast.TypedefNameDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.TypeAliasDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.TypeAliasDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -59402,15 +62644,12 @@ class TypeAliasDecl(multiplier.ast.TypedefNameDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypeAliasDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeAliasDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TypeAliasDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.TypeAliasDecl]:
     ...
 
   @overload
@@ -59436,6 +62675,14 @@ class TypeAliasDecl(multiplier.ast.TypedefNameDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TypeAliasDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TypeAliasDecl]:
     ...
 
 class ObjCTypeParamDecl(multiplier.ast.TypedefNameDecl):
@@ -59464,6 +62711,11 @@ class ObjCTypeParamDecl(multiplier.ast.TypedefNameDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCTypeParamDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCTypeParamDecl]:
     ...
 
@@ -59488,15 +62740,12 @@ class ObjCTypeParamDecl(multiplier.ast.TypedefNameDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCTypeParamDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCTypeParamDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCTypeParamDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCTypeParamDecl]:
     ...
 
   @overload
@@ -59522,6 +62771,14 @@ class ObjCTypeParamDecl(multiplier.ast.TypedefNameDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCTypeParamDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCTypeParamDecl]:
     ...
 
 class TemplateDecl(multiplier.ast.NamedDecl):
@@ -59550,6 +62807,11 @@ class TemplateDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.TemplateDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.TemplateDecl]:
     ...
 
@@ -59574,11 +62836,12 @@ class TemplateDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TemplateDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateDecl]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TemplateDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.TemplateDecl]:
     ...
 
   @overload
@@ -59606,6 +62869,10 @@ class TemplateDecl(multiplier.ast.NamedDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TemplateDecl]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TemplateDecl]:
+    ...
+
 class RedeclarableTemplateDecl(multiplier.ast.TemplateDecl):
   canonical_declaration: multiplier.ast.RedeclarableTemplateDecl
   definition: Optional[multiplier.ast.RedeclarableTemplateDecl]
@@ -59626,6 +62893,11 @@ class RedeclarableTemplateDecl(multiplier.ast.TemplateDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.RedeclarableTemplateDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.RedeclarableTemplateDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -59654,11 +62926,12 @@ class RedeclarableTemplateDecl(multiplier.ast.TemplateDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.RedeclarableTemplateDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RedeclarableTemplateDecl]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.RedeclarableTemplateDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.RedeclarableTemplateDecl]:
     ...
 
   @overload
@@ -59686,6 +62959,10 @@ class RedeclarableTemplateDecl(multiplier.ast.TemplateDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.RedeclarableTemplateDecl]:
     ...
 
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.RedeclarableTemplateDecl]:
+    ...
+
 class FunctionTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   canonical_declaration: multiplier.ast.FunctionTemplateDecl
   definition: Optional[multiplier.ast.FunctionTemplateDecl]
@@ -59706,6 +62983,11 @@ class FunctionTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.FunctionTemplateDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.FunctionTemplateDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -59734,15 +63016,12 @@ class FunctionTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FunctionTemplateDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionTemplateDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.FunctionTemplateDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.FunctionTemplateDecl]:
     ...
 
   @overload
@@ -59770,6 +63049,14 @@ class FunctionTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.FunctionTemplateDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.FunctionTemplateDecl]:
+    ...
+
 class ClassTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   canonical_declaration: multiplier.ast.ClassTemplateDecl
   definition: Optional[multiplier.ast.ClassTemplateDecl]
@@ -59789,6 +63076,11 @@ class ClassTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ClassTemplateDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ClassTemplateDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -59817,15 +63109,12 @@ class ClassTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ClassTemplateDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ClassTemplateDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ClassTemplateDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ClassTemplateDecl]:
     ...
 
   @overload
@@ -59853,6 +63142,14 @@ class ClassTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ClassTemplateDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ClassTemplateDecl]:
+    ...
+
 class VarTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   canonical_declaration: multiplier.ast.VarTemplateDecl
   definition: Optional[multiplier.ast.VarTemplateDecl]
@@ -59872,6 +63169,11 @@ class VarTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.VarTemplateDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.VarTemplateDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -59900,15 +63202,12 @@ class VarTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.VarTemplateDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VarTemplateDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.VarTemplateDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.VarTemplateDecl]:
     ...
 
   @overload
@@ -59936,6 +63235,14 @@ class VarTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.VarTemplateDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.VarTemplateDecl]:
+    ...
+
 class TypeAliasTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   canonical_declaration: multiplier.ast.TypeAliasTemplateDecl
   definition: Optional[multiplier.ast.TypeAliasTemplateDecl]
@@ -59954,6 +63261,11 @@ class TypeAliasTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.TypeAliasTemplateDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.TypeAliasTemplateDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -59982,15 +63294,12 @@ class TypeAliasTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TypeAliasTemplateDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeAliasTemplateDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TypeAliasTemplateDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.TypeAliasTemplateDecl]:
     ...
 
   @overload
@@ -60018,6 +63327,14 @@ class TypeAliasTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TypeAliasTemplateDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TypeAliasTemplateDecl]:
+    ...
+
 class ConceptDecl(multiplier.ast.TemplateDecl):
   canonical_declaration: multiplier.ast.ConceptDecl
   definition: Optional[multiplier.ast.ConceptDecl]
@@ -60038,6 +63355,11 @@ class ConceptDecl(multiplier.ast.TemplateDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ConceptDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ConceptDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -60066,15 +63388,12 @@ class ConceptDecl(multiplier.ast.TemplateDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ConceptDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConceptDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ConceptDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ConceptDecl]:
     ...
 
   @overload
@@ -60102,6 +63421,14 @@ class ConceptDecl(multiplier.ast.TemplateDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ConceptDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ConceptDecl]:
+    ...
+
 class BuiltinTemplateDecl(multiplier.ast.TemplateDecl):
   canonical_declaration: multiplier.ast.BuiltinTemplateDecl
   definition: Optional[multiplier.ast.BuiltinTemplateDecl]
@@ -60120,6 +63447,11 @@ class BuiltinTemplateDecl(multiplier.ast.TemplateDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.BuiltinTemplateDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.BuiltinTemplateDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -60148,15 +63480,12 @@ class BuiltinTemplateDecl(multiplier.ast.TemplateDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.BuiltinTemplateDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinTemplateDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.BuiltinTemplateDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.BuiltinTemplateDecl]:
     ...
 
   @overload
@@ -60182,6 +63511,14 @@ class BuiltinTemplateDecl(multiplier.ast.TemplateDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.BuiltinTemplateDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.BuiltinTemplateDecl]:
     ...
 
 class TemplateTemplateParmDecl(multiplier.ast.TemplateDecl):
@@ -60211,6 +63548,11 @@ class TemplateTemplateParmDecl(multiplier.ast.TemplateDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.TemplateTemplateParmDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.TemplateTemplateParmDecl]:
     ...
 
@@ -60235,15 +63577,12 @@ class TemplateTemplateParmDecl(multiplier.ast.TemplateDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.TemplateTemplateParmDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateTemplateParmDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TemplateTemplateParmDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.TemplateTemplateParmDecl]:
     ...
 
   @overload
@@ -60269,6 +63608,14 @@ class TemplateTemplateParmDecl(multiplier.ast.TemplateDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TemplateTemplateParmDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.TemplateTemplateParmDecl]:
     ...
 
 class ObjCPropertyDecl(multiplier.ast.NamedDecl):
@@ -60311,6 +63658,11 @@ class ObjCPropertyDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCPropertyDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCPropertyDecl]:
     ...
 
@@ -60335,15 +63687,12 @@ class ObjCPropertyDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCPropertyDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCPropertyDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCPropertyDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCPropertyDecl]:
     ...
 
   @overload
@@ -60369,6 +63718,14 @@ class ObjCPropertyDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCPropertyDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCPropertyDecl]:
     ...
 
 class ObjCMethodDecl(multiplier.ast.NamedDecl):
@@ -60427,6 +63784,11 @@ class ObjCMethodDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCMethodDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCMethodDecl]:
     ...
 
@@ -60451,15 +63813,12 @@ class ObjCMethodDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCMethodDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCMethodDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCMethodDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCMethodDecl]:
     ...
 
   @overload
@@ -60485,6 +63844,14 @@ class ObjCMethodDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCMethodDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCMethodDecl]:
     ...
 
   def nth_parameter(self, n: int) -> Optional[multiplier.ast.ParmVarDecl]:
@@ -60530,6 +63897,11 @@ class ObjCContainerDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCContainerDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCContainerDecl]:
     ...
 
@@ -60554,11 +63926,12 @@ class ObjCContainerDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCContainerDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCContainerDecl]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCContainerDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCContainerDecl]:
     ...
 
   @overload
@@ -60584,6 +63957,10 @@ class ObjCContainerDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCContainerDecl]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCContainerDecl]:
     ...
 
   def nth_class_method(self, n: int) -> Optional[multiplier.ast.ObjCMethodDecl]:
@@ -60639,6 +64016,11 @@ class ObjCCategoryDecl(multiplier.ast.ObjCContainerDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCCategoryDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCCategoryDecl]:
     ...
 
@@ -60663,15 +64045,12 @@ class ObjCCategoryDecl(multiplier.ast.ObjCContainerDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCCategoryDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCCategoryDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCCategoryDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCCategoryDecl]:
     ...
 
   @overload
@@ -60697,6 +64076,14 @@ class ObjCCategoryDecl(multiplier.ast.ObjCContainerDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCCategoryDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCCategoryDecl]:
     ...
 
   def nth_instance_variable(self, n: int) -> Optional[multiplier.ast.ObjCIvarDecl]:
@@ -60738,6 +64125,11 @@ class ObjCProtocolDecl(multiplier.ast.ObjCContainerDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCProtocolDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCProtocolDecl]:
     ...
 
@@ -60762,15 +64154,12 @@ class ObjCProtocolDecl(multiplier.ast.ObjCContainerDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCProtocolDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCProtocolDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCProtocolDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCProtocolDecl]:
     ...
 
   @overload
@@ -60796,6 +64185,14 @@ class ObjCProtocolDecl(multiplier.ast.ObjCContainerDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCProtocolDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCProtocolDecl]:
     ...
 
   def nth_protocol_token(self, n: int) -> Optional[multiplier.frontend.Token]:
@@ -60856,6 +64253,11 @@ class ObjCInterfaceDecl(multiplier.ast.ObjCContainerDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCInterfaceDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCInterfaceDecl]:
     ...
 
@@ -60880,15 +64282,12 @@ class ObjCInterfaceDecl(multiplier.ast.ObjCContainerDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCInterfaceDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCInterfaceDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCInterfaceDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCInterfaceDecl]:
     ...
 
   @overload
@@ -60914,6 +64313,14 @@ class ObjCInterfaceDecl(multiplier.ast.ObjCContainerDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCInterfaceDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCInterfaceDecl]:
     ...
 
   def nth_all_referenced_protocol(self, n: int) -> Optional[multiplier.ast.ObjCProtocolDecl]:
@@ -60965,6 +64372,11 @@ class ObjCImplDecl(multiplier.ast.ObjCContainerDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCImplDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCImplDecl]:
     ...
 
@@ -60989,11 +64401,12 @@ class ObjCImplDecl(multiplier.ast.ObjCContainerDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCImplDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCImplDecl]:
     ...
 
+  @overload
   @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCImplDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCImplDecl]:
     ...
 
   @overload
@@ -61019,6 +64432,10 @@ class ObjCImplDecl(multiplier.ast.ObjCContainerDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCImplDecl]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCImplDecl]:
     ...
 
   def nth_property_implementation(self, n: int) -> Optional[multiplier.ast.ObjCPropertyImplDecl]:
@@ -61048,6 +64465,11 @@ class ObjCCategoryImplDecl(multiplier.ast.ObjCImplDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCCategoryImplDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCCategoryImplDecl]:
     ...
 
@@ -61072,15 +64494,12 @@ class ObjCCategoryImplDecl(multiplier.ast.ObjCImplDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCCategoryImplDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCCategoryImplDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCCategoryImplDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCCategoryImplDecl]:
     ...
 
   @overload
@@ -61106,6 +64525,14 @@ class ObjCCategoryImplDecl(multiplier.ast.ObjCImplDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCCategoryImplDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCCategoryImplDecl]:
     ...
 
 class ObjCImplementationDecl(multiplier.ast.ObjCImplDecl):
@@ -61139,6 +64566,11 @@ class ObjCImplementationDecl(multiplier.ast.ObjCImplDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCImplementationDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCImplementationDecl]:
     ...
 
@@ -61163,15 +64595,12 @@ class ObjCImplementationDecl(multiplier.ast.ObjCImplDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCImplementationDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCImplementationDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCImplementationDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCImplementationDecl]:
     ...
 
   @overload
@@ -61197,6 +64626,14 @@ class ObjCImplementationDecl(multiplier.ast.ObjCImplDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCImplementationDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCImplementationDecl]:
     ...
 
   def nth_instance_variable(self, n: int) -> Optional[multiplier.ast.ObjCIvarDecl]:
@@ -61225,6 +64662,11 @@ class ObjCCompatibleAliasDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ObjCCompatibleAliasDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ObjCCompatibleAliasDecl]:
     ...
 
@@ -61249,15 +64691,12 @@ class ObjCCompatibleAliasDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ObjCCompatibleAliasDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCCompatibleAliasDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCCompatibleAliasDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ObjCCompatibleAliasDecl]:
     ...
 
   @overload
@@ -61285,6 +64724,14 @@ class ObjCCompatibleAliasDecl(multiplier.ast.NamedDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCCompatibleAliasDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ObjCCompatibleAliasDecl]:
+    ...
+
 class NamespaceDecl(multiplier.ast.NamedDecl):
   canonical_declaration: multiplier.ast.NamespaceDecl
   definition: Optional[multiplier.ast.NamespaceDecl]
@@ -61304,6 +64751,11 @@ class NamespaceDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.NamespaceDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.NamespaceDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -61332,15 +64784,12 @@ class NamespaceDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NamespaceDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NamespaceDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.NamespaceDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.NamespaceDecl]:
     ...
 
   @overload
@@ -61366,6 +64815,14 @@ class NamespaceDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.NamespaceDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.NamespaceDecl]:
     ...
 
 class NamespaceAliasDecl(multiplier.ast.NamedDecl):
@@ -61394,6 +64851,11 @@ class NamespaceAliasDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.NamespaceAliasDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.NamespaceAliasDecl]:
     ...
 
@@ -61418,15 +64880,12 @@ class NamespaceAliasDecl(multiplier.ast.NamedDecl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.NamespaceAliasDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NamespaceAliasDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.NamespaceAliasDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.NamespaceAliasDecl]:
     ...
 
   @overload
@@ -61454,6 +64913,14 @@ class NamespaceAliasDecl(multiplier.ast.NamedDecl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.NamespaceAliasDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.NamespaceAliasDecl]:
+    ...
+
 class LinkageSpecDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.LinkageSpecDecl
   definition: Optional[multiplier.ast.LinkageSpecDecl]
@@ -61473,6 +64940,11 @@ class LinkageSpecDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.LinkageSpecDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.LinkageSpecDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -61501,15 +64973,12 @@ class LinkageSpecDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LinkageSpecDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LinkageSpecDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.LinkageSpecDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.LinkageSpecDecl]:
     ...
 
   @overload
@@ -61535,6 +65004,14 @@ class LinkageSpecDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.LinkageSpecDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.LinkageSpecDecl]:
     ...
 
 class LifetimeExtendedTemporaryDecl(multiplier.ast.Decl):
@@ -61563,6 +65040,11 @@ class LifetimeExtendedTemporaryDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.LifetimeExtendedTemporaryDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.LifetimeExtendedTemporaryDecl]:
     ...
 
@@ -61587,15 +65069,12 @@ class LifetimeExtendedTemporaryDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.LifetimeExtendedTemporaryDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LifetimeExtendedTemporaryDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.LifetimeExtendedTemporaryDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.LifetimeExtendedTemporaryDecl]:
     ...
 
   @overload
@@ -61623,6 +65102,14 @@ class LifetimeExtendedTemporaryDecl(multiplier.ast.Decl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.LifetimeExtendedTemporaryDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.LifetimeExtendedTemporaryDecl]:
+    ...
+
 class ImportDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.ImportDecl
   definition: Optional[multiplier.ast.ImportDecl]
@@ -61643,6 +65130,11 @@ class ImportDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ImportDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ImportDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -61671,15 +65163,12 @@ class ImportDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ImportDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImportDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ImportDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ImportDecl]:
     ...
 
   @overload
@@ -61705,6 +65194,14 @@ class ImportDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ImportDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ImportDecl]:
     ...
 
   def nth_identifier_token(self, n: int) -> Optional[multiplier.frontend.Token]:
@@ -61734,6 +65231,11 @@ class ImplicitConceptSpecializationDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ImplicitConceptSpecializationDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ImplicitConceptSpecializationDecl]:
     ...
 
@@ -61758,15 +65260,12 @@ class ImplicitConceptSpecializationDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ImplicitConceptSpecializationDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImplicitConceptSpecializationDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ImplicitConceptSpecializationDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ImplicitConceptSpecializationDecl]:
     ...
 
   @overload
@@ -61792,6 +65291,14 @@ class ImplicitConceptSpecializationDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ImplicitConceptSpecializationDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ImplicitConceptSpecializationDecl]:
     ...
 
   def nth_template_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
@@ -61824,6 +65331,11 @@ class FriendTemplateDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.FriendTemplateDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.FriendTemplateDecl]:
     ...
 
@@ -61848,15 +65360,12 @@ class FriendTemplateDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FriendTemplateDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FriendTemplateDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.FriendTemplateDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.FriendTemplateDecl]:
     ...
 
   @overload
@@ -61882,6 +65391,14 @@ class FriendTemplateDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.FriendTemplateDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.FriendTemplateDecl]:
     ...
 
   def nth_template_parameter_list(self, n: int) -> Optional[multiplier.ast.TemplateParameterList]:
@@ -61915,6 +65432,11 @@ class FriendDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.FriendDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.FriendDecl]:
     ...
 
@@ -61939,15 +65461,12 @@ class FriendDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FriendDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FriendDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.FriendDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.FriendDecl]:
     ...
 
   @overload
@@ -61973,6 +65492,14 @@ class FriendDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.FriendDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.FriendDecl]:
     ...
 
   def nth_friend_type_template_parameter_list(self, n: int) -> Optional[multiplier.ast.TemplateParameterList]:
@@ -62003,6 +65530,11 @@ class FileScopeAsmDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.FileScopeAsmDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.FileScopeAsmDecl]:
     ...
 
@@ -62027,15 +65559,12 @@ class FileScopeAsmDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.FileScopeAsmDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FileScopeAsmDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.FileScopeAsmDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.FileScopeAsmDecl]:
     ...
 
   @overload
@@ -62063,6 +65592,14 @@ class FileScopeAsmDecl(multiplier.ast.Decl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.FileScopeAsmDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.FileScopeAsmDecl]:
+    ...
+
 class ExternCContextDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.ExternCContextDecl
   definition: Optional[multiplier.ast.ExternCContextDecl]
@@ -62082,6 +65619,11 @@ class ExternCContextDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.ExternCContextDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ExternCContextDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -62110,15 +65652,12 @@ class ExternCContextDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ExternCContextDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExternCContextDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ExternCContextDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ExternCContextDecl]:
     ...
 
   @overload
@@ -62144,6 +65683,14 @@ class ExternCContextDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ExternCContextDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ExternCContextDecl]:
     ...
 
 class ExportDecl(multiplier.ast.Decl):
@@ -62172,6 +65719,11 @@ class ExportDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.ExportDecl, multiplier.ir.highlevel.Operation]]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(tok: multiplier.frontend.Token) -> Generator[multiplier.ast.ExportDecl]:
     ...
 
@@ -62196,15 +65748,12 @@ class ExportDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.ExportDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExportDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ExportDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.ExportDecl]:
     ...
 
   @overload
@@ -62232,6 +65781,14 @@ class ExportDecl(multiplier.ast.Decl):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ExportDecl]:
     ...
 
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.ExportDecl]:
+    ...
+
 class EmptyDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.EmptyDecl
   definition: Optional[multiplier.ast.EmptyDecl]
@@ -62250,6 +65807,11 @@ class EmptyDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Generator[multiplier.ast.EmptyDecl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(tu: multiplier.frontend.Compilation) -> Generator[Tuple[multiplier.ast.EmptyDecl, multiplier.ir.highlevel.Operation]]:
     ...
 
   @overload
@@ -62278,15 +65840,12 @@ class EmptyDecl(multiplier.ast.Decl):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.ast.EmptyDecl]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EmptyDecl]:
     ...
 
+  @overload
   @staticmethod
-  def static_kind() -> multiplier.ast.DeclKind:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.EmptyDecl]:
+  def FROM(op: multiplier.ir.highlevel.Operation) -> Optional[multiplier.ast.EmptyDecl]:
     ...
 
   @overload
@@ -62312,4 +65871,12 @@ class EmptyDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.EmptyDecl]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.EmptyDecl]:
     ...

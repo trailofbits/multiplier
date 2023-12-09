@@ -46,6 +46,9 @@ class MX_EXPORT ObjCIvarDecl : public FieldDecl {
   static gap::generator<ObjCIvarDecl> in(const Fragment &frag);
   static gap::generator<ObjCIvarDecl> in(const File &file);
 
+  static std::optional<ObjCIvarDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ObjCIvarDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_IVAR;
   }

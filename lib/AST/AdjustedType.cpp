@@ -19,6 +19,13 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kAdjustedTypeDerivedKinds[] = {
+    AdjustedType::static_kind(),
+    DecayedType::static_kind(),
+};
+}  // namespace
+
 gap::generator<AdjustedType> AdjustedType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AdjustedType::from(*ctx)) {
@@ -53,14 +60,6 @@ std::optional<AdjustedType> AdjustedType::from(const std::optional<Type> &parent
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kAdjustedTypeDerivedKinds[] = {
-    AdjustedType::static_kind(),
-    DecayedType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<AdjustedType> AdjustedType::from_base(const Type &parent) {
   switch (parent.kind()) {

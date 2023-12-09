@@ -14,6 +14,8 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueDecl.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -21,6 +23,12 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const DeclKind kMSPropertyDeclDerivedKinds[] = {
+    MSPropertyDecl::static_kind(),
+};
+}  // namespace
 
 gap::generator<MSPropertyDecl> MSPropertyDecl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -36,6 +44,21 @@ bool MSPropertyDecl::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<MSPropertyDecl> MSPropertyDecl::from(const ir::hl::Operation &op) {
+  if (auto val = Decl::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<MSPropertyDecl, ir::hl::Operation>> MSPropertyDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kMSPropertyDeclDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<MSPropertyDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<MSPropertyDecl> MSPropertyDecl::containing(const Decl &decl) {
@@ -133,13 +156,6 @@ std::optional<MSPropertyDecl> MSPropertyDecl::from(const std::optional<Decl> &pa
   }
   return std::nullopt;
 }
-
-namespace {
-static const DeclKind kMSPropertyDeclDerivedKinds[] = {
-    MSPropertyDecl::static_kind(),
-};
-
-}  // namespace
 
 std::optional<MSPropertyDecl> MSPropertyDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {

@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kPragmaClangBSSSectionAttrDerivedKinds[] = {
+    PragmaClangBSSSectionAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = PragmaClangBSSSectionAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::from(const s
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kPragmaClangBSSSectionAttrDerivedKinds[] = {
-    PragmaClangBSSSectionAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

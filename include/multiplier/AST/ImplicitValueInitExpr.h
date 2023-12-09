@@ -40,6 +40,9 @@ class MX_EXPORT ImplicitValueInitExpr : public Expr {
   static gap::generator<ImplicitValueInitExpr> in(const Fragment &frag);
   static gap::generator<ImplicitValueInitExpr> in(const File &file);
 
+  static std::optional<ImplicitValueInitExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ImplicitValueInitExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::IMPLICIT_VALUE_INIT_EXPR;
   }

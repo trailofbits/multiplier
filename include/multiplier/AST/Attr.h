@@ -81,9 +81,9 @@ class MX_EXPORT Attr {
   PackedAttrId id(void) const;
 
  public:
-  static gap::generator<Attr> in(const Index &index, std::span<AttrKind> kinds);
-  static gap::generator<Attr> in(const Fragment &frag, std::span<AttrKind> kinds);
-  static gap::generator<Attr> in(const File &file, std::span<AttrKind> kinds);
+  static gap::generator<Attr> in(const Index &index, std::span<const AttrKind> kinds);
+  static gap::generator<Attr> in(const Fragment &frag, std::span<const AttrKind> kinds);
+  static gap::generator<Attr> in(const File &file, std::span<const AttrKind> kinds);
   static gap::generator<Attr> in(const Index &index);
   static gap::generator<Attr> containing(const Token &tok);
   bool contains(const Token &tok) const;

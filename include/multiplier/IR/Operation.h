@@ -23,7 +23,13 @@ class OpResultImpl;
 }  // namespace detail
 }  // namespace mlir
 namespace mx {
+class Decl;
 class Fragment;
+class Stmt;
+
+enum class DeclKind : unsigned char;
+enum class StmtKind : unsigned char;
+
 namespace ir {
 class Attribute;
 class Block;
@@ -49,7 +55,9 @@ class Operation {
   friend class SourceIRImpl;
   friend class Value;
 
+  friend class ::mx::Decl;
   friend class ::mx::Fragment;
+  friend class ::mx::Stmt;
 
   Operation(void) = delete;
 
@@ -61,10 +69,15 @@ class Operation {
  public:
 
   inline Operation(std::shared_ptr<const SourceIRImpl> module,
-                   mlir::Operation *opaque)
+                   mlir::Operation *opaque,
+                   OperationKind kind)
       : module_(std::move(module)),
         op_(opaque),
-        kind_(classify(opaque)) {}
+        kind_(kind) {}
+
+  inline Operation(std::shared_ptr<const SourceIRImpl> module,
+                   mlir::Operation *opaque)
+      : Operation(std::move(module), opaque, classify(opaque)) {}
 
   inline Operation(std::shared_ptr<const SourceIRImpl> module, void *opaque)
       : Operation(std::move(module),

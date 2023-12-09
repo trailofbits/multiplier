@@ -81,6 +81,8 @@ class IndexStatus(IntEnum):
   INDEXED = 2
 
 class ReferenceKind(object):
+  builtin_reference_kind: Optional[multiplier.BuiltinReferenceKind]
+  data: str
 
   @overload
   @staticmethod
@@ -94,10 +96,11 @@ class ReferenceKind(object):
 
 class Reference(object):
   category: multiplier.EntityCategory
-  referenced_entity_id: 'multiplier.EntityId'
+  builtin_reference_kind: Optional[multiplier.BuiltinReferenceKind]
+  referenced_entity_id: int
   kind: multiplier.ReferenceKind
-  context: 'multiplier.Entity'
-  as_variant: 'multiplier.Entity'
+  context: multiplier.Entity
+  as_variant: multiplier.Entity
   as_fragment: Optional[multiplier.Fragment]
   as_declaration: Optional[multiplier.ast.Decl]
   as_statement: Optional[multiplier.ast.Stmt]
@@ -132,7 +135,7 @@ class Reference(object):
 
 class Fragment(multiplier.Entity):
   parent: Optional[multiplier.Fragment]
-  parent_id: Optional['multiplier.FragmentId']
+  parent_id: Optional[multiplier.FragmentId]
   compilation: multiplier.frontend.Compilation
   file_tokens: multiplier.frontend.TokenRange
   parsed_tokens: multiplier.frontend.TokenRange
@@ -284,7 +287,7 @@ class Index(object):
   def status(self, block: bool) -> multiplier.IndexStatus:
     ...
 
-  def fragment_containing(self, arg_0: 'multiplier.EntityId') -> Optional[multiplier.Fragment]:
+  def fragment_containing(self, arg_0: int) -> Optional[multiplier.Fragment]:
     ...
 
   @overload
@@ -292,7 +295,7 @@ class Index(object):
     ...
 
   @overload
-  def fragment(self, id: 'multiplier.FragmentId') -> Optional[multiplier.Fragment]:
+  def fragment(self, id: multiplier.FragmentId) -> Optional[multiplier.Fragment]:
     ...
 
   @overload
@@ -300,7 +303,7 @@ class Index(object):
     ...
 
   @overload
-  def declaration(self, id: 'multiplier.DeclId') -> Optional[multiplier.ast.Decl]:
+  def declaration(self, id: multiplier.DeclId) -> Optional[multiplier.ast.Decl]:
     ...
 
   @overload
@@ -308,7 +311,7 @@ class Index(object):
     ...
 
   @overload
-  def statement(self, id: 'multiplier.StmtId') -> Optional[multiplier.ast.Stmt]:
+  def statement(self, id: multiplier.StmtId) -> Optional[multiplier.ast.Stmt]:
     ...
 
   @overload
@@ -316,7 +319,7 @@ class Index(object):
     ...
 
   @overload
-  def attribute(self, id: 'multiplier.AttrId') -> Optional[multiplier.ast.Attr]:
+  def attribute(self, id: multiplier.AttrId) -> Optional[multiplier.ast.Attr]:
     ...
 
   @overload
@@ -324,7 +327,7 @@ class Index(object):
     ...
 
   @overload
-  def macro(self, id: 'multiplier.MacroId') -> Optional[multiplier.frontend.Macro]:
+  def macro(self, id: multiplier.MacroId) -> Optional[multiplier.frontend.Macro]:
     ...
 
   @overload
@@ -332,7 +335,7 @@ class Index(object):
     ...
 
   @overload
-  def type(self, id: 'multiplier.TypeId') -> Optional[multiplier.ast.Type]:
+  def type(self, id: multiplier.TypeId) -> Optional[multiplier.ast.Type]:
     ...
 
   @overload
@@ -340,7 +343,7 @@ class Index(object):
     ...
 
   @overload
-  def file(self, id: 'multiplier.FileId') -> Optional[multiplier.frontend.File]:
+  def file(self, id: multiplier.FileId) -> Optional[multiplier.frontend.File]:
     ...
 
   @overload
@@ -348,7 +351,7 @@ class Index(object):
     ...
 
   @overload
-  def template_argument(self, id: 'multiplier.TemplateArgumentId') -> Optional[multiplier.ast.TemplateArgument]:
+  def template_argument(self, id: multiplier.TemplateArgumentId) -> Optional[multiplier.ast.TemplateArgument]:
     ...
 
   @overload
@@ -356,7 +359,7 @@ class Index(object):
     ...
 
   @overload
-  def template_parameter_list(self, id: 'multiplier.TemplateParameterListId') -> Optional[multiplier.ast.TemplateParameterList]:
+  def template_parameter_list(self, id: multiplier.TemplateParameterListId) -> Optional[multiplier.ast.TemplateParameterList]:
     ...
 
   @overload
@@ -364,7 +367,7 @@ class Index(object):
     ...
 
   @overload
-  def cxx_base_specifier(self, id: 'multiplier.CXXBaseSpecifierId') -> Optional[multiplier.ast.CXXBaseSpecifier]:
+  def cxx_base_specifier(self, id: multiplier.CXXBaseSpecifierId) -> Optional[multiplier.ast.CXXBaseSpecifier]:
     ...
 
   @overload
@@ -372,7 +375,7 @@ class Index(object):
     ...
 
   @overload
-  def designator(self, id: 'multiplier.DesignatorId') -> Optional[multiplier.ast.Designator]:
+  def designator(self, id: multiplier.DesignatorId) -> Optional[multiplier.ast.Designator]:
     ...
 
   @overload
@@ -380,10 +383,10 @@ class Index(object):
     ...
 
   @overload
-  def compilation(self, id: 'multiplier.CompilationId') -> Optional[multiplier.frontend.Compilation]:
+  def compilation(self, id: multiplier.CompilationId) -> Optional[multiplier.frontend.Compilation]:
     ...
 
-  def entity(self, eid: 'multiplier.EntityId') -> 'multiplier.Entity':
+  def entity(self, eid: int) -> multiplier.Entity:
     ...
 
   def query_entities(self, name: str) -> Generator[multiplier.ast.NamedDecl | multiplier.frontend.DefineMacroDirective | multiplier.frontend.File]:

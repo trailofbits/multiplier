@@ -39,6 +39,9 @@ class MX_EXPORT MSAsmStmt : public AsmStmt {
   static gap::generator<MSAsmStmt> in(const Fragment &frag);
   static gap::generator<MSAsmStmt> in(const File &file);
 
+  static std::optional<MSAsmStmt> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<MSAsmStmt, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_ASM_STMT;
   }

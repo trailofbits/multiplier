@@ -22,6 +22,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kObjCObjectPointerTypeDerivedKinds[] = {
+    ObjCObjectPointerType::static_kind(),
+};
+}  // namespace
+
 gap::generator<ObjCObjectPointerType> ObjCObjectPointerType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ObjCObjectPointerType::from(*ctx)) {
@@ -56,13 +62,6 @@ std::optional<ObjCObjectPointerType> ObjCObjectPointerType::from(const std::opti
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kObjCObjectPointerTypeDerivedKinds[] = {
-    ObjCObjectPointerType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ObjCObjectPointerType> ObjCObjectPointerType::from_base(const Type &parent) {
   switch (parent.kind()) {

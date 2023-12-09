@@ -20,6 +20,13 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kReferenceTypeDerivedKinds[] = {
+    LValueReferenceType::static_kind(),
+    RValueReferenceType::static_kind(),
+};
+}  // namespace
+
 gap::generator<ReferenceType> ReferenceType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ReferenceType::from(*ctx)) {
@@ -54,14 +61,6 @@ std::optional<ReferenceType> ReferenceType::from(const std::optional<Type> &pare
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kReferenceTypeDerivedKinds[] = {
-    LValueReferenceType::static_kind(),
-    RValueReferenceType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ReferenceType> ReferenceType::from_base(const Type &parent) {
   switch (parent.kind()) {

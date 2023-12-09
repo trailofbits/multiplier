@@ -39,6 +39,9 @@ class MX_EXPORT LabelDecl : public NamedDecl {
   static gap::generator<LabelDecl> in(const Fragment &frag);
   static gap::generator<LabelDecl> in(const File &file);
 
+  static std::optional<LabelDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<LabelDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LABEL;
   }

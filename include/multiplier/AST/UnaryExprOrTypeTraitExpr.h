@@ -42,6 +42,9 @@ class MX_EXPORT UnaryExprOrTypeTraitExpr : public Expr {
   static gap::generator<UnaryExprOrTypeTraitExpr> in(const Fragment &frag);
   static gap::generator<UnaryExprOrTypeTraitExpr> in(const File &file);
 
+  static std::optional<UnaryExprOrTypeTraitExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<UnaryExprOrTypeTraitExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR;
   }

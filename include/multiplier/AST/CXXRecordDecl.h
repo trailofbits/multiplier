@@ -57,6 +57,9 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   static gap::generator<CXXRecordDecl> in(const Fragment &frag);
   static gap::generator<CXXRecordDecl> in(const File &file);
 
+  static std::optional<CXXRecordDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<CXXRecordDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_RECORD;
   }

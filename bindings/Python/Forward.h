@@ -1916,6 +1916,7 @@ class AddrLabelExprOp;
 class AddressOfOp;
 class AlignOfExprOp;
 class AlignOfTypeOp;
+class AsmOp;
 class AssignOp;
 class BinAShrAssignOp;
 class BinAShrOp;

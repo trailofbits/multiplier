@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kCFReturnsNotRetainedAttrDerivedKinds[] = {
+    CFReturnsNotRetainedAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<CFReturnsNotRetainedAttr> CFReturnsNotRetainedAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = CFReturnsNotRetainedAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<CFReturnsNotRetainedAttr> CFReturnsNotRetainedAttr::from(const std
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kCFReturnsNotRetainedAttrDerivedKinds[] = {
-    CFReturnsNotRetainedAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<CFReturnsNotRetainedAttr> CFReturnsNotRetainedAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

@@ -41,6 +41,9 @@ class MX_EXPORT MSPropertyRefExpr : public Expr {
   static gap::generator<MSPropertyRefExpr> in(const Fragment &frag);
   static gap::generator<MSPropertyRefExpr> in(const File &file);
 
+  static std::optional<MSPropertyRefExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<MSPropertyRefExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_PROPERTY_REF_EXPR;
   }

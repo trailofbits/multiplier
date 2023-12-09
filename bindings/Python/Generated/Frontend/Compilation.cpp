@@ -262,6 +262,36 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::Compilation::arguments"),
     nullptr,
   },
+  {
+    "system_include_directories",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->system_include_directories());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Compilation::system_include_directories"),
+    nullptr,
+  },
+  {
+    "user_include_directories",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->user_include_directories());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Compilation::user_include_directories"),
+    nullptr,
+  },
+  {
+    "framework_directories",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->framework_directories());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Compilation::framework_directories"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

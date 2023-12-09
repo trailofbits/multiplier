@@ -19,6 +19,8 @@
 #include <multiplier/AST/VarTemplateDecl.h>
 #include <multiplier/AST/VarTemplatePartialSpecializationDecl.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -26,6 +28,13 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const DeclKind kVarTemplateSpecializationDeclDerivedKinds[] = {
+    VarTemplateSpecializationDecl::static_kind(),
+    VarTemplatePartialSpecializationDecl::static_kind(),
+};
+}  // namespace
 
 gap::generator<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -41,6 +50,21 @@ bool VarTemplateSpecializationDecl::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from(const ir::hl::Operation &op) {
+  if (auto val = Decl::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<VarTemplateSpecializationDecl, ir::hl::Operation>> VarTemplateSpecializationDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kVarTemplateSpecializationDeclDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<VarTemplateSpecializationDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::containing(const Decl &decl) {
@@ -138,14 +162,6 @@ std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from
   }
   return std::nullopt;
 }
-
-namespace {
-static const DeclKind kVarTemplateSpecializationDeclDerivedKinds[] = {
-    VarTemplateSpecializationDecl::static_kind(),
-    VarTemplatePartialSpecializationDecl::static_kind(),
-};
-
-}  // namespace
 
 std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {

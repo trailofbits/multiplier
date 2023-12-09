@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kDLLImportStaticLocalAttrDerivedKinds[] = {
+    DLLImportStaticLocalAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DLLImportStaticLocalAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::from(const std
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kDLLImportStaticLocalAttrDerivedKinds[] = {
-    DLLImportStaticLocalAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

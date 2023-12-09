@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kMSP430InterruptAttrDerivedKinds[] = {
+    MSP430InterruptAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<MSP430InterruptAttr> MSP430InterruptAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = MSP430InterruptAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<MSP430InterruptAttr> MSP430InterruptAttr::from(const std::optional
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kMSP430InterruptAttrDerivedKinds[] = {
-    MSP430InterruptAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<MSP430InterruptAttr> MSP430InterruptAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

@@ -36,6 +36,9 @@ class MX_EXPORT RequiresExprBodyDecl : public Decl {
   static gap::generator<RequiresExprBodyDecl> in(const Fragment &frag);
   static gap::generator<RequiresExprBodyDecl> in(const File &file);
 
+  static std::optional<RequiresExprBodyDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<RequiresExprBodyDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::REQUIRES_EXPR_BODY;
   }

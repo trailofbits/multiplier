@@ -12,6 +12,8 @@
 #include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Token.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../File.h"
 #include "../Fragment.h"
@@ -158,7 +160,7 @@ gap::generator<Stmt> Stmt::in(const Index &index) {
   }
 }
 
-gap::generator<Stmt> Stmt::in(const Index &index, std::span<StmtKind> kinds) {
+gap::generator<Stmt> Stmt::in(const Index &index, std::span<const StmtKind> kinds) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
@@ -185,7 +187,7 @@ gap::generator<Stmt> Stmt::in(const Fragment &frag) {
   }
 }
 
-gap::generator<Stmt> Stmt::in(const Fragment &frag, std::span<StmtKind> kinds) {
+gap::generator<Stmt> Stmt::in(const Fragment &frag, std::span<const StmtKind> kinds) {
   const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kinds) {
@@ -195,7 +197,7 @@ gap::generator<Stmt> Stmt::in(const Fragment &frag, std::span<StmtKind> kinds) {
   }
 }
 
-gap::generator<Stmt> Stmt::in(const File &file, std::span<StmtKind> kinds) {
+gap::generator<Stmt> Stmt::in(const File &file, std::span<const StmtKind> kinds) {
   const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {

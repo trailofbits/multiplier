@@ -38,6 +38,9 @@ class MX_EXPORT HLSLBufferDecl : public NamedDecl {
   static gap::generator<HLSLBufferDecl> in(const Fragment &frag);
   static gap::generator<HLSLBufferDecl> in(const File &file);
 
+  static std::optional<HLSLBufferDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<HLSLBufferDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::HLSL_BUFFER;
   }

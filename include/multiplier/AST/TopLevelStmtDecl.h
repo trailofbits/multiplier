@@ -36,6 +36,9 @@ class MX_EXPORT TopLevelStmtDecl : public Decl {
   static gap::generator<TopLevelStmtDecl> in(const Fragment &frag);
   static gap::generator<TopLevelStmtDecl> in(const File &file);
 
+  static std::optional<TopLevelStmtDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<TopLevelStmtDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TOP_LEVEL_STMT;
   }

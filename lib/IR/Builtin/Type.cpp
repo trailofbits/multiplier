@@ -14,36 +14,10 @@
 
 namespace mx::ir::builtin {
 std::optional<Type> Type::from(const ::mx::ir::Type &that) {
-  switch (that.kind()) {
-    default: return std::nullopt;
-    case mx::ir::TypeKind::BUILTIN_SHAPED:
-    case mx::ir::TypeKind::BUILTIN_FLOAT:
-    case mx::ir::TypeKind::BUILTIN_B_FLOAT16:
-    case mx::ir::TypeKind::BUILTIN_COMPLEX:
-    case mx::ir::TypeKind::BUILTIN_FLOAT8_E4_M3_B11_FNUZ:
-    case mx::ir::TypeKind::BUILTIN_FLOAT8_E4_M3_FN:
-    case mx::ir::TypeKind::BUILTIN_FLOAT8_E4_M3_FNUZ:
-    case mx::ir::TypeKind::BUILTIN_FLOAT8_E5_M2:
-    case mx::ir::TypeKind::BUILTIN_FLOAT8_E5_M2_FNUZ:
-    case mx::ir::TypeKind::BUILTIN_FLOAT16:
-    case mx::ir::TypeKind::BUILTIN_FLOAT32:
-    case mx::ir::TypeKind::BUILTIN_FLOAT64:
-    case mx::ir::TypeKind::BUILTIN_FLOAT80:
-    case mx::ir::TypeKind::BUILTIN_FLOAT128:
-    case mx::ir::TypeKind::BUILTIN_FLOAT_TF32:
-    case mx::ir::TypeKind::BUILTIN_FUNCTION:
-    case mx::ir::TypeKind::BUILTIN_INDEX:
-    case mx::ir::TypeKind::BUILTIN_INTEGER:
-    case mx::ir::TypeKind::BUILTIN_MEM_REF:
-    case mx::ir::TypeKind::BUILTIN_NONE:
-    case mx::ir::TypeKind::BUILTIN_OPAQUE:
-    case mx::ir::TypeKind::BUILTIN_RANKED_TENSOR:
-    case mx::ir::TypeKind::BUILTIN_TUPLE:
-    case mx::ir::TypeKind::BUILTIN_UNRANKED_MEM_REF:
-    case mx::ir::TypeKind::BUILTIN_UNRANKED_TENSOR:
-    case mx::ir::TypeKind::BUILTIN_VECTOR:
-      return reinterpret_cast<const Type &>(that);
+  if (IsBuiltinTypeKind(that.kind())) {
+    return reinterpret_cast<const Type &>(that);
   }
+  return std::nullopt;
 }
 
 std::optional<ShapedType> ShapedType::from(const ::mx::ir::Type &that) {

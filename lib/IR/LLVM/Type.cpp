@@ -14,16 +14,10 @@
 
 namespace mx::ir::llvm {
 std::optional<Type> Type::from(const ::mx::ir::Type &that) {
-  switch (that.kind()) {
-    default: return std::nullopt;
-    case mx::ir::TypeKind::LLVM_ARRAY:
-    case mx::ir::TypeKind::LLVM_FIXED_VECTOR:
-    case mx::ir::TypeKind::LLVM_FUNCTION:
-    case mx::ir::TypeKind::LLVM_POINTER:
-    case mx::ir::TypeKind::LLVM_SCALABLE_VECTOR:
-    case mx::ir::TypeKind::LLVM_TARGET_EXT:
-      return reinterpret_cast<const Type &>(that);
+  if (IsLLVMIRTypeKind(that.kind())) {
+    return reinterpret_cast<const Type &>(that);
   }
+  return std::nullopt;
 }
 
 std::optional<ArrayType> ArrayType::from(const ::mx::ir::Type &that) {

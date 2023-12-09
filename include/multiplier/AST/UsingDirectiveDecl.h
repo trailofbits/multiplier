@@ -38,6 +38,9 @@ class MX_EXPORT UsingDirectiveDecl : public NamedDecl {
   static gap::generator<UsingDirectiveDecl> in(const Fragment &frag);
   static gap::generator<UsingDirectiveDecl> in(const File &file);
 
+  static std::optional<UsingDirectiveDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<UsingDirectiveDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_DIRECTIVE;
   }

@@ -43,6 +43,9 @@ class MX_EXPORT DeclRefExpr : public Expr {
   static gap::generator<DeclRefExpr> in(const Fragment &frag);
   static gap::generator<DeclRefExpr> in(const File &file);
 
+  static std::optional<DeclRefExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<DeclRefExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DECL_REF_EXPR;
   }

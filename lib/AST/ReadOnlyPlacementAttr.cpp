@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kReadOnlyPlacementAttrDerivedKinds[] = {
+    ReadOnlyPlacementAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<ReadOnlyPlacementAttr> ReadOnlyPlacementAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ReadOnlyPlacementAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<ReadOnlyPlacementAttr> ReadOnlyPlacementAttr::from(const std::opti
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kReadOnlyPlacementAttrDerivedKinds[] = {
-    ReadOnlyPlacementAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ReadOnlyPlacementAttr> ReadOnlyPlacementAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

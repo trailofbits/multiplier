@@ -65,7 +65,7 @@ target_link_libraries("mx-python"
 )
 
 # This is a horrible way of "installing" libmultiplier as a Python extension.
-if(MX_ENABLE_INSTALL)
+if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
   include("${PROJECT_SOURCE_DIR}/cmake/python.cmake")
   
   # Get the ABI extension. Native Python modules must be named with this

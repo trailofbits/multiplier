@@ -9,6 +9,11 @@
 #include "Types.h"
 
 namespace mx {
+namespace ir {
+namespace hl {
+class Operation;
+}  // namespace hl
+}  // namespace ir
 
 class DefineMacroDirective;
 class NamedDecl;

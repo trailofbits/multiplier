@@ -18,6 +18,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kBlockPointerTypeDerivedKinds[] = {
+    BlockPointerType::static_kind(),
+};
+}  // namespace
+
 gap::generator<BlockPointerType> BlockPointerType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = BlockPointerType::from(*ctx)) {
@@ -52,13 +58,6 @@ std::optional<BlockPointerType> BlockPointerType::from(const std::optional<Type>
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kBlockPointerTypeDerivedKinds[] = {
-    BlockPointerType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<BlockPointerType> BlockPointerType::from_base(const Type &parent) {
   switch (parent.kind()) {

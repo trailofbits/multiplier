@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kArcWeakrefUnavailableAttrDerivedKinds[] = {
+    ArcWeakrefUnavailableAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<ArcWeakrefUnavailableAttr> ArcWeakrefUnavailableAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ArcWeakrefUnavailableAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<ArcWeakrefUnavailableAttr> ArcWeakrefUnavailableAttr::from(const s
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kArcWeakrefUnavailableAttrDerivedKinds[] = {
-    ArcWeakrefUnavailableAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ArcWeakrefUnavailableAttr> ArcWeakrefUnavailableAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

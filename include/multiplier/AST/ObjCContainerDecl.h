@@ -41,6 +41,9 @@ class MX_EXPORT ObjCContainerDecl : public NamedDecl {
   static gap::generator<ObjCContainerDecl> in(const Fragment &frag);
   static gap::generator<ObjCContainerDecl> in(const File &file);
 
+  static std::optional<ObjCContainerDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ObjCContainerDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   static gap::generator<ObjCContainerDecl> containing(const Decl &decl);
   static gap::generator<ObjCContainerDecl> containing(const std::optional<Decl> &decl);
 

@@ -25,6 +25,8 @@
 #include <multiplier/AST/ImplicitCastExpr.h>
 #include <multiplier/AST/ObjCBridgedCastExpr.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -32,6 +34,21 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kCastExprDerivedKinds[] = {
+    ImplicitCastExpr::static_kind(),
+    ObjCBridgedCastExpr::static_kind(),
+    BuiltinBitCastExpr::static_kind(),
+    CStyleCastExpr::static_kind(),
+    CXXFunctionalCastExpr::static_kind(),
+    CXXReinterpretCastExpr::static_kind(),
+    CXXStaticCastExpr::static_kind(),
+    CXXAddrspaceCastExpr::static_kind(),
+    CXXConstCastExpr::static_kind(),
+    CXXDynamicCastExpr::static_kind(),
+};
+}  // namespace
 
 gap::generator<CastExpr> CastExpr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -47,6 +64,21 @@ bool CastExpr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CastExpr> CastExpr::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<CastExpr, ir::hl::Operation>> CastExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCastExprDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<CastExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<CastExpr> CastExpr::containing(const Decl &decl) {
@@ -115,22 +147,6 @@ std::optional<CastExpr> CastExpr::from(const std::optional<Stmt> &parent) {
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kCastExprDerivedKinds[] = {
-    ImplicitCastExpr::static_kind(),
-    ObjCBridgedCastExpr::static_kind(),
-    BuiltinBitCastExpr::static_kind(),
-    CStyleCastExpr::static_kind(),
-    CXXFunctionalCastExpr::static_kind(),
-    CXXReinterpretCastExpr::static_kind(),
-    CXXStaticCastExpr::static_kind(),
-    CXXAddrspaceCastExpr::static_kind(),
-    CXXConstCastExpr::static_kind(),
-    CXXDynamicCastExpr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<CastExpr> CastExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {

@@ -40,6 +40,9 @@ class MX_EXPORT GNUNullExpr : public Expr {
   static gap::generator<GNUNullExpr> in(const Fragment &frag);
   static gap::generator<GNUNullExpr> in(const File &file);
 
+  static std::optional<GNUNullExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<GNUNullExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GNU_NULL_EXPR;
   }

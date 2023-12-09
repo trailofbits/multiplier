@@ -38,6 +38,9 @@ class MX_EXPORT OMPBarrierDirective : public OMPExecutableDirective {
   static gap::generator<OMPBarrierDirective> in(const Fragment &frag);
   static gap::generator<OMPBarrierDirective> in(const File &file);
 
+  static std::optional<OMPBarrierDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPBarrierDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_BARRIER_DIRECTIVE;
   }

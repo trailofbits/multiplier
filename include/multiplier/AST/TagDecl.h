@@ -44,6 +44,9 @@ class MX_EXPORT TagDecl : public TypeDecl {
   static gap::generator<TagDecl> in(const Fragment &frag);
   static gap::generator<TagDecl> in(const File &file);
 
+  static std::optional<TagDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<TagDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   static gap::generator<TagDecl> containing(const Decl &decl);
   static gap::generator<TagDecl> containing(const std::optional<Decl> &decl);
 

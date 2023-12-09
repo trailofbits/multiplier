@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kTypeNullUnspecifiedAttrDerivedKinds[] = {
+    TypeNullUnspecifiedAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<TypeNullUnspecifiedAttr> TypeNullUnspecifiedAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = TypeNullUnspecifiedAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<TypeNullUnspecifiedAttr> TypeNullUnspecifiedAttr::from(const std::
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kTypeNullUnspecifiedAttrDerivedKinds[] = {
-    TypeNullUnspecifiedAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<TypeNullUnspecifiedAttr> TypeNullUnspecifiedAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kTypeNullableResultAttrDerivedKinds[] = {
+    TypeNullableResultAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<TypeNullableResultAttr> TypeNullableResultAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = TypeNullableResultAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<TypeNullableResultAttr> TypeNullableResultAttr::from(const std::op
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kTypeNullableResultAttrDerivedKinds[] = {
-    TypeNullableResultAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<TypeNullableResultAttr> TypeNullableResultAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

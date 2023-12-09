@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1241]) || tp >= &(gTypes[1353])) {
+  if (tp < &(gTypes[1241]) || tp >= &(gTypes[1354])) {
     return std::nullopt;
   }
 
@@ -125,412 +125,416 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       tp = &(gTypes[1250]);
       break;
 
-    case mx::ir::hl::AssignOp::static_kind():
+    case mx::ir::hl::AsmOp::static_kind():
       tp = &(gTypes[1251]);
       break;
 
-    case mx::ir::hl::BinAShrAssignOp::static_kind():
+    case mx::ir::hl::AssignOp::static_kind():
       tp = &(gTypes[1252]);
       break;
 
-    case mx::ir::hl::BinAShrOp::static_kind():
+    case mx::ir::hl::BinAShrAssignOp::static_kind():
       tp = &(gTypes[1253]);
       break;
 
-    case mx::ir::hl::BinAndAssignOp::static_kind():
+    case mx::ir::hl::BinAShrOp::static_kind():
       tp = &(gTypes[1254]);
       break;
 
-    case mx::ir::hl::BinAndOp::static_kind():
+    case mx::ir::hl::BinAndAssignOp::static_kind():
       tp = &(gTypes[1255]);
       break;
 
-    case mx::ir::hl::BinCommaOp::static_kind():
+    case mx::ir::hl::BinAndOp::static_kind():
       tp = &(gTypes[1256]);
       break;
 
-    case mx::ir::hl::BinLAndOp::static_kind():
+    case mx::ir::hl::BinCommaOp::static_kind():
       tp = &(gTypes[1257]);
       break;
 
-    case mx::ir::hl::BinLOrOp::static_kind():
+    case mx::ir::hl::BinLAndOp::static_kind():
       tp = &(gTypes[1258]);
       break;
 
-    case mx::ir::hl::BinLShrAssignOp::static_kind():
+    case mx::ir::hl::BinLOrOp::static_kind():
       tp = &(gTypes[1259]);
       break;
 
-    case mx::ir::hl::BinLShrOp::static_kind():
+    case mx::ir::hl::BinLShrAssignOp::static_kind():
       tp = &(gTypes[1260]);
       break;
 
-    case mx::ir::hl::BinOrAssignOp::static_kind():
+    case mx::ir::hl::BinLShrOp::static_kind():
       tp = &(gTypes[1261]);
       break;
 
-    case mx::ir::hl::BinOrOp::static_kind():
+    case mx::ir::hl::BinOrAssignOp::static_kind():
       tp = &(gTypes[1262]);
       break;
 
-    case mx::ir::hl::BinShlAssignOp::static_kind():
+    case mx::ir::hl::BinOrOp::static_kind():
       tp = &(gTypes[1263]);
       break;
 
-    case mx::ir::hl::BinShlOp::static_kind():
+    case mx::ir::hl::BinShlAssignOp::static_kind():
       tp = &(gTypes[1264]);
       break;
 
-    case mx::ir::hl::BinXorAssignOp::static_kind():
+    case mx::ir::hl::BinShlOp::static_kind():
       tp = &(gTypes[1265]);
       break;
 
-    case mx::ir::hl::BinXorOp::static_kind():
+    case mx::ir::hl::BinXorAssignOp::static_kind():
       tp = &(gTypes[1266]);
       break;
 
-    case mx::ir::hl::BuiltinBitCastOp::static_kind():
+    case mx::ir::hl::BinXorOp::static_kind():
       tp = &(gTypes[1267]);
       break;
 
-    case mx::ir::hl::CStyleCastOp::static_kind():
+    case mx::ir::hl::BuiltinBitCastOp::static_kind():
       tp = &(gTypes[1268]);
       break;
 
-    case mx::ir::hl::CallOp::static_kind():
+    case mx::ir::hl::CStyleCastOp::static_kind():
       tp = &(gTypes[1269]);
       break;
 
-    case mx::ir::hl::ClassDeclOp::static_kind():
+    case mx::ir::hl::CallOp::static_kind():
       tp = &(gTypes[1270]);
       break;
 
-    case mx::ir::hl::CmpOp::static_kind():
+    case mx::ir::hl::ClassDeclOp::static_kind():
       tp = &(gTypes[1271]);
       break;
 
-    case mx::ir::hl::ConstantOp::static_kind():
+    case mx::ir::hl::CmpOp::static_kind():
       tp = &(gTypes[1272]);
       break;
 
-    case mx::ir::hl::CxxBaseSpecifierOp::static_kind():
+    case mx::ir::hl::ConstantOp::static_kind():
       tp = &(gTypes[1273]);
       break;
 
-    case mx::ir::hl::CxxStructDeclOp::static_kind():
+    case mx::ir::hl::CxxBaseSpecifierOp::static_kind():
       tp = &(gTypes[1274]);
       break;
 
-    case mx::ir::hl::DeclRefOp::static_kind():
+    case mx::ir::hl::CxxStructDeclOp::static_kind():
       tp = &(gTypes[1275]);
       break;
 
-    case mx::ir::hl::DerefOp::static_kind():
+    case mx::ir::hl::DeclRefOp::static_kind():
       tp = &(gTypes[1276]);
       break;
 
-    case mx::ir::hl::DivFAssignOp::static_kind():
+    case mx::ir::hl::DerefOp::static_kind():
       tp = &(gTypes[1277]);
       break;
 
-    case mx::ir::hl::DivFOp::static_kind():
+    case mx::ir::hl::DivFAssignOp::static_kind():
       tp = &(gTypes[1278]);
       break;
 
-    case mx::ir::hl::DivSAssignOp::static_kind():
+    case mx::ir::hl::DivFOp::static_kind():
       tp = &(gTypes[1279]);
       break;
 
-    case mx::ir::hl::DivSOp::static_kind():
+    case mx::ir::hl::DivSAssignOp::static_kind():
       tp = &(gTypes[1280]);
       break;
 
-    case mx::ir::hl::DivUAssignOp::static_kind():
+    case mx::ir::hl::DivSOp::static_kind():
       tp = &(gTypes[1281]);
       break;
 
-    case mx::ir::hl::DivUOp::static_kind():
+    case mx::ir::hl::DivUAssignOp::static_kind():
       tp = &(gTypes[1282]);
       break;
 
-    case mx::ir::hl::EnumConstantOp::static_kind():
+    case mx::ir::hl::DivUOp::static_kind():
       tp = &(gTypes[1283]);
       break;
 
-    case mx::ir::hl::EnumDeclOp::static_kind():
+    case mx::ir::hl::EnumConstantOp::static_kind():
       tp = &(gTypes[1284]);
       break;
 
-    case mx::ir::hl::EnumRefOp::static_kind():
+    case mx::ir::hl::EnumDeclOp::static_kind():
       tp = &(gTypes[1285]);
       break;
 
-    case mx::ir::hl::ExprOp::static_kind():
+    case mx::ir::hl::EnumRefOp::static_kind():
       tp = &(gTypes[1286]);
       break;
 
-    case mx::ir::hl::ExtensionOp::static_kind():
+    case mx::ir::hl::ExprOp::static_kind():
       tp = &(gTypes[1287]);
       break;
 
-    case mx::ir::hl::FCmpOp::static_kind():
+    case mx::ir::hl::ExtensionOp::static_kind():
       tp = &(gTypes[1288]);
       break;
 
-    case mx::ir::hl::FieldDeclOp::static_kind():
+    case mx::ir::hl::FCmpOp::static_kind():
       tp = &(gTypes[1289]);
       break;
 
-    case mx::ir::hl::FuncRefOp::static_kind():
+    case mx::ir::hl::FieldDeclOp::static_kind():
       tp = &(gTypes[1290]);
       break;
 
-    case mx::ir::hl::GlobalRefOp::static_kind():
+    case mx::ir::hl::FuncRefOp::static_kind():
       tp = &(gTypes[1291]);
       break;
 
-    case mx::ir::hl::BreakOp::static_kind():
+    case mx::ir::hl::GlobalRefOp::static_kind():
       tp = &(gTypes[1292]);
       break;
 
-    case mx::ir::hl::CaseOp::static_kind():
+    case mx::ir::hl::BreakOp::static_kind():
       tp = &(gTypes[1293]);
       break;
 
-    case mx::ir::hl::CondOp::static_kind():
+    case mx::ir::hl::CaseOp::static_kind():
       tp = &(gTypes[1294]);
       break;
 
-    case mx::ir::hl::CondYieldOp::static_kind():
+    case mx::ir::hl::CondOp::static_kind():
       tp = &(gTypes[1295]);
       break;
 
-    case mx::ir::hl::ContinueOp::static_kind():
+    case mx::ir::hl::CondYieldOp::static_kind():
       tp = &(gTypes[1296]);
       break;
 
-    case mx::ir::hl::DefaultOp::static_kind():
+    case mx::ir::hl::ContinueOp::static_kind():
       tp = &(gTypes[1297]);
       break;
 
-    case mx::ir::hl::DoOp::static_kind():
+    case mx::ir::hl::DefaultOp::static_kind():
       tp = &(gTypes[1298]);
       break;
 
-    case mx::ir::hl::EmptyDeclOp::static_kind():
+    case mx::ir::hl::DoOp::static_kind():
       tp = &(gTypes[1299]);
       break;
 
-    case mx::ir::hl::ForOp::static_kind():
+    case mx::ir::hl::EmptyDeclOp::static_kind():
       tp = &(gTypes[1300]);
       break;
 
-    case mx::ir::hl::FuncOp::static_kind():
+    case mx::ir::hl::ForOp::static_kind():
       tp = &(gTypes[1301]);
       break;
 
-    case mx::ir::hl::GotoStmtOp::static_kind():
+    case mx::ir::hl::FuncOp::static_kind():
       tp = &(gTypes[1302]);
       break;
 
-    case mx::ir::hl::IfOp::static_kind():
+    case mx::ir::hl::GotoStmtOp::static_kind():
       tp = &(gTypes[1303]);
       break;
 
-    case mx::ir::hl::LabelDeclOp::static_kind():
+    case mx::ir::hl::IfOp::static_kind():
       tp = &(gTypes[1304]);
       break;
 
-    case mx::ir::hl::LabelStmtOp::static_kind():
+    case mx::ir::hl::LabelDeclOp::static_kind():
       tp = &(gTypes[1305]);
       break;
 
-    case mx::ir::hl::SkipStmtOp::static_kind():
+    case mx::ir::hl::LabelStmtOp::static_kind():
       tp = &(gTypes[1306]);
       break;
 
-    case mx::ir::hl::SwitchOp::static_kind():
+    case mx::ir::hl::SkipStmtOp::static_kind():
       tp = &(gTypes[1307]);
       break;
 
-    case mx::ir::hl::TypeYieldOp::static_kind():
+    case mx::ir::hl::SwitchOp::static_kind():
       tp = &(gTypes[1308]);
       break;
 
-    case mx::ir::hl::ValueYieldOp::static_kind():
+    case mx::ir::hl::TypeYieldOp::static_kind():
       tp = &(gTypes[1309]);
       break;
 
-    case mx::ir::hl::VarDeclOp::static_kind():
+    case mx::ir::hl::ValueYieldOp::static_kind():
       tp = &(gTypes[1310]);
       break;
 
-    case mx::ir::hl::WhileOp::static_kind():
+    case mx::ir::hl::VarDeclOp::static_kind():
       tp = &(gTypes[1311]);
       break;
 
-    case mx::ir::hl::ImplicitCastOp::static_kind():
+    case mx::ir::hl::WhileOp::static_kind():
       tp = &(gTypes[1312]);
       break;
 
-    case mx::ir::hl::IndirectCallOp::static_kind():
+    case mx::ir::hl::ImplicitCastOp::static_kind():
       tp = &(gTypes[1313]);
       break;
 
-    case mx::ir::hl::InitListExprOp::static_kind():
+    case mx::ir::hl::IndirectCallOp::static_kind():
       tp = &(gTypes[1314]);
       break;
 
-    case mx::ir::hl::LNotOp::static_kind():
+    case mx::ir::hl::InitListExprOp::static_kind():
       tp = &(gTypes[1315]);
       break;
 
-    case mx::ir::hl::MinusOp::static_kind():
+    case mx::ir::hl::LNotOp::static_kind():
       tp = &(gTypes[1316]);
       break;
 
-    case mx::ir::hl::MulFAssignOp::static_kind():
+    case mx::ir::hl::MinusOp::static_kind():
       tp = &(gTypes[1317]);
       break;
 
-    case mx::ir::hl::MulFOp::static_kind():
+    case mx::ir::hl::MulFAssignOp::static_kind():
       tp = &(gTypes[1318]);
       break;
 
-    case mx::ir::hl::MulIAssignOp::static_kind():
+    case mx::ir::hl::MulFOp::static_kind():
       tp = &(gTypes[1319]);
       break;
 
-    case mx::ir::hl::MulIOp::static_kind():
+    case mx::ir::hl::MulIAssignOp::static_kind():
       tp = &(gTypes[1320]);
       break;
 
-    case mx::ir::hl::NotOp::static_kind():
+    case mx::ir::hl::MulIOp::static_kind():
       tp = &(gTypes[1321]);
       break;
 
-    case mx::ir::hl::PlusOp::static_kind():
+    case mx::ir::hl::NotOp::static_kind():
       tp = &(gTypes[1322]);
       break;
 
-    case mx::ir::hl::PostDecOp::static_kind():
+    case mx::ir::hl::PlusOp::static_kind():
       tp = &(gTypes[1323]);
       break;
 
-    case mx::ir::hl::PostIncOp::static_kind():
+    case mx::ir::hl::PostDecOp::static_kind():
       tp = &(gTypes[1324]);
       break;
 
-    case mx::ir::hl::PreDecOp::static_kind():
+    case mx::ir::hl::PostIncOp::static_kind():
       tp = &(gTypes[1325]);
       break;
 
-    case mx::ir::hl::PreIncOp::static_kind():
+    case mx::ir::hl::PreDecOp::static_kind():
       tp = &(gTypes[1326]);
       break;
 
-    case mx::ir::hl::PredefinedExprOp::static_kind():
+    case mx::ir::hl::PreIncOp::static_kind():
       tp = &(gTypes[1327]);
       break;
 
-    case mx::ir::hl::RecordMemberOp::static_kind():
+    case mx::ir::hl::PredefinedExprOp::static_kind():
       tp = &(gTypes[1328]);
       break;
 
-    case mx::ir::hl::RemFAssignOp::static_kind():
+    case mx::ir::hl::RecordMemberOp::static_kind():
       tp = &(gTypes[1329]);
       break;
 
-    case mx::ir::hl::RemFOp::static_kind():
+    case mx::ir::hl::RemFAssignOp::static_kind():
       tp = &(gTypes[1330]);
       break;
 
-    case mx::ir::hl::RemSAssignOp::static_kind():
+    case mx::ir::hl::RemFOp::static_kind():
       tp = &(gTypes[1331]);
       break;
 
-    case mx::ir::hl::RemSOp::static_kind():
+    case mx::ir::hl::RemSAssignOp::static_kind():
       tp = &(gTypes[1332]);
       break;
 
-    case mx::ir::hl::RemUAssignOp::static_kind():
+    case mx::ir::hl::RemSOp::static_kind():
       tp = &(gTypes[1333]);
       break;
 
-    case mx::ir::hl::RemUOp::static_kind():
+    case mx::ir::hl::RemUAssignOp::static_kind():
       tp = &(gTypes[1334]);
       break;
 
-    case mx::ir::hl::ReturnOp::static_kind():
+    case mx::ir::hl::RemUOp::static_kind():
       tp = &(gTypes[1335]);
       break;
 
-    case mx::ir::hl::SizeOfExprOp::static_kind():
+    case mx::ir::hl::ReturnOp::static_kind():
       tp = &(gTypes[1336]);
       break;
 
-    case mx::ir::hl::SizeOfTypeOp::static_kind():
+    case mx::ir::hl::SizeOfExprOp::static_kind():
       tp = &(gTypes[1337]);
       break;
 
-    case mx::ir::hl::StmtExprOp::static_kind():
+    case mx::ir::hl::SizeOfTypeOp::static_kind():
       tp = &(gTypes[1338]);
       break;
 
-    case mx::ir::hl::StructDeclOp::static_kind():
+    case mx::ir::hl::StmtExprOp::static_kind():
       tp = &(gTypes[1339]);
       break;
 
-    case mx::ir::hl::SubFAssignOp::static_kind():
+    case mx::ir::hl::StructDeclOp::static_kind():
       tp = &(gTypes[1340]);
       break;
 
-    case mx::ir::hl::SubFOp::static_kind():
+    case mx::ir::hl::SubFAssignOp::static_kind():
       tp = &(gTypes[1341]);
       break;
 
-    case mx::ir::hl::SubIAssignOp::static_kind():
+    case mx::ir::hl::SubFOp::static_kind():
       tp = &(gTypes[1342]);
       break;
 
-    case mx::ir::hl::SubIOp::static_kind():
+    case mx::ir::hl::SubIAssignOp::static_kind():
       tp = &(gTypes[1343]);
       break;
 
-    case mx::ir::hl::SubscriptOp::static_kind():
+    case mx::ir::hl::SubIOp::static_kind():
       tp = &(gTypes[1344]);
       break;
 
-    case mx::ir::hl::ThisOp::static_kind():
+    case mx::ir::hl::SubscriptOp::static_kind():
       tp = &(gTypes[1345]);
       break;
 
-    case mx::ir::hl::TranslationUnitOp::static_kind():
+    case mx::ir::hl::ThisOp::static_kind():
       tp = &(gTypes[1346]);
       break;
 
-    case mx::ir::hl::TypeDeclOp::static_kind():
+    case mx::ir::hl::TranslationUnitOp::static_kind():
       tp = &(gTypes[1347]);
       break;
 
-    case mx::ir::hl::TypeDefOp::static_kind():
+    case mx::ir::hl::TypeDeclOp::static_kind():
       tp = &(gTypes[1348]);
       break;
 
-    case mx::ir::hl::TypeOfExprOp::static_kind():
+    case mx::ir::hl::TypeDefOp::static_kind():
       tp = &(gTypes[1349]);
       break;
 
-    case mx::ir::hl::TypeOfTypeOp::static_kind():
+    case mx::ir::hl::TypeOfExprOp::static_kind():
       tp = &(gTypes[1350]);
       break;
 
-    case mx::ir::hl::UnionDeclOp::static_kind():
+    case mx::ir::hl::TypeOfTypeOp::static_kind():
       tp = &(gTypes[1351]);
       break;
 
-    case mx::ir::hl::UnreachableOp::static_kind():
+    case mx::ir::hl::UnionDeclOp::static_kind():
       tp = &(gTypes[1352]);
+      break;
+
+    case mx::ir::hl::UnreachableOp::static_kind():
+      tp = &(gTypes[1353]);
       break;
 
   }
@@ -591,6 +595,90 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ir::hl::Operation::from"),
+  },
+  {
+    "first_from",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Decl>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->first_from(arg_0.value()));
+          }
+          while (num_args == 2) {
+            auto arg_0 = PythonBinding<mx::Decl>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+            auto arg_1 = PythonBinding<mx::ir::OperationKind>::from_python(args[1]);
+            if (!arg_1.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->first_from(arg_0.value(), arg_1.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->first_from(arg_0.value()));
+          }
+          while (num_args == 2) {
+            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+            auto arg_1 = PythonBinding<mx::ir::OperationKind>::from_python(args[1]);
+            if (!arg_1.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->first_from(arg_0.value(), arg_1.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'first_from'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::ir::hl::Operation::first_from"),
+  },
+  {
+    "all_from",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          auto obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Decl>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->all_from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->all_from(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'all_from'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::ir::hl::Operation::all_from"),
   },
   {}  // Sentinel.
 };

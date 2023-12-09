@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kUnusedAttrDerivedKinds[] = {
+    UnusedAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<UnusedAttr> UnusedAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = UnusedAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<UnusedAttr> UnusedAttr::from(const std::optional<Attr> &parent) {
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kUnusedAttrDerivedKinds[] = {
-    UnusedAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<UnusedAttr> UnusedAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

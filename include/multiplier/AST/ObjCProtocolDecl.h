@@ -41,6 +41,9 @@ class MX_EXPORT ObjCProtocolDecl : public ObjCContainerDecl {
   static gap::generator<ObjCProtocolDecl> in(const Fragment &frag);
   static gap::generator<ObjCProtocolDecl> in(const File &file);
 
+  static std::optional<ObjCProtocolDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ObjCProtocolDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROTOCOL;
   }

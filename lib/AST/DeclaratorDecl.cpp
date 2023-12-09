@@ -33,6 +33,8 @@
 #include <multiplier/AST/VarTemplatePartialSpecializationDecl.h>
 #include <multiplier/AST/VarTemplateSpecializationDecl.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -40,6 +42,29 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const DeclKind kDeclaratorDeclDerivedKinds[] = {
+    FieldDecl::static_kind(),
+    FunctionDecl::static_kind(),
+    MSPropertyDecl::static_kind(),
+    NonTypeTemplateParmDecl::static_kind(),
+    VarDecl::static_kind(),
+    ObjCAtDefsFieldDecl::static_kind(),
+    ObjCIvarDecl::static_kind(),
+    CXXDeductionGuideDecl::static_kind(),
+    CXXMethodDecl::static_kind(),
+    VarTemplateSpecializationDecl::static_kind(),
+    DecompositionDecl::static_kind(),
+    ImplicitParamDecl::static_kind(),
+    OMPCapturedExprDecl::static_kind(),
+    ParmVarDecl::static_kind(),
+    CXXConstructorDecl::static_kind(),
+    CXXConversionDecl::static_kind(),
+    CXXDestructorDecl::static_kind(),
+    VarTemplatePartialSpecializationDecl::static_kind(),
+};
+}  // namespace
 
 gap::generator<DeclaratorDecl> DeclaratorDecl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -55,6 +80,21 @@ bool DeclaratorDecl::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<DeclaratorDecl> DeclaratorDecl::from(const ir::hl::Operation &op) {
+  if (auto val = Decl::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<DeclaratorDecl, ir::hl::Operation>> DeclaratorDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kDeclaratorDeclDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<DeclaratorDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<DeclaratorDecl> DeclaratorDecl::containing(const Decl &decl) {
@@ -152,30 +192,6 @@ std::optional<DeclaratorDecl> DeclaratorDecl::from(const std::optional<Decl> &pa
   }
   return std::nullopt;
 }
-
-namespace {
-static const DeclKind kDeclaratorDeclDerivedKinds[] = {
-    FieldDecl::static_kind(),
-    FunctionDecl::static_kind(),
-    MSPropertyDecl::static_kind(),
-    NonTypeTemplateParmDecl::static_kind(),
-    VarDecl::static_kind(),
-    ObjCAtDefsFieldDecl::static_kind(),
-    ObjCIvarDecl::static_kind(),
-    CXXDeductionGuideDecl::static_kind(),
-    CXXMethodDecl::static_kind(),
-    VarTemplateSpecializationDecl::static_kind(),
-    DecompositionDecl::static_kind(),
-    ImplicitParamDecl::static_kind(),
-    OMPCapturedExprDecl::static_kind(),
-    ParmVarDecl::static_kind(),
-    CXXConstructorDecl::static_kind(),
-    CXXConversionDecl::static_kind(),
-    CXXDestructorDecl::static_kind(),
-    VarTemplatePartialSpecializationDecl::static_kind(),
-};
-
-}  // namespace
 
 std::optional<DeclaratorDecl> DeclaratorDecl::from_base(const Decl &parent) {
   switch (parent.kind()) {

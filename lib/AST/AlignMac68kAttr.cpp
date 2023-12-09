@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kAlignMac68kAttrDerivedKinds[] = {
+    AlignMac68kAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<AlignMac68kAttr> AlignMac68kAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AlignMac68kAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<AlignMac68kAttr> AlignMac68kAttr::from(const std::optional<Attr> &
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kAlignMac68kAttrDerivedKinds[] = {
-    AlignMac68kAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<AlignMac68kAttr> AlignMac68kAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

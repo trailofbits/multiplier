@@ -93,4 +93,22 @@ inline static constexpr unsigned NumEnumerators(ir::TypeKind) {
 
 MX_EXPORT const char *EnumeratorName(ir::TypeKind);
 
+MX_EXPORT bool IsBuiltinTypeKind(ir::TypeKind);
+
+MX_EXPORT bool IsLLVMIRTypeKind(ir::TypeKind);
+
+MX_EXPORT bool IsMemRefTypeKind(ir::TypeKind);
+
+MX_EXPORT bool IsABITypeKind(ir::TypeKind);
+
+MX_EXPORT bool IsLowLevelTypeKind(ir::TypeKind);
+
+MX_EXPORT bool IsHighLevelTypeKind(ir::TypeKind);
+
+MX_EXPORT bool IsCoreTypeKind(ir::TypeKind);
+
+MX_EXPORT bool IsMetaTypeKind(ir::TypeKind);
+
+MX_EXPORT bool IsUnsupportedTypeKind(ir::TypeKind);
+
 }  // namespace mx

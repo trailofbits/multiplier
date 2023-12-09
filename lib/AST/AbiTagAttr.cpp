@@ -18,6 +18,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kAbiTagAttrDerivedKinds[] = {
+    AbiTagAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<AbiTagAttr> AbiTagAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AbiTagAttr::from(*ctx)) {
@@ -52,13 +58,6 @@ std::optional<AbiTagAttr> AbiTagAttr::from(const std::optional<Attr> &parent) {
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kAbiTagAttrDerivedKinds[] = {
-    AbiTagAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<AbiTagAttr> AbiTagAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

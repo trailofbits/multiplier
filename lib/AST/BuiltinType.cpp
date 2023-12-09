@@ -18,6 +18,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kBuiltinTypeDerivedKinds[] = {
+    BuiltinType::static_kind(),
+};
+}  // namespace
+
 gap::generator<BuiltinType> BuiltinType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = BuiltinType::from(*ctx)) {
@@ -52,13 +58,6 @@ std::optional<BuiltinType> BuiltinType::from(const std::optional<Type> &parent) 
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kBuiltinTypeDerivedKinds[] = {
-    BuiltinType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<BuiltinType> BuiltinType::from_base(const Type &parent) {
   switch (parent.kind()) {

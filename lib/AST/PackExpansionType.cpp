@@ -18,6 +18,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kPackExpansionTypeDerivedKinds[] = {
+    PackExpansionType::static_kind(),
+};
+}  // namespace
+
 gap::generator<PackExpansionType> PackExpansionType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = PackExpansionType::from(*ctx)) {
@@ -52,13 +58,6 @@ std::optional<PackExpansionType> PackExpansionType::from(const std::optional<Typ
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kPackExpansionTypeDerivedKinds[] = {
-    PackExpansionType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<PackExpansionType> PackExpansionType::from_base(const Type &parent) {
   switch (parent.kind()) {

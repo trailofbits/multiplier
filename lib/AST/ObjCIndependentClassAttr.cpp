@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kObjCIndependentClassAttrDerivedKinds[] = {
+    ObjCIndependentClassAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<ObjCIndependentClassAttr> ObjCIndependentClassAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ObjCIndependentClassAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::from(const std
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kObjCIndependentClassAttrDerivedKinds[] = {
-    ObjCIndependentClassAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

@@ -104,7 +104,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Decl &entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Stmt &entity) const {
-  return PerFragmentEntityId(entity.RawStmt());
+  return SelectiveEntityId(entity.RawStmt());
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Attr &entity) const {
@@ -113,7 +113,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Attr &entity) const {
       return it->second.Pack();
     }
   }
-  return PerFragmentEntityId(entity.RawAttr());
+  return SelectiveEntityId(entity.RawAttr());
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {

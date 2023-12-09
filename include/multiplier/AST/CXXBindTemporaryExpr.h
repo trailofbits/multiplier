@@ -40,6 +40,9 @@ class MX_EXPORT CXXBindTemporaryExpr : public Expr {
   static gap::generator<CXXBindTemporaryExpr> in(const Fragment &frag);
   static gap::generator<CXXBindTemporaryExpr> in(const File &file);
 
+  static std::optional<CXXBindTemporaryExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<CXXBindTemporaryExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_BIND_TEMPORARY_EXPR;
   }

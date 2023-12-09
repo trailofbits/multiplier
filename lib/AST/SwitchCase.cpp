@@ -13,6 +13,8 @@
 #include <multiplier/AST/CaseStmt.h>
 #include <multiplier/AST/DefaultStmt.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -20,6 +22,13 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kSwitchCaseDerivedKinds[] = {
+    CaseStmt::static_kind(),
+    DefaultStmt::static_kind(),
+};
+}  // namespace
 
 gap::generator<SwitchCase> SwitchCase::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -35,6 +44,21 @@ bool SwitchCase::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<SwitchCase> SwitchCase::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<SwitchCase, ir::hl::Operation>> SwitchCase::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kSwitchCaseDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<SwitchCase, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<SwitchCase> SwitchCase::containing(const Decl &decl) {
@@ -103,14 +127,6 @@ std::optional<SwitchCase> SwitchCase::from(const std::optional<Stmt> &parent) {
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kSwitchCaseDerivedKinds[] = {
-    CaseStmt::static_kind(),
-    DefaultStmt::static_kind(),
-};
-
-}  // namespace
 
 std::optional<SwitchCase> SwitchCase::from_base(const Stmt &parent) {
   switch (parent.kind()) {

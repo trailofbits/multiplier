@@ -279,7 +279,7 @@ set_target_properties("mx-api"
       cxx_std_20
 )
 
-if(MX_ENABLE_INSTALL)
+if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
   install(
     FILES
       ${ast_headers}

@@ -18,6 +18,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const MacroKind kMacroConcatenateDerivedKinds[] = {
+    MacroConcatenate::static_kind(),
+};
+}  // namespace
+
 gap::generator<MacroConcatenate> MacroConcatenate::containing(const Macro &macro) {
   for (auto impl = macro.parent(); impl; impl = impl->parent()) {
     if (auto d = MacroConcatenate::from(*impl)) {
@@ -68,13 +74,6 @@ std::optional<MacroConcatenate> MacroConcatenate::from(const std::optional<Macro
   }
   return std::nullopt;
 }
-
-namespace {
-static const MacroKind kMacroConcatenateDerivedKinds[] = {
-    MacroConcatenate::static_kind(),
-};
-
-}  // namespace
 
 std::optional<MacroConcatenate> MacroConcatenate::from_base(const Macro &parent) {
   switch (parent.kind()) {

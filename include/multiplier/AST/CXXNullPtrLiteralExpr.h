@@ -40,6 +40,9 @@ class MX_EXPORT CXXNullPtrLiteralExpr : public Expr {
   static gap::generator<CXXNullPtrLiteralExpr> in(const Fragment &frag);
   static gap::generator<CXXNullPtrLiteralExpr> in(const File &file);
 
+  static std::optional<CXXNullPtrLiteralExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<CXXNullPtrLiteralExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_NULL_PTR_LITERAL_EXPR;
   }

@@ -48,6 +48,9 @@ class MX_EXPORT LambdaExpr : public Expr {
   static gap::generator<LambdaExpr> in(const Fragment &frag);
   static gap::generator<LambdaExpr> in(const File &file);
 
+  static std::optional<LambdaExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<LambdaExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::LAMBDA_EXPR;
   }

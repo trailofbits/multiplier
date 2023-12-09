@@ -40,6 +40,9 @@ class MX_EXPORT ConvertVectorExpr : public Expr {
   static gap::generator<ConvertVectorExpr> in(const Fragment &frag);
   static gap::generator<ConvertVectorExpr> in(const File &file);
 
+  static std::optional<ConvertVectorExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ConvertVectorExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONVERT_VECTOR_EXPR;
   }

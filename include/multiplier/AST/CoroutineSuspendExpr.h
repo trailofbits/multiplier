@@ -41,6 +41,9 @@ class MX_EXPORT CoroutineSuspendExpr : public Expr {
   static gap::generator<CoroutineSuspendExpr> in(const Fragment &frag);
   static gap::generator<CoroutineSuspendExpr> in(const File &file);
 
+  static std::optional<CoroutineSuspendExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<CoroutineSuspendExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   static gap::generator<CoroutineSuspendExpr> containing(const Decl &decl);
   static gap::generator<CoroutineSuspendExpr> containing(const std::optional<Decl> &decl);
 

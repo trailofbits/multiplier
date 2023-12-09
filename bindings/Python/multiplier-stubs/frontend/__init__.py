@@ -639,6 +639,9 @@ class Compilation(multiplier.Entity):
   target_triple: str
   auxiliary_target_triple: Optional[str]
   arguments: Generator[str]
+  system_include_directories: Generator[Tuple[multiplier.frontend.IncludePathLocation, pathlib.PurePath]]
+  user_include_directories: Generator[Tuple[multiplier.frontend.IncludePathLocation, pathlib.PurePath]]
+  framework_directories: Generator[Tuple[multiplier.frontend.IncludePathLocation, pathlib.PurePath]]
 
   @overload
   @staticmethod
@@ -708,8 +711,8 @@ class Token(multiplier.Entity):
   derived_token: multiplier.frontend.Token
   file_token: multiplier.frontend.Token
   nearest_file_token: multiplier.frontend.Token
-  related_entity: 'multiplier.Entity'
-  related_entity_id: 'multiplier.EntityId'
+  related_entity: multiplier.Entity
+  related_entity_id: int
   category: multiplier.frontend.TokenCategory
   containing_macro: Optional[multiplier.frontend.Macro]
 
@@ -903,6 +906,21 @@ class Macro(multiplier.Entity):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index, kinds: Sequence[multiplier.frontend.MacroKind]) -> Generator[multiplier.frontend.Macro]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment, kinds: Sequence[multiplier.frontend.MacroKind]) -> Generator[multiplier.frontend.Macro]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File, kinds: Sequence[multiplier.frontend.MacroKind]) -> Generator[multiplier.frontend.Macro]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.Macro]:
     ...
 
@@ -917,7 +935,7 @@ class Macro(multiplier.Entity):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.Macro]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.Macro]:
     ...
 
   @overload
@@ -973,7 +991,7 @@ class MacroVAOptArgument(multiplier.frontend.Macro):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroVAOptArgument]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @staticmethod
@@ -1038,7 +1056,7 @@ class MacroVAOpt(multiplier.frontend.Macro):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroVAOpt]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroVAOpt]:
     ...
 
   @staticmethod
@@ -1106,7 +1124,7 @@ class MacroSubstitution(multiplier.frontend.Macro):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroSubstitution]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroSubstitution]:
     ...
 
   @staticmethod
@@ -1171,7 +1189,7 @@ class MacroConcatenate(multiplier.frontend.MacroSubstitution):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroConcatenate]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroConcatenate]:
     ...
 
   @staticmethod
@@ -1236,7 +1254,7 @@ class MacroStringify(multiplier.frontend.MacroSubstitution):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroStringify]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroStringify]:
     ...
 
   @staticmethod
@@ -1304,7 +1322,7 @@ class MacroExpansion(multiplier.frontend.MacroSubstitution):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroExpansion]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroExpansion]:
     ...
 
   @staticmethod
@@ -1373,7 +1391,7 @@ class MacroParameterSubstitution(multiplier.frontend.MacroSubstitution):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroParameterSubstitution]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @staticmethod
@@ -1439,7 +1457,7 @@ class MacroArgument(multiplier.frontend.Macro):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroArgument]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroArgument]:
     ...
 
   @staticmethod
@@ -1506,7 +1524,7 @@ class MacroParameter(multiplier.frontend.Macro):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroParameter]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroParameter]:
     ...
 
   @staticmethod
@@ -1572,7 +1590,7 @@ class MacroDirective(multiplier.frontend.Macro):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.MacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
@@ -1637,7 +1655,7 @@ class DefineMacroDirective(multiplier.frontend.MacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.DefineMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @staticmethod
@@ -1701,7 +1719,7 @@ class PragmaMacroDirective(multiplier.frontend.MacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.PragmaMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @staticmethod
@@ -1765,7 +1783,7 @@ class UndefineMacroDirective(multiplier.frontend.MacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.UndefineMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @staticmethod
@@ -1829,7 +1847,7 @@ class OtherMacroDirective(multiplier.frontend.MacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.OtherMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @staticmethod
@@ -1893,7 +1911,7 @@ class ConditionalMacroDirective(multiplier.frontend.MacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.ConditionalMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
@@ -1953,7 +1971,7 @@ class EndIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.EndIfMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @staticmethod
@@ -2017,7 +2035,7 @@ class ElseMacroDirective(multiplier.frontend.ConditionalMacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.ElseMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @staticmethod
@@ -2081,7 +2099,7 @@ class ElseIfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirecti
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2145,7 +2163,7 @@ class ElseIfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective)
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2209,7 +2227,7 @@ class ElseIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.ElseIfMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @staticmethod
@@ -2273,7 +2291,7 @@ class IfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2337,7 +2355,7 @@ class IfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2401,7 +2419,7 @@ class IfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.IfMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IfMacroDirective]:
     ...
 
   @staticmethod
@@ -2466,7 +2484,7 @@ class IncludeLikeMacroDirective(multiplier.frontend.MacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
@@ -2526,7 +2544,7 @@ class ImportMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.ImportMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @staticmethod
@@ -2590,7 +2608,7 @@ class IncludeMacrosMacroDirective(multiplier.frontend.IncludeLikeMacroDirective)
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @staticmethod
@@ -2654,7 +2672,7 @@ class IncludeNextMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @staticmethod
@@ -2718,7 +2736,7 @@ class IncludeMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: 'multiplier.EntityId') -> Optional[multiplier.frontend.IncludeMacroDirective]:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @staticmethod

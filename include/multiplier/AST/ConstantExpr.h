@@ -43,6 +43,9 @@ class MX_EXPORT ConstantExpr : public FullExpr {
   static gap::generator<ConstantExpr> in(const Fragment &frag);
   static gap::generator<ConstantExpr> in(const File &file);
 
+  static std::optional<ConstantExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ConstantExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONSTANT_EXPR;
   }

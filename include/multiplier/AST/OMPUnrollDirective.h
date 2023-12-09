@@ -42,6 +42,9 @@ class MX_EXPORT OMPUnrollDirective : public OMPLoopTransformationDirective {
   static gap::generator<OMPUnrollDirective> in(const Fragment &frag);
   static gap::generator<OMPUnrollDirective> in(const File &file);
 
+  static std::optional<OMPUnrollDirective> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPUnrollDirective, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_UNROLL_DIRECTIVE;
   }

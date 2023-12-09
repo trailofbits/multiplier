@@ -44,6 +44,9 @@ class MX_EXPORT OMPCapturedExprDecl : public VarDecl {
   static gap::generator<OMPCapturedExprDecl> in(const Fragment &frag);
   static gap::generator<OMPCapturedExprDecl> in(const File &file);
 
+  static std::optional<OMPCapturedExprDecl> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<OMPCapturedExprDecl, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_CAPTURED_EXPR;
   }

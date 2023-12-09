@@ -41,6 +41,9 @@ class MX_EXPORT CXXParenListInitExpr : public Expr {
   static gap::generator<CXXParenListInitExpr> in(const Fragment &frag);
   static gap::generator<CXXParenListInitExpr> in(const File &file);
 
+  static std::optional<CXXParenListInitExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<CXXParenListInitExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_PAREN_LIST_INIT_EXPR;
   }

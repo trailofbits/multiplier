@@ -20,6 +20,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kAMDGPUFlatWorkGroupSizeAttrDerivedKinds[] = {
+    AMDGPUFlatWorkGroupSizeAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<AMDGPUFlatWorkGroupSizeAttr> AMDGPUFlatWorkGroupSizeAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AMDGPUFlatWorkGroupSizeAttr::from(*ctx)) {
@@ -54,13 +60,6 @@ std::optional<AMDGPUFlatWorkGroupSizeAttr> AMDGPUFlatWorkGroupSizeAttr::from(con
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kAMDGPUFlatWorkGroupSizeAttrDerivedKinds[] = {
-    AMDGPUFlatWorkGroupSizeAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<AMDGPUFlatWorkGroupSizeAttr> AMDGPUFlatWorkGroupSizeAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

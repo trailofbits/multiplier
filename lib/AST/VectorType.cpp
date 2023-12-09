@@ -19,6 +19,13 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kVectorTypeDerivedKinds[] = {
+    VectorType::static_kind(),
+    ExtVectorType::static_kind(),
+};
+}  // namespace
+
 gap::generator<VectorType> VectorType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = VectorType::from(*ctx)) {
@@ -53,14 +60,6 @@ std::optional<VectorType> VectorType::from(const std::optional<Type> &parent) {
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kVectorTypeDerivedKinds[] = {
-    VectorType::static_kind(),
-    ExtVectorType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<VectorType> VectorType::from_base(const Type &parent) {
   switch (parent.kind()) {

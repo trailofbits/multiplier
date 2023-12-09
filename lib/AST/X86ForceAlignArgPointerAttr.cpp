@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kX86ForceAlignArgPointerAttrDerivedKinds[] = {
+    X86ForceAlignArgPointerAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = X86ForceAlignArgPointerAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::from(con
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kX86ForceAlignArgPointerAttrDerivedKinds[] = {
-    X86ForceAlignArgPointerAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

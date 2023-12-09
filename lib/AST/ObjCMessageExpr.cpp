@@ -16,6 +16,8 @@
 #include <multiplier/AST/Type.h>
 #include <multiplier/AST/ValueStmt.h>
 
+#include <multiplier/IR/HighLevel/Operation.h>
+
 #include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Stmt.h"
@@ -24,6 +26,12 @@ namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+
+namespace {
+static const StmtKind kObjCMessageExprDerivedKinds[] = {
+    ObjCMessageExpr::static_kind(),
+};
+}  // namespace
 
 gap::generator<ObjCMessageExpr> ObjCMessageExpr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -39,6 +47,21 @@ bool ObjCMessageExpr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const ir::hl::Operation &op) {
+  if (auto val = Stmt::from(op)) {
+    return from_base(val.value());
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::pair<ObjCMessageExpr, ir::hl::Operation>> ObjCMessageExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kObjCMessageExprDerivedKinds)) {
+    if (auto val = from_base(res.first)) {
+      co_yield std::pair<ObjCMessageExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+    }
+  }
 }
 
 gap::generator<ObjCMessageExpr> ObjCMessageExpr::containing(const Decl &decl) {
@@ -107,13 +130,6 @@ std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const std::optional<Stmt> &
   }
   return std::nullopt;
 }
-
-namespace {
-static const StmtKind kObjCMessageExprDerivedKinds[] = {
-    ObjCMessageExpr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<ObjCMessageExpr> ObjCMessageExpr::from_base(const Stmt &parent) {
   switch (parent.kind()) {

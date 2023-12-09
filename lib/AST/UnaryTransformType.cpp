@@ -18,6 +18,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const TypeKind kUnaryTransformTypeDerivedKinds[] = {
+    UnaryTransformType::static_kind(),
+};
+}  // namespace
+
 gap::generator<UnaryTransformType> UnaryTransformType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = UnaryTransformType::from(*ctx)) {
@@ -52,13 +58,6 @@ std::optional<UnaryTransformType> UnaryTransformType::from(const std::optional<T
   }
   return std::nullopt;
 }
-
-namespace {
-static const TypeKind kUnaryTransformTypeDerivedKinds[] = {
-    UnaryTransformType::static_kind(),
-};
-
-}  // namespace
 
 std::optional<UnaryTransformType> UnaryTransformType::from_base(const Type &parent) {
   switch (parent.kind()) {

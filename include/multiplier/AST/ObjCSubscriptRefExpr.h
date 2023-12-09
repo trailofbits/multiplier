@@ -41,6 +41,9 @@ class MX_EXPORT ObjCSubscriptRefExpr : public Expr {
   static gap::generator<ObjCSubscriptRefExpr> in(const Fragment &frag);
   static gap::generator<ObjCSubscriptRefExpr> in(const File &file);
 
+  static std::optional<ObjCSubscriptRefExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<ObjCSubscriptRefExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_SUBSCRIPT_REF_EXPR;
   }

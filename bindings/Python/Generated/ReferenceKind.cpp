@@ -112,6 +112,26 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "builtin_reference_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->builtin_reference_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ReferenceKind::builtin_reference_kind"),
+    nullptr,
+  },
+  {
+    "data",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->data());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ReferenceKind::data"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

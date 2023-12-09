@@ -19,6 +19,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+namespace {
+static const AttrKind kNSConsumesSelfAttrDerivedKinds[] = {
+    NSConsumesSelfAttr::static_kind(),
+};
+}  // namespace
+
 gap::generator<NSConsumesSelfAttr> NSConsumesSelfAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = NSConsumesSelfAttr::from(*ctx)) {
@@ -53,13 +59,6 @@ std::optional<NSConsumesSelfAttr> NSConsumesSelfAttr::from(const std::optional<A
   }
   return std::nullopt;
 }
-
-namespace {
-static const AttrKind kNSConsumesSelfAttrDerivedKinds[] = {
-    NSConsumesSelfAttr::static_kind(),
-};
-
-}  // namespace
 
 std::optional<NSConsumesSelfAttr> NSConsumesSelfAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {

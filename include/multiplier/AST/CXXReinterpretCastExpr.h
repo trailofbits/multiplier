@@ -46,6 +46,9 @@ class MX_EXPORT CXXReinterpretCastExpr : public CXXNamedCastExpr {
   static gap::generator<CXXReinterpretCastExpr> in(const Fragment &frag);
   static gap::generator<CXXReinterpretCastExpr> in(const File &file);
 
+  static std::optional<CXXReinterpretCastExpr> from(const ir::hl::Operation &op);
+  static gap::generator<std::pair<CXXReinterpretCastExpr, ir::hl::Operation>> in(const Compilation &tu);
+
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_REINTERPRET_CAST_EXPR;
   }
