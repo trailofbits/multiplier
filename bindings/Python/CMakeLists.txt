@@ -31,6 +31,11 @@ add_library("mx-python" STATIC
   "UserToken.cpp"
 )
 
+target_compile_definitions("mx-python"
+  PUBLIC
+    $<BUILD_INTERFACE:MX_BUILD>
+)
+
 set_target_properties("mx-python"
   PROPERTIES
     LINKER_LANGUAGE

@@ -23,6 +23,7 @@
 #include <variant>
 #include <vector>
 
+#include <Python.h>
 #include <multiplier/Bindings/Python.h>
 #include <multiplier/Entity.h>
 

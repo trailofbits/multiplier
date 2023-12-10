@@ -6,14 +6,11 @@
 
 #pragma once
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wgnu-include-next"
-#include_next <Python.h>
-#pragma GCC diagnostic pop
-
 #include <optional>
 
 #include "../Compiler.h"
+
+typedef struct _object PyObject;
 
 namespace mx {
 
