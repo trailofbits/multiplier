@@ -65,6 +65,18 @@ class MX_EXPORT Value {
 
   // Generate the uses of this value.
   gap::generator<Operand> uses(void) const & noexcept;
+
+  inline void *underlying_value(void) const noexcept {
+    return impl_.opaque;
+  }
+
+  inline bool operator==(const Value &that) const noexcept {
+    return impl_.opaque == that.impl_.opaque;
+  }
+
+  inline bool operator!=(const Value &that) const noexcept {
+    return impl_.opaque != that.impl_.opaque;
+  }
 };
 
 // A value with a specific type.

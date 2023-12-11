@@ -455,7 +455,7 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
   tp->tp_hash = gTypes[759].tp_hash;
-  tp->tp_richcompare = nullptr;
+  tp->tp_richcompare = gTypes[759].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;

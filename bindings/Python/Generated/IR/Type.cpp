@@ -414,8 +414,36 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = PyObject_HashNotImplemented;
-  tp->tp_richcompare = nullptr;
+  tp->tp_hash = [] (BorrowedPyObject *obj) -> Py_hash_t {
+    return static_cast<Py_hash_t>(reinterpret_cast<uintptr_t>(T_cast(obj)->underlying_type()));
+  };
+  tp->tp_richcompare = [] (BorrowedPyObject *a_obj, BorrowedPyObject *b_obj, int op) -> SharedPyObject * {
+    do {
+      if (Py_EQ != op && Py_NE != op) {
+        break;
+      }
+
+      auto a = ::mx::from_python<T>(a_obj);
+      if (!a.has_value()) {
+        break;
+      }
+
+      auto b = ::mx::from_python<T>(b_obj);
+      if (!b.has_value()) {
+        break;
+      }
+
+      auto ret = (a.value() == b.value()) == (Py_EQ == op) ? Py_True : Py_False;
+      Py_INCREF(ret);
+      return ret;
+    } while (false);
+
+    static constexpr const char *kOperators[] = {"<", "<=", "==", "!=", ">", ">="};
+    PyErrorStreamer(PyExc_TypeError)
+        << "'" << kOperators[op] << "' not supported between instances of '"
+        << Py_TYPE(a_obj)->tp_name << "' and '" << Py_TYPE(b_obj)->tp_name << "'";
+    return nullptr;
+  };
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;

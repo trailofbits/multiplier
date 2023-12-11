@@ -73,6 +73,18 @@ class MX_EXPORT Block final {
 
   // Return the terminating operation of a block.
   Operation terminator(void) const noexcept;
+
+  inline mlir::Block *underlying_block(void) const noexcept {
+    return block_;
+  }
+
+  inline bool operator==(const Block &that) const noexcept {
+    return block_ == that.block_;
+  }
+
+  inline bool operator!=(const Block &that) const noexcept {
+    return block_ != that.block_;
+  }
 };
 
 // An parameter to a block is like a PHI node in an SSA IR. It provides a merge

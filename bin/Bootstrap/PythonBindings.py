@@ -464,6 +464,11 @@ inline static const T *T_cast(const void *obj) noexcept {{
 """
 
 
+IR_TYPE_HASH = """[] (BorrowedPyObject *obj) -> Py_hash_t {{
+    return static_cast<Py_hash_t>(reinterpret_cast<uintptr_t>(T_cast(obj)->underlying_{}()));
+  }}"""
+
+
 TYPE_HASH = """[] (BorrowedPyObject *obj) -> Py_hash_t {
     return static_cast<Py_hash_t>(EntityId(T_cast(obj)->id()).Pack());
   }"""
@@ -1187,6 +1192,19 @@ def _strip_optional_const_ref(schema: Schema) -> Schema:
   else:
     return schema
 
+
+_IR_BASE_CLASSES = ("Operation", "Region", "Block", "Type",
+                    "Attribute", "Value", "Operand")
+
+
+def _is_mlir_base_class(schema: ClassSchema) -> bool:
+  if schema.name not in _IR_BASE_CLASSES:
+    return False
+
+  return schema.namespaces and len(schema.namespaces) and \
+         schema.namespaces[-1] == 'ir'
+
+
 def wrap_class(schema: ClassSchema,
                offsets: Dict[ClassSchema, Tuple[int, int]],
                children: Dict[ClassSchema, List[ClassSchema]],
@@ -1206,6 +1224,7 @@ def wrap_class(schema: ClassSchema,
   py_namespace_path = rel_dir and f"multiplier.{rel_dir.lower().replace('/', '.')}." or "multiplier."
 
   type_hash = "PyObject_HashNotImplemented"
+  type_compare = "nullptr"
   base_class = "nullptr"
   py_base_class = "object"
 
@@ -1218,6 +1237,7 @@ def wrap_class(schema: ClassSchema,
     base_offsets = offsets[base_schema]
     base_class = "&(gTypes[{}])".format(base_offsets[0])
     type_hash = "gTypes[{}].tp_hash".format(base_offsets[0])
+    type_compare = "gTypes[{}].tp_richcompare".format(base_offsets[0])
     py_base_class = base_schema.python_value_name.strip("'")
 
   # In the Python API, we give all of the entities a common base class.
@@ -1249,6 +1269,9 @@ def wrap_class(schema: ClassSchema,
     id_method = schema.methods["id"]
     if _is_id_method(id_method):
       type_hash = TYPE_HASH
+
+  if _is_mlir_base_class(schema):
+    type_hash = IR_TYPE_HASH.format(schema.name.lower())
 
   assert schema.location is not None
   out.append(DISABLE_DIAGNOSTICS)
@@ -1360,7 +1383,7 @@ def wrap_class(schema: ClassSchema,
       py_flag_sequencing=schema.indexed_type and " | Py_TPFLAGS_SEQUENCE " or "",
       py_hash=type_hash,
       py_rich_compare=(
-          schema.has_equivalence_relation and RICH_COMPARE or "nullptr"),
+          schema.has_equivalence_relation and RICH_COMPARE or type_compare),
       py_base_class=base_class,
       py_number=schema.has_boolean_conversion and "&gNumberMethods" or "nullptr",
       py_sequence=schema.indexed_type and "&gSequenceMethods" or "nullptr",

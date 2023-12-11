@@ -59,6 +59,18 @@ class MX_EXPORT Region final {
                 mlir::Region &region)
       : Region(std::move(module), &region) {}
 
+  inline mlir::Region *underlying_region(void) const noexcept {
+    return region_;
+  }
+
+  inline bool operator==(const Region &that) const noexcept {
+    return region_ == that.region_;
+  }
+
+  inline bool operator!=(const Region &that) const noexcept {
+    return region_ != that.region_;
+  }
+
   static Region containing(const Block &);
 
   // In general, all operations are contained inside a region, except the

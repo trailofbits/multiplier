@@ -83,8 +83,16 @@ class Operation {
       : Operation(std::move(module),
                   reinterpret_cast<mlir::Operation *>(opaque)) {}
 
-  inline mlir::Operation *underlying_op(void) const noexcept {
+  inline mlir::Operation *underlying_operation(void) const noexcept {
     return op_;
+  }
+
+  inline bool operator==(const Operation &that) const noexcept {
+    return op_ == that.op_;
+  }
+
+  inline bool operator!=(const Operation &that) const noexcept {
+    return op_ != that.op_;
   }
 
   // Classify an MLIR operation, by raw pointer or by operation name.
@@ -186,6 +194,18 @@ class Operand {
   inline Operand(std::shared_ptr<const SourceIRImpl> module, void *op)
       : module_(std::move(module)),
         op_(reinterpret_cast<mlir::OpOperand *>(op)) {}
+
+  inline mlir::OpOperand *underlying_operand(void) const noexcept {
+    return op_;
+  }
+
+  inline bool operator==(const Operand &that) const noexcept {
+    return op_ == that.op_;
+  }
+
+  inline bool operator!=(const Operand &that) const noexcept {
+    return op_ != that.op_;
+  }
 
   // The operation containing this operand.
   Operation operation(void) const noexcept;

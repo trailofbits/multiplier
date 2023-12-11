@@ -54,6 +54,18 @@ class MX_EXPORT Attribute {
   inline AttributeKind kind(void) const noexcept {
     return kind_;
   }
+
+  inline mlir::AttributeStorage *underlying_attribute(void) const noexcept {
+    return attr_;
+  }
+
+  inline bool operator==(const Attribute &that) const noexcept {
+    return attr_ == that.attr_;
+  }
+
+  inline bool operator!=(const Attribute &that) const noexcept {
+    return attr_ != that.attr_;
+  }
 };
 
 }  // namespace mx::ir

@@ -49,6 +49,18 @@ class MX_EXPORT Type {
   inline TypeKind kind(void) const noexcept {
     return kind_;
   }
+
+  inline mlir::TypeStorage *underlying_type(void) const noexcept {
+    return type_;
+  }
+
+  inline bool operator==(const Type &that) const noexcept {
+    return type_ == that.type_;
+  }
+
+  inline bool operator!=(const Type &that) const noexcept {
+    return type_ != that.type_;
+  }
 };
 
 }  // namespace mx::ir
