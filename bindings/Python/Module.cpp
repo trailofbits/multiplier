@@ -63,6 +63,7 @@ static PyModuleDef gIRModule = {
 static LoaderFunc * const gIRLoaders[] = {
   PythonBinding<mx::ir::AttributeKind>::load,
   PythonBinding<mx::ir::Attribute>::load,
+  PythonBinding<mx::ir::ValueKind>::load,
   PythonBinding<mx::ir::Value>::load,
   PythonBinding<mx::ir::Block>::load,
   PythonBinding<mx::ir::Argument>::load,

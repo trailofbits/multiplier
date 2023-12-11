@@ -15,6 +15,24 @@
 
 namespace mx::ir {
 
+MX_EXPORT const char *EnumeratorName(ValueKind kind) {
+  switch (kind) {
+    case ValueKind::OPERATION_RESULT: return "OPERATION_RESULT";
+    case ValueKind::BLOCK_ARGUMENT: return "BLOCK_ARGUMENT";
+    default: return "<invalid>";
+  }
+}
+
+ValueKind Value::kind(void) const noexcept {
+  switch (impl_.value->getKind()) {
+    case mlir::detail::ValueImpl::Kind::InlineOpResult:
+    case mlir::detail::ValueImpl::Kind::OutOfLineOpResult:
+      return ValueKind::OPERATION_RESULT;
+    case mlir::detail::ValueImpl::Kind::BlockArgument:
+      return ValueKind::BLOCK_ARGUMENT;
+  }
+}
+
 Type Value::type(void) const noexcept {
   mlir::Value val = mlir::Value::getFromOpaquePointer(impl_.opaque);
   return Type(

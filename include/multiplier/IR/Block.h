@@ -102,6 +102,10 @@ class MX_EXPORT Argument final : public Value {
 
  public:
 
+  inline static constexpr ValueKind static_kind(void) noexcept {
+    return ValueKind::BLOCK_ARGUMENT;
+  }
+
   static std::optional<Argument> from(const Value &val);
 
   // Index of this block argument.

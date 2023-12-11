@@ -154,6 +154,10 @@ class Result final : public Value {
 
  public:
 
+  inline static constexpr ValueKind static_kind(void) noexcept {
+    return ValueKind::OPERATION_RESULT;
+  }
+
   inline Result(std::shared_ptr<const SourceIRImpl> module,
                 void *res)
       : Value(std::move(module),

@@ -1427,6 +1427,7 @@ class RegexQuery;
 namespace ir {
 enum class AttributeKind : uint32_t;
 class Attribute;
+enum ValueKind : uint8_t;
 class Value;
 class Block;
 class Argument;

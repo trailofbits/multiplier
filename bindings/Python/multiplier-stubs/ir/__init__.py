@@ -114,6 +114,10 @@ class AttributeKind(IntEnum):
   CORE_VOID = 84
   META_IDENTIFIER = 85
 
+class ValueKind(IntEnum):
+  OPERATION_RESULT = 0
+  BLOCK_ARGUMENT = 1
+
 class OperationKind(IntEnum):
   UNKNOWN = 0
   BUILTIN_MODULE = 1
@@ -616,11 +620,16 @@ class Attribute(object):
   kind: multiplier.ir.AttributeKind
 
 class Value(object):
+  kind: multiplier.ir.ValueKind
   type: multiplier.ir.Type
   uses: Generator[multiplier.ir.Operand]
 
 class Argument(multiplier.ir.Value):
   index: int
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.ValueKind:
+    ...
 
   @staticmethod
   def FROM(val: multiplier.ir.Value) -> Optional[multiplier.ir.Argument]:
@@ -629,6 +638,10 @@ class Argument(multiplier.ir.Value):
 class Result(multiplier.ir.Value):
   operation: multiplier.ir.Operation
   index: int
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.ValueKind:
+    ...
 
   @staticmethod
   def of(arg_0: multiplier.ir.Operation) -> Optional[multiplier.ir.Result]:

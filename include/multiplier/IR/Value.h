@@ -32,6 +32,21 @@ class Result;
 class SourceIRImpl;
 class Type;
 
+enum ValueKind : unsigned char {
+  OPERATION_RESULT,
+  BLOCK_ARGUMENT
+};
+
+inline static const char *EnumerationName(ValueKind) {
+  return "ValueKind";
+}
+
+MX_EXPORT const char *EnumeratorName(ValueKind);
+
+inline static constexpr unsigned NumEnumerators(ValueKind) {
+  return 2;
+}
+
 // The result of an operation, or an argument to a block. Values can
 // have an arbitrary number of users.
 class MX_EXPORT Value {
@@ -60,6 +75,8 @@ class MX_EXPORT Value {
   inline Value(std::shared_ptr<const SourceIRImpl> module, void *value)
       : module_(std::move(module)),
         impl_(value) {}
+
+  ValueKind kind(void) const noexcept;
 
   Type type(void) const noexcept;
 
