@@ -47,7 +47,6 @@ CompilationImpl::SourceIRPtr(PackedCompilationId id) const & noexcept {
   auto ir_obj = source_ir.lock();
   if (!ir_obj) {
     if (auto mlir = SourceIR(); !mlir.empty()) {
-      std::cerr << mlir << '\n';
       ir_obj = std::make_shared<const ir::SourceIRImpl>(id, ep, mlir);
       source_ir = ir_obj;
     }

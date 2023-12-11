@@ -1355,6 +1355,11 @@ TokenRange::TokenRange(const Token &tok)
       num_tokens(tok.impl ? (tok.offset + 1u) : 0u) {}
 
 TokenRange TokenRange::create(std::vector<CustomToken> tokens) {
+
+  if (tokens.size() == 1 && std::holds_alternative<Token>(tokens[0])) {
+    return TokenRange(std::get<Token>(tokens[0]));
+  }
+
   auto reader = std::make_shared<CustomTokenReader>(FragmentImpl::Ptr());
   auto num_tokens = 0u;
   for (CustomToken &ctok : tokens) {
