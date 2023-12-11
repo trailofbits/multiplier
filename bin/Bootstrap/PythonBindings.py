@@ -1262,7 +1262,8 @@ def wrap_class(schema: ClassSchema,
   # Figure out if this class can use kind-based dispatch.
   kind_method = _get_method(schema, "kind")
   if isinstance(kind_method, MethodSchema) and \
-     isinstance(kind_method.return_type, EnumSchema):
+     isinstance(kind_method.return_type, EnumSchema) and \
+     schema.name != "Token":
     out.append(PYTHON_BINDING_TO_PYTHON_DYNAMIC_BEGIN)
     _dynamic_case(schema, offsets, children, out)
     out.append(PYTHON_BINDING_TO_PYTHON_DYNAMIC_END)

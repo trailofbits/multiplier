@@ -82,15 +82,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
 
 template <>
 SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
-  PyTypeObject *tp = nullptr;
-  switch (val.kind()) {
-    default:
-      assert(false);
-      tp = gType;
-      break;
-
-  }
-  auto ret = tp->tp_alloc(tp, 0);
+  auto ret = gType->tp_alloc(gType, 0);
   if (auto obj = O_cast(ret)) {
     obj->data = new (obj->backing_storage) T(std::move(val));
   }
