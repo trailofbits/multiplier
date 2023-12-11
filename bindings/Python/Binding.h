@@ -84,7 +84,7 @@ struct PythonBinding<std::optional<T>> {
     if (!val) {
       Py_RETURN_NONE;
     }
-    return PythonBinding<T>::to_python(std::move(val.value()));
+    return ::mx::to_python<T>(std::move(val.value()));
   }
 };
 
@@ -151,7 +151,7 @@ struct PythonBinding<EntityId> {
 
   // Wrap a value of type `T` as a python object.
   inline static SharedPyObject *to_python(EntityId val) noexcept {
-    return PythonBinding<RawEntityId>::to_python(val.Pack());
+    return ::mx::to_python<RawEntityId>(val.Pack());
   }
 };
 
@@ -172,7 +172,7 @@ struct PythonBinding<SpecificEntityId<T>> {
 
   // Wrap a value of type `T` as a python object.
   inline static SharedPyObject *to_python(SpecificEntityId<T> val) noexcept {
-    return PythonBinding<RawEntityId>::to_python(val.Pack());
+    return ::mx::to_python<RawEntityId>(val.Pack());
   }
 };
 
@@ -203,8 +203,8 @@ struct PythonBinding<std::pair<A, B>> {
     SharedPyObject *a_obj = PySequence_GetItem(obj, 0);
     SharedPyObject *b_obj = PySequence_GetItem(obj, 1);
 
-    auto a = PythonBinding<A>::from_python(a_obj);
-    auto b = PythonBinding<B>::from_python(b_obj);
+    auto a = ::mx::from_python<A>(a_obj);
+    auto b = ::mx::from_python<B>(b_obj);
 
     Py_DECREF(a_obj);
     Py_DECREF(b_obj);
@@ -218,8 +218,8 @@ struct PythonBinding<std::pair<A, B>> {
 
   // Wrap a value of type `T` as a python object.
   inline static SharedPyObject *to_python(std::pair<A, B> val) noexcept {
-    SharedPyObject *a_obj = PythonBinding<A>::to_python(std::move(val.first));
-    SharedPyObject *b_obj = PythonBinding<B>::to_python(std::move(val.second));
+    SharedPyObject *a_obj = ::mx::to_python<A>(std::move(val.first));
+    SharedPyObject *b_obj = ::mx::to_python<B>(std::move(val.second));
     auto ret = PyTuple_Pack(2, a_obj, b_obj);
     Py_DECREF(a_obj);
     Py_DECREF(b_obj);
@@ -243,7 +243,7 @@ struct PythonBinding<std::variant<Types...>> {
     };
 
     std::optional<std::variant<Types...>> ret;
-    (void) (1 + ... + set_item(ret, PythonBinding<Types>::from_python(obj)));
+    (void) (1 + ... + set_item(ret, ::mx::from_python<Types>(obj)));
 
     return ret;
   }
@@ -252,7 +252,7 @@ struct PythonBinding<std::variant<Types...>> {
   inline static SharedPyObject *to_python(std::variant<Types...> val) noexcept {
     return std::visit([] (auto &&arg) -> SharedPyObject * {
       using T = std::decay_t<decltype(arg)>;
-      return PythonBinding<T>::to_python(std::move(arg));
+      return ::mx::to_python<T>(std::move(arg));
     }, std::move(val));
   }
 };
@@ -294,7 +294,7 @@ struct PythonBinding<std::vector<T>> {
 
     std::vector<T> elements;
     while (auto item = PyIter_Next(iter)) {
-      auto elem = PythonBinding<T>::from_python(item);
+      auto elem = ::mx::from_python<T>(item);
       Py_DECREF(item);
       if (!elem) {
         Py_DECREF(iter);
@@ -314,7 +314,7 @@ struct PythonBinding<std::vector<T>> {
     Py_ssize_t i = 0;
 
     for (T &elem : val) {
-      auto elem_obj = PythonBinding<T>::to_python(std::move(elem));
+      auto elem_obj = ::mx::to_python<T>(std::move(elem));
       if (!elem_obj) {
         goto unwind;
       }
@@ -343,7 +343,7 @@ struct PythonBinding<std::span<T>> {
  public:
   static std::optional<std::vector<T>> from_python(
       BorrowedPyObject *obj) noexcept {
-    return PythonBinding<std::vector<T>>::from_python(obj);
+    return ::mx::from_python<std::vector<T>>(obj);
   }
 };
 
@@ -353,7 +353,7 @@ struct PythonBinding<std::span<const T>> {
  public:
   static std::optional<std::vector<T>> from_python(
       BorrowedPyObject *obj) noexcept {
-    return PythonBinding<std::vector<T>>::from_python(obj);
+    return ::mx::from_python<std::vector<T>>(obj);
   }
 };
 
@@ -368,8 +368,8 @@ struct MapPythonBinding {
 
     KVMap elements;
     while (PyDict_Next(obj, &i, &key, &val)) {
-      auto k = PythonBinding<K>::from_python(key);
-      auto v = PythonBinding<V>::from_python(val);
+      auto k = ::mx::from_python<K>(key);
+      auto v = ::mx::from_python<V>(val);
       if (!k || !v) {
         return std::nullopt;
       }
@@ -383,13 +383,13 @@ struct MapPythonBinding {
     SharedPyObject *map = PyDict_New();
 
     for (auto &entry : elements) {
-      auto key = PythonBinding<K>::to_python(std::move(entry.first));
+      auto key = ::mx::to_python<K>(std::move(entry.first));
       if (!key) {
         Py_DECREF(map);
         return nullptr;
       }
       
-      auto val = PythonBinding<V>::to_python(std::move(entry.second));
+      auto val = ::mx::to_python<V>(std::move(entry.second));
       if (!val) {
         Py_DECREF(key);
         Py_DECREF(map);
@@ -429,7 +429,7 @@ struct SetPythonBinding {
 
     Set elements;
     while (auto item = PyIter_Next(iter)) {
-      auto elem = PythonBinding<T>::from_python(item);
+      auto elem = ::mx::from_python<T>(item);
       Py_DECREF(item);
       if (!elem) {
         Py_DECREF(iter);
@@ -447,7 +447,7 @@ struct SetPythonBinding {
     SharedPyObject *set = PySet_New(nullptr);
 
     for (auto &entry : val) {
-      auto key = PythonBinding<T>::to_python(std::move(entry));
+      auto key = ::mx::to_python<T>(std::move(entry));
       if (!key) {
         Py_DECREF(set);
         return nullptr;
@@ -515,7 +515,7 @@ struct RangePythonBinding {
     }
 
     gInitialized = true;
-    auto module = ::mx::python_module();
+    auto module = PyImport_AddModule("__main__");
     if (!module) {
       return false;
     }
@@ -616,7 +616,7 @@ SharedPyObject *to_python(T val) noexcept {
 }
 
 template <typename T>
-std::optional<T> from_python(BorrowedPyObject *obj) noexcept {
+FromPythonReturnType<T> from_python(BorrowedPyObject *obj) noexcept {
   return PythonBinding<T>::from_python(obj);
 }
 

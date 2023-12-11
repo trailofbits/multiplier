@@ -249,12 +249,11 @@ static PyMethodDef gMethods[] = {
   {
     "entity_category",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 0) {
 
-            return ::mx::to_python(obj->entity_category());
+            return ::mx::to_python(T::entity_category());
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -268,10 +267,10 @@ static PyMethodDef gMethods[] = {
     "location",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<FileLocationCache>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<FileLocationCache>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -290,10 +289,10 @@ static PyMethodDef gMethods[] = {
     "next_location",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<FileLocationCache>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<FileLocationCache>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -312,10 +311,10 @@ static PyMethodDef gMethods[] = {
     "nearest_location",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<FileLocationCache>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<FileLocationCache>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -371,12 +370,12 @@ PyTypeObject *InitType(void) noexcept {
         break;
       }
 
-      auto a = PythonBinding<T>::from_python(a_obj);
+      auto a = ::mx::from_python<T>(a_obj);
       if (!a.has_value()) {
         break;
       }
 
-      auto b = PythonBinding<T>::from_python(b_obj);
+      auto b = ::mx::from_python<T>(b_obj);
       if (!b.has_value()) {
         break;
       }

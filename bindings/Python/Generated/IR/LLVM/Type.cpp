@@ -153,16 +153,15 @@ static PyMethodDef gMethods[] = {
   {
     "FROM",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::ir::Type>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::ir::Type>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->from(arg_0.value()));
+            return ::mx::to_python(T::from(arg_0.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)

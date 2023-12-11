@@ -577,16 +577,15 @@ static PyMethodDef gMethods[] = {
   {
     "FROM",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::ir::Operation>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::ir::Operation>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->from(arg_0.value()));
+            return ::mx::to_python(T::from(arg_0.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -599,48 +598,47 @@ static PyMethodDef gMethods[] = {
   {
     "first_from",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Decl>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Decl>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->first_from(arg_0.value()));
+            return ::mx::to_python(T::first_from(arg_0.value()));
           }
           while (num_args == 2) {
-            auto arg_0 = PythonBinding<mx::Decl>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Decl>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = PythonBinding<mx::ir::OperationKind>::from_python(args[1]);
+            auto arg_1 = ::mx::from_python<mx::ir::OperationKind>(args[1]);
             if (!arg_1.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->first_from(arg_0.value(), arg_1.value()));
+            return ::mx::to_python(T::first_from(arg_0.value(), arg_1.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Stmt>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->first_from(arg_0.value()));
+            return ::mx::to_python(T::first_from(arg_0.value()));
           }
           while (num_args == 2) {
-            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Stmt>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = PythonBinding<mx::ir::OperationKind>::from_python(args[1]);
+            auto arg_1 = ::mx::from_python<mx::ir::OperationKind>(args[1]);
             if (!arg_1.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->first_from(arg_0.value(), arg_1.value()));
+            return ::mx::to_python(T::first_from(arg_0.value(), arg_1.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -653,24 +651,23 @@ static PyMethodDef gMethods[] = {
   {
     "all_from",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Decl>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Decl>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->all_from(arg_0.value()));
+            return ::mx::to_python(T::all_from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Stmt>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->all_from(arg_0.value()));
+            return ::mx::to_python(T::all_from(arg_0.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)

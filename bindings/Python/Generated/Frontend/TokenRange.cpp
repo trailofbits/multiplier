@@ -191,16 +191,15 @@ static PyMethodDef gMethods[] = {
   {
     "create",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::vector<std::variant<UserToken, mx::Token>>>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<std::vector<std::variant<UserToken, mx::Token>>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->create(arg_0.value()));
+            return ::mx::to_python(T::create(arg_0.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -214,14 +213,14 @@ static PyMethodDef gMethods[] = {
     "slice",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 2) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = PythonBinding<uint64_t>::from_python(args[1]);
+            auto arg_1 = ::mx::from_python<uint64_t>(args[1]);
             if (!arg_1.has_value()) {
               break;
             }
@@ -240,10 +239,10 @@ static PyMethodDef gMethods[] = {
     "index_of",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Token>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Token>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -316,12 +315,12 @@ PyTypeObject *InitType(void) noexcept {
         break;
       }
 
-      auto a = PythonBinding<T>::from_python(a_obj);
+      auto a = ::mx::from_python<T>(a_obj);
       if (!a.has_value()) {
         break;
       }
 
-      auto b = PythonBinding<T>::from_python(b_obj);
+      auto b = ::mx::from_python<T>(b_obj);
       if (!b.has_value()) {
         break;
       }
@@ -368,7 +367,7 @@ PyTypeObject *InitType(void) noexcept {
       if (!obj_0) {
         break;
       }
-      auto arg_0 = PythonBinding<mx::Token>::from_python(obj_0);
+      auto arg_0 = ::mx::from_python<mx::Token>(obj_0);
       Py_DECREF(obj_0);
       if (!arg_0.has_value()) {
         break;

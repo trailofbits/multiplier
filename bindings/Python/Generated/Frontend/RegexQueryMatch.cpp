@@ -152,10 +152,10 @@ static PyMethodDef gMethods[] = {
     "index_of_captured_variable",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::string>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<std::string>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -174,10 +174,10 @@ static PyMethodDef gMethods[] = {
     "captured_tokens",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::string>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<std::string>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -185,7 +185,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->captured_tokens(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -204,10 +204,10 @@ static PyMethodDef gMethods[] = {
     "captured_data",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::string>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<std::string>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -215,7 +215,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->captured_data(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }

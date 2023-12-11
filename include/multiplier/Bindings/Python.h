@@ -7,6 +7,10 @@
 #pragma once
 
 #include <optional>
+#include <span>
+#include <string>
+#include <string_view>
+#include <vector>
 
 #include "../Compiler.h"
 
@@ -17,6 +21,29 @@ namespace mx {
 using BorrowedPyObject = ::PyObject;
 using SharedPyObject = ::PyObject;
 
+template <typename T>
+struct FromPythonReturnTypeImpl {
+  using Type = std::optional<T>;
+};
+
+template <typename T>
+struct FromPythonReturnTypeImpl<std::span<T>> {
+  using Type = std::optional<std::vector<T>>;
+};
+
+template <typename T>
+struct FromPythonReturnTypeImpl<std::span<const T>> {
+  using Type = std::optional<std::vector<T>>;
+};
+
+template <>
+struct FromPythonReturnTypeImpl<std::string_view> {
+  using Type = std::optional<std::string>;
+};
+
+template <typename T>
+using FromPythonReturnType = typename FromPythonReturnTypeImpl<T>::Type;
+
 // Convert an object of type `T` to a new reference to a Python object.
 template <typename T>
 [[gnu::noinline]]
@@ -26,9 +53,6 @@ MX_EXPORT SharedPyObject *to_python(T) noexcept;
 // a value of type `T`.
 template <typename T>
 [[gnu::noinline]]
-MX_EXPORT std::optional<T> from_python(BorrowedPyObject *obj) noexcept;
-
-// Return a new reference to the loaded `multiplier` module, if any.
-MX_EXPORT SharedPyObject *python_module(void) noexcept;
+MX_EXPORT FromPythonReturnType<T> from_python(BorrowedPyObject *obj) noexcept;
 
 }  // namespace mx

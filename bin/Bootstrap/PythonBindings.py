@@ -359,14 +359,23 @@ METHOD_SPEC_PREFIX = """  {{
     "{}",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {{
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
 """
+
+
+STATIC_METHOD_SPEC_PREFIX = """  {{
+    "{}",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {{
+          (void) args;
+"""
+
 
 METHOD_SPEC_CHECK_ARGCOUNT_BEGIN = "          while (num_args == {num_args}) {{\n"
 
 
-METHOD_SPEC_GET_ARG = """            auto arg_{arg_num} = PythonBinding<{arg_type}>::from_python(args[{arg_num}]);
+METHOD_SPEC_GET_ARG = """            auto arg_{arg_num} = ::mx::from_python<{arg_type}>(args[{arg_num}]);
             if (!arg_{arg_num}.has_value()) {{
               break;
             }}
@@ -377,7 +386,7 @@ METHOD_SPEC_CALL_ARG = "arg_{}.value()"
 
 
 METHOD_SPEC_CALL = """
-            return ::mx::to_python(obj->{method_name}({args}));
+            return ::mx::to_python({this}{method_name}({args}));
 """
 
 
@@ -466,12 +475,12 @@ RICH_COMPARE = """[] (BorrowedPyObject *a_obj, BorrowedPyObject *b_obj, int op) 
         break;
       }
 
-      auto a = PythonBinding<T>::from_python(a_obj);
+      auto a = ::mx::from_python<T>(a_obj);
       if (!a.has_value()) {
         break;
       }
 
-      auto b = PythonBinding<T>::from_python(b_obj);
+      auto b = ::mx::from_python<T>(b_obj);
       if (!b.has_value()) {
         break;
       }
@@ -717,7 +726,7 @@ INIT_SPEC_GET_ARG = """
       if (!obj_{arg_num}) {{
         break;
       }}
-      auto arg_{arg_num} = PythonBinding<{arg_type}>::from_python(obj_{arg_num});
+      auto arg_{arg_num} = ::mx::from_python<{arg_type}>(obj_{arg_num});
       Py_DECREF(obj_{arg_num});
       if (!arg_{arg_num}.has_value()) {{
         break;
@@ -1037,6 +1046,7 @@ def _wrap_method_impl(class_schema: ClassSchema, schema: MethodSchema,
     py_args.append(f"{arg_name}: {arg.element_type.python_value_name}")
 
   out.append(METHOD_SPEC_CALL.format(
+      this=is_static and "T::" or "obj->",
       method_name=schema.name,
       args=", ".join(METHOD_SPEC_CALL_ARG.format(i) for i in range(num_args))))
 
@@ -1078,7 +1088,10 @@ def _wrap_method(class_schema: ClassSchema, schema: NamedSchema,
   cxx_namespace = rel_ns and f"mx::{rel_ns}::" or "mx::"
   py_method_name = renamer.rename_method(class_schema, schema)
 
-  out.append(METHOD_SPEC_PREFIX.format(py_method_name))
+  if is_static:
+    out.append(STATIC_METHOD_SPEC_PREFIX.format(py_method_name))
+  else:
+    out.append(METHOD_SPEC_PREFIX.format(py_method_name))
 
   if isinstance(schema, OverloadSetSchema):
     for method in schema.overloads:

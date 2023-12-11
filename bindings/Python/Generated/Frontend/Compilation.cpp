@@ -301,104 +301,103 @@ static PyMethodDef gMethods[] = {
   {
     "containing",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Fragment>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Fragment>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::optional<mx::Fragment>>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<std::optional<mx::Fragment>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Decl>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Decl>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Stmt>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Attr>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Attr>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::TemplateArgument>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::TemplateArgument>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::TemplateParameterList>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::TemplateParameterList>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::CXXBaseSpecifier>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::CXXBaseSpecifier>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Designator>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Designator>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Token>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Token>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Macro>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Macro>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)

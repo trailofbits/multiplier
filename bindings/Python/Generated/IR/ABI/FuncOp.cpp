@@ -183,12 +183,11 @@ static PyMethodDef gMethods[] = {
   {
     "static_kind",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 0) {
 
-            return ::mx::to_python(obj->static_kind());
+            return ::mx::to_python(T::static_kind());
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -201,16 +200,15 @@ static PyMethodDef gMethods[] = {
   {
     "FROM",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::ir::Operation>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::ir::Operation>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->from(arg_0.value()));
+            return ::mx::to_python(T::from(arg_0.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -223,16 +221,15 @@ static PyMethodDef gMethods[] = {
   {
     "producing",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::ir::Value>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::ir::Value>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->producing(arg_0.value()));
+            return ::mx::to_python(T::producing(arg_0.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)

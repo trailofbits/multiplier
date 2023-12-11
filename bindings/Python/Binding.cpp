@@ -254,9 +254,4 @@ SharedPyObject *PythonBinding<std::filesystem::path>::to_python(
                                val.generic_string().c_str());
 }
 
-// Return a borrowed reference to the loaded `multiplier` module, if any.
-SharedPyObject *python_module(void) noexcept {
-  return PyImport_ImportModule("multiplier");
-}
-
 }  // namespace mx

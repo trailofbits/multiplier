@@ -1336,6 +1336,8 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
           ret.reader_index = ti.first;
           ret.begin_index = ti.second;
           ret.end_index = ret.begin_index;
+        } else {
+          assert(ret.reader_index == GetOrCreateIndex(file_tok).first);
         }
         last_tok = std::move(file_tok);
       }
@@ -1348,10 +1350,13 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
           ret.reader_index = ti.first;
           ret.begin_index = ti.second;
           ret.end_index = ret.begin_index;
+        } else {
+          assert(ret.reader_index == GetOrCreateIndex(file_tok).first);
         }
 
         last_tok = std::move(file_tok);
         if (auto rc_file_tok = RightCornerOfUse(m).file_token()) {
+          assert(ret.reader_index == GetOrCreateIndex(rc_file_tok).first);
           last_tok = std::move(rc_file_tok);
         }
       }

@@ -1935,16 +1935,15 @@ static PyMethodDef gMethods[] = {
   {
     "classify",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::string_view>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<std::string_view>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->classify(arg_0.value()));
+            return ::mx::to_python(T::classify(arg_0.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -1957,24 +1956,23 @@ static PyMethodDef gMethods[] = {
   {
     "producing",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::ir::Result>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::ir::Result>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->producing(arg_0.value()));
+            return ::mx::to_python(T::producing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::ir::Value>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::ir::Value>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->producing(arg_0.value()));
+            return ::mx::to_python(T::producing(arg_0.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -1987,24 +1985,23 @@ static PyMethodDef gMethods[] = {
   {
     "containing",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::ir::Region>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::ir::Region>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::ir::Block>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::ir::Block>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -2018,10 +2015,10 @@ static PyMethodDef gMethods[] = {
     "nth_operand",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint32_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -2040,10 +2037,10 @@ static PyMethodDef gMethods[] = {
     "nth_result",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint32_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -2062,10 +2059,10 @@ static PyMethodDef gMethods[] = {
     "nth_region",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint32_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint32_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }

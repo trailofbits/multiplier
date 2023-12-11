@@ -151,28 +151,27 @@ static PyMethodDef gMethods[] = {
   {
     "in_memory_cache",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Index>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Index>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->in_memory_cache(arg_0.value()));
+            return ::mx::to_python(T::in_memory_cache(arg_0.value()));
           }
           while (num_args == 2) {
-            auto arg_0 = PythonBinding<mx::Index>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Index>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = PythonBinding<uint32_t>::from_python(args[1]);
+            auto arg_1 = ::mx::from_python<uint32_t>(args[1]);
             if (!arg_1.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->in_memory_cache(arg_0.value(), arg_1.value()));
+            return ::mx::to_python(T::in_memory_cache(arg_0.value(), arg_1.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -185,16 +184,15 @@ static PyMethodDef gMethods[] = {
   {
     "from_database",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::filesystem::path>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<std::filesystem::path>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->from_database(arg_0.value()));
+            return ::mx::to_python(T::from_database(arg_0.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -207,88 +205,87 @@ static PyMethodDef gMethods[] = {
   {
     "containing",
     reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Fragment>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Fragment>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::File>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::File>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Decl>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Decl>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Stmt>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Stmt>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Type>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Type>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Attr>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Attr>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Macro>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Macro>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Designator>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Designator>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<mx::Token>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<mx::Token>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
 
-            return ::mx::to_python(obj->containing(arg_0.value()));
+            return ::mx::to_python(T::containing(arg_0.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -302,10 +299,10 @@ static PyMethodDef gMethods[] = {
     "status",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<bool>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<bool>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -324,10 +321,10 @@ static PyMethodDef gMethods[] = {
     "fragment_containing",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<EntityId>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<EntityId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -346,10 +343,10 @@ static PyMethodDef gMethods[] = {
     "fragment",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -357,7 +354,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->fragment(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<PackedFragmentId>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<PackedFragmentId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -376,10 +373,10 @@ static PyMethodDef gMethods[] = {
     "declaration",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -387,7 +384,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->declaration(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<PackedDeclId>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<PackedDeclId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -406,10 +403,10 @@ static PyMethodDef gMethods[] = {
     "statement",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -417,7 +414,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->statement(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<PackedStmtId>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<PackedStmtId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -436,10 +433,10 @@ static PyMethodDef gMethods[] = {
     "attribute",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -447,7 +444,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->attribute(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<PackedAttrId>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<PackedAttrId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -466,10 +463,10 @@ static PyMethodDef gMethods[] = {
     "macro",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -477,7 +474,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->macro(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<PackedMacroId>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<PackedMacroId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -496,10 +493,10 @@ static PyMethodDef gMethods[] = {
     "type",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -507,7 +504,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->type(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<PackedTypeId>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<PackedTypeId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -526,10 +523,10 @@ static PyMethodDef gMethods[] = {
     "file",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -537,7 +534,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->file(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<PackedFileId>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<PackedFileId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -556,10 +553,10 @@ static PyMethodDef gMethods[] = {
     "template_argument",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -567,7 +564,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->template_argument(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<PackedTemplateArgumentId>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<PackedTemplateArgumentId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -586,10 +583,10 @@ static PyMethodDef gMethods[] = {
     "template_parameter_list",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -597,7 +594,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->template_parameter_list(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<PackedTemplateParameterListId>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<PackedTemplateParameterListId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -616,10 +613,10 @@ static PyMethodDef gMethods[] = {
     "cxx_base_specifier",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -627,7 +624,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->cxx_base_specifier(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<PackedCXXBaseSpecifierId>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<PackedCXXBaseSpecifierId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -646,10 +643,10 @@ static PyMethodDef gMethods[] = {
     "designator",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -657,7 +654,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->designator(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<PackedDesignatorId>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<PackedDesignatorId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -676,10 +673,10 @@ static PyMethodDef gMethods[] = {
     "compilation",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<uint64_t>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -687,7 +684,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(obj->compilation(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<PackedCompilationId>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<PackedCompilationId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -706,10 +703,10 @@ static PyMethodDef gMethods[] = {
     "entity",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<EntityId>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<EntityId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -728,10 +725,10 @@ static PyMethodDef gMethods[] = {
     "query_entities",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          auto obj = T_cast(self);
+          T *obj = T_cast(self);
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = PythonBinding<std::string>::from_python(args[0]);
+            auto arg_0 = ::mx::from_python<std::string>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
