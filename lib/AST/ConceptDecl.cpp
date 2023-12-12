@@ -46,20 +46,23 @@ bool ConceptDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ConceptDecl> ConceptDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ConceptDecl> ConceptDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ConceptDecl, ir::hl::Operation>> ConceptDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kConceptDeclDerivedKinds)) {
+gap::generator<std::pair<ConceptDecl, ir::Operation>> ConceptDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kConceptDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ConceptDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ConceptDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ConceptDecl> ConceptDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

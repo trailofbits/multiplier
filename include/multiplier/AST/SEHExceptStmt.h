@@ -38,8 +38,10 @@ class MX_EXPORT SEHExceptStmt : public Stmt {
   static gap::generator<SEHExceptStmt> in(const Fragment &frag);
   static gap::generator<SEHExceptStmt> in(const File &file);
 
-  static std::optional<SEHExceptStmt> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<SEHExceptStmt, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<SEHExceptStmt> from(const ir::Operation &op);
+  static gap::generator<std::pair<SEHExceptStmt, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_EXCEPT_STMT;

@@ -42,8 +42,10 @@ class MX_EXPORT ConditionalOperator : public AbstractConditionalOperator {
   static gap::generator<ConditionalOperator> in(const Fragment &frag);
   static gap::generator<ConditionalOperator> in(const File &file);
 
-  static std::optional<ConditionalOperator> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<ConditionalOperator, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<ConditionalOperator> from(const ir::Operation &op);
+  static gap::generator<std::pair<ConditionalOperator, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONDITIONAL_OPERATOR;

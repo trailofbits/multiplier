@@ -18,7 +18,7 @@
 
 namespace mx {
 
-#define MX_DEFINE_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_DEFINE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     std::optional<type_name> FragmentTokenContextReader::as_ ## lower_name(RawEntityId entity_id) const { \
       if (impl && CategoryFromEntityId(entity_id) == EntityCategory::enum_name) { \
         if (auto ptr = impl->ep->type_name ## For(impl->ep, entity_id)) { \
@@ -35,6 +35,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_GETTER,
                             MX_DEFINE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DEFINE_GETTER
 
@@ -58,7 +59,7 @@ FragmentTokenContextReader::TokenContextOffsets(EntityOffset offset) const {
   return tagged_offset;
 }
 
-#define MX_DEFINE_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_DEFINE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     std::optional<type_name> TypeTokenContextReader::as_ ## lower_name(RawEntityId entity_id) const { \
       if (impl && CategoryFromEntityId(entity_id) == EntityCategory::enum_name) { \
         if (auto ptr = impl->ep->type_name ## For(impl->ep, entity_id)) { \
@@ -75,6 +76,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_GETTER,
                             MX_DEFINE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DEFINE_GETTER
 
@@ -144,7 +146,7 @@ std::optional<TokenContext> Token::context(void) const {
   return ret;
 }
 
-#define MX_DEFINE_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_DEFINE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     std::optional<type_name> TokenContext::as_ ## lower_name(void) const { \
       if (reader && CategoryFromEntityId(entity_id) == EntityCategory::enum_name) { \
         return reader->as_ ## lower_name(entity_id); \
@@ -158,6 +160,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_GETTER,
                             MX_DEFINE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DEFINE_GETTER
 

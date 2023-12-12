@@ -46,20 +46,23 @@ bool AtomicExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<AtomicExpr> AtomicExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<AtomicExpr> AtomicExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<AtomicExpr, ir::hl::Operation>> AtomicExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kAtomicExprDerivedKinds)) {
+gap::generator<std::pair<AtomicExpr, ir::Operation>> AtomicExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kAtomicExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<AtomicExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<AtomicExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<AtomicExpr> AtomicExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

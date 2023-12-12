@@ -13,92 +13,96 @@ set(ir_source_include_dir "${PROJECT_SOURCE_DIR}/include/${lower_project_name}/I
 file(GLOB_RECURSE ir_sources CONFIGURE_DEPENDS RELATIVE_PATH "${CMAKE_CURRENT_LIST_DIR}" "*.cpp")
 file(GLOB_RECURSE ir_headers CONFIGURE_DEPENDS RELATIVE_PATH "${ir_source_include_dir}" "*.h")
 
-add_library("mx-vast" INTERFACE)
+if(MX_ENABLE_VAST)
+  add_library("mx-vast" INTERFACE)
 
-set_target_properties("mx-vast"
-  PROPERTIES
-    LINKER_LANGUAGE
-      CXX
-    VISIBILITY_INLINES_HIDDEN
-      YES
-    CXX_VISIBILITY_PRESET
-      hidden
-    POSITION_INDEPENDENT_CODE
-      YES
-    COMPILE_FEATURES
-      cxx_std_20
-    INTERFACE_COMPILE_FEATURES
-      cxx_std_20
-)
+  set_target_properties("mx-vast"
+    PROPERTIES
+      LINKER_LANGUAGE
+        CXX
+      VISIBILITY_INLINES_HIDDEN
+        YES
+      CXX_VISIBILITY_PRESET
+        hidden
+      POSITION_INDEPENDENT_CODE
+        YES
+      COMPILE_FEATURES
+        cxx_std_20
+      INTERFACE_COMPILE_FEATURES
+        cxx_std_20
+  )
 
-target_link_libraries("mx-vast"
-  INTERFACE
-    ${MLIR_LIBS}
-    ${VAST_LIBS}
-)
+  target_link_libraries("mx-vast"
+    INTERFACE
+      ${MLIR_LIBS}
+      ${VAST_LIBS}
+  )
 
-add_library("mx-mlir" STATIC
-  ${ir_headers}
-  ${ir_sources}
-)
+  add_library("mx-mlir" STATIC
+    ${ir_headers}
+    ${ir_sources}
+  )
 
-target_include_directories("mx-mlir"
-  PUBLIC
-    "$<BUILD_INTERFACE:${LLVM_INCLUDE_DIRS};${LLVM_INCLUDE_DIR};${MLIR_INCLUDE_DIRS}>"
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-    $<INSTALL_INTERFACE:${MX_INSTALL_INCLUDE_DIR}>
-  PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CMAKE_CURRENT_BINARY_DIR}"
-)
+  target_include_directories("mx-mlir"
+    PUBLIC
+      "$<BUILD_INTERFACE:${LLVM_INCLUDE_DIRS};${LLVM_INCLUDE_DIR};${MLIR_INCLUDE_DIRS}>"
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+      $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+      $<INSTALL_INTERFACE:${MX_INSTALL_INCLUDE_DIR}>
+    PRIVATE
+      "${CMAKE_CURRENT_SOURCE_DIR}"
+      "${CMAKE_CURRENT_BINARY_DIR}"
+  )
 
-set_target_properties("mx-mlir"
-  PROPERTIES
-    LINKER_LANGUAGE
-      CXX
-    VISIBILITY_INLINES_HIDDEN
-      YES
-    CXX_VISIBILITY_PRESET
-      hidden
-    POSITION_INDEPENDENT_CODE
-      YES
-)
+  set_target_properties("mx-mlir"
+    PROPERTIES
+      LINKER_LANGUAGE
+        CXX
+      VISIBILITY_INLINES_HIDDEN
+        YES
+      CXX_VISIBILITY_PRESET
+        hidden
+      POSITION_INDEPENDENT_CODE
+        YES
+  )
 
-target_link_directories("mx-mlir"
-  PRIVATE
-    "${MLIR_LIB_DIR}"
-)
+  target_link_directories("mx-mlir"
+    PRIVATE
+      "${MLIR_LIB_DIR}"
+  )
 
-set_target_properties("mx-vast"
-  PROPERTIES
-    LINKER_LANGUAGE
-      CXX
-    PUBLIC_HEADER
-      "${api_headers}"
-    VISIBILITY_INLINES_HIDDEN
-      YES
-    CXX_VISIBILITY_PRESET
-      hidden
-    POSITION_INDEPENDENT_CODE
-      YES
-    COMPILE_FEATURES
-      cxx_std_20
-    INTERFACE_COMPILE_FEATURES
-      cxx_std_20
-)
+  set_target_properties("mx-vast"
+    PROPERTIES
+      LINKER_LANGUAGE
+        CXX
+      PUBLIC_HEADER
+        "${api_headers}"
+      VISIBILITY_INLINES_HIDDEN
+        YES
+      CXX_VISIBILITY_PRESET
+        hidden
+      POSITION_INDEPENDENT_CODE
+        YES
+      COMPILE_FEATURES
+        cxx_std_20
+      INTERFACE_COMPILE_FEATURES
+        cxx_std_20
+  )
 
-target_link_libraries("mx-mlir"
-  PUBLIC
-    "gap::gap"
-    "gap::gap-core"
-    "gap::gap-settings"
-    "std::coroutines"
-    "mx-vast"
-    "mx-serialize"
-)
+  target_link_libraries("mx-mlir"
+    PUBLIC
+      "gap::gap"
+      "gap::gap-core"
+      "gap::gap-settings"
+      "std::coroutines"
+      "mx-vast"
+      "mx-serialize"
+  )
+endif(MX_ENABLE_VAST)
 
 if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
+
+  # NOTE(pag): Always install the IR headers.
   install(
     DIRECTORY
       "${ir_source_include_dir}"

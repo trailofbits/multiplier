@@ -45,20 +45,23 @@ bool OMPTargetParallelDirective::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OMPTargetParallelDirective> OMPTargetParallelDirective::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<OMPTargetParallelDirective> OMPTargetParallelDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<OMPTargetParallelDirective, ir::hl::Operation>> OMPTargetParallelDirective::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPTargetParallelDirectiveDerivedKinds)) {
+gap::generator<std::pair<OMPTargetParallelDirective, ir::Operation>> OMPTargetParallelDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kOMPTargetParallelDirectiveDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPTargetParallelDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<OMPTargetParallelDirective, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPTargetParallelDirective> OMPTargetParallelDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

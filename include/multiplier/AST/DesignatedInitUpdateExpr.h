@@ -41,8 +41,10 @@ class MX_EXPORT DesignatedInitUpdateExpr : public Expr {
   static gap::generator<DesignatedInitUpdateExpr> in(const Fragment &frag);
   static gap::generator<DesignatedInitUpdateExpr> in(const File &file);
 
-  static std::optional<DesignatedInitUpdateExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<DesignatedInitUpdateExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<DesignatedInitUpdateExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<DesignatedInitUpdateExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DESIGNATED_INIT_UPDATE_EXPR;

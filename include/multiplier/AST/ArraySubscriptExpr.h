@@ -40,8 +40,10 @@ class MX_EXPORT ArraySubscriptExpr : public Expr {
   static gap::generator<ArraySubscriptExpr> in(const Fragment &frag);
   static gap::generator<ArraySubscriptExpr> in(const File &file);
 
-  static std::optional<ArraySubscriptExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<ArraySubscriptExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<ArraySubscriptExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<ArraySubscriptExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_SUBSCRIPT_EXPR;

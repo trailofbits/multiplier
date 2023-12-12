@@ -43,20 +43,23 @@ bool ExportDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ExportDecl> ExportDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ExportDecl> ExportDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ExportDecl, ir::hl::Operation>> ExportDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kExportDeclDerivedKinds)) {
+gap::generator<std::pair<ExportDecl, ir::Operation>> ExportDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kExportDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ExportDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ExportDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ExportDecl> ExportDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

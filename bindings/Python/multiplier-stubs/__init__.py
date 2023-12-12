@@ -59,6 +59,7 @@ class EntityCategory(IntEnum):
   CXX_BASE_SPECIFIER = 11
   DESIGNATOR = 12
   COMPILATION = 13
+  OPERATION = 14
 
 class BuiltinReferenceKind(IntEnum):
   USES_VALUE = 0
@@ -114,23 +115,24 @@ class Reference(object):
   as_cxx_base_specifier: Optional[multiplier.ast.CXXBaseSpecifier]
   as_designator: Optional[multiplier.ast.Designator]
   as_compilation: Optional[multiplier.frontend.Compilation]
+  as_operation: Optional[multiplier.ir.Operation]
 
   @overload
   @staticmethod
-  def add(kind: multiplier.ReferenceKind, from_: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation], to: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> bool:
+  def add(kind: multiplier.ReferenceKind, from_: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation], to: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> bool:
     ...
 
   @overload
   @staticmethod
-  def add(kind: multiplier.ReferenceKind, from_: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation], to: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation], context: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> bool:
+  def add(kind: multiplier.ReferenceKind, from_: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation], to: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation], context: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> bool:
     ...
 
   @staticmethod
-  def FROM(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Generator[multiplier.Reference]:
+  def FROM(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Generator[multiplier.Reference]:
     ...
 
   @staticmethod
-  def to(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Generator[multiplier.Reference]:
+  def to(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Generator[multiplier.Reference]:
     ...
 
 class Fragment(multiplier.Entity):
@@ -205,7 +207,12 @@ class Fragment(multiplier.Entity):
 
   @overload
   @staticmethod
-  def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.Fragment]:
+  def containing(arg_0: multiplier.ir.Operation) -> Optional[multiplier.Fragment]:
+    ...
+
+  @overload
+  @staticmethod
+  def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.Fragment]:
     ...
 
   @staticmethod
@@ -281,7 +288,12 @@ class Index(object):
 
   @overload
   @staticmethod
-  def containing(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation]) -> Optional[multiplier.Index]:
+  def containing(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.Index]:
+    ...
+
+  @overload
+  @staticmethod
+  def containing(entity: multiplier.ir.Operation) -> multiplier.Index:
     ...
 
   def status(self, block: bool) -> multiplier.IndexStatus:
@@ -384,6 +396,14 @@ class Index(object):
 
   @overload
   def compilation(self, id: multiplier.CompilationId) -> Optional[multiplier.frontend.Compilation]:
+    ...
+
+  @overload
+  def operation(self, id: int) -> Optional[multiplier.ir.Operation]:
+    ...
+
+  @overload
+  def operation(self, id: multiplier.OperationId) -> Optional[multiplier.ir.Operation]:
     ...
 
   def entity(self, eid: int) -> multiplier.Entity:

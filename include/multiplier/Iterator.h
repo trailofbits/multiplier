@@ -12,21 +12,14 @@
 #include "Types.h"
 
 namespace mx {
+namespace ir {
+class Operation;
+}  // namespace ir
 
-class Attr;
-class CXXBaseSpecifier;
-class Decl;
-class Designator;
 class FragmentImpl;
-class Macro;
-class Stmt;
-class TemplateArgument;
-class TemplateParameterList;
-class Token;
 class TokenContextReader;
-class Type;
 
-#define MX_FORWARD_DECLARE_ENTITY(type_name, lower_name, enum_name, category) \
+#define MX_FORWARD_DECLARE_ENTITY(ns_path, type_name, ...) \
     class type_name; \
     class type_name ## Impl;
 
@@ -36,7 +29,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
-                            MX_FORWARD_DECLARE_ENTITY)
+                            MX_FORWARD_DECLARE_ENTITY,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_FORWARD_DECLARE_ENTITY
 
 class IteratorEnd {};

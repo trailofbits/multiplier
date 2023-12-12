@@ -46,20 +46,23 @@ bool OMPTeamsDistributeParallelForSimdDirective::contains(const Token &tok) cons
   return false;
 }
 
-std::optional<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<OMPTeamsDistributeParallelForSimdDirective, ir::hl::Operation>> OMPTeamsDistributeParallelForSimdDirective::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPTeamsDistributeParallelForSimdDirectiveDerivedKinds)) {
+gap::generator<std::pair<OMPTeamsDistributeParallelForSimdDirective, ir::Operation>> OMPTeamsDistributeParallelForSimdDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kOMPTeamsDistributeParallelForSimdDirectiveDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPTeamsDistributeParallelForSimdDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<OMPTeamsDistributeParallelForSimdDirective, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

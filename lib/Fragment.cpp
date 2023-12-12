@@ -31,7 +31,7 @@ namespace ir {
 class SourceIRImpl;
 }  // namespace ir
 
-Fragment Fragment::containing(const Fragment &child) {
+Fragment Fragment::containing(const Fragment &child) noexcept {
   for (mx::RawEntityId parent_id : child.impl->reader.getParentIds()) {
     return Fragment(child.impl->ep->FragmentFor(child.impl->ep, parent_id));
   }
@@ -61,52 +61,52 @@ std::optional<PackedFragmentId> Fragment::parent_id(void) const noexcept {
 }
 
 // Return the fragment containing a query match.
-Fragment Fragment::containing(const RegexQueryMatch &match) {
+Fragment Fragment::containing(const RegexQueryMatch &match) noexcept {
   return Fragment(
       dynamic_cast<const RegexQueryMatchImpl *>(match.impl.get())->frag);
 }
 
-Fragment Fragment::containing(const Decl &entity) {
+Fragment Fragment::containing(const Decl &entity) noexcept {
   return Fragment(entity.impl->ep->FragmentFor(
       entity.impl->ep, entity.impl->fragment_id));
 }
 
-Fragment Fragment::containing(const Stmt &entity) {
+Fragment Fragment::containing(const Stmt &entity) noexcept {
   return Fragment(entity.impl->ep->FragmentFor(
       entity.impl->ep, entity.impl->fragment_id));
 }
 
-Fragment Fragment::containing(const Attr &entity) {
+Fragment Fragment::containing(const Attr &entity) noexcept {
   return Fragment(entity.impl->ep->FragmentFor(
       entity.impl->ep, entity.impl->fragment_id.Pack()));
 }
 
-Fragment Fragment::containing(const TemplateArgument &entity) {
+Fragment Fragment::containing(const TemplateArgument &entity) noexcept {
   return Fragment(entity.impl->ep->FragmentFor(
       entity.impl->ep, entity.impl->fragment_id));
 }
 
-Fragment Fragment::containing(const TemplateParameterList &entity) {
+Fragment Fragment::containing(const TemplateParameterList &entity) noexcept {
   return Fragment(entity.impl->ep->FragmentFor(
       entity.impl->ep, entity.impl->fragment_id));
 }
 
-Fragment Fragment::containing(const CXXBaseSpecifier &entity) {
+Fragment Fragment::containing(const CXXBaseSpecifier &entity) noexcept {
   return Fragment(entity.impl->ep->FragmentFor(
       entity.impl->ep, entity.impl->fragment_id));
 }
 
-Fragment Fragment::containing(const Designator &entity) {
+Fragment Fragment::containing(const Designator &entity) noexcept {
   return Fragment(entity.impl->ep->FragmentFor(
       entity.impl->ep, entity.impl->fragment_id));
 }
 
-Fragment Fragment::containing(const Macro &entity) {
+Fragment Fragment::containing(const Macro &entity) noexcept {
   return Fragment(entity.impl->ep->FragmentFor(
       entity.impl->ep, entity.impl->fragment_id));
 }
 
-std::optional<Fragment> Fragment::containing(const Token &entity) {
+std::optional<Fragment> Fragment::containing(const Token &entity) noexcept {
   if (auto frag = entity.impl->NthOwningFragment(entity.offset)) {
     return Fragment(FragmentImplPtr(entity.impl, frag));
   } else {
@@ -114,29 +114,46 @@ std::optional<Fragment> Fragment::containing(const Token &entity) {
   }
 }
 
-std::optional<Fragment> Fragment::containing(const VariantEntity &entity) {
-#define GET_FRAGMENT(type_name, lower_name, enum_name, category) \
-      } else if (std::holds_alternative<type_name>(entity)) { \
-        return Fragment::containing(std::get<type_name>(entity));
+// Return the fragment containing an operation.
+std::optional<Fragment> Fragment::containing(
+    const ir::Operation &op) noexcept {
+#ifndef MX_DISABLE_VAST
+  if (auto decl = Decl::from(op)) {
+    return Fragment::containing(decl.value());
+  } else if (auto stmt = Stmt::from(op)) {
+    return Fragment::containing(stmt.value());
+  }
+#else
+  assert(false);
+  (void) op;
+#endif
+
+  return std::nullopt;
+}
+
+std::optional<Fragment> Fragment::containing(
+    const VariantEntity &entity) noexcept {
+#define GET_FRAGMENT(ns_path, type_name, lower_name, enum_name, category) \
+    if (auto lower_name ## _ptr = std::get_if<ns_path type_name>(&entity)) { \
+      return Fragment::containing(*lower_name ## _ptr); \
+    }
 
   // TODO(pag): Pseudo entities have a fragment id.
 
-  if (false) {
-    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
-                                GET_FRAGMENT,
-                                MX_IGNORE_ENTITY_CATEGORY,
-                                GET_FRAGMENT,
-                                GET_FRAGMENT,
-                                GET_FRAGMENT,
-                                MX_IGNORE_ENTITY_CATEGORY)
-  } else {
-    return std::nullopt;
-  }
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                              GET_FRAGMENT,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              GET_FRAGMENT,
+                              GET_FRAGMENT,
+                              GET_FRAGMENT,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              GET_FRAGMENT)
+  return std::nullopt;
 #undef GET_FRAGMENT
 }
 
 // Return the fragment containing a token tree.
-std::optional<Fragment> Fragment::containing(const TokenTree &tree) {
+std::optional<Fragment> Fragment::containing(const TokenTree &tree) noexcept {
   if (tree.impl->fragment) {
     return Fragment(tree.impl->fragment);
   } else {

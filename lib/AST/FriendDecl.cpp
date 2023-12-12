@@ -46,20 +46,23 @@ bool FriendDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<FriendDecl> FriendDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<FriendDecl> FriendDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<FriendDecl, ir::hl::Operation>> FriendDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kFriendDeclDerivedKinds)) {
+gap::generator<std::pair<FriendDecl, ir::Operation>> FriendDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kFriendDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<FriendDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<FriendDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<FriendDecl> FriendDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

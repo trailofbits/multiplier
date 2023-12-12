@@ -38,8 +38,10 @@ class MX_EXPORT OMPTargetDataDirective : public OMPExecutableDirective {
   static gap::generator<OMPTargetDataDirective> in(const Fragment &frag);
   static gap::generator<OMPTargetDataDirective> in(const File &file);
 
-  static std::optional<OMPTargetDataDirective> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<OMPTargetDataDirective, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<OMPTargetDataDirective> from(const ir::Operation &op);
+  static gap::generator<std::pair<OMPTargetDataDirective, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_DATA_DIRECTIVE;

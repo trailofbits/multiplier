@@ -41,8 +41,10 @@ class MX_EXPORT EnumConstantDecl : public ValueDecl {
   static gap::generator<EnumConstantDecl> in(const Fragment &frag);
   static gap::generator<EnumConstantDecl> in(const File &file);
 
-  static std::optional<EnumConstantDecl> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<EnumConstantDecl, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<EnumConstantDecl> from(const ir::Operation &op);
+  static gap::generator<std::pair<EnumConstantDecl, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::ENUM_CONSTANT;

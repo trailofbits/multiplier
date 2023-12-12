@@ -60,20 +60,23 @@ bool CXXRecordDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXRecordDecl> CXXRecordDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CXXRecordDecl> CXXRecordDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CXXRecordDecl, ir::hl::Operation>> CXXRecordDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kCXXRecordDeclDerivedKinds)) {
+gap::generator<std::pair<CXXRecordDecl, ir::Operation>> CXXRecordDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kCXXRecordDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXRecordDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CXXRecordDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

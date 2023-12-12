@@ -20,6 +20,12 @@
 
 namespace mx::ir {
 
+// Return the ID of this operation.
+PackedOperationId Operation::id(void) const noexcept {
+  auto eid = op_->getLoc().cast<mlir::OpaqueLoc>().getUnderlyingLocation();
+  return EntityId(eid).Extract<::mx::OperationId>().value();
+}
+
 std::string_view Operation::kind_name(void) const noexcept {
   switch (kind_) {
     case OperationKind::UNKNOWN: break;

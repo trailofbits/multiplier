@@ -41,8 +41,10 @@ class MX_EXPORT CXXUnresolvedConstructExpr : public Expr {
   static gap::generator<CXXUnresolvedConstructExpr> in(const Fragment &frag);
   static gap::generator<CXXUnresolvedConstructExpr> in(const File &file);
 
-  static std::optional<CXXUnresolvedConstructExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<CXXUnresolvedConstructExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<CXXUnresolvedConstructExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<CXXUnresolvedConstructExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_UNRESOLVED_CONSTRUCT_EXPR;

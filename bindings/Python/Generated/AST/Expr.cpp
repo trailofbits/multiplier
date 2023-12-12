@@ -1181,7 +1181,7 @@ static PyMethodDef gMethods[] = {
         +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::ir::hl::Operation>(args[0]);
+            auto arg_0 = ::mx::from_python<mx::ir::Operation>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -1213,7 +1213,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation>>(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation, mx::ir::Operation>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }

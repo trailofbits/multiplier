@@ -45,20 +45,23 @@ bool CXXBoolLiteralExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXBoolLiteralExpr> CXXBoolLiteralExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CXXBoolLiteralExpr> CXXBoolLiteralExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CXXBoolLiteralExpr, ir::hl::Operation>> CXXBoolLiteralExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCXXBoolLiteralExprDerivedKinds)) {
+gap::generator<std::pair<CXXBoolLiteralExpr, ir::Operation>> CXXBoolLiteralExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCXXBoolLiteralExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXBoolLiteralExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CXXBoolLiteralExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CXXBoolLiteralExpr> CXXBoolLiteralExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

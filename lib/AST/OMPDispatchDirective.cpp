@@ -44,20 +44,23 @@ bool OMPDispatchDirective::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<OMPDispatchDirective, ir::hl::Operation>> OMPDispatchDirective::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPDispatchDirectiveDerivedKinds)) {
+gap::generator<std::pair<OMPDispatchDirective, ir::Operation>> OMPDispatchDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kOMPDispatchDirectiveDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPDispatchDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<OMPDispatchDirective, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPDispatchDirective> OMPDispatchDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

@@ -47,20 +47,23 @@ bool SizeOfPackExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<SizeOfPackExpr, ir::hl::Operation>> SizeOfPackExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kSizeOfPackExprDerivedKinds)) {
+gap::generator<std::pair<SizeOfPackExpr, ir::Operation>> SizeOfPackExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kSizeOfPackExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<SizeOfPackExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<SizeOfPackExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<SizeOfPackExpr> SizeOfPackExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

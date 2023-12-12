@@ -53,20 +53,23 @@ bool ClassTemplateSpecializationDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ClassTemplateSpecializationDecl, ir::hl::Operation>> ClassTemplateSpecializationDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kClassTemplateSpecializationDeclDerivedKinds)) {
+gap::generator<std::pair<ClassTemplateSpecializationDecl, ir::Operation>> ClassTemplateSpecializationDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kClassTemplateSpecializationDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ClassTemplateSpecializationDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ClassTemplateSpecializationDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

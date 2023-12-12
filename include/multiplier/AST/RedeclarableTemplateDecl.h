@@ -40,8 +40,10 @@ class MX_EXPORT RedeclarableTemplateDecl : public TemplateDecl {
   static gap::generator<RedeclarableTemplateDecl> in(const Fragment &frag);
   static gap::generator<RedeclarableTemplateDecl> in(const File &file);
 
-  static std::optional<RedeclarableTemplateDecl> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<RedeclarableTemplateDecl, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<RedeclarableTemplateDecl> from(const ir::Operation &op);
+  static gap::generator<std::pair<RedeclarableTemplateDecl, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   static gap::generator<RedeclarableTemplateDecl> containing(const Decl &decl);
   static gap::generator<RedeclarableTemplateDecl> containing(const std::optional<Decl> &decl);

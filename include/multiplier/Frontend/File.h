@@ -16,22 +16,22 @@
 #include "Token.h"
 
 namespace mx {
+namespace ir {
+class Operation;
+}  // namespace ir
 
-class Compilation;
-class CompilationImpl;
 class EntityProvider;
-class FileImpl;
 class FileLocationCache;
 class FileLocationCacheImpl;
-class FragmentImpl;
 class Index;
 class Reference;
 class RegexQueryMatch;
 class TokenRange;
 class TokenTree;
 
-#define MX_FORWARD_DECLARE(type_name, ln, e, c) \
-    class type_name;
+#define MX_FORWARD_DECLARE(ns_path, type_name, ln, e, c) \
+    class type_name; \
+    class type_name ## Impl;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
@@ -39,7 +39,8 @@ class TokenTree;
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
-                              MX_FORWARD_DECLARE)
+                              MX_FORWARD_DECLARE,
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_FORWARD_DECLARE
 
 using FragmentIdList = std::vector<PackedFragmentId>;
@@ -84,7 +85,6 @@ class MX_EXPORT FileLocationCache {
 // de-duplicate via a hash of the contents.
 class MX_EXPORT File {
  private:
-  friend class Compilation;
   friend class CompilationImpl;
   friend class EntityProvider;
   friend class FileLocationCache;
@@ -100,10 +100,11 @@ class MX_EXPORT File {
   friend class TokenTree;
   friend class TokenTreeImpl;
 
-#define MX_FRIEND(type_name, ln, e, c) \
-    friend class type_name;
+#define MX_FRIEND(ns_path, type_name, ln, e, c) \
+    friend class ns_path type_name;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
@@ -126,8 +127,8 @@ class MX_EXPORT File {
     return file;
   }
 
-#define MX_DECLARE_CONTAINING(type_name, lower_name, enum_name, category) \
-    static std::optional<File> containing(const type_name &entity);
+#define MX_DECLARE_CONTAINING(ns_path, type_name, lower_name, enum_name, category) \
+    static std::optional<File> containing(const ns_path type_name &entity);
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
@@ -135,7 +136,8 @@ class MX_EXPORT File {
                               MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING,
-                              MX_IGNORE_ENTITY_CATEGORY)
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_CONTAINING)
 #undef MX_DECLARE_CONTAINING
 
   // Return the file containing a specific token.

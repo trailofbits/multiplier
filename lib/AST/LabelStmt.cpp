@@ -45,20 +45,23 @@ bool LabelStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<LabelStmt> LabelStmt::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<LabelStmt> LabelStmt::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<LabelStmt, ir::hl::Operation>> LabelStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kLabelStmtDerivedKinds)) {
+gap::generator<std::pair<LabelStmt, ir::Operation>> LabelStmt::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kLabelStmtDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<LabelStmt, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<LabelStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<LabelStmt> LabelStmt::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

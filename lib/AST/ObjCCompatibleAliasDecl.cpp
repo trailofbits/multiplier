@@ -45,20 +45,23 @@ bool ObjCCompatibleAliasDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ObjCCompatibleAliasDecl, ir::hl::Operation>> ObjCCompatibleAliasDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kObjCCompatibleAliasDeclDerivedKinds)) {
+gap::generator<std::pair<ObjCCompatibleAliasDecl, ir::Operation>> ObjCCompatibleAliasDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kObjCCompatibleAliasDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ObjCCompatibleAliasDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ObjCCompatibleAliasDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

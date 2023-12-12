@@ -45,20 +45,23 @@ bool ObjCBoolLiteralExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ObjCBoolLiteralExpr, ir::hl::Operation>> ObjCBoolLiteralExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kObjCBoolLiteralExprDerivedKinds)) {
+gap::generator<std::pair<ObjCBoolLiteralExpr, ir::Operation>> ObjCBoolLiteralExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kObjCBoolLiteralExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ObjCBoolLiteralExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ObjCBoolLiteralExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

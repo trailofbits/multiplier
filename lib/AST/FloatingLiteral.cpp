@@ -45,20 +45,23 @@ bool FloatingLiteral::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<FloatingLiteral> FloatingLiteral::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<FloatingLiteral> FloatingLiteral::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<FloatingLiteral, ir::hl::Operation>> FloatingLiteral::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kFloatingLiteralDerivedKinds)) {
+gap::generator<std::pair<FloatingLiteral, ir::Operation>> FloatingLiteral::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kFloatingLiteralDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<FloatingLiteral, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<FloatingLiteral, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<FloatingLiteral> FloatingLiteral::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

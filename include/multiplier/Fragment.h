@@ -16,11 +16,11 @@
 #include "Frontend/File.h"
 
 namespace mx {
+namespace ir {
+class Operation;
+}  // namespace ir
 
-class Compilation;
-class CompilationImpl;
 class EntityProvider;
-class FragmentImpl;
 class Index;
 class InvalidEntityProvider;
 class ReferenceIteratorImpl;
@@ -28,8 +28,9 @@ class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryMatch;
 
-#define MX_FORWARD_DECLARE(type_name, ln, e, c) \
-    class type_name;
+#define MX_FORWARD_DECLARE(ns_path, type_name, ln, e, c) \
+    class type_name; \
+    class type_name ## Impl;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
@@ -37,7 +38,8 @@ class RegexQueryMatch;
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
-                              MX_FORWARD_DECLARE)
+                              MX_FORWARD_DECLARE,
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_FORWARD_DECLARE
 
 using MacroOrToken = std::variant<Macro, Token>;
@@ -59,10 +61,11 @@ class MX_EXPORT Fragment {
   friend class TokenTree;
   friend class TokenTreeImpl;
 
-#define MX_FRIEND(type_name, ln, e, c) \
-    friend class type_name;
+#define MX_FRIEND(ns_path, type_name, ln, e, c) \
+    friend class ns_path type_name;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
@@ -86,26 +89,27 @@ class MX_EXPORT Fragment {
 
   // Return a fragment's parent fragment. If this is a top-level fragment, then
   // this returns the argument.
-  static Fragment containing(const Fragment &);
+  static Fragment containing(const Fragment &) noexcept;
 
   // Return the fragment containing a query match.
-  static Fragment containing(const RegexQueryMatch &);
+  static Fragment containing(const RegexQueryMatch &) noexcept;
 
   // Return the fragment containing a token tree.
-  static std::optional<Fragment> containing(const TokenTree &);
+  static std::optional<Fragment> containing(const TokenTree &) noexcept;
 
-  static Fragment containing(const Decl &);
-  static Fragment containing(const Stmt &);
-  static Fragment containing(const Attr &);
-  static Fragment containing(const TemplateArgument &);
-  static Fragment containing(const TemplateParameterList &);
-  static Fragment containing(const CXXBaseSpecifier &);
-  static Fragment containing(const Designator &);
-  static std::optional<Fragment> containing(const Token &);
-  static Fragment containing(const Macro &);
-  static std::optional<Fragment> containing(const VariantEntity &);
+  static Fragment containing(const Decl &) noexcept;
+  static Fragment containing(const Stmt &) noexcept;
+  static Fragment containing(const Attr &) noexcept;
+  static Fragment containing(const TemplateArgument &) noexcept;
+  static Fragment containing(const TemplateParameterList &) noexcept;
+  static Fragment containing(const CXXBaseSpecifier &) noexcept;
+  static Fragment containing(const Designator &) noexcept;
+  static std::optional<Fragment> containing(const Token &) noexcept;
+  static Fragment containing(const Macro &) noexcept;
+  static std::optional<Fragment> containing(const ir::Operation &) noexcept;
+  static std::optional<Fragment> containing(const VariantEntity &) noexcept;
 
-  inline static constexpr EntityCategory entity_category(void) {
+  inline static constexpr EntityCategory entity_category(void) noexcept {
     return EntityCategory::FRAGMENT;
   }
 

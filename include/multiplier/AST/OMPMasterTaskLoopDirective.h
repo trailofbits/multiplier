@@ -42,8 +42,10 @@ class MX_EXPORT OMPMasterTaskLoopDirective : public OMPLoopDirective {
   static gap::generator<OMPMasterTaskLoopDirective> in(const Fragment &frag);
   static gap::generator<OMPMasterTaskLoopDirective> in(const File &file);
 
-  static std::optional<OMPMasterTaskLoopDirective> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<OMPMasterTaskLoopDirective, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<OMPMasterTaskLoopDirective> from(const ir::Operation &op);
+  static gap::generator<std::pair<OMPMasterTaskLoopDirective, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_MASTER_TASK_LOOP_DIRECTIVE;

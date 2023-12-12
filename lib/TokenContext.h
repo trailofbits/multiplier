@@ -17,7 +17,7 @@ class TokenContextReader {
 
   virtual ~TokenContextReader(void) noexcept {};
 
-#define MX_FORWARD_DECLARE_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_FORWARD_DECLARE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     virtual std::optional<type_name> as_ ## lower_name(RawEntityId entity_id) const = 0;
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
@@ -26,6 +26,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_FORWARD_DECLARE_GETTER,
                             MX_FORWARD_DECLARE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_FORWARD_DECLARE_GETTER
 
@@ -47,7 +48,7 @@ class FragmentTokenContextReader : public TokenContextReader {
 
   virtual ~FragmentTokenContextReader(void) noexcept {};
 
-#define MX_FORWARD_DECLARE_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_FORWARD_DECLARE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     std::optional<type_name> as_ ## lower_name(RawEntityId entity_id) const final;
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
@@ -56,6 +57,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_FORWARD_DECLARE_GETTER,
                             MX_FORWARD_DECLARE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_FORWARD_DECLARE_GETTER
 
@@ -76,7 +78,7 @@ class TypeTokenContextReader : public TokenContextReader {
 
   virtual ~TypeTokenContextReader(void) noexcept {}
 
-#define MX_FORWARD_DECLARE_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_FORWARD_DECLARE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     std::optional<type_name> as_ ## lower_name(RawEntityId entity_id) const final;
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
@@ -85,6 +87,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_FORWARD_DECLARE_GETTER,
                             MX_FORWARD_DECLARE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_FORWARD_DECLARE_GETTER
 

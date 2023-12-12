@@ -43,8 +43,10 @@ class MX_EXPORT OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   static gap::generator<OMPDeclareMapperDecl> in(const Fragment &frag);
   static gap::generator<OMPDeclareMapperDecl> in(const File &file);
 
-  static std::optional<OMPDeclareMapperDecl> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<OMPDeclareMapperDecl, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<OMPDeclareMapperDecl> from(const ir::Operation &op);
+  static gap::generator<std::pair<OMPDeclareMapperDecl, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_DECLARE_MAPPER;

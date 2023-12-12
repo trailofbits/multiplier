@@ -39,8 +39,10 @@ class MX_EXPORT LabelStmt : public ValueStmt {
   static gap::generator<LabelStmt> in(const Fragment &frag);
   static gap::generator<LabelStmt> in(const File &file);
 
-  static std::optional<LabelStmt> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<LabelStmt, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<LabelStmt> from(const ir::Operation &op);
+  static gap::generator<std::pair<LabelStmt, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::LABEL_STMT;

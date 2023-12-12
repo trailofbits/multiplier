@@ -46,20 +46,23 @@ bool OMPTargetParallelForSimdDirective::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OMPTargetParallelForSimdDirective> OMPTargetParallelForSimdDirective::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<OMPTargetParallelForSimdDirective> OMPTargetParallelForSimdDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<OMPTargetParallelForSimdDirective, ir::hl::Operation>> OMPTargetParallelForSimdDirective::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPTargetParallelForSimdDirectiveDerivedKinds)) {
+gap::generator<std::pair<OMPTargetParallelForSimdDirective, ir::Operation>> OMPTargetParallelForSimdDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kOMPTargetParallelForSimdDirectiveDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPTargetParallelForSimdDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<OMPTargetParallelForSimdDirective, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPTargetParallelForSimdDirective> OMPTargetParallelForSimdDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

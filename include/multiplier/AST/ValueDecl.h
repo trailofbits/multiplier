@@ -40,8 +40,10 @@ class MX_EXPORT ValueDecl : public NamedDecl {
   static gap::generator<ValueDecl> in(const Fragment &frag);
   static gap::generator<ValueDecl> in(const File &file);
 
-  static std::optional<ValueDecl> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<ValueDecl, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<ValueDecl> from(const ir::Operation &op);
+  static gap::generator<std::pair<ValueDecl, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   static gap::generator<ValueDecl> containing(const Decl &decl);
   static gap::generator<ValueDecl> containing(const std::optional<Decl> &decl);

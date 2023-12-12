@@ -46,20 +46,23 @@ bool CXXPseudoDestructorExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CXXPseudoDestructorExpr, ir::hl::Operation>> CXXPseudoDestructorExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCXXPseudoDestructorExprDerivedKinds)) {
+gap::generator<std::pair<CXXPseudoDestructorExpr, ir::Operation>> CXXPseudoDestructorExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCXXPseudoDestructorExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXPseudoDestructorExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CXXPseudoDestructorExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

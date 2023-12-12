@@ -45,20 +45,23 @@ bool MSPropertySubscriptExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<MSPropertySubscriptExpr, ir::hl::Operation>> MSPropertySubscriptExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kMSPropertySubscriptExprDerivedKinds)) {
+gap::generator<std::pair<MSPropertySubscriptExpr, ir::Operation>> MSPropertySubscriptExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kMSPropertySubscriptExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<MSPropertySubscriptExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<MSPropertySubscriptExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

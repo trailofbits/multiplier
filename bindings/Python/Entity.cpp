@@ -11,6 +11,7 @@
 #include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Macro.h>
 #include <multiplier/Frontend/Token.h>
+#include <multiplier/IR/Operation.h>
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/CXXBaseSpecifier.h>
 #include <multiplier/AST/Decl.h>
@@ -75,13 +76,14 @@ std::optional<VariantEntity> PythonBinding<VariantEntity>::from_python(
     return std::monostate{};
   }
 
-#define MX_CONVERT_FROM_PYTHON(type_name, lower_name, enum_name, category) \
-    if (auto lower_name ## _ = ::mx::from_python<type_name>(obj)) { \
-      type_name val = std::move(lower_name ## _.value()); \
+#define MX_CONVERT_FROM_PYTHON(ns_path, type_name, lower_name, enum_name, category) \
+    if (auto lower_name ## _ = ::mx::from_python<ns_path type_name>(obj)) { \
+      ns_path type_name val = std::move(lower_name ## _.value()); \
       return val; \
     }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_CONVERT_FROM_PYTHON,
+                            MX_CONVERT_FROM_PYTHON,
                             MX_CONVERT_FROM_PYTHON,
                             MX_CONVERT_FROM_PYTHON,
                             MX_CONVERT_FROM_PYTHON,
@@ -96,12 +98,13 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_CONVERT_FROM_PYTHON,
 SharedPyObject *PythonBinding<VariantEntity>::to_python(
     VariantEntity val) noexcept {
 
-#define MX_CONVERT_TO_PYTHON(type_name, lower_name, enum_name, category) \
-    if (const type_name *lower_name ## _ = std::get_if<type_name>(&val)) { \
-      return ::mx::to_python<type_name>(std::move(*lower_name ## _)); \
+#define MX_CONVERT_TO_PYTHON(ns_path, type_name, lower_name, enum_name, category) \
+    if (const auto *lower_name ## _ = std::get_if<ns_path type_name>(&val)) { \
+      return ::mx::to_python<ns_path type_name>(std::move(*lower_name ## _)); \
     }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_CONVERT_TO_PYTHON,
+                            MX_CONVERT_TO_PYTHON,
                             MX_CONVERT_TO_PYTHON,
                             MX_CONVERT_TO_PYTHON,
                             MX_CONVERT_TO_PYTHON,

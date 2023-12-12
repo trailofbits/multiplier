@@ -47,20 +47,23 @@ bool CXXFunctionalCastExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CXXFunctionalCastExpr, ir::hl::Operation>> CXXFunctionalCastExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCXXFunctionalCastExprDerivedKinds)) {
+gap::generator<std::pair<CXXFunctionalCastExpr, ir::Operation>> CXXFunctionalCastExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCXXFunctionalCastExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXFunctionalCastExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CXXFunctionalCastExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CXXFunctionalCastExpr> CXXFunctionalCastExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

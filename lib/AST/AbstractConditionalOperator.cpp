@@ -48,20 +48,23 @@ bool AbstractConditionalOperator::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<AbstractConditionalOperator, ir::hl::Operation>> AbstractConditionalOperator::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kAbstractConditionalOperatorDerivedKinds)) {
+gap::generator<std::pair<AbstractConditionalOperator, ir::Operation>> AbstractConditionalOperator::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kAbstractConditionalOperatorDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<AbstractConditionalOperator, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<AbstractConditionalOperator, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<AbstractConditionalOperator> AbstractConditionalOperator::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

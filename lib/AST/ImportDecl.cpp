@@ -44,20 +44,23 @@ bool ImportDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ImportDecl> ImportDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ImportDecl> ImportDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ImportDecl, ir::hl::Operation>> ImportDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kImportDeclDerivedKinds)) {
+gap::generator<std::pair<ImportDecl, ir::Operation>> ImportDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kImportDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ImportDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ImportDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ImportDecl> ImportDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

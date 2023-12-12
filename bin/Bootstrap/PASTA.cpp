@@ -2576,15 +2576,15 @@ MethodListPtr CodeGenerator::RunOnClass(
     class_os
         << "#ifndef MX_DISABLE_VAST\n"
         << "  static std::optional<" << class_name
-        << "> from(const ir::hl::Operation &op);\n"
+        << "> from(const ir::Operation &op);\n"
         << "  static gap::generator<std::pair<" << class_name
-        << ", ir::hl::Operation>> in(const Compilation &tu);\n";
+        << ", ir::Operation>> in(const Compilation &tu);\n";
 
     // The base class methods are all manually implemented.
     if (class_name == base_name) {
       class_os
           << "  static gap::generator<std::pair<" << class_name
-          << ", ir::hl::Operation>> in(const Compilation &tu, std::span<const "
+          << ", ir::Operation>> in(const Compilation &tu, std::span<const "
           << base_name << "Kind> kinds);\n"
           << "#endif  // MX_DISABLE_VAST\n\n";
     
@@ -2595,19 +2595,19 @@ MethodListPtr CodeGenerator::RunOnClass(
       lib_cpp_os
           << "#ifndef MX_DISABLE_VAST\n"
           << "std::optional<" << class_name
-          << "> " << class_name << "::from(const ir::hl::Operation &op) {\n"
+          << "> " << class_name << "::from(const ir::Operation &op) {\n"
           << "  if (auto val = " << base_name << "::from(op)) {\n"
           << "    return from_base(val.value());\n"
           << "  }\n"
           << "  return std::nullopt;\n"
           << "}\n\n"
-          << "gap::generator<std::pair<" << class_name << ", ir::hl::Operation>> "
+          << "gap::generator<std::pair<" << class_name << ", ir::Operation>> "
           << class_name << "::in(const Compilation &tu) {\n"
-          << "  for (std::pair<" << base_name << ", ir::hl::Operation> res : "
+          << "  for (std::pair<" << base_name << ", ir::Operation> res : "
           << base_name << "::in(tu, k" << class_name
           << "DerivedKinds)) {\n"
           << "    if (auto val = from_base(res.first)) {\n"
-          << "      co_yield std::pair<" << class_name << ", ir::hl::Operation>("
+          << "      co_yield std::pair<" << class_name << ", ir::Operation>("
           << "std::move(val.value()), std::move(res.second));\n"
           << "    }\n"
           << "  }\n"

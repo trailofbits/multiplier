@@ -36,8 +36,10 @@ class MX_EXPORT LinkageSpecDecl : public Decl {
   static gap::generator<LinkageSpecDecl> in(const Fragment &frag);
   static gap::generator<LinkageSpecDecl> in(const File &file);
 
-  static std::optional<LinkageSpecDecl> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<LinkageSpecDecl, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<LinkageSpecDecl> from(const ir::Operation &op);
+  static gap::generator<std::pair<LinkageSpecDecl, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LINKAGE_SPEC;

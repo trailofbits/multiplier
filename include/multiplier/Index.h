@@ -20,15 +20,14 @@
 #include "AST/TemplateArgument.h"
 #include "AST/TemplateParameterList.h"
 #include "AST/Type.h"
-
 #include "Frontend/Compilation.h"
 #include "Frontend/File.h"
 #include "Frontend/DefineMacroDirective.h"
 #include "Frontend/Macro.h"
 #include "Frontend/TokenKind.h"
 #include "Frontend/TokenCategory.h"
-
 #include "Fragment.h"
+#include "IR/Operation.h"
 #include "Iterator.h"
 #include "Reference.h"
 
@@ -57,11 +56,12 @@ using RawEntityIdList = std::vector<RawEntityId>;
 using NamedEntityList = std::vector<NamedEntity>;
 using EntityProviderPtr = std::shared_ptr<EntityProvider>;
 
-#define MX_DECLARE_ENTITY_VARIANT(type_name, lower_name, enum_name, category) \
-    , type_name
+#define MX_DECLARE_ENTITY_VARIANT(ns_path, type_name, ...) \
+    , ns_path type_name
 
 using VariantEntity = std::variant<
     NotAnEntity MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_VARIANT,
+                                            MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
@@ -92,10 +92,11 @@ class MX_EXPORT Index {
   friend class Reference;
   friend class ReferenceKind;
 
-#define MX_FRIEND(type_name, ln, e, c) \
-    friend class type_name;
+#define MX_FRIEND(ns_path, type_name, ...) \
+    friend class ns_path type_name;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
@@ -141,6 +142,10 @@ class MX_EXPORT Index {
   static std::optional<Index> containing(const Token &entity);
   static std::optional<Index> containing(const VariantEntity &entity);
 
+#ifndef MX_DISABLE_VAST
+  static Index containing(const ir::Operation &entity);
+#endif
+
   // Return the status of the index.
   IndexStatus status(bool block=false) const;
 
@@ -155,10 +160,10 @@ class MX_EXPORT Index {
   std::optional<Fragment> fragment_containing(EntityId) const;
 
 #ifndef __CDT_PARSER__
-#define MX_DECLARE_GETTER(type_name, lower_name, enum_name, category) \
-  std::optional<type_name> lower_name(RawEntityId id) const; \
+#define MX_DECLARE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
+  std::optional<ns_path type_name> lower_name(RawEntityId id) const; \
   \
-  inline std::optional<type_name> lower_name( \
+  inline std::optional<ns_path type_name> lower_name( \
       Packed ## type_name ## Id id) const { \
     return lower_name(id.Pack()); \
   }
@@ -166,7 +171,7 @@ class MX_EXPORT Index {
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_GETTER, MX_DECLARE_GETTER,
                               MX_DECLARE_GETTER, MX_DECLARE_GETTER,
-                              MX_DECLARE_GETTER)
+                              MX_DECLARE_GETTER, MX_DECLARE_GETTER)
 #undef MX_DECLARE_GETTER
 
   template <typename T>
@@ -224,7 +229,7 @@ std::optional<T> Reference::as(void) const noexcept {
   if constexpr (EntityCategory::NOT_AN_ENTITY == c) {
     return std::nullopt;
 
-#define MX_REFERENCE_AS(type_name, lower_name, enum_name, category) \
+#define MX_REFERENCE_AS(ns_path, type_name, lower_name, enum_name, category) \
   } else if constexpr (EntityCategory::enum_name == c) { \
     if (category_ == c) { \
       return T::from(as_ ## lower_name()); \
@@ -233,6 +238,7 @@ std::optional<T> Reference::as(void) const noexcept {
     }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_REFERENCE_AS,
+                            MX_REFERENCE_AS,
                             MX_REFERENCE_AS,
                             MX_REFERENCE_AS,
                             MX_REFERENCE_AS,

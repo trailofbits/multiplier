@@ -36,7 +36,7 @@ class CachingEntityProvider final : public EntityProvider {
 
   // NOTE(pag): These are not reset upon version updates. Entity data is
   //            read-only once written, and so these don't generally change.
-#define DECLARE_ENTITY_CACHE(type_name, lower_name, ...) \
+#define DECLARE_ENTITY_CACHE(ns_path, type_name, lower_name, ...) \
     std::unordered_map<RawEntityId, Weak ## type_name ## ImplPtr> \
         lower_name ## s;
 
@@ -46,7 +46,8 @@ class CachingEntityProvider final : public EntityProvider {
                               DECLARE_ENTITY_CACHE,
                               DECLARE_ENTITY_CACHE,
                               DECLARE_ENTITY_CACHE,
-                              DECLARE_ENTITY_CACHE)
+                              DECLARE_ENTITY_CACHE,
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef DECLARE_ENTITY_CACHE
 
   // Cached list of fragments inside of files.
@@ -107,7 +108,7 @@ class CachingEntityProvider final : public EntityProvider {
 
   gap::generator<RawEntityId> FindSymbol(const Ptr &, std::string name) & final;
 
-#define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_ENTITY_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     friend class type_name ## Impl; \
     \
     type_name ## ImplPtr type_name ## For( \
@@ -122,10 +123,11 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
-                            MX_DECLARE_ENTITY_GETTER)
+                            MX_DECLARE_ENTITY_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_GETTER
 
-#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_ENTITY_LISTERS(ns_path, type_name, lower_name, enum_name, category) \
     gap::generator<type_name ## ImplPtr> type_name ## sFor( \
         const Ptr &, type_name ## Kind) & final;
 
@@ -134,6 +136,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS

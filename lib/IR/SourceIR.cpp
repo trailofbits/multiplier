@@ -266,7 +266,11 @@ mlir::Operation *SourceIRImpl::scope(void) const {
 
 }  // namespace ir
 
-std::optional<Decl> Decl::from(const ir::hl::Operation &op) {
+Index Index::containing(const ir::Operation &entity) {
+  return Index(entity.module_->ep);
+}
+
+std::optional<Decl> Decl::from(const ir::Operation &op) {
   RawEntityId eid = ir::MetaIdFromLocation(op.op_->getLoc());
   VariantId vid = EntityId(eid).Unpack();
   if (!std::holds_alternative<DeclId>(vid)) {
@@ -282,7 +286,7 @@ std::optional<Decl> Decl::from(const ir::hl::Operation &op) {
   return Decl(std::move(eptr));
 }
 
-gap::generator<std::pair<Decl, ir::hl::Operation>>
+gap::generator<std::pair<Decl, ir::Operation>>
 Decl::in(const Compilation &tu) {
   auto source_ir = tu.impl->SourceIRPtr(tu.id());
   if (!source_ir) {
@@ -294,15 +298,15 @@ Decl::in(const Compilation &tu) {
     for (auto [eid, op_ptr] : eid_ops_pairs) {
       if (auto eptr = ep->DeclFor(ep, eid)) {
         ir::Operation op(source_ir, op_ptr);
-        co_yield std::pair<Decl, ir::hl::Operation>(
+        co_yield std::pair<Decl, ir::Operation>(
             Decl(std::move(eptr)),
-            std::move(reinterpret_cast<ir::hl::Operation &>(op)));
+            std::move(reinterpret_cast<ir::Operation &>(op)));
       }
     }
   }
 }
 
-gap::generator<std::pair<Decl, ir::hl::Operation>> Decl::in(
+gap::generator<std::pair<Decl, ir::Operation>> Decl::in(
   const Compilation &tu, std::span<const DeclKind> kinds) {
   if (kinds.empty()) {
     co_return;
@@ -324,15 +328,15 @@ gap::generator<std::pair<Decl, ir::hl::Operation>> Decl::in(
     for (auto [eid, op_ptr] : it->second) {
       if (auto eptr = ep->DeclFor(ep, eid)) {
         ir::Operation op(source_ir, op_ptr);
-        co_yield std::pair<Decl, ir::hl::Operation>(
+        co_yield std::pair<Decl, ir::Operation>(
             Decl(std::move(eptr)),
-            std::move(reinterpret_cast<ir::hl::Operation &>(op)));
+            std::move(reinterpret_cast<ir::Operation &>(op)));
       }
     }
   }
 }
 
-std::optional<Stmt> Stmt::from(const ir::hl::Operation &op) {
+std::optional<Stmt> Stmt::from(const ir::Operation &op) {
   RawEntityId eid = ir::MetaIdFromLocation(op.op_->getLoc());
   VariantId vid = EntityId(eid).Unpack();
   if (!std::holds_alternative<StmtId>(vid)) {
@@ -348,7 +352,7 @@ std::optional<Stmt> Stmt::from(const ir::hl::Operation &op) {
   return Stmt(std::move(eptr));
 }
 
-gap::generator<std::pair<Stmt, ir::hl::Operation>>
+gap::generator<std::pair<Stmt, ir::Operation>>
 Stmt::in(const Compilation &tu) {
   auto source_ir = tu.impl->SourceIRPtr(tu.id());
   if (!source_ir) {
@@ -360,15 +364,15 @@ Stmt::in(const Compilation &tu) {
     for (auto [eid, op_ptr] : eid_ops_pairs) {
       if (auto eptr = ep->StmtFor(ep, eid)) {
         ir::Operation op(source_ir, op_ptr);
-        co_yield std::pair<Stmt, ir::hl::Operation>(
+        co_yield std::pair<Stmt, ir::Operation>(
             Stmt(std::move(eptr)),
-            std::move(reinterpret_cast<ir::hl::Operation &>(op)));
+            std::move(reinterpret_cast<ir::Operation &>(op)));
       }
     }
   }
 }
 
-gap::generator<std::pair<Stmt, ir::hl::Operation>> Stmt::in(
+gap::generator<std::pair<Stmt, ir::Operation>> Stmt::in(
   const Compilation &tu, std::span<const StmtKind> kinds) {
     if (kinds.empty()) {
     co_return;
@@ -390,16 +394,15 @@ gap::generator<std::pair<Stmt, ir::hl::Operation>> Stmt::in(
     for (auto [eid, op_ptr] : it->second) {
       if (auto eptr = ep->StmtFor(ep, eid)) {
         ir::Operation op(source_ir, op_ptr);
-        co_yield std::pair<Stmt, ir::hl::Operation>(
+        co_yield std::pair<Stmt, ir::Operation>(
             Stmt(std::move(eptr)),
-            std::move(reinterpret_cast<ir::hl::Operation &>(op)));
+            std::move(reinterpret_cast<ir::Operation &>(op)));
       }
     }
   }
 }
 
 namespace ir {
-namespace hl {
 namespace {
 
 static std::optional<Operation> FirstFrom(
@@ -513,7 +516,5 @@ gap::generator<Operation> Operation::all_from(const ::mx::Stmt &that) {
       that.id().Pack());
 }
 
-}  // namespace hl
 }  // namespace ir
-
 }  // namespace mx

@@ -44,8 +44,10 @@ class MX_EXPORT RecordDecl : public TagDecl {
   static gap::generator<RecordDecl> in(const Fragment &frag);
   static gap::generator<RecordDecl> in(const File &file);
 
-  static std::optional<RecordDecl> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<RecordDecl, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<RecordDecl> from(const ir::Operation &op);
+  static gap::generator<std::pair<RecordDecl, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::RECORD;

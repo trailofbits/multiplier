@@ -44,20 +44,23 @@ bool OMPTaskyieldDirective::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OMPTaskyieldDirective> OMPTaskyieldDirective::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<OMPTaskyieldDirective> OMPTaskyieldDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<OMPTaskyieldDirective, ir::hl::Operation>> OMPTaskyieldDirective::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPTaskyieldDirectiveDerivedKinds)) {
+gap::generator<std::pair<OMPTaskyieldDirective, ir::Operation>> OMPTaskyieldDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kOMPTaskyieldDirectiveDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPTaskyieldDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<OMPTaskyieldDirective, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPTaskyieldDirective> OMPTaskyieldDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

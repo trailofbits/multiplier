@@ -45,20 +45,23 @@ bool IndirectGotoStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<IndirectGotoStmt, ir::hl::Operation>> IndirectGotoStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kIndirectGotoStmtDerivedKinds)) {
+gap::generator<std::pair<IndirectGotoStmt, ir::Operation>> IndirectGotoStmt::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kIndirectGotoStmtDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<IndirectGotoStmt, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<IndirectGotoStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<IndirectGotoStmt> IndirectGotoStmt::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

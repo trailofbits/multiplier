@@ -46,20 +46,23 @@ bool CoyieldExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CoyieldExpr> CoyieldExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CoyieldExpr> CoyieldExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CoyieldExpr, ir::hl::Operation>> CoyieldExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCoyieldExprDerivedKinds)) {
+gap::generator<std::pair<CoyieldExpr, ir::Operation>> CoyieldExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCoyieldExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CoyieldExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CoyieldExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CoyieldExpr> CoyieldExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

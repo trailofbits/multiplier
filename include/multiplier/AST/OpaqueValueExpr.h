@@ -40,8 +40,10 @@ class MX_EXPORT OpaqueValueExpr : public Expr {
   static gap::generator<OpaqueValueExpr> in(const Fragment &frag);
   static gap::generator<OpaqueValueExpr> in(const File &file);
 
-  static std::optional<OpaqueValueExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<OpaqueValueExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<OpaqueValueExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<OpaqueValueExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OPAQUE_VALUE_EXPR;

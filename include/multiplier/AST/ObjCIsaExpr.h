@@ -40,8 +40,10 @@ class MX_EXPORT ObjCIsaExpr : public Expr {
   static gap::generator<ObjCIsaExpr> in(const Fragment &frag);
   static gap::generator<ObjCIsaExpr> in(const File &file);
 
-  static std::optional<ObjCIsaExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<ObjCIsaExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<ObjCIsaExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<ObjCIsaExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_ISA_EXPR;

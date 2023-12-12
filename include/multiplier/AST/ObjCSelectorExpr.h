@@ -40,8 +40,10 @@ class MX_EXPORT ObjCSelectorExpr : public Expr {
   static gap::generator<ObjCSelectorExpr> in(const Fragment &frag);
   static gap::generator<ObjCSelectorExpr> in(const File &file);
 
-  static std::optional<ObjCSelectorExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<ObjCSelectorExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<ObjCSelectorExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<ObjCSelectorExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_SELECTOR_EXPR;

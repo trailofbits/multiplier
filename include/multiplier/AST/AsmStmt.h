@@ -37,8 +37,10 @@ class MX_EXPORT AsmStmt : public Stmt {
   static gap::generator<AsmStmt> in(const Fragment &frag);
   static gap::generator<AsmStmt> in(const File &file);
 
-  static std::optional<AsmStmt> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<AsmStmt, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<AsmStmt> from(const ir::Operation &op);
+  static gap::generator<std::pair<AsmStmt, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   static gap::generator<AsmStmt> containing(const Decl &decl);
   static gap::generator<AsmStmt> containing(const std::optional<Decl> &decl);

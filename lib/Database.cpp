@@ -144,7 +144,7 @@ class BulkInserterState {
 #endif
       {
 
-#define CREATE_FRAG_OFFSET_INDEX(upper, lower, enum_, index) \
+#define CREATE_FRAG_OFFSET_INDEX(ns_path, upper, lower, enum_, index) \
     for (auto kind : mx::EnumerationRange<mx::upper ## Kind>()) { \
       INSERT_INTO_FRAGMNET_INDEX.emplace( \
           EncodeCategoryKind(mx::EntityCategory::enum_, kind), \
@@ -153,7 +153,7 @@ class BulkInserterState {
 
 // NOTE(pag): `-1` corresponds to return value of `KindFromEntityId` on an
 //            entity ID of this category.
-#define CREATE_PSEUDO_INDEX(upper, lower, enum_, index) \
+#define CREATE_PSEUDO_INDEX(ns_path, upper, lower, enum_, index) \
     INSERT_INTO_FRAGMNET_INDEX.emplace( \
         EncodeCategoryKind(mx::EntityCategory::enum_, -1), \
         CreateEntityIndexInsertQuery(mx::EntityCategory::enum_)); \
@@ -165,6 +165,7 @@ class BulkInserterState {
       MX_IGNORE_ENTITY_CATEGORY,
       CREATE_FRAG_OFFSET_INDEX,
       CREATE_PSEUDO_INDEX,
+      MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY)
 
 #undef CREATE_FRAG_OFFSET_INDEX
@@ -716,7 +717,7 @@ std::filesystem::path CreateDatabase(const std::filesystem::path &db_path_) {
     db.Execute(std::string(stmt));
   }
 
-#define CREATE_FRAG_OFFSET_INDEX(upper, lower, enum_, index) \
+#define CREATE_FRAG_OFFSET_INDEX(ns_path, upper, lower, enum_, index) \
     for (auto enum_val : mx::EnumerationRange<mx::upper ## Kind>()) { \
       std::string query = "CREATE TABLE IF NOT EXISTS fragment_with_"; \
       query += mx::EnumeratorName(mx::EntityCategory::enum_); \
@@ -726,7 +727,7 @@ std::filesystem::path CreateDatabase(const std::filesystem::path &db_path_) {
       db.Execute(query); \
     }
 
-#define CREATE_PSEUDO_INDEX(upper, lower, enum_, index) \
+#define CREATE_PSEUDO_INDEX(ns_path, upper, lower, enum_, index) \
     do { \
       std::string query = "CREATE TABLE IF NOT EXISTS fragment_with_"; \
       query += mx::EnumeratorName(mx::EntityCategory::enum_); \
@@ -741,6 +742,7 @@ std::filesystem::path CreateDatabase(const std::filesystem::path &db_path_) {
       MX_IGNORE_ENTITY_CATEGORY,
       CREATE_FRAG_OFFSET_INDEX,
       CREATE_PSEUDO_INDEX,
+      MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY)
 
 #undef CREATE_FRAG_OFFSET_INDEX

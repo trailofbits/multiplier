@@ -43,20 +43,23 @@ bool BreakStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<BreakStmt> BreakStmt::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<BreakStmt> BreakStmt::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<BreakStmt, ir::hl::Operation>> BreakStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kBreakStmtDerivedKinds)) {
+gap::generator<std::pair<BreakStmt, ir::Operation>> BreakStmt::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kBreakStmtDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<BreakStmt, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<BreakStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<BreakStmt> BreakStmt::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

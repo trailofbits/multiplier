@@ -109,7 +109,7 @@ class EntityProvider {
   TokenRange TokenRangeFor(const Ptr &, EntityId begin_id,
                            EntityId end_id) const;
 
-#define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_ENTITY_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     friend class type_name ## Impl; \
     \
     virtual type_name ## ImplPtr type_name ## For( \
@@ -128,10 +128,11 @@ class EntityProvider {
                               MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER,
-                              MX_DECLARE_ENTITY_GETTER)
+                              MX_DECLARE_ENTITY_GETTER,
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_GETTER
 
-#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_ENTITY_LISTERS(ns_path, type_name, lower_name, enum_name, category) \
     virtual gap::generator<type_name ## ImplPtr> type_name ## sFor( \
         const Ptr &, type_name ## Kind kind) & = 0;
 
@@ -141,10 +142,11 @@ class EntityProvider {
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 
-#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_ENTITY_LISTERS(ns_path, type_name, lower_name, enum_name, category) \
     gap::generator<type_name ## ImplPtr> type_name ## sFor( \
         const Ptr &, type_name ## Kind kind, PackedFragmentId id) &;
 
@@ -154,10 +156,11 @@ class EntityProvider {
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 
-#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_ENTITY_LISTERS(ns_path, type_name, lower_name, enum_name, category) \
     gap::generator<type_name ## ImplPtr> type_name ## sFor( \
         const Ptr &, PackedFragmentId id) &;
 
@@ -167,6 +170,7 @@ class EntityProvider {
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
                               MX_DECLARE_ENTITY_LISTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 

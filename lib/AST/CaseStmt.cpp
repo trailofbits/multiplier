@@ -45,20 +45,23 @@ bool CaseStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CaseStmt> CaseStmt::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CaseStmt> CaseStmt::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CaseStmt, ir::hl::Operation>> CaseStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCaseStmtDerivedKinds)) {
+gap::generator<std::pair<CaseStmt, ir::Operation>> CaseStmt::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCaseStmtDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CaseStmt, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CaseStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CaseStmt> CaseStmt::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

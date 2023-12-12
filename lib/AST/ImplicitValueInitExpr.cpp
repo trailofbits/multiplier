@@ -45,20 +45,23 @@ bool ImplicitValueInitExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ImplicitValueInitExpr> ImplicitValueInitExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ImplicitValueInitExpr> ImplicitValueInitExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ImplicitValueInitExpr, ir::hl::Operation>> ImplicitValueInitExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kImplicitValueInitExprDerivedKinds)) {
+gap::generator<std::pair<ImplicitValueInitExpr, ir::Operation>> ImplicitValueInitExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kImplicitValueInitExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ImplicitValueInitExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ImplicitValueInitExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ImplicitValueInitExpr> ImplicitValueInitExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

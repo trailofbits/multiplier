@@ -46,8 +46,10 @@ class MX_EXPORT CXXMethodDecl : public FunctionDecl {
   static gap::generator<CXXMethodDecl> in(const Fragment &frag);
   static gap::generator<CXXMethodDecl> in(const File &file);
 
-  static std::optional<CXXMethodDecl> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<CXXMethodDecl, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<CXXMethodDecl> from(const ir::Operation &op);
+  static gap::generator<std::pair<CXXMethodDecl, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_METHOD;

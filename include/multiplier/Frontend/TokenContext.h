@@ -79,8 +79,8 @@ class MX_EXPORT TokenContext {
     return offset;
   }
 
-#define MX_FORWARD_DECLARE_GETTER(type_name, lower_name, enum_name, category) \
-    std::optional<type_name> as_ ## lower_name(void) const;
+#define MX_FORWARD_DECLARE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
+    std::optional<ns_path type_name> as_ ## lower_name(void) const;
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
@@ -88,6 +88,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_FORWARD_DECLARE_GETTER,
                             MX_FORWARD_DECLARE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_FORWARD_DECLARE_GETTER
 

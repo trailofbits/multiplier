@@ -44,8 +44,10 @@ class MX_EXPORT BuiltinBitCastExpr : public ExplicitCastExpr {
   static gap::generator<BuiltinBitCastExpr> in(const Fragment &frag);
   static gap::generator<BuiltinBitCastExpr> in(const File &file);
 
-  static std::optional<BuiltinBitCastExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<BuiltinBitCastExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<BuiltinBitCastExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<BuiltinBitCastExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BUILTIN_BIT_CAST_EXPR;

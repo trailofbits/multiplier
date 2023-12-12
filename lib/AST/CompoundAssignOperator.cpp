@@ -47,20 +47,23 @@ bool CompoundAssignOperator::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CompoundAssignOperator, ir::hl::Operation>> CompoundAssignOperator::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCompoundAssignOperatorDerivedKinds)) {
+gap::generator<std::pair<CompoundAssignOperator, ir::Operation>> CompoundAssignOperator::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCompoundAssignOperatorDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CompoundAssignOperator, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CompoundAssignOperator, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CompoundAssignOperator> CompoundAssignOperator::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

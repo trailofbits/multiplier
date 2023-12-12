@@ -46,20 +46,23 @@ bool OMPTargetParallelGenericLoopDirective::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OMPTargetParallelGenericLoopDirective> OMPTargetParallelGenericLoopDirective::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<OMPTargetParallelGenericLoopDirective> OMPTargetParallelGenericLoopDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<OMPTargetParallelGenericLoopDirective, ir::hl::Operation>> OMPTargetParallelGenericLoopDirective::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPTargetParallelGenericLoopDirectiveDerivedKinds)) {
+gap::generator<std::pair<OMPTargetParallelGenericLoopDirective, ir::Operation>> OMPTargetParallelGenericLoopDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kOMPTargetParallelGenericLoopDirectiveDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPTargetParallelGenericLoopDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<OMPTargetParallelGenericLoopDirective, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPTargetParallelGenericLoopDirective> OMPTargetParallelGenericLoopDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

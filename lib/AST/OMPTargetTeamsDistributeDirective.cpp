@@ -46,20 +46,23 @@ bool OMPTargetTeamsDistributeDirective::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<OMPTargetTeamsDistributeDirective, ir::hl::Operation>> OMPTargetTeamsDistributeDirective::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPTargetTeamsDistributeDirectiveDerivedKinds)) {
+gap::generator<std::pair<OMPTargetTeamsDistributeDirective, ir::Operation>> OMPTargetTeamsDistributeDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kOMPTargetTeamsDistributeDirectiveDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPTargetTeamsDistributeDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<OMPTargetTeamsDistributeDirective, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

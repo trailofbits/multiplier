@@ -15,6 +15,8 @@
 #include "OperationKind.h"
 #include "Value.h"
 
+#include "../Types.h"
+
 namespace mlir {
 class Operation;
 class OpOperand;
@@ -25,6 +27,7 @@ class OpResultImpl;
 namespace mx {
 class Decl;
 class Fragment;
+class Index;
 class Stmt;
 
 enum class DeclKind : unsigned char;
@@ -57,6 +60,7 @@ class Operation {
 
   friend class ::mx::Decl;
   friend class ::mx::Fragment;
+  friend class ::mx::Index;
   friend class ::mx::Stmt;
 
   Operation(void) = delete;
@@ -102,6 +106,9 @@ class Operation {
   // The name of this operation.
   std::string_view kind_name(void) const noexcept;
 
+  // Return the ID of this operation.
+  PackedOperationId id(void) const noexcept;
+
   // Kind of this operation. If the kind is from a dialect that isn't recognized
   // by multiplier, then `OperationKind::UNKNOWN` is returned.
   inline OperationKind kind(void) const noexcept {
@@ -117,6 +124,14 @@ class Operation {
   // Regions and blocks are always contained inside of an operation.
   static Operation containing(const Region &);
   static Operation containing(const Block &);
+
+  static std::optional<Operation> first_from(const ::mx::Decl &that);
+  static std::optional<Operation> first_from(const ::mx::Decl &that, OperationKind);
+  static gap::generator<Operation> all_from(const ::mx::Decl &that);
+
+  static std::optional<Operation> first_from(const ::mx::Stmt &that);
+  static std::optional<Operation> first_from(const ::mx::Stmt &that, OperationKind);
+  static gap::generator<Operation> all_from(const ::mx::Stmt &that);
 
   // Operations can have zero or more operands.
   unsigned num_operands(void) const noexcept;

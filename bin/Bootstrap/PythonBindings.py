@@ -1332,7 +1332,7 @@ def wrap_class(schema: ClassSchema,
     if _is_id_method(id_method):
       type_hash = TYPE_HASH
 
-  if _is_mlir_base_class(schema):
+  elif _is_mlir_base_class(schema):
     type_hash = IR_TYPE_HASH.format(schema.name.lower())
 
   assert schema.location is not None
@@ -1732,6 +1732,7 @@ ENTITY_KINDS: Tuple[str] = (
   "TemplateArgument",
   "TemplateParameterList",
   "Macro",
+  "Operation",
 )
 
 def run_on_ast(ast: AST, ns_name: str):

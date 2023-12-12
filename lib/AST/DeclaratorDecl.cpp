@@ -82,20 +82,23 @@ bool DeclaratorDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<DeclaratorDecl> DeclaratorDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<DeclaratorDecl> DeclaratorDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<DeclaratorDecl, ir::hl::Operation>> DeclaratorDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kDeclaratorDeclDerivedKinds)) {
+gap::generator<std::pair<DeclaratorDecl, ir::Operation>> DeclaratorDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kDeclaratorDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<DeclaratorDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<DeclaratorDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<DeclaratorDecl> DeclaratorDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

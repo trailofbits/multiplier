@@ -46,20 +46,23 @@ bool ObjCProtocolExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ObjCProtocolExpr, ir::hl::Operation>> ObjCProtocolExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kObjCProtocolExprDerivedKinds)) {
+gap::generator<std::pair<ObjCProtocolExpr, ir::Operation>> ObjCProtocolExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kObjCProtocolExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ObjCProtocolExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ObjCProtocolExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCProtocolExpr> ObjCProtocolExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

@@ -54,20 +54,23 @@ bool CXXMethodDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXMethodDecl> CXXMethodDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CXXMethodDecl> CXXMethodDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CXXMethodDecl, ir::hl::Operation>> CXXMethodDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kCXXMethodDeclDerivedKinds)) {
+gap::generator<std::pair<CXXMethodDecl, ir::Operation>> CXXMethodDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kCXXMethodDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXMethodDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CXXMethodDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CXXMethodDecl> CXXMethodDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

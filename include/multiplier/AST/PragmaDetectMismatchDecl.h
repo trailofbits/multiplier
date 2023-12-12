@@ -36,8 +36,10 @@ class MX_EXPORT PragmaDetectMismatchDecl : public Decl {
   static gap::generator<PragmaDetectMismatchDecl> in(const Fragment &frag);
   static gap::generator<PragmaDetectMismatchDecl> in(const File &file);
 
-  static std::optional<PragmaDetectMismatchDecl> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<PragmaDetectMismatchDecl, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<PragmaDetectMismatchDecl> from(const ir::Operation &op);
+  static gap::generator<std::pair<PragmaDetectMismatchDecl, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::PRAGMA_DETECT_MISMATCH;

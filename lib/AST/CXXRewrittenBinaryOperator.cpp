@@ -45,20 +45,23 @@ bool CXXRewrittenBinaryOperator::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CXXRewrittenBinaryOperator, ir::hl::Operation>> CXXRewrittenBinaryOperator::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCXXRewrittenBinaryOperatorDerivedKinds)) {
+gap::generator<std::pair<CXXRewrittenBinaryOperator, ir::Operation>> CXXRewrittenBinaryOperator::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCXXRewrittenBinaryOperatorDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXRewrittenBinaryOperator, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CXXRewrittenBinaryOperator, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

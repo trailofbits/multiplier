@@ -64,20 +64,23 @@ bool TypeDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<TypeDecl> TypeDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<TypeDecl> TypeDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<TypeDecl, ir::hl::Operation>> TypeDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kTypeDeclDerivedKinds)) {
+gap::generator<std::pair<TypeDecl, ir::Operation>> TypeDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kTypeDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<TypeDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<TypeDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<TypeDecl> TypeDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

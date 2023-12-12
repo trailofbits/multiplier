@@ -47,20 +47,23 @@ bool CStyleCastExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CStyleCastExpr> CStyleCastExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CStyleCastExpr> CStyleCastExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CStyleCastExpr, ir::hl::Operation>> CStyleCastExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCStyleCastExprDerivedKinds)) {
+gap::generator<std::pair<CStyleCastExpr, ir::Operation>> CStyleCastExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCStyleCastExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CStyleCastExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CStyleCastExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CStyleCastExpr> CStyleCastExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

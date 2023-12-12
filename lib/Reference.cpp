@@ -33,15 +33,20 @@ static OpaqueImplPtr ReferencedEntity(const EntityProviderPtr &ep,
 
   if (false) {
 
-#define MX_DISPATCH_GETTER(type_name, lower_name, enum_name, category_) \
+#define MX_DISPATCH_GETTER(ns_path, type_name, lower_name, enum_name, category_) \
     } else if (std::holds_alternative<type_name ## Id>(vid)) { \
       return OpaqueImplPtr(ep->type_name ## For(ep, raw_id)); \
 
     MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                                 MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
                                 MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
-                                MX_DISPATCH_GETTER)
+                                MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DISPATCH_GETTER
+
+  // It's a reference to an IR oeration.
+  } else if (std::holds_alternative<OperationId>(vid)) {
+    // TODO(pag): Figure this out.
+    assert(false);
 
   // It's a reference to a parsed token resident in a fragment.
   } else if (std::holds_alternative<ParsedTokenId>(vid)) {
@@ -233,7 +238,7 @@ VariantEntity Reference::as_variant(void) const noexcept {
   switch (category()) {
     case EntityCategory::NOT_AN_ENTITY: break;
 
-#define DEFINE_REF_GETTER(type_name, lower_name, enum_name, category_) \
+#define DEFINE_REF_GETTER(ns_path, type_name, lower_name, enum_name, category_) \
     case EntityCategory::enum_name: \
       if (auto ent_ ## lower_name = as_ ## lower_name()) { \
         return std::move(ent_ ## lower_name.value()); \
@@ -241,6 +246,7 @@ VariantEntity Reference::as_variant(void) const noexcept {
       break;
 
     MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_REF_GETTER,
+                                DEFINE_REF_GETTER,
                                 DEFINE_REF_GETTER,
                                 DEFINE_REF_GETTER,
                                 DEFINE_REF_GETTER,
@@ -291,8 +297,13 @@ gap::generator<Reference> Reference::from(const VariantEntity &entity) {
   return EmptyReferences();
 }
 
-#define DEFINE_REF_GETTER(type_name, lower_name, enum_name, category_) \
-    std::optional<type_name> \
+std::optional<::mx::ir::Operation> Reference::as_operation(void) const noexcept {
+  assert(false);  // TODO(pag): Implement me.
+  return std::nullopt;
+}
+
+#define DEFINE_REF_GETTER(ns_path, type_name, lower_name, enum_name, category_) \
+    std::optional<ns_path type_name> \
     Reference::as_ ## lower_name (void) const noexcept { \
       if (category() != EntityCategory::enum_name) { \
         return std::nullopt; \
@@ -311,7 +322,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
-                            DEFINE_REF_GETTER)
+                            DEFINE_REF_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 
 #undef DEFINE_REF_GETTER
 

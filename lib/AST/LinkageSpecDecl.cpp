@@ -43,20 +43,23 @@ bool LinkageSpecDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<LinkageSpecDecl, ir::hl::Operation>> LinkageSpecDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kLinkageSpecDeclDerivedKinds)) {
+gap::generator<std::pair<LinkageSpecDecl, ir::Operation>> LinkageSpecDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kLinkageSpecDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<LinkageSpecDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<LinkageSpecDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<LinkageSpecDecl> LinkageSpecDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();
