@@ -175,11 +175,7 @@ union PackedEntityId {
   } __attribute__((packed)) small_or_big_type;
 
   struct {
-    uint64_t compilation_id:(63u - (kFileIdNumBits + kOtherKindBits));
-
-    // Second so that `file_id` is significant in sorting. If there are multiple
-    // TUs with the same main source file then we want them sorted side-by-side.
-    uint64_t file_id:kFileIdNumBits;
+    uint64_t compilation_id:(63u - kOtherKindBits);
     uint64_t kind:kOtherKindBits;
     uint64_t is_fragment_entity:1u;
   } __attribute__((packed)) compilation;
@@ -679,13 +675,11 @@ EntityId::EntityId(DesignatorId id) {
 }
 
 EntityId::EntityId(CompilationId id) {
-  if (id.file_id && id.compilation_id) {
+  if (id.compilation_id) {
     PackedEntityId packed = {};
     packed.compilation.is_fragment_entity = 0u;
     packed.compilation.compilation_id = id.compilation_id;
     RETURN_EARLY_IF_NOT(packed.compilation.compilation_id == id.compilation_id);
-    packed.compilation.file_id = id.file_id;
-    RETURN_EARLY_IF_NOT(packed.compilation.file_id == id.file_id);
     packed.compilation.kind =
         static_cast<uint64_t>(OtherKind::kCompilation);
     opaque = packed.opaque;
@@ -1171,9 +1165,8 @@ VariantId EntityId::Unpack(void) const noexcept {
         return id;
       }
       case OtherKind::kCompilation: {
-        if (packed.compilation.compilation_id &&packed.compilation.file_id) {
-          return CompilationId(packed.compilation.compilation_id,
-                               packed.compilation.file_id);
+        if (packed.compilation.compilation_id) {
+          return CompilationId(packed.compilation.compilation_id);
         }
         break;
       }

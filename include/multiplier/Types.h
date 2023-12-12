@@ -338,12 +338,10 @@ struct MX_EXPORT CompilationId {
   RawEntityId compilation_id;
 
   // The ID (FileId::file_id) of the main source file of the compilation.
-  RawEntityId file_id;
+  RawEntityId file_id __attribute__((deprecated));
 
-  inline explicit CompilationId(RawEntityId compilation_id_,
-                                RawEntityId file_id_)
-      : compilation_id(compilation_id_),
-        file_id(file_id_) {}
+  inline explicit CompilationId(RawEntityId compilation_id_)
+      : compilation_id(compilation_id_) {}
 
   bool operator==(const CompilationId &) const noexcept = default;
   auto operator<=>(const CompilationId &) const noexcept = default;
@@ -405,9 +403,6 @@ struct MX_EXPORT FragmentId final {
 };
 
 inline FileId::FileId(const FileTokenId &id_)
-    : file_id(id_.file_id) {}
-
-inline FileId::FileId(const CompilationId &id_)
     : file_id(id_.file_id) {}
 
 inline TypeId::TypeId(const TypeTokenId &id_)
