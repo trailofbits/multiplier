@@ -22,10 +22,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   message(FATAL_ERROR "CMAKE_BUILD_TYPE must not be RelWithDebInfo")
 endif()
 
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_C_VISIBILITY_PRESET hidden)
-set(VISIBILITY_INLINES_HIDDEN YES)
-
 list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 
 include("cmake/system.cmake")

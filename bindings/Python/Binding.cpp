@@ -56,6 +56,7 @@ SharedPyObject *PythonBinding<bool>::to_python(bool val) noexcept {
       return from_func(static_cast<longest_type>(val)); \
     }
 
+
 MAKE_INTEGRAL_CONVERTER(char, int64_t, PyLong_FromLongLong)
 MAKE_INTEGRAL_CONVERTER(short, int64_t, PyLong_FromLongLong)
 MAKE_INTEGRAL_CONVERTER(int, int64_t, PyLong_FromLongLong)

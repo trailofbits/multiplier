@@ -45,7 +45,7 @@ set_target_properties("mx-python"
     VISIBILITY_INLINES_HIDDEN
       YES
     CXX_VISIBILITY_PRESET
-      default
+      hidden
     POSITION_INDEPENDENT_CODE
       YES
     COMPILE_FEATURES

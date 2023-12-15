@@ -616,7 +616,8 @@ SharedPyObject *to_python(T val) noexcept {
 }
 
 template <typename T>
-FromPythonReturnType<T> from_python(BorrowedPyObject *obj) noexcept {
+std::optional<typename FromPythonReturnType<T>::Type>
+from_python(BorrowedPyObject *obj) noexcept {
   return PythonBinding<T>::from_python(obj);
 }
 

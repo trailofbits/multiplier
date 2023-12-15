@@ -890,6 +890,49 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 """
 
 
+BINDING_CPP_HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
+// All rights reserved.
+//
+// This source code is licensed in accordance with the terms specified in
+// the LICENSE file found in the root directory of this source tree.
+
+// Auto-generated file; do not modify!
+
+#include "../Binding.h"
+
+#include <multiplier/AST.h>
+#include <multiplier/Fragment.h>
+#include <multiplier/Frontend.h>
+#include <multiplier/Index.h>
+#include <multiplier/IR.h>
+#include <multiplier/Re2.h>
+#include <multiplier/Reference.h>
+
+namespace mx {
+
+// This one is manually added; needed by `TokenTreeVisitor` which is manually
+// wrapped.
+template MX_EXPORT SharedPyObject *mx::to_python<std::vector<mx::Fragment>>(std::vector<mx::Fragment>) noexcept;
+
+// The rest are auto-generated...
+"""
+
+
+TEMPLATE_SPEC_FROM_PYTHON = """
+template MX_EXPORT std::optional<FromPythonReturnType<{0}>::Type>
+from_python<{0}>(BorrowedPyObject *obj) noexcept;
+"""
+
+
+TEMPLATE_SPEC_TO_PYTHON = """
+template MX_EXPORT SharedPyObject *to_python<{0}>({0}) noexcept;
+"""
+
+
+BINDING_CPP_FOOTER = """}  // namespace mx
+"""
+
+
 class UserTokenSchema(Schema):
   def __init__(self, *args):
     super().__init__()
@@ -1030,12 +1073,19 @@ class BasicRenamer(Renamer):
     return self.METHOD_RENAMES.get(method_schema.name, method_schema.name)
 
 
+FROM_EXPORTS: Set[Schema] = set()
+TO_EXPORTS: Set[Schema] = set()
+
+
 def _wrap_method_impl(class_schema: ClassSchema, schema: MethodSchema,
                       is_static: bool, is_overload: bool, out: List[str],
                       stubs_out: List[str]):
+  global FROM_EXPORTS, TO_EXPORTS
+
   if isinstance(schema.return_type, UnknownSchema):
     return
 
+  TO_EXPORTS.add(schema.return_type)
   num_args = len(schema.parameters)
   out.append(METHOD_SPEC_CHECK_ARGCOUNT_BEGIN.format(num_args=num_args))
 
@@ -1044,6 +1094,7 @@ def _wrap_method_impl(class_schema: ClassSchema, schema: MethodSchema,
     py_args.append("self")
 
   for i, arg in enumerate(schema.parameters):
+    FROM_EXPORTS.add(arg.element_type)
     out.append(METHOD_SPEC_GET_ARG.format(
         arg_num=i,
         arg_type=arg.element_type.cxx_value_name))
@@ -1067,10 +1118,13 @@ def _wrap_method_impl(class_schema: ClassSchema, schema: MethodSchema,
 
 def _wrap_constructor_impl(class_schema: ClassSchema, schema: MethodSchema,
                            out: List[str]):
+  global FROM_EXPORTS
+
   num_args = len(schema.parameters)
   out.append(INIT_SPEC_CHECK_ARGCOUNT_BEGIN.format(num_args=num_args))
 
   for i, arg in enumerate(schema.parameters):
+    FROM_EXPORTS.add(arg.element_type)
     out.append(INIT_SPEC_GET_ARG.format(
         arg_num=i,
         arg_type=arg.element_type.cxx_value_name))
@@ -1119,6 +1173,9 @@ def _wrap_property(class_schema: ClassSchema, schema: NamedSchema,
                    renamer: Renamer, out: List[str]):
   """Creates Python bindings for an instance method with no arguments. These are
   implemented as Python properties."""
+  global TO_EXPORTS
+
+  TO_EXPORTS.add(schema.return_type)
 
   rel_ns = _relative_namespace(class_schema)
   cxx_namespace = rel_ns and f"mx::{rel_ns}::" or "mx::"
@@ -1210,6 +1267,11 @@ def wrap_class(schema: ClassSchema,
                children: Dict[ClassSchema, List[ClassSchema]],
                renamer: Renamer, stubs_out: List[str]):
   """Create Python bindings for a class schema."""
+  global FROM_EXPORTS, TO_EXPORTS
+
+  FROM_EXPORTS.add(schema)
+  TO_EXPORTS.add(schema)
+
   type_offsets = offsets[schema]
 
   out: List[str] = []
@@ -1402,6 +1464,11 @@ def wrap_class(schema: ClassSchema,
 
 def wrap_enum(schema: EnumSchema, renamer: Renamer, stubs_out: List[str]):
   """Wrap an enumeration and its enumerators."""
+  global FROM_EXPORTS, TO_EXPORTS
+
+  FROM_EXPORTS.add(schema)
+  TO_EXPORTS.add(schema)
+
   rel_ns = _relative_namespace(schema)
   cxx_namespace = rel_ns and f"mx::{rel_ns}::" or "mx::"
   cxx_enum_name = schema.name
@@ -1479,6 +1546,8 @@ def _fill_into(schema: ClassSchema, children: Dict[ClassSchema, List[ClassSchema
 
 
 def wrap(schemas: Iterable[Schema], renamer: Renamer):
+  global FROM_EXPORTS, TO_EXPORTS
+
   work_list: List[ClassSchema] = []
   children: Dict[ClassSchema, List[ClassSchema]] = {}
   enums: List[EnumSchema] = []
@@ -1630,6 +1699,25 @@ def wrap(schemas: Iterable[Schema], renamer: Renamer):
                              rel_dir.lower(), "__init__.py")
     _save_output_file(init_path, stubs_out)
 
+  bindings_out = [BINDING_CPP_HEADER]
+  seen_bindings = set()
+
+  for schema in FROM_EXPORTS:
+    line = TEMPLATE_SPEC_FROM_PYTHON.format(schema.cxx_value_name)
+    if line not in seen_bindings:
+      bindings_out.append(line)
+      seen_bindings.add(line)
+  
+  for schema in TO_EXPORTS:
+    line = TEMPLATE_SPEC_TO_PYTHON.format(schema.cxx_value_name)
+    if line not in seen_bindings:
+      bindings_out.append(line)
+      seen_bindings.add(line)
+  
+  bindings_out.append(BINDING_CPP_FOOTER)
+  _save_output_file(os.path.join(MX_BINDINGS_PYTHON_DIR, "Generated", "Bindings.cpp"), bindings_out)
+
+
 
 ENTITY_KINDS: Tuple[str] = (
   "File",
@@ -1645,7 +1733,6 @@ ENTITY_KINDS: Tuple[str] = (
   "TemplateParameterList",
   "Macro",
 )
-
 
 def run_on_ast(ast: AST, ns_name: str):
   schemas: List[Schema] = []

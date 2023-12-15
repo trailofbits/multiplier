@@ -22,27 +22,24 @@ using BorrowedPyObject = ::PyObject;
 using SharedPyObject = ::PyObject;
 
 template <typename T>
-struct FromPythonReturnTypeImpl {
-  using Type = std::optional<T>;
+struct FromPythonReturnType {
+  using Type = T;
 };
 
 template <typename T>
-struct FromPythonReturnTypeImpl<std::span<T>> {
-  using Type = std::optional<std::vector<T>>;
+struct FromPythonReturnType<std::span<T>> {
+  using Type = std::vector<T>;
 };
 
 template <typename T>
-struct FromPythonReturnTypeImpl<std::span<const T>> {
-  using Type = std::optional<std::vector<T>>;
+struct FromPythonReturnType<std::span<const T>> {
+  using Type = std::vector<T>;
 };
 
 template <>
-struct FromPythonReturnTypeImpl<std::string_view> {
-  using Type = std::optional<std::string>;
+struct FromPythonReturnType<std::string_view> {
+  using Type = std::string;
 };
-
-template <typename T>
-using FromPythonReturnType = typename FromPythonReturnTypeImpl<T>::Type;
 
 // Convert an object of type `T` to a new reference to a Python object.
 template <typename T>
@@ -53,6 +50,7 @@ MX_EXPORT SharedPyObject *to_python(T) noexcept;
 // a value of type `T`.
 template <typename T>
 [[gnu::noinline]]
-MX_EXPORT FromPythonReturnType<T> from_python(BorrowedPyObject *obj) noexcept;
+MX_EXPORT std::optional<typename FromPythonReturnType<T>::Type>
+from_python(BorrowedPyObject *obj) noexcept;
 
 }  // namespace mx
