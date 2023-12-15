@@ -152,7 +152,8 @@ static mx::CompilationId MakeId(Tag<mx::CompilationId>, mx::RawEntityId index,
                                 const std::string & /* hash */) {
   auto fid = mx::EntityId(file_id).Extract<mx::FileId>();
   CHECK(fid.has_value());
-  return mx::CompilationId(index, fid->file_id);
+
+  return mx::CompilationId(index);
 }
 
 static mx::TypeId MakeId(Tag<mx::TypeId>, mx::RawEntityId index,

@@ -93,4 +93,16 @@ Region::entry_block_arguments(void) const & noexcept {
   }
 }
 
+bool Region::operator==(const Region &that) const noexcept {
+  if (underlying_region() == that.underlying_region()) {
+    return true;
+  }
+
+  if (region_->getRegionNumber() != that.region_->getRegionNumber()) {
+    return false;
+  }
+
+  return Operation::containing(*this) == Operation::containing(that);
+}
+
 }  // namespace mx::ir

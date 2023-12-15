@@ -888,7 +888,7 @@ void CodeGenerator::RunOnOps(void) {
       << "  return \"OperationKind\";\n"
       << "}\n\n"
       << "inline static constexpr unsigned NumEnumerators(ir::OperationKind) {\n"
-      << "  return " << num_ops << ";\n"
+      << "  return " << (num_ops + 1u  /* +1 for UNKNOWN */) << ";\n"
       << "}\n\n"
       << "MX_EXPORT const char *EnumeratorName(ir::OperationKind);\n\n";
 

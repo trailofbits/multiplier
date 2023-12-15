@@ -12,6 +12,7 @@
 #include <multiplier/AST/Type.h>
 
 #include "Attr.h"
+#include "Compilation.h"
 #include "Decl.h"
 #include "File.h"
 #include "Fragment.h"
@@ -20,6 +21,10 @@
 #include "Stmt.h"
 #include "Type.h"
 #include "Types.h"
+
+#ifndef MX_DISABLE_VAST
+# include "IR/SourceIR.h"
+#endif
 
 namespace mx {
 
@@ -177,11 +182,22 @@ std::optional<ir::Operation> Index::operation(RawEntityId id) const {
     return std::nullopt;
   }
 
+  CompilationId compilation_id(op_id->compilation_id);
+  auto cptr = impl->CompilationFor(impl, EntityId(compilation_id).Pack());
+  if (!cptr) {
+    assert(false);
+    return std::nullopt;
+  }
+
 #ifndef MX_DISABLE_VAST
-  // TODO(pag): Think about why embed file id into compilation id...
-  assert(false);
+  if (auto source_ir = cptr->SourceIRPtr(compilation_id)) {
+    if (auto op = source_ir->OperationFor(source_ir, id)) {
+      return op;
+    }
+  }
 #endif
 
+  assert(false);
   return std::nullopt;
 }
 

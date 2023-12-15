@@ -85,6 +85,60 @@ Operation Block::terminator(void) const noexcept {
   return Operation(module_, block_->getTerminator());
 }
 
+bool Block::operator==(const Block &that) const noexcept {
+  if (underlying_block() == that.underlying_block()) {
+    return true;
+  }
+
+  auto parent_op = Operation::containing(*this);
+  auto that_parent_op = Operation::containing(that);
+
+  // Same pointers for the parent op means that these blocks must have the
+  // same address to be equivalent.
+  if (parent_op.underlying_operation() ==
+      that_parent_op.underlying_operation()) {
+    return false;
+  }
+
+  if (parent_op != that_parent_op) {
+    return false;
+  }
+
+  if (block_->getNumArguments() != that.block_->getNumArguments()) {
+    return false;
+  }
+
+  if (block_->empty() != that.block_->empty()) {
+    return false;
+  }
+
+  auto parent_region = block_->getParent();
+  auto that_parent_region = that.block_->getParent();
+
+  // If these two blocks are nested inside of equivalent operations, then we
+  // need to figure out if the regions containing these blocks are logically
+  // equivalent.
+  if (parent_region->getRegionNumber() !=
+      that_parent_region->getRegionNumber()) {
+    return false;
+  }
+
+#ifndef NDEBUG
+  // If the blocks aren't empty, and the blocks are nested inside of equivalent
+  // operations, then we expect the first two operations in the non-empty blocks
+  // to also be equal.
+  if (!block_->empty()) {
+    assert(block_->getNumSuccessors() == that.block_->getNumSuccessors());
+
+    mlir::Operation &first = block_->getOperations().front();
+    mlir::Operation &that_first = that.block_->getOperations().front();
+    assert(Operation(module_, &first) == Operation(module_, &that_first));
+  }
+#endif
+
+  return true;
+}
+
 std::optional<Argument> Argument::from(const Value &val) {
   if (mlir::Value(val.impl_.value).isa<mlir::BlockArgument>()) {
     return Argument(val.module_, val.impl_.arg);
@@ -95,6 +149,18 @@ std::optional<Argument> Argument::from(const Value &val) {
 // Index of this block argument.
 unsigned Argument::index(void) const noexcept {
   return mlir::BlockArgument(impl_.arg).getArgNumber();
+}
+
+bool Argument::operator==(const Argument &that) const noexcept {
+  if (underlying_value() == that.underlying_value()) {
+    return true;
+  }
+
+  if (index() != that.index()) {
+    return false;
+  }
+
+  return Block::containing(*this) == Block::containing(that);
 }
 
 // The operation containing this label.
@@ -109,6 +175,24 @@ Block Label::block(void) const noexcept {
 // The index of this label within its owner operation's block operand list.
 unsigned Label::index(void) const noexcept {
   return op_->getOperandNumber();
+}
+
+bool Label::operator==(const Label &that) const noexcept {
+  if (op_ == that.op_) {
+    return true;
+  }
+
+  if (index() != that.index()) {
+    return false;
+  }
+
+  if (operation() != that.operation()) {
+    return false;
+  }
+
+  assert(block() == that.block());
+
+  return true;
 }
 
 }  // namespace mx::ir

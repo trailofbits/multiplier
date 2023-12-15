@@ -334,11 +334,9 @@ struct MX_EXPORT DesignatorId final {
 // Translation units represent a compilation. From a translation unit we can
 // get the compile command, the MLIR, etc.
 struct MX_EXPORT CompilationId {
+
   // The ID of the compilation/translation unit.
   RawEntityId compilation_id;
-
-  // The ID (FileId::file_id) of the main source file of the compilation.
-  RawEntityId file_id __attribute__((deprecated));
 
   inline explicit CompilationId(RawEntityId compilation_id_)
       : compilation_id(compilation_id_) {}

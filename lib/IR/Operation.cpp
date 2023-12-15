@@ -21,9 +21,23 @@
 namespace mx::ir {
 
 // Return the ID of this operation.
-PackedOperationId Operation::id(void) const noexcept {
+EntityId Operation::id(void) const noexcept {
   auto eid = op_->getLoc().cast<mlir::OpaqueLoc>().getUnderlyingLocation();
   return EntityId(eid).Extract<::mx::OperationId>().value();
+}
+
+bool Operation::operator==(const Operation &that) const noexcept {
+  if (underlying_operation() == that.underlying_operation()) {
+    return true;
+  }
+
+  auto eid = op_->getLoc().cast<mlir::OpaqueLoc>().getUnderlyingLocation();
+  auto that_eid = op_->getLoc().cast<mlir::OpaqueLoc>().getUnderlyingLocation();
+  if (eid != that_eid) {
+    return false;
+  }
+
+  return eid != kInvalidEntityId;
 }
 
 std::string_view Operation::kind_name(void) const noexcept {

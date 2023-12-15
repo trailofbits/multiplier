@@ -878,6 +878,8 @@ void GlobalIndexingState::PersistCompilation(
     fl.set(i++, frag_id.Pack());
   }
 
+  cb.setMainFileId(em.EntityId(ast.MainFile()));
+
   if (sourceir_progress) {
     sourceir_progress->AddWork(1u);
   }

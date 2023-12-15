@@ -83,6 +83,10 @@ class SourceIRImpl {
                         std::string_view mlir);
 
   mlir::Operation *scope(void) const;
+
+  std::optional<Operation> OperationFor(
+      const std::shared_ptr<const SourceIRImpl> &self,
+      RawEntityId eid) const noexcept;
 };
 
 }  // namespace ir

@@ -214,24 +214,47 @@ SourceIRImpl::SourceIRImpl(PackedCompilationId compilation_id_,
   mlir::MLIRContext &context = ir::kMLIR.Context();
   context.enterMultiThreadedExecution();
   mod = mlir::parseSourceFile<mlir::ModuleOp>(sm, &context);
-  context.exitMultiThreadedExecution();
 
   if (!mod) {
+    context.exitMultiThreadedExecution();
     return;
   }
 
   // Index the entities / operations in the module.
   auto result = mod->walk<mlir::WalkOrder::PreOrder>(
-      [this] (mlir::Operation *child) {
-        auto op_kind = ir::Operation::classify(child);
-        operations[op_kind].push_back(child);
-
-        if (!IsHighLevelOperationKind(op_kind)) {
+      [this, &context] (mlir::Operation *child) {
+        auto op_kind = Operation::classify(child);
+        
+        if (op_kind == OperationKind::UNKNOWN) {
+          
+          // Even if we have an entity ID for it, overwrite it with an unknown
+          // entity ID, so that we have the invariant that after parsing the
+          // MLIR, all locations represent `OperationId`s or `InvalidId`s.
+          child->setLoc(mlir::OpaqueLoc::get(
+              reinterpret_cast<void *>(kInvalidEntityId), &context));
+          
           return mlir::WalkResult::advance();
         }
 
+        auto &kind_ops = operations[op_kind];
+
+        OperationId op_id(
+            compilation_id.Unpack().compilation_id,
+            op_kind,
+            static_cast<EntityOffset>(kind_ops.size()),
+            0u  /* level */);
+
+        kind_ops.push_back(child);
+
+        // The location after parsing is the associated entity of an AST entity.
         RawEntityId eid = MetaIdFromLocation(child->getLoc());
         VariantId vid = EntityId(eid).Unpack();
+
+        // Replace the location with our invented (but stable) entity ID for
+        // this operation.
+        auto op_eid = EntityId(op_id).Pack();
+        child->setLoc(mlir::OpaqueLoc::get(
+            reinterpret_cast<void *>(op_eid), &context));
 
         if (std::holds_alternative<InvalidId>(vid)) {
           return mlir::WalkResult::advance();
@@ -249,6 +272,7 @@ SourceIRImpl::SourceIRImpl(PackedCompilationId compilation_id_,
         return mlir::WalkResult::advance();
       });
 
+  context.exitMultiThreadedExecution();
   assert(result != mlir::WalkResult::interrupt());
   (void) result;
 }
@@ -262,6 +286,41 @@ mlir::Operation *SourceIRImpl::scope(void) const {
   } else {
     return nullptr;
   }
+}
+
+std::optional<Operation> SourceIRImpl::OperationFor(
+    const std::shared_ptr<const SourceIRImpl> &self,
+    RawEntityId eid) const noexcept {
+
+  auto op_id = EntityId(eid).Extract<OperationId>();
+  if (!op_id) {
+    return std::nullopt;
+  }
+
+  // TODO(pag): Eventually add tower support.
+  if (op_id->level != 0u) {
+    assert(false);
+    return std::nullopt;
+  }
+
+  if (CompilationId(op_id->compilation_id) != compilation_id.Unpack()) {
+    assert(false);
+    return std::nullopt;
+  }
+
+  auto kind_ops_it = operations.find(op_id->kind);
+  if (kind_ops_it == operations.end()) {
+    assert(false);
+    return std::nullopt;
+  }
+
+  auto &kind_ops = kind_ops_it->second;
+  if (kind_ops.size() <= op_id->offset) {
+    assert(false);
+    return std::nullopt;
+  }
+
+  return Operation(self, kind_ops[op_id->offset], op_id->kind);
 }
 
 }  // namespace ir

@@ -1180,6 +1180,7 @@ VariantId EntityId::Unpack(void) const noexcept {
               packed.operation.offset,
               packed.operation.level);
         }
+        break;
       }
     }
   }

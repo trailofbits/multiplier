@@ -8,6 +8,7 @@ from pypasta import *
 from lift import SchemaLifter, find_tags_in_namespace
 from schema import *
 from typing import DefaultDict, Dict, Iterable, List, Set, Tuple, Type
+import sys
 
 MX_BIN_BOOSTRAP_DIR = os.path.dirname(__file__)
 MX_BIN_DIR = os.path.dirname(MX_BIN_BOOSTRAP_DIR)
