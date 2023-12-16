@@ -46,20 +46,23 @@ bool CUDAKernelCallExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CUDAKernelCallExpr, ir::hl::Operation>> CUDAKernelCallExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCUDAKernelCallExprDerivedKinds)) {
+gap::generator<std::pair<CUDAKernelCallExpr, ir::Operation>> CUDAKernelCallExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCUDAKernelCallExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CUDAKernelCallExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CUDAKernelCallExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CUDAKernelCallExpr> CUDAKernelCallExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

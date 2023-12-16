@@ -40,8 +40,10 @@ class MX_EXPORT CXXThisExpr : public Expr {
   static gap::generator<CXXThisExpr> in(const Fragment &frag);
   static gap::generator<CXXThisExpr> in(const File &file);
 
-  static std::optional<CXXThisExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<CXXThisExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<CXXThisExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<CXXThisExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_THIS_EXPR;

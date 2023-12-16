@@ -78,13 +78,8 @@ class MX_EXPORT Block final {
     return block_;
   }
 
-  inline bool operator==(const Block &that) const noexcept {
-    return block_ == that.block_;
-  }
-
-  inline bool operator!=(const Block &that) const noexcept {
-    return block_ != that.block_;
-  }
+  bool operator==(const Block &that) const noexcept;
+  bool operator!=(const Block &that) const noexcept = default;
 };
 
 // An parameter to a block is like a PHI node in an SSA IR. It provides a merge
@@ -110,6 +105,9 @@ class MX_EXPORT Argument final : public Value {
 
   // Index of this block argument.
   unsigned index(void) const noexcept;
+
+  bool operator==(const Argument &that) const noexcept;
+  bool operator!=(const Argument &that) const noexcept = default;
 };
 
 static_assert(sizeof(Argument) == sizeof(Value));
@@ -139,6 +137,9 @@ class MX_EXPORT Label final {
 
   // The index of this operand within its owner operation's block operand list.
   unsigned index(void) const noexcept;
+
+  bool operator==(const Label &that) const noexcept;
+  bool operator!=(const Label &that) const noexcept = default;
 };
 
 }  // namespace mx::ir

@@ -49,20 +49,23 @@ bool ObjCMessageExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ObjCMessageExpr, ir::hl::Operation>> ObjCMessageExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kObjCMessageExprDerivedKinds)) {
+gap::generator<std::pair<ObjCMessageExpr, ir::Operation>> ObjCMessageExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kObjCMessageExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ObjCMessageExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ObjCMessageExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCMessageExpr> ObjCMessageExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

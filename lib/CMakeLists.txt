@@ -43,9 +43,7 @@ target_link_libraries("mx-serialize"
     "CapnProto::capnp"
 )
 
-if(MX_ENABLE_VAST)
-  add_subdirectory("IR")
-endif()
+add_subdirectory("IR")
 
 add_library("mx-frontend" INTERFACE)
 set_target_properties("mx-frontend"

@@ -43,20 +43,23 @@ bool ContinueStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ContinueStmt> ContinueStmt::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ContinueStmt> ContinueStmt::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ContinueStmt, ir::hl::Operation>> ContinueStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kContinueStmtDerivedKinds)) {
+gap::generator<std::pair<ContinueStmt, ir::Operation>> ContinueStmt::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kContinueStmtDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ContinueStmt, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ContinueStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ContinueStmt> ContinueStmt::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

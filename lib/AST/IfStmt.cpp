@@ -46,20 +46,23 @@ bool IfStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<IfStmt> IfStmt::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<IfStmt> IfStmt::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<IfStmt, ir::hl::Operation>> IfStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kIfStmtDerivedKinds)) {
+gap::generator<std::pair<IfStmt, ir::Operation>> IfStmt::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kIfStmtDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<IfStmt, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<IfStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<IfStmt> IfStmt::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

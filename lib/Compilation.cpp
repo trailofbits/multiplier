@@ -143,8 +143,7 @@ gap::generator<File> Compilation::files(void) const & noexcept {
 }
 
 File Compilation::main_source_file(void) const noexcept {
-  FileId fid(id().Unpack().file_id);
-  return File(impl->ep->FileFor(impl->ep, fid));
+  return File(impl->ep->FileFor(impl->ep, impl->reader.getMainFileId()));
 }
 
 // The path of the main source file for this job. This should be one of the

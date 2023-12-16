@@ -44,8 +44,10 @@ class MX_EXPORT ObjCAtDefsFieldDecl : public FieldDecl {
   static gap::generator<ObjCAtDefsFieldDecl> in(const Fragment &frag);
   static gap::generator<ObjCAtDefsFieldDecl> in(const File &file);
 
-  static std::optional<ObjCAtDefsFieldDecl> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<ObjCAtDefsFieldDecl, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<ObjCAtDefsFieldDecl> from(const ir::Operation &op);
+  static gap::generator<std::pair<ObjCAtDefsFieldDecl, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_AT_DEFS_FIELD;

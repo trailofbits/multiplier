@@ -43,20 +43,23 @@ bool ObjCAutoreleasePoolStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ObjCAutoreleasePoolStmt, ir::hl::Operation>> ObjCAutoreleasePoolStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kObjCAutoreleasePoolStmtDerivedKinds)) {
+gap::generator<std::pair<ObjCAutoreleasePoolStmt, ir::Operation>> ObjCAutoreleasePoolStmt::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kObjCAutoreleasePoolStmtDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ObjCAutoreleasePoolStmt, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ObjCAutoreleasePoolStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

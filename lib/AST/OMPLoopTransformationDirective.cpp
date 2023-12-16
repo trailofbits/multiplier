@@ -48,20 +48,23 @@ bool OMPLoopTransformationDirective::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<OMPLoopTransformationDirective, ir::hl::Operation>> OMPLoopTransformationDirective::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPLoopTransformationDirectiveDerivedKinds)) {
+gap::generator<std::pair<OMPLoopTransformationDirective, ir::Operation>> OMPLoopTransformationDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kOMPLoopTransformationDirectiveDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPLoopTransformationDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<OMPLoopTransformationDirective, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPLoopTransformationDirective> OMPLoopTransformationDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

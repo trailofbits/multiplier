@@ -42,8 +42,10 @@ class MX_EXPORT CXXTemporaryObjectExpr : public CXXConstructExpr {
   static gap::generator<CXXTemporaryObjectExpr> in(const Fragment &frag);
   static gap::generator<CXXTemporaryObjectExpr> in(const File &file);
 
-  static std::optional<CXXTemporaryObjectExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<CXXTemporaryObjectExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<CXXTemporaryObjectExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<CXXTemporaryObjectExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_TEMPORARY_OBJECT_EXPR;

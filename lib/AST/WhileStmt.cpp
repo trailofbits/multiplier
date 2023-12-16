@@ -46,20 +46,23 @@ bool WhileStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<WhileStmt> WhileStmt::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<WhileStmt> WhileStmt::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<WhileStmt, ir::hl::Operation>> WhileStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kWhileStmtDerivedKinds)) {
+gap::generator<std::pair<WhileStmt, ir::Operation>> WhileStmt::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kWhileStmtDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<WhileStmt, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<WhileStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<WhileStmt> WhileStmt::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

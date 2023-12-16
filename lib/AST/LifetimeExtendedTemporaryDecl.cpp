@@ -45,20 +45,23 @@ bool LifetimeExtendedTemporaryDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<LifetimeExtendedTemporaryDecl, ir::hl::Operation>> LifetimeExtendedTemporaryDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kLifetimeExtendedTemporaryDeclDerivedKinds)) {
+gap::generator<std::pair<LifetimeExtendedTemporaryDecl, ir::Operation>> LifetimeExtendedTemporaryDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kLifetimeExtendedTemporaryDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<LifetimeExtendedTemporaryDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<LifetimeExtendedTemporaryDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

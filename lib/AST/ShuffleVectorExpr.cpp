@@ -45,20 +45,23 @@ bool ShuffleVectorExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ShuffleVectorExpr, ir::hl::Operation>> ShuffleVectorExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kShuffleVectorExprDerivedKinds)) {
+gap::generator<std::pair<ShuffleVectorExpr, ir::Operation>> ShuffleVectorExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kShuffleVectorExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ShuffleVectorExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ShuffleVectorExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ShuffleVectorExpr> ShuffleVectorExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

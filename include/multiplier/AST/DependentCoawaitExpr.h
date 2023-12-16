@@ -41,8 +41,10 @@ class MX_EXPORT DependentCoawaitExpr : public Expr {
   static gap::generator<DependentCoawaitExpr> in(const Fragment &frag);
   static gap::generator<DependentCoawaitExpr> in(const File &file);
 
-  static std::optional<DependentCoawaitExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<DependentCoawaitExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<DependentCoawaitExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<DependentCoawaitExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DEPENDENT_COAWAIT_EXPR;

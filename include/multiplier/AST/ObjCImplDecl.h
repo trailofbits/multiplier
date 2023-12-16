@@ -42,8 +42,10 @@ class MX_EXPORT ObjCImplDecl : public ObjCContainerDecl {
   static gap::generator<ObjCImplDecl> in(const Fragment &frag);
   static gap::generator<ObjCImplDecl> in(const File &file);
 
-  static std::optional<ObjCImplDecl> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<ObjCImplDecl, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<ObjCImplDecl> from(const ir::Operation &op);
+  static gap::generator<std::pair<ObjCImplDecl, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   static gap::generator<ObjCImplDecl> containing(const Decl &decl);
   static gap::generator<ObjCImplDecl> containing(const std::optional<Decl> &decl);

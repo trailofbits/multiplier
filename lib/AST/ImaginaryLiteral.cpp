@@ -45,20 +45,23 @@ bool ImaginaryLiteral::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ImaginaryLiteral, ir::hl::Operation>> ImaginaryLiteral::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kImaginaryLiteralDerivedKinds)) {
+gap::generator<std::pair<ImaginaryLiteral, ir::Operation>> ImaginaryLiteral::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kImaginaryLiteralDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ImaginaryLiteral, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ImaginaryLiteral, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ImaginaryLiteral> ImaginaryLiteral::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

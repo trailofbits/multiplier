@@ -185,10 +185,11 @@ class MX_EXPORT Reference {
   RawEntityId entity_id;
   RawEntityId kind_id;
 
-#define MX_FRIEND(type_name, lower_name, enum_name, category) \
-    friend class type_name;
+#define MX_FRIEND(ns_path, type_name, ...) \
+    friend class ns_path type_name;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
@@ -256,10 +257,11 @@ class MX_EXPORT Reference {
   // Return this reference as a `VariantEntity`.
   VariantEntity as_variant(void) const noexcept;
 
-#define MX_DECLARE_REF_GETTER(type_name, lower_name, enum_name, category) \
-    std::optional<type_name> as_ ## lower_name (void) const noexcept;
+#define MX_DECLARE_REF_GETTER(ns_path, type_name, lower_name, ...) \
+    std::optional<ns_path type_name> as_ ## lower_name (void) const noexcept;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_REF_GETTER,
+                              MX_DECLARE_REF_GETTER,
                               MX_DECLARE_REF_GETTER,
                               MX_DECLARE_REF_GETTER,
                               MX_DECLARE_REF_GETTER,

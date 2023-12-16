@@ -48,8 +48,10 @@ class MX_EXPORT ParmVarDecl : public VarDecl {
   static gap::generator<ParmVarDecl> in(const Fragment &frag);
   static gap::generator<ParmVarDecl> in(const File &file);
 
-  static std::optional<ParmVarDecl> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<ParmVarDecl, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<ParmVarDecl> from(const ir::Operation &op);
+  static gap::generator<std::pair<ParmVarDecl, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::PARM_VAR;

@@ -250,36 +250,6 @@ class Operation(multiplier.ir.Operation):
   def FROM(arg_0: multiplier.ir.Operation) -> Optional[multiplier.ir.highlevel.Operation]:
     ...
 
-  @overload
-  @staticmethod
-  def first_from(that: multiplier.ast.Decl) -> Optional[multiplier.ir.highlevel.Operation]:
-    ...
-
-  @overload
-  @staticmethod
-  def first_from(that: multiplier.ast.Decl, arg_1: multiplier.ir.OperationKind) -> Optional[multiplier.ir.highlevel.Operation]:
-    ...
-
-  @overload
-  @staticmethod
-  def first_from(that: multiplier.ast.Stmt) -> Optional[multiplier.ir.highlevel.Operation]:
-    ...
-
-  @overload
-  @staticmethod
-  def first_from(that: multiplier.ast.Stmt, arg_1: multiplier.ir.OperationKind) -> Optional[multiplier.ir.highlevel.Operation]:
-    ...
-
-  @overload
-  @staticmethod
-  def all_from(that: multiplier.ast.Decl) -> Generator[multiplier.ir.highlevel.Operation]:
-    ...
-
-  @overload
-  @staticmethod
-  def all_from(that: multiplier.ast.Stmt) -> Generator[multiplier.ir.highlevel.Operation]:
-    ...
-
 class AccessSpecifierOp(multiplier.ir.highlevel.Operation):
 
   @staticmethod

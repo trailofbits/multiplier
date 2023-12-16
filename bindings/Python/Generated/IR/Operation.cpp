@@ -1827,6 +1827,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::Operation::id"),
+    nullptr,
+  },
+  {
     "kind",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -2012,6 +2022,88 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::ir::Operation::containing"),
   },
   {
+    "first_from",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Decl>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::first_from(arg_0.value()));
+          }
+          while (num_args == 2) {
+            auto arg_0 = ::mx::from_python<mx::Decl>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+            auto arg_1 = ::mx::from_python<mx::ir::OperationKind>(args[1]);
+            if (!arg_1.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::first_from(arg_0.value(), arg_1.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Stmt>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::first_from(arg_0.value()));
+          }
+          while (num_args == 2) {
+            auto arg_0 = ::mx::from_python<mx::Stmt>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+            auto arg_1 = ::mx::from_python<mx::ir::OperationKind>(args[1]);
+            if (!arg_1.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::first_from(arg_0.value(), arg_1.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'first_from'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::ir::Operation::first_from"),
+  },
+  {
+    "all_from",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Decl>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::all_from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Stmt>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::all_from(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'all_from'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::ir::Operation::all_from"),
+  },
+  {
     "nth_operand",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
@@ -2100,7 +2192,7 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
   tp->tp_hash = [] (BorrowedPyObject *obj) -> Py_hash_t {
-    return static_cast<Py_hash_t>(reinterpret_cast<uintptr_t>(T_cast(obj)->underlying_operation()));
+    return static_cast<Py_hash_t>(EntityId(T_cast(obj)->id()).Pack());
   };
   tp->tp_richcompare = [] (BorrowedPyObject *a_obj, BorrowedPyObject *b_obj, int op) -> SharedPyObject * {
     do {
@@ -2132,7 +2224,7 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = nullptr;
+  tp->tp_base = PythonBinding<VariantEntity>::type();
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

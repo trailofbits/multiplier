@@ -448,7 +448,7 @@ inline static const char *EnumerationName(ir::OperationKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::OperationKind) {
-  return 424;
+  return 425;
 }
 
 MX_EXPORT const char *EnumeratorName(ir::OperationKind);

@@ -36,8 +36,10 @@ class MX_EXPORT ObjCAutoreleasePoolStmt : public Stmt {
   static gap::generator<ObjCAutoreleasePoolStmt> in(const Fragment &frag);
   static gap::generator<ObjCAutoreleasePoolStmt> in(const File &file);
 
-  static std::optional<ObjCAutoreleasePoolStmt> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<ObjCAutoreleasePoolStmt, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<ObjCAutoreleasePoolStmt> from(const ir::Operation &op);
+  static gap::generator<std::pair<ObjCAutoreleasePoolStmt, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AUTORELEASE_POOL_STMT;

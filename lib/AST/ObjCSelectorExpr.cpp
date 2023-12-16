@@ -45,20 +45,23 @@ bool ObjCSelectorExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ObjCSelectorExpr> ObjCSelectorExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ObjCSelectorExpr> ObjCSelectorExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ObjCSelectorExpr, ir::hl::Operation>> ObjCSelectorExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kObjCSelectorExprDerivedKinds)) {
+gap::generator<std::pair<ObjCSelectorExpr, ir::Operation>> ObjCSelectorExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kObjCSelectorExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ObjCSelectorExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ObjCSelectorExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCSelectorExpr> ObjCSelectorExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

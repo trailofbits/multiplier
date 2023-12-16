@@ -43,8 +43,10 @@ class MX_EXPORT OMPDistributeParallelForDirective : public OMPLoopDirective {
   static gap::generator<OMPDistributeParallelForDirective> in(const Fragment &frag);
   static gap::generator<OMPDistributeParallelForDirective> in(const File &file);
 
-  static std::optional<OMPDistributeParallelForDirective> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<OMPDistributeParallelForDirective, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<OMPDistributeParallelForDirective> from(const ir::Operation &op);
+  static gap::generator<std::pair<OMPDistributeParallelForDirective, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;

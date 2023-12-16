@@ -176,12 +176,15 @@ struct Compilation @0xc8b5fa5dd0739e82 {
   
   # List of files associated with this compilation.
   fileIds @1 :List(UInt64);
+
+  # The ID of the main source file associated with this compilation.
+  mainFileId @2 :UInt64;
   
   # The compile command for this compilation unit.
-  command @2 :CompileCommand;
+  command @3 :CompileCommand;
   
   # Source IR in text format
-  mlir @3 :Text;
+  mlir @4 :Text;
 } 
 
 struct Type @0xd2d91de1b5fe2e03 {

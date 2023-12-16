@@ -45,8 +45,10 @@ class MX_EXPORT ObjCBridgedCastExpr : public ExplicitCastExpr {
   static gap::generator<ObjCBridgedCastExpr> in(const Fragment &frag);
   static gap::generator<ObjCBridgedCastExpr> in(const File &file);
 
-  static std::optional<ObjCBridgedCastExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<ObjCBridgedCastExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<ObjCBridgedCastExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<ObjCBridgedCastExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_BRIDGED_CAST_EXPR;

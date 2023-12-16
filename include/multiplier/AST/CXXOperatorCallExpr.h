@@ -43,8 +43,10 @@ class MX_EXPORT CXXOperatorCallExpr : public CallExpr {
   static gap::generator<CXXOperatorCallExpr> in(const Fragment &frag);
   static gap::generator<CXXOperatorCallExpr> in(const File &file);
 
-  static std::optional<CXXOperatorCallExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<CXXOperatorCallExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<CXXOperatorCallExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<CXXOperatorCallExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_OPERATOR_CALL_EXPR;

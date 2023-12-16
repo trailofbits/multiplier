@@ -46,20 +46,23 @@ bool OMPForSimdDirective::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OMPForSimdDirective> OMPForSimdDirective::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<OMPForSimdDirective> OMPForSimdDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<OMPForSimdDirective, ir::hl::Operation>> OMPForSimdDirective::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPForSimdDirectiveDerivedKinds)) {
+gap::generator<std::pair<OMPForSimdDirective, ir::Operation>> OMPForSimdDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kOMPForSimdDirectiveDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPForSimdDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<OMPForSimdDirective, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPForSimdDirective> OMPForSimdDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

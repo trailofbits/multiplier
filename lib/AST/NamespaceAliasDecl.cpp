@@ -44,20 +44,23 @@ bool NamespaceAliasDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<NamespaceAliasDecl, ir::hl::Operation>> NamespaceAliasDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kNamespaceAliasDeclDerivedKinds)) {
+gap::generator<std::pair<NamespaceAliasDecl, ir::Operation>> NamespaceAliasDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kNamespaceAliasDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<NamespaceAliasDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<NamespaceAliasDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

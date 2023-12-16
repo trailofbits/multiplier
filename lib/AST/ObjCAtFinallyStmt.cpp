@@ -43,20 +43,23 @@ bool ObjCAtFinallyStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ObjCAtFinallyStmt, ir::hl::Operation>> ObjCAtFinallyStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kObjCAtFinallyStmtDerivedKinds)) {
+gap::generator<std::pair<ObjCAtFinallyStmt, ir::Operation>> ObjCAtFinallyStmt::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kObjCAtFinallyStmtDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ObjCAtFinallyStmt, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ObjCAtFinallyStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

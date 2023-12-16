@@ -12,6 +12,8 @@
 #include <multiplier/IR/Block.h>
 #include <multiplier/IR/Operation.h>
 
+#include "SourceIR.h"
+
 namespace mx::ir {
 
 const char *EnumeratorName(BasicBlockOrder val) {
@@ -91,6 +93,22 @@ Region::entry_block_arguments(void) const & noexcept {
         reinterpret_cast<mlir::detail::BlockArgumentImpl *>(
             arg.getAsOpaquePointer()));
   }
+}
+
+bool Region::operator==(const Region &that) const noexcept {
+  if (underlying_region() == that.underlying_region()) {
+    return true;
+  }
+
+  if (module_ == that.module_) {
+    return false;
+  }
+
+  if (region_->getRegionNumber() != that.region_->getRegionNumber()) {
+    return false;
+  }
+
+  return OperationIdsMatch(region_->getParentOp(), that.region_->getParentOp());
 }
 
 }  // namespace mx::ir

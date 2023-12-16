@@ -42,8 +42,10 @@ class MX_EXPORT CXXDependentScopeMemberExpr : public Expr {
   static gap::generator<CXXDependentScopeMemberExpr> in(const Fragment &frag);
   static gap::generator<CXXDependentScopeMemberExpr> in(const File &file);
 
-  static std::optional<CXXDependentScopeMemberExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<CXXDependentScopeMemberExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<CXXDependentScopeMemberExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<CXXDependentScopeMemberExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_DEPENDENT_SCOPE_MEMBER_EXPR;

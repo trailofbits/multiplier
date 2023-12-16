@@ -42,8 +42,10 @@ class MX_EXPORT SubstNonTypeTemplateParmExpr : public Expr {
   static gap::generator<SubstNonTypeTemplateParmExpr> in(const Fragment &frag);
   static gap::generator<SubstNonTypeTemplateParmExpr> in(const File &file);
 
-  static std::optional<SubstNonTypeTemplateParmExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<SubstNonTypeTemplateParmExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<SubstNonTypeTemplateParmExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<SubstNonTypeTemplateParmExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_EXPR;

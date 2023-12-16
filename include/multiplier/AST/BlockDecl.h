@@ -39,8 +39,10 @@ class MX_EXPORT BlockDecl : public Decl {
   static gap::generator<BlockDecl> in(const Fragment &frag);
   static gap::generator<BlockDecl> in(const File &file);
 
-  static std::optional<BlockDecl> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<BlockDecl, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<BlockDecl> from(const ir::Operation &op);
+  static gap::generator<std::pair<BlockDecl, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BLOCK;

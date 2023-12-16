@@ -48,20 +48,23 @@ bool CXXAddrspaceCastExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CXXAddrspaceCastExpr, ir::hl::Operation>> CXXAddrspaceCastExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCXXAddrspaceCastExprDerivedKinds)) {
+gap::generator<std::pair<CXXAddrspaceCastExpr, ir::Operation>> CXXAddrspaceCastExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCXXAddrspaceCastExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXAddrspaceCastExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CXXAddrspaceCastExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

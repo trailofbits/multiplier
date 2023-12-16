@@ -45,20 +45,23 @@ bool CXXNoexceptExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CXXNoexceptExpr, ir::hl::Operation>> CXXNoexceptExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCXXNoexceptExprDerivedKinds)) {
+gap::generator<std::pair<CXXNoexceptExpr, ir::Operation>> CXXNoexceptExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCXXNoexceptExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXNoexceptExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CXXNoexceptExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CXXNoexceptExpr> CXXNoexceptExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

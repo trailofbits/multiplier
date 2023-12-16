@@ -45,20 +45,23 @@ bool OMPParallelDirective::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OMPParallelDirective> OMPParallelDirective::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<OMPParallelDirective> OMPParallelDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<OMPParallelDirective, ir::hl::Operation>> OMPParallelDirective::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPParallelDirectiveDerivedKinds)) {
+gap::generator<std::pair<OMPParallelDirective, ir::Operation>> OMPParallelDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kOMPParallelDirectiveDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPParallelDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<OMPParallelDirective, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPParallelDirective> OMPParallelDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

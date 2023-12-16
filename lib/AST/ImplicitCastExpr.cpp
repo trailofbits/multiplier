@@ -46,20 +46,23 @@ bool ImplicitCastExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ImplicitCastExpr> ImplicitCastExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ImplicitCastExpr> ImplicitCastExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ImplicitCastExpr, ir::hl::Operation>> ImplicitCastExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kImplicitCastExprDerivedKinds)) {
+gap::generator<std::pair<ImplicitCastExpr, ir::Operation>> ImplicitCastExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kImplicitCastExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ImplicitCastExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ImplicitCastExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ImplicitCastExpr> ImplicitCastExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

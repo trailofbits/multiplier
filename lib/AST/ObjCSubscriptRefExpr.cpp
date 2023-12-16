@@ -46,20 +46,23 @@ bool ObjCSubscriptRefExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ObjCSubscriptRefExpr, ir::hl::Operation>> ObjCSubscriptRefExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kObjCSubscriptRefExprDerivedKinds)) {
+gap::generator<std::pair<ObjCSubscriptRefExpr, ir::Operation>> ObjCSubscriptRefExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kObjCSubscriptRefExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ObjCSubscriptRefExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ObjCSubscriptRefExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

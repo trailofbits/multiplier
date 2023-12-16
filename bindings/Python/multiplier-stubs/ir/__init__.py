@@ -677,7 +677,7 @@ class Label(object):
   block: multiplier.ir.Block
   index: int
 
-class Operation(object):
+class Operation(multiplier.Entity):
   kind_name: str
   kind: multiplier.ir.OperationKind
   num_operands: int
@@ -712,6 +712,36 @@ class Operation(object):
   @overload
   @staticmethod
   def containing(arg_0: multiplier.ir.Block) -> multiplier.ir.Operation:
+    ...
+
+  @overload
+  @staticmethod
+  def first_from(that: multiplier.ast.Decl) -> Optional[multiplier.ir.Operation]:
+    ...
+
+  @overload
+  @staticmethod
+  def first_from(that: multiplier.ast.Decl, arg_1: multiplier.ir.OperationKind) -> Optional[multiplier.ir.Operation]:
+    ...
+
+  @overload
+  @staticmethod
+  def first_from(that: multiplier.ast.Stmt) -> Optional[multiplier.ir.Operation]:
+    ...
+
+  @overload
+  @staticmethod
+  def first_from(that: multiplier.ast.Stmt, arg_1: multiplier.ir.OperationKind) -> Optional[multiplier.ir.Operation]:
+    ...
+
+  @overload
+  @staticmethod
+  def all_from(that: multiplier.ast.Decl) -> Generator[multiplier.ir.Operation]:
+    ...
+
+  @overload
+  @staticmethod
+  def all_from(that: multiplier.ast.Stmt) -> Generator[multiplier.ir.Operation]:
     ...
 
   def nth_operand(self, arg_0: int) -> Optional[multiplier.ir.Operand]:

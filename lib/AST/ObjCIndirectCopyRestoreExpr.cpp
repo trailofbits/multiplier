@@ -45,20 +45,23 @@ bool ObjCIndirectCopyRestoreExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ObjCIndirectCopyRestoreExpr, ir::hl::Operation>> ObjCIndirectCopyRestoreExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kObjCIndirectCopyRestoreExprDerivedKinds)) {
+gap::generator<std::pair<ObjCIndirectCopyRestoreExpr, ir::Operation>> ObjCIndirectCopyRestoreExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kObjCIndirectCopyRestoreExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ObjCIndirectCopyRestoreExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ObjCIndirectCopyRestoreExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

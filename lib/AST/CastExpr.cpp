@@ -66,20 +66,23 @@ bool CastExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CastExpr> CastExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CastExpr> CastExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CastExpr, ir::hl::Operation>> CastExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kCastExprDerivedKinds)) {
+gap::generator<std::pair<CastExpr, ir::Operation>> CastExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCastExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CastExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CastExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CastExpr> CastExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

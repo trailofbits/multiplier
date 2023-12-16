@@ -44,20 +44,23 @@ bool OMPTeamsDirective::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OMPTeamsDirective> OMPTeamsDirective::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<OMPTeamsDirective> OMPTeamsDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<OMPTeamsDirective, ir::hl::Operation>> OMPTeamsDirective::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPTeamsDirectiveDerivedKinds)) {
+gap::generator<std::pair<OMPTeamsDirective, ir::Operation>> OMPTeamsDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kOMPTeamsDirectiveDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPTeamsDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<OMPTeamsDirective, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPTeamsDirective> OMPTeamsDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

@@ -15,6 +15,8 @@
 #include "OperationKind.h"
 #include "Value.h"
 
+#include "../Types.h"
+
 namespace mlir {
 class Operation;
 class OpOperand;
@@ -25,6 +27,7 @@ class OpResultImpl;
 namespace mx {
 class Decl;
 class Fragment;
+class Index;
 class Stmt;
 
 enum class DeclKind : unsigned char;
@@ -57,6 +60,7 @@ class Operation {
 
   friend class ::mx::Decl;
   friend class ::mx::Fragment;
+  friend class ::mx::Index;
   friend class ::mx::Stmt;
 
   Operation(void) = delete;
@@ -87,20 +91,15 @@ class Operation {
     return op_;
   }
 
-  inline bool operator==(const Operation &that) const noexcept {
-    return op_ == that.op_;
-  }
-
-  inline bool operator!=(const Operation &that) const noexcept {
-    return op_ != that.op_;
-  }
-
   // Classify an MLIR operation, by raw pointer or by operation name.
   static OperationKind classify(mlir::Operation *);
   static OperationKind classify(std::string_view);
 
   // The name of this operation.
   std::string_view kind_name(void) const noexcept;
+
+  // Return the ID of this operation.
+  EntityId id(void) const noexcept;
 
   // Kind of this operation. If the kind is from a dialect that isn't recognized
   // by multiplier, then `OperationKind::UNKNOWN` is returned.
@@ -117,6 +116,14 @@ class Operation {
   // Regions and blocks are always contained inside of an operation.
   static Operation containing(const Region &);
   static Operation containing(const Block &);
+
+  static std::optional<Operation> first_from(const ::mx::Decl &that);
+  static std::optional<Operation> first_from(const ::mx::Decl &that, OperationKind);
+  static gap::generator<Operation> all_from(const ::mx::Decl &that);
+
+  static std::optional<Operation> first_from(const ::mx::Stmt &that);
+  static std::optional<Operation> first_from(const ::mx::Stmt &that, OperationKind);
+  static gap::generator<Operation> all_from(const ::mx::Stmt &that);
 
   // Operations can have zero or more operands.
   unsigned num_operands(void) const noexcept;
@@ -144,6 +151,9 @@ class Operation {
   // An operation can have zero or more uses. A use of an operation is a use of
   // one of the result values of the operations.
   gap::generator<Operand> uses(void) const & noexcept;
+
+  bool operator==(const Operation &that) const noexcept;
+  bool operator!=(const Operation &that) const noexcept = default;
 };
 
 // A value produced as a result of an operation.
@@ -174,6 +184,9 @@ class Result final : public Value {
 
   // Index of this result in its operation's result list.
   unsigned index(void) const noexcept;
+
+  bool operator==(const Result &that) const noexcept;
+  bool operator!=(const Result &that) const noexcept = default;
 };
 
 static_assert(sizeof(Result) == sizeof(Value));
@@ -203,14 +216,6 @@ class Operand {
     return op_;
   }
 
-  inline bool operator==(const Operand &that) const noexcept {
-    return op_ == that.op_;
-  }
-
-  inline bool operator!=(const Operand &that) const noexcept {
-    return op_ != that.op_;
-  }
-
   // The operation containing this operand.
   Operation operation(void) const noexcept;
 
@@ -220,6 +225,9 @@ class Operand {
   // Value associated with this operand. This could be a block argument, or
   // the result of another operation.
   Value value(void) const noexcept;
+
+  bool operator==(const Operand &that) const noexcept;
+  bool operator!=(const Operand &that) const noexcept = default;
 };
 
 }  // namespace ir

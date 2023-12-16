@@ -46,20 +46,23 @@ bool ArrayInitLoopExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ArrayInitLoopExpr> ArrayInitLoopExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ArrayInitLoopExpr> ArrayInitLoopExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ArrayInitLoopExpr, ir::hl::Operation>> ArrayInitLoopExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kArrayInitLoopExprDerivedKinds)) {
+gap::generator<std::pair<ArrayInitLoopExpr, ir::Operation>> ArrayInitLoopExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kArrayInitLoopExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ArrayInitLoopExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ArrayInitLoopExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ArrayInitLoopExpr> ArrayInitLoopExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

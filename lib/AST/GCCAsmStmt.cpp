@@ -46,20 +46,23 @@ bool GCCAsmStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<GCCAsmStmt> GCCAsmStmt::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<GCCAsmStmt> GCCAsmStmt::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<GCCAsmStmt, ir::hl::Operation>> GCCAsmStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kGCCAsmStmtDerivedKinds)) {
+gap::generator<std::pair<GCCAsmStmt, ir::Operation>> GCCAsmStmt::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kGCCAsmStmtDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<GCCAsmStmt, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<GCCAsmStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<GCCAsmStmt> GCCAsmStmt::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

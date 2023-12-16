@@ -274,7 +274,7 @@ inline static RawEntityId DefinitionId(const Args&...) {
 
 // Something like `EntityFor(ep, kind)`, e.g. get all declarations of a specific
 // kind.
-#define MX_DECLARE_FRAGMENT_OFFSET_LISTERS(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_FRAGMENT_OFFSET_LISTERS(ns_path, type_name, lower_name, enum_name, category) \
     gap::generator<type_name ## ImplPtr> EntityProvider::type_name ## sFor( \
         const Ptr &self, type_name ## Kind kind, PackedFragmentId frag_id) & { \
       \
@@ -354,7 +354,7 @@ inline static RawEntityId DefinitionId(const Args&...) {
       } \
     }
 
-#define MX_DECLARE_FRAGMENT_PSEUDO_LISTERS(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_FRAGMENT_PSEUDO_LISTERS(ns_path, type_name, lower_name, enum_name, category) \
     gap::generator<type_name ## ImplPtr> EntityProvider::type_name ## sFor( \
         const Ptr &self, PackedFragmentId frag_id) & { \
       \
@@ -389,6 +389,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_FRAGMENT_OFFSET_LISTERS,
                             MX_DECLARE_FRAGMENT_PSEUDO_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_FRAGMENT_OFFSET_LISTERS
 #undef MX_DECLARE_FRAGMENT_PSEUDO_LISTERS

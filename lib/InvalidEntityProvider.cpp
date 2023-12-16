@@ -81,7 +81,7 @@ gap::generator<RawEntityId> InvalidEntityProvider::FindSymbol(
   co_return;
 }
 
-#define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_ENTITY_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     type_name ## ImplPtr InvalidEntityProvider::type_name ## For( \
         const Ptr &, RawEntityId) { return {}; } \
     \
@@ -94,10 +94,11 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
-                            MX_DECLARE_ENTITY_GETTER)
+                            MX_DECLARE_ENTITY_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_GETTER
 
-#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_ENTITY_LISTERS(ns_path, type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> InvalidEntityProvider::type_name ## sFor( \
       const Ptr &, type_name ## Kind) & { co_return; }
 
@@ -106,6 +107,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS

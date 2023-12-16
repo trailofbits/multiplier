@@ -45,20 +45,23 @@ bool ParenExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ParenExpr> ParenExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ParenExpr> ParenExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ParenExpr, ir::hl::Operation>> ParenExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kParenExprDerivedKinds)) {
+gap::generator<std::pair<ParenExpr, ir::Operation>> ParenExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kParenExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ParenExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ParenExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ParenExpr> ParenExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

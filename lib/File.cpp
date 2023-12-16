@@ -12,6 +12,7 @@
 #include <multiplier/AST/Type.h>
 #include <multiplier/Frontend/Macro.h>
 #include <multiplier/Frontend/Query.h>
+#include <multiplier/IR/Operation.h>
 #include <mutex>
 
 #include "Attr.h"
@@ -222,7 +223,7 @@ std::optional<File> File::containing(const RegexQueryMatch &match) {
   }
 }
 
-#define MX_DEFINE_CONTAINING(type_name, lower_name, enum_name, category) \
+#define MX_DEFINE_CONTAINING(ns_path, type_name, lower_name, enum_name, category) \
     std::optional<File> File::containing(const type_name &entity) { \
       auto &ep = entity.impl->ep; \
       RawEntityId fid = entity.impl->fragment_id.Pack(); \
@@ -245,21 +246,31 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_CONTAINING,
                             MX_DEFINE_CONTAINING,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DEFINE_CONTAINING
 
-std::optional<File> File::containing(const VariantEntity &entity) {
-#define GET_FILE(type_name, lower_name, enum_name, category) \
-      } else if (std::holds_alternative<type_name>(entity)) { \
-        return File::containing(std::get<type_name>(entity));
-
-  if (false) {
-    MX_FOR_EACH_ENTITY_CATEGORY(GET_FILE, GET_FILE, MX_IGNORE_ENTITY_CATEGORY,
-                                GET_FILE, GET_FILE, GET_FILE,
-                                MX_IGNORE_ENTITY_CATEGORY)
+// Return the file containing an operation.
+std::optional<File> File::containing(const ir::Operation &op) {
+  if (auto decl = Decl::from(op)) {
+    return File::containing(decl.value());
+  } else if (auto stmt = Stmt::from(op)) {
+    return File::containing(stmt.value());
   } else {
     return std::nullopt;
   }
+}
+
+std::optional<File> File::containing(const VariantEntity &entity) {
+#define GET_FILE(ns_path, type_name, lower_name, enum_name, category) \
+    if (auto lower_name ## _ptr = std::get_if<ns_path type_name>(&entity)) { \
+      return File::containing(*lower_name ## _ptr); \
+    }
+
+  MX_FOR_EACH_ENTITY_CATEGORY(GET_FILE, GET_FILE, MX_IGNORE_ENTITY_CATEGORY,
+                              GET_FILE, GET_FILE, GET_FILE,
+                              MX_IGNORE_ENTITY_CATEGORY, GET_FILE)
+  return std::nullopt;
 #undef GET_FILE
 }
 

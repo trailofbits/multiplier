@@ -39,8 +39,10 @@ class MX_EXPORT ForStmt : public Stmt {
   static gap::generator<ForStmt> in(const Fragment &frag);
   static gap::generator<ForStmt> in(const File &file);
 
-  static std::optional<ForStmt> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<ForStmt, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<ForStmt> from(const ir::Operation &op);
+  static gap::generator<std::pair<ForStmt, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FOR_STMT;

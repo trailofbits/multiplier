@@ -96,9 +96,11 @@ class MX_EXPORT Stmt {
   static gap::generator<Stmt> in(const Fragment &frag);
   static gap::generator<Stmt> in(const File &file);
 
-  static std::optional<Stmt> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<Stmt, ir::hl::Operation>> in(const Compilation &tu);
-  static gap::generator<std::pair<Stmt, ir::hl::Operation>> in(const Compilation &tu, std::span<const StmtKind> kinds);
+#ifndef MX_DISABLE_VAST
+  static std::optional<Stmt> from(const ir::Operation &op);
+  static gap::generator<std::pair<Stmt, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<std::pair<Stmt, ir::Operation>> in(const Compilation &tu, std::span<const StmtKind> kinds);
+#endif  // MX_DISABLE_VAST
 
   static gap::generator<Stmt> containing(const Decl &decl);
   static gap::generator<Stmt> containing(const std::optional<Decl> &decl);

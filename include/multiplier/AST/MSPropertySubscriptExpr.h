@@ -40,8 +40,10 @@ class MX_EXPORT MSPropertySubscriptExpr : public Expr {
   static gap::generator<MSPropertySubscriptExpr> in(const Fragment &frag);
   static gap::generator<MSPropertySubscriptExpr> in(const File &file);
 
-  static std::optional<MSPropertySubscriptExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<MSPropertySubscriptExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<MSPropertySubscriptExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<MSPropertySubscriptExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_PROPERTY_SUBSCRIPT_EXPR;

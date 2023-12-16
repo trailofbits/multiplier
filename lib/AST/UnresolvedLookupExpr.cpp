@@ -46,20 +46,23 @@ bool UnresolvedLookupExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<UnresolvedLookupExpr, ir::hl::Operation>> UnresolvedLookupExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kUnresolvedLookupExprDerivedKinds)) {
+gap::generator<std::pair<UnresolvedLookupExpr, ir::Operation>> UnresolvedLookupExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kUnresolvedLookupExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<UnresolvedLookupExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<UnresolvedLookupExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<UnresolvedLookupExpr> UnresolvedLookupExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

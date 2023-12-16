@@ -41,8 +41,10 @@ class MX_EXPORT ObjCProtocolExpr : public Expr {
   static gap::generator<ObjCProtocolExpr> in(const Fragment &frag);
   static gap::generator<ObjCProtocolExpr> in(const File &file);
 
-  static std::optional<ObjCProtocolExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<ObjCProtocolExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<ObjCProtocolExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<ObjCProtocolExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_PROTOCOL_EXPR;

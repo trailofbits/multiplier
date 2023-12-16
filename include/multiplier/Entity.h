@@ -10,9 +10,7 @@
 
 namespace mx {
 namespace ir {
-namespace hl {
 class Operation;
-}  // namespace hl
 }  // namespace ir
 
 class DefineMacroDirective;
@@ -22,7 +20,7 @@ class TokenReader;
 
 using TokenImplPtr = std::shared_ptr<const TokenReader>;
 
-#define MX_FORWARD_DECLARE(type_name, lower_name, enum_name, category) \
+#define MX_FORWARD_DECLARE(ns_path, type_name, lower_name, enum_name, category) \
     class type_name; \
     class type_name ## Impl; \
     using type_name ## ImplPtr = std::shared_ptr<const type_name ## Impl>; \
@@ -34,15 +32,17 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE,
                             MX_FORWARD_DECLARE,
                             MX_FORWARD_DECLARE,
                             MX_FORWARD_DECLARE,
-                            MX_FORWARD_DECLARE)
+                            MX_FORWARD_DECLARE,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_FORWARD_DECLARE
 
-#define MX_DECLARE_ENTITY_VARIANT(type_name, lower_name, enum_name, category) \
-    , type_name
+#define MX_DECLARE_ENTITY_VARIANT(ns_path, type_name, lower_name, enum_name, category) \
+    , ns_path type_name
 
 using NotAnEntity = std::monostate;
 using VariantEntity = std::variant<
     NotAnEntity MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_VARIANT,
+                                            MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,

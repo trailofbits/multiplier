@@ -42,8 +42,10 @@ class MX_EXPORT CXXDeleteExpr : public Expr {
   static gap::generator<CXXDeleteExpr> in(const Fragment &frag);
   static gap::generator<CXXDeleteExpr> in(const File &file);
 
-  static std::optional<CXXDeleteExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<CXXDeleteExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<CXXDeleteExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<CXXDeleteExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_DELETE_EXPR;

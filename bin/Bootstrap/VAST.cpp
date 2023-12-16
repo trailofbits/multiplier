@@ -888,7 +888,7 @@ void CodeGenerator::RunOnOps(void) {
       << "  return \"OperationKind\";\n"
       << "}\n\n"
       << "inline static constexpr unsigned NumEnumerators(ir::OperationKind) {\n"
-      << "  return " << num_ops << ";\n"
+      << "  return " << (num_ops + 1u  /* +1 for UNKNOWN */) << ";\n"
       << "}\n\n"
       << "MX_EXPORT const char *EnumeratorName(ir::OperationKind);\n\n";
 
@@ -1016,21 +1016,7 @@ void CodeGenerator::RunOnOps(void) {
         << "namespace mx::ir::" << dialect.our_ns_name << " {\n\n"
         << "class MX_EXPORT Operation : public ::mx::ir::Operation {\n"
         << " public:\n"
-        << "  static std::optional<Operation> from(const ::mx::ir::Operation &);\n";
-    
-    // These are manually implemented.
-    if (dialect.name == "HighLevel") {
-      hpp
-          << '\n'
-          << "  static std::optional<Operation> first_from(const ::mx::Decl &that);\n"
-          << "  static std::optional<Operation> first_from(const ::mx::Decl &that, OperationKind);\n"
-          << "  static gap::generator<Operation> all_from(const ::mx::Decl &that);\n\n"
-          << "  static std::optional<Operation> first_from(const ::mx::Stmt &that);\n"
-          << "  static std::optional<Operation> first_from(const ::mx::Stmt &that, OperationKind);\n"
-          << "  static gap::generator<Operation> all_from(const ::mx::Stmt &that);\n";
-    }
-
-    hpp
+        << "  static std::optional<Operation> from(const ::mx::ir::Operation &);\n"
         << "};\n"
         << "static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));\n\n";
 

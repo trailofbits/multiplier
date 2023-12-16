@@ -49,20 +49,23 @@ bool CXXDeductionGuideDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<CXXDeductionGuideDecl, ir::hl::Operation>> CXXDeductionGuideDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kCXXDeductionGuideDeclDerivedKinds)) {
+gap::generator<std::pair<CXXDeductionGuideDecl, ir::Operation>> CXXDeductionGuideDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kCXXDeductionGuideDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXDeductionGuideDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<CXXDeductionGuideDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

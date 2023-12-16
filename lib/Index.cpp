@@ -12,6 +12,7 @@
 #include <multiplier/AST/Type.h>
 
 #include "Attr.h"
+#include "Compilation.h"
 #include "Decl.h"
 #include "File.h"
 #include "Fragment.h"
@@ -20,6 +21,10 @@
 #include "Stmt.h"
 #include "Type.h"
 #include "Types.h"
+
+#ifndef MX_DISABLE_VAST
+# include "IR/SourceIR.h"
+#endif
 
 namespace mx {
 
@@ -171,11 +176,36 @@ gap::generator<File> Index::files(void) const & {
   }
 }
 
-#define MX_DEFINE_GETTER(type_name, lower_name, enum_name, category) \
-  std::optional<type_name> Index::lower_name(RawEntityId id) const { \
+std::optional<ir::Operation> Index::operation(RawEntityId id) const {
+  auto op_id = EntityId(id).Extract<OperationId>();
+  if (!op_id) {
+    return std::nullopt;
+  }
+
+  CompilationId compilation_id(op_id->compilation_id);
+  auto cptr = impl->CompilationFor(impl, EntityId(compilation_id).Pack());
+  if (!cptr) {
+    assert(false);
+    return std::nullopt;
+  }
+
+#ifndef MX_DISABLE_VAST
+  if (auto source_ir = cptr->SourceIRPtr(compilation_id)) {
+    if (auto op = source_ir->OperationFor(source_ir, id)) {
+      return op;
+    }
+  }
+#endif
+
+  assert(false);
+  return std::nullopt;
+}
+
+#define MX_DEFINE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
+  std::optional<ns_path type_name> Index::lower_name(RawEntityId id) const { \
     if (CategoryFromEntityId(id) == EntityCategory::enum_name) { \
       if (type_name ## ImplPtr ptr = impl->type_name ## For(impl, id)) { \
-        return type_name(std::move(ptr)); \
+        return ns_path type_name(std::move(ptr)); \
       } \
     } \
     return std::nullopt; \
@@ -184,7 +214,7 @@ gap::generator<File> Index::files(void) const & {
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DEFINE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_GETTER, MX_DEFINE_GETTER,
                             MX_DEFINE_GETTER, MX_DEFINE_GETTER,
-                            MX_DEFINE_GETTER)
+                            MX_DEFINE_GETTER, MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DEFINE_GETTER
 
 // Download a fragment based off of an entity ID.
@@ -251,8 +281,17 @@ VariantEntity Index::entity(EntityId eid) const {
     }
     assert(false);
 
+  // It's an IR operation.
+  } else if (std::holds_alternative<OperationId>(vid)) {
+#ifndef MX_DISABLE_VAST
+    if (auto op = operation(eid.Pack())) {
+      return op.value();
+    }
+#else
+    assert(false);
+#endif
 
-#define MX_DISPATCH_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_DISPATCH_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     } else if (std::holds_alternative<type_name ## Id>(vid)) { \
       if (type_name ## ImplPtr eptr = impl->type_name ## For(impl, raw_id)) { \
         type_name ret(std::move(eptr)); \
@@ -265,7 +304,7 @@ VariantEntity Index::entity(EntityId eid) const {
     MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                                 MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
                                 MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
-                                MX_DISPATCH_GETTER)
+                                MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DISPATCH_GETTER
 
 

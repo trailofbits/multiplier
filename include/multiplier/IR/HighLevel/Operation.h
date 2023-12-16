@@ -129,14 +129,6 @@ namespace mx::ir::hl {
 class MX_EXPORT Operation : public ::mx::ir::Operation {
  public:
   static std::optional<Operation> from(const ::mx::ir::Operation &);
-
-  static std::optional<Operation> first_from(const ::mx::Decl &that);
-  static std::optional<Operation> first_from(const ::mx::Decl &that, OperationKind);
-  static gap::generator<Operation> all_from(const ::mx::Decl &that);
-
-  static std::optional<Operation> first_from(const ::mx::Stmt &that);
-  static std::optional<Operation> first_from(const ::mx::Stmt &that, OperationKind);
-  static gap::generator<Operation> all_from(const ::mx::Stmt &that);
 };
 static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));
 

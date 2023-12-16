@@ -40,8 +40,10 @@ class MX_EXPORT GNUNullExpr : public Expr {
   static gap::generator<GNUNullExpr> in(const Fragment &frag);
   static gap::generator<GNUNullExpr> in(const File &file);
 
-  static std::optional<GNUNullExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<GNUNullExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<GNUNullExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<GNUNullExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GNU_NULL_EXPR;

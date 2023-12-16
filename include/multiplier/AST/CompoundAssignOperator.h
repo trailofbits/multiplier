@@ -43,8 +43,10 @@ class MX_EXPORT CompoundAssignOperator : public BinaryOperator {
   static gap::generator<CompoundAssignOperator> in(const Fragment &frag);
   static gap::generator<CompoundAssignOperator> in(const File &file);
 
-  static std::optional<CompoundAssignOperator> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<CompoundAssignOperator, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<CompoundAssignOperator> from(const ir::Operation &op);
+  static gap::generator<std::pair<CompoundAssignOperator, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COMPOUND_ASSIGN_OPERATOR;

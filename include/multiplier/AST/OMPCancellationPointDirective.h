@@ -38,8 +38,10 @@ class MX_EXPORT OMPCancellationPointDirective : public OMPExecutableDirective {
   static gap::generator<OMPCancellationPointDirective> in(const Fragment &frag);
   static gap::generator<OMPCancellationPointDirective> in(const File &file);
 
-  static std::optional<OMPCancellationPointDirective> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<OMPCancellationPointDirective, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<OMPCancellationPointDirective> from(const ir::Operation &op);
+  static gap::generator<std::pair<OMPCancellationPointDirective, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_CANCELLATION_POINT_DIRECTIVE;

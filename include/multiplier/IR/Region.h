@@ -63,14 +63,6 @@ class MX_EXPORT Region final {
     return region_;
   }
 
-  inline bool operator==(const Region &that) const noexcept {
-    return region_ == that.region_;
-  }
-
-  inline bool operator!=(const Region &that) const noexcept {
-    return region_ != that.region_;
-  }
-
   static Region containing(const Block &);
 
   // In general, all operations are contained inside a region, except the
@@ -89,6 +81,9 @@ class MX_EXPORT Region final {
   unsigned num_entry_block_arguments(void) const noexcept;
   std::optional<Argument> nth_entry_block_argument(unsigned) const noexcept;
   gap::generator<Argument> entry_block_arguments(void) const & noexcept;
+
+  bool operator==(const Region &that) const noexcept;
+  bool operator!=(const Region &that) const noexcept;
 };
 
 }  // namespace mx::ir

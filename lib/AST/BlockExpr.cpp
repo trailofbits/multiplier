@@ -47,20 +47,23 @@ bool BlockExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<BlockExpr> BlockExpr::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<BlockExpr> BlockExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<BlockExpr, ir::hl::Operation>> BlockExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kBlockExprDerivedKinds)) {
+gap::generator<std::pair<BlockExpr, ir::Operation>> BlockExpr::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kBlockExprDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<BlockExpr, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<BlockExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<BlockExpr> BlockExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

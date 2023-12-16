@@ -43,20 +43,23 @@ bool PragmaCommentDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<PragmaCommentDecl, ir::hl::Operation>> PragmaCommentDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kPragmaCommentDeclDerivedKinds)) {
+gap::generator<std::pair<PragmaCommentDecl, ir::Operation>> PragmaCommentDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kPragmaCommentDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<PragmaCommentDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<PragmaCommentDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<PragmaCommentDecl> PragmaCommentDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

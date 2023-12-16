@@ -825,7 +825,7 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
 }
 
 // Get a `Decl`, `Stmt`, `Attr`.
-#define MX_DECLARE_FRAGMENT_OFFSET_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_FRAGMENT_OFFSET_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     type_name ## ImplPtr SQLiteEntityProvider:: type_name ## For( \
         const Ptr &self, RawEntityId raw_id) { \
       \
@@ -860,7 +860,7 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
     }
 
 // Get a `Designator`, `CXXBaseSpecifier`, etc.
-#define MX_DECLARE_FRAGMENT_PSEUDO_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_FRAGMENT_PSEUDO_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     type_name ## ImplPtr SQLiteEntityProvider:: type_name ## For( \
         const Ptr &self, RawEntityId raw_id) { \
       \
@@ -888,7 +888,7 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
     }
 
 // Get an entity, e.g. a `File`, `Fragment`, `Compilation`, `Type`, etc.
-#define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_ENTITY_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     type_name ## ImplPtr SQLiteEntityProvider:: type_name ## For( \
         const Ptr &self, RawEntityId raw_id) { \
       \
@@ -937,13 +937,14 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_FRAGMENT_OFFSET_GETTER,
                             MX_DECLARE_FRAGMENT_PSEUDO_GETTER,
-                            MX_DECLARE_ENTITY_GETTER)
+                            MX_DECLARE_ENTITY_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_GETTER
 #undef MX_DECLARE_FRAGMENT_OFFSET_GETTER
 #undef MX_DECLARE_FRAGMENT_PSEUDO_GETTER
 
 // Get a list of `Decl`, `Stmt`, `Attr`, `Designator`, etc.
-#define MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
         const Ptr &self) & { \
       \
@@ -1004,7 +1005,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
       } \
     }
 
-#define MX_DECLARE_FRAGMENT_PSEUDO_LIST_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_FRAGMENT_PSEUDO_LIST_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
         const Ptr &self) & { \
       \
@@ -1061,7 +1062,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
       } \
     }
 
-#define MX_DECLARE_ENTITY_LIST_GETTER(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_ENTITY_LIST_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
         const Ptr &self) & { \
       \
@@ -1119,7 +1120,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_LIST_GETTER,
                             MX_DECLARE_ENTITY_LIST_GETTER,
                             MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER,
                             MX_DECLARE_FRAGMENT_PSEUDO_LIST_GETTER,
-                            MX_DECLARE_ENTITY_LIST_GETTER)
+                            MX_DECLARE_ENTITY_LIST_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 
 #undef MX_DECLARE_ENTITY_LIST_GETTER
 #undef MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER
@@ -1178,7 +1180,7 @@ gap::generator<TypeImplPtr> SQLiteEntityProvider::TypesFor(
 
 // Something like `EntityFor(ep, kind)`, e.g. get all declarations of a specific
 // kind.
-#define MX_DECLARE_FRAGMENT_OFFSET_LISTERS(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_FRAGMENT_OFFSET_LISTERS(ns_path, type_name, lower_name, enum_name, category) \
     gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
         const Ptr &self, type_name ## Kind kind) & { \
       \
@@ -1240,6 +1242,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_FRAGMENT_OFFSET_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_FRAGMENT_OFFSET_LISTERS

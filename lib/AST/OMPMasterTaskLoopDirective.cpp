@@ -46,20 +46,23 @@ bool OMPMasterTaskLoopDirective::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<OMPMasterTaskLoopDirective, ir::hl::Operation>> OMPMasterTaskLoopDirective::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kOMPMasterTaskLoopDirectiveDerivedKinds)) {
+gap::generator<std::pair<OMPMasterTaskLoopDirective, ir::Operation>> OMPMasterTaskLoopDirective::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kOMPMasterTaskLoopDirectiveDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPMasterTaskLoopDirective, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<OMPMasterTaskLoopDirective, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

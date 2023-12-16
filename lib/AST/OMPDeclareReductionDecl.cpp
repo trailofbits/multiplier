@@ -46,20 +46,23 @@ bool OMPDeclareReductionDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<OMPDeclareReductionDecl, ir::hl::Operation>> OMPDeclareReductionDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kOMPDeclareReductionDeclDerivedKinds)) {
+gap::generator<std::pair<OMPDeclareReductionDecl, ir::Operation>> OMPDeclareReductionDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kOMPDeclareReductionDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPDeclareReductionDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<OMPDeclareReductionDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPDeclareReductionDecl> OMPDeclareReductionDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

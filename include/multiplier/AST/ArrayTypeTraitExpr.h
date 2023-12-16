@@ -42,8 +42,10 @@ class MX_EXPORT ArrayTypeTraitExpr : public Expr {
   static gap::generator<ArrayTypeTraitExpr> in(const Fragment &frag);
   static gap::generator<ArrayTypeTraitExpr> in(const File &file);
 
-  static std::optional<ArrayTypeTraitExpr> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<ArrayTypeTraitExpr, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<ArrayTypeTraitExpr> from(const ir::Operation &op);
+  static gap::generator<std::pair<ArrayTypeTraitExpr, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_TYPE_TRAIT_EXPR;

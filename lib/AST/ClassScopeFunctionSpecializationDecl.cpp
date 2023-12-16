@@ -44,20 +44,23 @@ bool ClassScopeFunctionSpecializationDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<ClassScopeFunctionSpecializationDecl, ir::hl::Operation>> ClassScopeFunctionSpecializationDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::hl::Operation> res : Decl::in(tu, kClassScopeFunctionSpecializationDeclDerivedKinds)) {
+gap::generator<std::pair<ClassScopeFunctionSpecializationDecl, ir::Operation>> ClassScopeFunctionSpecializationDecl::in(const Compilation &tu) {
+  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kClassScopeFunctionSpecializationDeclDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<ClassScopeFunctionSpecializationDecl, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<ClassScopeFunctionSpecializationDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

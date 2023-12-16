@@ -36,8 +36,10 @@ class MX_EXPORT BreakStmt : public Stmt {
   static gap::generator<BreakStmt> in(const Fragment &frag);
   static gap::generator<BreakStmt> in(const File &file);
 
-  static std::optional<BreakStmt> from(const ir::hl::Operation &op);
-  static gap::generator<std::pair<BreakStmt, ir::hl::Operation>> in(const Compilation &tu);
+#ifndef MX_DISABLE_VAST
+  static std::optional<BreakStmt> from(const ir::Operation &op);
+  static gap::generator<std::pair<BreakStmt, ir::Operation>> in(const Compilation &tu);
+#endif  // MX_DISABLE_VAST
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BREAK_STMT;

@@ -46,20 +46,23 @@ bool UserDefinedLiteral::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const ir::hl::Operation &op) {
+#ifndef MX_DISABLE_VAST
+std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
   }
   return std::nullopt;
 }
 
-gap::generator<std::pair<UserDefinedLiteral, ir::hl::Operation>> UserDefinedLiteral::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::hl::Operation> res : Stmt::in(tu, kUserDefinedLiteralDerivedKinds)) {
+gap::generator<std::pair<UserDefinedLiteral, ir::Operation>> UserDefinedLiteral::in(const Compilation &tu) {
+  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kUserDefinedLiteralDerivedKinds)) {
     if (auto val = from_base(res.first)) {
-      co_yield std::pair<UserDefinedLiteral, ir::hl::Operation>(std::move(val.value()), std::move(res.second));
+      co_yield std::pair<UserDefinedLiteral, ir::Operation>(std::move(val.value()), std::move(res.second));
     }
   }
 }
+
+#endif  // MX_DISABLE_VAST
 
 gap::generator<UserDefinedLiteral> UserDefinedLiteral::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

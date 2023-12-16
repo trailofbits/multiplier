@@ -17,10 +17,8 @@
 
 namespace mx {
 namespace ir {
-class SourceIRImpl;
-namespace hl {
 class Operation;
-}  // namespace hl
+class SourceIRImpl;
 namespace builtin {
 class ModuleOp;
 }  // namespace builtin
@@ -53,7 +51,7 @@ class MX_EXPORT Compilation {
   friend class Reference;
   friend class Stmt;
   friend class ir::SourceIRImpl;
-  friend class ir::hl::Operation;
+  friend class ir::Operation;
 
   CompilationImplPtr impl;
 

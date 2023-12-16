@@ -83,7 +83,17 @@ class SourceIRImpl {
                         std::string_view mlir);
 
   mlir::Operation *scope(void) const;
+
+  std::optional<Operation> OperationFor(
+      const std::shared_ptr<const SourceIRImpl> &self,
+      RawEntityId eid) const noexcept;
 };
+
+bool OperationIdsMatch(mlir::Operation *a, mlir::Operation *b);
+
+bool BlocksMatch(
+    const std::shared_ptr<const SourceIRImpl> &a_mod, mlir::Block *a,
+    const std::shared_ptr<const SourceIRImpl> &b_mod, mlir::Block *b);
 
 }  // namespace ir
 }  // namespace mx
