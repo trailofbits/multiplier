@@ -12,6 +12,8 @@
 #include <multiplier/IR/Block.h>
 #include <multiplier/IR/Operation.h>
 
+#include "SourceIR.h"
+
 namespace mx::ir {
 
 const char *EnumeratorName(BasicBlockOrder val) {
@@ -98,11 +100,15 @@ bool Region::operator==(const Region &that) const noexcept {
     return true;
   }
 
+  if (module_ == that.module_) {
+    return false;
+  }
+
   if (region_->getRegionNumber() != that.region_->getRegionNumber()) {
     return false;
   }
 
-  return Operation::containing(*this) == Operation::containing(that);
+  return OperationIdsMatch(region_->getParentOp(), that.region_->getParentOp());
 }
 
 }  // namespace mx::ir

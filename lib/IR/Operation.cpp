@@ -20,6 +20,16 @@
 
 namespace mx::ir {
 
+bool OperationIdsMatch(mlir::Operation *a, mlir::Operation *b) {
+  auto a_eid = a->getLoc().cast<mlir::OpaqueLoc>().getUnderlyingLocation();
+  auto b_eid = b->getLoc().cast<mlir::OpaqueLoc>().getUnderlyingLocation();
+  if (a_eid != b_eid) {
+    return false;
+  }
+
+  return a_eid != kInvalidEntityId;
+}
+
 // Return the ID of this operation.
 EntityId Operation::id(void) const noexcept {
   auto eid = op_->getLoc().cast<mlir::OpaqueLoc>().getUnderlyingLocation();
@@ -31,13 +41,11 @@ bool Operation::operator==(const Operation &that) const noexcept {
     return true;
   }
 
-  auto eid = op_->getLoc().cast<mlir::OpaqueLoc>().getUnderlyingLocation();
-  auto that_eid = op_->getLoc().cast<mlir::OpaqueLoc>().getUnderlyingLocation();
-  if (eid != that_eid) {
+  if (module_ == that.module_) {
     return false;
   }
 
-  return eid != kInvalidEntityId;
+  return OperationIdsMatch(op_, that.op_);
 }
 
 std::string_view Operation::kind_name(void) const noexcept {
@@ -189,6 +197,23 @@ unsigned Result::index(void) const noexcept {
   return mlir::OpResult(impl_.result).getResultNumber();
 }
 
+bool Result::operator==(const Result &that) const noexcept {
+  if (underlying_value() == that.underlying_value()) {
+    return true;
+  }
+
+  if (module_ == that.module_) {
+    return false;
+  }
+
+  if (index() != that.index()) {
+    return false;
+  }
+
+  return OperationIdsMatch(mlir::OpResult(impl_.result).getDefiningOp(),
+                           mlir::OpResult(that.impl_.result).getDefiningOp());
+}
+
 // The operation containing this operand.
 Operation Operand::operation(void) const noexcept {
   return Operation(module_, op_->getOwner());
@@ -203,6 +228,22 @@ unsigned Operand::index(void) const noexcept {
 // the result of another operation.
 Value Operand::value(void) const noexcept {
   return Value(module_, op_->get().getAsOpaquePointer());
+}
+
+bool Operand::operator==(const Operand &that) const noexcept {
+  if (underlying_operand() == that.underlying_operand()) {
+    return true;
+  }
+
+  if (module_ == that.module_) {
+    return false;
+  }
+
+  if (index() != that.index()) {
+    return false;
+  }
+
+  return OperationIdsMatch(op_->getOwner(), that.op_->getOwner());
 }
 
 }  // namespace mx::ir

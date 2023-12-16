@@ -87,13 +87,8 @@ class MX_EXPORT Value {
     return impl_.opaque;
   }
 
-  inline bool operator==(const Value &that) const noexcept {
-    return impl_.opaque == that.impl_.opaque;
-  }
-
-  inline bool operator!=(const Value &that) const noexcept {
-    return impl_.opaque != that.impl_.opaque;
-  }
+  bool operator==(const Value &that) const noexcept;
+  bool operator!=(const Value &that) const noexcept = default;
 };
 
 // A value with a specific type.

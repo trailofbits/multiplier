@@ -15,7 +15,70 @@
 #include <multiplier/IR/Region.h>
 #include <multiplier/IR/Value.h>
 
+#include "SourceIR.h"
+
 namespace mx::ir {
+
+bool BlocksMatch(
+    const std::shared_ptr<const SourceIRImpl> &a_mod, mlir::Block *a,
+    const std::shared_ptr<const SourceIRImpl> &b_mod, mlir::Block *b) {
+  if (a == b) {
+    return true;
+  }
+
+  if (a_mod == b_mod) {
+    return false;
+  }
+
+  auto a_op = a->getParentOp();
+  auto b_op = b->getParentOp();
+
+  // Same pointers for the parent op means that these blocks must have the
+  // same address to be equivalent.
+  if (a_op == b_op) {
+    return false;
+  }
+
+  if (!OperationIdsMatch(a_op, b_op)) {
+    return false;
+  }
+
+  if (a->getNumArguments() != b->getNumArguments()) {
+    return false;
+  }
+
+  if (a->empty() != b->empty()) {
+    return false;
+  }
+
+  auto a_region = a->getParent();
+  auto b_region = b->getParent();
+
+  assert(a_region != b_region);
+
+  // If these two blocks are nested inside of equivalent operations, then we
+  // need to figure out if the regions containing these blocks are logically
+  // equivalent.
+  if (a_region->getRegionNumber() !=
+      b_region->getRegionNumber()) {
+    return false;
+  }
+
+#ifndef NDEBUG
+  // If the blocks aren't empty, and the blocks are nested inside of equivalent
+  // operations, then we expect the first two operations in the non-empty blocks
+  // to also be equal.
+  if (!a->empty()) {
+    assert(a->getNumSuccessors() == b->getNumSuccessors());
+
+    mlir::Operation &first = a->getOperations().front();
+    mlir::Operation &that_first = b->getOperations().front();
+    assert(OperationIdsMatch(&first, &that_first));
+  }
+#endif
+
+  return true;
+}
 
 // Return the block containing a given argument.
 Block Block::containing(const Argument &arg_) {
@@ -86,57 +149,7 @@ Operation Block::terminator(void) const noexcept {
 }
 
 bool Block::operator==(const Block &that) const noexcept {
-  if (underlying_block() == that.underlying_block()) {
-    return true;
-  }
-
-  auto parent_op = Operation::containing(*this);
-  auto that_parent_op = Operation::containing(that);
-
-  // Same pointers for the parent op means that these blocks must have the
-  // same address to be equivalent.
-  if (parent_op.underlying_operation() ==
-      that_parent_op.underlying_operation()) {
-    return false;
-  }
-
-  if (parent_op != that_parent_op) {
-    return false;
-  }
-
-  if (block_->getNumArguments() != that.block_->getNumArguments()) {
-    return false;
-  }
-
-  if (block_->empty() != that.block_->empty()) {
-    return false;
-  }
-
-  auto parent_region = block_->getParent();
-  auto that_parent_region = that.block_->getParent();
-
-  // If these two blocks are nested inside of equivalent operations, then we
-  // need to figure out if the regions containing these blocks are logically
-  // equivalent.
-  if (parent_region->getRegionNumber() !=
-      that_parent_region->getRegionNumber()) {
-    return false;
-  }
-
-#ifndef NDEBUG
-  // If the blocks aren't empty, and the blocks are nested inside of equivalent
-  // operations, then we expect the first two operations in the non-empty blocks
-  // to also be equal.
-  if (!block_->empty()) {
-    assert(block_->getNumSuccessors() == that.block_->getNumSuccessors());
-
-    mlir::Operation &first = block_->getOperations().front();
-    mlir::Operation &that_first = that.block_->getOperations().front();
-    assert(Operation(module_, &first) == Operation(module_, &that_first));
-  }
-#endif
-
-  return true;
+  return BlocksMatch(module_, block_, that.module_, that.block_);
 }
 
 std::optional<Argument> Argument::from(const Value &val) {
@@ -156,11 +169,19 @@ bool Argument::operator==(const Argument &that) const noexcept {
     return true;
   }
 
+  if (module_ == that.module_) {
+    return false;
+  }
+
   if (index() != that.index()) {
     return false;
   }
 
-  return Block::containing(*this) == Block::containing(that);
+  mlir::BlockArgument arg(impl_.arg);
+  mlir::BlockArgument that_arg(that.impl_.arg);
+
+  return BlocksMatch(module_, arg.getParentBlock(),
+                     that.module_, that_arg.getParentBlock());
 }
 
 // The operation containing this label.
@@ -182,15 +203,19 @@ bool Label::operator==(const Label &that) const noexcept {
     return true;
   }
 
+  if (module_ == that.module_) {
+    return false;
+  }
+
   if (index() != that.index()) {
     return false;
   }
 
-  if (operation() != that.operation()) {
+  if (!OperationIdsMatch(op_->getOwner(), that.op_->getOwner())) {
     return false;
   }
 
-  assert(block() == that.block());
+  assert(BlocksMatch(module_, op_->get(), that.module_, that.op_->get()));
 
   return true;
 }

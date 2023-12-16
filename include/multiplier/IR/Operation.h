@@ -185,11 +185,7 @@ class Result final : public Value {
   // Index of this result in its operation's result list.
   unsigned index(void) const noexcept;
 
-  inline bool operator==(const Result &that) const noexcept {
-    return underlying_value() == that.underlying_value() ||
-           (index() == that.index() && operation() == that.operation());
-  }
-
+  bool operator==(const Result &that) const noexcept;
   bool operator!=(const Result &that) const noexcept = default;
 };
 
@@ -230,11 +226,7 @@ class Operand {
   // the result of another operation.
   Value value(void) const noexcept;
 
-  inline bool operator==(const Operand &that) const noexcept {
-    return underlying_operand() == that.underlying_operand() ||
-           (index() == that.index() && operation() == that.operation());
-  }
-
+  bool operator==(const Operand &that) const noexcept;
   bool operator!=(const Operand &that) const noexcept = default;
 };
 

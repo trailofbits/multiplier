@@ -10,6 +10,7 @@
 #include <mlir/IR/Operation.h>
 #include <mlir/IR/OperationSupport.h>
 #include <mlir/IR/Value.h>
+#include <multiplier/IR/Block.h>
 #include <multiplier/IR/Operation.h>
 #include <multiplier/IR/Type.h>
 
@@ -45,6 +46,24 @@ Type Value::type(void) const noexcept {
 gap::generator<Operand> Value::uses(void) const & noexcept {
   for (mlir::OpOperand &use : mlir::Value(impl_.value).getUses()) {
     co_yield Operand(module_, &use);
+  }
+}
+
+bool Value::operator==(const Value &that) const noexcept {
+  auto that_kind = that.impl_.value->getKind();
+  if (impl_.value->getKind() != that_kind) {
+    return false;
+  }
+
+  switch (impl_.value->getKind()) {
+    case mlir::detail::ValueImpl::Kind::InlineOpResult:
+    case mlir::detail::ValueImpl::Kind::OutOfLineOpResult:
+      return reinterpret_cast<const Result &>(*this) ==
+             reinterpret_cast<const Result &>(that);
+
+    case mlir::detail::ValueImpl::Kind::BlockArgument:
+      return reinterpret_cast<const Argument &>(*this) ==
+             reinterpret_cast<const Argument &>(that);
   }
 }
 
