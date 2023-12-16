@@ -27,11 +27,17 @@
 #include "Frontend/TokenKind.h"
 #include "Frontend/TokenCategory.h"
 #include "Fragment.h"
-#include "IR/Operation.h"
 #include "Iterator.h"
 #include "Reference.h"
 
+#ifndef MX_DISABLE_VAST
+# include "IR/Operation.h"
+#endif
+
 namespace mx {
+namespace ir {
+class Operation;
+}  // namespace ir
 
 class CachingEntityProvider;
 class Compilation;
