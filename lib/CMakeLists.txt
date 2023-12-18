@@ -223,6 +223,12 @@ target_compile_definitions("mx-api"
     $<BUILD_INTERFACE:MX_BUILD>
 )
 
+if(NOT MX_ENABLE_PYTHON_BINDINGS)
+  target_compile_definitions("mx-api"
+    PUBLIC
+      "MX_DISABLE_PYTHON_BINDINGS")
+endif()
+
 if(MX_ENABLE_VAST)
   target_link_libraries("mx-api"
     PUBLIC

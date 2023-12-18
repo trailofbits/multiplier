@@ -156,12 +156,6 @@ if(NOT MX_ENABLE_VAST)
       "MX_DISABLE_VAST")
 endif()
 
-if(NOT MX_ENABLE_PYTHON_BINDINGS)
-  target_compile_definitions("mx-api"
-    PUBLIC
-      "MX_DISABLE_PYTHON_BINDINGS")
-endif()
-
 set_target_properties("multiplier"
   PROPERTIES
     LINKER_LANGUAGE

@@ -1033,10 +1033,17 @@ class SpecificEntityIdSchema(EntityIdSchema):
     return "SpecificEntityId<{}>".format(self.specific_type.cxx_name)
 
 
-def make_schema(cxx_name, py_name, base) -> Tuple[str, type[Schema]]:
+def make_schema_class_instance(cxx_name, py_name, base):
+  return make_schema_class(cxx_name, py_name, base)()
+
+
+def make_schema_class(cxx_name, py_name, base) -> type[Schema]:
   class NamedEntitySchema(base):
     def __init__(self, *args):
       super().__init__(*args)
+
+    def __str__(self):
+      return cxx_name
 
     @property
     def python_value_name(self):
@@ -1046,7 +1053,11 @@ def make_schema(cxx_name, py_name, base) -> Tuple[str, type[Schema]]:
     def cxx_value_name(self):
       return f"{cxx_name}"
 
-  return f"mx::{cxx_name}", NamedEntitySchema
+    def __reduce__(self):
+      return (make_schema_class_instance, (cxx_name, py_name, base))
+
+  NamedEntitySchema.__name__ = cxx_name + "Schema"
+  return NamedEntitySchema
 
 
 class Renamer:
@@ -1644,8 +1655,6 @@ def wrap(schemas: Iterable[Schema], renamer: Renamer):
     upper_name = rel_dir and rel_dir.split("/")[-1] or ""
     lower_name = upper_name.lower()
 
-
-
     module_out.append(BEGIN_MODULE_CPP_DEF.format(
         dot_name=dot_name,
         lower_name=lower_name,
@@ -1736,23 +1745,33 @@ ENTITY_KINDS: Tuple[str] = (
   "Operation",
 )
 
+VariantEntitySchema = make_schema_class("VariantEntity", "Entity", Schema)
+FileTokenIdSchema = make_schema_class("FileTokenId", "FileTokenId", EntityIdSchema)
+MacroTokenIdSchema = make_schema_class("MacroTokenId", "MacroTokenId", EntityIdSchema)
+ParsedTokenIdSchema = make_schema_class("ParsedTokenId", "ParsedTokenId", EntityIdSchema)
+VariantIdSchema = make_schema_class("VariantId", "EntityId", EntityIdSchema)
+
+for entity in ENTITY_KINDS:
+  globals()[f"{entity}IdSchema"] = make_schema_class(f"{entity}Id", f"{entity}Id", EntityIdSchema)
+  globals()[f"Packed{entity}IdSchema"] = make_schema_class(f"Packed{entity}Id", f"{entity}Id", EntityIdSchema)
+
 def run_on_ast(ast: AST, ns_name: str):
   schemas: List[Schema] = []
   lifter: SchemaLifter = SchemaLifter()
   lifter.add_lifter("mx::FileLocationCache", FileLocationCacheSchema)
   lifter.add_lifter("mx::TokenTreeVisitor", TokenTreeVisitorSchema)
   lifter.add_lifter("mx::UserToken", UserTokenSchema)
-  lifter.add_lifter(*make_schema("VariantEntity", "Entity", Schema))
+  lifter.add_lifter("mx::VariantEntity", VariantEntitySchema)
   lifter.add_lifter("mx::EntityId", EntityIdSchema)
   lifter.add_lifter("mx::RawEntityId", RawEntityIdSchema)
-  lifter.add_lifter(*make_schema("FileTokenId", "FileTokenId", EntityIdSchema))
-  lifter.add_lifter(*make_schema("MacroTokenId", "MacroTokenId", EntityIdSchema))
-  lifter.add_lifter(*make_schema("ParsedTokenId", "ParsedTokenId", EntityIdSchema))
-  lifter.add_lifter(*make_schema("VariantId", "EntityId", EntityIdSchema))
+  lifter.add_lifter("mx::FileTokenId", FileTokenIdSchema)
+  lifter.add_lifter("mx::MacroTokenId", MacroTokenIdSchema)
+  lifter.add_lifter("mx::ParsedTokenId", ParsedTokenIdSchema)
+  lifter.add_lifter("mx::VariantId", VariantIdSchema)
 
   for entity in ENTITY_KINDS:
-    lifter.add_lifter(*make_schema(f"{entity}Id", f"{entity}Id", EntityIdSchema))
-    lifter.add_lifter(*make_schema(f"Packed{entity}Id", f"{entity}Id", EntityIdSchema))
+    lifter.add_lifter(f"mx::{entity}Id", globals()[f"{entity}IdSchema"])
+    lifter.add_lifter(f"mx::Packed{entity}Id", globals()[f"Packed{entity}IdSchema"])
 
   lifter.add_parameterized_lifter("mx::SpecificEntityId", 1,
                                   SpecificEntityIdSchema)
@@ -1815,9 +1834,12 @@ if __name__ == "__main__":
             pickle_schemas.append(schema)
 
         if args.pickle_file:
+          import pickle
           with open(args.pickle_file, "wb") as f:
-            import pickle
             pickle.dump(pickle_schemas, f)
+
+          with open(args.pickle_file, "rb") as f:
+            pickle.load(f)
 
       else:
         wrap(schemas, renamer)
