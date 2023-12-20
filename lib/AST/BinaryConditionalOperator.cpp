@@ -47,7 +47,6 @@ bool BinaryConditionalOperator::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -62,8 +61,6 @@ gap::generator<std::pair<BinaryConditionalOperator, ir::Operation>> BinaryCondit
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

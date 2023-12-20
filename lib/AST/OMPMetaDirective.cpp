@@ -44,7 +44,6 @@ bool OMPMetaDirective::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<OMPMetaDirective> OMPMetaDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -59,8 +58,6 @@ gap::generator<std::pair<OMPMetaDirective, ir::Operation>> OMPMetaDirective::in(
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPMetaDirective> OMPMetaDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

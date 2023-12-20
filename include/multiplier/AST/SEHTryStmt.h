@@ -39,11 +39,8 @@ class MX_EXPORT SEHTryStmt : public Stmt {
   static gap::generator<SEHTryStmt> in(const Fragment &frag);
   static gap::generator<SEHTryStmt> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<SEHTryStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<SEHTryStmt, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_TRY_STMT;
   }

@@ -37,11 +37,8 @@ class MX_EXPORT ClassScopeFunctionSpecializationDecl : public Decl {
   static gap::generator<ClassScopeFunctionSpecializationDecl> in(const Fragment &frag);
   static gap::generator<ClassScopeFunctionSpecializationDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<ClassScopeFunctionSpecializationDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ClassScopeFunctionSpecializationDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION;
   }

@@ -8,9 +8,15 @@
 
 string(TOLOWER "${PROJECT_NAME}" lower_project_name)
 
+include("${PROJECT_SOURCE_DIR}/cmake/python.cmake")
+
+# Get the ABI extension. Native Python modules must be named with this
+# extension.
+get_python_extension_suffix(python_module_extension)
+
 file(GLOB_RECURSE generated_sources CONFIGURE_DEPENDS RELATIVE_PATH "${CMAKE_CURRENT_LIST_DIR}/Generated" "*.cpp")
 
-add_library("mx-python" STATIC
+add_library("mx-python" SHARED
   "${PROJECT_SOURCE_DIR}/include/${lower_project_name}/Bindings/Python.h"
 
   ${generated_sources}
@@ -36,6 +42,8 @@ target_compile_definitions("mx-python"
     $<BUILD_INTERFACE:MX_BUILD>
 )
 
+set(site_packages_dir "python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages")
+  
 set_target_properties("mx-python"
   PROPERTIES
     LINKER_LANGUAGE
@@ -52,11 +60,38 @@ set_target_properties("mx-python"
       cxx_std_20
     INTERFACE_COMPILE_FEATURES
       cxx_std_20
+
+    # Make sure we have the right output name, e.g.
+    # `multiplier.cpython-312-darwin.so`.
+    OUTPUT_NAME
+      "${lower_project_name}${python_module_extension}"
+
+    # Remove `lib` prefix.
+    PREFIX
+      ""
+
+    # Remove `.dylib` or `.so` suffix, the `${python_module_extension}` has the
+    # right stuff.
+    SUFFIX
+      ""
+
+    # NOTE(pag): This is important! We need to emulate the shape of the
+    #            install directories, so that install targets behave in the
+    #            same way to local build targets w.r.t. shared library
+    #            resolution. This places `libmultiplier.so` in the `lib/` sub-
+    #            directory, where we also place copies of `libLTO.so` and
+    #            `libRemarks.so`. This mirrors the organization inside of
+    #            `<install-prefix>/lib`. This same-shapedness is necessary for
+    #            how we fiddle with the RPATH, and do symlinking for Python
+    #            extensions.
+    LIBRARY_OUTPUT_DIRECTORY
+      "${PROJECT_BINARY_DIR}/lib/${site_packages_dir}"
 )
 
 target_include_directories("mx-python"
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:${MX_INSTALL_INCLUDE_DIR}>
   PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}"
@@ -65,47 +100,38 @@ target_include_directories("mx-python"
 target_link_libraries("mx-python"
   PUBLIC
     Python3::Python
+    "gap::gap"
+    "gap::gap-core"
+    "gap::gap-settings"
+    "std::coroutines"
   PRIVATE
-    "mx-api"
+    "$<LINK_LIBRARY:WHOLE_ARCHIVE,mx-api>"
 )
 
-# This is a horrible way of "installing" libmultiplier as a Python extension.
+# Slightly horrible way of "installing" multiplier as a Python extension, that
+# directly invents the relevant files into a `site-packages` directory.
 if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
-  install(
-    FILES
-      "${PROJECT_SOURCE_DIR}/include/multiplier/Bindings/Python.h"
-    DESTINATION
-      "${MX_INSTALL_INCLUDE_DIR}/multiplier/Bindings"
-  )
 
-  include("${PROJECT_SOURCE_DIR}/cmake/python.cmake")
-  
-  # Get the ABI extension. Native Python modules must be named with this
-  # extension.
-  get_python_extension_suffix(python_module_extension)
-
-  # Figure out where the installation `site-packages` directory is.
-  set(site_packages_dir "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_LIB_DIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages")
-  
-  # Make sure the `site-packages` directory exists in the installation directory.
-  # This also copies over the stubs.
+  # Copy our stubs into the install site-packages dir. This will also create
+  # the installation site-packages directory.
   install(
     DIRECTORY
-      "${CMAKE_CURRENT_LIST_DIR}/multiplier-stubs"
+      "${CMAKE_CURRENT_LIST_DIR}/${lower_project_name}-stubs"
     DESTINATION
-      "${site_packages_dir}"
+      "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_LIB_DIR}/${site_packages_dir}"
   )
 
-  # Do the install, which creates a symlink to our main `libmultiplier.so` target.
-  # We rely on the following directory hierarchy:
-  #
-  #     <prefix>/lib/libmultiplier.so
-  #     <prefix>/lib/python<major>.<minor>/site-packages/multiplier<abi-extension>
-  #
-  # So then the `../../` relative symbolic link goes and references the
-  # `libmultiplier.so` shared library.
+  # Install the binary into the target site-packages directory.
   install(
-    CODE
-      "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"../../$<TARGET_FILE_NAME:multiplier>\" \"multiplier${python_module_extension}\" WORKING_DIRECTORY \"${site_packages_dir}\")"
+    TARGETS
+      "mx-python"
+    EXPORT
+      "${PROJECT_NAME}Targets"
+    LIBRARY
+      DESTINATION
+        "${MX_INSTALL_LIB_DIR}/${site_packages_dir}"
+    PUBLIC_HEADER
+      DESTINATION
+        "${MX_INSTALL_INCLUDE_DIR}/${lower_project_name}/Bindings"
   )
 endif()

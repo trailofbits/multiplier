@@ -43,7 +43,6 @@ bool DeclStmt::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<DeclStmt> DeclStmt::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -58,8 +57,6 @@ gap::generator<std::pair<DeclStmt, ir::Operation>> DeclStmt::in(const Compilatio
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<DeclStmt> DeclStmt::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

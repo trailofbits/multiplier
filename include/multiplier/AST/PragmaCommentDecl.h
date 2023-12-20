@@ -37,11 +37,8 @@ class MX_EXPORT PragmaCommentDecl : public Decl {
   static gap::generator<PragmaCommentDecl> in(const Fragment &frag);
   static gap::generator<PragmaCommentDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<PragmaCommentDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<PragmaCommentDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::PRAGMA_COMMENT;
   }

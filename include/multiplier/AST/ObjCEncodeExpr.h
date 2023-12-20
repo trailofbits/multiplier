@@ -41,11 +41,8 @@ class MX_EXPORT ObjCEncodeExpr : public Expr {
   static gap::generator<ObjCEncodeExpr> in(const Fragment &frag);
   static gap::generator<ObjCEncodeExpr> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<ObjCEncodeExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCEncodeExpr, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_ENCODE_EXPR;
   }

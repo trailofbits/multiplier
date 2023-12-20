@@ -41,11 +41,8 @@ class MX_EXPORT OverloadExpr : public Expr {
   static gap::generator<OverloadExpr> in(const Fragment &frag);
   static gap::generator<OverloadExpr> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<OverloadExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<OverloadExpr, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   static gap::generator<OverloadExpr> containing(const Decl &decl);
   static gap::generator<OverloadExpr> containing(const std::optional<Decl> &decl);
 

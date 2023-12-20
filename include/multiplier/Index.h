@@ -27,12 +27,9 @@
 #include "Frontend/TokenKind.h"
 #include "Frontend/TokenCategory.h"
 #include "Fragment.h"
+#include "IR/Operation.h"
 #include "Iterator.h"
 #include "Reference.h"
-
-#ifndef MX_DISABLE_VAST
-# include "IR/Operation.h"
-#endif
 
 namespace mx {
 namespace ir {
@@ -148,9 +145,7 @@ class MX_EXPORT Index {
   static std::optional<Index> containing(const Token &entity);
   static std::optional<Index> containing(const VariantEntity &entity);
 
-#ifndef MX_DISABLE_VAST
   static Index containing(const ir::Operation &entity);
-#endif
 
   // Return the status of the index.
   IndexStatus status(bool block=false) const;

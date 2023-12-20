@@ -41,11 +41,8 @@ class MX_EXPORT InitListExpr : public Expr {
   static gap::generator<InitListExpr> in(const Fragment &frag);
   static gap::generator<InitListExpr> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<InitListExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<InitListExpr, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::INIT_LIST_EXPR;
   }

@@ -41,11 +41,8 @@ class MX_EXPORT OMPLoopDirective : public OMPLoopBasedDirective {
   static gap::generator<OMPLoopDirective> in(const Fragment &frag);
   static gap::generator<OMPLoopDirective> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<OMPLoopDirective> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPLoopDirective, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   static gap::generator<OMPLoopDirective> containing(const Decl &decl);
   static gap::generator<OMPLoopDirective> containing(const std::optional<Decl> &decl);
 

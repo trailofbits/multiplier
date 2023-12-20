@@ -46,7 +46,6 @@ bool TypeTraitExpr::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<TypeTraitExpr> TypeTraitExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<TypeTraitExpr, ir::Operation>> TypeTraitExpr::in(const 
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<TypeTraitExpr> TypeTraitExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

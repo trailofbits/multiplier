@@ -46,7 +46,6 @@ bool StmtExpr::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<StmtExpr> StmtExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<StmtExpr, ir::Operation>> StmtExpr::in(const Compilatio
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<StmtExpr> StmtExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

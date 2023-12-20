@@ -46,7 +46,6 @@ bool OMPGenericLoopDirective::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<OMPGenericLoopDirective> OMPGenericLoopDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<OMPGenericLoopDirective, ir::Operation>> OMPGenericLoop
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPGenericLoopDirective> OMPGenericLoopDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

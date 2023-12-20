@@ -56,7 +56,6 @@ bool ObjCContainerDecl::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
@@ -71,8 +70,6 @@ gap::generator<std::pair<ObjCContainerDecl, ir::Operation>> ObjCContainerDecl::i
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCContainerDecl> ObjCContainerDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

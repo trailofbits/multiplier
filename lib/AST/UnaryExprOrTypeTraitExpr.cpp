@@ -46,7 +46,6 @@ bool UnaryExprOrTypeTraitExpr::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<UnaryExprOrTypeTraitExpr, ir::Operation>> UnaryExprOrTy
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

@@ -46,7 +46,6 @@ bool SwitchCase::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<SwitchCase> SwitchCase::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<SwitchCase, ir::Operation>> SwitchCase::in(const Compil
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<SwitchCase> SwitchCase::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

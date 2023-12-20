@@ -47,11 +47,8 @@ class MX_EXPORT CXXConversionDecl : public CXXMethodDecl {
   static gap::generator<CXXConversionDecl> in(const Fragment &frag);
   static gap::generator<CXXConversionDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<CXXConversionDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXConversionDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_CONVERSION;
   }

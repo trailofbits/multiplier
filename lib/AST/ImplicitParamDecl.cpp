@@ -47,7 +47,6 @@ bool ImplicitParamDecl::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
@@ -62,8 +61,6 @@ gap::generator<std::pair<ImplicitParamDecl, ir::Operation>> ImplicitParamDecl::i
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<ImplicitParamDecl> ImplicitParamDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

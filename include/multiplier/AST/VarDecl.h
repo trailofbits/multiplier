@@ -51,11 +51,8 @@ class MX_EXPORT VarDecl : public DeclaratorDecl {
   static gap::generator<VarDecl> in(const Fragment &frag);
   static gap::generator<VarDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<VarDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<VarDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR;
   }

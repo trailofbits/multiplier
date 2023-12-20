@@ -40,11 +40,8 @@ class MX_EXPORT UnresolvedUsingTypenameDecl : public TypeDecl {
   static gap::generator<UnresolvedUsingTypenameDecl> in(const Fragment &frag);
   static gap::generator<UnresolvedUsingTypenameDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<UnresolvedUsingTypenameDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<UnresolvedUsingTypenameDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_TYPENAME;
   }

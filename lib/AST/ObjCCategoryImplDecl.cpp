@@ -47,7 +47,6 @@ bool ObjCCategoryImplDecl::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
@@ -62,8 +61,6 @@ gap::generator<std::pair<ObjCCategoryImplDecl, ir::Operation>> ObjCCategoryImplD
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

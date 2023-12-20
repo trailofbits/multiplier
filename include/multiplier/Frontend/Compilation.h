@@ -77,11 +77,8 @@ class MX_EXPORT Compilation {
   // Return the unique ID of this compilation.
   PackedCompilationId id(void) const noexcept;
 
-#ifndef MX_DISABLE_VAST
   // Returns source IR for the compilation.
   std::optional<ir::builtin::ModuleOp> ir(void) const noexcept;
-
-#endif  // MX_DISABLE_VAST
 
   // The fragments owned by this compilation. This will be a subset of all
   // observable fragments by this compilation, because some of them may be

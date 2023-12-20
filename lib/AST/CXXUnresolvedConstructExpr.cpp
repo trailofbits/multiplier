@@ -46,7 +46,6 @@ bool CXXUnresolvedConstructExpr::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<CXXUnresolvedConstructExpr, ir::Operation>> CXXUnresolv
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

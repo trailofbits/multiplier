@@ -13,10 +13,7 @@
 #include <multiplier/Database.h>
 #include <string>
 
-#ifndef MX_DISABLE_VAST
-# include "Codegen.h"
-#endif
-
+#include "Codegen.h"
 #include "Executor.h"
 #include "ProgressBar.h"
 #include "Util.h"
@@ -75,10 +72,8 @@ class GlobalIndexingState {
   // Worker pool.
   Executor executor;
 
-#ifndef MX_DISABLE_VAST
   // MLIR code generator.
   CodeGenerator codegen;
-#endif
 
   // Write access to the index database.
   mx::DatabaseWriter &database;

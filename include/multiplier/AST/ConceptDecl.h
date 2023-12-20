@@ -41,11 +41,8 @@ class MX_EXPORT ConceptDecl : public TemplateDecl {
   static gap::generator<ConceptDecl> in(const Fragment &frag);
   static gap::generator<ConceptDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<ConceptDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ConceptDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CONCEPT;
   }

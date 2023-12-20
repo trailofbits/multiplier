@@ -42,11 +42,8 @@ class MX_EXPORT BindingDecl : public ValueDecl {
   static gap::generator<BindingDecl> in(const Fragment &frag);
   static gap::generator<BindingDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<BindingDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<BindingDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BINDING;
   }

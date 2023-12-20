@@ -12,9 +12,7 @@ if(NOT MX_USE_VENDORED_CLANG)
   find_package(Clang CONFIG QUIET)
 
   if(LLVM_FOUND AND MLIR_FOUND AND Clang_FOUND)
-    if(NOT MX_ENABLE_VAST OR MLIR_FOUND)
-      return()
-    endif()
+    return()
   endif()
 endif()
 
@@ -96,7 +94,5 @@ execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install
                 WORKING_DIRECTORY "${build_dir}")
 
 find_package(LLVM CONFIG REQUIRED HINTS "${MX_VENDOR_INSTALL_DIR}" NO_DEFAULT_PATH)
-if(MX_ENABLE_VAST)
-  find_package(MLIR CONFIG REQUIRED HINTS "${MX_VENDOR_INSTALL_DIR}" NO_DEFAULT_PATH)
-endif()
+find_package(MLIR CONFIG REQUIRED HINTS "${MX_VENDOR_INSTALL_DIR}" NO_DEFAULT_PATH)
 find_package(Clang CONFIG REQUIRED PATHS "${MX_VENDOR_INSTALL_DIR}" NO_DEFAULT_PATH)

@@ -46,7 +46,6 @@ bool OMPForSimdDirective::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<OMPForSimdDirective> OMPForSimdDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<OMPForSimdDirective, ir::Operation>> OMPForSimdDirectiv
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPForSimdDirective> OMPForSimdDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

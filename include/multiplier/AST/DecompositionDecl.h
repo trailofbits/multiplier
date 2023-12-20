@@ -45,11 +45,8 @@ class MX_EXPORT DecompositionDecl : public VarDecl {
   static gap::generator<DecompositionDecl> in(const Fragment &frag);
   static gap::generator<DecompositionDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<DecompositionDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<DecompositionDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::DECOMPOSITION;
   }

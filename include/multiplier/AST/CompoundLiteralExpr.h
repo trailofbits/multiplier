@@ -40,11 +40,8 @@ class MX_EXPORT CompoundLiteralExpr : public Expr {
   static gap::generator<CompoundLiteralExpr> in(const Fragment &frag);
   static gap::generator<CompoundLiteralExpr> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<CompoundLiteralExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<CompoundLiteralExpr, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COMPOUND_LITERAL_EXPR;
   }

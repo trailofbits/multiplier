@@ -46,7 +46,6 @@ bool OMPTeamsDistributeParallelForSimdDirective::contains(const Token &tok) cons
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<OMPTeamsDistributeParallelForSimdDirective, ir::Operati
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

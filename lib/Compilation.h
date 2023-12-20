@@ -39,13 +39,9 @@ class CompilationImpl final : public EntityImpl<rpc::Compilation> {
   // Return the source ir for the compilation.
   std::string_view SourceIR(void) const & noexcept;
 
-#ifndef MX_DISABLE_VAST
-
   // Return a pointer to the source IR object.
   std::shared_ptr<const ir::SourceIRImpl> SourceIRPtr(
       PackedCompilationId id) const & noexcept;
-
-#endif  // MX_DISABLE_VAST
 };
 
 }  // namespace mx

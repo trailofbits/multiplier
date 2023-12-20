@@ -46,7 +46,6 @@ bool OMPDistributeSimdDirective::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<OMPDistributeSimdDirective, ir::Operation>> OMPDistribu
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPDistributeSimdDirective> OMPDistributeSimdDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

@@ -8,19 +8,13 @@
 
 set(exe_name "mx-index")
 
-if(MX_ENABLE_VAST)
-  set(mlir_codegen_sources
-    "Codegen.cpp"
-    "Codegen.h"
-    "CodegenMetaGenerator.h"
-  )
-endif()
-
 add_executable("${exe_name}"
   "Action.cpp"
   "Action.h"
   "BuildPendingFragment.cpp"
-  ${mlir_codegen_sources}
+  "Codegen.cpp"
+  "Codegen.h"
+  "CodegenMetaGenerator.h"
   "Context.cpp"
   "Context.h"
   "Endian.h"
@@ -121,7 +115,7 @@ set_target_properties("${exe_name}"
     #            how we fiddle with the RPATH, and do symlinking for Python
     #            extensions.
     RUNTIME_OUTPUT_DIRECTORY
-      "${PROJECT_BINARY_DIR}/bin"
+      "${PROJECT_BINARY_DIR}/${MX_INSTALL_BIN_DIR}"
 )
 
 find_and_link_llvm_dependencies("${exe_name}")

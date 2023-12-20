@@ -50,11 +50,8 @@ class MX_EXPORT ClassTemplatePartialSpecializationDecl : public ClassTemplateSpe
   static gap::generator<ClassTemplatePartialSpecializationDecl> in(const Fragment &frag);
   static gap::generator<ClassTemplatePartialSpecializationDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ClassTemplatePartialSpecializationDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION;
   }

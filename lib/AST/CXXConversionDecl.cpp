@@ -49,7 +49,6 @@ bool CXXConversionDecl::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<CXXConversionDecl> CXXConversionDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
@@ -64,8 +63,6 @@ gap::generator<std::pair<CXXConversionDecl, ir::Operation>> CXXConversionDecl::i
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<CXXConversionDecl> CXXConversionDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

@@ -44,7 +44,6 @@ bool GotoStmt::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<GotoStmt> GotoStmt::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -59,8 +58,6 @@ gap::generator<std::pair<GotoStmt, ir::Operation>> GotoStmt::in(const Compilatio
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<GotoStmt> GotoStmt::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

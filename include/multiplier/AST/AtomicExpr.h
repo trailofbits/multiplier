@@ -42,11 +42,8 @@ class MX_EXPORT AtomicExpr : public Expr {
   static gap::generator<AtomicExpr> in(const Fragment &frag);
   static gap::generator<AtomicExpr> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<AtomicExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<AtomicExpr, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ATOMIC_EXPR;
   }

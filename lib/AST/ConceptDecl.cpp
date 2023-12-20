@@ -46,7 +46,6 @@ bool ConceptDecl::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<ConceptDecl> ConceptDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<ConceptDecl, ir::Operation>> ConceptDecl::in(const Comp
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<ConceptDecl> ConceptDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

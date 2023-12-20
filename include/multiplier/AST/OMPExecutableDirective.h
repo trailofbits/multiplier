@@ -37,11 +37,8 @@ class MX_EXPORT OMPExecutableDirective : public Stmt {
   static gap::generator<OMPExecutableDirective> in(const Fragment &frag);
   static gap::generator<OMPExecutableDirective> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<OMPExecutableDirective> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPExecutableDirective, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   static gap::generator<OMPExecutableDirective> containing(const Decl &decl);
   static gap::generator<OMPExecutableDirective> containing(const std::optional<Decl> &decl);
 

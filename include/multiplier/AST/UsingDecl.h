@@ -40,11 +40,8 @@ class MX_EXPORT UsingDecl : public BaseUsingDecl {
   static gap::generator<UsingDecl> in(const Fragment &frag);
   static gap::generator<UsingDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<UsingDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<UsingDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING;
   }

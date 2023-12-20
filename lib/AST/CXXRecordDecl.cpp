@@ -60,7 +60,6 @@ bool CXXRecordDecl::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<CXXRecordDecl> CXXRecordDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
@@ -75,8 +74,6 @@ gap::generator<std::pair<CXXRecordDecl, ir::Operation>> CXXRecordDecl::in(const 
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

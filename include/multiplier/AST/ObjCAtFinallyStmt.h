@@ -36,11 +36,8 @@ class MX_EXPORT ObjCAtFinallyStmt : public Stmt {
   static gap::generator<ObjCAtFinallyStmt> in(const Fragment &frag);
   static gap::generator<ObjCAtFinallyStmt> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<ObjCAtFinallyStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCAtFinallyStmt, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_FINALLY_STMT;
   }

@@ -42,11 +42,8 @@ class MX_EXPORT TypedefNameDecl : public TypeDecl {
   static gap::generator<TypedefNameDecl> in(const Fragment &frag);
   static gap::generator<TypedefNameDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<TypedefNameDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<TypedefNameDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   static gap::generator<TypedefNameDecl> containing(const Decl &decl);
   static gap::generator<TypedefNameDecl> containing(const std::optional<Decl> &decl);
 
