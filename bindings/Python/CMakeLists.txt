@@ -104,8 +104,7 @@ target_link_libraries("mx-python"
     "gap::gap-core"
     "gap::gap-settings"
     "std::coroutines"
-  PRIVATE
-    "$<LINK_LIBRARY:WHOLE_ARCHIVE,mx-api>"
+    "$<BUILD_INTERFACE:mx-api>"
 )
 
 # Slightly horrible way of "installing" multiplier as a Python extension, that

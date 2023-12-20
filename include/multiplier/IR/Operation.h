@@ -47,7 +47,7 @@ class Value;
 // An operation is like an 'instruction', but can contain arbitrary
 // complexity in the form or one or more regions, each of which can
 // embed their own control-flow graphs of blocks containing operations.
-class Operation {
+class MX_EXPORT Operation {
  private:
   friend class Attribute;
   friend class Block;
@@ -196,7 +196,7 @@ inline Operation Operation::producing(const Result &res) {
 }
 
 // A use of a value by a specific operation.
-class Operand {
+class MX_EXPORT Operand {
  private:
   friend class Block;
   friend class Label;

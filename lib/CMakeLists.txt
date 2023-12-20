@@ -21,6 +21,11 @@ file(GLOB frontend_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Frontend
 file(GLOB ast_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_DIR}/AST/*.h")
 file(GLOB ast_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/AST/*.cpp")
 
+set(ir_source_include_dir "${PROJECT_SOURCE_DIR}/include/${lower_project_name}/IR")
+
+file(GLOB_RECURSE ir_sources CONFIGURE_DEPENDS RELATIVE_PATH "${CMAKE_CURRENT_LIST_DIR}" "*.cpp")
+file(GLOB_RECURSE ir_headers CONFIGURE_DEPENDS RELATIVE_PATH "${ir_source_include_dir}" "*.h")
+
 # Configure the version to include the git hash.
 #
 # TODO(pag): This only tracks the hash that was present at CMake configure time.
@@ -47,38 +52,6 @@ set_target_properties("mx-serialize"
 target_link_libraries("mx-serialize"
   INTERFACE
     "CapnProto::capnp"
-)
-
-add_subdirectory("IR")
-
-add_library("mx-frontend" INTERFACE)
-set_target_properties("mx-frontend"
-  PROPERTIES
-    LINKER_LANGUAGE
-      CXX
-    PUBLIC_HEADER
-      "${frontend_headers}"
-    VISIBILITY_INLINES_HIDDEN
-      YES
-    CXX_VISIBILITY_PRESET
-      hidden
-    POSITION_INDEPENDENT_CODE
-      YES
-)
-
-add_library("mx-ast" INTERFACE)
-set_target_properties("mx-ast"
-  PROPERTIES
-    LINKER_LANGUAGE
-      CXX
-    PUBLIC_HEADER
-      "${ast_headers}"
-    VISIBILITY_INLINES_HIDDEN
-      YES
-    CXX_VISIBILITY_PRESET
-      hidden
-    POSITION_INDEPENDENT_CODE
-      YES
 )
 
 # Generate the commands to copy the headers into the binary include directory.
@@ -135,11 +108,12 @@ set(api_headers
   "${source_include_dir}/Types.h"
 )
 
-add_library("mx-api" STATIC
+add_library("mx-api" OBJECT
   ${api_headers}
 
   ${frontend_sources}  # Auto-generated
   ${ast_sources}  # Auto-generated
+  ${ir_sources}  # Auto-generated
 
   $<BUILD_INTERFACE:${source_include_dir}/Database.h>
   $<BUILD_INTERFACE:${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}>
@@ -204,7 +178,6 @@ add_library("mx-api" STATIC
   # Auto-generated.
   ${copied_headers}
 
-
   "${PROJECT_BINARY_DIR}/lib/Version.cpp"
 )
 
@@ -214,9 +187,6 @@ add_dependencies("mx-api"
 
 target_link_libraries("mx-api"
   PUBLIC
-    "mx-frontend"
-    "mx-ast"
-    "mx-mlir"
     "gap::gap"
     "gap::gap-core"
     "gap::gap-settings"
@@ -226,6 +196,13 @@ target_link_libraries("mx-api"
     "mx-sqlite"
     "zstd::zstd"
     "concurrentqueue"
+    ${MLIR_LIBS}
+    ${VAST_LIBS}
+)
+
+target_link_directories("mx-api"
+  PRIVATE
+    "$<BUILD_INTERFACE:${MLIR_LIB_DIR}>"
 )
 
 target_compile_definitions("mx-api"
@@ -261,6 +238,7 @@ target_include_directories("mx-api"
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:${MX_INSTALL_INCLUDE_DIR}>
   PRIVATE
+    "$<BUILD_INTERFACE:${LLVM_INCLUDE_DIRS};${LLVM_INCLUDE_DIR};${MLIR_INCLUDE_DIRS}>"
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_CURRENT_BINARY_DIR}"
 )
@@ -300,8 +278,7 @@ target_link_libraries("multiplier"
     "gap::gap-core"
     "gap::gap-settings"
     "std::coroutines"
-  PRIVATE
-    "$<LINK_LIBRARY:WHOLE_ARCHIVE,mx-api>"
+    "$<BUILD_INTERFACE:mx-api>"
 )
 
 set_target_properties("multiplier"
@@ -350,6 +327,12 @@ if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
       ${api_headers}
     DESTINATION
       "${MX_INSTALL_INCLUDE_DIR}/${lower_project_name}"
+  )
+  install(
+    DIRECTORY
+      "${ir_source_include_dir}"
+    DESTINATION
+      "${MX_INSTALL_INCLUDE_DIR}/multiplier"
   )
   install(
     TARGETS
