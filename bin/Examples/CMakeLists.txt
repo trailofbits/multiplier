@@ -43,7 +43,7 @@ function(define_example exe_name source_file)
       #            how we fiddle with the RPATH, and do symlinking for Python
       #            extensions.
       RUNTIME_OUTPUT_DIRECTORY
-        "${PROJECT_BINARY_DIR}/bin"
+        "${PROJECT_BINARY_DIR}/${MX_INSTALL_BIN_DIR}"
   )
 
   if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
@@ -89,9 +89,6 @@ define_example("mx-taint-entity" "TaintEntity.cpp")
 define_example("mx-harness" "Harness.cpp")
 define_example("mx-print-type-token-graph" "PrintTypeTokenGraph.cpp")
 define_example("mx-find-linked-structures" "FindLinkedStructures.cpp")
-
-if(MX_ENABLE_VAST)
-  define_example("mx-count-sourceir" "CountSourceIR.cpp")
-endif()
+define_example("mx-count-sourceir" "CountSourceIR.cpp")
 
 # define_example("mx-print-sourceir" "PrintSourceIR.cpp")

@@ -36,11 +36,8 @@ class MX_EXPORT OMPDeclarativeDirectiveDecl : public Decl {
   static gap::generator<OMPDeclarativeDirectiveDecl> in(const Fragment &frag);
   static gap::generator<OMPDeclarativeDirectiveDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<OMPDeclarativeDirectiveDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPDeclarativeDirectiveDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const Decl &decl);
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const std::optional<Decl> &decl);
 

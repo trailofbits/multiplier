@@ -107,11 +107,9 @@ class MX_EXPORT Decl {
   static gap::generator<Decl> in(const Fragment &frag);
   static gap::generator<Decl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<Decl> from(const ir::Operation &op);
   static gap::generator<std::pair<Decl, ir::Operation>> in(const Compilation &tu);
   static gap::generator<std::pair<Decl, ir::Operation>> in(const Compilation &tu, std::span<const DeclKind> kinds);
-#endif  // MX_DISABLE_VAST
 
   static gap::generator<Decl> containing(const Decl &decl);
   static gap::generator<Decl> containing(const std::optional<Decl> &decl);

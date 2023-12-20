@@ -2574,7 +2574,6 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   if (is_declaration || is_statement) {
     class_os
-        << "#ifndef MX_DISABLE_VAST\n"
         << "  static std::optional<" << class_name
         << "> from(const ir::Operation &op);\n"
         << "  static gap::generator<std::pair<" << class_name
@@ -2585,15 +2584,11 @@ MethodListPtr CodeGenerator::RunOnClass(
       class_os
           << "  static gap::generator<std::pair<" << class_name
           << ", ir::Operation>> in(const Compilation &tu, std::span<const "
-          << base_name << "Kind> kinds);\n"
-          << "#endif  // MX_DISABLE_VAST\n\n";
+          << base_name << "Kind> kinds);\n\n";
     
     } else {
-      class_os
-          << "#endif  // MX_DISABLE_VAST\n\n";
 
       lib_cpp_os
-          << "#ifndef MX_DISABLE_VAST\n"
           << "std::optional<" << class_name
           << "> " << class_name << "::from(const ir::Operation &op) {\n"
           << "  if (auto val = " << base_name << "::from(op)) {\n"
@@ -2611,8 +2606,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "std::move(val.value()), std::move(res.second));\n"
           << "    }\n"
           << "  }\n"
-          << "}\n\n"
-          << "#endif  // MX_DISABLE_VAST\n\n";
+          << "}\n\n";
     }
   }
 

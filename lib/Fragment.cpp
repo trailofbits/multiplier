@@ -117,16 +117,11 @@ std::optional<Fragment> Fragment::containing(const Token &entity) noexcept {
 // Return the fragment containing an operation.
 std::optional<Fragment> Fragment::containing(
     const ir::Operation &op) noexcept {
-#ifndef MX_DISABLE_VAST
   if (auto decl = Decl::from(op)) {
     return Fragment::containing(decl.value());
   } else if (auto stmt = Stmt::from(op)) {
     return Fragment::containing(stmt.value());
   }
-#else
-  assert(false);
-  (void) op;
-#endif
 
   return std::nullopt;
 }

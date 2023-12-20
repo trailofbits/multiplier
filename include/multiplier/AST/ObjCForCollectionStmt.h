@@ -37,11 +37,8 @@ class MX_EXPORT ObjCForCollectionStmt : public Stmt {
   static gap::generator<ObjCForCollectionStmt> in(const Fragment &frag);
   static gap::generator<ObjCForCollectionStmt> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<ObjCForCollectionStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCForCollectionStmt, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_FOR_COLLECTION_STMT;
   }

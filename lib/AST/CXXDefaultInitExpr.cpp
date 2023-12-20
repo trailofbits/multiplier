@@ -46,7 +46,6 @@ bool CXXDefaultInitExpr::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<CXXDefaultInitExpr, ir::Operation>> CXXDefaultInitExpr:
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<CXXDefaultInitExpr> CXXDefaultInitExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

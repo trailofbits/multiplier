@@ -47,11 +47,8 @@ class MX_EXPORT ObjCMethodDecl : public NamedDecl {
   static gap::generator<ObjCMethodDecl> in(const Fragment &frag);
   static gap::generator<ObjCMethodDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<ObjCMethodDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCMethodDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_METHOD;
   }

@@ -40,11 +40,8 @@ class MX_EXPORT ShuffleVectorExpr : public Expr {
   static gap::generator<ShuffleVectorExpr> in(const Fragment &frag);
   static gap::generator<ShuffleVectorExpr> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<ShuffleVectorExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<ShuffleVectorExpr, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SHUFFLE_VECTOR_EXPR;
   }

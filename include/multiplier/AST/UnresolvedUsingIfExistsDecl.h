@@ -38,11 +38,8 @@ class MX_EXPORT UnresolvedUsingIfExistsDecl : public NamedDecl {
   static gap::generator<UnresolvedUsingIfExistsDecl> in(const Fragment &frag);
   static gap::generator<UnresolvedUsingIfExistsDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<UnresolvedUsingIfExistsDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<UnresolvedUsingIfExistsDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_IF_EXISTS;
   }

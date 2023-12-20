@@ -45,11 +45,8 @@ class MX_EXPORT CXXNamedCastExpr : public ExplicitCastExpr {
   static gap::generator<CXXNamedCastExpr> in(const Fragment &frag);
   static gap::generator<CXXNamedCastExpr> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<CXXNamedCastExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXNamedCastExpr, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   static gap::generator<CXXNamedCastExpr> containing(const Decl &decl);
   static gap::generator<CXXNamedCastExpr> containing(const std::optional<Decl> &decl);
 

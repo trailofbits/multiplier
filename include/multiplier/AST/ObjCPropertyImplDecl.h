@@ -41,11 +41,8 @@ class MX_EXPORT ObjCPropertyImplDecl : public Decl {
   static gap::generator<ObjCPropertyImplDecl> in(const Fragment &frag);
   static gap::generator<ObjCPropertyImplDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<ObjCPropertyImplDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCPropertyImplDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROPERTY_IMPL;
   }

@@ -36,11 +36,8 @@ class MX_EXPORT CompoundStmt : public Stmt {
   static gap::generator<CompoundStmt> in(const Fragment &frag);
   static gap::generator<CompoundStmt> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<CompoundStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<CompoundStmt, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COMPOUND_STMT;
   }

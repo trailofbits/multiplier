@@ -45,7 +45,6 @@ bool OMPParallelSectionsDirective::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -60,8 +59,6 @@ gap::generator<std::pair<OMPParallelSectionsDirective, ir::Operation>> OMPParall
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPParallelSectionsDirective> OMPParallelSectionsDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

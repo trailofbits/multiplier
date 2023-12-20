@@ -47,7 +47,6 @@ bool OMPTargetParallelForDirective::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<OMPTargetParallelForDirective> OMPTargetParallelForDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -62,8 +61,6 @@ gap::generator<std::pair<OMPTargetParallelForDirective, ir::Operation>> OMPTarge
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPTargetParallelForDirective> OMPTargetParallelForDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

@@ -38,11 +38,8 @@ class MX_EXPORT OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
   static gap::generator<OMPRequiresDecl> in(const Fragment &frag);
   static gap::generator<OMPRequiresDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<OMPRequiresDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPRequiresDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_REQUIRES;
   }

@@ -42,11 +42,8 @@ class MX_EXPORT CUDAKernelCallExpr : public CallExpr {
   static gap::generator<CUDAKernelCallExpr> in(const Fragment &frag);
   static gap::generator<CUDAKernelCallExpr> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<CUDAKernelCallExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<CUDAKernelCallExpr, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CUDA_KERNEL_CALL_EXPR;
   }

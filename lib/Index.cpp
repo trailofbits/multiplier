@@ -16,15 +16,12 @@
 #include "Decl.h"
 #include "File.h"
 #include "Fragment.h"
+#include "IR/SourceIR.h"
 #include "Macro.h"
 #include "Pseudo.h"
 #include "Stmt.h"
 #include "Type.h"
 #include "Types.h"
-
-#ifndef MX_DISABLE_VAST
-# include "IR/SourceIR.h"
-#endif
 
 namespace mx {
 
@@ -189,13 +186,11 @@ std::optional<ir::Operation> Index::operation(RawEntityId id) const {
     return std::nullopt;
   }
 
-#ifndef MX_DISABLE_VAST
   if (auto source_ir = cptr->SourceIRPtr(compilation_id)) {
     if (auto op = source_ir->OperationFor(source_ir, id)) {
       return op;
     }
   }
-#endif
 
   assert(false);
   return std::nullopt;
@@ -283,13 +278,10 @@ VariantEntity Index::entity(EntityId eid) const {
 
   // It's an IR operation.
   } else if (std::holds_alternative<OperationId>(vid)) {
-#ifndef MX_DISABLE_VAST
     if (auto op = operation(eid.Pack())) {
       return op.value();
     }
-#else
     assert(false);
-#endif
 
 #define MX_DISPATCH_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     } else if (std::holds_alternative<type_name ## Id>(vid)) { \

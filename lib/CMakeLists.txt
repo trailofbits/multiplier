@@ -21,6 +21,12 @@ file(GLOB frontend_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Frontend
 file(GLOB ast_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_DIR}/AST/*.h")
 file(GLOB ast_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/AST/*.cpp")
 
+# Configure the version to include the git hash.
+#
+# TODO(pag): This only tracks the hash that was present at CMake configure time.
+get_patch_from_git(MX_GIT_HASH)
+configure_file(Version.cpp.in "${PROJECT_BINARY_DIR}/lib/Version.cpp" @ONLY)
+
 add_library("mx-serialize" INTERFACE
   ${MX_AST_SOURCES}
   ${MX_RPC_SOURCES}
@@ -197,6 +203,9 @@ add_library("mx-api" STATIC
 
   # Auto-generated.
   ${copied_headers}
+
+
+  "${PROJECT_BINARY_DIR}/lib/Version.cpp"
 )
 
 add_dependencies("mx-api"
@@ -207,6 +216,7 @@ target_link_libraries("mx-api"
   PUBLIC
     "mx-frontend"
     "mx-ast"
+    "mx-mlir"
     "gap::gap"
     "gap::gap-core"
     "gap::gap-settings"
@@ -227,16 +237,6 @@ if(NOT MX_ENABLE_PYTHON_BINDINGS)
   target_compile_definitions("mx-api"
     PUBLIC
       "MX_DISABLE_PYTHON_BINDINGS")
-endif()
-
-if(MX_ENABLE_VAST)
-  target_link_libraries("mx-api"
-    PUBLIC
-      "mx-mlir")
-else()
-  target_compile_definitions("mx-api"
-    PUBLIC
-      "MX_DISABLE_VAST")
 endif()
 
 if(MX_ENABLE_RE2)
@@ -283,23 +283,90 @@ set_target_properties("mx-api"
       cxx_std_20
 )
 
+add_library("multiplier" SHARED
+  "Shared.cpp"  # Dummy file.
+)
+
+target_include_directories("multiplier"
+  PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:${MX_INSTALL_INCLUDE_DIR}>
+)
+
+target_link_libraries("multiplier"
+  PUBLIC
+    "gap::gap"
+    "gap::gap-core"
+    "gap::gap-settings"
+    "std::coroutines"
+  PRIVATE
+    "$<LINK_LIBRARY:WHOLE_ARCHIVE,mx-api>"
+)
+
+set_target_properties("multiplier"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX
+    VISIBILITY_INLINES_HIDDEN
+      YES
+    CXX_VISIBILITY_PRESET
+      hidden
+    POSITION_INDEPENDENT_CODE
+      YES
+    COMPILE_FEATURES
+      cxx_std_20
+    INTERFACE_COMPILE_FEATURES
+      cxx_std_20
+
+    # NOTE(pag): This is important! We need to emulate the shape of the
+    #            install directories, so that install targets behave in the
+    #            same way to local build targets w.r.t. shared library
+    #            resolution. This places `libmultiplier.so` in the `lib/` sub-
+    #            directory, where we also place copies of `libLTO.so` and
+    #            `libRemarks.so`. This mirrors the organization inside of
+    #            `<install-prefix>/lib`. This same-shapedness is necessary for
+    #            how we fiddle with the RPATH, and do symlinking for Python
+    #            extensions.
+    LIBRARY_OUTPUT_DIRECTORY
+      "${PROJECT_BINARY_DIR}/${MX_INSTALL_LIB_DIR}"
+)
+
 if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
   install(
     FILES
       ${ast_headers}
     DESTINATION
-      "${MX_INSTALL_INCLUDE_DIR}/multiplier/AST"
+      "${MX_INSTALL_INCLUDE_DIR}/${lower_project_name}/AST"
   )  
   install(
     FILES
       ${frontend_headers}
     DESTINATION
-      "${MX_INSTALL_INCLUDE_DIR}/multiplier/Frontend"
+      "${MX_INSTALL_INCLUDE_DIR}/${lower_project_name}/Frontend"
   )
   install(
     FILES
       ${api_headers}
     DESTINATION
-      "${MX_INSTALL_INCLUDE_DIR}/multiplier"
+      "${MX_INSTALL_INCLUDE_DIR}/${lower_project_name}"
+  )
+  install(
+    TARGETS
+      "multiplier"
+    EXPORT
+      "${PROJECT_NAME}Targets"
+    RUNTIME
+      DESTINATION
+        "${MX_INSTALL_BIN_DIR}"
+    LIBRARY
+      DESTINATION
+        "${MX_INSTALL_LIB_DIR}"
+    ARCHIVE
+      DESTINATION
+        "${MX_INSTALL_LIB_DIR}"
+    PUBLIC_HEADER
+      DESTINATION
+        "${MX_INSTALL_INCLUDE_DIR}/${lower_project_name}"
   )
 endif(MX_ENABLE_INSTALL)

@@ -49,7 +49,6 @@ bool CXXDeductionGuideDecl::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
@@ -64,8 +63,6 @@ gap::generator<std::pair<CXXDeductionGuideDecl, ir::Operation>> CXXDeductionGuid
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

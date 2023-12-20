@@ -46,7 +46,6 @@ bool GCCAsmStmt::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<GCCAsmStmt> GCCAsmStmt::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<GCCAsmStmt, ir::Operation>> GCCAsmStmt::in(const Compil
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<GCCAsmStmt> GCCAsmStmt::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

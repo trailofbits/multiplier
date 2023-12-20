@@ -38,11 +38,8 @@ class MX_EXPORT OMPDispatchDirective : public OMPExecutableDirective {
   static gap::generator<OMPDispatchDirective> in(const Fragment &frag);
   static gap::generator<OMPDispatchDirective> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<OMPDispatchDirective> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPDispatchDirective, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_DISPATCH_DIRECTIVE;
   }

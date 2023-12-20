@@ -40,11 +40,8 @@ class MX_EXPORT OMPArrayShapingExpr : public Expr {
   static gap::generator<OMPArrayShapingExpr> in(const Fragment &frag);
   static gap::generator<OMPArrayShapingExpr> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<OMPArrayShapingExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPArrayShapingExpr, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ARRAY_SHAPING_EXPR;
   }

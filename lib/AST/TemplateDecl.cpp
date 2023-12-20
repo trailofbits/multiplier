@@ -58,7 +58,6 @@ bool TemplateDecl::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<TemplateDecl> TemplateDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
@@ -73,8 +72,6 @@ gap::generator<std::pair<TemplateDecl, ir::Operation>> TemplateDecl::in(const Co
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<TemplateDecl> TemplateDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

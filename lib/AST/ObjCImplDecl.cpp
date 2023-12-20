@@ -50,7 +50,6 @@ bool ObjCImplDecl::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<ObjCImplDecl> ObjCImplDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
@@ -65,8 +64,6 @@ gap::generator<std::pair<ObjCImplDecl, ir::Operation>> ObjCImplDecl::in(const Co
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCImplDecl> ObjCImplDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

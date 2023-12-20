@@ -44,7 +44,6 @@ bool OMPCancellationPointDirective::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<OMPCancellationPointDirective> OMPCancellationPointDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -59,8 +58,6 @@ gap::generator<std::pair<OMPCancellationPointDirective, ir::Operation>> OMPCance
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPCancellationPointDirective> OMPCancellationPointDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

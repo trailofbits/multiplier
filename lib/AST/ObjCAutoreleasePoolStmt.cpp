@@ -43,7 +43,6 @@ bool ObjCAutoreleasePoolStmt::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -58,8 +57,6 @@ gap::generator<std::pair<ObjCAutoreleasePoolStmt, ir::Operation>> ObjCAutoreleas
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

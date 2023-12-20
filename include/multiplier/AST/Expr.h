@@ -44,11 +44,8 @@ class MX_EXPORT Expr : public ValueStmt {
   static gap::generator<Expr> in(const Fragment &frag);
   static gap::generator<Expr> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<Expr> from(const ir::Operation &op);
   static gap::generator<std::pair<Expr, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   static gap::generator<Expr> containing(const Decl &decl);
   static gap::generator<Expr> containing(const std::optional<Decl> &decl);
 

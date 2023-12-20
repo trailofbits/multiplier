@@ -72,9 +72,7 @@ DEFINE_string(workspace, "mx-workspace",
               "is stored. When you're done indexing, and if you don't plan to add any additional "
               "targets into the index, then you can delete this directory.");
 
-#ifndef MX_DISABLE_VAST
 DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level declarations");
-#endif
 
 namespace {
 
@@ -229,11 +227,9 @@ int main(int argc, char *argv[], char *envp[]) {
   auto fs = pasta::FileSystem::CreateNative();
   pasta::FileManager fm(fs);
 
-#ifndef MX_DISABLE_VAST
   if (!FLAGS_generate_sourceir) {
     context.codegen.Disable();
   }
-#endif
 
   std::filesystem::path path(FLAGS_target);
 

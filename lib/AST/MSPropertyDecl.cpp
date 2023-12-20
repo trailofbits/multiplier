@@ -46,7 +46,6 @@ bool MSPropertyDecl::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<MSPropertyDecl> MSPropertyDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<MSPropertyDecl, ir::Operation>> MSPropertyDecl::in(cons
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<MSPropertyDecl> MSPropertyDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

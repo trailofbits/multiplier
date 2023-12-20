@@ -51,7 +51,6 @@ bool ObjCInterfaceDecl::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
@@ -66,8 +65,6 @@ gap::generator<std::pair<ObjCInterfaceDecl, ir::Operation>> ObjCInterfaceDecl::i
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCInterfaceDecl> ObjCInterfaceDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

@@ -46,7 +46,6 @@ bool CoyieldExpr::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<CoyieldExpr> CoyieldExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<CoyieldExpr, ir::Operation>> CoyieldExpr::in(const Comp
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<CoyieldExpr> CoyieldExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

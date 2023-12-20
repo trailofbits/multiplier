@@ -44,7 +44,6 @@ bool OMPRequiresDecl::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<OMPRequiresDecl> OMPRequiresDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
@@ -59,8 +58,6 @@ gap::generator<std::pair<OMPRequiresDecl, ir::Operation>> OMPRequiresDecl::in(co
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPRequiresDecl> OMPRequiresDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

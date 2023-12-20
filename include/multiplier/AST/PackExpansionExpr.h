@@ -40,11 +40,8 @@ class MX_EXPORT PackExpansionExpr : public Expr {
   static gap::generator<PackExpansionExpr> in(const Fragment &frag);
   static gap::generator<PackExpansionExpr> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<PackExpansionExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<PackExpansionExpr, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::PACK_EXPANSION_EXPR;
   }

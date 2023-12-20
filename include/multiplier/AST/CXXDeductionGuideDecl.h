@@ -47,11 +47,8 @@ class MX_EXPORT CXXDeductionGuideDecl : public FunctionDecl {
   static gap::generator<CXXDeductionGuideDecl> in(const Fragment &frag);
   static gap::generator<CXXDeductionGuideDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<CXXDeductionGuideDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXDeductionGuideDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_DEDUCTION_GUIDE;
   }

@@ -42,11 +42,8 @@ class MX_EXPORT IndirectFieldDecl : public ValueDecl {
   static gap::generator<IndirectFieldDecl> in(const Fragment &frag);
   static gap::generator<IndirectFieldDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<IndirectFieldDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<IndirectFieldDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::INDIRECT_FIELD;
   }

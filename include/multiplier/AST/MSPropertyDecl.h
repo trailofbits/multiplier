@@ -42,11 +42,8 @@ class MX_EXPORT MSPropertyDecl : public DeclaratorDecl {
   static gap::generator<MSPropertyDecl> in(const Fragment &frag);
   static gap::generator<MSPropertyDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<MSPropertyDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<MSPropertyDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::MS_PROPERTY;
   }

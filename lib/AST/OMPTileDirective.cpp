@@ -46,7 +46,6 @@ bool OMPTileDirective::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<OMPTileDirective> OMPTileDirective::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<OMPTileDirective, ir::Operation>> OMPTileDirective::in(
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<OMPTileDirective> OMPTileDirective::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();

@@ -10,10 +10,7 @@
 #include <multiplier/Frontend/IncludePathLocation.h>
 #include <multiplier/IR/Builtin/Operation.h>
 
-#if !defined(MX_DISABLE_VAST) && !defined(__CDT_PARSER__)
 #include "IR/SourceIR.h"
-#endif
-
 #include "Reference.h"
 #include "Token.h"
 
@@ -37,8 +34,6 @@ std::string_view CompilationImpl::SourceIR(void) const & noexcept {
   return {};
 }
 
-#ifndef MX_DISABLE_VAST
-
 // Return a pointer to the source IR object.
 std::shared_ptr<const ir::SourceIRImpl>
 CompilationImpl::SourceIRPtr(PackedCompilationId id) const & noexcept {
@@ -54,8 +49,6 @@ CompilationImpl::SourceIRPtr(PackedCompilationId id) const & noexcept {
 
   return ir_obj;
 }
-
-#endif  // MX_DISABLE_VAST
 
 PackedCompilationId Compilation::id(void) const noexcept {
   return impl->compilation_id;
@@ -293,8 +286,6 @@ Compilation::framework_directories(void) const & noexcept {
   }
 }
 
-#ifndef MX_DISABLE_VAST
-
 // Returns source IR for the compilation.
 std::optional<ir::builtin::ModuleOp> Compilation::ir(void) const noexcept {
   if (auto ir_obj = impl->SourceIRPtr(id())) {
@@ -306,6 +297,5 @@ std::optional<ir::builtin::ModuleOp> Compilation::ir(void) const noexcept {
 
   return std::nullopt;
 }
-#endif  // MX_DISABLE_VAST
 
 }  // namespace mx

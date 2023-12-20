@@ -46,7 +46,6 @@ bool ObjCTypeParamDecl::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const ir::Operation &op) {
   if (auto val = Decl::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<ObjCTypeParamDecl, ir::Operation>> ObjCTypeParamDecl::i
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCTypeParamDecl> ObjCTypeParamDecl::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_declaration(); ancestor.has_value();

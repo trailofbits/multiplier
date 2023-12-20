@@ -39,11 +39,8 @@ class MX_EXPORT FriendDecl : public Decl {
   static gap::generator<FriendDecl> in(const Fragment &frag);
   static gap::generator<FriendDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<FriendDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<FriendDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FRIEND;
   }

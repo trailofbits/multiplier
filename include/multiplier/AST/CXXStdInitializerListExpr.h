@@ -40,11 +40,8 @@ class MX_EXPORT CXXStdInitializerListExpr : public Expr {
   static gap::generator<CXXStdInitializerListExpr> in(const Fragment &frag);
   static gap::generator<CXXStdInitializerListExpr> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<CXXStdInitializerListExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXStdInitializerListExpr, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_STD_INITIALIZER_LIST_EXPR;
   }

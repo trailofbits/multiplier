@@ -6,10 +6,6 @@
 
 #pragma once
 
-#ifdef MX_DISABLE_VAST
-# error "VAST is disabled; this shouldn't be compiled."
-#endif
-
 #include <memory>
 #include <string>
 

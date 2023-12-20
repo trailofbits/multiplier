@@ -42,11 +42,8 @@ class MX_EXPORT VarTemplateDecl : public RedeclarableTemplateDecl {
   static gap::generator<VarTemplateDecl> in(const Fragment &frag);
   static gap::generator<VarTemplateDecl> in(const File &file);
 
-#ifndef MX_DISABLE_VAST
   static std::optional<VarTemplateDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<VarTemplateDecl, ir::Operation>> in(const Compilation &tu);
-#endif  // MX_DISABLE_VAST
-
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR_TEMPLATE;
   }

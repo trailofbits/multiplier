@@ -46,7 +46,6 @@ bool ObjCIvarRefExpr::contains(const Token &tok) const {
   return false;
 }
 
-#ifndef MX_DISABLE_VAST
 std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const ir::Operation &op) {
   if (auto val = Stmt::from(op)) {
     return from_base(val.value());
@@ -61,8 +60,6 @@ gap::generator<std::pair<ObjCIvarRefExpr, ir::Operation>> ObjCIvarRefExpr::in(co
     }
   }
 }
-
-#endif  // MX_DISABLE_VAST
 
 gap::generator<ObjCIvarRefExpr> ObjCIvarRefExpr::containing(const Decl &decl) {
   for (auto ancestor = decl.parent_statement(); ancestor.has_value();
