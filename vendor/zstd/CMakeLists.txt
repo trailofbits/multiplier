@@ -48,6 +48,8 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DZSTD_BUILD_PROGRAMS=OFF
                         -DZSTD_BUILD_CONTRIB=OFF
                         -DZSTD_BUILD_TESTS=OFF
+                        -DZSTD_BUILD_SHARED=OFF
+                        -DZSTD_BUILD_STATIC=ON
                         -DZSTD_USE_STATIC_RUNTIME=ON
                         -DZSTD_PROGRAMS_LINK_SHARED=OFF
                         -DBUILD_TESTING=OFF
