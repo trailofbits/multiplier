@@ -194,7 +194,7 @@ target_link_libraries("mx-api"
   PRIVATE
     "mx-serialize"
     "mx-sqlite"
-    "zstd::zstd"
+    "zstd::libzstd_static"
     "concurrentqueue"
     ${MLIR_LIBS}
     ${VAST_LIBS}
