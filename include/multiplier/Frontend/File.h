@@ -121,14 +121,15 @@ class MX_EXPORT File {
       : impl(std::move(impl_)) {}
 
   // Return the file containing a regex query match.
-  static std::optional<File> containing(const RegexQueryMatch &match);
+  static std::optional<File> containing(const RegexQueryMatch &match) noexcept;
 
-  inline static File containing(const File &file) {
+  inline static File containing(const File &file) noexcept {
     return file;
   }
 
 #define MX_DECLARE_CONTAINING(ns_path, type_name, lower_name, enum_name, category) \
-    static std::optional<File> containing(const ns_path type_name &entity);
+    static std::optional<File> containing( \
+        const ns_path type_name &entity) noexcept;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
@@ -146,18 +147,21 @@ class MX_EXPORT File {
   //            containing the fragment itself. That might be very different
   //            than the file from which the token came. For that, once should
   //            use `File::containing` on the result of `Token::file_token`.
-  static std::optional<File> containing(const Token &token);
+  static std::optional<File> containing(const Token &token) noexcept;
 
   // Go through the tokens of the iterator and return the first file found.
-  static std::optional<File> containing(const TokenRange &tokens);
+  static std::optional<File> containing(const TokenRange &tokens) noexcept;
 
   // Return the file containing the token tree. Token trees can cover multiple
   // files, e.g. in the case of x-macro like includes (e.g. within an `enum`
   // declaration). This will return the "top" file.
-  static std::optional<File> containing(const TokenTree &tokens);
+  static std::optional<File> containing(const TokenTree &tokens) noexcept;
 
   // Return the file holding a generic entity.
-  static std::optional<File> containing(const VariantEntity &);
+  static std::optional<File> containing(const VariantEntity &) noexcept;
+
+  // Try to convert a variant entity into a file.
+  static std::optional<File> from(const VariantEntity &) noexcept;
 
   inline static constexpr EntityCategory entity_category(void) {
     return EntityCategory::FILE;

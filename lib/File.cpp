@@ -175,7 +175,7 @@ std::optional<std::pair<unsigned, unsigned>> Token::next_location(
 }
 
 // Return the file containing a specific fragment.
-std::optional<File> File::containing(const Fragment &fragment) {
+std::optional<File> File::containing(const Fragment &fragment) noexcept {
   const auto &ep = fragment.impl->ep;
   RawEntityId ftid = fragment.impl->FileContaingFirstToken();
   if (FileImplPtr fp = ep->FileFor(ep, ftid)) {
@@ -185,7 +185,7 @@ std::optional<File> File::containing(const Fragment &fragment) {
 }
 
 // Return the file containing a specific token.
-std::optional<File> File::containing(const Token &token) {
+std::optional<File> File::containing(const Token &token) noexcept {
 
   if (auto file = token.impl->NthOwningFile(token.offset)) {
     return File(FileImplPtr(token.impl, file));
@@ -199,7 +199,7 @@ std::optional<File> File::containing(const Token &token) {
 }
 
 // Go through the tokens of the iterator and return the first file found.
-std::optional<File> File::containing(const TokenRange &tokens) {
+std::optional<File> File::containing(const TokenRange &tokens) noexcept {
   for (Token tok : tokens.file_tokens()) {
     if (auto file = File::containing(tok)) {
       return file;
@@ -214,7 +214,7 @@ std::optional<File> File::containing(const TokenRange &tokens) {
 }
 
 // Return the file containing a regex match.
-std::optional<File> File::containing(const RegexQueryMatch &match) {
+std::optional<File> File::containing(const RegexQueryMatch &match) noexcept {
   if (auto file = match.impl->OwningFile()) {
     return File(FileImplPtr(match.impl, file));
 
@@ -224,7 +224,7 @@ std::optional<File> File::containing(const RegexQueryMatch &match) {
 }
 
 #define MX_DEFINE_CONTAINING(ns_path, type_name, lower_name, enum_name, category) \
-    std::optional<File> File::containing(const type_name &entity) { \
+    std::optional<File> File::containing(const type_name &entity) noexcept { \
       auto &ep = entity.impl->ep; \
       RawEntityId fid = entity.impl->fragment_id.Pack(); \
       if (FragmentImplPtr fptr = ep->FragmentFor(ep, fid)) { \
@@ -251,7 +251,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
 #undef MX_DEFINE_CONTAINING
 
 // Return the file containing an operation.
-std::optional<File> File::containing(const ir::Operation &op) {
+std::optional<File> File::containing(const ir::Operation &op) noexcept {
   if (auto decl = Decl::from(op)) {
     return File::containing(decl.value());
   } else if (auto stmt = Stmt::from(op)) {
@@ -261,7 +261,7 @@ std::optional<File> File::containing(const ir::Operation &op) {
   }
 }
 
-std::optional<File> File::containing(const VariantEntity &entity) {
+std::optional<File> File::containing(const VariantEntity &entity) noexcept {
 #define GET_FILE(ns_path, type_name, lower_name, enum_name, category) \
     if (auto lower_name ## _ptr = std::get_if<ns_path type_name>(&entity)) { \
       return File::containing(*lower_name ## _ptr); \
@@ -275,7 +275,7 @@ std::optional<File> File::containing(const VariantEntity &entity) {
 }
 
 // Return the file containing the token tree.
-std::optional<File> File::containing(const TokenTree &tree) {
+std::optional<File> File::containing(const TokenTree &tree) noexcept {
   if (tree.impl->file) {
     return File(tree.impl->file);
   } else if (tree.impl->fragment) {
@@ -283,6 +283,14 @@ std::optional<File> File::containing(const TokenTree &tree) {
   } else {
     return std::nullopt;
   }
+}
+
+// Try to convert a variant entity into a file.
+std::optional<File> File::from(const VariantEntity &entity) noexcept {
+  if (std::holds_alternative<File>(entity)) {
+    return std::get<File>(entity);
+  }
+  return std::nullopt;
 }
 
 // Return the ID of this file.
