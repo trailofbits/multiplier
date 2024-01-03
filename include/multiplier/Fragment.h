@@ -109,6 +109,9 @@ class MX_EXPORT Fragment {
   static std::optional<Fragment> containing(const ir::Operation &) noexcept;
   static std::optional<Fragment> containing(const VariantEntity &) noexcept;
 
+  // Try to convert a variant entity into a fragment.
+  static std::optional<Fragment> from(const VariantEntity &) noexcept;
+
   inline static constexpr EntityCategory entity_category(void) noexcept {
     return EntityCategory::FRAGMENT;
   }

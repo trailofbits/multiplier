@@ -156,6 +156,14 @@ std::optional<Fragment> Fragment::containing(const TokenTree &tree) noexcept {
   }
 }
 
+// Try to convert a variant entity into a fragment.
+std::optional<Fragment> Fragment::from(const VariantEntity &entity) noexcept {
+  if (std::holds_alternative<Fragment>(entity)) {
+    return std::get<Fragment>(entity);
+  }
+  return std::nullopt;
+}
+
 // Return the ID of this fragment.
 SpecificEntityId<FragmentId> Fragment::id(void) const noexcept {
   return FragmentId(impl->fragment_id);
