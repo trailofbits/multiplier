@@ -29,6 +29,12 @@
 #include "Type.h"
 
 namespace mx {
+namespace {
+
+// A zero-sized string view that nontheless has a valid `.data()` pointer.
+static const std::string_view kEmptyStringView("");
+
+}  // namespace
 
 class TemplateDecl;
 
@@ -934,7 +940,7 @@ TokenKind InvalidTokenReader::NthTokenKind(EntityOffset) const {
 
 // Return the data of the Nth token.
 std::string_view InvalidTokenReader::NthTokenData(EntityOffset) const {
-  return {};
+  return kEmptyStringView;
 }
 
 // Return the id of the token from which the Nth token is derived.
@@ -1129,7 +1135,7 @@ TokenCategory CustomTokenReader::NthTokenCategory(EntityOffset to) const {
 // Return the data of the Nth token.
 std::string_view CustomTokenReader::NthTokenData(EntityOffset to) const {
   if ((to + 1u) >= data_offset.size()) {
-    return {};
+    return kEmptyStringView;
   }
 
   auto begin_offset = data_offset[to];
@@ -1138,7 +1144,7 @@ std::string_view CustomTokenReader::NthTokenData(EntityOffset to) const {
       begin_offset > data.size() ||
       end_offset > data.size()) {
     assert(false);
-    return {};
+    return kEmptyStringView;
   }
 
   return std::string_view(data).substr(
@@ -1470,7 +1476,7 @@ std::optional<unsigned> TokenRange::index_of(const Token &that) const noexcept {
 // token range.
 std::string_view TokenRange::data(void) const & {
   if (!impl || impl.get() == kInvalidTokenReader.get() || !num_tokens) {
-    return {};
+    return kEmptyStringView;
   }
 
   auto data_begin = impl->NthTokenData(index);
@@ -1478,7 +1484,7 @@ std::string_view TokenRange::data(void) const & {
 
   if (data_begin.data() > data_end.data()) {
     assert(false);
-    return {};
+    return kEmptyStringView;
   }
 
   auto size = static_cast<size_t>(data_end.data() - data_begin.data()) +
@@ -1486,7 +1492,7 @@ std::string_view TokenRange::data(void) const & {
 
   if (static_cast<EntityOffset>(size) != size) {
     assert(false);
-    return {};
+    return kEmptyStringView;
   }
 
   return std::string_view(data_begin.data(), size);

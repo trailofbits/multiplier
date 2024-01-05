@@ -17,6 +17,12 @@
 #include <iostream>
 
 namespace mx {
+namespace {
+
+// A zero-sized string view that nontheless has a valid `.data()` pointer.
+static const std::string_view kEmptyStringView("");
+
+}  // namespace
 
 CompilationImpl::~CompilationImpl(void) noexcept {}
 
@@ -31,7 +37,7 @@ std::string_view CompilationImpl::SourceIR(void) const & noexcept {
       return std::string_view(mlir.cStr(), size);
     }
   }
-  return {};
+  return kEmptyStringView;
 }
 
 // Return a pointer to the source IR object.

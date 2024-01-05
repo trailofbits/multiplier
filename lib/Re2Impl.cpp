@@ -16,9 +16,15 @@
 #include "Types.h"
 #include "Util.h"
 
-#ifndef MX_DISABLE_RE2
-
 namespace mx {
+namespace {
+
+// A zero-sized string view that nontheless has a valid `.data()` pointer.
+static const std::string_view kEmptyStringView("");
+
+}  // namespace
+
+#ifndef MX_DISABLE_RE2
 
 RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 
@@ -345,7 +351,7 @@ std::string_view RegexQueryMatch::data(void) const noexcept {
   auto real_impl = dynamic_cast<const RegexQueryMatchImpl *>(impl.get());
   if (!real_impl) {
     assert(false);
-    return {};
+    return kEmptyStringView;
   }
 
   return real_impl->matched_ranges[0];
@@ -453,9 +459,7 @@ gap::generator<RegexQueryMatch> RegexQuery::match_fragments(
   }
 }
 
-}  // namespace mx
 #else
-namespace mx {
 
 RegexQueryMatchImpl::~RegexQueryMatchImpl(void) {}
 
@@ -538,7 +542,7 @@ size_t RegexQueryMatch::num_captures(void) const {
 // The actual range of matched data. This is possibly a sub-sequence of
 // `this->TokenRange::data()`.
 std::string_view RegexQueryMatch::data(void) const noexcept {
-  return {};
+  return kEmptyStringView;
 }
 
 // Return a list of matched variables.
@@ -567,6 +571,5 @@ RegexQuery::match_fragments(const Fragment &) const & {
   co_return;
 }
 
-}  // namespace mx
 #endif   // MX_DISABLE_RE2
-
+}  // namespace mx
