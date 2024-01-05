@@ -8,9 +8,15 @@
 
 #include <cassert>
 
-#ifndef MX_DISABLE_RE2
-
 namespace mx {
+namespace {
+
+// A zero-sized string view that nontheless has a valid `.data()` pointer.
+static const std::string_view kEmptyStringView("");
+
+}  // namespace
+
+#ifndef MX_DISABLE_RE2
 
 // NOTE(pag): `RE2::FindAndConsume` is a variadic function taking additional
 //            arguments per sub-match, hence the requirement for enclosing
@@ -72,7 +78,7 @@ std::string_view RegexQuery::pattern(void) const {
     // NOTE(pag): Need to remove the wrapping `(` and `)`.
     return std::string_view(impl->pattern).substr(1u, impl->pattern.size() - 2u);
   } else {
-    return {};
+    return kEmptyStringView;
   }
 }
 
@@ -81,10 +87,7 @@ bool RegexQuery::is_valid(void) const {
   return impl && impl->IsValid();
 }
 
-}  // namespace mx
 #else
-
-namespace mx {
 
 // NOTE(pag): `RE2::FindAndConsume` is a variadic function taking additional
 //            arguments per sub-match, hence the requirement for enclosing
@@ -112,7 +115,7 @@ void RegexQuery::for_each_match(
 
 // Returns the underlying pattern.
 std::string_view RegexQuery::pattern(void) const {
-    return {};
+    return kEmptyStringView;
 }
 
 // Returns `true` if we successfully compiled this regular expression.
@@ -120,5 +123,5 @@ bool RegexQuery::is_valid(void) const {
   return false;
 }
 
-}  // namespace mx
 #endif   // MX_DISABLE_RE2
+}  // namespace mx

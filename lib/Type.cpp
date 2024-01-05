@@ -13,6 +13,12 @@
 #include "Types.h"
 
 namespace mx {
+namespace {
+
+// A zero-sized string view that nontheless has a valid `.data()` pointer.
+static const std::string_view kEmptyStringView("");
+
+}  // namespace
 
 // Return the number of tokens in the fragment.
 EntityOffset ReadTypeTokens::NumTokens(void) const {
@@ -30,7 +36,7 @@ TokenKind ReadTypeTokens::NthTokenKind(EntityOffset to) const {
 // Return the data of the Nth token.
 std::string_view ReadTypeTokens::NthTokenData(EntityOffset to) const {
   if (to >= type->num_type_tokens) {
-    return {};
+    return kEmptyStringView;
   }
 
   const auto &reader = type->frag_reader;
@@ -145,7 +151,7 @@ std::string_view TypeImpl::Data(void) const & noexcept {
       return std::string_view(toks.cStr(), size);
     }
   }
-  return {};
+  return kEmptyStringView;
 }
 
 // Return the token associated with a specific entity ID.

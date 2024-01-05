@@ -14,6 +14,12 @@
 #include "File.h"
 
 namespace mx {
+namespace {
+
+// A zero-sized string view that nontheless has a valid `.data()` pointer.
+static const std::string_view kEmptyStringView("");
+
+}  // namespace
 
 FragmentImpl::FragmentImpl(EntityProviderPtr ep_,
                            kj::Array<capnp::word> data_,
@@ -87,7 +93,7 @@ std::string_view ReadMacroTokensFromFragment::NthTokenData(
     EntityOffset ti) const {
   if (ti >= fragment->num_tokens) {
     assert(false);
-    return {};
+    return kEmptyStringView;
   }
 
   const auto &reader = fragment->reader;
@@ -307,13 +313,13 @@ std::string_view ReadParsedTokensFromFragment::NthTokenData(
     EntityOffset to) const {
   if (to >= fragment->num_parsed_tokens) {
     assert(false);
-    return {};
+    return kEmptyStringView;
   }
 
   auto ti = fragment->reader.getParsedTokenOffsetToIndex()[to];
   if (ti >= fragment->num_tokens) {
     assert(false);
-    return {};
+    return kEmptyStringView;
   }
 
   return this->ReadMacroTokensFromFragment::NthTokenData(ti);
@@ -456,7 +462,7 @@ std::string_view FragmentImpl::Data(void) const & noexcept {
       return std::string_view(toks.cStr(), size);
     }
   }
-  return {};
+  return kEmptyStringView;
 }
 
 // Return the token associated with a specific entity ID.

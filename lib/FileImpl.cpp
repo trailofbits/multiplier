@@ -10,6 +10,12 @@
 #include <multiplier/Frontend/TokenKind.h>
 
 namespace mx {
+namespace {
+
+// A zero-sized string view that nontheless has a valid `.data()` pointer.
+static const std::string_view kEmptyStringView("");
+
+}  // namespace
 
 FileImpl::~FileImpl(void) noexcept {}
 
@@ -29,7 +35,7 @@ std::string_view FileImpl::Data(void) const & noexcept {
       return std::string_view(data.cStr(), size);
     }
   }
-  return {};
+  return kEmptyStringView;
 }
 
 // Return the number of tokens in the file.
@@ -55,7 +61,7 @@ std::string_view ReadFileTokensFromFile::NthTokenData(
     auto eo = tor[token_index + 1u];
     return std::string_view(&(file->reader.getData().cStr()[bo]), eo - bo);
   } else {
-    return {};
+    return kEmptyStringView;
   }
 }
 
