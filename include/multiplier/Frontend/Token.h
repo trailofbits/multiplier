@@ -102,6 +102,9 @@ class MX_EXPORT Token final {
  public:
   Token(void);
 
+  // Try to convert a variant entity into a token.
+  static std::optional<Token> from(const VariantEntity &entity);
+
   inline static constexpr EntityCategory entity_category(void) {
     return EntityCategory::TOKEN;
   }

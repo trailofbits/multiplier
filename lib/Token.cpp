@@ -1287,6 +1287,15 @@ Token::Token(void)
     : impl(kInvalidTokenReader),
       offset(0) {}
 
+// Try to convert a variant entity into a token.
+std::optional<Token> Token::from(const VariantEntity &entity) {
+  if (!std::holds_alternative<Token>(entity)) {
+    return std::nullopt;
+  }
+
+  return std::get<Token>(entity);
+}
+
 // Return `true` if this is a valid token.
 Token::operator bool(void) const {
   return !dynamic_cast<const InvalidTokenReader *>(impl.get());
