@@ -1235,7 +1235,7 @@ EntityId CustomTokenReader::NthContainingMacroId(EntityOffset to) const {
 
 // Return an entity id associated with the Nth token.
 EntityId CustomTokenReader::NthRelatedEntityId(EntityOffset to) const {
-  if (to < related_entity_ids.size()) {
+  if (to < related_entities.size()) {
     return EntityId(related_entities[to]);
   }
   return kInvalidEntityId;
