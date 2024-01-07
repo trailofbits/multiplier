@@ -197,7 +197,6 @@ class CustomTokenReader final : public TokenReader {
   std::vector<RawEntityId> parsed_token_ids;
   std::vector<RawEntityId> containing_macro_ids;
   std::vector<VariantEntity> related_entities;
-  std::vector<RawEntityId> related_entity_ids;
   std::vector<RawEntityId> token_ids;
   std::vector<RawEntityId> file_token_ids;
   std::vector<TokenKind> token_kinds;
