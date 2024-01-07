@@ -216,6 +216,10 @@ class Fragment(multiplier.Entity):
     ...
 
   @staticmethod
+  def FROM(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.Fragment]:
+    ...
+
+  @staticmethod
   def entity_category() -> multiplier.EntityCategory:
     ...
 

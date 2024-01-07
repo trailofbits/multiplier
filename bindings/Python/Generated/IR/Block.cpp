@@ -219,7 +219,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_argument(arg_0.value()));
+            return ::mx::to_python(obj->nth_argument(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)

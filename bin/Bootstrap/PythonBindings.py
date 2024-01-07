@@ -10,13 +10,12 @@ from schema import *
 from typing import DefaultDict, Dict, Iterable, List, Set, Tuple, Type
 import sys
 
-MX_BIN_BOOSTRAP_DIR = os.path.dirname(__file__)
+MX_BIN_BOOSTRAP_DIR = os.path.dirname(os.path.abspath(__file__))
 MX_BIN_DIR = os.path.dirname(MX_BIN_BOOSTRAP_DIR)
 MX_DIR = os.path.dirname(MX_BIN_DIR)
 MX_INCLUDE_DIR = os.path.join(MX_DIR, "include")
 MX_BINDINGS_DIR = os.path.join(MX_DIR, "bindings")
 MX_BINDINGS_PYTHON_DIR = os.path.join(MX_BINDINGS_DIR, "Python")
-
 
 TYPES_CPP = """// Copyright (c) 2023-present, Trail of Bits, Inc.
 // All rights reserved.
@@ -384,6 +383,7 @@ METHOD_SPEC_GET_ARG = """            auto arg_{arg_num} = ::mx::from_python<{arg
 
 
 METHOD_SPEC_CALL_ARG = "arg_{}.value()"
+METHOD_SPEC_CALL_VALUE_ARG = "std::move(arg_{}.value())"
 
 
 METHOD_SPEC_CALL = """
@@ -1102,6 +1102,8 @@ def _wrap_method_impl(class_schema: ClassSchema, schema: MethodSchema,
   out.append(METHOD_SPEC_CHECK_ARGCOUNT_BEGIN.format(num_args=num_args))
 
   py_args = []
+  cxx_args = []
+
   if not is_static:
     py_args.append("self")
 
@@ -1113,10 +1115,15 @@ def _wrap_method_impl(class_schema: ClassSchema, schema: MethodSchema,
     arg_name = ARGUMENT_RENAMES.get(arg.name, arg.name) or f"arg_{i}"
     py_args.append(f"{arg_name}: {arg.element_type.python_value_name}")
 
+    if not isinstance(arg.element_type, ReferenceSchema):
+      cxx_args.append(METHOD_SPEC_CALL_VALUE_ARG.format(i))
+    else:
+      cxx_args.append(METHOD_SPEC_CALL_ARG.format(i))
+
   out.append(METHOD_SPEC_CALL.format(
       this=is_static and "T::" or "obj->",
       method_name=schema.name,
-      args=", ".join(METHOD_SPEC_CALL_ARG.format(i) for i in range(num_args))))
+      args=", ".join(cxx_args)))
 
   out.append(METHOD_SPEC_CHECK_ARGCOUNT_END)
 
@@ -1135,15 +1142,22 @@ def _wrap_constructor_impl(class_schema: ClassSchema, schema: MethodSchema,
   num_args = len(schema.parameters)
   out.append(INIT_SPEC_CHECK_ARGCOUNT_BEGIN.format(num_args=num_args))
 
+  cxx_args = []
+
   for i, arg in enumerate(schema.parameters):
     FROM_EXPORTS.add(arg.element_type)
     out.append(INIT_SPEC_GET_ARG.format(
         arg_num=i,
         arg_type=arg.element_type.cxx_value_name))
 
+    if not isinstance(arg.element_type, ReferenceSchema):
+      cxx_args.append(METHOD_SPEC_CALL_VALUE_ARG.format(i))
+    else:
+      cxx_args.append(METHOD_SPEC_CALL_ARG.format(i))
+
   out.append(INIT_SPEC_CALL.format(
       cxx_class_name=class_schema.name,
-      args=", ".join(METHOD_SPEC_CALL_ARG.format(i) for i in range(num_args))))
+      args=", ".join(cxx_args)))
 
   out.append(INIT_SPEC_CHECK_ARGCOUNT_END)
 

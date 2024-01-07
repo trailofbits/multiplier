@@ -348,7 +348,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(T::in(arg_0.value(), arg_1.value()));
+            return ::mx::to_python(T::in(arg_0.value(), std::move(arg_1.value())));
           }
           while (num_args == 2) {
             auto arg_0 = ::mx::from_python<mx::Fragment>(args[0]);
@@ -360,7 +360,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(T::in(arg_0.value(), arg_1.value()));
+            return ::mx::to_python(T::in(arg_0.value(), std::move(arg_1.value())));
           }
           while (num_args == 2) {
             auto arg_0 = ::mx::from_python<mx::File>(args[0]);
@@ -372,7 +372,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(T::in(arg_0.value(), arg_1.value()));
+            return ::mx::to_python(T::in(arg_0.value(), std::move(arg_1.value())));
           }
           while (num_args == 1) {
             auto arg_0 = ::mx::from_python<mx::Fragment>(args[0]);
@@ -421,7 +421,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(T::by_id(arg_0.value(), arg_1.value()));
+            return ::mx::to_python(T::by_id(arg_0.value(), std::move(arg_1.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)

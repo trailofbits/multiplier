@@ -190,7 +190,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->captured_tokens(arg_0.value()));
+            return ::mx::to_python(obj->captured_tokens(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -220,7 +220,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->captured_data(arg_0.value()));
+            return ::mx::to_python(obj->captured_data(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)

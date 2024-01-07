@@ -403,7 +403,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(T::by_id(arg_0.value(), arg_1.value()));
+            return ::mx::to_python(T::by_id(arg_0.value(), std::move(arg_1.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -524,7 +524,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_label(arg_0.value()));
+            return ::mx::to_python(obj->nth_label(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -546,7 +546,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_output_constraint_literal(arg_0.value()));
+            return ::mx::to_python(obj->nth_output_constraint_literal(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -568,7 +568,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_input_constraint_literal(arg_0.value()));
+            return ::mx::to_python(obj->nth_input_constraint_literal(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -590,7 +590,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_clobber_string_literal(arg_0.value()));
+            return ::mx::to_python(obj->nth_clobber_string_literal(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -612,7 +612,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_label_expression(arg_0.value()));
+            return ::mx::to_python(obj->nth_label_expression(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)

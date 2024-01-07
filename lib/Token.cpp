@@ -1156,6 +1156,10 @@ void CustomTokenReader::Append(TokenImplPtr tr, EntityOffset to) noexcept {
 
 // Append a simple token into this reader.
 void CustomTokenReader::Append(UserToken stok) noexcept {
+  if (stok.data.empty()) {
+    return;
+  }
+
   data.insert(data.end(), stok.data.begin(), stok.data.end());
   data_offset.push_back(static_cast<EntityOffset>(data.size()));
 
