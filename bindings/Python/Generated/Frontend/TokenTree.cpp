@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[805]) || tp >= &(gTypes[806])) {
+  if (tp < &(gTypes[835]) || tp >= &(gTypes[836])) {
     return std::nullopt;
   }
 
@@ -112,6 +112,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "root",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->root());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TokenTree::root"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace
@@ -184,7 +194,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[805]);
+  PyTypeObject * const tp = &(gTypes[835]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

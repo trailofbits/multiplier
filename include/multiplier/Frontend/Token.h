@@ -38,6 +38,7 @@ class TokenContext;
 class TokenRangeIterator;
 class TokenRange;
 class TokenReader;
+class TokenTokenTreeNode;
 class TokenTree;
 class TokenTreeImpl;
 class TypeImpl;
@@ -88,6 +89,7 @@ class MX_EXPORT Token final {
   friend class TokenRangeIterator;
   friend class TokenRange;
   friend class TokenReader;
+  friend class TokenTokenTreeNode;
   friend class TokenTree;
   friend class TokenTreeImpl;
   friend class TypeImpl;

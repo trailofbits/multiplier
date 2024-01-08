@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[929]) || tp >= &(gTypes[930])) {
+  if (tp < &(gTypes[936]) || tp >= &(gTypes[937])) {
     return std::nullopt;
   }
 
@@ -236,7 +236,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[929]);
+  PyTypeObject * const tp = &(gTypes[936]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

@@ -26,6 +26,40 @@ import multiplier.ir.lowlevel
 import multiplier.ir.highlevel
 import multiplier.ir.unsupported
 
+class MacroKind(IntEnum):
+  SUBSTITUTION = 0
+  EXPANSION = 1
+  ARGUMENT = 2
+  PARAMETER = 3
+  OTHER_DIRECTIVE = 4
+  IF_DIRECTIVE = 5
+  IF_DEFINED_DIRECTIVE = 6
+  IF_NOT_DEFINED_DIRECTIVE = 7
+  ELSE_IF_DIRECTIVE = 8
+  ELSE_IF_DEFINED_DIRECTIVE = 9
+  ELSE_IF_NOT_DEFINED_DIRECTIVE = 10
+  ELSE_DIRECTIVE = 11
+  END_IF_DIRECTIVE = 12
+  DEFINE_DIRECTIVE = 13
+  UNDEFINE_DIRECTIVE = 14
+  PRAGMA_DIRECTIVE = 15
+  INCLUDE_DIRECTIVE = 16
+  INCLUDE_NEXT_DIRECTIVE = 17
+  INCLUDE_MACROS_DIRECTIVE = 18
+  IMPORT_DIRECTIVE = 19
+  PARAMETER_SUBSTITUTION = 20
+  STRINGIFY = 21
+  CONCATENATE = 22
+  VA_OPT = 23
+  VA_OPT_ARGUMENT = 24
+
+class TokenTreeNodeKind(IntEnum):
+  EMPTY = 0
+  TOKEN = 1
+  CHOICE = 2
+  SUBSTITUTION = 3
+  SEQUENCE = 4
+
 class TokenKind(IntEnum):
   UNKNOWN = 0
   END_OF_FILE = 1
@@ -511,33 +545,6 @@ class TokenKind(IntEnum):
   OBJC_AT_IMPORT = 481
   OBJC_AT_AVAILABLE = 482
 
-class MacroKind(IntEnum):
-  SUBSTITUTION = 0
-  EXPANSION = 1
-  ARGUMENT = 2
-  PARAMETER = 3
-  OTHER_DIRECTIVE = 4
-  IF_DIRECTIVE = 5
-  IF_DEFINED_DIRECTIVE = 6
-  IF_NOT_DEFINED_DIRECTIVE = 7
-  ELSE_IF_DIRECTIVE = 8
-  ELSE_IF_DEFINED_DIRECTIVE = 9
-  ELSE_IF_NOT_DEFINED_DIRECTIVE = 10
-  ELSE_DIRECTIVE = 11
-  END_IF_DIRECTIVE = 12
-  DEFINE_DIRECTIVE = 13
-  UNDEFINE_DIRECTIVE = 14
-  PRAGMA_DIRECTIVE = 15
-  INCLUDE_DIRECTIVE = 16
-  INCLUDE_NEXT_DIRECTIVE = 17
-  INCLUDE_MACROS_DIRECTIVE = 18
-  IMPORT_DIRECTIVE = 19
-  PARAMETER_SUBSTITUTION = 20
-  STRINGIFY = 21
-  CONCATENATE = 22
-  VA_OPT = 23
-  VA_OPT_ARGUMENT = 24
-
 class PathKind(IntEnum):
   UNIX = 0
   WINDOWS = 1
@@ -887,26 +894,6 @@ class File(multiplier.Entity):
   def entity_category() -> multiplier.EntityCategory:
     ...
 
-class TokenTree(object):
-
-  @overload
-  @staticmethod
-  def FROM(arg_0: multiplier.frontend.File) -> multiplier.frontend.TokenTree:
-    ...
-
-  @overload
-  @staticmethod
-  def FROM(arg_0: multiplier.Fragment) -> multiplier.frontend.TokenTree:
-    ...
-
-  @overload
-  @staticmethod
-  def FROM(arg_0: multiplier.frontend.TokenRange) -> Optional[multiplier.frontend.TokenTree]:
-    ...
-
-  def serialize(self, vis: multiplier.frontend.TokenTreeVisitor) -> multiplier.frontend.TokenRange:
-    ...
-
 class Macro(multiplier.Entity):
   root: multiplier.frontend.Macro
   use_tokens: multiplier.frontend.TokenRange
@@ -988,135 +975,6 @@ class Macro(multiplier.Entity):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.Macro]:
-    ...
-
-class MacroVAOptArgument(multiplier.frontend.Macro):
-
-  @overload
-  @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroVAOptArgument]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroVAOptArgument]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroVAOptArgument]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroVAOptArgument]:
-    ...
-
-  @staticmethod
-  def static_kind() -> multiplier.frontend.MacroKind:
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroVAOptArgument]:
-    ...
-
-  @overload
-  @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroVAOptArgument]:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroVAOptArgument]:
-    ...
-
-  @overload
-  @staticmethod
-  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroVAOptArgument]:
-    ...
-
-  @overload
-  @staticmethod
-  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.MacroVAOptArgument]:
-    ...
-
-  @overload
-  @staticmethod
-  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.MacroVAOptArgument]:
-    ...
-
-  @overload
-  @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroVAOptArgument]:
-    ...
-
-  @overload
-  @staticmethod
-  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroVAOptArgument]:
-    ...
-
-class MacroVAOpt(multiplier.frontend.Macro):
-  contents_are_elided: bool
-
-  @overload
-  @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroVAOpt]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroVAOpt]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroVAOpt]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroVAOpt]:
-    ...
-
-  @staticmethod
-  def static_kind() -> multiplier.frontend.MacroKind:
-    ...
-
-  @overload
-  @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroVAOpt]:
-    ...
-
-  @overload
-  @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroVAOpt]:
-    ...
-
-  @staticmethod
-  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroVAOpt]:
-    ...
-
-  @overload
-  @staticmethod
-  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroVAOpt]:
-    ...
-
-  @overload
-  @staticmethod
-  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.MacroVAOpt]:
-    ...
-
-  @overload
-  @staticmethod
-  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.MacroVAOpt]:
-    ...
-
-  @overload
-  @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroVAOpt]:
-    ...
-
-  @overload
-  @staticmethod
-  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroVAOpt]:
     ...
 
 class MacroSubstitution(multiplier.frontend.Macro):
@@ -1452,6 +1310,135 @@ class MacroParameterSubstitution(multiplier.frontend.MacroSubstitution):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroParameterSubstitution]:
+    ...
+
+class MacroVAOpt(multiplier.frontend.Macro):
+  contents_are_elided: bool
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.frontend.MacroKind:
+    ...
+
+  @overload
+  @staticmethod
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @overload
+  @staticmethod
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroVAOpt]:
+    ...
+
+class MacroVAOptArgument(multiplier.frontend.Macro):
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @staticmethod
+  def static_kind() -> multiplier.frontend.MacroKind:
+    ...
+
+  @overload
+  @staticmethod
+  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @overload
+  @staticmethod
+  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @staticmethod
+  def from_base(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(parent: multiplier.frontend.Macro) -> Optional[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(parent: Optional[multiplier.frontend.Macro]) -> Optional[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(r: multiplier.Reference) -> Optional[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.MacroVAOptArgument]:
     ...
 
 class MacroArgument(multiplier.frontend.Macro):
@@ -2797,4 +2784,84 @@ class IncludeMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.frontend.IncludeMacroDirective]:
+    ...
+
+class TokenTree(object):
+  root: multiplier.frontend.TokenTreeNode
+
+  @overload
+  @staticmethod
+  def FROM(arg_0: multiplier.frontend.File) -> multiplier.frontend.TokenTree:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(arg_0: multiplier.Fragment) -> multiplier.frontend.TokenTree:
+    ...
+
+  @overload
+  @staticmethod
+  def FROM(arg_0: multiplier.frontend.TokenRange) -> Optional[multiplier.frontend.TokenTree]:
+    ...
+
+  def serialize(self, vis: multiplier.frontend.TokenTreeVisitor) -> multiplier.frontend.TokenRange:
+    ...
+
+class TokenTreeNode(object):
+  kind: multiplier.frontend.TokenTreeNodeKind
+
+class EmptyTokenTreeNode(multiplier.frontend.TokenTreeNode):
+
+  @staticmethod
+  def static_kind() -> multiplier.frontend.TokenTreeNodeKind:
+    ...
+
+  @staticmethod
+  def FROM(arg_0: multiplier.frontend.TokenTreeNode) -> Optional[multiplier.frontend.EmptyTokenTreeNode]:
+    ...
+
+class TokenTokenTreeNode(multiplier.frontend.TokenTreeNode):
+  token: multiplier.frontend.Token
+
+  @staticmethod
+  def static_kind() -> multiplier.frontend.TokenTreeNodeKind:
+    ...
+
+  @staticmethod
+  def FROM(arg_0: multiplier.frontend.TokenTreeNode) -> Optional[multiplier.frontend.TokenTokenTreeNode]:
+    ...
+
+class ChoiceTokenTreeNode(multiplier.frontend.TokenTreeNode):
+  children: Generator[Tuple[multiplier.Fragment, multiplier.frontend.TokenTreeNode]]
+
+  @staticmethod
+  def static_kind() -> multiplier.frontend.TokenTreeNodeKind:
+    ...
+
+  @staticmethod
+  def FROM(arg_0: multiplier.frontend.TokenTreeNode) -> Optional[multiplier.frontend.ChoiceTokenTreeNode]:
+    ...
+
+class SubstitutionTokenTreeNode(multiplier.frontend.TokenTreeNode):
+  macro: multiplier.frontend.MacroSubstitution | multiplier.frontend.MacroVAOpt
+  before: multiplier.frontend.TokenTreeNode
+  after: multiplier.frontend.TokenTreeNode
+
+  @staticmethod
+  def static_kind() -> multiplier.frontend.TokenTreeNodeKind:
+    ...
+
+  @staticmethod
+  def FROM(arg_0: multiplier.frontend.TokenTreeNode) -> Optional[multiplier.frontend.SubstitutionTokenTreeNode]:
+    ...
+
+class SequenceTokenTreeNode(multiplier.frontend.TokenTreeNode):
+  children: Generator[multiplier.frontend.TokenTreeNode]
+
+  @staticmethod
+  def static_kind() -> multiplier.frontend.TokenTreeNodeKind:
+    ...
+
+  @staticmethod
+  def FROM(arg_0: multiplier.frontend.TokenTreeNode) -> Optional[multiplier.frontend.SequenceTokenTreeNode]:
     ...
