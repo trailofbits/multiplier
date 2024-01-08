@@ -475,6 +475,11 @@ TYPE_HASH = """[] (BorrowedPyObject *obj) -> Py_hash_t {
   }"""
 
 
+HASH_CODE_TYPE_HASH = """[] (BorrowedPyObject *obj) -> Py_hash_t {{
+    return static_cast<Py_hash_t>(::mx::hash_code(T_cast(obj)));
+  }}"""
+
+
 RICH_COMPARE = """[] (BorrowedPyObject *a_obj, BorrowedPyObject *b_obj, int op) -> SharedPyObject * {
     do {
       if (Py_EQ != op && Py_NE != op) {
@@ -1360,6 +1365,10 @@ def wrap_class(schema: ClassSchema,
 
   elif _is_mlir_base_class(schema):
     type_hash = IR_TYPE_HASH.format(schema.name.lower())
+
+  elif schema.name == "TokenTreeNode":
+    type_hash = HASH_CODE_TYPE_HASH
+
 
   assert schema.location is not None
   out.append(DISABLE_DIAGNOSTICS)

@@ -63,7 +63,7 @@ class MX_EXPORT TokenTree {
   void dump(std::ostream &os);
 
   // Return the root node of this token tree.
-  inline TokenTreeNode root(void) const noexcept;
+  TokenTreeNode root(void) const noexcept;
 };
 
 enum class TokenTreeNodeKind : int {
@@ -93,31 +93,41 @@ inline static constexpr unsigned NumEnumerators(TokenTreeNodeKind) {
 
 MX_EXPORT const char *EnumeratorName(TokenTreeNodeKind);
 
+uintptr_t hash_code(const TokenTreeNode &ttn) noexcept;
+
 // General node kind in a token tree.
 class MX_EXPORT TokenTreeNode {
  private:
-  TokenTreeNode(void) = delete;
-  TokenTreeNode(const std::shared_ptr<TokenTreeImpl> &impl_);
-
- protected:
   friend class TokenTree;
+  friend class EmptyTokenTreeNode;
+  friend class TokenTokenTreeNode;
+  friend class ChoiceTokenTreeNode;
+  friend class SubstitutionTokenTreeNode;
+  friend class SequenceTokenTreeNode;
 
-  std::shared_ptr<const void> impl;
+  std::shared_ptr<TokenTreeImpl> impl;
+  const void *opaque_node;
 
-  inline TokenTreeNode(const std::shared_ptr<const void> &parent_impl_,
-                       const void *child)
-      : impl(parent_impl_, child) {}
+  TokenTreeNode(void) = delete;
+
+  inline TokenTreeNode(std::shared_ptr<TokenTreeImpl> impl_,
+                       const void *opaque_node_)
+      : impl(std::move(impl_)),
+        opaque_node(opaque_node_) {}
+
  public:
   ~TokenTreeNode(void);
 
   // Return the kind of this token tree node.
   TokenTreeNodeKind kind(void) const noexcept;
-};
 
-// Get the root token tree node.
-TokenTreeNode TokenTree::root(void) const noexcept {
-  return TokenTreeNode(impl);
-}
+  // Comparison against nodes.
+  inline bool operator==(const TokenTreeNode &that) const noexcept {
+    return opaque_node == that.opaque_node;
+  }
+
+  friend uintptr_t hash_code(const TokenTreeNode &ttn) noexcept;
+};
 
 // An empty token tree node.
 class MX_EXPORT EmptyTokenTreeNode final : public TokenTreeNode {
@@ -183,3 +193,11 @@ class MX_EXPORT SequenceTokenTreeNode final : public TokenTreeNode {
 };
 
 }  // namespace mx
+namespace std {
+template <>
+struct std::hash<mx::TokenTreeNode> {
+  inline uintptr_t operator()(const mx::TokenTreeNode &n) const noexcept {
+    return ::mx::hash_code(n);
+  }
+};
+}  // namespace std
