@@ -439,7 +439,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(T::by_id(arg_0.value(), arg_1.value()));
+            return ::mx::to_python(T::by_id(arg_0.value(), std::move(arg_1.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -543,7 +543,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_class_method(arg_0.value()));
+            return ::mx::to_python(obj->nth_class_method(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -565,7 +565,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_class_propertie(arg_0.value()));
+            return ::mx::to_python(obj->nth_class_propertie(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -587,7 +587,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_instance_method(arg_0.value()));
+            return ::mx::to_python(obj->nth_instance_method(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -609,7 +609,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_instance_propertie(arg_0.value()));
+            return ::mx::to_python(obj->nth_instance_propertie(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -631,7 +631,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_method(arg_0.value()));
+            return ::mx::to_python(obj->nth_method(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -653,7 +653,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_propertie(arg_0.value()));
+            return ::mx::to_python(obj->nth_propertie(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)

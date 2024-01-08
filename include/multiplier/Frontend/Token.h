@@ -102,6 +102,9 @@ class MX_EXPORT Token final {
  public:
   Token(void);
 
+  // Try to convert a variant entity into a token.
+  static std::optional<Token> from(const VariantEntity &entity);
+
   inline static constexpr EntityCategory entity_category(void) {
     return EntityCategory::TOKEN;
   }
@@ -158,6 +161,10 @@ class MX_EXPORT Token final {
 
   // The category of this token. This takes into account any related entities.
   TokenCategory category(void) const;
+
+  // Categorize an entity into a token category. This is useful for creating
+  // `UserToken`s.
+  static TokenCategory categorize(const VariantEntity &entity) noexcept;
 
   // Return the line and column number for this token, if any.
   std::optional<std::pair<unsigned, unsigned>> location(

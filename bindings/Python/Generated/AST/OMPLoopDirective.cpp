@@ -829,7 +829,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(T::by_id(arg_0.value(), arg_1.value()));
+            return ::mx::to_python(T::by_id(arg_0.value(), std::move(arg_1.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -933,7 +933,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_counter(arg_0.value()));
+            return ::mx::to_python(obj->nth_counter(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -955,7 +955,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_dependent_counter(arg_0.value()));
+            return ::mx::to_python(obj->nth_dependent_counter(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -977,7 +977,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_dependent_initializer(arg_0.value()));
+            return ::mx::to_python(obj->nth_dependent_initializer(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -999,7 +999,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_final(arg_0.value()));
+            return ::mx::to_python(obj->nth_final(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -1021,7 +1021,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_finals_condition(arg_0.value()));
+            return ::mx::to_python(obj->nth_finals_condition(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -1043,7 +1043,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_initializer(arg_0.value()));
+            return ::mx::to_python(obj->nth_initializer(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -1065,7 +1065,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_private_counter(arg_0.value()));
+            return ::mx::to_python(obj->nth_private_counter(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -1087,7 +1087,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_update(arg_0.value()));
+            return ::mx::to_python(obj->nth_update(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)

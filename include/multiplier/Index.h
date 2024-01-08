@@ -253,8 +253,10 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_REFERENCE_AS,
 }
 #endif  // __CDT_PARSER__
 
+// User-definable token. See `TokenRange::create`.
 class MX_EXPORT UserToken {
  public:
+
   // The kind of this token.
   TokenKind kind{TokenKind::UNKNOWN};
 
@@ -265,6 +267,35 @@ class MX_EXPORT UserToken {
 
   // The entity related to this token.
   VariantEntity related_entity;
+
+  ~UserToken(void) = default;
+  UserToken(void) = default;
+  UserToken(const UserToken &) noexcept = default;
+  UserToken &operator=(const UserToken &) noexcept = default;
+
+  inline UserToken(TokenKind kind_, TokenCategory category_, std::string data_,
+                   VariantEntity related_entity_)
+      : kind(kind_),
+        category(category_),
+        data(std::move(data_)),
+        related_entity(std::move(related_entity_)) {}
+
+  inline UserToken(UserToken &&that) noexcept
+      : kind(that.kind),
+        category(that.category),
+        data(std::move(that.data)),
+        related_entity(std::move(that.related_entity)) {
+    that.related_entity = NotAnEntity{};  // Make sure to reset it.
+  }
+
+  inline UserToken &operator=(UserToken &&that_) noexcept {
+    UserToken that(std::move(that_));
+    kind = that.kind;
+    category = that.category;
+    data.swap(that.data);
+    related_entity.swap(that.related_entity);
+    return *this;
+  }
 };
 
 }  // namespace mx

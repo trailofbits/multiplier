@@ -199,7 +199,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(T::create(arg_0.value()));
+            return ::mx::to_python(T::create(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -225,7 +225,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->slice(arg_0.value(), arg_1.value()));
+            return ::mx::to_python(obj->slice(std::move(arg_0.value()), std::move(arg_1.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)

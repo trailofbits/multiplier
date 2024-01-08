@@ -250,7 +250,7 @@ PyTypeObject *InitType(void) noexcept {
         break;
       }
 
-      obj->data = new (obj->backing_storage) RegexQuery(arg_0.value());
+      obj->data = new (obj->backing_storage) RegexQuery(std::move(arg_0.value()));
       return 0;
     }
 

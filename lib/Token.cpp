@@ -34,11 +34,69 @@ namespace {
 // A zero-sized string view that nontheless has a valid `.data()` pointer.
 static const std::string_view kEmptyStringView("");
 
-}  // namespace
+// A dummy token reader allowing us to categorize a given entity into a token
+// category.
+class CategorizableEntityTokenReader final : public TokenReader {
+ public:
+  const VariantEntity &entity;
 
-class TemplateDecl;
+  virtual ~CategorizableEntityTokenReader(void) noexcept = default;
 
-namespace {
+  inline CategorizableEntityTokenReader(const VariantEntity &entity_)
+      : entity(entity_) {}
+
+  // Return the number of tokens accessible to this reader.
+  EntityOffset NumTokens(void) const override {
+    return 0;
+  }
+
+  TokenKind NthTokenKind(EntityOffset) const override {
+    return TokenKind::UNKNOWN;
+  }
+
+  [[noreturn]]
+  std::string_view NthTokenData(EntityOffset) const override {
+    __builtin_unreachable();
+  }
+
+  [[noreturn]]
+  EntityId NthDerivedTokenId(EntityOffset) const override {
+    __builtin_unreachable();
+  }
+
+  [[noreturn]]
+  EntityId NthParsedTokenId(EntityOffset) const override {
+    __builtin_unreachable();
+  }
+
+  [[noreturn]]
+  EntityId NthContainingMacroId(EntityOffset) const override {
+    __builtin_unreachable();
+  }
+
+  EntityId NthRelatedEntityId(EntityOffset) const override {
+    return EntityId(entity);
+  }
+
+  VariantEntity NthRelatedEntity(EntityOffset) const override {
+    return entity;
+  }
+
+  [[noreturn]]
+  EntityId NthTokenId(EntityOffset) const override {
+    __builtin_unreachable();
+  }
+
+  [[noreturn]]
+  EntityId NthFileTokenId(EntityOffset) const override {
+    __builtin_unreachable();
+  }
+
+  [[noreturn]]
+  bool Equals(const TokenReader *) const override {
+    __builtin_unreachable();
+  }
+};
 
 static const std::shared_ptr<InvalidTokenReader> kInvalidTokenReader =
     std::make_shared<InvalidTokenReader>();
@@ -1098,6 +1156,10 @@ void CustomTokenReader::Append(TokenImplPtr tr, EntityOffset to) noexcept {
 
 // Append a simple token into this reader.
 void CustomTokenReader::Append(UserToken stok) noexcept {
+  if (stok.data.empty()) {
+    return;
+  }
+
   data.insert(data.end(), stok.data.begin(), stok.data.end());
   data_offset.push_back(static_cast<EntityOffset>(data.size()));
 
@@ -1177,8 +1239,8 @@ EntityId CustomTokenReader::NthContainingMacroId(EntityOffset to) const {
 
 // Return an entity id associated with the Nth token.
 EntityId CustomTokenReader::NthRelatedEntityId(EntityOffset to) const {
-  if (to < related_entity_ids.size()) {
-    return EntityId(related_entity_ids[to]);
+  if (to < related_entities.size()) {
+    return EntityId(related_entities[to]);
   }
   return kInvalidEntityId;
 }
@@ -1228,6 +1290,15 @@ const FragmentImpl *CustomTokenReader::OwningFragment(void) const noexcept {
 Token::Token(void)
     : impl(kInvalidTokenReader),
       offset(0) {}
+
+// Try to convert a variant entity into a token.
+std::optional<Token> Token::from(const VariantEntity &entity) {
+  if (!std::holds_alternative<Token>(entity)) {
+    return std::nullopt;
+  }
+
+  return std::get<Token>(entity);
+}
 
 // Return `true` if this is a valid token.
 Token::operator bool(void) const {
@@ -1322,6 +1393,13 @@ Token Token::nearest_file_token(void) const {
 // The category of this token. This takes into account any related entities.
 TokenCategory Token::category(void) const {
   return impl->NthTokenCategory(offset);
+}
+
+// Categorize an entity into a token category. This is useful for creating
+// `UserToken`s.
+TokenCategory Token::categorize(const VariantEntity &entity) noexcept {
+  CategorizableEntityTokenReader reader(entity);
+  return reader.NthTokenCategory(0);
 }
 
 // The macro that immediately contains this token, if any.

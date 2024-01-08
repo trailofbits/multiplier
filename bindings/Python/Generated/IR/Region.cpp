@@ -219,7 +219,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_block(arg_0.value()));
+            return ::mx::to_python(obj->nth_block(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
@@ -241,7 +241,7 @@ static PyMethodDef gMethods[] = {
               break;
             }
 
-            return ::mx::to_python(obj->nth_entry_block_argument(arg_0.value()));
+            return ::mx::to_python(obj->nth_entry_block_argument(std::move(arg_0.value())));
           }
 
           PyErrorStreamer(PyExc_TypeError)
