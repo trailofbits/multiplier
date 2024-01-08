@@ -179,7 +179,7 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
   tp->tp_hash = [] (BorrowedPyObject *obj) -> Py_hash_t {{
-    return static_cast<Py_hash_t>(::mx::hash_code(T_cast(obj)));
+    return static_cast<Py_hash_t>(::mx::hash_code(*T_cast(obj)));
   }};
   tp->tp_richcompare = [] (BorrowedPyObject *a_obj, BorrowedPyObject *b_obj, int op) -> SharedPyObject * {
     do {

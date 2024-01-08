@@ -476,7 +476,7 @@ TYPE_HASH = """[] (BorrowedPyObject *obj) -> Py_hash_t {
 
 
 HASH_CODE_TYPE_HASH = """[] (BorrowedPyObject *obj) -> Py_hash_t {{
-    return static_cast<Py_hash_t>(::mx::hash_code(T_cast(obj)));
+    return static_cast<Py_hash_t>(::mx::hash_code(*T_cast(obj)));
   }}"""
 
 
