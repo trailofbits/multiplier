@@ -2133,6 +2133,27 @@ TokenTree TokenTree::from(const Fragment &frag) {
   return TokenTree(frag.impl->cached_token_tree.Put(std::move(self)));
 }
 
+// Create a "flat" token tree for a token range.
+TokenTree TokenTree::from(const TokenRange &range) {
+  if (!range) {
+    return TokenTree();
+  }
+
+  auto self = std::make_shared<TokenTreeImpl>();
+  self->readers.emplace_back(range.impl);
+  self->readers.emplace_back(kWhitespaceReader);
+  self->root = self->CreateFileNode(file);
+
+  TokenTreeImpl::SequenceNode *seq = nullptr;
+  for (auto tok : range) {
+    auto ti = impl->GetOrCreateIndex(tok);
+    seq = impl->AddTokenToSequence(seq, GetOrCreateIndex(tok));
+  }
+
+  self->root = seq;
+  return TokenTree(std::move(self));
+}
+
 namespace {
 
 // Used for invalid tokens.
@@ -2453,17 +2474,6 @@ static void StreamTokData(std::ostream &os, std::string_view tok) {
 }
 
 }  // namespace
-
-// Try to get the token tree containing a token range.
-std::optional<TokenTree> TokenTree::from(const TokenRange &range) {
-  if (auto reader = range.impl.get()) {
-    if (auto ttr = dynamic_cast<const TokenTreeReader *>(reader)) {
-      return TokenTree(ttr->impl);
-    }
-  }
-
-  return std::nullopt;
-}
 
 // Serialize the token tree into a linear range.
 TokenRange TokenTree::serialize(const TokenTreeVisitor &vis) const {

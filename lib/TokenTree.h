@@ -123,8 +123,8 @@ class TokenTreeImpl {
       const TrailingTokens &trailing_toks);
 
   SequenceNode *ExtendWithSubstitution(
-        SequenceNode *seq, const MacroSubstitution &macro,
-        const Bounds &bounds, const TrailingTokens &trailing_toks);
+      SequenceNode *seq, const MacroSubstitution &macro,
+      const Bounds &bounds, const TrailingTokens &trailing_toks);
 
   SequenceNode *ExtendWithExpansion(
       SequenceNode *seq, const MacroExpansion &macro,

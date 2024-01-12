@@ -52,9 +52,7 @@ class MX_EXPORT TokenTree {
 
   static TokenTree from(const File &);
   static TokenTree from(const Fragment &);
-
-  // Try to get the token tree containing a token range.
-  static std::optional<TokenTree> from(const TokenRange &);
+  static TokenTree from(const TokenRange &);
 
   // Serialize the token tree into a linear range.
   TokenRange serialize(const TokenTreeVisitor &vis=TokenTreeVisitor()) const;
