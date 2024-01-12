@@ -2147,7 +2147,6 @@ TokenTree TokenTree::from(const TokenRange &range) {
   auto self = std::make_shared<TokenTreeImpl>();
   self->readers.emplace_back(range.impl);
   self->readers.emplace_back(kWhitespaceReader);
-  self->root = self->CreateFileNode(file);
 
   TokenTreeImpl::SequenceNode *seq = nullptr;
   for (auto tok : range) {
