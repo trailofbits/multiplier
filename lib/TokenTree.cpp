@@ -2092,6 +2092,11 @@ static constexpr EntityOffset kWhitespaceReaderIndex = 1u;
 TokenTree::TokenTree(void)
     : TokenTree(kInvalidTree) {}
 
+// Returns `false` if this is an empty, default-initialized token tree.
+TokenTree::operator bool(void) const noexcept {
+  return impl != kInvalidTree;
+}
+
 TokenTree TokenTree::from(const File &file) {
   auto self = file.impl->cached_token_tree.Get();
   if (self) {
@@ -2146,8 +2151,7 @@ TokenTree TokenTree::from(const TokenRange &range) {
 
   TokenTreeImpl::SequenceNode *seq = nullptr;
   for (auto tok : range) {
-    auto ti = impl->GetOrCreateIndex(tok);
-    seq = impl->AddTokenToSequence(seq, GetOrCreateIndex(tok));
+    seq = self->AddTokenToSequence(seq, self->GetOrCreateIndex(tok));
   }
 
   self->root = seq;
@@ -2604,19 +2608,19 @@ const char *EnumeratorName(TokenTreeNodeKind kind) {
   }
 }
 
-#define MX_MAKE_TT_FROM(class_, kind_) \
+#define MX_MAKE_TT_FROM(class_) \
     std::optional<class_> class_::from(const TokenTreeNode &that) { \
-      if (that.kind() == TokenTreeNodeKind::kind_) { \
+      if (that.kind() == class_::static_kind()) { \
         return reinterpret_cast<const class_ &>(that); \
       } \
       return std::nullopt; \
     }
 
-MX_MAKE_TT_FROM(EmptyTokenTreeNode, EMPTY)
-MX_MAKE_TT_FROM(TokenTokenTreeNode, TOKEN)
-MX_MAKE_TT_FROM(ChoiceTokenTreeNode, CHOICE)
-MX_MAKE_TT_FROM(SubstitutionTokenTreeNode, SUBSTITUTION)
-MX_MAKE_TT_FROM(SequenceTokenTreeNode, SEQUENCE)
+MX_MAKE_TT_FROM(EmptyTokenTreeNode)
+MX_MAKE_TT_FROM(TokenTokenTreeNode)
+MX_MAKE_TT_FROM(ChoiceTokenTreeNode)
+MX_MAKE_TT_FROM(SubstitutionTokenTreeNode)
+MX_MAKE_TT_FROM(SequenceTokenTreeNode)
 
 #undef MX_MAKE_TT_FROM
 

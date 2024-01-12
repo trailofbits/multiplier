@@ -62,6 +62,9 @@ class MX_EXPORT TokenTree {
 
   // Return the root node of this token tree.
   TokenTreeNode root(void) const noexcept;
+
+  // Returns `false` if this is an empty, default-initialized token tree.
+  operator bool(void) const noexcept;
 };
 
 enum class TokenTreeNodeKind : int {
