@@ -50,6 +50,9 @@ const char *EnumeratorName(TokenCategory e) {
     case TokenCategory::FILE_NAME: return "FILE_NAME";
     case TokenCategory::LINE_NUMBER: return "LINE_NUMBER";
     case TokenCategory::COLUMN_NUMBER: return "COLUMN_NUMBER";
+    case TokenCategory::INFORMATION: return "INFORMATION";
+    case TokenCategory::WARNING: return "WARNING";
+    case TokenCategory::ERROR: return "ERROR";
     default: return "<invalid>";
   }
 }

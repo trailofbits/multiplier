@@ -8185,6 +8185,9 @@ TokenCategory FromPasta(pasta::TokenCategory e) {
     case 33: return TokenCategory::FILE_NAME;
     case 34: return TokenCategory::LINE_NUMBER;
     case 35: return TokenCategory::COLUMN_NUMBER;
+    case 36: return TokenCategory::INFORMATION;
+    case 37: return TokenCategory::WARNING;
+    case 38: return TokenCategory::ERROR;
     default: __builtin_unreachable();
   }
 }

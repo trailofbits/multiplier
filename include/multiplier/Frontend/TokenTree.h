@@ -117,7 +117,7 @@ class MX_EXPORT TokenTreeNode {
         opaque_node(opaque_node_) {}
 
  public:
-  ~TokenTreeNode(void);
+  ~TokenTreeNode(void) = default;
 
   // Return the kind of this token tree node.
   TokenTreeNodeKind kind(void) const noexcept;

@@ -2632,7 +2632,15 @@ TokenTreeNode TokenTree::root(void) const noexcept {
   return TokenTreeNode(impl, &(impl->root));
 }
 
-TokenTreeNode::~TokenTreeNode(void) {}
+namespace {
+
+template <typename T>
+static const T *TryExtract(const void *opaque_node) {
+  auto node = reinterpret_cast<const TokenTreeImpl::Node *>(opaque_node);
+  return node ? std::get_if<T>(node) : nullptr;
+}
+
+}  // namespace
 
 // Return the kind of this token tree node.
 TokenTreeNodeKind TokenTreeNode::kind(void) const noexcept {
@@ -2641,70 +2649,54 @@ TokenTreeNodeKind TokenTreeNode::kind(void) const noexcept {
 }
 
 Token TokenTokenTreeNode::token(void) const noexcept {
-  auto node = reinterpret_cast<const TokenTreeImpl::Node *>(opaque_node);
-  auto index = std::get_if<TokenTreeImpl::TokenIndex>(node);
+  auto index = TryExtract<TokenTreeImpl::TokenIndex>(opaque_node);
   auto [ri, to] = *index;
   return Token(impl->readers[ri], to);
 }
 
 gap::generator<std::pair<Fragment, TokenTreeNode>>
 ChoiceTokenTreeNode::children(void) const & noexcept {
-  auto node = reinterpret_cast<const TokenTreeImpl::Node *>(opaque_node);
-  if (!node) {
-    assert(false);
-    co_return;
-  }
-
-  auto choice_ptr = std::get_if<TokenTreeImpl::ChoiceNode *>(node);
+  auto choice_ptr = TryExtract<TokenTreeImpl::ChoiceNode *>(opaque_node);
   if (!choice_ptr) {
     assert(false);
     co_return;
   }
 
-  auto num_children = (*choice_ptr)->children.size();
+  const auto &choice = **choice_ptr;
+  auto num_children = choice.children.size();
   for (auto i = 0ull; i < num_children; ++i) {
-    auto child = &((*choice_ptr)->children[i]);
-    co_yield {(*choice_ptr)->fragments[i], TokenTreeNode(impl, child)};
+    auto child = &(choice.children[i]);
+    co_yield {choice.fragments[i], TokenTreeNode(impl, child)};
   }
 }
 
 std::variant<MacroSubstitution, MacroVAOpt>
 SubstitutionTokenTreeNode::macro(void) const noexcept {
-  auto node = reinterpret_cast<const TokenTreeImpl::Node *>(opaque_node);
-  auto sub_ptr = std::get_if<TokenTreeImpl::SubstitutionNode *>(node);
+  auto sub_ptr = TryExtract<TokenTreeImpl::SubstitutionNode *>(opaque_node);
   return (*sub_ptr)->macro;
 }
 
 TokenTreeNode SubstitutionTokenTreeNode::before(void) const noexcept {
-  auto node = reinterpret_cast<const TokenTreeImpl::Node *>(opaque_node);
-  auto sub_ptr = std::get_if<TokenTreeImpl::SubstitutionNode *>(node);
+  auto sub_ptr = TryExtract<TokenTreeImpl::SubstitutionNode *>(opaque_node);
   return TokenTreeNode(impl, &((*sub_ptr)->before));
 }
 
 TokenTreeNode SubstitutionTokenTreeNode::after(void) const noexcept {
-  auto node = reinterpret_cast<const TokenTreeImpl::Node *>(opaque_node);
-  auto sub_ptr = std::get_if<TokenTreeImpl::SubstitutionNode *>(node);
+  auto sub_ptr = TryExtract<TokenTreeImpl::SubstitutionNode *>(opaque_node);
   return TokenTreeNode(impl, &((*sub_ptr)->after));
 }
 
 gap::generator<TokenTreeNode>
 SequenceTokenTreeNode::children(void) const & noexcept {
-  auto node = reinterpret_cast<const TokenTreeImpl::Node *>(opaque_node);
-  if (!node) {
-    assert(false);
-    co_return;
-  }
-
-  auto seq_ptr = std::get_if<TokenTreeImpl::SequenceNode *>(node);
+  auto seq_ptr = TryExtract<TokenTreeImpl::SequenceNode *>(opaque_node);
   if (!seq_ptr) {
     assert(false);
     co_return;
   }
 
-  auto it = (*seq_ptr)->children.begin();
-  auto end = (*seq_ptr)->children.end();
-  for (; it != end; ++it) {
-    co_yield TokenTreeNode(impl, &*it);
+  const auto &seq = **seq_ptr;
+  for (const auto &child_node : seq.children) {
+    co_yield TokenTreeNode(impl, &child_node);
   }
 }
 

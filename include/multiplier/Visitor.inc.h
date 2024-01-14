@@ -6688,6 +6688,9 @@ MX_BEGIN_ENUM_CLASS(TokenCategory, unsigned char)
   MX_ENUM_CLASS_ENTRY(TokenCategory, FILE_NAME, unsigned char)
   MX_ENUM_CLASS_ENTRY(TokenCategory, LINE_NUMBER, unsigned char)
   MX_ENUM_CLASS_ENTRY(TokenCategory, COLUMN_NUMBER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TokenCategory, INFORMATION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TokenCategory, WARNING, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TokenCategory, ERROR, unsigned char)
 MX_END_ENUM_CLASS(TokenCategory)
 
 #ifndef MX_ENTER_VISIT_Designator
