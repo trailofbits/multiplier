@@ -89,31 +89,31 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       tp = gType;
       break;
 
-    case mx::MacroVAOptArgument::static_kind():
+    case mx::MacroSubstitution::static_kind():
       tp = &(gTypes[807]);
       break;
 
-    case mx::MacroVAOpt::static_kind():
+    case mx::MacroConcatenate::static_kind():
       tp = &(gTypes[808]);
       break;
 
-    case mx::MacroSubstitution::static_kind():
+    case mx::MacroStringify::static_kind():
       tp = &(gTypes[809]);
       break;
 
-    case mx::MacroConcatenate::static_kind():
+    case mx::MacroExpansion::static_kind():
       tp = &(gTypes[810]);
       break;
 
-    case mx::MacroStringify::static_kind():
+    case mx::MacroParameterSubstitution::static_kind():
       tp = &(gTypes[811]);
       break;
 
-    case mx::MacroExpansion::static_kind():
+    case mx::MacroVAOpt::static_kind():
       tp = &(gTypes[812]);
       break;
 
-    case mx::MacroParameterSubstitution::static_kind():
+    case mx::MacroVAOptArgument::static_kind():
       tp = &(gTypes[813]);
       break;
 

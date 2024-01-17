@@ -50,6 +50,9 @@ enum class TokenCategory : unsigned char {
   FILE_NAME,
   LINE_NUMBER,
   COLUMN_NUMBER,
+  INFORMATION,
+  WARNING,
+  ERROR,
 };
 
 inline static const char *EnumerationName(TokenCategory) {
@@ -57,7 +60,7 @@ inline static const char *EnumerationName(TokenCategory) {
 }
 
 inline static constexpr unsigned NumEnumerators(TokenCategory) {
-  return 36;
+  return 39;
 }
 
 MX_EXPORT const char *EnumeratorName(TokenCategory);

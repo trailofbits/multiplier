@@ -2092,6 +2092,11 @@ static constexpr EntityOffset kWhitespaceReaderIndex = 1u;
 TokenTree::TokenTree(void)
     : TokenTree(kInvalidTree) {}
 
+// Returns `false` if this is an empty, default-initialized token tree.
+TokenTree::operator bool(void) const noexcept {
+  return impl != kInvalidTree;
+}
+
 TokenTree TokenTree::from(const File &file) {
   auto self = file.impl->cached_token_tree.Get();
   if (self) {
@@ -2131,6 +2136,25 @@ TokenTree TokenTree::from(const Fragment &frag) {
   self->root = self->CreateFragmentNode(frag, frag_bounds);
 
   return TokenTree(frag.impl->cached_token_tree.Put(std::move(self)));
+}
+
+// Create a "flat" token tree for a token range.
+TokenTree TokenTree::from(const TokenRange &range) {
+  if (!range) {
+    return TokenTree();
+  }
+
+  auto self = std::make_shared<TokenTreeImpl>();
+  self->readers.emplace_back(range.impl);
+  self->readers.emplace_back(kWhitespaceReader);
+
+  TokenTreeImpl::SequenceNode *seq = nullptr;
+  for (auto tok : range) {
+    seq = self->AddTokenToSequence(seq, self->GetOrCreateIndex(tok));
+  }
+
+  self->root = seq;
+  return TokenTree(std::move(self));
 }
 
 namespace {
@@ -2454,17 +2478,6 @@ static void StreamTokData(std::ostream &os, std::string_view tok) {
 
 }  // namespace
 
-// Try to get the token tree containing a token range.
-std::optional<TokenTree> TokenTree::from(const TokenRange &range) {
-  if (auto reader = range.impl.get()) {
-    if (auto ttr = dynamic_cast<const TokenTreeReader *>(reader)) {
-      return TokenTree(ttr->impl);
-    }
-  }
-
-  return std::nullopt;
-}
-
 // Serialize the token tree into a linear range.
 TokenRange TokenTree::serialize(const TokenTreeVisitor &vis) const {
   auto reader = std::make_shared<TokenTreeReader>(impl);
@@ -2581,6 +2594,110 @@ void TokenTree::dump(std::ostream &os) {
   }
 
   os << "}\n";
+}
+
+const char *EnumeratorName(TokenTreeNodeKind kind) {
+  switch (kind) {
+    case TokenTreeNodeKind::EMPTY: return "EMPTY";
+    case TokenTreeNodeKind::TOKEN: return "TOKEN";
+    case TokenTreeNodeKind::CHOICE: return "CHOICE";
+    case TokenTreeNodeKind::SUBSTITUTION: return "SUBSTITUTION";
+    case TokenTreeNodeKind::SEQUENCE: return "SEQUENCE";
+    default: return "<invalid>";
+  }
+}
+
+#define MX_MAKE_TT_FROM(class_) \
+    std::optional<class_> class_::from(const TokenTreeNode &that) { \
+      if (that.kind() == class_::static_kind()) { \
+        return reinterpret_cast<const class_ &>(that); \
+      } \
+      return std::nullopt; \
+    }
+
+MX_MAKE_TT_FROM(EmptyTokenTreeNode)
+MX_MAKE_TT_FROM(TokenTokenTreeNode)
+MX_MAKE_TT_FROM(ChoiceTokenTreeNode)
+MX_MAKE_TT_FROM(SubstitutionTokenTreeNode)
+MX_MAKE_TT_FROM(SequenceTokenTreeNode)
+
+#undef MX_MAKE_TT_FROM
+
+uintptr_t hash_code(const TokenTreeNode &ttn) noexcept {
+  return reinterpret_cast<uintptr_t>(ttn.opaque_node);
+}
+
+// Get the root token tree node.
+TokenTreeNode TokenTree::root(void) const noexcept {
+  return TokenTreeNode(impl, &(impl->root));
+}
+
+namespace {
+
+template <typename T>
+static const T *TryExtract(const void *opaque_node) {
+  auto node = reinterpret_cast<const TokenTreeImpl::Node *>(opaque_node);
+  return node ? std::get_if<T>(node) : nullptr;
+}
+
+}  // namespace
+
+// Return the kind of this token tree node.
+TokenTreeNodeKind TokenTreeNode::kind(void) const noexcept {
+  auto node = reinterpret_cast<const TokenTreeImpl::Node *>(opaque_node);
+  return static_cast<TokenTreeNodeKind>(node->index());
+}
+
+Token TokenTokenTreeNode::token(void) const noexcept {
+  auto index = TryExtract<TokenTreeImpl::TokenIndex>(opaque_node);
+  auto [ri, to] = *index;
+  return Token(impl->readers[ri], to);
+}
+
+gap::generator<std::pair<Fragment, TokenTreeNode>>
+ChoiceTokenTreeNode::children(void) const & noexcept {
+  auto choice_ptr = TryExtract<TokenTreeImpl::ChoiceNode *>(opaque_node);
+  if (!choice_ptr) {
+    assert(false);
+    co_return;
+  }
+
+  const auto &choice = **choice_ptr;
+  auto num_children = choice.children.size();
+  for (auto i = 0ull; i < num_children; ++i) {
+    auto child = &(choice.children[i]);
+    co_yield {choice.fragments[i], TokenTreeNode(impl, child)};
+  }
+}
+
+std::variant<MacroSubstitution, MacroVAOpt>
+SubstitutionTokenTreeNode::macro(void) const noexcept {
+  auto sub_ptr = TryExtract<TokenTreeImpl::SubstitutionNode *>(opaque_node);
+  return (*sub_ptr)->macro;
+}
+
+TokenTreeNode SubstitutionTokenTreeNode::before(void) const noexcept {
+  auto sub_ptr = TryExtract<TokenTreeImpl::SubstitutionNode *>(opaque_node);
+  return TokenTreeNode(impl, &((*sub_ptr)->before));
+}
+
+TokenTreeNode SubstitutionTokenTreeNode::after(void) const noexcept {
+  auto sub_ptr = TryExtract<TokenTreeImpl::SubstitutionNode *>(opaque_node);
+  return TokenTreeNode(impl, &((*sub_ptr)->after));
+}
+
+gap::generator<TokenTreeNode>
+SequenceTokenTreeNode::children(void) const & noexcept {
+  auto seq_ptr = TryExtract<TokenTreeImpl::SequenceNode *>(opaque_node);
+  if (!seq_ptr) {
+    assert(false);
+    co_return;
+  }
+
+  const auto &seq = **seq_ptr;
+  for (const auto &child_node : seq.children) {
+    co_yield TokenTreeNode(impl, &child_node);
+  }
 }
 
 }  // namespace mx
