@@ -84,7 +84,7 @@ include("cmake/vast.cmake")
 
 if(MX_ENABLE_PYTHON_BINDINGS)
   find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed)
-endif()
+endif(MX_ENABLE_PYTHON_BINDINGS)
 
 if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
   export(PACKAGE "${PROJECT_NAME}")
@@ -112,7 +112,7 @@ if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
     NAMESPACE
       "${PROJECT_NAME}::"
   )
-endif(MX_ENABLE_INSTALL)
+endif()
 
 # The remaining arguments to `mx-bootstrap` are the paths to the files that will
 # be generated based on analyzing the types/classes in the `pasta` namespace.

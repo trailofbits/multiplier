@@ -352,4 +352,4 @@ if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
       DESTINATION
         "${MX_INSTALL_INCLUDE_DIR}/${lower_project_name}"
   )
-endif(MX_ENABLE_INSTALL)
+endif()
