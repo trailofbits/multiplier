@@ -68,7 +68,7 @@ build-multiplier: install-pasta
     -DMLIR_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/llvm \
     -Dpasta_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/pasta \
     -DMX_USE_VENDORED_CLANG=OFF \
-    -DMX_USE_VENDORED_PASTA=OFF \
+    -DMX_USE_VENDORED_PASTA=OFF && \
   cmake --build builds/multiplier
 
 install-multiplier: build-multiplier
