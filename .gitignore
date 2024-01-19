@@ -570,3 +570,6 @@ MigrationBackup/
 # End of https://www.toptal.com/developers/gitignore/api/eclipse,clion,vs,c++,python
 
 compile_commands.json
+
+builds/
+install/
