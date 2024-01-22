@@ -25,7 +25,7 @@ endif()
 list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 
 include("cmake/system.cmake")
-include("cmake/llvm.cmake")
+#include("cmake/llvm.cmake")
 include("cmake/linker.cmake")
 include("cmake/git.cmake")
 

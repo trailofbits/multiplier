@@ -1,0 +1,10 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+    "name": "llvm",
+    "version": "17.0.4",
+    "dependencies": [
+        "zstd",
+        "vcpkg-cmake",
+        "vcpkg-cmake-config"
+    ]
+}
