@@ -18,3 +18,5 @@ vcpkg_cmake_configure(
 )
 
 vcpkg_cmake_install()
+vcpkg_cmake_config_fixup()
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")
