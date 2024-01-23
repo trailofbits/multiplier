@@ -58,42 +58,32 @@ jobs:
       - name: Set up variables
         run: |
           echo "RELEASE_DIR=${RUNNER_TEMP}/release" >> $GITHUB_ENV
-          echo "LLVM_PREFIX_DIR=${RUNNER_TEMP}/llvm" >> $GITHUB_ENV
           echo "VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
           echo "ARTIFACT_NAME=multiplier-$(git rev-parse --short=7 HEAD).tar.xz" >> $GITHUB_ENV
 
-      - name: Install llvm-pasta
+      - name: Setup vcpkg
         run: |
-          mkdir -p ${RELEASE_DIR}
-          mkdir -p ${LLVM_PREFIX_DIR}
-          gh release download ${LLVM_PASTA_VER} --repo trail-of-forks/llvm-project --pattern 'llvm-*'
-          tar -xvJf llvm-pasta-*.tar.xz -C ${LLVM_PREFIX_DIR}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git clone https://github.com/microsoft/vcpkg $HOME/vcpkg
+          $HOME/vcpkg/bootstrap-vcpkg.sh
 
       - name: Build
         run: |
-
           CXXFLAGS="-g0" \
           CCFLAGS="-g0" \
           cmake \
+            --toolchain "$HOME/vcpkg/scripts/buildsystems/vcpkg.cmake" \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX=${RELEASE_DIR} \
             -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
             -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
             -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
             -DCMAKE_C_COMPILER="$(which clang-${LLVM_VER})" \
             -DCMAKE_CXX_COMPILER=$(which clang++-${LLVM_VER}) \
-            -DClang_DIR=${LLVM_PREFIX_DIR}/lib/cmake/clang \
-            -DLLVM_DIR=${LLVM_PREFIX_DIR}/lib/cmake/llvm \
-            -DMLIR_DIR=${LLVM_PREFIX_DIR}/lib/cmake/mlir \
-            -DMX_USE_VENDORED_CLANG=OFF \
-            -DMX_USE_VENDORED_PASTA=OFF \
-            -DLLVM_ENABLE_LLD:BOOL=TRUE \
             -GNinja \
-            ./
+            -S . \
+            -B build
 
-          ninja install
+          cmake --build build
+          cmake --install build --prefix ${RELEASE_DIR}
 
       # Release on merge to main
       - name: Package Release
