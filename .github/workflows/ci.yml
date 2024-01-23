@@ -15,11 +15,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LLVM_PASTA_VER: ba5b66d
   LLVM_VER: 17
   PYTHON_VER: 3.11
   VCPKG_BINARY_SOURCES: clear;files,/root/vcpkg-binary-cache,readwrite
-  VCPKG_DEFAULT_TRIPLET: x64-linux-rel
 
 jobs:
   build:
@@ -81,6 +79,7 @@ jobs:
           CXXFLAGS="-g0" \
           CCFLAGS="-g0" \
           cmake \
+            -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
             --toolchain "$HOME/vcpkg/scripts/buildsystems/vcpkg.cmake" \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
