@@ -18,6 +18,7 @@ env:
   LLVM_PASTA_VER: ba5b66d
   LLVM_VER: 17
   PYTHON_VER: 3.11
+  VCPKG_BINARY_SOURCES: clear;files,/root/vcpkg-binary-cache,readwrite
 
 jobs:
   build:
@@ -63,6 +64,7 @@ jobs:
 
       - name: Setup vcpkg
         run: |
+          mkdir -p /root/vcpkg-binary-cache
           git clone https://github.com/microsoft/vcpkg $HOME/vcpkg
           $HOME/vcpkg/bootstrap-vcpkg.sh
 
@@ -84,6 +86,13 @@ jobs:
 
           cmake --build build
           cmake --install build --prefix ${RELEASE_DIR}
+
+      - name: Cache vcpkg binaries
+        id: cache-vcpkg
+        uses: actions/cache@v4
+        with:
+          path: /root/vcpkg-binary-cache
+          key: ${{ runner.os }}-vcpkg-binaries
 
       # Release on merge to main
       - name: Package Release
