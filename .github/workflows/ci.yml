@@ -19,6 +19,7 @@ env:
   LLVM_VER: 17
   PYTHON_VER: 3.11
   VCPKG_BINARY_SOURCES: clear;files,/root/vcpkg-binary-cache,readwrite
+  VCPKG_DEFAULT_TRIPLET: x64-linux-rel
 
 jobs:
   build:
