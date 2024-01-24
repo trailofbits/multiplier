@@ -3,6 +3,7 @@
     "name": "multiplier",
     "version": "0.1.0",
     "dependencies": [
+        "gap",
         "capnproto",
         "gflags",
         "glog",

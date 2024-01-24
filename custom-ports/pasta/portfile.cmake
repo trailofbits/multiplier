@@ -19,5 +19,8 @@ vcpkg_cmake_configure(
 )
 
 vcpkg_cmake_install()
-vcpkg_cmake_config_fixup()
+vcpkg_cmake_config_fixup(
+    PACKAGE_NAME "pasta"
+    CONFIG_PATH lib/cmake/pasta
+)
 vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")

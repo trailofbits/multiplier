@@ -25,6 +25,3 @@ vcpkg_cmake_config_fixup(
 vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")
 
 file( REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug" )
-
-# we do not populate lib folder yet
-file( REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/lib" )
