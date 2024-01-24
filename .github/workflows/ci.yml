@@ -60,6 +60,8 @@ jobs:
           echo "RELEASE_DIR=${RUNNER_TEMP}/release" >> $GITHUB_ENV
           echo "VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
           echo "ARTIFACT_NAME=multiplier-$(git rev-parse --short=7 HEAD).tar.xz" >> $GITHUB_ENV
+          echo "CC=$(which clang-17)" >> $GITHUB_ENV
+          echo "CXX=$(which clang++-17)" >> $GITHUB_ENV
 
       - name: Setup vcpkg
         run: |
@@ -85,8 +87,6 @@ jobs:
             -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
             -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
             -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
-            -DCMAKE_C_COMPILER="$(which clang-${LLVM_VER})" \
-            -DCMAKE_CXX_COMPILER=$(which clang++-${LLVM_VER}) \
             -GNinja \
             -S . \
             -B build
