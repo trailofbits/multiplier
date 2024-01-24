@@ -281,6 +281,7 @@ BuildCommandAction::GetCompilerInfo(void) {
         if (arg_str.ends_with(".cc") ||
             arg_str.ends_with(".cpp") ||
             arg_str.ends_with(".cxx") ||
+            arg_str.ends_with(".hh") ||
             arg_str.ends_with(".hpp")) {
           inferred_lang = "c++";
 
@@ -487,14 +488,15 @@ bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) const {
       continue;
     }
 
-    if (arg == "c" || arg == "c-header" || (arg == "c++" && cxx_support)) {
+    if (arg == "c" || arg == "c-header" ||
+        (cxx_support && (arg == "c++" || arg == "c++-header"))) {
 
     } else {
       LOG(ERROR) << "Skipping compile job due to unsupported language "
                  << arg << ": " << args.Join();
       return false;
     }
-    
+
     return true;
   }
 
