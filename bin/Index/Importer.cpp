@@ -487,7 +487,7 @@ bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) const {
       continue;
     }
 
-    if (arg == "c" || (arg == "c++" && cxx_support)) {
+    if (arg == "c" || arg == "c-header" || (arg == "c++" && cxx_support)) {
 
     } else {
       LOG(ERROR) << "Skipping compile job due to unsupported language "
