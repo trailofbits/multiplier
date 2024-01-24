@@ -24,7 +24,6 @@
         },
         "llvm",
         "pasta",
-        "vast",
         {
             "name": "abseil",
             "features": [
