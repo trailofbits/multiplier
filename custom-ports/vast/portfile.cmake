@@ -16,5 +16,8 @@ vcpkg_cmake_configure(
 )
 
 vcpkg_cmake_install()
-vcpkg_cmake_config_fixup()
+vcpkg_cmake_config_fixup(
+    PACKAGE_NAME "VAST"
+    CONFIG_PATH lib/cmake/VAST
+)
 vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")
