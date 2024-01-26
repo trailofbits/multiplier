@@ -60,8 +60,10 @@ jobs:
           echo "RELEASE_DIR=${RUNNER_TEMP}/release" >> $GITHUB_ENV
           echo "VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
           echo "ARTIFACT_NAME=multiplier-$(git rev-parse --short=7 HEAD).tar.xz" >> $GITHUB_ENV
-          echo "CC=$(which clang-17)" >> $GITHUB_ENV
-          echo "CXX=$(which clang++-17)" >> $GITHUB_ENV
+          echo "CC=$(which clang-$LLVM_VER)" >> $GITHUB_ENV
+          echo "CXX=$(which clang++-$LLVM_VER)" >> $GITHUB_ENV
+          echo "CFLAGS=-g0 --ld-path=$(which ld.lld-$LLVM_VER) -flto" >> $GITHUB_ENV
+          echo "CXXFLAGS=-g0 --ld-path=$(which ld.lld-$LLVM_VER) -flto" >> $GITHUB_ENV
 
       - name: Setup vcpkg
         run: |
@@ -78,15 +80,10 @@ jobs:
 
       - name: Build
         run: |
-          CXXFLAGS="-g0" \
-          CCFLAGS="-g0" \
           cmake \
             -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
             --toolchain "$HOME/vcpkg/scripts/buildsystems/vcpkg.cmake" \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
-            -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
-            -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-${LLVM_VER})" \
             -GNinja \
             -S . \
             -B build
