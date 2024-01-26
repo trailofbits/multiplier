@@ -11,4 +11,5 @@ set(VAST_LIBS
   VAST::VASTAliasTypeInterface
   VAST::VASTElementTypeInterface
   VAST::VASTCodeGen
+  VAST::VASTFrontend
 )
