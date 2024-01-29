@@ -76,7 +76,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /root/vcpkg-binary-cache
-          key: ${{ runner.os }}-vcpkg-binaries
+          key: ${{ runner.os }}-${{ hashFiles('/root/vcpkg-binary-cache/**/*') }}
 
       - name: Build
         run: |
