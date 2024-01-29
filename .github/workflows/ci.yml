@@ -17,7 +17,6 @@ concurrency:
 env:
   LLVM_VER: 17
   PYTHON_VER: 3.11
-  VCPKG_BINARY_SOURCES: clear;files,/root/vcpkg-binary-cache,readwrite
 
 jobs:
   build:
@@ -64,10 +63,11 @@ jobs:
           echo "CXX=$(which clang++-$LLVM_VER)" >> $GITHUB_ENV
           echo "CFLAGS=-g0 --ld-path=$(which ld.lld-$LLVM_VER) -flto" >> $GITHUB_ENV
           echo "CXXFLAGS=-g0 --ld-path=$(which ld.lld-$LLVM_VER) -flto" >> $GITHUB_ENV
+          echo "VCPKG_BINARY_SOURCES=clear;files,$GITHUB_WORKSPACE/vcpkg-binary-cache,readwrite" >> $GITHUB_ENV
 
       - name: Setup vcpkg
         run: |
-          mkdir -p /root/vcpkg-binary-cache
+          mkdir -p $GITHUB_WORKSPACE/vcpkg-binary-cache
           git clone https://github.com/microsoft/vcpkg $HOME/vcpkg
           $HOME/vcpkg/bootstrap-vcpkg.sh
 
@@ -75,8 +75,8 @@ jobs:
         id: cache-vcpkg
         uses: actions/cache@v4
         with:
-          path: /root/vcpkg-binary-cache
-          key: ${{ runner.os }}-${{ hashFiles('/root/vcpkg-binary-cache/**/*') }}
+          path: $GITHUB_WORKSPACE/vcpkg-binary-cache
+          key: ${{ runner.os }}-${{ hashFiles('vcpkg-binary-cache/**/*') }}
 
       - name: Build
         run: |
