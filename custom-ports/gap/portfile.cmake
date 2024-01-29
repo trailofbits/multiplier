@@ -14,7 +14,6 @@ vcpkg_cmake_configure(
         -DGAP_ENABLE_COROUTINES=ON
         -DGAP_ENABLE_WARNINGS=OFF
         -DGAP_INSTALL=ON
-        -DUSE_SYSTEM_DEPENDENCIES=ON
 )
 
 vcpkg_cmake_install()
@@ -24,4 +23,5 @@ vcpkg_cmake_config_fixup(
 )
 vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")
 
-file( REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug" )
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug")
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/lib")

@@ -6,6 +6,12 @@ vcpkg_from_github(
     HEAD_REF pasta-llvmorg-17.0.4
 )
 
+if("dynamic" STREQUAL "${VCPKG_LIBRARY_LINKAGE}")
+    set(LLVM_DYLIB OFF)
+else()
+    set(LLVM_DYLIB ON)
+endif()
+
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}/llvm"
     OPTIONS
@@ -17,14 +23,14 @@ vcpkg_cmake_configure(
         -DLLVM_INCLUDE_DOCS=OFF
         -DLLVM_INCLUDE_EXAMPLES=OFF
         -DLLVM_BUILD_EXAMPLES=OFF
-        -DLLVM_BUILD_LLVM_DYLIB=OFF
+        -DBUILD_SHARED_LIBS=OFF
+        -DLLVM_BUILD_LLVM_DYLIB="${LLVM_DYLIB}"
         -DLLVM_BUILD_TESTS=OFF
         -DLLVM_ENABLE_BINDINGS=OFF
         -DLLVM_ENABLE_OCAMLDOC=OFF
         -DLLVM_ENABLE_DIA_SDK=OFF
         -DLLVM_ENABLE_EH=ON
         -DLLVM_ENABLE_RTTI=ON
-        -DLLVM_ENABLE_ASSERTIONS=ON
         -DLLVM_ENABLE_EXPENSIVE_CHECKS=OFF
         -DLLVM_ENABLE_FFI=OFF
         -DLLVM_ENABLE_WARNINGS=ON
@@ -67,7 +73,7 @@ llvm_cmake_package_config_fixup("LLVM")
 
 vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/share/mlir/MLIRConfig.cmake" "set(MLIR_MAIN_SRC_DIR \"${SOURCE_PATH}/mlir\")" "")
 vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/share/mlir/MLIRConfig.cmake" "${CURRENT_BUILDTREES_DIR}" "\${MLIR_INCLUDE_DIRS}")
-file(INSTALL "${SOURCE_PATH}/llvm/LICENSE.TXT" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME copyright)
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/llvm/LICENSE.TXT")
 
 if(NOT DEFINED VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL "debug")
     file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/bin"
