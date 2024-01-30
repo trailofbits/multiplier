@@ -227,7 +227,7 @@ Expr ConceptDecl::constraint_expression(void) const {
 }
 
 bool ConceptDecl::is_type_concept(void) const {
-  return impl->reader.getVal76();
+  return impl->reader.getVal77();
 }
 
 #pragma GCC diagnostic pop

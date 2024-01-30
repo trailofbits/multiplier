@@ -175,6 +175,36 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "num_clobber_string_literals",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_clobber_string_literals());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::num_clobber_string_literals"),
+    nullptr,
+  },
+  {
+    "clobber_string_literals",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->clobber_string_literals());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::clobber_string_literals"),
+    nullptr,
+  },
+  {
+    "output_names",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->output_names());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::output_names"),
+    nullptr,
+  },
+  {
     "num_output_constraint_literals",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -195,13 +225,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "output_names",
+    "input_names",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->output_names());
+          return ::mx::to_python(T_cast(self)->input_names());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::output_names"),
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::input_names"),
     nullptr,
   },
   {
@@ -222,36 +252,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::input_constraint_literals"),
-    nullptr,
-  },
-  {
-    "input_names",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->input_names());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::input_names"),
-    nullptr,
-  },
-  {
-    "num_clobber_string_literals",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_clobber_string_literals());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::num_clobber_string_literals"),
-    nullptr,
-  },
-  {
-    "clobber_string_literals",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->clobber_string_literals());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::clobber_string_literals"),
     nullptr,
   },
   {
@@ -535,6 +535,28 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::nth_label"),
   },
   {
+    "nth_clobber_string_literal",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          T *obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<uint32_t>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nth_clobber_string_literal(std::move(arg_0.value())));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nth_clobber_string_literal'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::nth_clobber_string_literal"),
+  },
+  {
     "nth_output_constraint_literal",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
@@ -577,28 +599,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::nth_input_constraint_literal"),
-  },
-  {
-    "nth_clobber_string_literal",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          T *obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<uint32_t>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->nth_clobber_string_literal(std::move(arg_0.value())));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'nth_clobber_string_literal'";
-          return nullptr;
-        }),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::nth_clobber_string_literal"),
   },
   {
     "nth_label_expression",

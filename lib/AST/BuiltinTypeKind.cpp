@@ -482,6 +482,7 @@ const char *EnumeratorName(BuiltinTypeKind e) {
     case BuiltinTypeKind::OMP_ARRAY_SECTION: return "OMP_ARRAY_SECTION";
     case BuiltinTypeKind::OMP_ARRAY_SHAPING: return "OMP_ARRAY_SHAPING";
     case BuiltinTypeKind::OMP_ITERATOR: return "OMP_ITERATOR";
+    case BuiltinTypeKind::UNRESOLVED: return "UNRESOLVED";
     default: return "<invalid>";
   }
 }

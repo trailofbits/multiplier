@@ -97,27 +97,51 @@ std::optional<UnaryTransformType> UnaryTransformType::from(const TokenContext &t
   return std::nullopt;
 }
 
-Type UnaryTransformType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal18();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
+std::optional<Type> UnaryTransformType::desugar(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal19();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
-Type UnaryTransformType::base_type(void) const {
-  RawEntityId eid = impl->reader.getVal19();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
+std::optional<Type> UnaryTransformType::base_type(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal20();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 UnaryTransformTypeUTTKind UnaryTransformType::utt_kind(void) const {
-  return static_cast<UnaryTransformTypeUTTKind>(impl->reader.getVal27());
+  return static_cast<UnaryTransformTypeUTTKind>(impl->reader.getVal28());
 }
 
-Type UnaryTransformType::underlying_type(void) const {
-  RawEntityId eid = impl->reader.getVal25();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
+std::optional<Type> UnaryTransformType::underlying_type(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal26();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 bool UnaryTransformType::is_sugared(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal21();
 }
 
 #pragma GCC diagnostic pop

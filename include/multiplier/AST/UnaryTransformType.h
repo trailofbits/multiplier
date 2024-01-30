@@ -47,10 +47,10 @@ class MX_EXPORT UnaryTransformType : public Type {
   static std::optional<UnaryTransformType> from(const VariantEntity &e);
   static std::optional<UnaryTransformType> from(const TokenContext &t);
 
-  Type desugar(void) const;
-  Type base_type(void) const;
+  std::optional<Type> desugar(void) const;
+  std::optional<Type> base_type(void) const;
   UnaryTransformTypeUTTKind utt_kind(void) const;
-  Type underlying_type(void) const;
+  std::optional<Type> underlying_type(void) const;
   bool is_sugared(void) const;
 };
 

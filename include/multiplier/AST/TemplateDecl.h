@@ -63,7 +63,7 @@ class MX_EXPORT TemplateDecl : public NamedDecl {
   static std::optional<TemplateDecl> from(const TokenContext &t);
 
   TemplateParameterList template_parameters(void) const;
-  NamedDecl templated_declaration(void) const;
+  std::optional<NamedDecl> templated_declaration(void) const;
   bool has_associated_constraints(void) const;
   bool is_type_alias(void) const;
 };

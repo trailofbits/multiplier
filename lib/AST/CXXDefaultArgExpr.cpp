@@ -207,9 +207,17 @@ ParmVarDecl CXXDefaultArgExpr::parameter(void) const {
   return ParmVarDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
-Expr CXXDefaultArgExpr::rewritten_expression(void) const {
-  RawEntityId eid = impl->reader.getVal40();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+std::optional<Expr> CXXDefaultArgExpr::rewritten_expression(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal40();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 Token CXXDefaultArgExpr::used_token(void) const {

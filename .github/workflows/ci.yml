@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LLVM_PASTA_VER: ba5b66d
+  LLVM_PASTA_VER: 4a2f2bf
   LLVM_VER: 17
   PYTHON_VER: 3.11
 

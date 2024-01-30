@@ -192,9 +192,17 @@ std::optional<PredefinedExpr> PredefinedExpr::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-StringLiteral PredefinedExpr::function_name(void) const {
-  RawEntityId eid = impl->reader.getVal37();
-  return StringLiteral::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+std::optional<StringLiteral> PredefinedExpr::function_name(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal37();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return StringLiteral::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 PredefinedExprIdentKind PredefinedExpr::identifier_kind(void) const {

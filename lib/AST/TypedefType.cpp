@@ -99,21 +99,21 @@ std::optional<TypedefType> TypedefType::from(const TokenContext &t) {
 }
 
 Type TypedefType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal18();
+  RawEntityId eid = impl->reader.getVal19();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TypedefNameDecl TypedefType::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal19();
+  RawEntityId eid = impl->reader.getVal20();
   return TypedefNameDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool TypedefType::is_sugared(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal21();
 }
 
 bool TypedefType::type_matches_declaration(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal22();
 }
 
 #pragma GCC diagnostic pop

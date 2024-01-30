@@ -105,7 +105,7 @@ std::optional<TypeWithKeyword> TypeWithKeyword::from(const TokenContext &t) {
 }
 
 ElaboratedTypeKeyword TypeWithKeyword::keyword(void) const {
-  return static_cast<ElaboratedTypeKeyword>(impl->reader.getVal27());
+  return static_cast<ElaboratedTypeKeyword>(impl->reader.getVal28());
 }
 
 #pragma GCC diagnostic pop

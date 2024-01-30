@@ -99,16 +99,16 @@ std::optional<RecordType> RecordType::from(const TokenContext &t) {
 }
 
 Type RecordType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal19();
+  RawEntityId eid = impl->reader.getVal20();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool RecordType::has_const_fields(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal22();
 }
 
 bool RecordType::is_sugared(void) const {
-  return impl->reader.getVal22();
+  return impl->reader.getVal23();
 }
 
 #pragma GCC diagnostic pop

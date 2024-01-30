@@ -244,17 +244,25 @@ TemplateParameterList TemplateDecl::template_parameters(void) const {
   return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
-NamedDecl TemplateDecl::templated_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal57();
-  return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
+std::optional<NamedDecl> TemplateDecl::templated_declaration(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal57();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return NamedDecl::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 bool TemplateDecl::has_associated_constraints(void) const {
-  return impl->reader.getVal74();
+  return impl->reader.getVal75();
 }
 
 bool TemplateDecl::is_type_alias(void) const {
-  return impl->reader.getVal75();
+  return impl->reader.getVal76();
 }
 
 #pragma GCC diagnostic pop

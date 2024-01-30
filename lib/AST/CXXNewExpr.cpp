@@ -251,14 +251,30 @@ std::optional<Expr> CXXNewExpr::initializer(void) const {
   return std::nullopt;
 }
 
-FunctionDecl CXXNewExpr::operator_delete(void) const {
-  RawEntityId eid = impl->reader.getVal43();
-  return FunctionDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
+std::optional<FunctionDecl> CXXNewExpr::operator_delete(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal43();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionDecl::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
-FunctionDecl CXXNewExpr::operator_new(void) const {
-  RawEntityId eid = impl->reader.getVal44();
-  return FunctionDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
+std::optional<FunctionDecl> CXXNewExpr::operator_new(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal44();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionDecl::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 TokenRange CXXNewExpr::type_id_parentheses(void) const {

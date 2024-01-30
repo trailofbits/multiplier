@@ -319,11 +319,11 @@ Type ValueDecl::type(void) const {
 }
 
 bool ValueDecl::is_initializer_capture(void) const {
-  return impl->reader.getVal74();
+  return impl->reader.getVal75();
 }
 
 bool ValueDecl::is_weak(void) const {
-  return impl->reader.getVal75();
+  return impl->reader.getVal76();
 }
 
 #pragma GCC diagnostic pop

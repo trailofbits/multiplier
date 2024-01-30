@@ -448,8 +448,8 @@ void EntityVisitor::VisitDependentBitIntType(
 
 void EntityVisitor::VisitDependentSizedArrayType(
     const pasta::DependentSizedArrayType &type) {
-  if (EnterType(type)) {
-    Accept(type.SizeExpression());
+  if (EnterType(type) && type.SizeExpression().has_value()) {
+    Accept(type.SizeExpression().value());
   }
 }
 

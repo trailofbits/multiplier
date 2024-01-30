@@ -482,6 +482,7 @@ enum class BuiltinTypeKind : unsigned short {
   OMP_ARRAY_SECTION,
   OMP_ARRAY_SHAPING,
   OMP_ITERATOR,
+  UNRESOLVED,
 };
 
 inline static const char *EnumerationName(BuiltinTypeKind) {
@@ -489,7 +490,7 @@ inline static const char *EnumerationName(BuiltinTypeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(BuiltinTypeKind) {
-  return 468;
+  return 469;
 }
 
 MX_EXPORT const char *EnumeratorName(BuiltinTypeKind);

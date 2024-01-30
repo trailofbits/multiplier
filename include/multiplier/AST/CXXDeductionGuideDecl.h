@@ -74,7 +74,7 @@ class MX_EXPORT CXXDeductionGuideDecl : public FunctionDecl {
   static std::optional<CXXDeductionGuideDecl> from(const VariantEntity &e);
   static std::optional<CXXDeductionGuideDecl> from(const TokenContext &t);
 
-  CXXConstructorDecl corresponding_constructor(void) const;
+  std::optional<CXXConstructorDecl> corresponding_constructor(void) const;
   TemplateDecl deduced_template(void) const;
   DeductionCandidate deduction_candidate_kind(void) const;
   bool is_explicit(void) const;

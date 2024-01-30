@@ -614,6 +614,9 @@ class TokenCategory(IntEnum):
   FILE_NAME = 33
   LINE_NUMBER = 34
   COLUMN_NUMBER = 35
+  INFORMATION = 36
+  WARNING = 37
+  ERROR = 38
 
 class TokenContext(object):
   has_parent: bool
@@ -2801,10 +2804,13 @@ class TokenTree(object):
 
   @overload
   @staticmethod
-  def FROM(arg_0: multiplier.frontend.TokenRange) -> Optional[multiplier.frontend.TokenTree]:
+  def FROM(arg_0: multiplier.frontend.TokenRange) -> multiplier.frontend.TokenTree:
     ...
 
   def serialize(self, vis: multiplier.frontend.TokenTreeVisitor) -> multiplier.frontend.TokenRange:
+    ...
+
+  def __bool__(self) -> bool:
     ...
 
 class TokenTreeNode(object):

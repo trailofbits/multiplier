@@ -232,33 +232,33 @@ Token ObjCImplementationDecl::instance_variable_r_brace_token(void) const {
 }
 
 std::string_view ObjCImplementationDecl::obj_c_runtime_name_as_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal73();
+  capnp::Text::Reader data = impl->reader.getVal74();
   return std::string_view(data.cStr(), data.size());
 }
 
 ObjCInterfaceDecl ObjCImplementationDecl::super_class(void) const {
-  RawEntityId eid = impl->reader.getVal78();
+  RawEntityId eid = impl->reader.getVal79();
   return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token ObjCImplementationDecl::super_class_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal79());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal80());
 }
 
 bool ObjCImplementationDecl::has_destructors(void) const {
-  return impl->reader.getVal74();
-}
-
-bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
   return impl->reader.getVal75();
 }
 
+bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
+  return impl->reader.getVal76();
+}
+
 unsigned ObjCImplementationDecl::num_instance_variables(void) const {
-  return impl->reader.getVal341().size();
+  return impl->reader.getVal342().size();
 }
 
 std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsigned n) const {
-  auto list = impl->reader.getVal341();
+  auto list = impl->reader.getVal342();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -272,12 +272,12 @@ std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsign
 }
 
 gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const & {
-  auto list = impl->reader.getVal341();
+  auto list = impl->reader.getVal342();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d341 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCIvarDecl::from_base(std::move(d341))) {
+    if (auto d342 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCIvarDecl::from_base(std::move(d342))) {
         co_yield std::move(*e);
       }
     }

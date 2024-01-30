@@ -78,8 +78,8 @@ class MX_EXPORT ClassTemplatePartialSpecializationDecl : public ClassTemplateSpe
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const TokenContext &t);
 
   Type injected_specialization_type(void) const;
-  ClassTemplatePartialSpecializationDecl instantiated_from_member(void) const;
-  ClassTemplatePartialSpecializationDecl instantiated_from_member_template(void) const;
+  std::optional<ClassTemplatePartialSpecializationDecl> instantiated_from_member(void) const;
+  std::optional<ClassTemplatePartialSpecializationDecl> instantiated_from_member_template(void) const;
   TemplateParameterList template_parameters(void) const;
   bool has_associated_constraints(void) const;
 };

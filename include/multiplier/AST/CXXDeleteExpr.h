@@ -68,8 +68,8 @@ class MX_EXPORT CXXDeleteExpr : public Expr {
 
   bool does_usual_array_delete_want_size(void) const;
   Expr argument(void) const;
-  Type destroyed_type(void) const;
-  FunctionDecl operator_delete(void) const;
+  std::optional<Type> destroyed_type(void) const;
+  std::optional<FunctionDecl> operator_delete(void) const;
   bool is_array_form(void) const;
   bool is_array_form_as_written(void) const;
   bool is_global_delete(void) const;

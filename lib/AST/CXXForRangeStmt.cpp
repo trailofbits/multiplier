@@ -192,9 +192,17 @@ std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-DeclStmt CXXForRangeStmt::begin_statement(void) const {
-  RawEntityId eid = impl->reader.getVal9();
-  return DeclStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+std::optional<DeclStmt> CXXForRangeStmt::begin_statement(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal9();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return DeclStmt::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 Stmt CXXForRangeStmt::body(void) const {
@@ -210,14 +218,30 @@ Token CXXForRangeStmt::colon_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
 }
 
-Expr CXXForRangeStmt::condition(void) const {
-  RawEntityId eid = impl->reader.getVal14();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+std::optional<Expr> CXXForRangeStmt::condition(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal14();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
-DeclStmt CXXForRangeStmt::end_statement(void) const {
-  RawEntityId eid = impl->reader.getVal17();
-  return DeclStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+std::optional<DeclStmt> CXXForRangeStmt::end_statement(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal17();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return DeclStmt::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 Token CXXForRangeStmt::for_token(void) const {

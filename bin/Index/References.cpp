@@ -191,6 +191,14 @@ static ClassificationAction ClassifyParentChild(
           return {mx::BuiltinReferenceKind::TESTS_VALUE,
                   ContinuationAction::kDoneClassifying};
         }
+      } else if (parent.Kind() == pasta::StmtKind::kForStmt) {
+        // if parent is not a conditional expr, the reference kind
+        // will be a updating the ValueDecl
+        // e.g:
+        //      int j, j;
+        //      for(i=0, j=0;;) {}
+        return {mx::BuiltinReferenceKind::UPDATES_VALUE,
+                ContinuationAction::kDoneClassifying};
       } else {
         assert(false);
       }
@@ -510,11 +518,15 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt) {
       co_yield ref;
     }
 
-    co_yield cxx_new->OperatorNew();
+    if (auto op_new = cxx_new->OperatorNew()) {
+      co_yield op_new.value();
+    }
 
   // If we have `delete x`, then mark `` as being referenced in this fragment.
   } else if (auto cxx_del = pasta::CXXDeleteExpr::From(stmt)) {
-    co_yield cxx_del->OperatorDelete();
+    if (auto op_del = cxx_del->OperatorDelete()) {
+      co_yield op_del.value();
+    }
 
   // If we have `(T *) b` then mark `T` as being referenced in this fragment.
   } else if (auto cast = pasta::CastExpr::From(stmt)) {
@@ -572,7 +584,9 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type) {
     }
     case pasta::TypeKind::kDependentSizedArray: {
       auto &tt = reinterpret_cast<const pasta::DependentSizedArrayType &>(type);
-      GEN(tt.SizeExpression());
+      if (auto sz_expr = tt.SizeExpression()) {
+        GEN(sz_expr.value());
+      }
       GEN(tt.ElementType());
       break;
     }
@@ -824,7 +838,9 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type) {
     }
     case pasta::TypeKind::kUnaryTransform: {
       auto &tt = reinterpret_cast<const pasta::UnaryTransformType &>(type);
-      GEN(tt.UnderlyingType());
+      if (auto uty = tt.UnderlyingType()) {
+        GEN(uty.value());
+      }
       break;
     }
     case pasta::TypeKind::kUnresolvedUsing: {

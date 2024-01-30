@@ -195,9 +195,17 @@ Token CXXCatchStmt::catch_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
-Type CXXCatchStmt::caught_type(void) const {
-  RawEntityId eid = impl->reader.getVal10();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
+std::optional<Type> CXXCatchStmt::caught_type(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal10();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 std::optional<VarDecl> CXXCatchStmt::exception_declaration(void) const {

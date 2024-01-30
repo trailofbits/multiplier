@@ -125,14 +125,30 @@ std::optional<PointerAttr> PointerAttr::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-Type PointerAttr::deref_type(void) const {
-  RawEntityId eid = impl->reader.getVal8();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
+std::optional<Type> PointerAttr::dereferenced_type(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal8();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
-Type PointerAttr::deref_type_token(void) const {
-  RawEntityId eid = impl->reader.getVal16();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
+std::optional<Type> PointerAttr::dereferenced_type_token(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal16();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

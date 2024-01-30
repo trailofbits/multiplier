@@ -193,6 +193,16 @@ static PyMethodDef gMethods[] = {
 
 namespace {
 
+static PyNumberMethods gNumberMethods = {
+  .nb_bool = [] (BorrowedPyObject *obj) -> int {
+    return !!*T_cast(obj);
+  }
+};
+
+}  // namespace
+
+namespace {
+
 PyTypeObject *InitType(void) noexcept {
   PyTypeObject * const tp = &(gTypes[835]);
   tp->tp_basicsize = sizeof(O);
@@ -206,7 +216,7 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_name = "multiplier.frontend.TokenTree";
   tp->tp_flags = Py_TPFLAGS_DEFAULT;
   tp->tp_doc = PyDoc_STR("Wrapper for mx::::TokenTree");
-  tp->tp_as_number = nullptr;
+  tp->tp_as_number = &gNumberMethods;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
   tp->tp_hash = PyObject_HashNotImplemented;

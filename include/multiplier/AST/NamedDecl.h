@@ -67,7 +67,7 @@ class MX_EXPORT NamedDecl : public Decl {
   std::optional<ObjCStringFormatFamily> obj_cf_string_formatting_family(void) const;
   std::string_view qualified_name_as_string(void) const;
   NamedDecl underlying_declaration(void) const;
-  Visibility visibility(void) const;
+  std::optional<Visibility> visibility(void) const;
   bool has_external_formal_linkage(void) const;
   bool has_linkage(void) const;
   bool has_linkage_been_computed(void) const;

@@ -54,6 +54,8 @@ class TokenProvenanceCalculator {
     // How many children does this node have, OR the address of the only child.
     uintptr_t child{0u};
 
+    // Zero represents unintialized, then we use the maximum valued unsigned
+    // number to represent the shallowest value.
     unsigned depth{0u};
 
 #ifndef NDEBUG

@@ -85,7 +85,7 @@ class MX_EXPORT VarTemplateSpecializationDecl : public VarDecl {
   unsigned num_template_instantiation_arguments(void) const;
   gap::generator<TemplateArgument> template_instantiation_arguments(void) const &;
   Token template_keyword_token(void) const;
-  Type type_as_written(void) const;
+  std::optional<Type> type_as_written(void) const;
   bool is_class_scope_explicit_specialization(void) const;
   bool is_explicit_instantiation_or_specialization(void) const;
   bool is_explicit_specialization(void) const;

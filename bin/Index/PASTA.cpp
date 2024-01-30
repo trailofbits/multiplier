@@ -1464,6 +1464,7 @@ BuiltinTypeKind FromPasta(pasta::BuiltinTypeKind e) {
     case 465: return BuiltinTypeKind::OMP_ARRAY_SECTION;
     case 466: return BuiltinTypeKind::OMP_ARRAY_SHAPING;
     case 467: return BuiltinTypeKind::OMP_ITERATOR;
+    case 468: return BuiltinTypeKind::UNRESOLVED;
     default: __builtin_unreachable();
   }
 }
