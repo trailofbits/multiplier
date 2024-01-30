@@ -1533,13 +1533,15 @@ void TokenProvenanceCalculator::Run(
     }
   }
 
-  auto max_depth = 1u;
+  // NOTE(pag): Depth values are actually very very large positive numbers.
+  auto min_depth = ~0u;
   for (auto t : ordered_tokens) {
-    max_depth = std::max(max_depth, t->Depth(*this));
+    min_depth = std::max(min_depth, t->Depth(*this));
   }
 
   Sort();
-
+  
+  auto max_depth = (~0u - min_depth) + 1u;
   auto iter = 0u;
 
   // Iteratively improve connections.
