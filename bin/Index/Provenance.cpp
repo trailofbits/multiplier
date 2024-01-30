@@ -43,12 +43,13 @@
 namespace indexer {
 namespace {
 
-template <typename T>
-static void Update(T &val, T new_val, bool &changed) {
-  if (val != new_val) {
-    changed = true;
-    val = new_val;
+static bool Update(mx::RawEntityId *val, mx::RawEntityId new_val,
+                   bool changed) {
+  if (*val != new_val) {
+    *val = new_val;
+    return true;
   }
+  return changed;
 }
 
 static bool IsDefinableToken(pasta::TokenKind kind) {
@@ -1248,15 +1249,18 @@ bool TokenProvenanceCalculator::Pull(void) {
     if (matching_parsed) {
       if (!parent_has_rel ||
           parent_related_entity_id == matching_parsed->related_entity_id) {
-        Update(tok->parsed_token_id, matching_parsed->parsed_token_id, changed);
-        Update(tok->related_entity_id, matching_parsed->related_entity_id, changed);
+        changed = Update(&(tok->parsed_token_id),
+                         matching_parsed->parsed_token_id, changed);
+        changed = Update(&(tok->related_entity_id),
+                         matching_parsed->related_entity_id, changed);
         continue;
       }
     }
 
     if (matching_rel) {
       if (!parent_has_rel) {
-        Update(tok->related_entity_id, matching_rel->related_entity_id, changed);
+        changed = Update(&(tok->related_entity_id),
+                         matching_rel->related_entity_id, changed);
         continue;
       }
     }
@@ -1264,15 +1268,18 @@ bool TokenProvenanceCalculator::Pull(void) {
     if (other_parsed) {
       if (!parent_has_rel ||
           parent_related_entity_id == other_parsed->related_entity_id) {
-        Update(tok->parsed_token_id, other_parsed->parsed_token_id, changed);
-        Update(tok->related_entity_id, other_parsed->related_entity_id, changed);
+        changed = Update(&(tok->parsed_token_id),
+                         other_parsed->parsed_token_id, changed);
+        changed = Update(&(tok->related_entity_id),
+                         other_parsed->related_entity_id, changed);
         continue;
       }
     }
 
     if (other_rel) {
       if (!parent_has_rel) {
-        Update(tok->related_entity_id, other_rel->related_entity_id, changed);
+        changed = Update(&(tok->related_entity_id),
+                         other_rel->related_entity_id, changed);
         continue;
       }
     }
@@ -1401,13 +1408,13 @@ bool TokenProvenanceCalculator::Push(void) {
       if (derived_parsed_id == mx::kInvalidEntityId &&
           derived_rel_id == mx::kInvalidEntityId &&
           rel_id != mx::kInvalidEntityId) {
-        Update(derived_tok->related_entity_id, rel_id, changed);
-        Update(derived_tok->parsed_token_id, parsed_id, changed);
+        changed = Update(&(derived_tok->related_entity_id), rel_id, changed);
+        changed = Update(&(derived_tok->parsed_token_id), parsed_id, changed);
 
       } else if (derived_parsed_id == mx::kInvalidEntityId &&
                  derived_rel_id == rel_id &&
                  parsed_id != mx::kInvalidEntityId) {
-        Update(derived_tok->parsed_token_id, parsed_id, changed);
+        changed = Update(&(derived_tok->parsed_token_id), parsed_id, changed);
       }
     }
   }
@@ -1526,10 +1533,17 @@ void TokenProvenanceCalculator::Run(
     }
   }
 
+  auto max_depth = 1u;
+  for (auto t : ordered_tokens) {
+    max_depth = std::max(max_depth, t->Depth(*this));
+  }
+
   Sort();
 
+  auto iter = 0u;
+
   // Iteratively improve connections.
-  for (auto changed = Pull(tokens); changed; ) {
+  for (auto changed = Pull(tokens); changed && iter <= max_depth; ++iter) {
     changed = Pull();
     changed = Push() || changed;
   }
