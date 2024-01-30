@@ -52,7 +52,8 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_EXE_LINKER_FLAGS_INIT=${CMAKE_EXE_LINKER_FLAGS_INIT}"
                         "-DCMAKE_MODULE_LINKER_FLAGS_INIT=${CMAKE_MODULE_LINKER_FLAGS_INIT}"
                         "-DCMAKE_SHARED_LINKER_FLAGS_INIT=${CMAKE_SHARED_LINKER_FLAGS_INIT}"
-                        -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
+                        "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
+                        "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=${CMAKE_INTERPROCEDURAL_OPTIMIZATION}"
                         -DBUILD_SHARED_LIBS=OFF
                         -DBUILD_STATIC_LIBS=ON
                         -DBUILD_gflags_LIB=ON

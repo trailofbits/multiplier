@@ -43,7 +43,8 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_EXE_LINKER_FLAGS_INIT=${CMAKE_EXE_LINKER_FLAGS_INIT}"
                         "-DCMAKE_MODULE_LINKER_FLAGS_INIT=${CMAKE_MODULE_LINKER_FLAGS_INIT}"
                         "-DCMAKE_SHARED_LINKER_FLAGS_INIT=${CMAKE_SHARED_LINKER_FLAGS_INIT}"
-                        -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
+                        "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
+                        "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=${CMAKE_INTERPROCEDURAL_OPTIMIZATION}"
                         -DWITH_JEMALLOC:BOOL=OFF
                         -DWITH_GFLAGS:BOOL=ON
                         "-Dgflags_DIR:PATH=${gflags_DIR}"
