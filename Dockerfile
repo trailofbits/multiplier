@@ -27,13 +27,14 @@ RUN cmake \
     -S '/work/src/multiplier' \
     -B '/work/build/multiplier' \
     -G Ninja \
-    -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-17)" \
-    -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-17)" \
-    -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-17)" \
+    -DCMAKE_EXE_LINKER_FLAGS="--ld-path=$(which ld.lld-17)" \
+    -DCMAKE_MODULE_LINKER_FLAGS="--ld-path=$(which ld.lld-17)" \
+    -DCMAKE_SHARED_LINKER_FLAGS="--ld-path=$(which ld.lld-17)" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_COMPILER="$(which clang-17)" \
     -DCMAKE_CXX_COMPILER="$(which clang++-17)" \
     -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+    -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE \
     -DLLVM_ENABLE_LLD:BOOL=TRUE
 
 RUN cmake --build '/work/build/multiplier' --target install
