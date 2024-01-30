@@ -101,22 +101,22 @@ std::optional<AdjustedType> AdjustedType::from(const TokenContext &t) {
 }
 
 Type AdjustedType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal18();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
-Type AdjustedType::resolved_type(void) const {
   RawEntityId eid = impl->reader.getVal19();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
+Type AdjustedType::resolved_type(void) const {
+  RawEntityId eid = impl->reader.getVal20();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
+}
+
 Type AdjustedType::original_type(void) const {
-  RawEntityId eid = impl->reader.getVal25();
+  RawEntityId eid = impl->reader.getVal26();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool AdjustedType::is_sugared(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal21();
 }
 
 #pragma GCC diagnostic pop

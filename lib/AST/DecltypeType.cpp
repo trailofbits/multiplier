@@ -99,22 +99,22 @@ std::optional<DecltypeType> DecltypeType::from(const TokenContext &t) {
 }
 
 Type DecltypeType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal18();
+  RawEntityId eid = impl->reader.getVal19();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr DecltypeType::underlying_expression(void) const {
-  RawEntityId eid = impl->reader.getVal19();
+  RawEntityId eid = impl->reader.getVal20();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Type DecltypeType::underlying_type(void) const {
-  RawEntityId eid = impl->reader.getVal25();
+  RawEntityId eid = impl->reader.getVal26();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool DecltypeType::is_sugared(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal21();
 }
 
 #pragma GCC diagnostic pop

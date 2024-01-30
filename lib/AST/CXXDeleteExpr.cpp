@@ -202,14 +202,30 @@ Expr CXXDeleteExpr::argument(void) const {
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-Type CXXDeleteExpr::destroyed_type(void) const {
-  RawEntityId eid = impl->reader.getVal38();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
+std::optional<Type> CXXDeleteExpr::destroyed_type(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal38();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
-FunctionDecl CXXDeleteExpr::operator_delete(void) const {
-  RawEntityId eid = impl->reader.getVal39();
-  return FunctionDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
+std::optional<FunctionDecl> CXXDeleteExpr::operator_delete(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal39();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionDecl::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 bool CXXDeleteExpr::is_array_form(void) const {

@@ -63,12 +63,12 @@ class MX_EXPORT CXXForRangeStmt : public Stmt {
   static std::optional<CXXForRangeStmt> from(const VariantEntity &e);
   static std::optional<CXXForRangeStmt> from(const TokenContext &t);
 
-  DeclStmt begin_statement(void) const;
+  std::optional<DeclStmt> begin_statement(void) const;
   Stmt body(void) const;
   Token coawait_token(void) const;
   Token colon_token(void) const;
-  Expr condition(void) const;
-  DeclStmt end_statement(void) const;
+  std::optional<Expr> condition(void) const;
+  std::optional<DeclStmt> end_statement(void) const;
   Token for_token(void) const;
   Expr increment(void) const;
   std::optional<Stmt> initializer(void) const;

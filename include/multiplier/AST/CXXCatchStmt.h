@@ -63,7 +63,7 @@ class MX_EXPORT CXXCatchStmt : public Stmt {
   static std::optional<CXXCatchStmt> from(const TokenContext &t);
 
   Token catch_token(void) const;
-  Type caught_type(void) const;
+  std::optional<Type> caught_type(void) const;
   std::optional<VarDecl> exception_declaration(void) const;
   Stmt handler_block(void) const;
 };

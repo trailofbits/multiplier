@@ -164,8 +164,12 @@ Visibility Type::visibility(void) const {
   return static_cast<Visibility>(impl->reader.getVal16());
 }
 
-bool Type::is_vlst_builtin_type(void) const {
+bool Type::is_unresolved_type(void) const {
   return impl->reader.getVal17();
+}
+
+bool Type::is_vlst_builtin_type(void) const {
+  return impl->reader.getVal18();
 }
 
 #pragma GCC diagnostic pop

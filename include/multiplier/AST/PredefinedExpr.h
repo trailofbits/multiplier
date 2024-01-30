@@ -66,7 +66,7 @@ class MX_EXPORT PredefinedExpr : public Expr {
   static std::optional<PredefinedExpr> from(const VariantEntity &e);
   static std::optional<PredefinedExpr> from(const TokenContext &t);
 
-  StringLiteral function_name(void) const;
+  std::optional<StringLiteral> function_name(void) const;
   PredefinedExprIdentKind identifier_kind(void) const;
   std::string_view identifier_kind_name(void) const;
   Token token(void) const;

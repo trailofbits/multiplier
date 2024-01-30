@@ -222,7 +222,7 @@ std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::from(const
 }
 
 bool ConstructorUsingShadowDecl::constructs_virtual_base(void) const {
-  return impl->reader.getVal74();
+  return impl->reader.getVal75();
 }
 
 CXXRecordDecl ConstructorUsingShadowDecl::constructed_base_class(void) const {
@@ -250,7 +250,7 @@ CXXRecordDecl ConstructorUsingShadowDecl::nominated_base_class(void) const {
 
 std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::nominated_base_class_shadow_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal78();
+    RawEntityId eid = impl->reader.getVal79();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

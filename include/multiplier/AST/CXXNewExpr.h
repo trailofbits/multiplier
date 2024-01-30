@@ -76,8 +76,8 @@ class MX_EXPORT CXXNewExpr : public Expr {
   TokenRange direct_initializer_range(void) const;
   CXXNewExprInitializationStyle initialization_style(void) const;
   std::optional<Expr> initializer(void) const;
-  FunctionDecl operator_delete(void) const;
-  FunctionDecl operator_new(void) const;
+  std::optional<FunctionDecl> operator_delete(void) const;
+  std::optional<FunctionDecl> operator_new(void) const;
   TokenRange type_id_parentheses(void) const;
   bool has_initializer(void) const;
   bool is_array(void) const;

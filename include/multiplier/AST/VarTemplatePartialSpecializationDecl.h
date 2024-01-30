@@ -74,7 +74,7 @@ class MX_EXPORT VarTemplatePartialSpecializationDecl : public VarTemplateSpecial
   static std::optional<VarTemplatePartialSpecializationDecl> from(const VariantEntity &e);
   static std::optional<VarTemplatePartialSpecializationDecl> from(const TokenContext &t);
 
-  VarTemplatePartialSpecializationDecl instantiated_from_member(void) const;
+  std::optional<VarTemplatePartialSpecializationDecl> instantiated_from_member(void) const;
   TemplateParameterList template_parameters(void) const;
   bool has_associated_constraints(void) const;
 };

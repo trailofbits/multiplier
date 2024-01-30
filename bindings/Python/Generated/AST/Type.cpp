@@ -511,6 +511,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "is_unresolved_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_unresolved_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Type::is_unresolved_type"),
+    nullptr,
+  },
+  {
     "is_vlst_builtin_type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

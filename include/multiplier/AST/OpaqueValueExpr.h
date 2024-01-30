@@ -65,7 +65,7 @@ class MX_EXPORT OpaqueValueExpr : public Expr {
   static std::optional<OpaqueValueExpr> from(const TokenContext &t);
 
   Token token(void) const;
-  Expr source_expression(void) const;
+  std::optional<Expr> source_expression(void) const;
   bool is_unique(void) const;
 };
 

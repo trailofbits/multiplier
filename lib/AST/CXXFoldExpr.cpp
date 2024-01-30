@@ -192,23 +192,47 @@ std::optional<CXXFoldExpr> CXXFoldExpr::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-UnresolvedLookupExpr CXXFoldExpr::callee(void) const {
-  RawEntityId eid = impl->reader.getVal37();
-  return UnresolvedLookupExpr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+std::optional<UnresolvedLookupExpr> CXXFoldExpr::callee(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal37();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return UnresolvedLookupExpr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 Token CXXFoldExpr::ellipsis_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
-Expr CXXFoldExpr::initializer(void) const {
-  RawEntityId eid = impl->reader.getVal39();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+std::optional<Expr> CXXFoldExpr::initializer(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal39();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
-Expr CXXFoldExpr::lhs(void) const {
-  RawEntityId eid = impl->reader.getVal40();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+std::optional<Expr> CXXFoldExpr::lhs(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal40();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 Token CXXFoldExpr::l_paren_token(void) const {
@@ -224,9 +248,17 @@ Expr CXXFoldExpr::pattern(void) const {
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-Expr CXXFoldExpr::rhs(void) const {
-  RawEntityId eid = impl->reader.getVal43();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+std::optional<Expr> CXXFoldExpr::rhs(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal43();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 Token CXXFoldExpr::r_paren_token(void) const {
