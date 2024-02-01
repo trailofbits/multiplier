@@ -32,7 +32,9 @@ jobs:
 
     steps:
       - name: Setup deploy keys
-        run: ssh-add - <<< '${{ secrets.MX_REGISTRY_KEY }}'
+        run: printf "%s" "$MX_REGISTRY_KEY" | ssh-add - 
+        env:
+          MX_REGISTRY_KEY: ${{ secrets.MX_REGISTRY_KEY }}
 
       - name: Checkout repository
         uses: actions/checkout@v4
