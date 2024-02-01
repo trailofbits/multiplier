@@ -17,7 +17,7 @@ concurrency:
 env:
   LLVM_VER: 17
   PYTHON_VER: 3.11
-  VCPKG_REGISTRY_VERSION: v1.0.0
+  VCPKG_REGISTRY_VERSION: v1.1.0
 
 jobs:
   build:
@@ -31,15 +31,8 @@ jobs:
       packages: write
 
     steps:
-      - name: Setup deploy keys
-        run: printf "%s" "$MX_REGISTRY_KEY" | ssh-add - 
-        env:
-          MX_REGISTRY_KEY: ${{ secrets.MX_REGISTRY_KEY }}
-
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: "recursive"
       - run: git config --global --add safe.directory '*'
 
       - name: Install prereqs
@@ -50,7 +43,18 @@ jobs:
           curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
           echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VER} main" | tee -a /etc/apt/sources.list > /dev/null
           echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VER} main" | tee -a /etc/apt/sources.list > /dev/null
-          apt-get update; apt-get install gh clang-${LLVM_VER} lld-${LLVM_VER} python${PYTHON_VER} python${PYTHON_VER}-dev -y
+          apt-get update; apt-get install gh clang-${LLVM_VER} lld-${LLVM_VER} python${PYTHON_VER} python${PYTHON_VER}-dev openssh-client -y
+
+      - name: Fetch submodules
+        run: |
+          mkdir -p ~/.ssh
+          eval $(ssh-agent -s)
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          echo "$MX_REGISTRY_KEY" | ssh-add - 
+          git submodule update --init --recursive -- vcpkg-registry
+        env:
+          MX_REGISTRY_KEY: ${{ secrets.MX_REGISTRY_KEY }}
 
       - name: Setup cmake
         uses: trail-of-forks/actions-setup-cmake@master
@@ -67,8 +71,8 @@ jobs:
           echo "ARTIFACT_NAME=multiplier-$(git rev-parse --short=7 HEAD).tar.xz" >> $GITHUB_ENV
           echo "CC=$(which clang-$LLVM_VER)" >> $GITHUB_ENV
           echo "CXX=$(which clang++-$LLVM_VER)" >> $GITHUB_ENV
-          echo "CFLAGS=-g0 --ld-path=$(which ld.lld-$LLVM_VER) -flto" >> $GITHUB_ENV
-          echo "CXXFLAGS=-g0 --ld-path=$(which ld.lld-$LLVM_VER) -flto" >> $GITHUB_ENV
+          echo "CFLAGS=-g0 --ld-path=$(which ld.lld-$LLVM_VER)" >> $GITHUB_ENV
+          echo "CXXFLAGS=-g0 --ld-path=$(which ld.lld-$LLVM_VER)" >> $GITHUB_ENV
           echo "VCPKG_BINARY_SOURCES=clear;files,$GITHUB_WORKSPACE/vcpkg-binary-cache,readwrite" >> $GITHUB_ENV
 
       - name: Setup vcpkg
@@ -79,7 +83,9 @@ jobs:
 
       - name: Preseed vcpkg cache
         run: |
-          gh release download $VCPKG_REGISTRY_VERSION vcpkg-binary-cache.tar.bz2 --repo trailofbits/multiplier-vcpkg-registry
+          gh release download $VCPKG_REGISTRY_VERSION \
+            --pattern vcpkg-binary-cache.tar.bz2 \
+            --repo trailofbits/multiplier-vcpkg-registry
           tar xjf vcpkg-binary-cache.tar.bz2
           rm vcpkg-binary-cache.tar.bz2
         env:
@@ -89,7 +95,7 @@ jobs:
         id: cache-vcpkg
         uses: actions/cache@v4
         with:
-          path: $GITHUB_WORKSPACE/vcpkg-binary-cache
+          path: vcpkg-binary-cache
           key: ${{ runner.os }}-${{ hashFiles('vcpkg-registry/ports/**/*') }}
           restore-keys: |
             ${{ runner.os }}-${{ hashFiles('vcpkg-registry/ports/**/*') }}
