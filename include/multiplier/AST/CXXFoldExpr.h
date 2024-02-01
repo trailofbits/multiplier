@@ -66,14 +66,14 @@ class MX_EXPORT CXXFoldExpr : public Expr {
   static std::optional<CXXFoldExpr> from(const VariantEntity &e);
   static std::optional<CXXFoldExpr> from(const TokenContext &t);
 
-  UnresolvedLookupExpr callee(void) const;
+  std::optional<UnresolvedLookupExpr> callee(void) const;
   Token ellipsis_token(void) const;
-  Expr initializer(void) const;
-  Expr lhs(void) const;
+  std::optional<Expr> initializer(void) const;
+  std::optional<Expr> lhs(void) const;
   Token l_paren_token(void) const;
   BinaryOperatorKind operator_(void) const;
   Expr pattern(void) const;
-  Expr rhs(void) const;
+  std::optional<Expr> rhs(void) const;
   Token r_paren_token(void) const;
   bool is_left_fold(void) const;
   bool is_right_fold(void) const;

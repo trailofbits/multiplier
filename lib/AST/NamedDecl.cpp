@@ -433,40 +433,45 @@ NamedDecl NamedDecl::underlying_declaration(void) const {
   return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
-Visibility NamedDecl::visibility(void) const {
-  return static_cast<Visibility>(impl->reader.getVal70());
+std::optional<Visibility> NamedDecl::visibility(void) const {
+  if (!impl->reader.getVal53()) {
+    return std::nullopt;
+  } else {
+    return static_cast<Visibility>(impl->reader.getVal70());
+  }
+  return std::nullopt;
 }
 
 bool NamedDecl::has_external_formal_linkage(void) const {
-  return impl->reader.getVal53();
-}
-
-bool NamedDecl::has_linkage(void) const {
   return impl->reader.getVal54();
 }
 
-bool NamedDecl::has_linkage_been_computed(void) const {
+bool NamedDecl::has_linkage(void) const {
   return impl->reader.getVal55();
 }
 
-bool NamedDecl::is_cxx_class_member(void) const {
+bool NamedDecl::has_linkage_been_computed(void) const {
   return impl->reader.getVal59();
 }
 
-bool NamedDecl::is_cxx_instance_member(void) const {
+bool NamedDecl::is_cxx_class_member(void) const {
   return impl->reader.getVal60();
 }
 
-bool NamedDecl::is_externally_declarable(void) const {
+bool NamedDecl::is_cxx_instance_member(void) const {
   return impl->reader.getVal61();
 }
 
-bool NamedDecl::is_externally_visible(void) const {
+bool NamedDecl::is_externally_declarable(void) const {
   return impl->reader.getVal71();
 }
 
-bool NamedDecl::is_linkage_valid(void) const {
+bool NamedDecl::is_externally_visible(void) const {
   return impl->reader.getVal72();
+}
+
+bool NamedDecl::is_linkage_valid(void) const {
+  return impl->reader.getVal73();
 }
 
 #pragma GCC diagnostic pop

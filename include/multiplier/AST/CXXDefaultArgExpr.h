@@ -68,7 +68,7 @@ class MX_EXPORT CXXDefaultArgExpr : public Expr {
   Expr adjusted_rewritten_expression(void) const;
   Expr expression(void) const;
   ParmVarDecl parameter(void) const;
-  Expr rewritten_expression(void) const;
+  std::optional<Expr> rewritten_expression(void) const;
   Token used_token(void) const;
   bool has_rewritten_initializer(void) const;
 };

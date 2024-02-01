@@ -300,7 +300,7 @@ Token DeclaratorDecl::type_spec_end_token(void) const {
 }
 
 Token DeclaratorDecl::type_spec_start_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal78());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal79());
 }
 
 unsigned DeclaratorDecl::num_template_parameter_lists(void) const {

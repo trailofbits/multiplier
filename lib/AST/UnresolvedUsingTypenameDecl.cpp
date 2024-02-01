@@ -233,7 +233,7 @@ Token UnresolvedUsingTypenameDecl::using_token(void) const {
 }
 
 bool UnresolvedUsingTypenameDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal74();
+  return impl->reader.getVal75();
 }
 
 #pragma GCC diagnostic pop

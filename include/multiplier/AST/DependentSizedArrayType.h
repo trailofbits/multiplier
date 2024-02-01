@@ -54,7 +54,7 @@ class MX_EXPORT DependentSizedArrayType : public ArrayType {
   TokenRange brackets_range(void) const;
   Token l_bracket_token(void) const;
   Token r_bracket_token(void) const;
-  Expr size_expression(void) const;
+  std::optional<Expr> size_expression(void) const;
   bool is_sugared(void) const;
 };
 

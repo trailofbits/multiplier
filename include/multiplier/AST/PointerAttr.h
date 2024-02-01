@@ -51,8 +51,8 @@ class MX_EXPORT PointerAttr : public InheritableAttr {
   static std::optional<PointerAttr> from(const VariantEntity &e);
   static std::optional<PointerAttr> from(const TokenContext &t);
 
-  Type deref_type(void) const;
-  Type deref_type_token(void) const;
+  std::optional<Type> dereferenced_type(void) const;
+  std::optional<Type> dereferenced_type_token(void) const;
 };
 
 static_assert(sizeof(PointerAttr) == sizeof(InheritableAttr));

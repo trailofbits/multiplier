@@ -195,9 +195,17 @@ Token OpaqueValueExpr::token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
-Expr OpaqueValueExpr::source_expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+std::optional<Expr> OpaqueValueExpr::source_expression(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal38();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 bool OpaqueValueExpr::is_unique(void) const {

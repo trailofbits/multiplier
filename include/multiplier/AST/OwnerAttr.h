@@ -51,8 +51,8 @@ class MX_EXPORT OwnerAttr : public InheritableAttr {
   static std::optional<OwnerAttr> from(const VariantEntity &e);
   static std::optional<OwnerAttr> from(const TokenContext &t);
 
-  Type deref_type(void) const;
-  Type deref_type_token(void) const;
+  std::optional<Type> dereferenced_type(void) const;
+  std::optional<Type> dereferenced_type_token(void) const;
 };
 
 static_assert(sizeof(OwnerAttr) == sizeof(InheritableAttr));

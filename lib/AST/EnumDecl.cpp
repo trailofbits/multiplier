@@ -258,7 +258,7 @@ gap::generator<EnumConstantDecl> EnumDecl::enumerators(void) const & {
 
 std::optional<EnumDecl> EnumDecl::instantiated_from_member_enum(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal78();
+    RawEntityId eid = impl->reader.getVal79();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -271,7 +271,7 @@ std::optional<EnumDecl> EnumDecl::instantiated_from_member_enum(void) const {
 
 std::optional<Type> EnumDecl::integer_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal79();
+    RawEntityId eid = impl->reader.getVal80();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -283,21 +283,21 @@ std::optional<Type> EnumDecl::integer_type(void) const {
 }
 
 TokenRange EnumDecl::integer_type_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal81(), impl->reader.getVal82());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal82(), impl->reader.getVal83());
 }
 
 std::optional<uint32_t> EnumDecl::odr_hash(void) const {
-  if (!impl->reader.getVal104()) {
+  if (!impl->reader.getVal105()) {
     return std::nullopt;
   } else {
-    return static_cast<uint32_t>(impl->reader.getVal142());
+    return static_cast<uint32_t>(impl->reader.getVal143());
   }
   return std::nullopt;
 }
 
 std::optional<Type> EnumDecl::promotion_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal83();
+    RawEntityId eid = impl->reader.getVal84();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -310,7 +310,7 @@ std::optional<Type> EnumDecl::promotion_type(void) const {
 
 std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal84();
+    RawEntityId eid = impl->reader.getVal85();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -322,35 +322,35 @@ std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
 }
 
 TemplateSpecializationKind EnumDecl::template_specialization_kind(void) const {
-  return static_cast<TemplateSpecializationKind>(impl->reader.getVal85());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal86());
 }
 
 bool EnumDecl::is_closed(void) const {
-  return impl->reader.getVal105();
-}
-
-bool EnumDecl::is_closed_flag(void) const {
   return impl->reader.getVal106();
 }
 
-bool EnumDecl::is_closed_non_flag(void) const {
+bool EnumDecl::is_closed_flag(void) const {
   return impl->reader.getVal107();
 }
 
-bool EnumDecl::is_complete(void) const {
+bool EnumDecl::is_closed_non_flag(void) const {
   return impl->reader.getVal108();
 }
 
-bool EnumDecl::is_fixed(void) const {
+bool EnumDecl::is_complete(void) const {
   return impl->reader.getVal109();
 }
 
-bool EnumDecl::is_scoped(void) const {
+bool EnumDecl::is_fixed(void) const {
   return impl->reader.getVal110();
 }
 
-bool EnumDecl::is_scoped_using_class_tag(void) const {
+bool EnumDecl::is_scoped(void) const {
   return impl->reader.getVal111();
+}
+
+bool EnumDecl::is_scoped_using_class_tag(void) const {
+  return impl->reader.getVal112();
 }
 
 #pragma GCC diagnostic pop

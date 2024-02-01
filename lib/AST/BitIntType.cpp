@@ -98,20 +98,20 @@ std::optional<BitIntType> BitIntType::from(const TokenContext &t) {
 }
 
 Type BitIntType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal18();
+  RawEntityId eid = impl->reader.getVal19();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool BitIntType::is_signed(void) const {
-  return impl->reader.getVal20();
-}
-
-bool BitIntType::is_sugared(void) const {
   return impl->reader.getVal21();
 }
 
-bool BitIntType::is_unsigned(void) const {
+bool BitIntType::is_sugared(void) const {
   return impl->reader.getVal22();
+}
+
+bool BitIntType::is_unsigned(void) const {
+  return impl->reader.getVal23();
 }
 
 #pragma GCC diagnostic pop
