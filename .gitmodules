@@ -1,0 +1,3 @@
+[submodule "vcpkg-registry"]
+	path = vcpkg-registry
+	url = git@github.com:trailofbits/multiplier-vcpkg-registry.git

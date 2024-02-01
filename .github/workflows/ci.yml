@@ -17,6 +17,7 @@ concurrency:
 env:
   LLVM_VER: 17
   PYTHON_VER: 3.11
+  VCPKG_REGISTRY_VERSION: v1.0.0
 
 jobs:
   build:
@@ -30,6 +31,11 @@ jobs:
       packages: write
 
     steps:
+      - name: Setup deploy keys
+        run: |
+          eval $(ssh-agent -s)
+          ssh-add - <<< '${{ secrets.MX_REGISTRY_KEY }}'
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -71,12 +77,23 @@ jobs:
           git clone https://github.com/microsoft/vcpkg $HOME/vcpkg
           $HOME/vcpkg/bootstrap-vcpkg.sh
 
+      - name: Preseed vcpkg cache
+        run: |
+          gh release download $VCPKG_REGISTRY_VERSION vcpkg-binary-cache.tar.bz2 --repo trailofbits/multiplier-vcpkg-registry
+          tar xjf vcpkg-binary-cache.tar.bz2
+          rm vcpkg-binary-cache.tar.bz2
+        env:
+          GITHUB_TOKEN: ${{ secrets.MX_REGISTRY_RELEASES_TOKEN }}
+
       - name: Cache vcpkg binaries
         id: cache-vcpkg
         uses: actions/cache@v4
         with:
           path: $GITHUB_WORKSPACE/vcpkg-binary-cache
-          key: ${{ runner.os }}-${{ hashFiles('vcpkg-binary-cache/**/*') }}
+          key: ${{ runner.os }}-${{ hashFiles('vcpkg-registry/ports/**/*') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ hashFiles('vcpkg-registry/ports/**/*') }}
+            ${{ runner.os }}-
 
       - name: Build
         run: |
