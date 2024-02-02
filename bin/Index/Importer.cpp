@@ -264,6 +264,7 @@ std::variant<CompilerPathInfo, std::string>
 BuildCommandAction::GetCompilerInfo(void) {
   std::vector<std::string> new_args;
   bool skip = false;
+  bool xclang = false;
   bool has_output = false;
   auto inferred_lang = "c";
   bool specifies_language = false;
@@ -294,6 +295,11 @@ BuildCommandAction::GetCompilerInfo(void) {
       }
     }
 
+    if (xclang) {
+      xclang = false;
+      continue;
+    }
+
     if (skip) {
       skip = false;
 
@@ -306,22 +312,29 @@ BuildCommandAction::GetCompilerInfo(void) {
       }
     }
 
-    if (arg.starts_with("-Wno-")) {
-      // Keep the argument.
-
     // Drop things like `-Wall`, `-Werror, `-fsanitize=..`, etc.
-    } else if (arg.starts_with("-W") ||
+    if (arg.starts_with("-W") ||
                arg.starts_with("-pedantic") ||
                arg.starts_with("-ftrivial-auto-var-init=") ||
                arg.starts_with("-fpatchable-function-entry=") ||
                arg.starts_with("-fpatchable-function-entry-offset=") ||
                arg.starts_with("-fstrict-flex-arrays=") ||
                arg.starts_with("-mfunction-return=") ||
+               arg.starts_with("-fsanitize=") ||
                arg == "-pic-is-pie" ||
                arg == "-mindirect-branch-cs-prefix" ||
                arg == "-Wno-cast-function-type-strict") {
       continue;  // Skip the argument.
 
+    // Keep the argument.
+    } else if (arg.starts_with("-Wno-")) {
+
+    // Drop these, and the following argument.
+    } else if (arg == "-Xclang") {
+      xclang = true;
+      continue;
+
+    // Drop these, and the following argument.
     } else if (arg == "-mllvm" ||
                arg == "-Xclang" ||
                arg == "-dependency-file" ||
@@ -332,7 +345,7 @@ BuildCommandAction::GetCompilerInfo(void) {
                arg == "-pic-level" ||
                arg == "-main-file-name") {
       skip = true;
-      continue;  // Skip the argument and the next argument.
+      continue;
 
     // If it specifies some file, e.g. `-frandomize-layout-seed-file=...` or
     // `-fprofile-remapping-file=`, or ..., then drop it.
@@ -345,7 +358,9 @@ BuildCommandAction::GetCompilerInfo(void) {
                arg.starts_with("-fxray-attr-list=") ||
                arg.starts_with("-tsan-compound-read-before-write=") ||
                arg.starts_with("-tsan-distinguish-volatile=") ||
-               arg.starts_with("-treat")) {
+               arg.starts_with("-treat") ||
+               arg.starts_with("-split-threshold-for-reg-with-hint=") ||
+               arg.starts_with("-instcombine-lower-dbg-declare=")) {
       continue;
 
     // Output file, `-o <file>`, `--output <arg>`.
