@@ -1043,16 +1043,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "is_interface_like",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_interface_like());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRecordDecl::is_interface_like"),
-    nullptr,
-  },
-  {
     "is_literal",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

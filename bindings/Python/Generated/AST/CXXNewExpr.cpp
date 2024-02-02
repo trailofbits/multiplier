@@ -294,16 +294,6 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::CXXNewExpr::placement_arguments"),
     nullptr,
   },
-  {
-    "should_null_check_allocation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->should_null_check_allocation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXNewExpr::should_null_check_allocation"),
-    nullptr,
-  },
   {}  // Sentinel.
 };
 }  // namespace

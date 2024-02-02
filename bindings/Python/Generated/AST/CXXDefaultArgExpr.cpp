@@ -125,16 +125,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "adjusted_rewritten_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->adjusted_rewritten_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXDefaultArgExpr::adjusted_rewritten_expression"),
-    nullptr,
-  },
-  {
     "expression",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

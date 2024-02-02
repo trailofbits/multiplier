@@ -30100,7 +30100,6 @@ class ObjCObjectPointerType(multiplier.ast.Type):
 class MemberPointerType(multiplier.ast.Type):
   desugar: multiplier.ast.Type
   class_: multiplier.ast.Type
-  most_recent_cxx_record_declaration: multiplier.ast.CXXRecordDecl
   pointee_type: multiplier.ast.Type
   is_member_data_pointer: bool
   is_member_function_pointer: bool
@@ -42778,7 +42777,6 @@ class Expr(multiplier.ast.ValueStmt):
   ignore_unless_spelled_in_source: multiplier.ast.Expr
   contains_errors: bool
   contains_unexpanded_parameter_pack: bool
-  dependence: multiplier.ast.ExprDependence
   expression_token: multiplier.frontend.Token
   obj_c_property: Optional[multiplier.ast.ObjCPropertyRefExpr]
   object_kind: multiplier.ast.ExprObjectKind
@@ -42791,7 +42789,6 @@ class Expr(multiplier.ast.ValueStmt):
   is_gl_value: bool
   is_implicit_cxx_this: bool
   is_instantiation_dependent: bool
-  is_integer_constant_expression: Optional[bool]
   is_known_to_have_boolean_value: Optional[bool]
   is_l_value: bool
   is_objcgc_candidate: bool
@@ -43740,7 +43737,6 @@ class ConceptSpecializationExpr(multiplier.ast.Expr):
   specialization_declaration: multiplier.ast.ImplicitConceptSpecializationDecl
   num_template_arguments: int
   template_arguments: Generator[multiplier.ast.TemplateArgument]
-  is_satisfied: bool
 
   @overload
   @staticmethod
@@ -46894,7 +46890,6 @@ class CXXNewExpr(multiplier.ast.Expr):
   pass_alignment: bool
   num_placement_arguments: int
   placement_arguments: Generator[multiplier.ast.Expr]
-  should_null_check_allocation: bool
 
   @overload
   @staticmethod
@@ -47472,7 +47467,6 @@ class CXXDefaultInitExpr(multiplier.ast.Expr):
     ...
 
 class CXXDefaultArgExpr(multiplier.ast.Expr):
-  adjusted_rewritten_expression: multiplier.ast.Expr
   expression: multiplier.ast.Expr
   parameter: multiplier.ast.ParmVarDecl
   rewritten_expression: Optional[multiplier.ast.Expr]
@@ -50396,7 +50390,6 @@ class RequiresExpr(multiplier.ast.Expr):
   local_parameters: Generator[multiplier.ast.ParmVarDecl]
   r_brace_token: multiplier.frontend.Token
   requires_keyword_token: multiplier.frontend.Token
-  is_satisfied: bool
 
   @overload
   @staticmethod
@@ -51149,7 +51142,6 @@ class OverloadExpr(multiplier.ast.Expr):
     ...
 
 class UnresolvedMemberExpr(multiplier.ast.OverloadExpr):
-  base: multiplier.ast.Expr
   base_type: multiplier.ast.Type
   member_token: multiplier.frontend.Token
   operator_token: multiplier.frontend.Token
@@ -55679,7 +55671,6 @@ class Decl(multiplier.Entity):
   redeclarations: Generator[multiplier.ast.Decl]
   num_attributes: int
   attributes: Generator[multiplier.ast.Attr]
-  access: multiplier.ast.AccessSpecifier
   availability: multiplier.ast.AvailabilityResult
   defining_attribute: Optional[multiplier.ast.Attr]
   described_template: Optional[multiplier.ast.TemplateDecl]
@@ -58722,7 +58713,6 @@ class VarDecl(multiplier.ast.DeclaratorDecl):
   has_external_storage: bool
   has_flexible_array_initializer: Optional[bool]
   has_global_storage: bool
-  has_ice_initializer: Optional[bool]
   has_initializer: bool
   has_local_storage: bool
   is_arc_pseudo_strong: bool
@@ -61870,7 +61860,6 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   is_effectively_final: Optional[bool]
   is_empty: Optional[bool]
   is_generic_lambda: bool
-  is_interface_like: Optional[bool]
   is_literal: Optional[bool]
   is_local_class: Optional[multiplier.ast.FunctionDecl]
   is_never_dependent_lambda: bool

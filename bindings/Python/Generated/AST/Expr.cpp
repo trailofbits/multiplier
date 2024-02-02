@@ -767,16 +767,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "dependence",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->dependence());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Expr::dependence"),
-    nullptr,
-  },
-  {
     "expression_token",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -894,16 +884,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Expr::is_instantiation_dependent"),
-    nullptr,
-  },
-  {
-    "is_integer_constant_expression",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_integer_constant_expression());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Expr::is_integer_constant_expression"),
     nullptr,
   },
   {

@@ -379,16 +379,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "has_ice_initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_ice_initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::VarDecl::has_ice_initializer"),
-    nullptr,
-  },
-  {
     "has_initializer",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

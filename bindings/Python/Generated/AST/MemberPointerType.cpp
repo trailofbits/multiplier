@@ -145,16 +145,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "most_recent_cxx_record_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->most_recent_cxx_record_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::MemberPointerType::most_recent_cxx_record_declaration"),
-    nullptr,
-  },
-  {
     "pointee_type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

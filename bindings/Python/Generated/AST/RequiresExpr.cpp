@@ -174,16 +174,6 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::RequiresExpr::requires_keyword_token"),
     nullptr,
   },
-  {
-    "is_satisfied",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_satisfied());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RequiresExpr::is_satisfied"),
-    nullptr,
-  },
   {}  // Sentinel.
 };
 }  // namespace
