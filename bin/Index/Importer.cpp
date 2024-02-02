@@ -234,6 +234,7 @@ struct CompilerPathInfo {
 class BuildCommandAction final : public Action {
  private:
   pasta::FileManager &fm;
+  std::shared_ptr<pasta::FileSystem> fs;
   const Command &command;
   GlobalIndexingState &ctx;
   const bool cxx_support;
@@ -251,6 +252,7 @@ class BuildCommandAction final : public Action {
                             GlobalIndexingState &ctx_,
                             bool cxx_support_)
       : fm(fm_),
+        fs(fm.FileSystem()),
         command(command_),
         ctx(ctx_),
         cxx_support(cxx_support_) {}
@@ -264,7 +266,7 @@ std::variant<CompilerPathInfo, std::string>
 BuildCommandAction::GetCompilerInfo(void) {
   std::vector<std::string> new_args;
   bool skip = false;
-  bool xclang = false;
+  bool skip_internal_option = false;
   bool has_output = false;
   auto inferred_lang = "c";
   bool specifies_language = false;
@@ -295,8 +297,8 @@ BuildCommandAction::GetCompilerInfo(void) {
       }
     }
 
-    if (xclang) {
-      xclang = false;
+    if (skip_internal_option) {
+      skip_internal_option = false;
       continue;
     }
 
@@ -314,36 +316,39 @@ BuildCommandAction::GetCompilerInfo(void) {
 
     // Drop things like `-Wall`, `-Werror, `-fsanitize=..`, etc.
     if (arg.starts_with("-W") ||
-               arg.starts_with("-pedantic") ||
-               arg.starts_with("-ftrivial-auto-var-init=") ||
-               arg.starts_with("-fpatchable-function-entry=") ||
-               arg.starts_with("-fpatchable-function-entry-offset=") ||
-               arg.starts_with("-fstrict-flex-arrays=") ||
-               arg.starts_with("-mfunction-return=") ||
-               arg.starts_with("-fsanitize=") ||
-               arg == "-pic-is-pie" ||
-               arg == "-mindirect-branch-cs-prefix" ||
-               arg == "-Wno-cast-function-type-strict") {
+        arg.starts_with("-pedantic") ||
+        arg.starts_with("-ftrivial-auto-var-init=") ||
+        arg.starts_with("-fpatchable-function-entry=") ||
+        arg.starts_with("-fpatchable-function-entry-offset=") ||
+        arg.starts_with("-fstrict-flex-arrays=") ||
+        arg.starts_with("-mfunction-return=") ||
+        arg.starts_with("-fsanitize=") ||
+        arg.starts_with("-fcoverage-compilation-dir=") ||
+        arg == "-pic-is-pie" ||
+        arg == "-mindirect-branch-cs-prefix" ||
+        arg == "-Wno-cast-function-type-strict" ||
+        arg == "-Wno-c++11-narrowing-const-reference" ||
+        arg == "-Wno-thread-safety-reference-return") {
       continue;  // Skip the argument.
 
     // Keep the argument.
     } else if (arg.starts_with("-Wno-")) {
 
     // Drop these, and the following argument.
-    } else if (arg == "-Xclang") {
-      xclang = true;
+    } else if (arg == "-Xclang" || arg == "-mllvm") {
+      skip_internal_option = true;
       continue;
 
     // Drop these, and the following argument.
-    } else if (arg == "-mllvm" ||
-               arg == "-Xclang" ||
-               arg == "-dependency-file" ||
+    } else if (arg == "-dependency-file" ||
                arg == "-diagnostic-log-file" ||
                arg == "-header-include-file" ||
                arg == "-stack-usage-file" ||
                arg == "-mrelocation-model" ||
                arg == "-pic-level" ||
-               arg == "-main-file-name") {
+               arg == "-main-file-name" ||
+               arg == "-MT" ||
+               arg == "-MQ") {
       skip = true;
       continue;
 
@@ -421,6 +426,15 @@ BuildCommandAction::GetCompilerInfo(void) {
   if (has_output) {
     new_args.emplace_back("-o");
     new_args.emplace_back("/dev/null");
+  }
+
+  // Probably not needed, but if the first argument looks like a relative path
+  // then convert it to an absolute path.
+  if (new_args.front().starts_with("./") ||
+      new_args.front().starts_with("../")) {
+    auto res = fs->ParsePath(new_args.front(), command.working_dir,
+                             pasta::PathKind::kUnix);
+    new_args.front() = res.generic_string();
   }
 
   CompilerPathInfo output;
@@ -522,9 +536,69 @@ bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) const {
   return false;
 }
 
+namespace {
+
+static const std::string_view kOptNoStdInc("-nostdinc");
+static const std::string_view kOptNoStdIncxx("-nostdinc++");
+static const std::string_view kOptNoBuiltinInc("-nobuiltininc");
+static const std::string_view kOptNoStdSystemInc("-nostdsysteminc");
+
+static bool IsOptNeedingFixing(std::string_view arg) {
+  return arg == kOptNoStdInc || arg == kOptNoStdIncxx ||
+         arg == kOptNoBuiltinInc || arg == kOptNoStdSystemInc;
+}
+
+// The way we do system include directory inference with the compiler means
+// that we will learn what the new include dirs are. But, we use the configured
+// compiler to go and form the jobs, and that process will use the detection of
+// these flags to figure out if it should include the system include dirs or
+// not. Therefore, if a command includes these flags which say "don't use the
+// system include dirs", then we actually want to eliminate these flags, because
+// we have learned the "new" system include dirs from the config, and thus want
+// to use them.
+static bool NeedsFixing(const pasta::ArgumentVector &argv) {
+  for (auto arg : argv) {
+    if (IsOptNeedingFixing(arg)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Produce a "fixed" command that strips options that tell PASTA to ingore
+// the system includes configured into the `pasta::Compiler`, which were
+// themselves derived from `orig_command` and thus should be trusted.
+static std::optional<pasta::CompileCommand> FixedCommand(
+    const pasta::CompileCommand &orig_command) {
+  std::vector<std::string> args;
+  for (auto arg : orig_command.Arguments()) {
+    if (!IsOptNeedingFixing(arg)) {
+      args.emplace_back(arg);
+    }
+  }
+
+  pasta::ArgumentVector argv(args);
+  pasta::Result<pasta::CompileCommand, std::string_view> maybe_cmd =
+      pasta::CompileCommand::CreateFromArguments(
+          argv, orig_command.WorkingDirectory());
+
+  if (!maybe_cmd.Succeeded()) {
+    return std::nullopt;
+  }
+
+  return maybe_cmd.TakeValue();
+}
+
+}  // namespace
+
 void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
                                          pasta::Compiler cc) {
-  auto maybe_jobs = cc.CreateJobsForCommand(cmd);
+  std::optional<pasta::CompileCommand> fixed_cmd;
+  if (NeedsFixing(cmd.Arguments())) {
+    fixed_cmd = FixedCommand(cmd);
+  }
+
+  auto maybe_jobs = cc.CreateJobsForCommand(fixed_cmd ? *fixed_cmd : cmd);
   if (!maybe_jobs.Succeeded()) {
     LOG(ERROR)
         << "Unable to create compile jobs: " << maybe_jobs.TakeError()
