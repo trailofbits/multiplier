@@ -193,7 +193,16 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   void VisitClassTemplateSpecializationDecl(
       const pasta::ClassTemplateSpecializationDecl &decl) final {
+    // Note: If the specialization is explict and is in the redeclaration
+    //       table, the canonical decl may not get added as one of the TLD
+    //       and any reference of canonical reference will not get resolved
+
     VisitDeeperDeclContext(decl);
+
+    if(IsExplicitSpecialization(decl.TemplateSpecializationKind()) &&
+       !decl.IsCanonicalDeclaration()) {
+      Accept(decl.CanonicalDeclaration());
+    }
     AddDecl(decl);
   }
 
@@ -343,7 +352,9 @@ class TLDFinder final : public pasta::DeclVisitor {
     // }
   }
 
-  void VisitUsingShadowDecl(const pasta::UsingShadowDecl &) final {}
+  void VisitUsingShadowDecl(const pasta::UsingShadowDecl &) final {
+
+  }
 
   void VisitTypeAliasTemplateDecl(const pasta::TypeAliasTemplateDecl &decl) final {
     VisitDecl(decl);
