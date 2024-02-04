@@ -700,6 +700,7 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"RequiresExpr", "IsSatisfied"},
   {"ConceptSpecializationExpr", "IsSatisfied"},
   {"Decl", "Access"},
+  {"Expr","IsKnownToHaveBooleanValue"},
 
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.

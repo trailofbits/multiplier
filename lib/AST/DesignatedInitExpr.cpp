@@ -237,11 +237,11 @@ Expr DesignatedInitExpr::initializer(void) const {
 }
 
 bool DesignatedInitExpr::is_direct_initializer(void) const {
-  return impl->reader.getVal86();
+  return impl->reader.getVal84();
 }
 
 bool DesignatedInitExpr::uses_gnu_syntax(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal85();
 }
 
 unsigned DesignatedInitExpr::num_sub_expressions(void) const {

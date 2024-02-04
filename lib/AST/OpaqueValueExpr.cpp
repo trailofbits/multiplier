@@ -209,7 +209,7 @@ std::optional<Expr> OpaqueValueExpr::source_expression(void) const {
 }
 
 bool OpaqueValueExpr::is_unique(void) const {
-  return impl->reader.getVal86();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

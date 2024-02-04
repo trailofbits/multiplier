@@ -198,7 +198,7 @@ Expr UserDefinedLiteral::cooked_literal(void) const {
 }
 
 UserDefinedLiteralLiteralOperatorKind UserDefinedLiteral::literal_operator_kind(void) const {
-  return static_cast<UserDefinedLiteralLiteralOperatorKind>(impl->reader.getVal94());
+  return static_cast<UserDefinedLiteralLiteralOperatorKind>(impl->reader.getVal92());
 }
 
 Token UserDefinedLiteral::ud_suffix_token(void) const {

@@ -239,7 +239,7 @@ gap::generator<Expr> CallExpr::arguments(void) const & {
 }
 
 CallExprADLCallKind CallExpr::adl_call_kind(void) const {
-  return static_cast<CallExprADLCallKind>(impl->reader.getVal92());
+  return static_cast<CallExprADLCallKind>(impl->reader.getVal90());
 }
 
 Type CallExpr::call_return_type(void) const {
@@ -283,27 +283,27 @@ Token CallExpr::r_paren_token(void) const {
 }
 
 bool CallExpr::has_stored_fp_features(void) const {
-  return impl->reader.getVal86();
+  return impl->reader.getVal84();
 }
 
 bool CallExpr::has_unused_result_attribute(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal85();
 }
 
 bool CallExpr::is_builtin_assume_false(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal86();
 }
 
 bool CallExpr::is_call_to_std_move(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool CallExpr::is_unevaluated_builtin_call(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal88();
 }
 
 bool CallExpr::uses_adl(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

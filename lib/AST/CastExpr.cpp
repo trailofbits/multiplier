@@ -222,7 +222,7 @@ std::optional<CastExpr> CastExpr::from(const TokenContext &t) {
 }
 
 CastKind CastExpr::cast_kind(void) const {
-  return static_cast<CastKind>(impl->reader.getVal92());
+  return static_cast<CastKind>(impl->reader.getVal90());
 }
 
 std::string_view CastExpr::cast_kind_name(void) const {
@@ -267,7 +267,7 @@ std::optional<FieldDecl> CastExpr::target_union_field(void) const {
 }
 
 bool CastExpr::has_stored_fp_features(void) const {
-  return impl->reader.getVal86();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

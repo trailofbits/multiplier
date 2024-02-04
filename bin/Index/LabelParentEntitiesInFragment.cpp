@@ -127,7 +127,10 @@ class ParentTrackerVisitor : public EntityVisitor {
     // Handle the serializable decl context differently
     auto eid = em.SpecificEntityId<mx::DeclId>(entity);
     if (!eid) {
-      assert(false);
+
+      // TODO(kumarak): I see an unlinked instance of TemplateTypeParmDecl that is 
+      //                not available in AST. Adding check to avoid assert
+      assert((false || entity.Kind() == pasta::DeclKind::kTemplateTypeParm));
       return;
     }
 

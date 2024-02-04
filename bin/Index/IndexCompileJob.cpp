@@ -279,7 +279,7 @@ class TLDFinder final : public pasta::DeclVisitor {
         continue;
       }
 
-      Accept(spec);
+      VisitDeeperDeclContext(spec);
     }
 
     // Note: A FunctionTemplateDecl node can be inline to a Record context and

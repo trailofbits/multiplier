@@ -207,11 +207,11 @@ MSPropertyDecl MSPropertyRefExpr::property_declaration(void) const {
 }
 
 bool MSPropertyRefExpr::is_arrow(void) const {
-  return impl->reader.getVal86();
+  return impl->reader.getVal84();
 }
 
 bool MSPropertyRefExpr::is_implicit_access(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop

@@ -8,6 +8,8 @@
 
 #include <cassert>
 
+#include "Util.h"
+
 namespace indexer {
 
 void EntityVisitor::VisitDeclContext(const pasta::DeclContext &dc) {
@@ -70,7 +72,7 @@ void EntityVisitor::VisitTemplateTypeParmDecl(
 }
 
 bool EntityVisitor::EnterTemplateDecl(const pasta::TemplateDecl &decl) {
-    if (EnterDecl(decl)) {
+  if (EnterDecl(decl)) {
     for (auto ls : decl.TemplateParameters().Parameters()) {
       Accept(ls);
     }
@@ -100,14 +102,21 @@ void EntityVisitor::VisitClassTemplateDecl(
   EnterTemplateDecl(decl);
 }
 
-void EntityVisitor::VisitVarTemplateDecl(const pasta::VarTemplateDecl &decl) {
+void EntityVisitor::VisitVarTemplateDecl(
+  const pasta::VarTemplateDecl &decl) {
   EnterTemplateDecl(decl);
 }
 
 void EntityVisitor::VisitFunctionTemplateDecl(
   const pasta::FunctionTemplateDecl &decl) {
   if (EnterTemplateDecl(decl)) {
-    
+    for (const pasta::FunctionDecl &spec : decl.Specializations()) {
+      if(IsExplicitSpecialization(spec.TemplateSpecializationKind())
+        || spec.IsOutOfLine()) {
+        continue;
+      }
+      Accept(spec);
+    }
   }
 }
 

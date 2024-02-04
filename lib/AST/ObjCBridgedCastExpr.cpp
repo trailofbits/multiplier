@@ -198,7 +198,7 @@ Token ObjCBridgedCastExpr::bridge_keyword_token(void) const {
 }
 
 ObjCBridgeCastKind ObjCBridgedCastExpr::bridge_kind(void) const {
-  return static_cast<ObjCBridgeCastKind>(impl->reader.getVal94());
+  return static_cast<ObjCBridgeCastKind>(impl->reader.getVal92());
 }
 
 std::string_view ObjCBridgedCastExpr::bridge_kind_name(void) const {

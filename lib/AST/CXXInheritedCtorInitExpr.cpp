@@ -193,11 +193,11 @@ std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const Tok
 }
 
 bool CXXInheritedCtorInitExpr::constructs_virtual_base(void) const {
-  return impl->reader.getVal86();
+  return impl->reader.getVal84();
 }
 
 CXXConstructExprConstructionKind CXXInheritedCtorInitExpr::construction_kind(void) const {
-  return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal92());
+  return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal90());
 }
 
 CXXConstructorDecl CXXInheritedCtorInitExpr::constructor(void) const {
@@ -210,7 +210,7 @@ Token CXXInheritedCtorInitExpr::token(void) const {
 }
 
 bool CXXInheritedCtorInitExpr::inherited_from_virtual_base(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop

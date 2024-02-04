@@ -201,7 +201,7 @@ Token CompoundLiteralExpr::l_paren_token(void) const {
 }
 
 bool CompoundLiteralExpr::is_file_scope(void) const {
-  return impl->reader.getVal86();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

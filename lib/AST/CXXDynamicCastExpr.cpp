@@ -195,7 +195,7 @@ std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const TokenContext &t
 }
 
 bool CXXDynamicCastExpr::is_always_null(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop

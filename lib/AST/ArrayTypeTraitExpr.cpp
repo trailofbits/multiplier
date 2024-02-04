@@ -203,7 +203,7 @@ Type ArrayTypeTraitExpr::queried_type(void) const {
 }
 
 ArrayTypeTrait ArrayTypeTraitExpr::trait(void) const {
-  return static_cast<ArrayTypeTrait>(impl->reader.getVal92());
+  return static_cast<ArrayTypeTrait>(impl->reader.getVal90());
 }
 
 #pragma GCC diagnostic pop

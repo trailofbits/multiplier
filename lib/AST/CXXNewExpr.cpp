@@ -196,7 +196,7 @@ std::optional<CXXNewExpr> CXXNewExpr::from(const TokenContext &t) {
 }
 
 bool CXXNewExpr::does_usual_array_delete_want_size(void) const {
-  return impl->reader.getVal86();
+  return impl->reader.getVal84();
 }
 
 Type CXXNewExpr::allocated_type(void) const {
@@ -235,7 +235,7 @@ TokenRange CXXNewExpr::direct_initializer_range(void) const {
 }
 
 CXXNewExprInitializationStyle CXXNewExpr::initialization_style(void) const {
-  return static_cast<CXXNewExprInitializationStyle>(impl->reader.getVal92());
+  return static_cast<CXXNewExprInitializationStyle>(impl->reader.getVal90());
 }
 
 std::optional<Expr> CXXNewExpr::initializer(void) const {
@@ -282,23 +282,23 @@ TokenRange CXXNewExpr::type_id_parentheses(void) const {
 }
 
 bool CXXNewExpr::has_initializer(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal85();
 }
 
 bool CXXNewExpr::is_array(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal86();
 }
 
 bool CXXNewExpr::is_global_new(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool CXXNewExpr::is_parenthesis_type_id(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal88();
 }
 
 bool CXXNewExpr::pass_alignment(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal89();
 }
 
 unsigned CXXNewExpr::num_placement_arguments(void) const {
