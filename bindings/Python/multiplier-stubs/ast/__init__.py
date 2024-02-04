@@ -42789,7 +42789,6 @@ class Expr(multiplier.ast.ValueStmt):
   is_gl_value: bool
   is_implicit_cxx_this: bool
   is_instantiation_dependent: bool
-  is_known_to_have_boolean_value: Optional[bool]
   is_l_value: bool
   is_objcgc_candidate: bool
   is_obj_c_self_expression: bool
