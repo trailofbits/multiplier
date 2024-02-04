@@ -42790,9 +42790,12 @@ class Expr(multiplier.ast.ValueStmt):
   is_implicit_cxx_this: bool
   is_instantiation_dependent: bool
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   is_known_to_have_boolean_value: Optional[bool]
 >>>>>>> 5fb8049e8 (Update python bindings.)
+=======
+>>>>>>> a6f0a37b0 (Update python bindings for new nullabls.)
   is_l_value: bool
   is_objcgc_candidate: bool
   is_obj_c_self_expression: bool
