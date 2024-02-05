@@ -67,7 +67,7 @@ jobs:
           git fetch
           head_hash="$(git rev-parse HEAD)"
           tag_hash="$(git rev-parse $VCPKG_REGISTRY_VERSION)"
-          [[ "$head_hash" == "$tag_hash" ]] || { echo "The \$VCPKG_REGISTRY_VERSION specified in CI ($VCPKG_REGISTRY_VERSION) and the submodule commit don\'t match. You probably updated \$VCPKG_REGISTRY_VERSION without updating the submodule version as well." ; exit 1 ; }
+          [ "$head_hash" = "$tag_hash" ] || { echo "The \$VCPKG_REGISTRY_VERSION specified in CI ($VCPKG_REGISTRY_VERSION) and the submodule commit don\'t match. You probably updated \$VCPKG_REGISTRY_VERSION without updating the submodule version as well." ; exit 1 ; }
         env:
             MX_REGISTRY_KEY: ${{ secrets.MX_REGISTRY_KEY }}
 
