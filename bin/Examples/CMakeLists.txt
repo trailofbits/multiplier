@@ -50,8 +50,6 @@ function(define_example exe_name source_file)
     install(
       TARGETS
         "${exe_name}"
-      EXPORT
-        "${PROJECT_NAME}Targets"
       RUNTIME
         DESTINATION
           "${CMAKE_INSTALL_BINDIR}"

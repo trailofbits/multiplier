@@ -15,9 +15,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LLVM_PASTA_VER: 4a2f2bf
   LLVM_VER: 17
   PYTHON_VER: 3.11
+  VCPKG_REGISTRY_VERSION: v1.2.0
+  VCPKG_COMMIT: fecdd89f28ed883b26a48c2b30085f6384070bb8
 
 jobs:
   build:
@@ -30,11 +31,17 @@ jobs:
       contents: write
       packages: write
 
+    strategy:
+      matrix:
+        include:
+          - name: lto
+            additional_flags: -flto
+          - name: nolto
+            additional_flags:
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: "recursive"
       - run: git config --global --add safe.directory '*'
 
       - name: Install prereqs
@@ -45,7 +52,24 @@ jobs:
           curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
           echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VER} main" | tee -a /etc/apt/sources.list > /dev/null
           echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VER} main" | tee -a /etc/apt/sources.list > /dev/null
-          apt-get update; apt-get install gh clang-${LLVM_VER} lld-${LLVM_VER} python${PYTHON_VER} python${PYTHON_VER}-dev -y
+          apt-get update; apt-get install gh clang-${LLVM_VER} lld-${LLVM_VER} python${PYTHON_VER} python${PYTHON_VER}-dev openssh-client -y
+
+      - name: Fetch submodules
+        run: |
+          mkdir -p ~/.ssh
+          eval $(ssh-agent -s)
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          echo "$MX_REGISTRY_KEY" | ssh-add - 
+          git submodule update --init --recursive -- vcpkg-registry
+
+          cd vcpkg-registry
+          git fetch
+          head_hash="$(git rev-parse HEAD)"
+          tag_hash="$(git rev-parse $VCPKG_REGISTRY_VERSION)"
+          [ "$head_hash" = "$tag_hash" ] || { echo "The \$VCPKG_REGISTRY_VERSION specified in CI ($VCPKG_REGISTRY_VERSION) and the submodule commit don\'t match. You probably updated \$VCPKG_REGISTRY_VERSION without updating the submodule version as well." ; exit 1 ; }
+        env:
+            MX_REGISTRY_KEY: ${{ secrets.MX_REGISTRY_KEY }}
 
       - name: Setup cmake
         uses: trail-of-forks/actions-setup-cmake@master
@@ -58,43 +82,53 @@ jobs:
       - name: Set up variables
         run: |
           echo "RELEASE_DIR=${RUNNER_TEMP}/release" >> $GITHUB_ENV
-          echo "LLVM_PREFIX_DIR=${RUNNER_TEMP}/llvm" >> $GITHUB_ENV
           echo "VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
-          echo "ARTIFACT_NAME=multiplier-$(git rev-parse --short=7 HEAD).tar.xz" >> $GITHUB_ENV
+          echo "ARTIFACT_NAME=multiplier-$(git rev-parse --short=7 HEAD)-${{ matrix.name }}.tar.xz" >> $GITHUB_ENV
+          echo "CC=$(which clang-$LLVM_VER)" >> $GITHUB_ENV
+          echo "CXX=$(which clang++-$LLVM_VER)" >> $GITHUB_ENV
+          echo "CFLAGS=-g0 --ld-path=$(which ld.lld-$LLVM_VER) ${{ matrix.additional_flags }}" >> $GITHUB_ENV
+          echo "CXXFLAGS=-g0 --ld-path=$(which ld.lld-$LLVM_VER) ${{ matrix.additional_flags }}" >> $GITHUB_ENV
+          echo "VCPKG_BINARY_SOURCES=clear;files,$GITHUB_WORKSPACE/vcpkg-binary-cache,readwrite" >> $GITHUB_ENV
 
-      - name: Install llvm-pasta
+      - name: Setup vcpkg
         run: |
-          mkdir -p ${RELEASE_DIR}
-          mkdir -p ${LLVM_PREFIX_DIR}
-          gh release download ${LLVM_PASTA_VER} --repo trail-of-forks/llvm-project --pattern 'llvm-*'
-          tar -xvJf llvm-pasta-*.tar.xz -C ${LLVM_PREFIX_DIR}
+          mkdir -p $GITHUB_WORKSPACE/vcpkg-binary-cache
+          git clone https://github.com/microsoft/vcpkg $HOME/vcpkg
+          git -C $HOME/vcpkg checkout $VCPKG_COMMIT
+          $HOME/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+
+      - name: Preseed vcpkg cache
+        run: |
+          gh release download $VCPKG_REGISTRY_VERSION \
+            --pattern vcpkg-binary-cache-${{ matrix.name }}.tar.bz2 \
+            --repo trailofbits/multiplier-vcpkg-registry
+          tar xjf vcpkg-binary-cache-${{ matrix.name }}.tar.bz2
+          rm vcpkg-binary-cache-${{ matrix.name }}.tar.bz2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MX_REGISTRY_RELEASES_TOKEN }}
+
+      - name: Cache vcpkg binaries
+        id: cache-vcpkg
+        uses: actions/cache@v4
+        with:
+          path: vcpkg-binary-cache
+          key: ${{ runner.os }}-${{ matrix.name }}-${{ hashFiles('vcpkg-registry/ports/**/*') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.name }}-${{ hashFiles('vcpkg-registry/ports/**/*') }}
+            ${{ runner.os }}-
 
       - name: Build
         run: |
-
-          CXXFLAGS="-g0" \
-          CCFLAGS="-g0" \
           cmake \
+            -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
+            --toolchain "$HOME/vcpkg/scripts/buildsystems/vcpkg.cmake" \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX=${RELEASE_DIR} \
-            -DCMAKE_EXE_LINKER_FLAGS="--ld-path=$(which ld.lld-${LLVM_VER})" \
-            -DCMAKE_MODULE_LINKER_FLAGS="--ld-path=$(which ld.lld-${LLVM_VER})" \
-            -DCMAKE_SHARED_LINKER_FLAGS="--ld-path=$(which ld.lld-${LLVM_VER})" \
-            -DCMAKE_C_COMPILER="$(which clang-${LLVM_VER})" \
-            -DCMAKE_CXX_COMPILER="$(which clang++-${LLVM_VER})" \
-            -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE \
-            -DClang_DIR=${LLVM_PREFIX_DIR}/lib/cmake/clang \
-            -DLLVM_DIR=${LLVM_PREFIX_DIR}/lib/cmake/llvm \
-            -DMLIR_DIR=${LLVM_PREFIX_DIR}/lib/cmake/mlir \
-            -DMX_USE_VENDORED_CLANG=OFF \
-            -DMX_USE_VENDORED_PASTA=OFF \
-            -DLLVM_ENABLE_LLD:BOOL=TRUE \
             -GNinja \
-            ./
+            -S . \
+            -B build
 
-          ninja install
+          cmake --build build
+          cmake --install build --prefix ${RELEASE_DIR}
 
       # Release on merge to main
       - name: Package Release
@@ -102,8 +136,49 @@ jobs:
         working-directory: ${{ env.RELEASE_DIR }}
         run: tar --use-compress-program pixz -cf "${ARTIFACT_NAME}" *
 
-      - name: Create Release
+      - name: Upload cache artifact
         if: github.ref == 'refs/heads/main'
-        run: gh release create ${VERSION} --generate-notes ${{ env.RELEASE_DIR }}/${{ env.ARTIFACT_NAME }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: multiplier-${{ matrix.name }}
+          path: ${{ env.RELEASE_DIR }}/${{ env.ARTIFACT_NAME }}
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/main'
+    name: Create release
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          run-id: build
+
+      - name: Install gh and extract
+        run: |
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+
+          sudo apt-get update
+          sudo apt-get install gh
+          echo "VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
+          echo "ARTIFACT_PREFIX=multiplier-$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
+
+      - name: Create release
+        run: |
+          gh release create "${{ env.VERSION }}" --generate-notes \
+            multiplier-lto/${{ env.ARTIFACT_PREFIX }}-lto.tar.xz \
+            multiplier-nolto/${{ env.ARTIFACT_PREFIX }}-nolto.tar.xz \
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

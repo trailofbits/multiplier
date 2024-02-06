@@ -117,7 +117,7 @@ if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
     DIRECTORY
       "${CMAKE_CURRENT_LIST_DIR}/${lower_project_name}-stubs"
     DESTINATION
-      "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_LIB_DIR}/${site_packages_dir}"
+      "${MX_INSTALL_LIB_DIR}/${site_packages_dir}"
   )
 
   # Install the binary into the target site-packages directory.

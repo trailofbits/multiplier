@@ -8,23 +8,23 @@
 
 find_package(Git REQUIRED)
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${MX_VENDOR_INSTALL_DIR}")
-
-add_subdirectory(capnproto)
-add_subdirectory(gflags)
-add_subdirectory(glog)  # Depends on gflags
-add_subdirectory(concurrentqueue)
-add_subdirectory(reproc)
-add_subdirectory(sqlite)
-add_subdirectory(gap)
-add_subdirectory(zstd)
-add_subdirectory(xxhash)
-add_subdirectory(rocksdb)  # Depends on zstd, gflags
-add_subdirectory(llvm-project)  # Depends on zstd
-add_subdirectory(pasta)  # Depends on llvm-project
-add_subdirectory(vast)  # Depends on gap, llvm-project
+find_package(CapnProto CONFIG REQUIRED)
+find_package(gflags CONFIG REQUIRED)
+find_package(glog CONFIG REQUIRED)
+find_package(concurrentqueue MODULE REQUIRED)
+find_package(reproc CONFIG REQUIRED)
+find_package(SQLite3 MODULE REQUIRED)
+find_package(gap CONFIG REQUIRED)
+find_package(zstd CONFIG REQUIRED)
+find_package(xxHash CONFIG REQUIRED)
+find_package(RocksDB CONFIG REQUIRED)  # Depends on zstd, gflags
+find_package(LLVM CONFIG REQUIRED)
+find_package(MLIR CONFIG REQUIRED)
+find_package(Clang CONFIG REQUIRED)
+find_package(pasta CONFIG REQUIRED)  # Depends on llvm-project
+find_package(VAST CONFIG REQUIRED)  # Depends on gap, llvm-project
 
 if(MX_ENABLE_RE2)
-  add_subdirectory(abseil)
-  add_subdirectory(re2)  # Depends on abseil
+  find_package(absl CONFIG REQUIRED)
+  find_package(re2 CONFIG REQUIRED)  # Depends on abseil
 endif()

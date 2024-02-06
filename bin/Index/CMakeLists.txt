@@ -73,6 +73,8 @@ add_executable("${exe_name}"
   "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"
 )
 
+find_package(concurrentqueue MODULE REQUIRED)
+
 target_link_libraries("${exe_name}"
   PRIVATE
     "mx-api"
@@ -118,7 +120,7 @@ set_target_properties("${exe_name}"
       "${PROJECT_BINARY_DIR}/${MX_INSTALL_BIN_DIR}"
 )
 
-find_and_link_llvm_dependencies("${exe_name}")
+#find_and_link_llvm_dependencies("${exe_name}")
 
 if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
   install(

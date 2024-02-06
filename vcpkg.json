@@ -1,0 +1,37 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+    "name": "multiplier",
+    "version": "0.1.0",
+    "dependencies": [
+        "gap",
+        "capnproto",
+        "gflags",
+        "glog",
+        "concurrentqueue",
+        "reproc",
+        {
+            "name": "sqlite3",
+            "features": [
+                "fts5"
+            ]
+        },
+        "zstd",
+        "xxhash",
+        {
+            "name": "rocksdb",
+            "features": [
+                "zstd"
+            ]
+        },
+        "llvm",
+        "pasta",
+        "vast",
+        {
+            "name": "abseil",
+            "features": [
+                "cxx17"
+            ]
+        },
+        "re2"
+    ]
+}

@@ -185,6 +185,9 @@ add_dependencies("mx-api"
   "copy_headers"
 )
 
+find_package(concurrentqueue MODULE REQUIRED)
+find_package(SQLite3 REQUIRED)
+
 target_link_libraries("mx-api"
   PUBLIC
     "gap::gap"
@@ -193,7 +196,7 @@ target_link_libraries("mx-api"
     "std::coroutines"
   PRIVATE
     "mx-serialize"
-    "mx-sqlite"
+    SQLite::SQLite3
     "zstd::libzstd_static"
     "concurrentqueue"
     ${MLIR_LIBS}
