@@ -54,7 +54,7 @@ function(define_example exe_name source_file)
         "${PROJECT_NAME}Targets"
       RUNTIME
         DESTINATION
-          "${CMAKE_INSTALL_BINDIR}"
+          "${MX_INSTALL_TOOLS_DIR}"
     )
   endif()
 endfunction(define_example)
