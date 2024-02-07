@@ -113,6 +113,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
+    "entity_id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->entity_id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TokenContext::entity_id"),
+    nullptr,
+  },
+  {
     "has_parent",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

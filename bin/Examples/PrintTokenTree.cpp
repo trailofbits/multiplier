@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
       return EXIT_FAILURE;
     }
 
-    mx::TokenTree tt = mx::TokenTree::from(fragment.value());
+    mx::TokenTree tt = mx::TokenTree::create(fragment.value());
     tt.dump(std::cout);
   
   } else if (FLAGS_file_id != mx::kInvalidEntityId) {
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
       return EXIT_FAILURE;
     }
 
-    mx::TokenTree tt = mx::TokenTree::from(file.value());
+    mx::TokenTree tt = mx::TokenTree::create(file.value());
     tt.dump(std::cout);
 
   } else {

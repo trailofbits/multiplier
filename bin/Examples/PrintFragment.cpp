@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
   std::cout << fragment->file_tokens().data();
 
   std::cout << "\n\nFused data from file and fragment token ranges:\n";
-  mx::TokenTree tt = mx::TokenTree::from(fragment.value());
+  mx::TokenTree tt = mx::TokenTree::create(fragment.value());
   mx::TokenRange fused_tokens = tt.serialize();
   std::cout << fused_tokens.data();
 

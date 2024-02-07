@@ -170,6 +170,11 @@ class TokenTreeImpl {
       SequenceNode *seq, const TrailingTokens &trailing_tokens);
 };
 
+class CustomTokenTreeImpl final : public TokenTreeImpl {
+ public:
+  std::vector<std::shared_ptr<TokenTreeImpl>> nested_trees;
+};
+
 class TokenTreeImplCache {
  private:
   mutable std::weak_ptr<TokenTreeImpl> impl;

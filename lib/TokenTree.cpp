@@ -2098,6 +2098,10 @@ TokenTree::operator bool(void) const noexcept {
 }
 
 TokenTree TokenTree::from(const File &file) {
+  return create(file);
+}
+
+TokenTree TokenTree::create(const File &file) {
   auto self = file.impl->cached_token_tree.Get();
   if (self) {
     return TokenTree(std::move(self));
@@ -2114,6 +2118,10 @@ TokenTree TokenTree::from(const File &file) {
 }
 
 TokenTree TokenTree::from(const Fragment &frag) {
+  return create(frag);
+}
+
+TokenTree TokenTree::create(const Fragment &frag) {
   auto self = frag.impl->cached_token_tree.Get();
   if (self) {
     return TokenTree(std::move(self));
@@ -2138,8 +2146,12 @@ TokenTree TokenTree::from(const Fragment &frag) {
   return TokenTree(frag.impl->cached_token_tree.Put(std::move(self)));
 }
 
-// Create a "flat" token tree for a token range.
 TokenTree TokenTree::from(const TokenRange &range) {
+  return create(range);
+}
+
+// Create a "flat" token tree for a token range.
+TokenTree TokenTree::create(const TokenRange &range) {
   if (!range) {
     return TokenTree();
   }
@@ -2157,9 +2169,34 @@ TokenTree TokenTree::from(const TokenRange &range) {
   return TokenTree(std::move(self));
 }
 
+TokenTree TokenTree::create(std::vector<CustomTokenTreeNode> elems) {
+  if (elems.empty()) {
+    return TokenTree();
+  }
+
+  auto self = std::make_shared<CustomTokenTreeImpl>();
+  TokenTreeImpl::SequenceNode *seq = nullptr;
+  for (auto elem : elems) {
+    if (std::holds_alternative<TokenRange>(elem)) {
+      for (auto tok : std::get<TokenRange>(elem)) {
+        seq = self->AddTokenToSequence(seq, self->GetOrCreateIndex(tok));
+      }
+    } else if (std::holds_alternative<TokenTreeNode>(elem)) {
+      auto &node = std::get<TokenTreeNode>(elem);
+      self->nested_trees.emplace_back(node.impl);
+      seq = self->AddNodeToSequence(
+          seq, *reinterpret_cast<const TokenTreeImpl::Node *>(node.opaque_node),
+          self->dummy_trailing_tokens);
+    }
+  }
+
+  self->root = seq;
+  return TokenTree(std::move(self));
+}
+
 namespace {
 
-// Used for invalid tokens.
+// Used to read tokens from the token tree.
 class TokenTreeReader final : public TokenReader {
  public:
   const std::shared_ptr<TokenTreeImpl> impl;

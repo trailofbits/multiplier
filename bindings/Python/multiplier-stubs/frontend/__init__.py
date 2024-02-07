@@ -619,6 +619,7 @@ class TokenCategory(IntEnum):
   ERROR = 38
 
 class TokenContext(object):
+  entity_id: int
   has_parent: bool
   is_alias: bool
   index_in_fragment: int
@@ -2805,6 +2806,26 @@ class TokenTree(object):
   @overload
   @staticmethod
   def FROM(arg_0: multiplier.frontend.TokenRange) -> multiplier.frontend.TokenTree:
+    ...
+
+  @overload
+  @staticmethod
+  def create(arg_0: multiplier.frontend.File) -> multiplier.frontend.TokenTree:
+    ...
+
+  @overload
+  @staticmethod
+  def create(arg_0: multiplier.Fragment) -> multiplier.frontend.TokenTree:
+    ...
+
+  @overload
+  @staticmethod
+  def create(arg_0: multiplier.frontend.TokenRange) -> multiplier.frontend.TokenTree:
+    ...
+
+  @overload
+  @staticmethod
+  def create(elems: Sequence[multiplier.frontend.TokenRange | multiplier.frontend.TokenTreeNode]) -> multiplier.frontend.TokenTree:
     ...
 
   def serialize(self, vis: multiplier.frontend.TokenTreeVisitor) -> multiplier.frontend.TokenRange:
