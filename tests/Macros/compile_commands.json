@@ -75,6 +75,11 @@
 "directory": ""
 },
 {
+"file": "ForwardThenConcat.c",
+"command": "/usr/bin/cc ForwardThenConcat.c",
+"directory": ""
+},
+{
 "file": "FragmentWithMultipleBounds.c",
 "command": "/usr/bin/cc -DSHORT_BOUNDS FragmentWithMultipleBounds.c",
 "directory": ""

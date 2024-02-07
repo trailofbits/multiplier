@@ -606,8 +606,7 @@ void Substitution::Print(std::ostream &os) const {
     } else if (!c.empty()) {
       return c;
     } else {
-      TT_ASSERT(false);
-      return {};
+      return "\x1b[1;31m???\033[0m";
     }
   };
 
@@ -2282,22 +2281,12 @@ std::optional<TokenTreeNodeRange> TokenTree::Create(
       return std::nullopt;
     }
 
-
-//    std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
-//    std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
-//    sub->Print(std::cerr);
-//    std::cerr << "\n\n\n";
-//    sub->PrintDOT(std::cerr);
-//    std::cerr << "\n\n";
-
-
-//        std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
-//        std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
-//        sub->Print(std::cerr);
-//        std::cerr << "\n\n\n";
-//        sub->PrintDOT(std::cerr);
-//        std::cerr << "\n\n\n";
-//        return std::string();
+    // std::cerr << "-----------------------------------------------------\n";
+    // std::cerr << "-----------------------------------------------------\n";
+    // sub->Print(std::cerr);
+    // std::cerr << "\n\n\n";
+    // sub->PrintDOT(std::cerr);
+    // std::cerr << "\n\n\n";
 
     std::shared_ptr<const SubstitutionNodeList> ret(
         std::move(impl), &(sub->before));
