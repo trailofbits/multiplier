@@ -92,6 +92,12 @@ class TokenTreeImpl {
   // or an invalid token reader. This is indexed by a `TokenIndex`.
   std::vector<TokenReaderPtr> readers;
 
+  // References to nodes end up being raw pointers, so we can have one tree
+  // refer to the internal node of anotehr tree as long as we hold a reference
+  // to the tree itself. This enables file token trees to reference fragment
+  // token tree nodes, and also allows user-constructed token tree nodes.
+  std::vector<std::shared_ptr<TokenTreeImpl>> nested_trees;
+
   int depth{0};
 
   Node root;
@@ -168,11 +174,6 @@ class TokenTreeImpl {
                                   const TrailingTokens &trailing_tokens);
   SequenceNode *AddTrailingTokensToSequence(
       SequenceNode *seq, const TrailingTokens &trailing_tokens);
-};
-
-class CustomTokenTreeImpl final : public TokenTreeImpl {
- public:
-  std::vector<std::shared_ptr<TokenTreeImpl>> nested_trees;
 };
 
 class TokenTreeImplCache {

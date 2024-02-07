@@ -2795,21 +2795,6 @@ class TokenTree(object):
 
   @overload
   @staticmethod
-  def FROM(arg_0: multiplier.frontend.File) -> multiplier.frontend.TokenTree:
-    ...
-
-  @overload
-  @staticmethod
-  def FROM(arg_0: multiplier.Fragment) -> multiplier.frontend.TokenTree:
-    ...
-
-  @overload
-  @staticmethod
-  def FROM(arg_0: multiplier.frontend.TokenRange) -> multiplier.frontend.TokenTree:
-    ...
-
-  @overload
-  @staticmethod
   def create(arg_0: multiplier.frontend.File) -> multiplier.frontend.TokenTree:
     ...
 

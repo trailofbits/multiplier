@@ -38,7 +38,7 @@ class MX_EXPORT TokenContext {
   std::shared_ptr<const TokenContextReader> reader;
 
   // Offset of this token context inside of the fragment.
-  unsigned offset;
+  unsigned offset{0u};
 
   // Offset of this token context's parent within the fragment.
   std::optional<unsigned> parent_offset;
@@ -48,14 +48,18 @@ class MX_EXPORT TokenContext {
 
   // Entity to which this token context refers. In general, this belongs to
   // the current fragment, but in rare instances it may not.
-  RawEntityId entity_id_;
+  RawEntityId referenced_entity_id{kInvalidEntityId};
 
   TokenContext(void) = delete;
 
   inline TokenContext(std::shared_ptr<const TokenContextReader> reader_)
+      : reader(std::move(reader_)) {}
+
+  inline TokenContext(std::shared_ptr<const TokenContextReader> reader_,
+                      RawEntityId referenced_entity_id_, unsigned offset_)
       : reader(std::move(reader_)),
-        offset(0u),
-        entity_id_(kInvalidEntityId) {}
+        offset(offset_),
+        referenced_entity_id(referenced_entity_id_) {}
 
  public:
 
@@ -66,7 +70,7 @@ class MX_EXPORT TokenContext {
   TokenContext &operator=(const TokenContext &) noexcept = default;
 
   inline RawEntityId entity_id(void) const noexcept {
-    return entity_id_;
+    return referenced_entity_id;
   }
 
   inline bool has_parent(void) const noexcept {

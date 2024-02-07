@@ -1929,11 +1929,13 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
            std::get<FileTokenId>(last_file_tok_vid).offset);
 #endif
 
-    Bounds frag_bounds = FragmentBounds(file_toks);
+    // Create an independent tree for the fragment, and reference it directly.
+    TokenTree frag_tree = TokenTree::create(frag);
+    Node frag_node = *reinterpret_cast<const Node *>(
+        frag_tree.root().opaque_node);
 
-    depth = 0;
-    Node frag_node = CreateFragmentNode(frag, frag_bounds);
-    assert(!depth);
+    // Steal the nested tree.
+    nested_trees.emplace_back(std::move(frag_tree.impl));
 
     if (auto frag_it = file_frags.find(last_file_tok_id);
         frag_it != file_frags.end()) {
@@ -2097,10 +2099,6 @@ TokenTree::operator bool(void) const noexcept {
   return impl != kInvalidTree;
 }
 
-TokenTree TokenTree::from(const File &file) {
-  return create(file);
-}
-
 TokenTree TokenTree::create(const File &file) {
   auto self = file.impl->cached_token_tree.Get();
   if (self) {
@@ -2115,10 +2113,6 @@ TokenTree TokenTree::create(const File &file) {
   self->root = self->CreateFileNode(file);
 
   return TokenTree(file.impl->cached_token_tree.Put(std::move(self)));
-}
-
-TokenTree TokenTree::from(const Fragment &frag) {
-  return create(frag);
 }
 
 TokenTree TokenTree::create(const Fragment &frag) {
@@ -2146,10 +2140,6 @@ TokenTree TokenTree::create(const Fragment &frag) {
   return TokenTree(frag.impl->cached_token_tree.Put(std::move(self)));
 }
 
-TokenTree TokenTree::from(const TokenRange &range) {
-  return create(range);
-}
-
 // Create a "flat" token tree for a token range.
 TokenTree TokenTree::create(const TokenRange &range) {
   if (!range) {
@@ -2174,14 +2164,14 @@ TokenTree TokenTree::create(std::vector<CustomTokenTreeNode> elems) {
     return TokenTree();
   }
 
-  auto self = std::make_shared<CustomTokenTreeImpl>();
+  auto self = std::make_shared<TokenTreeImpl>();
   TokenTreeImpl::SequenceNode *seq = nullptr;
   for (auto elem : elems) {
     if (std::holds_alternative<TokenRange>(elem)) {
       for (auto tok : std::get<TokenRange>(elem)) {
         seq = self->AddTokenToSequence(seq, self->GetOrCreateIndex(tok));
       }
-    } else if (std::holds_alternative<TokenTreeNode>(elem)) {
+    } else {
       auto &node = std::get<TokenTreeNode>(elem);
       self->nested_trees.emplace_back(node.impl);
       seq = self->AddNodeToSequence(

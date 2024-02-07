@@ -45,6 +45,7 @@ class MX_EXPORT TokenTree {
   friend class Compilation;
   friend class File;
   friend class Fragment;
+  friend class TokenTreeImpl;
 
   std::shared_ptr<TokenTreeImpl> impl;
 
@@ -53,10 +54,6 @@ class MX_EXPORT TokenTree {
 
  public:
   TokenTree(void);
-
-  [[deprecated]] static TokenTree from(const File &);
-  [[deprecated]] static TokenTree from(const Fragment &);
-  [[deprecated]] static TokenTree from(const TokenRange &);
 
   static TokenTree create(const File &);
   static TokenTree create(const Fragment &);
@@ -109,6 +106,7 @@ uintptr_t hash_code(const TokenTreeNode &ttn) noexcept;
 class MX_EXPORT TokenTreeNode {
  private:
   friend class TokenTree;
+  friend class TokenTreeImpl;
   friend class EmptyTokenTreeNode;
   friend class TokenTokenTreeNode;
   friend class ChoiceTokenTreeNode;
