@@ -90,7 +90,6 @@ static Token RightCornerOfUse(const Macro &exp) {
   return ret;
 }
 
-
 // If the `i`th thing of `before` is a `, ## __VA_ARGS__` then return `true`
 // if the `__VA_ARGS__` expands to something, and `false` if it expands to
 // nothing. If it's not a paste of `__VA_ARGS__` then return `std::nullopt`.
@@ -1220,7 +1219,7 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::TopLevelUseBounds(
     if (Token file_tok = tok.file_token()) {
       if (!last_tok) {
         TokenIndex ti = GetOrCreateIndex(file_tok);
-        ret.reader_index = ti.first;
+        ret.reader = ti.first;
         ret.begin_index = ti.second + 1u;
         ret.end_index = ret.begin_index;
       }
@@ -1231,7 +1230,7 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::TopLevelUseBounds(
 
   TokenIndex ti = GetOrCreateIndex(last_tok);
   ret.end_index = ti.second;
-  if (ti.first != ret.reader_index) {
+  if (ti.first != ret.reader) {
     assert(false);
     return std::nullopt;
   }
@@ -1259,7 +1258,7 @@ TokenTreeImpl::Bounds TokenTreeImpl::FragmentBounds(const TokenRange &tokens) {
       return ret;
     }
 
-    ret.reader_index = ri_begin;
+    ret.reader = ri_begin;
     ret.begin_index = ti_begin;
     ret.end_index = ti_end;
   }
@@ -1268,11 +1267,9 @@ TokenTreeImpl::Bounds TokenTreeImpl::FragmentBounds(const TokenRange &tokens) {
 
 // Widen bounds to cover leading/trailing comments.
 TokenTreeImpl::Bounds TokenTreeImpl::WidenBounds(Bounds ret) {
-  auto &reader = readers[ret.reader_index];
-
   // Try to widen to encompass leading comments.
   for (auto i = ret.begin_index; i; ) {
-    switch (reader->NthTokenKind(--i)) {
+    switch (ret.reader->NthTokenKind(--i)) {
       case TokenKind::COMMENT:
         ret.begin_index = i;
         continue;
@@ -1288,13 +1285,13 @@ TokenTreeImpl::Bounds TokenTreeImpl::WidenBounds(Bounds ret) {
   auto saw_lc = false;
   auto good = true;
   for (auto i = ret.end_index; good; ) {
-    switch (reader->NthTokenKind(++i)) {
+    switch (ret.reader->NthTokenKind(++i)) {
       case TokenKind::COMMENT:
         ret.end_index = i;
         continue;
       case TokenKind::WHITESPACE:
         saw_lc = false;
-        for (auto ch : reader->NthTokenData(i)) {
+        for (auto ch : ret.reader->NthTokenData(i)) {
           if (ch == '\\') {
             saw_lc = true;
           } else if (ch == '\r') {
@@ -1333,11 +1330,11 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
       if (Token file_tok = std::get<Token>(mt).file_token()) {
         if (!last_tok) {
           TokenIndex ti = GetOrCreateIndex(file_tok);
-          ret.reader_index = ti.first;
+          ret.reader = ti.first;
           ret.begin_index = ti.second;
           ret.end_index = ret.begin_index;
         } else {
-          assert(ret.reader_index == GetOrCreateIndex(file_tok).first);
+          assert(ret.reader == GetOrCreateIndex(file_tok).first);
         }
         last_tok = std::move(file_tok);
       }
@@ -1347,16 +1344,16 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
       if (Token file_tok = LeftCornerOfUse(m).file_token()) {
         if (!last_tok) {
           TokenIndex ti = GetOrCreateIndex(file_tok);
-          ret.reader_index = ti.first;
+          ret.reader = ti.first;
           ret.begin_index = ti.second;
           ret.end_index = ret.begin_index;
         } else {
-          assert(ret.reader_index == GetOrCreateIndex(file_tok).first);
+          assert(ret.reader == GetOrCreateIndex(file_tok).first);
         }
 
         last_tok = std::move(file_tok);
         if (auto rc_file_tok = RightCornerOfUse(m).file_token()) {
-          assert(ret.reader_index == GetOrCreateIndex(rc_file_tok).first);
+          assert(ret.reader == GetOrCreateIndex(rc_file_tok).first);
           last_tok = std::move(rc_file_tok);
         }
       }
@@ -1368,7 +1365,7 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
   }
 
   TokenIndex ti = GetOrCreateIndex(last_tok);
-  assert(ti.first == ret.reader_index);
+  assert(ti.first == ret.reader);
   assert(ti.second >= ret.begin_index);
   ret.end_index = ti.second;
   return WidenBounds(ret);
@@ -1377,16 +1374,8 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
 // Get a `TokenIndex` for `tok`. This will save the reader into the token tree
 // if it can't be found, formulating a new token index position for that reader.
 TokenTreeImpl::TokenIndex TokenTreeImpl::GetOrCreateIndex(const Token &tok) {
-  EntityOffset i = 0u;
-  for (TokenReaderPtr &reader : readers) {
-    if (reader == tok.impl) {
-      return TokenIndex(i, tok.offset);
-    }
-    ++i;
-  }
-
-  readers.emplace_back(tok.impl);
-  return TokenIndex(i, tok.offset);
+  nested_readers.emplace(tok.impl);
+  return TokenIndex(tok.impl.get(), tok.offset);
 }
 
 // Get the `TokenIndex` that is the right corner of an existing use.
@@ -1415,7 +1404,7 @@ static std::optional<TokenTreeImpl::TokenIndex> RightCornerOfUse(
 // Counts the number of tokens after `begin` and before `end` that we can
 // inject before the token which logically represents `end`.
 static EntityOffset CountInjectable(
-    const TokenReaderPtr &reader, const TokenTreeImpl::Bounds &bounds,
+    const TokenReader *reader, const TokenTreeImpl::Bounds &bounds,
     TokenTreeImpl::TokenIndex upper_bound,
     TokenTreeImpl::SequenceNode *parent_seq,
     TokenTreeImpl::SequenceNode *seq, int depth) {
@@ -1488,17 +1477,17 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
   }
 
   TokenIndex fti = GetOrCreateIndex(file_tok);
-  if (fti.first != bounds.reader_index || fti.second <= bounds.begin_index ||
+  if (fti.first != bounds.reader || fti.second <= bounds.begin_index ||
       fti.second > bounds.end_index) {
     return seq;
   }
 
   // Inject the missing whitespace/comment tokens.
-  const TokenReaderPtr &fti_reader = readers[fti.first];
+  const TokenReader *fti_reader = fti.first;
   for (auto num = CountInjectable(fti_reader, bounds, fti, last_sequence,
                                   seq, depth);
        num; --num) {
-    seq = AddTokenToSequence(seq, TokenIndex(fti.first, fti.second - num));
+    seq = AddTokenToSequence(seq, TokenIndex(fti_reader, fti.second - num));
   }
 
   return seq;
@@ -1621,7 +1610,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
 
     TokenIndex lc_index = GetOrCreateIndex(lc_ft);
     Bounds new_bounds = bounds;
-    if (new_bounds.reader_index != lc_index.first ||
+    if (new_bounds.reader != lc_index.first ||
         lc_index.second < bounds.begin_index ||
         lc_index.second > bounds.end_index) {
 
@@ -1639,7 +1628,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
       const Token &rc_ft = fts[i + 1u];
       if (rc_ft) {
         TokenIndex rc_index = GetOrCreateIndex(rc_ft);
-        if (new_bounds.reader_index == rc_index.first &&
+        if (new_bounds.reader == rc_index.first &&
             rc_index.second >= new_bounds.begin_index &&
             rc_index.second <= new_bounds.end_index) {
           assert(new_bounds.begin_index <= rc_index.second);
@@ -1701,7 +1690,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
     }
 
     TokenIndex ti = GetOrCreateIndex(te_file_tok);
-    if (ti.first != me_bounds.reader_index ||
+    if (ti.first != me_bounds.reader ||
         ti.second < me_bounds.begin_index ||
         ti.second > me_bounds.end_index) {
       trailing_tokens.tokens.clear();
@@ -2088,9 +2077,6 @@ static const std::shared_ptr<TokenTreeImpl> kInvalidTree =
 static const std::shared_ptr<TokenReader> kWhitespaceReader =
     CreateWhitespaceReader();
 
-//static constexpr EntityOffset kFileReaderIndex = 0u;
-static constexpr EntityOffset kWhitespaceReaderIndex = 1u;
-
 TokenTree::TokenTree(void)
     : TokenTree(kInvalidTree) {}
 
@@ -2108,8 +2094,6 @@ TokenTree TokenTree::create(const File &file) {
   self = std::make_shared<TokenTreeImpl>();
   auto file_tokens = file.tokens();
   self->file = file.impl;
-  self->readers.emplace_back(file_tokens.impl);
-  self->readers.emplace_back(kWhitespaceReader);
   self->root = self->CreateFileNode(file);
 
   return TokenTree(file.impl->cached_token_tree.Put(std::move(self)));
@@ -2125,14 +2109,8 @@ TokenTree TokenTree::create(const Fragment &frag) {
   self->fragment = frag.impl;
 
   if (auto opt_file = File::containing(frag)) {
-    auto file_tokens = opt_file->tokens();
     self->file = opt_file->impl;
-    self->readers.emplace_back(file_tokens.impl);
-  } else {
-    self->readers.emplace_back(TokenRange().impl);
   }
-
-  self->readers.emplace_back(kWhitespaceReader);
 
   TokenTreeImpl::Bounds frag_bounds = self->FragmentBounds(frag.file_tokens());
   self->root = self->CreateFragmentNode(frag, frag_bounds);
@@ -2147,8 +2125,6 @@ TokenTree TokenTree::create(const TokenRange &range) {
   }
 
   auto self = std::make_shared<TokenTreeImpl>();
-  self->readers.emplace_back(range.impl);
-  self->readers.emplace_back(kWhitespaceReader);
 
   TokenTreeImpl::SequenceNode *seq = nullptr;
   for (auto tok : range) {
@@ -2228,16 +2204,16 @@ class TokenTreeReader final : public TokenReader {
     if (ti >= tokens.size()) {
       return OwningFragment();
     }
-    auto [ri, to] = tokens[ti];
-    return impl->readers[ri]->NthOwningFragment(to);
+    auto [reader, to] = tokens[ti];
+    return reader->NthOwningFragment(to);
   }
 
   const FileImpl *NthOwningFile(EntityOffset ti) const noexcept override {
     if (ti >= tokens.size()) {
       return OwningFile();
     }
-    auto [ri, to] = tokens[ti];
-    return impl->readers[ri]->NthOwningFile(to);
+    auto [reader, to] = tokens[ti];
+    return reader->NthOwningFile(to);
   }
 
   // Return the number of tokens accessible to this reader.
@@ -2250,8 +2226,8 @@ class TokenTreeReader final : public TokenReader {
     if (ti >= tokens.size()) {
       return TokenKind::UNKNOWN;
     }
-    auto [ri, to] = tokens[ti];
-    return impl->readers[ri]->NthTokenKind(to);
+    auto [reader, to] = tokens[ti];
+    return reader->NthTokenKind(to);
   }
 
   // Return the data of the Nth token.
@@ -2270,8 +2246,8 @@ class TokenTreeReader final : public TokenReader {
     if (ti >= tokens.size()) {
       return mx::kInvalidEntityId;
     }
-    auto [ri, to] = tokens[ti];
-    return impl->readers[ri]->NthDerivedTokenId(to);
+    auto [reader, to] = tokens[ti];
+    return reader->NthDerivedTokenId(to);
   }
 
   // Return the id of the parsed token which is derived from the Nth token.
@@ -2279,8 +2255,8 @@ class TokenTreeReader final : public TokenReader {
     if (ti >= tokens.size()) {
       return mx::kInvalidEntityId;
     }
-    auto [ri, to] = tokens[ti];
-    return impl->readers[ri]->NthParsedTokenId(to);
+    auto [reader, to] = tokens[ti];
+    return reader->NthParsedTokenId(to);
   }
 
   // Return the id of the macro containing the Nth token.
@@ -2288,8 +2264,8 @@ class TokenTreeReader final : public TokenReader {
     if (ti >= tokens.size()) {
       return mx::kInvalidEntityId;
     }
-    auto [ri, to] = tokens[ti];
-    return impl->readers[ri]->NthContainingMacroId(to);
+    auto [reader, to] = tokens[ti];
+    return reader->NthContainingMacroId(to);
   }
 
   // Return an entity id associated with the Nth token.
@@ -2297,8 +2273,8 @@ class TokenTreeReader final : public TokenReader {
     if (ti >= tokens.size()) {
       return mx::kInvalidEntityId;
     }
-    auto [ri, to] = tokens[ti];
-    return impl->readers[ri]->NthRelatedEntityId(to);
+    auto [reader, to] = tokens[ti];
+    return reader->NthRelatedEntityId(to);
   }
 
   // Return the entity associated with the Nth token.
@@ -2306,8 +2282,8 @@ class TokenTreeReader final : public TokenReader {
     if (ti >= tokens.size()) {
       return NotAnEntity{};
     }
-    auto [ri, to] = tokens[ti];
-    return impl->readers[ri]->NthRelatedEntity(to);
+    auto [reader, to] = tokens[ti];
+    return reader->NthRelatedEntity(to);
   }
 
   // Return the id of the Nth token.
@@ -2315,16 +2291,16 @@ class TokenTreeReader final : public TokenReader {
     if (ti >= tokens.size()) {
       return mx::kInvalidEntityId;
     }
-    auto [ri, to] = tokens[ti];
-    return impl->readers[ri]->NthTokenId(to);
+    auto [reader, to] = tokens[ti];
+    return reader->NthTokenId(to);
   }
 
   EntityId NthFileTokenId(EntityOffset ti) const override {
     if (ti >= tokens.size()) {
       return mx::kInvalidEntityId;
     }
-    auto [ri, to] = tokens[ti];
-    return impl->readers[ri]->NthFileTokenId(to);
+    auto [reader, to] = tokens[ti];
+    return reader->NthFileTokenId(to);
   }
 
   // Returns `true` if `this` is logically equivalent to `that`.
@@ -2349,7 +2325,8 @@ class TokenTreeReader final : public TokenReader {
       // Not configured to look at the same high-level entities.
       if (impl->file != that->impl->file ||
           impl->fragment != that->impl->fragment ||
-          impl->readers.size() != that->impl->readers.size()) {
+          impl->nested_readers.size() != that->impl->nested_readers.size() ||
+          impl->nested_trees.size() != that->impl->nested_trees.size()) {
         return false;
       }
     }
@@ -2362,8 +2339,7 @@ class TokenTreeReader final : public TokenReader {
 
 void TokenTreeReader::Append(TokenTreeImpl::TokenIndex ti) {
 
-  auto [ri, to] = ti;
-  const TokenReaderPtr &tok_reader = impl->readers[ri];
+  auto [tok_reader, to] = ti;
 
   TokenKind tk = tok_reader->NthTokenKind(to);
   VariantId rel_id = EntityId(tok_reader->NthRelatedEntity(to)).Unpack();
@@ -2384,7 +2360,7 @@ void TokenTreeReader::Append(TokenTreeImpl::TokenIndex ti) {
   if (last_tk == TokenKind::WHITESPACE && tk == TokenKind::WHITESPACE &&
       !is_include_tok) {
     TokenTreeImpl::TokenIndex last_ti = tokens.back();
-    if (last_ti.first != ri || (last_ti.second + 1u) != to) {
+    if (last_ti.first != tok_reader || (last_ti.second + 1u) != to) {
       return;  // Don't add two whitespaces side-by-side.
     }
   }
@@ -2404,7 +2380,7 @@ void TokenTreeReader::Append(TokenTreeImpl::TokenIndex ti) {
   // Force inject whitespace between two tokens.
   if (add_leading_ws || (!is_first && AddLeadingWhitespace(tk))) {
     if (!is_include_tok && !SuppressLeadingWhitespace(tk)) {
-      tokens.emplace_back(kWhitespaceReaderIndex, 0u);
+      tokens.emplace_back(kWhitespaceReader.get(), 0u);
       data.push_back(' ');
       token_offset.emplace_back(data_size++);
     }
@@ -2560,9 +2536,9 @@ void TokenTree::dump(std::ostream &os) {
     auto i = 0u;
     for (const TokenTreeImpl::Node &child : node.children) {
       if (std::holds_alternative<TokenTreeImpl::TokenIndex>(child)) {
-        auto [ri, to] = std::get<TokenTreeImpl::TokenIndex>(child);
+        auto [reader, to] = std::get<TokenTreeImpl::TokenIndex>(child);
         os << "<TD>";
-        StreamTokData(os, impl->readers[ri]->NthTokenData(to));
+        StreamTokData(os, reader->NthTokenData(to));
         os << "</TD>";
       } else {
         os << "<TD port=\"c" << i << "\"> </TD>";
@@ -2677,8 +2653,8 @@ TokenTreeNodeKind TokenTreeNode::kind(void) const noexcept {
 
 Token TokenTokenTreeNode::token(void) const noexcept {
   auto index = TryExtract<TokenTreeImpl::TokenIndex>(opaque_node);
-  auto [ri, to] = *index;
-  return Token(impl->readers[ri], to);
+  auto [reader, to] = *index;
+  return Token(TokenReaderPtr(impl, reader), to);
 }
 
 gap::generator<std::pair<Fragment, TokenTreeNode>>

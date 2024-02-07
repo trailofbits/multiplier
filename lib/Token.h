@@ -98,6 +98,12 @@ class TokenReader {
 // Used for invalid tokens.
 class InvalidTokenReader final : public TokenReader {
  public:
+  // Returns the singleton instance of the invalid token reader.
+  static TokenReaderPtr Singleton(void);
+
+  // Returns the singleton instance of the invalid token reader.
+  static const TokenReader *RawSingleton(void);
+
   virtual ~InvalidTokenReader(void) noexcept;
 
   // Return the number of tokens accessible to this reader.
