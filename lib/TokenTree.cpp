@@ -1893,6 +1893,8 @@ static bool IsFloatingDirectiveFragment(const Fragment &frag) {
 // then this will include them.
 TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
 
+  const TokenRange all_file_toks = entity.tokens();
+
   // Collect all overlapping fragments into alternations.
   std::unordered_map<RawEntityId, ChoiceNode *> file_frags;
   std::unordered_map<RawEntityId, RawEntityId> frag_begin;
@@ -1927,22 +1929,16 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
     // Steal the nested tree.
     nested_trees.emplace_back(std::move(frag_tree.impl));
 
-    if (auto frag_it = file_frags.find(last_file_tok_id);
-        frag_it != file_frags.end()) {
-
-      ChoiceNode *alt = frag_it->second;
-      alt->fragments.emplace_back(std::move(frag));
-      alt->children.emplace_back(std::move(frag_node));
-
-    } else {
-      ChoiceNode *alt = &(choices.emplace_back());
-      alt->fragments.emplace_back(std::move(frag));
-      alt->children.emplace_back(std::move(frag_node));
-
-      file_frags.emplace(last_file_tok_id, alt);
+    ChoiceNode *&alt = file_frags[last_file_tok_id];
+    if (!alt) {
+      alt = &(choices.emplace_back());
       frag_begin.emplace(last_file_tok_id, first_file_tok_id);
       frag_end.emplace(first_file_tok_id, last_file_tok_id);
     }
+
+    alt->fragments.emplace_back(std::move(frag));
+    alt->children.emplace_back(std::move(frag_node));
+    alt->first_file_token.emplace_back(first_file_tok_id);
 
     // Keep track of the minimum/maximum beginning file token id. In the case
     // of something like:
@@ -1956,10 +1952,8 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
     // having different begin locations. We also have floating fragments for
     // the directives, which may also share the same beginning/ending
     // locations.
-#ifndef NDEBUG
     auto &min_first_file_tok_id = frag_begin[last_file_tok_id];
     min_first_file_tok_id = std::min(first_file_tok_id, min_first_file_tok_id);
-#endif
 
     auto &max_last_file_tok_id = frag_end[first_file_tok_id];
     max_last_file_tok_id = std::max(last_file_tok_id, max_last_file_tok_id);
@@ -1985,7 +1979,7 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
   std::optional<RawEntityId> stop_skip_after;
 
   // Combine the file tokens and alternations of the fragment tokens.
-  for (Token file_tok : entity.tokens()) {
+  for (Token file_tok : all_file_toks) {
     RawEntityId file_tok_id = file_tok.id().Pack();
 
     // We're inside a fragment, so skip file tokens.
@@ -2014,36 +2008,65 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
       continue;
     }
 
+    // This file token doesn't correspond to the beginning of any fragment, so
+    // add it to a top-level sequence.
+    auto end_it = frag_end.find(file_tok_id);
+    if (end_it == frag_end.end()) {
+      seq = AddTokenToSequence(seq, file_tok, dummy_trailing_tokens);
+      continue;
+    }
+
     // We've just got to the beginning of a fragmnet. Compute the end location
     // of the fragment, then look up the fragment by its end location.
-    if (auto end_it = frag_end.find(file_tok_id); end_it != frag_end.end()) {
-      auto max_last_file_tok_id = end_it->second;
-      assert(frag_begin[max_last_file_tok_id] == file_tok_id);
+    auto max_last_file_tok_id = end_it->second;
+    assert(frag_begin[max_last_file_tok_id] == file_tok_id);
 
-      auto frag_it = file_frags.find(max_last_file_tok_id);
-      if (frag_it != file_frags.end()) {
+    auto frag_it = file_frags.find(max_last_file_tok_id);
+    if (frag_it == file_frags.end()) {
+      assert(false);
+      continue;
+    }
 
-        // Don't add `stop_skip_after` if this fragment is represented by a
-        // single file token, e.g. the `__BEGIN_DECLS` macro in libc.
-        if (file_tok_id != max_last_file_tok_id) {
-          stop_skip_after.emplace(max_last_file_tok_id);
-        }
+    // Don't add `stop_skip_after` if this fragment is represented by a
+    // single file token, e.g. the `__BEGIN_DECLS` macro in libc.
+    if (file_tok_id != max_last_file_tok_id) {
+      stop_skip_after.emplace(max_last_file_tok_id);
+    }
 
-        // This file token corresponds to a choice among one or more
-        // overlapping fragments. Add the fragment to the top-level sequence.
-        ChoiceNode *frag_node = frag_it->second;
-        assert(frag_node != nullptr);
+    // This file token corresponds to a choice among one or more
+    // overlapping fragments. Add the fragment to the top-level sequence.
+    ChoiceNode *frag_node = frag_it->second;
+    assert(frag_node != nullptr);
 
-        seq = AddToSequence(seq, frag_node, dummy_trailing_tokens);
+    seq = AddToSequence(seq, frag_node, dummy_trailing_tokens);
+
+    // Detect if we need to prefix the tokens of one or more of the fragment
+    // variants.
+    auto i = 0u;
+    for (auto frag_fft : frag_node->first_file_token) {
+      auto &node = frag_node->children[i++];
+      if (frag_fft == file_tok_id) {
         continue;
       }
 
-      assert(false);
-    }
+      auto begin_id = EntityId(file_tok_id).Extract<FileTokenId>();
+      auto end_id = EntityId(frag_fft).Extract<FileTokenId>();
+      if (!begin_id || !end_id || begin_id->file_id != end_id->file_id ||
+          begin_id->offset >= end_id->offset) {
+        assert(false);
+        continue;
+      }
 
-    // This file token doesn't correspond to the beginning of any fragment, so
-    // add it to a top-level sequence.
-    seq = AddTokenToSequence(seq, file_tok, dummy_trailing_tokens);
+      SequenceNode *prefix_seq = nullptr;
+      for (auto j = begin_id->offset; j < end_id->offset; ++j) {
+        prefix_seq = AddTokenToSequence(
+            prefix_seq, GetOrCreateIndex(all_file_toks[j]));
+      }
+
+      if (prefix_seq) {
+        node = AddNodeToSequence(prefix_seq, node, dummy_trailing_tokens);
+      }
+    }
   }
 
   if (!seq) {

@@ -56,6 +56,7 @@ class TokenTreeImpl {
   struct ChoiceNode final {
     std::vector<Fragment> fragments;
     std::vector<Node> children;
+    std::vector<RawEntityId> first_file_token;
   };
 
   // A choice among the different stages of macro expansion.
