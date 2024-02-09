@@ -10,7 +10,7 @@
 
 #include <deque>
 #include <mutex>
-#include <unordered_set>
+#include <unordered_map>
 
 #include "Token.h"
 
@@ -100,7 +100,7 @@ class TokenTreeImpl {
   // The list of token readers used in this fragment. There is always one
   // entry in this list. The first entry is always either a file token reader,
   // or an invalid token reader. This is indexed by a `TokenIndex`.
-  std::unordered_set<TokenReaderPtr> nested_readers;
+  std::unordered_map<const TokenReader *, TokenReaderPtr> nested_readers;
 
   // References to nodes end up being raw pointers, so we can have one tree
   // refer to the internal node of anotehr tree as long as we hold a reference
@@ -125,6 +125,9 @@ class TokenTreeImpl {
   TokenIndex GetOrCreateIndex(const Token &tok);
   SequenceNode *AddLeadingTokensInBounds(
       SequenceNode *seq, const Token &tok, const Bounds &bounds);
+
+  SequenceNode *AddLeadingTokensInBounds(
+      SequenceNode *seq, TokenIndex fti, EntityId fti_id, const Bounds &bounds);
 
   SequenceNode *ExtendWithMacroChild(
       SequenceNode *seq, const MacroOrToken &mt,
@@ -184,6 +187,10 @@ class TokenTreeImpl {
                                   const TrailingTokens &trailing_tokens);
   SequenceNode *AddTrailingTokensToSequence(
       SequenceNode *seq, const TrailingTokens &trailing_tokens);
+
+
+  static std::shared_ptr<TokenTreeImpl> ImplFromPublic(TokenTree tree);
+  static const Node *NodeFromPublic(TokenTreeNode node);
 };
 
 class TokenTreeImplCache {

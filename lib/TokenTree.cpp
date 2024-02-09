@@ -10,23 +10,28 @@
 #include <functional>
 #include <iterator>
 #include <type_traits>
-#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
+#include <multiplier/Frontend/IncludeLikeMacroDirective.h>
 #include <multiplier/Frontend/MacroParameterSubstitution.h>
 #include <multiplier/Frontend/MacroParameter.h>
 
 #include "File.h"
 #include "Fragment.h"
 
-// #define D(...) __VA_ARGS__
+#define D(...) __VA_ARGS__
 #ifndef D
 # define D(...)
 #endif
 #if D(1 +) 0
 #include <iostream>
 #endif
+
+#define INDENT std::string(static_cast<size_t>(depth), ' ')
+#define BOUNDS(b) "[reader=" << reinterpret_cast<const void *>(b.reader) << ", " << b.begin_index << ", " << b.end_index << ']' 
+#define TOKEN_INDEX(ti) "[reader=" << reinterpret_cast<const void *>(ti.first) << ", index=" << ti.second << ", data=" << (ti.first->NthTokenData(ti.second)) << ']' 
+
 
 namespace mx {
 namespace {
@@ -1143,9 +1148,9 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::AddToSequence(
 
   // Try to fold single-item choice nodes.
   } else if constexpr (std::is_same_v<ChoiceNode, T>) {
-    if (that->children.size() == 1u) {
-      return AddNodeToSequence(seq, that->children.front(), trailing_tokens);
-    }
+    // if (that->children.size() == 1u) {
+    //   return AddNodeToSequence(seq, that->children.front(), trailing_tokens);
+    // }
   }
 
   if (!seq) {
@@ -1171,6 +1176,9 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::AddTokenToSequence(
   if (!seq) {
     seq = &(sequences.emplace_back());
   }
+
+  D( std::cerr << INDENT << "AddTokenToSequence: " << TOKEN_INDEX(ti) << '\n'; )
+
   seq->children.push_back(ti);
   return seq;
 }
@@ -1231,12 +1239,12 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::TopLevelUseBounds(
 
   TokenIndex ti = GetOrCreateIndex(last_tok);
   ret.end_index = ti.second;
-  if (ti.first != ret.reader) {
+  if (ret.begin_index > ret.end_index) {
     assert(false);
     return std::nullopt;
   }
 
-  if (ret.begin_index > ret.end_index) {
+  if (!ti.first->Equals(ret.reader)) {
     assert(false);
     return std::nullopt;
   }
@@ -1335,7 +1343,7 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
           ret.begin_index = ti.second;
           ret.end_index = ret.begin_index;
         } else {
-          assert(ret.reader == GetOrCreateIndex(file_tok).first);
+          assert(ret.reader->Equals(GetOrCreateIndex(file_tok).first));
         }
         last_tok = std::move(file_tok);
       }
@@ -1349,12 +1357,12 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
           ret.begin_index = ti.second;
           ret.end_index = ret.begin_index;
         } else {
-          assert(ret.reader == GetOrCreateIndex(file_tok).first);
+          assert(ret.reader->Equals(GetOrCreateIndex(file_tok).first));
         }
 
         last_tok = std::move(file_tok);
         if (auto rc_file_tok = RightCornerOfUse(m).file_token()) {
-          assert(ret.reader == GetOrCreateIndex(rc_file_tok).first);
+          assert(ret.reader->Equals(GetOrCreateIndex(rc_file_tok).first));
           last_tok = std::move(rc_file_tok);
         }
       }
@@ -1366,7 +1374,7 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
   }
 
   TokenIndex ti = GetOrCreateIndex(last_tok);
-  assert(ti.first == ret.reader);
+  assert(ti.first->Equals(ret.reader));
   assert(ti.second >= ret.begin_index);
   ret.end_index = ti.second;
   return WidenBounds(ret);
@@ -1375,7 +1383,11 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
 // Get a `TokenIndex` for `tok`. This will save the reader into the token tree
 // if it can't be found, formulating a new token index position for that reader.
 TokenTreeImpl::TokenIndex TokenTreeImpl::GetOrCreateIndex(const Token &tok) {
-  nested_readers.emplace(tok.impl);
+  if (!tok) {
+    return TokenIndex(InvalidTokenReader::RawSingleton(), 0u);
+  }
+
+  nested_readers.emplace(tok.impl.get(), tok.impl);
   return TokenIndex(tok.impl.get(), tok.offset);
 }
 
@@ -1414,29 +1426,46 @@ static EntityOffset CountInjectable(
   EntityOffset end = upper_bound.second;
   EntityOffset count = 0u;
 
-  auto use_seq = depth ? parent_seq : seq;
+  // auto use_seq = depth ? ( ? parent_seq : seq) : seq;
+  if (auto rc = RightCornerOfUse(parent_seq)) {
+    D( std::cerr << INDENT << "Leading tokens lower bound reader="
+                 << reinterpret_cast<const void *>(rc->first) << " offset="
+                 << rc->second << '\n'; )
+
+    if (!rc->first->Equals(bounds.reader)) {
+      return 0u;
+    }
+    begin = std::max(rc->second + 1u, begin);
+  }
 
   // If we're at a file level, then allow us to suck in more tokens.
-  if (auto rc = RightCornerOfUse(use_seq)) {
 
-    // Allow unbounded whitespace/comment injection, but nothing else.
-    if (rc->first != upper_bound.first) {
-      depth = 1;
-      begin = 0;
 
-    // If the previous thing is from the same reader, then allow injection
-    // from it.
-    } else if (rc->first == upper_bound.first) {
-      begin = rc->second + 1u;
-    }
 
-    // TODO(pag): Have observed issues where `bounds` and `rc`s reader indices
-    //            don't match. This is likely due to subtleties related to the
-    //            how `bounds` is simplistically passed down.
-  }
+  // if (!depth) {
+
+  // }
+
+  //   // Allow unbounded whitespace/comment injection, but nothing else.
+  //   if (rc->first != upper_bound.first) {
+  //     depth = 1;
+  //     begin = 0;
+
+  //   // If the previous thing is from the same reader, then allow injection
+  //   // from it.
+  //   } else if (rc->first == upper_bound.first) {
+  //     begin = rc->second + 1u;
+  //   }
+
+  //   // TODO(pag): Have observed issues where `bounds` and `rc`s reader indices
+  //   //            don't match. This is likely due to subtleties related to the
+  //   //            how `bounds` is simplistically passed down.
+  // }
 
   // TODO(pag): We know that the reader index for files will always be zero,
   //            so should be check that here?
+
+  assert(0u < end);
 
   for (auto i = end - 1u; begin <= i; ++count, --i) {
     switch (reader->NthTokenKind(i)) {
@@ -1444,27 +1473,84 @@ static EntityOffset CountInjectable(
       case TokenKind::COMMENT:
       case TokenKind::UNKNOWN:
         if (!reader->NthTokenData(i).empty()) {
-          D( std::cerr << "Injectable (begin=" << begin << "; i=" << i
+          D( std::cerr << "Injectable (reader="
+                       << reinterpret_cast<const void *>(reader)
+                       << " begin=" << begin << "; i=" << i
                        << "; depth=" << depth << "): "
                        << reader->NthTokenData(i) << '\n'; )
-          continue;
+          break;
         }
         [[clang::fallthrough]];
       default:
         if (depth) {
-          D( std::cerr << "Not injectable (begin=" << begin << "; i=" << i
+          D( std::cerr << "Not injectable (reader="
+                       << reinterpret_cast<const void *>(reader)
+                       << " begin=" << begin << "; i=" << i
                        << "; depth=" << depth << "): "
                        << reader->NthTokenData(i) << '\n'; )
           return count;
         } else {
-          continue;
+          break;
         }
     }
-    if (!i) {
+    if (i == begin) {
       break;
     }
   }
   return count;
+}
+
+TokenTreeImpl::SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
+    SequenceNode *seq, TokenIndex fti, EntityId fti_id, const Bounds &bounds) {
+
+  D( std::cerr << INDENT << "AddLeadingTokensInBounds: bounds="
+               << BOUNDS(bounds) << " fti=" << TOKEN_INDEX(fti) << '\n'; )
+
+  if (!fti.second || fti.second <= bounds.begin_index ||
+      (fti.second - 1u) > bounds.end_index ||
+      !fti.first->Equals(bounds.reader)) {
+    return seq;
+  }
+
+  auto maybe_rci = RightCornerOfUse(seq);
+  if (!maybe_rci) {
+    return seq;
+  }
+
+  TokenIndex rci = std::move(*maybe_rci);
+  D( std::cerr << INDENT << "AddLeadingTokensInBounds: rci=" << TOKEN_INDEX(rci) << '\n'; )
+
+  // The right corner of `seq` might be in a different token tree, and it might
+  // not be a file token.
+  if (!rci.first->Equals(fti.first)) {
+    auto rci_ft_id = rci.first->NthFileTokenId(rci.second).Extract<FileTokenId>();
+    if (!rci_ft_id) {
+      return seq;
+    }
+
+    auto fti_ft_id = fti_id.Extract<FileTokenId>();
+    if (rci_ft_id->file_id != fti_ft_id->file_id) {
+      return seq;
+    }
+
+    rci.first = fti.first;
+    rci.second = rci_ft_id->offset;
+  }
+
+  D( std::cerr << INDENT << "AddLeadingTokensInBounds: adjusted rci=" << TOKEN_INDEX(rci) << '\n'; )
+  if (!rci.first->Equals(fti.first)) {
+    return seq;
+  }
+
+  auto begin = std::max(bounds.begin_index, rci.second + 1u);
+  auto end = std::min(bounds.end_index, fti.second - 1u);
+
+  D( std::cerr << INDENT << "AddLeadingTokensInBounds: begin=" << begin << ", end=" << end << '\n'; )
+  for (auto i = begin; i <= end; ++i) {
+    seq = AddTokenToSequence(seq, TokenIndex(fti.first, i));
+  }
+
+  return seq;
 }
 
 // Try to add leading file tokens into `node` that should logically come from
@@ -1472,26 +1558,19 @@ static EntityOffset CountInjectable(
 TokenTreeImpl::SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
     SequenceNode *seq, const Token &tok, const Bounds &bounds) {
 
+  auto use_seq = seq ? seq : last_sequence;
+  if (!use_seq) {
+    return seq;
+  }
+
   Token file_tok = tok.file_token();
   if (!file_tok) {
     return seq;
   }
 
-  TokenIndex fti = GetOrCreateIndex(file_tok);
-  if (fti.first != bounds.reader || fti.second <= bounds.begin_index ||
-      fti.second > bounds.end_index) {
-    return seq;
-  }
-
-  // Inject the missing whitespace/comment tokens.
-  const TokenReader *fti_reader = fti.first;
-  for (auto num = CountInjectable(fti_reader, bounds, fti, last_sequence,
-                                  seq, depth);
-       num; --num) {
-    seq = AddTokenToSequence(seq, TokenIndex(fti_reader, fti.second - num));
-  }
-
-  return seq;
+  auto out_seq = AddLeadingTokensInBounds(
+      use_seq, GetOrCreateIndex(file_tok), file_tok.id(), bounds);
+  return use_seq == seq ? out_seq : seq;
 }
 
 TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithMacroChild(
@@ -1582,6 +1661,9 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
 
   size_t num_mts = mts.size();
 
+  D( std::cerr << INDENT << "ProcessMacroChildren: bounds="
+               << BOUNDS(bounds) << '\n'; )
+
   for (auto i = 0u; i < num_mts; ++i) {
     const MacroOrToken &mt = mts[i];
     auto &tt = (i + 1u) == num_mts ? trailing_tokens : dummy_trailing_tokens;
@@ -1607,15 +1689,17 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
       continue;
     }
 
-    D( std::cerr << "LC token for tighter bounds is " << lc_ft.data() << '\n'; )
-
     TokenIndex lc_index = GetOrCreateIndex(lc_ft);
     Bounds new_bounds = bounds;
-    if (new_bounds.reader != lc_index.first ||
-        lc_index.second < bounds.begin_index ||
-        lc_index.second > bounds.end_index) {
 
-      D( std::cerr << " - Failed to tighten bounds\n"; )
+    D( std::cerr << INDENT << "ProcessMacroChildren(" << i << "): lc_index="
+                 << TOKEN_INDEX(lc_index) << '\n'; )
+
+    if (lc_index.second < bounds.begin_index ||
+        lc_index.second > bounds.end_index ||
+        !new_bounds.reader->Equals(lc_index.first)) {
+
+      D( std::cerr << INDENT << "\tFailed to tighten bounds\n"; )
       seq = ExtendWithMacro(seq, m, bounds, tt);
       continue;
     }
@@ -1629,9 +1713,9 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
       const Token &rc_ft = fts[i + 1u];
       if (rc_ft) {
         TokenIndex rc_index = GetOrCreateIndex(rc_ft);
-        if (new_bounds.reader == rc_index.first &&
-            rc_index.second >= new_bounds.begin_index &&
-            rc_index.second <= new_bounds.end_index) {
+        if (rc_index.second >= new_bounds.begin_index &&
+            rc_index.second <= new_bounds.end_index &&
+            new_bounds.reader->Equals(rc_index.first)) {
           assert(new_bounds.begin_index <= rc_index.second);
           assert(rc_index.second <= new_bounds.end_index);
           new_bounds.end_index = rc_index.second - 1u;
@@ -1691,9 +1775,9 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
     }
 
     TokenIndex ti = GetOrCreateIndex(te_file_tok);
-    if (ti.first != me_bounds.reader ||
-        ti.second < me_bounds.begin_index ||
-        ti.second > me_bounds.end_index) {
+    if (ti.second < me_bounds.begin_index ||
+        ti.second > me_bounds.end_index ||
+        !ti.first->Equals(me_bounds.reader)) {
       trailing_tokens.tokens.clear();
       continue;
     }
@@ -1788,14 +1872,22 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
     SequenceNode *seq, const MacroSubstitution &macro,
     const Bounds &use_bounds, const TrailingTokens &trailing_tokens) {
 
+  Bounds bounds = use_bounds;
+
   auto prev_depth = depth;
   auto next_depth = depth + 1;
 
   SaveRestoreLastSequence seq_raii(last_sequence, seq);
 
   FILL_MACRO_CHILREN(macro.children(), mts, fts)
+
+  std::optional<IncludeLikeMacroDirective> include_dir;
+  if (mts.size() == 1u && std::holds_alternative<Macro>(mts.front())) {
+    include_dir = IncludeLikeMacroDirective::from(std::get<Macro>(mts.front()));
+  }
+
   SequenceNode *before = ProcessMacroChildren(
-      nullptr, use_bounds, std::move(mts), std::move(fts), trailing_tokens);
+      nullptr, bounds, std::move(mts), std::move(fts), trailing_tokens);
 
   if (!before) {
     return seq;
@@ -1804,12 +1896,33 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
   SubstitutionNode *sub = &(substitutions.emplace_back(macro));
   sub->before = before;
 
+  TokenIndex lft;
+
+  if (include_dir) {
+    if (auto file = include_dir->included_file()) {
+      D( std::cerr << INDENT << "Changing file; old bounds=" << BOUNDS(bounds); )
+      auto tokens = file->tokens();
+      lft = GetOrCreateIndex(tokens.back());
+      bounds.reader = lft.first;
+      bounds.begin_index = 0u;
+      bounds.end_index = lft.second;
+      D( std::cerr << "; new bounds=" << BOUNDS(bounds) << '\n'; )
+    }
+  }
+
   SequenceNode *after = nullptr;
   last_sequence = &dummy_sequence;
   for (MacroOrToken mt : macro.replacement_children()) {
-    depth = next_depth;
-    after = ExtendWithMacroChild(after, mt, use_bounds, dummy_trailing_tokens);
+    depth = include_dir ? 0u : next_depth;
+    after = ExtendWithMacroChild(after, mt, bounds, dummy_trailing_tokens);
     depth = prev_depth;
+  }
+
+  // Make sure to capture the end of the included file.
+  if (include_dir) {
+    lft.second += 1u;  // Beyond the last token.
+    after = AddLeadingTokensInBounds(
+        after, lft, lft.first->NthFileTokenId(lft.second - 1u), bounds);
   }
 
   if (after) {
@@ -1822,6 +1935,39 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
 TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithMacro(
     SequenceNode *seq, const Macro &macro, const Bounds &bounds,
     const TrailingTokens &trailing_tokens) {
+
+  // It's possible that this macro is from a floating fragment, e.g. an
+  // `#endif`. Go and pull it in as a fragment token tree, rather than
+  // integrating it manually.
+  if (macro.id().Unpack().fragment_id != fragment->fragment_id) {
+    auto frag = Fragment::containing(macro);
+    if (auto file_toks = frag.file_tokens()) {
+
+      auto first_file_tok = file_toks.front();
+      D( auto fft_index = GetOrCreateIndex(first_file_tok);
+         std::cerr << INDENT << "ExtendWithMacro: bounds=" << BOUNDS(bounds)
+                   << " fft_index=" << TOKEN_INDEX(fft_index) << '\n'; )
+
+      // Mark us as being at the top level.
+      auto prev_depth = depth;
+      depth = 0;
+      seq = AddLeadingTokensInBounds(seq, first_file_tok, bounds);
+      depth = prev_depth;
+
+      D( std::cerr << INDENT << "\tDone prefixing fragment\n"; )
+
+      TokenTree frag_tree = TokenTree::create(frag);
+
+      TokenTreeImpl::Node frag_node = *NodeFromPublic(frag_tree.root());
+      nested_trees.emplace_back(ImplFromPublic(std::move(frag_tree)));
+
+      auto alt = &(choices.emplace_back());
+      alt->fragments.emplace_back(std::move(frag));
+      alt->children.emplace_back(std::move(frag_node));
+      alt->first_file_token.emplace_back(first_file_tok.id().Pack());
+      return AddNodeToSequence(seq, alt, dummy_trailing_tokens);
+    }
+  }
 
   if (auto ms = MacroSubstitution::from(macro)) {
     if (auto me = MacroExpansion::from(macro)) {
@@ -1887,104 +2033,100 @@ static bool IsFloatingDirectiveFragment(const Fragment &frag) {
   return num_directives == 1u;
 }
 
-}  // namespace
-
-// Create a node for a file. If there are overlapping fragments in this file,
-// then this will include them.
-TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
-
-  const TokenRange all_file_toks = entity.tokens();
-
-  // Collect all overlapping fragments into alternations.
-  std::unordered_map<RawEntityId, ChoiceNode *> file_frags;
+struct FillerContext {
+  std::unordered_map<RawEntityId, TokenTreeImpl::ChoiceNode *> file_frags;
   std::unordered_map<RawEntityId, RawEntityId> frag_begin;
   std::unordered_map<RawEntityId, RawEntityId> frag_end;
   std::unordered_map<RawEntityId, RawEntityId> last_frag;
 
-  auto process_fragment = [&] (Fragment frag) {
-    TokenRange file_toks = frag.file_tokens();
-    if (file_toks.empty()) {
-      return;
-    }
+  void CollectFragment(TokenTreeImpl *impl, Fragment frag);
 
-    RawEntityId first_file_tok_id = file_toks.front().id().Pack();
-    RawEntityId last_file_tok_id = file_toks.back().id().Pack();
+  TokenTreeImpl::SequenceNode *FillFileRange(
+      TokenTreeImpl *impl, const TokenRange &all_file_toks,
+      TokenRange sub_file_toks, int depth);
+};
+
+// Collect a fragment into the context. This tries to keep track of the
+// bounds of overlapping fragments, and collect overlapping fragments into
+// alternations, as represented by `ChoiceNode`s.
+void FillerContext::CollectFragment(TokenTreeImpl *impl, Fragment frag) {
+  TokenRange file_toks = frag.file_tokens();
+  if (file_toks.empty()) {
+    return;
+  }
+
+  RawEntityId first_file_tok_id = file_toks.front().id().Pack();
+  RawEntityId last_file_tok_id = file_toks.back().id().Pack();
 
 #ifndef NDEBUG
-    VariantId first_file_tok_vid = EntityId(first_file_tok_id).Unpack();
-    VariantId last_file_tok_vid = EntityId(last_file_tok_id).Unpack();
-    assert(std::holds_alternative<FileTokenId>(first_file_tok_vid));
-    assert(std::holds_alternative<FileTokenId>(last_file_tok_vid));
-    assert(std::get<FileTokenId>(first_file_tok_vid).file_id ==
-           std::get<FileTokenId>(last_file_tok_vid).file_id);
-    assert(std::get<FileTokenId>(first_file_tok_vid).offset <=
-           std::get<FileTokenId>(last_file_tok_vid).offset);
+  VariantId first_file_tok_vid = EntityId(first_file_tok_id).Unpack();
+  VariantId last_file_tok_vid = EntityId(last_file_tok_id).Unpack();
+  assert(std::holds_alternative<FileTokenId>(first_file_tok_vid));
+  assert(std::holds_alternative<FileTokenId>(last_file_tok_vid));
+  assert(std::get<FileTokenId>(first_file_tok_vid).file_id ==
+         std::get<FileTokenId>(last_file_tok_vid).file_id);
+  assert(std::get<FileTokenId>(first_file_tok_vid).offset <=
+         std::get<FileTokenId>(last_file_tok_vid).offset);
 #endif
 
-    // Create an independent tree for the fragment, and reference it directly.
-    TokenTree frag_tree = TokenTree::create(frag);
-    Node frag_node = *reinterpret_cast<const Node *>(
-        frag_tree.root().opaque_node);
+  // Create an independent tree for the fragment, and reference it directly.
+  TokenTree frag_tree = TokenTree::create(frag);
+  TokenTreeImpl::Node frag_node = *impl->NodeFromPublic(frag_tree.root());
 
-    // Steal the nested tree.
-    nested_trees.emplace_back(std::move(frag_tree.impl));
+  // Steal the nested tree.
+  impl->nested_trees.emplace_back(impl->ImplFromPublic(std::move(frag_tree)));
 
-    ChoiceNode *&alt = file_frags[last_file_tok_id];
-    if (!alt) {
-      alt = &(choices.emplace_back());
-      frag_begin.emplace(last_file_tok_id, first_file_tok_id);
-      frag_end.emplace(first_file_tok_id, last_file_tok_id);
-    }
-
-    alt->fragments.emplace_back(std::move(frag));
-    alt->children.emplace_back(std::move(frag_node));
-    alt->first_file_token.emplace_back(first_file_tok_id);
-
-    // Keep track of the minimum/maximum beginning file token id. In the case
-    // of something like:
-    //
-    //      #if ...
-    //      static
-    //      #endif
-    //      void func(...) { ... }
-    //
-    // We have two or more fragments sharing the same end location, but
-    // having different begin locations. We also have floating fragments for
-    // the directives, which may also share the same beginning/ending
-    // locations.
-    auto &min_first_file_tok_id = frag_begin[last_file_tok_id];
-    min_first_file_tok_id = std::min(first_file_tok_id, min_first_file_tok_id);
-
-    auto &max_last_file_tok_id = frag_end[first_file_tok_id];
-    max_last_file_tok_id = std::max(last_file_tok_id, max_last_file_tok_id);
-  };
-
-  std::vector<Fragment> floating_frags;
-  for (Fragment frag : entity.fragments()) {
-    if (IsFloatingDirectiveFragment(frag)) {
-      floating_frags.emplace_back(std::move(frag));
-    } else {
-      process_fragment(std::move(frag));
-    }
+  TokenTreeImpl::ChoiceNode *&alt = file_frags[last_file_tok_id];
+  if (!alt) {
+    alt = &(impl->choices.emplace_back());
+    frag_begin.emplace(last_file_tok_id, first_file_tok_id);
+    frag_end.emplace(first_file_tok_id, last_file_tok_id);
   }
 
-  // Process floating fragments last. We want our "bigger", i.e. normal
-  // fragments to show up in the `ChoiceNode`s first, rather than floating
-  // fragments.
-  for (Fragment &frag : floating_frags) {
-    process_fragment(std::move(frag));
-  }
+  alt->fragments.emplace_back(std::move(frag));
+  alt->children.emplace_back(std::move(frag_node));
+  alt->first_file_token.emplace_back(first_file_tok_id);
 
-  SequenceNode *seq = nullptr;
+  // Keep track of the minimum/maximum beginning file token id. In the case
+  // of something like:
+  //
+  //      #if ...
+  //      static
+  //      #endif
+  //      void func(...) { ... }
+  //
+  // We have two or more fragments sharing the same end location, but
+  // having different begin locations. We also have floating fragments for
+  // the directives, which may also share the same beginning/ending
+  // locations.
+  auto &min_first_file_tok_id = frag_begin[last_file_tok_id];
+  min_first_file_tok_id = std::min(first_file_tok_id, min_first_file_tok_id);
+
+  auto &max_last_file_tok_id = frag_end[first_file_tok_id];
+  max_last_file_tok_id = std::max(last_file_tok_id, max_last_file_tok_id);
+}
+
+TokenTreeImpl::SequenceNode *FillerContext::FillFileRange(
+    TokenTreeImpl *impl, const TokenRange &all_file_toks,
+    TokenRange sub_file_toks, int depth) {
+
+  (void) depth;
+
+  TokenTreeImpl::SequenceNode *seq = nullptr;
   std::optional<RawEntityId> stop_skip_after;
 
+  auto is_first = true;
+
   // Combine the file tokens and alternations of the fragment tokens.
-  for (Token file_tok : all_file_toks) {
-    RawEntityId file_tok_id = file_tok.id().Pack();
+  for (Token file_tok : sub_file_toks) {
+    const RawEntityId file_tok_id = file_tok.id().Pack();
+    D( std::cerr << depth << "\tAT FILE TOKEN: " << file_tok_id << " "
+                 << file_tok.data() << '\n'; )
 
     // We're inside a fragment, so skip file tokens.
     if (stop_skip_after) {
       auto skip_stop_file_tok_id = stop_skip_after.value();
+      D( std::cerr << "\t\tSTOP SKIP AFTER: " << skip_stop_file_tok_id << '\n';)
 
       // We might have floating fragments inside of some larger fragments. Go
       // and double check that they are indeed floating.
@@ -2012,9 +2154,14 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
     // add it to a top-level sequence.
     auto end_it = frag_end.find(file_tok_id);
     if (end_it == frag_end.end()) {
-      seq = AddTokenToSequence(seq, file_tok, dummy_trailing_tokens);
+      D( std::cerr << "\t\tADDING TO SEQ: " << file_tok_id << '\n'; )
+      seq = impl->AddTokenToSequence(
+          seq, file_tok, impl->dummy_trailing_tokens);
       continue;
     }
+
+    D( std::cerr << "\t\tFRAGMENT BEGINS AT: " << file_tok_id << " ENDS AT "
+                 << end_it->second << '\n'; )
 
     // We've just got to the beginning of a fragmnet. Compute the end location
     // of the fragment, then look up the fragment by its end location.
@@ -2035,10 +2182,10 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
 
     // This file token corresponds to a choice among one or more
     // overlapping fragments. Add the fragment to the top-level sequence.
-    ChoiceNode *frag_node = frag_it->second;
+    TokenTreeImpl::ChoiceNode *frag_node = frag_it->second;
     assert(frag_node != nullptr);
 
-    seq = AddToSequence(seq, frag_node, dummy_trailing_tokens);
+    seq = impl->AddToSequence(seq, frag_node, impl->dummy_trailing_tokens);
 
     // Detect if we need to prefix the tokens of one or more of the fragment
     // variants.
@@ -2057,14 +2204,23 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
         continue;
       }
 
-      SequenceNode *prefix_seq = nullptr;
-      for (auto j = begin_id->offset; j < end_id->offset; ++j) {
-        prefix_seq = AddTokenToSequence(
-            prefix_seq, GetOrCreateIndex(all_file_toks[j]));
-      }
+      // Prevent infinite recursion.
+      D( std::cerr << depth << "\t\t{Erasing " << file_tok_id << '\n'; )
+      frag_end.erase(file_tok_id);
+
+      TokenTreeImpl::SequenceNode *prefix_seq = FillFileRange(
+          impl, all_file_toks,
+          all_file_toks.slice(begin_id->offset, end_id->offset),
+          depth + 1);
+
+      // Restore for another sub-fragment.
+      frag_end.emplace(file_tok_id, max_last_file_tok_id);
+      
+      D( std::cerr << depth << "\t\t}Adding " << file_tok_id << '\n'; )
 
       if (prefix_seq) {
-        node = AddNodeToSequence(prefix_seq, node, dummy_trailing_tokens);
+        node = impl->AddNodeToSequence(
+            prefix_seq, node, impl->dummy_trailing_tokens);
       }
     }
   }
@@ -2076,6 +2232,35 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
   assert(!stop_skip_after.has_value());
 
   return seq;
+}
+
+}  // namespace
+
+// Create a node for a file. If there are overlapping fragments in this file,
+// then this will include them.
+TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
+
+  FillerContext context;
+
+  // Collect all overlapping fragments into alternations.
+  std::vector<Fragment> floating_frags;
+  for (Fragment frag : entity.fragments()) {
+    if (IsFloatingDirectiveFragment(frag)) {
+      floating_frags.emplace_back(std::move(frag));
+    } else {
+      context.CollectFragment(this, std::move(frag));
+    }
+  }
+
+  // Process floating fragments last. We want our "bigger", i.e. normal
+  // fragments to show up in the `ChoiceNode`s first, rather than floating
+  // fragments.
+  for (Fragment &frag : floating_frags) {
+    context.CollectFragment(this, std::move(frag));
+  }
+
+  auto file_toks = entity.tokens();
+  return context.FillFileRange(this, file_toks, file_toks, 0);
 }
 
 // Return `true` if the input substitution should be expanded or not.
@@ -2137,7 +2322,11 @@ TokenTree TokenTree::create(const Fragment &frag) {
   }
 
   TokenTreeImpl::Bounds frag_bounds = self->FragmentBounds(frag.file_tokens());
+  D( std::cerr << "FRAGMENT{id=" << frag.id().Pack() << ' ' << BOUNDS(frag_bounds) << '\n'; )
+
   self->root = self->CreateFragmentNode(frag, frag_bounds);
+
+  D( std::cerr << "}FRAGMENT id=" << frag.id().Pack() << ' ' << BOUNDS(frag_bounds) << '\n'; )
 
   return TokenTree(frag.impl->cached_token_tree.Put(std::move(self)));
 }
@@ -2384,7 +2573,7 @@ void TokenTreeReader::Append(TokenTreeImpl::TokenIndex ti) {
   if (last_tk == TokenKind::WHITESPACE && tk == TokenKind::WHITESPACE &&
       !is_include_tok) {
     TokenTreeImpl::TokenIndex last_ti = tokens.back();
-    if (last_ti.first != tok_reader || (last_ti.second + 1u) != to) {
+    if ((last_ti.second + 1u) != to || !last_ti.first->Equals(tok_reader)) {
       return;  // Don't add two whitespaces side-by-side.
     }
   }
@@ -2518,34 +2707,42 @@ TokenRange TokenTree::serialize(const TokenTreeVisitor &vis) const {
 
 namespace {
 
-static void DumpChoice(std::ostream &os, const TokenTreeImpl::ChoiceNode &node);
+static void DumpChoice(std::ostream &os, const TokenTreeImpl::ChoiceNode &node,
+                       std::unordered_set<uintptr_t> &seen);
+
 static void DumpSubstitution(
-    std::ostream &os, const TokenTreeImpl::SubstitutionNode &node);
+    std::ostream &os, const TokenTreeImpl::SubstitutionNode &node,
+                       std::unordered_set<uintptr_t> &seen);
+
 static void DumpSequence(
-    std::ostream &os, const TokenTreeImpl::SequenceNode &node);
+    std::ostream &os, const TokenTreeImpl::SequenceNode &node,
+    std::unordered_set<uintptr_t> &seen);
 
 static void DumpNode(
-    std::ostream &os, const TokenTreeImpl::Node &node) {
+    std::ostream &os, const TokenTreeImpl::Node &node,
+    std::unordered_set<uintptr_t> &seen) {
+
   if (std::holds_alternative<TokenTreeImpl::ChoiceNode *>(node)) {
     if (TokenTreeImpl::ChoiceNode *choice =
             std::get<TokenTreeImpl::ChoiceNode *>(node)) {
-      DumpChoice(os, *choice);
+      DumpChoice(os, *choice, seen);
     }
   } else if (std::holds_alternative<TokenTreeImpl::SubstitutionNode *>(node)) {
     if (TokenTreeImpl::SubstitutionNode *sub =
             std::get<TokenTreeImpl::SubstitutionNode *>(node)) {
-      DumpSubstitution(os, *sub);
+      DumpSubstitution(os, *sub, seen);
     }
   } else if (std::holds_alternative<TokenTreeImpl::SequenceNode *>(node)) {
     if (TokenTreeImpl::SequenceNode *seq =
             std::get<TokenTreeImpl::SequenceNode *>(node)) {
-      DumpSequence(os, *seq);
+      DumpSequence(os, *seq, seen);
     }
   }
 }
 
 static void DumpLink(std::ostream &ss, uintptr_t s_id, unsigned i,
-                     const TokenTreeImpl::Node &node) {
+                     const TokenTreeImpl::Node &node,
+                     std::unordered_set<uintptr_t> &seen) {
   if (std::holds_alternative<std::monostate>(node)) {
     return;
 
@@ -2553,7 +2750,7 @@ static void DumpLink(std::ostream &ss, uintptr_t s_id, unsigned i,
     return;
   }
 
-  DumpNode(ss, node);
+  DumpNode(ss, node, seen);
 
   if (std::holds_alternative<TokenTreeImpl::ChoiceNode *>(node)) {
     if (TokenTreeImpl::ChoiceNode *choice =
@@ -2578,8 +2775,13 @@ static void DumpLink(std::ostream &ss, uintptr_t s_id, unsigned i,
   }
 }
 
-void DumpChoice(std::ostream &os, const TokenTreeImpl::ChoiceNode &node) {
+void DumpChoice(std::ostream &os, const TokenTreeImpl::ChoiceNode &node,
+                std::unordered_set<uintptr_t> &seen) {
   auto id = reinterpret_cast<uintptr_t>(&node);
+  if (!seen.emplace(id).second) {
+    return;
+  }
+
   os << "n" << id
      << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\" bgcolor=\"azure2\"><TR>";
 
@@ -2593,13 +2795,18 @@ void DumpChoice(std::ostream &os, const TokenTreeImpl::ChoiceNode &node) {
 
   i = 0u;
   for (const TokenTreeImpl::Node &child : node.children) {
-    DumpLink(os, id, i++, child);
+    DumpLink(os, id, i++, child, seen);
   }
 }
 
 void DumpSubstitution(std::ostream &os,
-                      const TokenTreeImpl::SubstitutionNode &node) {
+                      const TokenTreeImpl::SubstitutionNode &node,
+                      std::unordered_set<uintptr_t> &seen) {
   auto id = reinterpret_cast<uintptr_t>(&node);
+  if (!seen.emplace(id).second) {
+    return;
+  }
+
   EntityId eid;
   if (std::holds_alternative<MacroSubstitution>(node.macro)) {
     eid = std::get<MacroSubstitution>(node.macro).id();
@@ -2616,12 +2823,17 @@ void DumpSubstitution(std::ostream &os,
      << "<TD port=\"c1\">after</TD>"
      << "</TR></TABLE>>];\n";
 
-  DumpLink(os, id, 0, node.before);
-  DumpLink(os, id, 1, node.after);
+  DumpLink(os, id, 0, node.before, seen);
+  DumpLink(os, id, 1, node.after, seen);
 }
 
-void DumpSequence(std::ostream &os, const TokenTreeImpl::SequenceNode &node) {
+void DumpSequence(std::ostream &os, const TokenTreeImpl::SequenceNode &node,
+                  std::unordered_set<uintptr_t> &seen) {
   auto id = reinterpret_cast<uintptr_t>(&node);
+  if (!seen.emplace(id).second) {
+    return;
+  }
+
   os << "n" << id
      << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\" bgcolor=\"goldenrod\"><TR>";
 
@@ -2642,7 +2854,7 @@ void DumpSequence(std::ostream &os, const TokenTreeImpl::SequenceNode &node) {
   i = 0u;
   for (const TokenTreeImpl::Node &child : node.children) {
     if (!std::holds_alternative<TokenTreeImpl::TokenIndex>(child)) {
-      DumpLink(os, id, i++, child);
+      DumpLink(os, id, i++, child, seen);
     }
   }
 }
@@ -2655,7 +2867,8 @@ void TokenTree::dump(std::ostream &os) {
       << "digraph {\n"
       << "node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
 
-  DumpNode(os, impl->root);
+  std::unordered_set<uintptr_t> seen;
+  DumpNode(os, impl->root, seen);
 
   os << "}\n";
 }
@@ -2705,6 +2918,14 @@ static const T *TryExtract(const void *opaque_node) {
 }
 
 }  // namespace
+
+std::shared_ptr<TokenTreeImpl> TokenTreeImpl::ImplFromPublic(TokenTree tree) {
+  return std::move(tree.impl);
+}
+
+const TokenTreeImpl::Node *TokenTreeImpl::NodeFromPublic(TokenTreeNode node) {
+  return reinterpret_cast<const TokenTreeImpl::Node *>(node.opaque_node);
+}
 
 // Return the kind of this token tree node.
 TokenTreeNodeKind TokenTreeNode::kind(void) const noexcept {
