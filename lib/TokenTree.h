@@ -129,6 +129,13 @@ class TokenTreeImpl {
   SequenceNode *AddLeadingTokensInBounds(
       SequenceNode *seq, TokenIndex fti, EntityId fti_id, const Bounds &bounds);
 
+  SequenceNode *AddLeadingTokensInBounds(
+      SequenceNode *seq, TokenIndex fti, EntityId fti_id, TokenIndex rci,
+      const Bounds &bounds);
+
+  SequenceNode *AddLeadingTokensBeforeParam(
+      SequenceNode *seq, TokenIndex fti, const Bounds &bounds);
+
   SequenceNode *ExtendWithMacroChild(
       SequenceNode *seq, const MacroOrToken &mt,
       const Bounds &bounds, const TrailingTokens &trailing_tokens);
