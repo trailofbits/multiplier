@@ -195,6 +195,11 @@
 "directory": ""
 },
 {
+"file": "WhitespaceAfterPragma.c",
+"command": "/usr/bin/cc WhitespaceAfterPragma.c",
+"directory": ""
+},
+{
 "file": "XMacro.c",
 "command": "/usr/bin/cc XMacro.c",
 "directory": ""
