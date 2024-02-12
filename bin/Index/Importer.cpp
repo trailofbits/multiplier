@@ -145,8 +145,7 @@ struct PathCache {
   }
 };
 
-static void FixEnvVariablesAndPath(Command &command, PathCache *cache,
-                                   bool allow_unquote) {
+static void FixEnvVariablesAndPath(Command &command, PathCache *cache) {
   EnvVariableMap &envp = command.env;
   std::vector<std::string> to_remove;
   std::string path;
@@ -157,52 +156,6 @@ static void FixEnvVariablesAndPath(Command &command, PathCache *cache,
 
     } else if (key.starts_with("BLIGHT_")) {
       to_remove.push_back(key);
-    }
-  }
-
-  auto is_quoted = [] (std::string_view arg) {
-    return arg.back() == '"' || arg.back() == '\'';
-  };
-
-  // Something like `"-DFOO=bar"` or `'-DFOO=bar'`.
-  if (allow_unquote) {
-    std::vector<std::string> new_vec;
-
-    auto has_quoted = false;
-    for (const char *arg : command.vec.Arguments()) {
-      if (is_quoted(arg)) {
-        has_quoted = true;
-        break;
-      }
-    }
-
-    // If there are quoted arguments, then unquote them.
-    if (has_quoted) {
-      for (const char *arg : command.vec.Arguments()) {
-        if (!is_quoted(arg)) {
-          new_vec.emplace_back(arg);
-          continue;
-        }
-
-        auto max_i = strlen(arg);
-        char quote = arg[max_i - 1u];
-
-        std::string new_arg;
-        new_arg.reserve(max_i - 2u);
-
-        for (auto i = 0u; i < max_i - 1u; ++i) {
-          if (arg[i] == '\\') {
-            ++i;
-            new_arg.push_back(arg[i]);
-
-          } else if (arg[i] != quote) {
-            new_arg.push_back(arg[i]);
-          }
-        }
-        new_vec.emplace_back(std::move(new_arg));
-      }
-
-      command.vec.Reset(new_vec);
     }
   }
 
@@ -796,7 +749,7 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
     command.compiler_hash = command.vec.Join();
   }
 
-  FixEnvVariablesAndPath(command, nullptr, false  /* allow_unquote */);
+  FixEnvVariablesAndPath(command, nullptr);
 
   return true;
 }
@@ -899,7 +852,7 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
     }
   }
 
-  FixEnvVariablesAndPath(*command, &cache, !!commands_str  /* allow_unquote */);
+  FixEnvVariablesAndPath(*command, &cache);
 
   // Log after so that we can show the absolute path to the compiler if
   // it was updated by `FixEnvVariablesAndPath`.

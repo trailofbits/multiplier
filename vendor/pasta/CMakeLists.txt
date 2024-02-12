@@ -48,6 +48,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DPASTA_BOOTSTRAP_MACROS:BOOL=OFF
                         -DPASTA_BOOTSTRAP_TYPES:BOOL=OFF
                         -DPASTA_ENABLE_TESTING:BOOL=OFF
+                        -DPASTA_ENABLE_TOOLS:BOOL=OFF
                         -DPASTA_ENABLE_PY_BINDINGS:BOOL=OFF
                         -DPASTA_USE_VENDORED_CLANG:BOOL=OFF
                         -DPASTA_DISABLE_HOST_COMPILER:BOOL=ON
