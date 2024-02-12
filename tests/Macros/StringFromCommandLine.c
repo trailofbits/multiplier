@@ -1,0 +1,1 @@
+const char *StringFromCommandLine = STRING_FROM_COMMAND_LINE;
