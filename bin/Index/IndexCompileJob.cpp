@@ -13,6 +13,7 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <map>
+#include <multiplier/Frontend/TokenKind.h>
 #include <multiplier/Types.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Macro.h>
@@ -1458,15 +1459,34 @@ static std::vector<EntityGroupRange> PartitionEntities(
 static void FindTokenFileBounds(const pasta::FileToken &tok,
                                 std::optional<pasta::FileToken> &begin_tok,
                                 std::optional<pasta::FileToken> &end_tok) {
-  if (!begin_tok ||
-      (begin_tok->RawFile() == tok.RawFile() &&
-       begin_tok->Index() > tok.Index())) {
-    begin_tok = tok;
+
+  // NOTE(pag): `tests/Macros/WhitespaceAfterPragma.c` revealed that whitespace
+  //            would sometimes be included as the beginning or ending token of
+  //            a macro. Here we try to account for that by excluding them.
+  auto bt = tok;
+  auto et = tok;
+  if (TokenKindFromPasta(tok) == mx::TokenKind::WHITESPACE) {
+    auto file_tokens = pasta::File::Containing(tok).Tokens();
+    auto index = static_cast<unsigned>(tok.Index());
+    if ((index + 1u) < file_tokens.Size()) {
+      bt = file_tokens[index + 1u];
+    }
+    if (index) {
+      et = file_tokens[index - 1u];
+    }
   }
+
+  // Try to widen the bounds.
+  if (!begin_tok ||
+      (begin_tok->RawFile() == bt.RawFile() &&
+       begin_tok->Index() > bt.Index())) {
+    begin_tok = bt;
+  }
+
   if (!end_tok ||
-      (end_tok->RawFile() == tok.RawFile() &&
-       end_tok->Index() < tok.Index())) {
-    end_tok = tok;
+      (end_tok->RawFile() == et.RawFile() &&
+       end_tok->Index() < et.Index())) {
+    end_tok = et;
   }
 }
 

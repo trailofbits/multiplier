@@ -55,6 +55,10 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DVAST_ENABLE_GAP_SUBMODULE:BOOL=FALSE
                         -DVAST_WARNINGS_AS_ERRORS:BOOL=FALSE
                         -DVAST_ENABLE_TESTING:BOOL=OFF
+                        -DVAST_GENERATE_TOOLS:BOOL=OFF
+                        -DVAST_BUILD_TOOLS:BOOL=OFF
+                        -DVAST_BUILD_FRONTEND:BOOL=ON
+                        -DVAST_ENABLE_EXCEPTIONS:BOOL=ON
                         "-Dgap_DIR=${gap_DIR}"
                         "-DLLVM_DIR=${LLVM_DIR}"
                         "-DMLIR_DIR=${MLIR_DIR}"

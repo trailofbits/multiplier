@@ -7,6 +7,8 @@
 #pragma once
 
 #include <iosfwd>
+#include <variant>
+#include <vector>
 
 #include "../Fragment.h"
 #include "MacroSubstitution.h"
@@ -33,6 +35,8 @@ class MX_EXPORT TokenTreeVisitor {
   virtual Fragment choose(const std::vector<Fragment> &) const;
 };
 
+using CustomTokenTreeNode = std::variant<TokenRange, TokenTreeNode>;
+
 // A tree of tokens, which can represent the variability of overlapping
 // fragments, macro expansions, etc., allowing one to render the tree down
 // into a singular linear range of tokens.
@@ -41,6 +45,7 @@ class MX_EXPORT TokenTree {
   friend class Compilation;
   friend class File;
   friend class Fragment;
+  friend class TokenTreeImpl;
 
   std::shared_ptr<TokenTreeImpl> impl;
 
@@ -50,9 +55,10 @@ class MX_EXPORT TokenTree {
  public:
   TokenTree(void);
 
-  static TokenTree from(const File &);
-  static TokenTree from(const Fragment &);
-  static TokenTree from(const TokenRange &);
+  static TokenTree create(const File &);
+  static TokenTree create(const Fragment &);
+  static TokenTree create(const TokenRange &);
+  static TokenTree create(std::vector<CustomTokenTreeNode> elems);
 
   // Serialize the token tree into a linear range.
   TokenRange serialize(const TokenTreeVisitor &vis=TokenTreeVisitor()) const;
@@ -100,6 +106,7 @@ uintptr_t hash_code(const TokenTreeNode &ttn) noexcept;
 class MX_EXPORT TokenTreeNode {
  private:
   friend class TokenTree;
+  friend class TokenTreeImpl;
   friend class EmptyTokenTreeNode;
   friend class TokenTokenTreeNode;
   friend class ChoiceTokenTreeNode;

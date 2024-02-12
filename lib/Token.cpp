@@ -984,6 +984,16 @@ TokenReaderPtr TokenReader::ReaderForToken(
   return kInvalidTokenReader;
 }
 
+// Returns the singleton instance of the invalid token reader.
+TokenReaderPtr InvalidTokenReader::Singleton(void) {
+  return kInvalidTokenReader;
+}
+
+// Returns the singleton instance of the invalid token reader.
+const TokenReader *InvalidTokenReader::RawSingleton(void) {
+  return kInvalidTokenReader.get();
+}
+
 InvalidTokenReader::~InvalidTokenReader(void) noexcept {}
 
 // Return the number of tokens accessible to this reader.

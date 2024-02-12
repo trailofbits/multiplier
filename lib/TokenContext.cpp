@@ -129,11 +129,8 @@ std::optional<TokenContext> Token::context(void) const {
   }
 
   // NOTE(pag): +1 to skip `kInvalid`.
-  TokenContext ret(std::move(reader));
-  ret.entity_id = tc->getEntityId();
-  ret.offset = untagged_offset;
-
-  assert(ret.entity_id != kInvalidEntityId);
+  TokenContext ret(std::move(reader), tc->getEntityId(), untagged_offset);
+  assert(ret.referenced_entity_id != kInvalidEntityId);
 
   if (auto parent_index = tc->getParentIndex()) {
     ret.parent_offset = parent_index >> 1u;
@@ -148,8 +145,8 @@ std::optional<TokenContext> Token::context(void) const {
 
 #define MX_DEFINE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     std::optional<type_name> TokenContext::as_ ## lower_name(void) const { \
-      if (reader && CategoryFromEntityId(entity_id) == EntityCategory::enum_name) { \
-        return reader->as_ ## lower_name(entity_id); \
+      if (reader && CategoryFromEntityId(referenced_entity_id) == EntityCategory::enum_name) { \
+        return reader->as_ ## lower_name(referenced_entity_id); \
       } \
       return std::nullopt; \
     }
@@ -176,11 +173,9 @@ std::optional<TokenContext> TokenContext::aliasee(void) const {
     return std::nullopt;
   }
 
-  TokenContext ret(reader);
-  assert(entity_id == tc->getEntityId());
+  TokenContext ret(reader, referenced_entity_id, alias_offset.value());
+  assert(referenced_entity_id == tc->getEntityId());
   assert(!tc->getAliasIndex());
-  ret.entity_id = entity_id;
-  ret.offset = alias_offset.value();
   assert(ret.offset != offset);
   return ret;
 }
@@ -198,12 +193,9 @@ std::optional<TokenContext> TokenContext::parent(void) const {
   }
 
   // NOTE(pag): `+1` to skip `kInvalid`.
-  TokenContext ret(reader);
-  ret.entity_id = tc->getEntityId();
-  ret.offset = parent_offset.value();
-
+  TokenContext ret(reader, tc->getEntityId(), parent_offset.value());
   assert(ret.offset != offset);
-  assert(ret.entity_id != kInvalidEntityId);
+  assert(ret.referenced_entity_id != kInvalidEntityId);
 
   if (auto parent_index = tc->getParentIndex()) {
     ret.parent_offset = parent_index >> 1u;

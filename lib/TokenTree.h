@@ -10,6 +10,7 @@
 
 #include <deque>
 #include <mutex>
+#include <unordered_map>
 
 #include "Token.h"
 
@@ -19,9 +20,14 @@ class TokenTreeImpl {
  public:
   struct MacroExpansionProcessor;
 
-  // The index of a token is the index of a specific reader, followed by the
-  // offset of the token within that reader.
-  using TokenIndex = std::pair<EntityOffset, EntityOffset>;
+  // A raw reader pointer, whose lifetime is tracked by
+  // `TokenTreeImpl::nested_readers`, followed by the offset of the token within
+  // that reader.
+  //
+  // There are two cases where the reader pointer's lifetime isn't present in
+  // `nested_readers`: the whitespace case and the invalid token case. These
+  // readers are both singletons with infinite lifetime.
+  using TokenIndex = std::pair<const TokenReader *, EntityOffset>;
 
   struct ChoiceNode;
   struct SubstitutionNode;
@@ -31,9 +37,12 @@ class TokenTreeImpl {
 
   // Inclusive bounds of something, e.g. the body of a macro.
   struct Bounds {
-    EntityOffset reader_index{0u};
+    const TokenReader *reader;
     EntityOffset begin_index{0u};
     EntityOffset end_index{0u};
+
+    inline Bounds(void)
+        : reader(InvalidTokenReader::RawSingleton()) {}
   };
 
   struct TrailingTokens {
@@ -47,6 +56,7 @@ class TokenTreeImpl {
   struct ChoiceNode final {
     std::vector<Fragment> fragments;
     std::vector<Node> children;
+    std::vector<RawEntityId> first_file_token;
   };
 
   // A choice among the different stages of macro expansion.
@@ -90,7 +100,13 @@ class TokenTreeImpl {
   // The list of token readers used in this fragment. There is always one
   // entry in this list. The first entry is always either a file token reader,
   // or an invalid token reader. This is indexed by a `TokenIndex`.
-  std::vector<TokenReaderPtr> readers;
+  std::unordered_map<const TokenReader *, TokenReaderPtr> nested_readers;
+
+  // References to nodes end up being raw pointers, so we can have one tree
+  // refer to the internal node of anotehr tree as long as we hold a reference
+  // to the tree itself. This enables file token trees to reference fragment
+  // token tree nodes, and also allows user-constructed token tree nodes.
+  std::vector<std::shared_ptr<TokenTreeImpl>> nested_trees;
 
   int depth{0};
 
@@ -109,6 +125,16 @@ class TokenTreeImpl {
   TokenIndex GetOrCreateIndex(const Token &tok);
   SequenceNode *AddLeadingTokensInBounds(
       SequenceNode *seq, const Token &tok, const Bounds &bounds);
+
+  SequenceNode *AddLeadingTokensInBounds(
+      SequenceNode *seq, TokenIndex fti, EntityId fti_id, const Bounds &bounds);
+
+  SequenceNode *AddLeadingTokensInBounds(
+      SequenceNode *seq, TokenIndex fti, EntityId fti_id, TokenIndex rci,
+      const Bounds &bounds);
+
+  SequenceNode *AddLeadingTokensBeforeParam(
+      SequenceNode *seq, TokenIndex fti, const Bounds &bounds);
 
   SequenceNode *ExtendWithMacroChild(
       SequenceNode *seq, const MacroOrToken &mt,
@@ -168,6 +194,10 @@ class TokenTreeImpl {
                                   const TrailingTokens &trailing_tokens);
   SequenceNode *AddTrailingTokensToSequence(
       SequenceNode *seq, const TrailingTokens &trailing_tokens);
+
+
+  static std::shared_ptr<TokenTreeImpl> ImplFromPublic(TokenTree tree);
+  static const Node *NodeFromPublic(TokenTreeNode node);
 };
 
 class TokenTreeImplCache {
