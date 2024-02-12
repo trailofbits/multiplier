@@ -145,11 +145,10 @@ struct PathCache {
   }
 };
 
-static void FixEnvVariablesAndPath(Command &command, const std::string &cwd,
-                                   PathCache &cache) {
+static void FixEnvVariablesAndPath(Command &command, PathCache *cache,
+                                   bool allow_unquote) {
   EnvVariableMap &envp = command.env;
   std::vector<std::string> to_remove;
-  std::vector<std::string> new_vec;
   std::string path;
 
   for (auto &[key, val] : envp) {
@@ -161,56 +160,71 @@ static void FixEnvVariablesAndPath(Command &command, const std::string &cwd,
     }
   }
 
-  auto is_quoted = [] (const char *arg) {
-    return (arg[0] == '\'' || arg[0] == '"') && arg[strlen(arg) - 1u] == arg[0];
+  auto is_quoted = [] (std::string_view arg) {
+    return arg.back() == '"' || arg.back() == '\'';
   };
 
   // Something like `"-DFOO=bar"` or `'-DFOO=bar'`.
-  auto has_quoted = false;
-  for (const char *arg : command.vec.Arguments()) {
-    if (is_quoted(arg)) {
-      has_quoted = true;
-      break;
-    }
-  }
+  if (allow_unquote) {
+    std::vector<std::string> new_vec;
 
-  // If there are quoted arguments, then unquote them.
-  if (has_quoted) {
+    auto has_quoted = false;
     for (const char *arg : command.vec.Arguments()) {
-      if (!is_quoted(arg)) {
-        new_vec.emplace_back(arg);
-      } else {
-        std::string new_arg;
+      if (is_quoted(arg)) {
+        has_quoted = true;
+        break;
+      }
+    }
+
+    // If there are quoted arguments, then unquote them.
+    if (has_quoted) {
+      for (const char *arg : command.vec.Arguments()) {
+        if (!is_quoted(arg)) {
+          new_vec.emplace_back(arg);
+          continue;
+        }
+
         auto max_i = strlen(arg);
-        new_arg.reserve(max_i);
-        for (size_t i = 1u; i < max_i - 1; ++i) {
-          if (arg[i] != '\\') {
+        char quote = arg[max_i - 1u];
+
+        std::string new_arg;
+        new_arg.reserve(max_i - 2u);
+
+        for (auto i = 0u; i < max_i - 1u; ++i) {
+          if (arg[i] == '\\') {
+            ++i;
+            new_arg.push_back(arg[i]);
+
+          } else if (arg[i] != quote) {
             new_arg.push_back(arg[i]);
           }
         }
         new_vec.emplace_back(std::move(new_arg));
       }
+
+      command.vec.Reset(new_vec);
     }
-    command.vec.Reset(new_vec);
-    new_vec.clear();
   }
 
   // Try to get the path of the target executable, and if we succeed, then
   // use it, otherwise drop `_`.
   std::string exe_name_var("_");
-  if (auto exe = cache.PathOf(command.vec[0], path, cwd)) {
-    envp[exe_name_var] = *exe;
+  if (cache && envp.count(exe_name_var)) {
+    std::vector<std::string> new_vec;
+    if (auto exe = cache->PathOf(command.vec[0], path, command.working_dir)) {
+      envp[exe_name_var] = *exe;
 
-    // Overwrite the first argument in the vector with the fully realized
-    // path of the compiler.
-    for (const char *arg : command.vec.Arguments()) {
-      new_vec.emplace_back(arg);
+      // Overwrite the first argument in the vector with the fully realized
+      // path of the compiler.
+      for (const char *arg : command.vec.Arguments()) {
+        new_vec.emplace_back(arg);
+      }
+      new_vec[0] = *exe;
+      command.vec.Reset(new_vec);
+
+    } else {
+      envp.erase(exe_name_var);
     }
-    new_vec[0] = *exe;
-    command.vec.Reset(new_vec);
-
-  } else {
-    envp.erase(exe_name_var);
   }
 
   // Remove Blight-specific environment variables.
@@ -222,8 +236,8 @@ static void FixEnvVariablesAndPath(Command &command, const std::string &cwd,
   envp["LC_ALL"] = "C";
   envp["LC_COLLATE"] = "C";
   envp["LANG"] = "C";
-  envp["CWD"] = cwd;
-  envp["PWD"] = cwd;
+  envp["CWD"] = command.working_dir;
+  envp["PWD"] = command.working_dir;
 }
 
 struct CompilerPathInfo {
@@ -759,7 +773,7 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
         << "Skipping bundle command: "
         << command.vec.Join();
     d->commands[cwd_str].pop_back();
-    return true;
+    return true;  // Not an error.
   }
 
   if (!lang || lang->equals_insensitive("unknown")) {
@@ -781,6 +795,8 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
   } else {
     command.compiler_hash = command.vec.Join();
   }
+
+  FixEnvVariablesAndPath(command, nullptr, false  /* allow_unquote */);
 
   return true;
 }
@@ -806,85 +822,90 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
 
   PathCache cache(d->fm);
 
+  auto commands_str = o.getString("command");
+  auto arguments_list = o.getArray("arguments");
+  auto bundle = false;
+
+  // Blight.
+  if (!arguments_list) {
+    arguments_list = o.getArray("canonicalized_args");
+    if (!arguments_list) {
+      arguments_list = o.getArray("args");
+    }
+  }
+
+  Command *command = nullptr;
+
   // E.g. from CMake, Blight.
-  if (auto commands_str = o.getString("command")) {
+  if (commands_str) {
     std::string args_str = commands_str->str();
-    Command &command = commands.emplace_back(args_str);
-    if (command.vec.Size()) {
-      command.compiler_hash = std::move(args_str);
-      command.working_dir = cwd_str;
-      command.env = envp;
-      FixEnvVariablesAndPath(command, cwd_str, cache);
-
-      // Log after so that we can show the absolute path to the compiler if
-      // it was updated by `FixEnvVariablesAndPath`.
-      DLOG(INFO) << "Parsed command: " << command.vec.Join();
-
-      // Guess at the language.
-      if (commands_str->contains_insensitive("++") ||
-          commands_str->contains_insensitive(".cc") ||
-          commands_str->contains_insensitive(".cxx") ||
-          commands_str->contains_insensitive(".cpp") ||
-          commands_str->contains_insensitive(".hxx") ||
-          commands_str->contains_insensitive(".hpp")) {
-        command.lang = pasta::TargetLanguage::kCXX;
-      }
-
-      return true;
-
-    } else {
+    command = &(commands.emplace_back(args_str));
+    if (!command->vec.Size()) {
       DLOG(ERROR) << "Can't parse arguments from JSON object";
       commands.pop_back();
       return false;
     }
 
   // E.g. from Bear (Build ear).
-  } else if (auto arguments_list = o.getArray("arguments");
-             arguments_list && !arguments_list->empty()) {
-
-    auto lang = pasta::TargetLanguage::kC;
-    std::stringstream ss;
+  } else if (arguments_list && !arguments_list->empty()) {
 
     std::vector<std::string> args_vec;
     for (auto arg : *arguments_list) {
       if (auto arg_str = arg.getAsString()) {
-        // Guess at the language.
-        if (arg_str->contains_insensitive("++") ||
-            arg_str->contains_insensitive(".cc") ||
-            arg_str->contains_insensitive(".cxx") ||
-            arg_str->contains_insensitive(".cpp") ||
-            arg_str->contains_insensitive(".hxx") ||
-            arg_str->contains_insensitive(".hpp")) {
-          lang = pasta::TargetLanguage::kCXX;
+        if (arg_str->equals("-bundle")) {
+          bundle = true;
         }
-        auto str = arg_str->str();
-        ss << ' ' << str;
-        args_vec.emplace_back(std::move(str));
+        args_vec.emplace_back(arg_str->str());
       } else {
         return false;
       }
     }
 
-    auto &command = commands.emplace_back(args_vec);
-    if (command.vec.Size()) {
-      DLOG(INFO) << "Parsed command: " << command.vec.Join();
-      command.compiler_hash = ss.str();
-      command.working_dir = cwd_str;
-      command.env = envp;
-      FixEnvVariablesAndPath(command, cwd_str, cache);
-      command.lang = lang;
-      return true;
-
-    } else {
+    command = &(commands.emplace_back(args_vec));
+    if (!command->vec.Size()) {
       DLOG(ERROR) << "Can't parse arguments from JSON object";
       commands.pop_back();
       return false;
+    }
+
+    if (bundle) {
+      LOG(WARNING)
+          << "Skipping bundle command: "
+          << command->vec.Join();
+      commands.pop_back();
+      return true;  // Not an error.
     }
 
   } else {
     DLOG(ERROR) << "Can't locate compiler arguments in JSON object";
     return false;
   }
+
+  command->compiler_hash = command->vec.Join();
+  command->working_dir = cwd_str;
+  command->env = envp;
+  command->lang = pasta::TargetLanguage::kC;
+
+  for (const char *arg : command->vec.Arguments()) {
+    llvm::StringRef arg_view(arg);
+    if (arg_view.contains_insensitive("++") ||
+        arg_view.contains_insensitive(".cc") ||
+        arg_view.contains_insensitive(".cxx") ||
+        arg_view.contains_insensitive(".cpp") ||
+        arg_view.contains_insensitive(".hxx") ||
+        arg_view.contains_insensitive(".hpp")) {
+      command->lang = pasta::TargetLanguage::kCXX;
+      break;
+    }
+  }
+
+  FixEnvVariablesAndPath(*command, &cache, !!commands_str  /* allow_unquote */);
+
+  // Log after so that we can show the absolute path to the compiler if
+  // it was updated by `FixEnvVariablesAndPath`.
+  DLOG(INFO) << "Parsed command: " << command->compiler_hash;
+  
+  return true;
 }
 
 namespace {
