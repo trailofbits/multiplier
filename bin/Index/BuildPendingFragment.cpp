@@ -416,6 +416,12 @@ bool PendingFragment::TryAdd(const pasta::Attr &entity) {
     //                parsed token location and identify if the attribute is used in the
     //                specialization or inherited to another fragment.
 
+    auto it = em.attr_ids.find(locator);
+    if (it != em.attr_ids.end()) {
+      entity_ids.emplace(locator, it->second);
+      return false;  // We've seen this.
+    }
+
     auto loc_it = em.attr_token_locs.find(raw_tok);
     if (loc_it != em.attr_token_locs.end()) {
       auto begin_index = loc_it->second.first;
@@ -439,6 +445,7 @@ bool PendingFragment::TryAdd(const pasta::Attr &entity) {
       em.attr_token_locs.emplace(raw_tok,
         std::pair(first_parsed_token_index, last_parsed_token_index));
       em.attr_token_ids.emplace(raw_tok, id);
+      em.attr_ids.emplace(locator, id);
     }
 
   // NOTE(pag): This is pretty ugly, but we need to label the attributes

@@ -108,6 +108,9 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Stmt &entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Attr &entity) const {
+  if (auto it = attr_ids.find(entity.RawAttr()); it != attr_ids.end()) {
+    return it->second.Pack();
+  }
   return SelectiveEntityId(entity.RawAttr());
 }
 

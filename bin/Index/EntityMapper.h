@@ -28,6 +28,7 @@ class EntityMapper final {
   // Attributes that we've observed. Many attributes can be inherited, and so
   // they are actually copied/cloned from place-to-place. Ideally, we want to
   // only keep around the "original" or first version of an attribute.
+  EntityIdMap attr_ids;
   EntityIdMap attr_token_ids;
 
   // Attributes location that we have seen in fragment. The Attributes in
