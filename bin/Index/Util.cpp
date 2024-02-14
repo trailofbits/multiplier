@@ -743,8 +743,18 @@ bool ShouldGoInFloatingFragment(const pasta::Decl &decl) {
       }
       return false;
     }
-    case pasta::DeclKind::kFunction: {
-      return false;
+
+    case pasta::DeclKind::kFunction:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod: {
+      auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
+      if (func.TemplateSpecializationKind() !=
+          pasta::TemplateSpecializationKind::kUndeclared) {
+        return !IsExplicitSpecialization(func.TemplateSpecializationKind());
+      }
+      break;
     }
     default:
       break;

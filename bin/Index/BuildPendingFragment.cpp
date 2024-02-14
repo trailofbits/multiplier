@@ -445,8 +445,9 @@ bool PendingFragment::TryAdd(const pasta::Attr &entity) {
       em.attr_token_locs.emplace(raw_tok,
         std::pair(first_parsed_token_index, last_parsed_token_index));
       em.attr_token_ids.emplace(raw_tok, id);
-      em.attr_ids.emplace(locator, id);
     }
+
+    em.attr_ids.emplace(locator, id);
 
   // NOTE(pag): This is pretty ugly, but we need to label the attributes
   //            when we're processing all fragments, as the attributes may

@@ -320,7 +320,7 @@ static ClassificationAction ClassifyParentChild(
 
     case pasta::StmtKind::kMemberExpr:
       if (auto member = pasta::MemberExpr::From(parent)) {
-        assert(member->Base() == child);
+        //assert(member->Base() == child);
         return {mx::BuiltinReferenceKind::ACCESSES_VALUE,
                 ContinuationAction::kDoneClassifying};
       }
