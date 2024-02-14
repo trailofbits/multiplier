@@ -227,8 +227,8 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
     //            same syntactical block.
     if (!em.token_tree_ids.emplace(pt->RawToken(), id).second) {
       LOG_IF(ERROR, !IsAcceptableRepeatedToken(pt.value()))
-            << "Token kind " << pt.value().Kind()
-            << " is repeated and exist in the token tree!"
+            << "Token kind " << pt.value().KindName()
+            << " is repeated and exist in the token tree!";
     }
   }
 
