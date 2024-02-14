@@ -2071,7 +2071,7 @@ static void CreatePendingFragments(
       // `struct page` declaration will show up on the same level as the
       // `typedef`.
       } else if (IsInjectedForwardDeclaration(decl) || !floc ||
-                 decl.IsImplicit()) {
+                 ShouldGoInFloatingFragment(decl) || decl.IsImplicit()) {
 
         CreateFreestandingDeclFragment(
             id_store, em, floc, tu_id, begin_index, end_index,

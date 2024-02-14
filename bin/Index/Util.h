@@ -8,6 +8,7 @@
 
 #include <capnp/c++.capnp.h>
 #include <capnp/message.h>
+#include <cstdint>
 #include <gap/core/generator.hpp>
 #include <map>
 #include <multiplier/Iterator.h>
@@ -45,6 +46,7 @@ enum class TokenKind : unsigned short;
 namespace indexer {
 
 using Entity = std::variant<std::monostate, pasta::Decl, pasta::Macro>;
+using EntityLocation = std::pair<uint32_t, uint32_t>;
 struct EntityIdMap final : public std::unordered_map<const void *, mx::EntityId> {};
 struct EntityParentMap final : public std::unordered_map<const void *, const void *> {};
 struct FileIdMap final : public std::unordered_map<const void *, mx::SpecificEntityId<mx::FileId>> {};
@@ -52,6 +54,7 @@ struct FileHashMap final : public std::unordered_map<pasta::File, std::string> {
 using TypeKey = std::pair<const void *, uint32_t>;
 struct TypeIdMap final : public std::map<TypeKey, mx::SpecificEntityId<mx::TypeId>> {};
 struct PseudoOffsetMap final : public std::unordered_map<const void *, uint32_t> {};
+struct EntityLocationMap final : public std::unordered_map<const void*, EntityLocation> {};
 class EntityMapper;
 class TokenTree;
 
@@ -120,6 +123,10 @@ bool ShouldGoInNestedFragment(const pasta::Decl &decl);
 // Determines whether or not a TLM is likely to have to go into a floating
 // fragment. This generally happens when a TLM is a directive.
 bool ShouldGoInFloatingFragment(const pasta::Macro &macro);
+
+// Determines whether or not a TLD is likely to have to go into a floating
+// fragment. This generally happens if a TLD is template or its explict specialization
+bool ShouldGoInFloatingFragment(const pasta::Decl &decl);
 
 // Returns `true` if a macro is visible across fragments, and should have an
 // entity id stored in the global mapper.

@@ -723,6 +723,36 @@ bool ShouldGoInFloatingFragment(const pasta::Macro &macro) {
   }
 }
 
+bool ShouldGoInFloatingFragment(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kVarTemplateSpecialization: {
+      // The variable template specialization that is not in the lexical
+      // context of record should be in floating fragment
+      if (auto vsd = pasta::VarTemplateSpecializationDecl::From(decl)) {
+        if (auto lc = vsd->LexicalDeclarationContext()) {
+          return !lc->IsRecord();
+        }
+      }
+      return false;
+    }
+    case pasta::DeclKind::kClassTemplateSpecialization: {
+      if (auto csd = pasta::ClassTemplateSpecializationDecl::From(decl)) {
+        if (auto lc = csd->LexicalDeclarationContext()) {
+          return !lc->IsRecord();
+        }
+      }
+      return false;
+    }
+    case pasta::DeclKind::kFunction: {
+      return false;
+    }
+    default:
+      break;
+  }
+
+  return false;
+}
+
 // Returns `true` if a macro is visible across fragments, and should have an
 // entity id stored in the global mapper.
 bool AreVisibleAcrossFragments(const pasta::Macro &macro) {

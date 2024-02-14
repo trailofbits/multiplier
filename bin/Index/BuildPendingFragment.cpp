@@ -13,6 +13,7 @@
 #include "References.h"
 #include "TypeMapper.h"
 #include "Util.h"
+#include <glog/logging.h>
 
 #include <iostream>
 
@@ -380,12 +381,6 @@ bool PendingFragment::TryAdd(const pasta::Attr &entity) {
   id.kind = mx::FromPasta(entity.Kind());
 
   if (auto tok = entity.Token(); auto raw_tok = tok.RawToken()) {
-    auto it = em.attr_ids.find(raw_tok);
-    if (it != em.attr_ids.end()) {
-      entity_ids.emplace(locator, it->second);
-      return false;  // We've seen this.
-    }
-
     // If we have something like:
     //
     //      struct CGPoint { int x; int y; };
@@ -400,7 +395,51 @@ bool PendingFragment::TryAdd(const pasta::Attr &entity) {
       return false;
     }
 
-    em.attr_ids.emplace(raw_tok, id);
+    // NOTE(kumarak): Deduplicating inherited attributes becomes complex with
+    //                templates and its specialization. The attributes for
+    //                templates and all its specialization will have same
+    //                RawToken but used in different context and we want to
+    //                assign different entity ids to them.
+    //                e.g:
+    //                        template <typename T>
+    //                        struct AlignedStorage {
+    //                          __attribute__((aligned(alignof(T)))) char data[sizeof(T)];
+    //                        };
+    //
+    //                        AlignedStorage<int> aligned_int_storage;
+    //                        AlignedStorage<double> aligned_double_storage;
+    //
+    //                In the example above, the AlignedAttr for both the specialization will
+    //                be different entity and we don't want to de-duplicate them.
+    //
+    //                The updated approach creates a map of raw token with the fragment
+    //                parsed token location and identify if the attribute is used in the
+    //                specialization or inherited to another fragment.
+
+    auto loc_it = em.attr_token_locs.find(raw_tok);
+    if (loc_it != em.attr_token_locs.end()) {
+      auto begin_index = loc_it->second.first;
+      auto end_index = loc_it->second.second;
+
+      if (first_parsed_token_index != begin_index ||
+          last_parsed_token_index != end_index) {
+
+        // The fragment is not specialization. Get the entity ids
+        // for the raw token and add it to the entity_ids map
+        auto it = em.attr_token_ids.find(raw_tok);
+        if (it != em.attr_token_ids.end()) {
+          entity_ids.emplace(locator, it->second);
+          return false;  // We've seen this.
+        }
+      }
+    } else {
+      // If the raw_tok is not in `attr_token_locs`, we have not
+      // seen it. Go ahead and add the fragment parse token indices
+      // to the map and also update the attr_token_ids map;
+      em.attr_token_locs.emplace(raw_tok,
+        std::pair(first_parsed_token_index, last_parsed_token_index));
+      em.attr_token_ids.emplace(raw_tok, id);
+    }
 
   // NOTE(pag): This is pretty ugly, but we need to label the attributes
   //            when we're processing all fragments, as the attributes may

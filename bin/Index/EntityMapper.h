@@ -28,7 +28,13 @@ class EntityMapper final {
   // Attributes that we've observed. Many attributes can be inherited, and so
   // they are actually copied/cloned from place-to-place. Ideally, we want to
   // only keep around the "original" or first version of an attribute.
-  EntityIdMap attr_ids;
+  EntityIdMap attr_token_ids;
+
+  // Attributes location that we have seen in fragment. The Attributes in
+  // template specialization can be used in different context and don't
+  // want to de-duplicate them. The attribute location tells us if we are
+  // referring to the original attribute or inherited one.
+  EntityLocationMap attr_token_locs;
 
   // An instance of TypeMapper that will hold type_ids of the
   // new types encountered in a translation unit. It will be used
