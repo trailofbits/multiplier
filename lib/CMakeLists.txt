@@ -106,6 +106,7 @@ set(api_headers
   "${source_include_dir}/Re2.h"
   "${source_include_dir}/Reference.h"
   "${source_include_dir}/Types.h"
+  "${source_include_dir}/Version.h"
 )
 
 add_library("mx-api" OBJECT
