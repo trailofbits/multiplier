@@ -159,7 +159,8 @@ class EntityLabeller final : public EntityVisitor {
    bool ShouldLabelDecl(const pasta::Decl &decl) {
      switch (decl.Kind()) {
        case pasta::DeclKind::kClassTemplate:
-       case pasta::DeclKind::kClassTemplateSpecialization: {
+       case pasta::DeclKind::kClassTemplateSpecialization:
+       case pasta::DeclKind::kClassTemplatePartialSpecialization: {
           auto it = std::find(fragment.top_level_decls.begin(),
            fragment.top_level_decls.end(), decl);
           if (it == fragment.top_level_decls.end()) {
