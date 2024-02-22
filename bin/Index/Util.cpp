@@ -743,7 +743,9 @@ bool ShouldGoInFloatingFragment(const pasta::Decl &decl) {
       }
       return false;
     }
-
+    case pasta::DeclKind::kClassTemplate: {
+      return true;
+    }
     case pasta::DeclKind::kFunction:
     case pasta::DeclKind::kCXXConversion:
     case pasta::DeclKind::kCXXConstructor:

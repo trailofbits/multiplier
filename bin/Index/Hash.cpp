@@ -16,6 +16,7 @@
 #include <pasta/Util/File.h>
 #include <pasta/Util/FileManager.h>
 #include <sstream>
+#include <iostream>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
@@ -161,7 +162,8 @@ std::string HashFragment(
     const std::vector<pasta::Decl> &decls,
     const std::vector<pasta::Macro> &macros,
     const pasta::TokenRange *frag_tok_range,
-    const pasta::PrintedTokenRange &decl_tok_range) {
+    const pasta::PrintedTokenRange &decl_tok_range,
+    const pasta::PrintedTokenRange *printed_tok_range) {
 
   std::stringstream ss;
 
@@ -198,6 +200,8 @@ std::string HashFragment(
       ss << Hash64(data);
     } else if (data[0] != '_' && !isalpha(data[0])) {
       ss << data;
+    } else if (isalpha(data[0])) {
+      ss << Hash64(data);
     }
   };
 
@@ -235,6 +239,13 @@ std::string HashFragment(
       }
 
       ss << " c" << Hash64(tc.str());
+    }
+  }
+
+  if (printed_tok_range && *printed_tok_range) {
+    for (pasta::PrintedToken token : *printed_tok_range) {
+      accumulate_token_into_hash(mx::FromPasta(token.Kind()),
+                                 pasta::TokenRole::kFileToken, token.Data());
     }
   }
 

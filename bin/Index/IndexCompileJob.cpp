@@ -11,7 +11,6 @@
 #include <cassert>
 #include <fstream>
 #include <glog/logging.h>
-#include <iostream>
 #include <map>
 #include <multiplier/Frontend/TokenKind.h>
 #include <multiplier/Types.h>
@@ -1086,7 +1085,7 @@ static void AddDeclRangeToEntityListFor(
   // tokens, which have no contextual information. We do this so that we
   // can get the contextual information from parsed tokens, which is often
   // more useful.
-  LOG_IF(FATAL, ShouldFindDeclInTokenContexts(decl) &&
+  LOG_IF(ERROR, ShouldFindDeclInTokenContexts(decl) &&
                 decl.Kind() != pasta::DeclKind::kBlock &&
                 !TokenIsInContextOfDecl(tok, decl) &&
                 !IsProbablyABuiltinDecl(decl))
@@ -1697,6 +1696,7 @@ static PendingFragmentPtr CreatePendingFragment(
     IdStore &id_store, EntityMapper &em,
     const pasta::TokenRange *original_tokens,
     pasta::PrintedTokenRange parsed_tokens,
+    const pasta::PrintedTokenRange *printed_tokens,
     std::optional<FileLocationOfFragment> floc,
     mx::PackedCompilationId tu_id,
     uint64_t begin_index,
@@ -1723,8 +1723,8 @@ static PendingFragmentPtr CreatePendingFragment(
   // a new fragment.
   auto [fid, is_new_fragment_id] = id_store.GetOrCreateFragmentIdForHash(
       (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
-      HashFragment(decls, macros, original_tokens, parsed_tokens),
-      num_tokens  /* for fragment id packing format */);
+      HashFragment(decls, macros, original_tokens, parsed_tokens,
+      printed_tokens), num_tokens  /* for fragment id packing format */);
 
   PendingFragmentPtr pf(new PendingFragment(
       fid,
@@ -1916,6 +1916,7 @@ static void CreateFreestandingDeclFragment(
       em,
       nullptr  /* original_tokens */,
       std::move(printed_tokens)  /* parsed_tokens */,
+      nullptr /* printed tokens */,
       std::move(floc),
       tu_id,
       begin_index,
@@ -1981,6 +1982,7 @@ static void CreateFloatingDirectiveFragment(
       em,
       &directive_range  /* original_tokens */,
       std::move(parsed_tokens_in_directive_range)  /* parsed_tokens */,
+      nullptr,
       std::move(floc),
       tu_id,
       directive_range.Front()->Index(),
@@ -2048,6 +2050,7 @@ static void CreatePendingFragments(
   std::vector<pasta::Decl> root_decls;
   std::vector<std::vector<pasta::Decl>> nested_decls;
   std::vector<pasta::Macro> top_level_macros;
+  std::vector<pasta::Decl> floating_decls;
 
   std::vector<pasta::Decl> forward_decls;
   std::optional<mx::PackedFragmentId> root_fragment_id;
@@ -2071,12 +2074,13 @@ static void CreatePendingFragments(
       // `struct page` declaration will show up on the same level as the
       // `typedef`.
       } else if (IsInjectedForwardDeclaration(decl) ||
-                 ShouldGoInFloatingFragment(decl) ||
                  !floc || decl.IsImplicit()) {
 
         CreateFreestandingDeclFragment(
             id_store, em, floc, tu_id, begin_index, end_index,
             decl, pending_fragments, main_file_path);
+      } else if (ShouldGoInFloatingFragment(decl)) {
+        floating_decls.push_back(decl);
 
       // These are generally template instantiations.
       } else if (ShouldGoInNestedFragment(decl)) {
@@ -2120,6 +2124,7 @@ static void CreatePendingFragments(
         em,
         &frag_tok_range  /* original_tokens */,
         std::move(aligned_tokens)  /* parsed_tokens */,
+        nullptr /* printed tokens */,
         floc  /* copied */,
         tu_id,
         begin_index,
@@ -2153,6 +2158,7 @@ static void CreatePendingFragments(
         em,
         &frag_tok_range  /* original_tokens */,
         std::move(aligned_tokens)  /* parsed_tokens */,
+        nullptr /* printed tokens */,
         floc  /* copied */,
         tu_id,
         begin_index,
@@ -2160,6 +2166,47 @@ static void CreatePendingFragments(
         std::move(decls),
         top_level_macros  /* copied */,
         root_fragment_id);
+
+    LabelDeclsInFragment(*pf);
+
+    if (pf->is_new) {
+      pending_fragments.emplace_back(std::move(pf));
+    }
+  }
+
+  for(auto &decl : floating_decls) {
+    // NOTE(kumarak) Use default printing policy for floating
+    //               fragment tokens
+    const pasta::PrintingPolicy pp;
+
+    pasta::PrintedTokenRange parsed_tokens =
+      pasta::PrintedTokenRange::Adopt(decl.Tokens());
+
+    pasta::PrintedTokenRange printed_tokens =
+      pasta::PrintedTokenRange::Create(decl, pp);
+
+    auto err = pasta::PrintedTokenRange::Align(parsed_tokens, printed_tokens);
+    LOG_IF(ERROR, err.has_value())
+      << "Unable to align tokens: " << err.value();
+
+    CHECK(!parsed_tokens.empty());
+
+    std::vector<pasta::Decl> decls;
+    decls.push_back(decl);
+
+    auto pf = CreatePendingFragment(
+        id_store,
+        em,
+        nullptr, //&frag_tok_range  /* original_tokens */,
+        std::move(parsed_tokens)  /* parsed_tokens */,
+        &printed_tokens,
+        floc  /* copied */,
+        tu_id,
+        begin_index,
+        end_index,
+        std::move(decls),
+        {}  /* copied */,
+        std::nullopt);
 
     LabelDeclsInFragment(*pf);
 

@@ -25,11 +25,6 @@
 "directory": ""
 },
 {
-"file": "TemplateExplicitSpecialization.cpp",
-"command": "/usr/bin/c++ TemplateExplicitSpecialization.cpp",
-"directory": ""
-},
-{
 "file": "TemplateSpecializationQuals.cpp",
 "command": "/usr/bin/c++ TemplateSpecializationQuals.cpp",
 "directory": ""
@@ -38,6 +33,11 @@
 "file": "TemplateRecursive.cpp",
 "command": "/usr/bin/c++ TemplateRecursive.cpp",
 "directory": ""
+},
+{
+  "file": "TemplateExplicitSpecialization.cpp",
+  "command": "/usr/bin/c++ TemplateExplicitSpecialization.cpp",
+  "directory": ""
 },
 {
 "file": "PartialSpecInstantiation.cpp",
@@ -53,5 +53,20 @@
 "file": "BuiltinTemplates.cpp",
 "command": "/usr/bin/c++ BuiltinTemplates.cpp",
 "directory": ""
+},
+{
+    "file": "AlignAttribute.cpp",
+    "command": "/usr/bin/c++ AlignAttribute.cpp",
+    "directory": ""
+},
+{
+    "file": "RestrictAttribute.cpp",
+    "command": "/usr/bin/c++ RestrictAttribute.cpp",
+    "directory": ""
+},
+{
+    "file": "TemplateArgumentType.cpp",
+    "command": "/usr/bin/c++ TemplateArgumentType.cpp",
+    "directory": ""
 }
 ]
