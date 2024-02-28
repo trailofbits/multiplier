@@ -512,7 +512,8 @@ static const std::string_view kOptNoStdSystemInc("-nostdsysteminc");
 
 static bool IsOptNeedingFixing(std::string_view arg) {
   return arg == kOptNoStdInc || arg == kOptNoStdIncxx ||
-         arg == kOptNoBuiltinInc || arg == kOptNoStdSystemInc;
+         arg == kOptNoBuiltinInc || arg == kOptNoStdSystemInc ||
+         arg.starts_with("-fsanitize=");
 }
 
 // The way we do system include directory inference with the compiler means
