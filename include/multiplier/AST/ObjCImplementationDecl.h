@@ -14,6 +14,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class CXXCtorInitializer;
 class Decl;
 class NamedDecl;
 class ObjCContainerDecl;
@@ -78,6 +79,9 @@ class MX_EXPORT ObjCImplementationDecl : public ObjCImplDecl {
   Token super_class_token(void) const;
   bool has_destructors(void) const;
   bool has_non_zero_constructors(void) const;
+  std::optional<CXXCtorInitializer> nth_initializer(unsigned n) const;
+  unsigned num_initializers(void) const;
+  gap::generator<CXXCtorInitializer> initializers(void) const &;
   std::optional<ObjCIvarDecl> nth_instance_variable(unsigned n) const;
   unsigned num_instance_variables(void) const;
   gap::generator<ObjCIvarDecl> instance_variables(void) const &;

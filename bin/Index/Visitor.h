@@ -77,6 +77,7 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitVarTemplateSpecializationDecl(const pasta::VarTemplateSpecializationDecl &decl) final;
   void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final;
   void VisitCXXMethodDecl(const pasta::CXXMethodDecl &decl) final;
+  void VisitCXXConstructorDecl(const pasta::CXXConstructorDecl &decl) final;
   void VisitCXXDestructorDecl(const pasta::CXXDestructorDecl &decl) final;
   void VisitTagDecl(const pasta::TagDecl &decl) final;
   void VisitClassTemplateSpecializationDecl(const pasta::ClassTemplateSpecializationDecl &decl) final;
@@ -85,6 +86,7 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitFileScopeAsmDecl(const pasta::FileScopeAsmDecl &decl) final;
   void VisitConceptDecl(const pasta::ConceptDecl &decl) final;
   void VisitCXXDeductionGuideDecl(const pasta::CXXDeductionGuideDecl &decl) final;
+  void VisitTypeAliasDecl(const pasta::TypeAliasDecl &decl) final;
   void VisitLambdaExpr(const pasta::LambdaExpr &stmt) final;
   void VisitInitListExpr(const pasta::InitListExpr &stmt) override;
   void VisitGCCAsmStmt(const pasta::GCCAsmStmt &stmt) final;
@@ -107,6 +109,10 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitCXXUuidofExpr(const pasta::CXXUuidofExpr &expr) final;
   void VisitCXXBoolLiteralExpr(const pasta::CXXBoolLiteralExpr &expr) final;
   void VisitImplicitCastExpr(const pasta::ImplicitCastExpr &stmt) final;
+  void VisitArrayTypeTraitExpr(const pasta::ArrayTypeTraitExpr &expr) final;
+  void VisitCXXConstructExpr(const pasta::CXXConstructExpr  &expr) final;
+  void VisitCXXTemporaryObjectExpr(const pasta::CXXTemporaryObjectExpr &expr) final;
+  void VisitCXXOperatorCallExpr(const pasta::CXXOperatorCallExpr &expr) final;
   void VisitAlignedAttr(const pasta::AlignedAttr &attr) final;
   void VisitDecl(const pasta::Decl &decl) final;
   void VisitStmt(const pasta::Stmt &stmt) final;

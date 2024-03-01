@@ -5,6 +5,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "TypeMapper.h"
+#include "PendingFragment.h"
 
 #include <sstream>
 
@@ -51,10 +52,12 @@ static bool IsSizedBuiltinType(const pasta::Type &type) {
 // the adjusted version of an adjusted type. This also helps us persist fewer
 // overall types.
 static clang::Type *BasicTypeDeduplication(clang::Type *type,
-                                           uint32_t &up_quals);
+                                           uint32_t &up_quals,
+                                           EntityList<const clang::Stmt*> *list = nullptr);
 
 static clang::Type *BasicTypeDeduplication(clang::QualType type,
-                                           uint32_t &up_quals) {
+                                           uint32_t &up_quals,
+                                           EntityList<const clang::Stmt*> *list = nullptr) {
   clang::Type *tp = const_cast<clang::Type *>(type.getTypePtrOrNull());
   if (!tp) {
     return tp;
@@ -64,7 +67,8 @@ static clang::Type *BasicTypeDeduplication(clang::QualType type,
   return BasicTypeDeduplication(tp, up_quals);
 }
 
-clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals) {
+clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals,
+                                    EntityList<const clang::Stmt*> *list) {
   if (!type) {
     return nullptr;
   }
@@ -88,6 +92,11 @@ clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals) {
       if (et->isSugared()) {
         new_type = BasicTypeDeduplication(et->desugar(), up_quals);
       }
+      if (auto underlying_expr = et->getUnderlyingExpr()) {
+        if (list) {
+          list->emplace_back(reinterpret_cast<const clang::Stmt*>(underlying_expr));
+        }
+      }
       break;
     }
 
@@ -98,9 +107,12 @@ clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals) {
 
     case clang::Type::Decltype: {
       clang::DecltypeType *dt = clang::dyn_cast<clang::DecltypeType>(type);
-      if (dt->getUnderlyingExpr()) {
+      if (auto underlying_expr = dt->getUnderlyingExpr()) {
         if (dt->isSugared()) {
           new_type = BasicTypeDeduplication(dt->desugar(), up_quals);
+        }
+        if (list) {
+          list->emplace_back(reinterpret_cast<const clang::Stmt*>(underlying_expr));
         }
       } else {
         new_type = BasicTypeDeduplication(dt->getUnderlyingType(), up_quals);
@@ -308,7 +320,8 @@ mx::RawEntityId TypeMapper::EntityId(const pasta::Type &entity) const {
 }
 
 // NOTE(pag): `entity` may be updated.
-bool TypeMapper::AddEntityId(const EntityMapper &em, pasta::Type *entity_) {
+bool TypeMapper::AddEntityId(const EntityMapper &em, pasta::Type *entity_,
+                             EntityList<const clang::Stmt*> *entity_list) {
   assert(!read_only);
 
   pasta::Type &entity = *entity_;
@@ -322,7 +335,7 @@ bool TypeMapper::AddEntityId(const EntityMapper &em, pasta::Type *entity_) {
   }
 
   clang::Type *raw_type = BasicTypeDeduplication(
-      const_cast<clang::Type *>(entity.RawType()), raw_qualifiers);
+      const_cast<clang::Type *>(entity.RawType()), raw_qualifiers, entity_list);
 
   TypeKey dedup_type_key(raw_type, raw_qualifiers);
   assert(dedup_type_key.first != nullptr);

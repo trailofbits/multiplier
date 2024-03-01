@@ -72,7 +72,7 @@ extern void DispatchSerializeMacro(const PendingFragment &pf,
 // Build the fragment. This fills out the decls/stmts/types to serialize.
 //
 // NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
-extern void BuildPendingFragment(PendingFragment &pf);
+extern void BuildPendingFragment(const pasta::AST &ast, PendingFragment &pf);
 
 // Label the parent entity ids.
 extern void LabelParentsInPendingFragment(PendingFragment &pf);
@@ -706,7 +706,7 @@ void GlobalIndexingState::PersistFragment(
 
   // Identify all of the declarations, statements, types, and pseudo-entities,
   // and build lists of the entities to serialize.
-  BuildPendingFragment(pf);
+  BuildPendingFragment(ast, pf);
 
   // Figure out parentage/inheritance between the entities.
   LabelParentsInPendingFragment(pf);

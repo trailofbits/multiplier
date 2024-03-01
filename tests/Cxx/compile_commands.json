@@ -68,5 +68,15 @@
     "file": "TemplateArgumentType.cpp",
     "command": "/usr/bin/c++ TemplateArgumentType.cpp",
     "directory": ""
+},
+{
+    "file": "FriendFunctionDecl.cpp",
+    "command": "/usr/bin/c++ FriendFunctionDecl.cpp",
+    "directory": ""
+},
+{
+    "file": "FriendFunctionDecl2.cpp",
+    "command": "/usr/bin/c++ FriendFunctionDecl2.cpp",
+    "directory": ""
 }
 ]

@@ -6650,6 +6650,7 @@ MX_BEGIN_ENUM_CLASS(PseudoKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(PseudoKind, TEMPLATE_PARAMETER_LIST, unsigned char)
   MX_ENUM_CLASS_ENTRY(PseudoKind, CXX_BASE_SPECIFIER, unsigned char)
   MX_ENUM_CLASS_ENTRY(PseudoKind, DESIGNATOR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PseudoKind, CXX_CTOR_INITIALIZER, unsigned char)
 MX_END_ENUM_CLASS(PseudoKind)
 
 MX_BEGIN_ENUM_CLASS(TokenCategory, unsigned char)
@@ -6693,6 +6694,35 @@ MX_BEGIN_ENUM_CLASS(TokenCategory, unsigned char)
   MX_ENUM_CLASS_ENTRY(TokenCategory, WARNING, unsigned char)
   MX_ENUM_CLASS_ENTRY(TokenCategory, ERROR, unsigned char)
 MX_END_ENUM_CLASS(TokenCategory)
+
+#ifndef MX_ENTER_VISIT_CXXCtorInitializer
+#  define MX_ENTER_VISIT_CXXCtorInitializer
+#endif
+#ifndef MX_EXIT_VISIT_CXXCtorInitializer
+#  define MX_EXIT_VISIT_CXXCtorInitializer
+#endif
+
+MX_BEGIN_VISIT_PSEUDO(CXXCtorInitializer)
+  MX_ENTER_VISIT_CXXCtorInitializer
+  MX_VISIT_BOOL(CXXCtorInitializer, is_base_initializer, 0, MX_APPLY_METHOD, IsBaseInitializer, bool, NthCXXCtorInitializer)
+  MX_VISIT_BOOL(CXXCtorInitializer, is_member_initializer, 1, MX_APPLY_METHOD, IsMemberInitializer, bool, NthCXXCtorInitializer)
+  MX_VISIT_BOOL(CXXCtorInitializer, is_any_member_initializer, 2, MX_APPLY_METHOD, IsAnyMemberInitializer, bool, NthCXXCtorInitializer)
+  MX_VISIT_BOOL(CXXCtorInitializer, is_indirect_member_initializer, 3, MX_APPLY_METHOD, IsIndirectMemberInitializer, bool, NthCXXCtorInitializer)
+  MX_VISIT_BOOL(CXXCtorInitializer, is_in_class_member_initializer, 4, MX_APPLY_METHOD, IsInClassMemberInitializer, bool, NthCXXCtorInitializer)
+  MX_VISIT_BOOL(CXXCtorInitializer, is_delegating_initializer, 5, MX_APPLY_METHOD, IsDelegatingInitializer, bool, NthCXXCtorInitializer)
+  MX_VISIT_BOOL(CXXCtorInitializer, is_pack_expansion, 6, MX_APPLY_METHOD, IsPackExpansion, bool, NthCXXCtorInitializer)
+  MX_VISIT_BOOL(CXXCtorInitializer, is_base_virtual, 7, MX_APPLY_METHOD, IsBaseVirtual, bool, NthCXXCtorInitializer)
+  MX_VISIT_OPTIONAL_ENTITY(CXXCtorInitializer, member, 8, MX_APPLY_METHOD, Member, FieldDecl, NthCXXCtorInitializer)
+  MX_VISIT_OPTIONAL_ENTITY(CXXCtorInitializer, any_member, 9, MX_APPLY_METHOD, AnyMember, FieldDecl, NthCXXCtorInitializer)
+  MX_VISIT_OPTIONAL_ENTITY(CXXCtorInitializer, indirect_member, 10, MX_APPLY_METHOD, IndirectMember, IndirectFieldDecl, NthCXXCtorInitializer)
+  MX_VISIT_OPTIONAL_ENTITY(CXXCtorInitializer, initializer, 11, MX_APPLY_METHOD, Initializer, Stmt, NthCXXCtorInitializer)
+  MX_VISIT_ENTITY(CXXCtorInitializer, ellipsis_token, 12, MX_APPLY_METHOD, EllipsisToken, Token, NthCXXCtorInitializer)
+  MX_VISIT_ENTITY(CXXCtorInitializer, member_token, 13, MX_APPLY_METHOD, MemberToken, Token, NthCXXCtorInitializer)
+  MX_VISIT_ENTITY(CXXCtorInitializer, left_angle_token, 14, MX_APPLY_METHOD, LeftAngleToken, Token, NthCXXCtorInitializer)
+  MX_VISIT_ENTITY(CXXCtorInitializer, right_angle_token, 15, MX_APPLY_METHOD, RightAngleToken, Token, NthCXXCtorInitializer)
+  MX_VISIT_TOKEN_RANGE(CXXCtorInitializer, tokens, 16, 17, NthCXXCtorInitializer)
+  MX_EXIT_VISIT_CXXCtorInitializer
+MX_END_VISIT_PSEUDO(CXXCtorInitializer)
 
 #ifndef MX_ENTER_VISIT_Designator
 #  define MX_ENTER_VISIT_Designator
@@ -15170,11 +15200,11 @@ MX_BEGIN_VISIT_STMT(GCCAsmStmt)
   MX_VISIT_ENTITY(GCCAsmStmt, r_paren_token, 11, MX_APPLY_METHOD, RParenToken, Token, NthStmt)
   MX_VISIT_BOOL(GCCAsmStmt, is_assembly_goto, 23, MX_APPLY_METHOD, IsAssemblyGoto, bool, NthStmt)
   MX_VISIT_ENTITY_LIST(GCCAsmStmt, labels, 29, MX_APPLY_METHOD, Labels, AddrLabelExpr, NthStmt)
-  MX_VISIT_ENTITY_LIST(GCCAsmStmt, clobber_string_literals, 52, MX_APPLY_METHOD, ClobberStringLiterals, StringLiteral, NthStmt)
+  MX_VISIT_ENTITY_LIST(GCCAsmStmt, output_constraint_literals, 52, MX_APPLY_METHOD, OutputConstraintLiterals, StringLiteral, NthStmt)
   MX_VISIT_TEXT_LIST(GCCAsmStmt, output_names, 64, MX_APPLY_METHOD, OutputNames, basic_string_view, NthStmt)
-  MX_VISIT_ENTITY_LIST(GCCAsmStmt, output_constraint_literals, 53, MX_APPLY_METHOD, OutputConstraintLiterals, StringLiteral, NthStmt)
+  MX_VISIT_ENTITY_LIST(GCCAsmStmt, input_constraint_literals, 53, MX_APPLY_METHOD, InputConstraintLiterals, StringLiteral, NthStmt)
   MX_VISIT_TEXT_LIST(GCCAsmStmt, input_names, 66, MX_APPLY_METHOD, InputNames, basic_string_view, NthStmt)
-  MX_VISIT_ENTITY_LIST(GCCAsmStmt, input_constraint_literals, 54, MX_APPLY_METHOD, InputConstraintLiterals, StringLiteral, NthStmt)
+  MX_VISIT_ENTITY_LIST(GCCAsmStmt, clobber_string_literals, 54, MX_APPLY_METHOD, ClobberStringLiterals, StringLiteral, NthStmt)
   MX_VISIT_ENTITY_LIST(GCCAsmStmt, label_expressions, 67, MX_APPLY_METHOD, LabelExpressions, AddrLabelExpr, NthStmt)
   MX_VISIT_TEXT_LIST(GCCAsmStmt, label_names, 68, MX_APPLY_METHOD, LabelNames, basic_string_view, NthStmt)
   MX_EXIT_VISIT_GCCAsmStmt
@@ -18580,11 +18610,12 @@ MX_BEGIN_VISIT_DECL(CXXConstructorDecl)
   MX_ENTER_VISIT_CXXConstructorDecl
   MX_VISIT_BASE(CXXConstructorDecl, CXXMethodDecl)
   MX_VISIT_OPTIONAL_ENTITY(CXXConstructorDecl, target_constructor, 180, MX_APPLY_METHOD, TargetConstructor, CXXConstructorDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(CXXConstructorDecl, initializers, 184, MX_APPLY_METHOD, Initializers, CXXCtorInitializer, NthDecl)
   MX_VISIT_BOOL(CXXConstructorDecl, is_default_constructor, 182, MX_APPLY_METHOD, IsDefaultConstructor, bool, NthDecl)
   MX_VISIT_BOOL(CXXConstructorDecl, is_delegating_constructor, 183, MX_APPLY_METHOD, IsDelegatingConstructor, bool, NthDecl)
-  MX_VISIT_BOOL(CXXConstructorDecl, is_explicit, 184, MX_APPLY_METHOD, IsExplicit, bool, NthDecl)
-  MX_VISIT_BOOL(CXXConstructorDecl, is_inheriting_constructor, 185, MX_APPLY_METHOD, IsInheritingConstructor, bool, NthDecl)
-  MX_VISIT_BOOL(CXXConstructorDecl, is_specialization_copying_object, 186, MX_APPLY_METHOD, IsSpecializationCopyingObject, bool, NthDecl)
+  MX_VISIT_BOOL(CXXConstructorDecl, is_explicit, 185, MX_APPLY_METHOD, IsExplicit, bool, NthDecl)
+  MX_VISIT_BOOL(CXXConstructorDecl, is_inheriting_constructor, 186, MX_APPLY_METHOD, IsInheritingConstructor, bool, NthDecl)
+  MX_VISIT_BOOL(CXXConstructorDecl, is_specialization_copying_object, 187, MX_APPLY_METHOD, IsSpecializationCopyingObject, bool, NthDecl)
   MX_EXIT_VISIT_CXXConstructorDecl
 MX_END_VISIT_DECL(CXXConstructorDecl)
 
@@ -18908,7 +18939,7 @@ MX_BEGIN_VISIT_DECL(CXXRecordDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, allow_const_default_initializer, 133, MX_APPLY_METHOD, AllowConstDefaultInitializer, bool, NthDecl)
   MX_VISIT_OPTIONAL_ENTITY_LIST(CXXRecordDecl, bases, 179, MX_APPLY_METHOD, Bases, CXXBaseSpecifier, NthDecl)
   MX_VISIT_OPTIONAL_ENUM(CXXRecordDecl, calculate_inheritance_model, 87, MX_APPLY_METHOD, CalculateInheritanceModel, MSInheritanceModel, NthDecl)
-  MX_VISIT_ENTITY_LIST(CXXRecordDecl, constructors, 187, MX_APPLY_METHOD, Constructors, CXXConstructorDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(CXXRecordDecl, constructors, 184, MX_APPLY_METHOD, Constructors, CXXConstructorDecl, NthDecl)
   MX_VISIT_OPTIONAL_ENTITY_LIST(CXXRecordDecl, friends, 188, MX_APPLY_METHOD, Friends, FriendDecl, NthDecl)
   MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, dependent_lambda_call_operator, 82, MX_APPLY_METHOD, DependentLambdaCallOperator, FunctionTemplateDecl, NthDecl)
   MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, described_class_template, 83, MX_APPLY_METHOD, DescribedClassTemplate, ClassTemplateDecl, NthDecl)
@@ -18940,8 +18971,8 @@ MX_BEGIN_VISIT_DECL(CXXRecordDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_inherited_constructor, 175, MX_APPLY_METHOD, HasInheritedConstructor, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_initializer_method, 177, MX_APPLY_METHOD, HasInitializerMethod, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_irrelevant_destructor, 182, MX_APPLY_METHOD, HasIrrelevantDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_known_lambda_internal_linkage, 184, MX_APPLY_METHOD, HasKnownLambdaInternalLinkage, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_move_assignment, 186, MX_APPLY_METHOD, HasMoveAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_known_lambda_internal_linkage, 185, MX_APPLY_METHOD, HasKnownLambdaInternalLinkage, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_move_assignment, 187, MX_APPLY_METHOD, HasMoveAssignment, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_move_constructor, 192, MX_APPLY_METHOD, HasMoveConstructor, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_mutable_fields, 194, MX_APPLY_METHOD, HasMutableFields, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_literal_type_fields_or_bases, 196, MX_APPLY_METHOD, HasNonLiteralTypeFieldsOrBases, bool, NthDecl)
@@ -19402,7 +19433,7 @@ MX_BEGIN_VISIT_ABSTRACT_DECL(ObjCContainerDecl)
   MX_VISIT_ENTITY(ObjCContainerDecl, at_start_token, 57, MX_APPLY_METHOD, AtStartToken, Token, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCContainerDecl, instance_methods, 61, MX_APPLY_METHOD, InstanceMethods, ObjCMethodDecl, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCContainerDecl, instance_properties, 179, MX_APPLY_METHOD, InstanceProperties, ObjCPropertyDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, methods, 187, MX_APPLY_METHOD, Methods, ObjCMethodDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, methods, 184, MX_APPLY_METHOD, Methods, ObjCMethodDecl, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCContainerDecl, properties, 188, MX_APPLY_METHOD, Properties, ObjCPropertyDecl, NthDecl)
   MX_VISIT_DECL_CONTEXT(ObjCContainerDecl, declarations_in_context, 189, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_ObjCContainerDecl
@@ -19532,7 +19563,8 @@ MX_BEGIN_VISIT_DECL(ObjCImplementationDecl)
   MX_VISIT_ENTITY(ObjCImplementationDecl, super_class_token, 79, MX_APPLY_METHOD, SuperClassToken, Token, NthDecl)
   MX_VISIT_BOOL(ObjCImplementationDecl, has_destructors, 74, MX_APPLY_METHOD, HasDestructors, bool, NthDecl)
   MX_VISIT_BOOL(ObjCImplementationDecl, has_non_zero_constructors, 75, MX_APPLY_METHOD, HasNonZeroConstructors, bool, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCImplementationDecl, instance_variables, 339, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCImplementationDecl, initializers, 339, MX_APPLY_METHOD, Initializers, CXXCtorInitializer, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCImplementationDecl, instance_variables, 350, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
   MX_EXIT_VISIT_ObjCImplementationDecl
 MX_END_VISIT_DECL(ObjCImplementationDecl)
 
@@ -19732,6 +19764,8 @@ MX_BEGIN_VISIT_DECL(EmptyDecl)
   MX_EXIT_VISIT_EmptyDecl
 MX_END_VISIT_DECL(EmptyDecl)
 
+#undef MX_ENTER_VISIT_CXXCtorInitializer
+#undef MX_EXIT_VISIT_CXXCtorInitializer
 #undef MX_ENTER_VISIT_Designator
 #undef MX_EXIT_VISIT_Designator
 #undef MX_ENTER_VISIT_CXXBaseSpecifier

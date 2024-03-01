@@ -258,6 +258,11 @@ mx::RawEntityId EntityMapper::EntityId(
   return PerFragmentEntityId(pseudo.RawDesignator());
 }
 
+mx::RawEntityId EntityMapper::EntityId(
+    const pasta::CXXCtorInitializer &pseudo) const {
+  return PerFragmentEntityId(pseudo.RawCXXCtorInitializer());
+}
+
 mx::RawEntityId EntityMapper::EntityIdOfType(
     const void *type, uint32_t quals) const {
   return tm.EntityId(type, quals);

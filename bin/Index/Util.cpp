@@ -794,6 +794,24 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
   if (!IsSerializableDecl(decl)) {
     return true;
   }
+
+  switch(decl.Kind()) {
+    case pasta::DeclKind::kFunction: {
+      auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
+      if(auto pattern_decl = func.TemplateInstantiationPattern()) {
+        // Return true if
+        //        1) isReferenced() is false
+        //        2) pattern->doesThisDeclarationHaveABody() is true
+        //        3) decl->doesThisDeclarationHaveABody() is false
+        return (pattern_decl->DoesThisDeclarationHaveABody() &&
+          !func.DoesThisDeclarationHaveABody() && !func.IsReferenced());
+      }
+
+    }
+    default:
+      break;
+  }
+
   return false;
 }
 

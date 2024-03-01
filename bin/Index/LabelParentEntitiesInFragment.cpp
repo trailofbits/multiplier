@@ -124,10 +124,13 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 
   void Accept(const pasta::Decl &entity) final {
+    if (ShouldHideFromIndexer(entity)) {
+      return;
+    }
+
     // Handle the serializable decl context differently
     auto eid = em.SpecificEntityId<mx::DeclId>(entity);
     if (!eid) {
-
       // TODO(kumarak): I see an unlinked instance of TemplateTypeParmDecl that is 
       //                not available in AST. Adding check to avoid assert
       assert((false || entity.Kind() == pasta::DeclKind::kTemplateTypeParm 
@@ -159,7 +162,13 @@ class ParentTrackerVisitor : public EntityVisitor {
   void Accept(const pasta::Stmt &entity) final {
     auto eid = em.SpecificEntityId<mx::StmtId>(entity);
     if (!eid) {
-      assert(false);
+      // TODO(kumarak): Log error instead of assert. See the assert
+      //                while visiting dependent types.
+      LOG(ERROR)
+        << "Fragment has statment missing from Entity Mapper: "
+        << DiagnosePrintedTokens(
+              pasta::PrintedTokenRange::Create(entity));
+      //assert(false);
       return;
     }
 
@@ -194,7 +203,7 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 
   bool Enter(const pasta::Type &) final {
-    return false;
+    return true;
   }
 
   bool Enter(const pasta::Attr &entity) final {
@@ -202,7 +211,11 @@ class ParentTrackerVisitor : public EntityVisitor {
     return false;
   }
 
-  void Accept(const pasta::Type &) final {}
+  void Accept(const pasta::Type &entity) final {
+    if (!entity.IsDependentType()) {
+      this->EntityVisitor::Accept(entity);
+    }
+  }
 
   void Accept(const pasta::TemplateParameterList &entity) final {
     AddToMaps(RawEntity(entity));

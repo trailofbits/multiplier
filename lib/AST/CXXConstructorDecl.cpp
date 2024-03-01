@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/CXXConstructorDecl.h>
+#include <multiplier/AST/CXXCtorInitializer.h>
 #include <multiplier/AST/CXXMethodDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/DeclaratorDecl.h>
@@ -236,6 +237,36 @@ std::optional<CXXConstructorDecl> CXXConstructorDecl::target_constructor(void) c
   return std::nullopt;
 }
 
+unsigned CXXConstructorDecl::num_initializers(void) const {
+  return impl->reader.getVal184().size();
+}
+
+std::optional<CXXCtorInitializer> CXXConstructorDecl::nth_initializer(unsigned n) const {
+  auto list = impl->reader.getVal184();
+  if (n >= list.size()) {
+    return std::nullopt;
+  }
+  const EntityProviderPtr &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->CXXCtorInitializerFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return CXXCtorInitializer(std::move(e));
+}
+
+gap::generator<CXXCtorInitializer> CXXConstructorDecl::initializers(void) const & {
+  auto list = impl->reader.getVal184();
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d184 = ep->CXXCtorInitializerFor(ep, v)) {
+      co_yield CXXCtorInitializer(std::move(d184));
+    }
+  }
+  co_return;
+}
+
 bool CXXConstructorDecl::is_default_constructor(void) const {
   return impl->reader.getVal182();
 }
@@ -245,15 +276,15 @@ bool CXXConstructorDecl::is_delegating_constructor(void) const {
 }
 
 bool CXXConstructorDecl::is_explicit(void) const {
-  return impl->reader.getVal184();
-}
-
-bool CXXConstructorDecl::is_inheriting_constructor(void) const {
   return impl->reader.getVal185();
 }
 
-bool CXXConstructorDecl::is_specialization_copying_object(void) const {
+bool CXXConstructorDecl::is_inheriting_constructor(void) const {
   return impl->reader.getVal186();
+}
+
+bool CXXConstructorDecl::is_specialization_copying_object(void) const {
+  return impl->reader.getVal187();
 }
 
 #pragma GCC diagnostic pop

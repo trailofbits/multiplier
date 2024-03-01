@@ -167,6 +167,7 @@ struct Fragment @0xe5f27760091f9a3a {
   templateParameterLists @21 :List(AST.TemplateParameterList);
   cXXBaseSpecifiers @22 :List(AST.CXXBaseSpecifier);
   designators @23 :List(AST.Designator);
+  cXXCtorInitializers @24 :List(AST.CXXCtorInitializer);
 }
 
 struct Compilation @0xc8b5fa5dd0739e82 {

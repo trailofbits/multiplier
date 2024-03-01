@@ -17,7 +17,8 @@ namespace mx {
     m(TemplateArgument) \
     m(TemplateParameterList) \
     m(CXXBaseSpecifier) \
-    m(Designator)
+    m(Designator) \
+    m(CXXCtorInitializer)
 
 #define MX_DEFINE_PSEUDO(name) \
     class name ## Impl final : public FragmentEntityImpl<ast::name> { \

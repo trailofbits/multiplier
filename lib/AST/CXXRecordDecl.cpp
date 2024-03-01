@@ -273,11 +273,11 @@ std::optional<MSInheritanceModel> CXXRecordDecl::calculate_inheritance_model(voi
 }
 
 unsigned CXXRecordDecl::num_constructors(void) const {
-  return impl->reader.getVal187().size();
+  return impl->reader.getVal184().size();
 }
 
 std::optional<CXXConstructorDecl> CXXRecordDecl::nth_constructor(unsigned n) const {
-  auto list = impl->reader.getVal187();
+  auto list = impl->reader.getVal184();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -291,12 +291,12 @@ std::optional<CXXConstructorDecl> CXXRecordDecl::nth_constructor(unsigned n) con
 }
 
 gap::generator<CXXConstructorDecl> CXXRecordDecl::constructors(void) const & {
-  auto list = impl->reader.getVal187();
+  auto list = impl->reader.getVal184();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d187 = ep->DeclFor(ep, v)) {
-      if (auto e = CXXConstructorDecl::from_base(std::move(d187))) {
+    if (auto d184 = ep->DeclFor(ep, v)) {
+      if (auto e = CXXConstructorDecl::from_base(std::move(d184))) {
         co_yield std::move(*e);
       }
     }
@@ -626,10 +626,10 @@ std::optional<bool> CXXRecordDecl::has_irrelevant_destructor(void) const {
 }
 
 std::optional<bool> CXXRecordDecl::has_known_lambda_internal_linkage(void) const {
-  if (!impl->reader.getVal185()) {
+  if (!impl->reader.getVal186()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal184());
+    return static_cast<bool>(impl->reader.getVal185());
   }
   return std::nullopt;
 }
@@ -638,7 +638,7 @@ std::optional<bool> CXXRecordDecl::has_move_assignment(void) const {
   if (!impl->reader.getVal191()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal186());
+    return static_cast<bool>(impl->reader.getVal187());
   }
   return std::nullopt;
 }

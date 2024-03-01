@@ -572,6 +572,7 @@
 #include "AST/AttributeSyntax.h"
 #include "AST/DeclCategory.h"
 #include "AST/PseudoKind.h"
+#include "AST/CXXCtorInitializer.h"
 #include "AST/Designator.h"
 #include "AST/CXXBaseSpecifier.h"
 #include "AST/TemplateParameterList.h"

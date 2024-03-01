@@ -162,6 +162,10 @@ static const std::unordered_set<std::string> gDesignatorNames{
   "Designator"
 };
 
+static const std::unordered_set<std::string> gCXXCtorInitializerNames{
+  "CXXCtorInitializer"
+};
+
 static const std::unordered_set<std::string> gFileNames{
   "File"
 };

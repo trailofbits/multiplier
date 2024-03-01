@@ -35,7 +35,7 @@ struct Decl @0xfb5879761ffaedb6{
   val51 @20 :List(UInt64);
   val61 @21 :List(UInt64);
   val179 @22 :List(UInt64);
-  val187 @23 :List(UInt64);
+  val184 @23 :List(UInt64);
   val188 @24 :List(UInt64);
   val189 @25 :List(UInt64);
   val313 @26 :List(UInt64);
@@ -207,9 +207,9 @@ struct Decl @0xfb5879761ffaedb6{
   val178 @192 :Bool;
   val182 @193 :Bool;
   val183 @194 :Bool;
-  val184 @195 :Bool;
-  val185 @196 :Bool;
-  val186 @197 :Bool;
+  val185 @195 :Bool;
+  val186 @196 :Bool;
+  val187 @197 :Bool;
   val191 @198 :Bool;
   val192 @199 :Bool;
   val193 @200 :Bool;
@@ -657,5 +657,26 @@ struct Designator @0x8fa2d595d812339e{
   val10 @10 :UInt64;
   val11 @11 :UInt64;
   val12 @12 :UInt64;
+}
+
+struct CXXCtorInitializer @0x96ba2ce1a1157040{
+  val8 @0 :UInt64;
+  val9 @1 :UInt64;
+  val10 @2 :UInt64;
+  val11 @3 :UInt64;
+  val12 @4 :UInt64;
+  val13 @5 :UInt64;
+  val14 @6 :UInt64;
+  val15 @7 :UInt64;
+  val16 @8 :UInt64;
+  val17 @9 :UInt64;
+  val0 @10 :Bool;
+  val1 @11 :Bool;
+  val2 @12 :Bool;
+  val3 @13 :Bool;
+  val4 @14 :Bool;
+  val5 @15 :Bool;
+  val6 @16 :Bool;
+  val7 @17 :Bool;
 }
 

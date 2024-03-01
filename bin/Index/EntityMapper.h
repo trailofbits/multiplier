@@ -99,6 +99,7 @@ class EntityMapper final {
   mx::RawEntityId EntityId(const pasta::TemplateParameterList &pseudo) const;
   mx::RawEntityId EntityId(const pasta::CXXBaseSpecifier &pseudo) const;
   mx::RawEntityId EntityId(const pasta::Designator &pseudo) const;
+  mx::RawEntityId EntityId(const pasta::CXXCtorInitializer &pseudo) const;
 
   inline mx::RawEntityId SelectiveEntityId(const void *entity) const {
     if (generate_source_ir) {

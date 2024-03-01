@@ -12,6 +12,7 @@
 #include <multiplier/Types.h>
 
 #include "Entity.h"
+#include "PendingFragment.h"
 #include "Util.h"
 
 namespace clang {
@@ -83,7 +84,8 @@ class TypeMapper final {
   mx::RawEntityId EntityId(const pasta::Type &entity) const;
 
   // NOTE(pag): `*entity` may be updated.
-  bool AddEntityId(const EntityMapper &em, pasta::Type *entity);
+  bool AddEntityId(const EntityMapper &em, pasta::Type *entity,
+                   EntityList<const clang::Stmt*> *entity_list = nullptr);
 
   mx::PackedTypeId TypeId(const pasta::Type &entity) const;
 

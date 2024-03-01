@@ -106,6 +106,12 @@ class FragmentBuilder final {
     fragment.TryAdd(pseudo);
   }
 
+  void MaybeVisitNext(const pasta::CXXCtorInitializer &pseudo) {
+    if (auto init_expr = pseudo.Initializer()) {
+      fragment.TryAdd(init_expr.value());
+    }
+  }
+
   template <typename T>
   void Accept(const T &pseudo) {
     MaybeVisitNext(pseudo);
@@ -474,8 +480,9 @@ bool PendingFragment::TryAdd(const pasta::Attr &entity) {
   return true;
 }
 
-bool PendingFragment::TryAdd(pasta::Type entity) {
-  if (!em.tm.AddEntityId(em, &entity)) {
+bool PendingFragment::TryAdd(pasta::Type entity,
+                             EntityList<const clang::Stmt*> *entity_list) {
+  if (!em.tm.AddEntityId(em, &entity, entity_list)) {
     return false;
   }
 
@@ -500,7 +507,7 @@ bool PendingFragment::TryAdd(pasta::Type entity) {
 }
 
 // Build the fragment. This fills out the decls/stmts/types to serialize.
-void BuildPendingFragment(PendingFragment &pf) {
+void BuildPendingFragment(const pasta::AST &ast, PendingFragment &pf) {
   EntityMapper &em = pf.em;
 
   std::unordered_map<mx::DeclKind, size_t, HashKind<mx::DeclKind>> prev_num_decls;
@@ -595,8 +602,12 @@ void BuildPendingFragment(PendingFragment &pf) {
     // want to see as many declarations first (thus giving them IDs) prior to
     // us processing types.
     for (const pasta::Type &entity : builder.pending_types) {
-      if (pf.TryAdd(entity)) {
+      EntityList<const clang::Stmt*> underlying_stmts;
+      if (pf.TryAdd(entity, &underlying_stmts)) {
         has_new_types = true;
+      }
+      for (auto &stmt : underlying_stmts) {
+        builder.Accept(ast.Adopt(stmt));
       }
     }
 

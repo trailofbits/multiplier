@@ -237,11 +237,11 @@ gap::generator<AddrLabelExpr> GCCAsmStmt::labels(void) const & {
   co_return;
 }
 
-unsigned GCCAsmStmt::num_clobber_string_literals(void) const {
+unsigned GCCAsmStmt::num_output_constraint_literals(void) const {
   return impl->reader.getVal52().size();
 }
 
-std::optional<StringLiteral> GCCAsmStmt::nth_clobber_string_literal(unsigned n) const {
+std::optional<StringLiteral> GCCAsmStmt::nth_output_constraint_literal(unsigned n) const {
   auto list = impl->reader.getVal52();
   if (n >= list.size()) {
     return std::nullopt;
@@ -255,7 +255,7 @@ std::optional<StringLiteral> GCCAsmStmt::nth_clobber_string_literal(unsigned n) 
   return StringLiteral::from_base(std::move(e));
 }
 
-gap::generator<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const & {
+gap::generator<StringLiteral> GCCAsmStmt::output_constraint_literals(void) const & {
   auto list = impl->reader.getVal52();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
@@ -278,11 +278,11 @@ co_yield std::string_view(v.cStr(), v.size());
   co_return;
 }
 
-unsigned GCCAsmStmt::num_output_constraint_literals(void) const {
+unsigned GCCAsmStmt::num_input_constraint_literals(void) const {
   return impl->reader.getVal53().size();
 }
 
-std::optional<StringLiteral> GCCAsmStmt::nth_output_constraint_literal(unsigned n) const {
+std::optional<StringLiteral> GCCAsmStmt::nth_input_constraint_literal(unsigned n) const {
   auto list = impl->reader.getVal53();
   if (n >= list.size()) {
     return std::nullopt;
@@ -296,7 +296,7 @@ std::optional<StringLiteral> GCCAsmStmt::nth_output_constraint_literal(unsigned 
   return StringLiteral::from_base(std::move(e));
 }
 
-gap::generator<StringLiteral> GCCAsmStmt::output_constraint_literals(void) const & {
+gap::generator<StringLiteral> GCCAsmStmt::input_constraint_literals(void) const & {
   auto list = impl->reader.getVal53();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
@@ -319,11 +319,11 @@ co_yield std::string_view(v.cStr(), v.size());
   co_return;
 }
 
-unsigned GCCAsmStmt::num_input_constraint_literals(void) const {
+unsigned GCCAsmStmt::num_clobber_string_literals(void) const {
   return impl->reader.getVal54().size();
 }
 
-std::optional<StringLiteral> GCCAsmStmt::nth_input_constraint_literal(unsigned n) const {
+std::optional<StringLiteral> GCCAsmStmt::nth_clobber_string_literal(unsigned n) const {
   auto list = impl->reader.getVal54();
   if (n >= list.size()) {
     return std::nullopt;
@@ -337,7 +337,7 @@ std::optional<StringLiteral> GCCAsmStmt::nth_input_constraint_literal(unsigned n
   return StringLiteral::from_base(std::move(e));
 }
 
-gap::generator<StringLiteral> GCCAsmStmt::input_constraint_literals(void) const & {
+gap::generator<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const & {
   auto list = impl->reader.getVal54();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {

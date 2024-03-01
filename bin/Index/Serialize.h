@@ -839,6 +839,7 @@ class TemplateArgument;
 class TemplateParameterList;
 class CXXBaseSpecifier;
 class Designator;
+class CXXCtorInitializer;
 enum class TokenRole : unsigned char;
 enum class DeclKind : unsigned int;
 enum class AttrKind : unsigned int;
@@ -2245,4 +2246,5 @@ void SerializeTemplateArgument(const PendingFragment &, const EntityMapper &, mx
 void SerializeTemplateParameterList(const PendingFragment &, const EntityMapper &, mx::ast::TemplateParameterList::Builder, const pasta::TemplateParameterList &, const TokenTree *);
 void SerializeCXXBaseSpecifier(const PendingFragment &, const EntityMapper &, mx::ast::CXXBaseSpecifier::Builder, const pasta::CXXBaseSpecifier &, const TokenTree *);
 void SerializeDesignator(const PendingFragment &, const EntityMapper &, mx::ast::Designator::Builder, const pasta::Designator &, const TokenTree *);
+void SerializeCXXCtorInitializer(const PendingFragment &, const EntityMapper &, mx::ast::CXXCtorInitializer::Builder, const pasta::CXXCtorInitializer &, const TokenTree *);
 }  // namespace indexer

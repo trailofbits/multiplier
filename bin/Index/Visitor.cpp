@@ -109,15 +109,7 @@ void EntityVisitor::VisitVarTemplateDecl(
 
 void EntityVisitor::VisitFunctionTemplateDecl(
   const pasta::FunctionTemplateDecl &decl) {
-  if (EnterTemplateDecl(decl)) {
-    for (const pasta::FunctionDecl &spec : decl.Specializations()) {
-      if(IsExplicitSpecialization(spec.TemplateSpecializationKind())
-        || spec.IsOutOfLine()) {
-        continue;
-      }
-      Accept(spec);
-    }
-  }
+  EnterTemplateDecl(decl);
 }
 
 bool EntityVisitor::EnterVarDecl(const pasta::VarDecl &decl) {
@@ -162,6 +154,8 @@ void EntityVisitor::VisitParmVarDecl(const pasta::ParmVarDecl &decl) {
       if (auto init_expr = decl.DefaultArgument()) {
         Accept(init_expr.value());
       }
+    }
+    if (decl.HasUninstantiatedDefaultArgument()) {
       if (auto tpl_init_expr = decl.UninstantiatedDefaultArgument()) {
         Accept(tpl_init_expr.value());
       }
@@ -277,6 +271,14 @@ void EntityVisitor::VisitCXXDeductionGuideDecl(
   EnterFunctionDecl(decl);
 }
 
+void EntityVisitor::VisitTypeAliasDecl(
+  const pasta::TypeAliasDecl &decl) {
+  if (EnterDecl(decl)) {
+    Accept(decl.UnderlyingType());
+  }
+}
+
+
 void EntityVisitor::VisitDeclStmt(const pasta::DeclStmt &stmt) {
   if (EnterStmt(stmt)) {
     for (const pasta::Decl &child : stmt.Declarations()) {
@@ -356,6 +358,18 @@ void EntityVisitor::VisitVarTemplateSpecializationDecl(
 void EntityVisitor::VisitCXXMethodDecl(
     const pasta::CXXMethodDecl &decl) {
   (void)EnterFunctionDecl(decl);
+}
+
+void EntityVisitor::VisitCXXConstructorDecl(
+    const pasta::CXXConstructorDecl &decl) {
+    if (EnterFunctionDecl(decl)) {
+      auto init_list = decl.Initializers();
+      for (auto init : init_list) {
+        if (auto init_expr = init.Initializer()) {
+          Accept(init_expr.value());
+        }
+      }
+  }
 }
 
 void EntityVisitor::VisitCXXDestructorDecl(
@@ -538,7 +552,9 @@ void EntityVisitor::VisitMaterializeTemporaryExpr(
 
 void EntityVisitor::VisitExprWithCleanups(
   const pasta::ExprWithCleanups &expr) {
-  EnterStmt(expr);
+  if(EnterStmt(expr)) {
+    Accept(expr.SubExpression());
+  }
 }
 
 void EntityVisitor::VisitTypeOfExprType(const pasta::TypeOfExprType &type) {
@@ -621,9 +637,47 @@ void EntityVisitor::VisitFunctionProtoType(
     if (auto noexcept_expr = type.NoexceptExpression()) {
       Accept(noexcept_expr.value());
     }
-    
+
+    // Function return type
+    Accept(type.ReturnType());
+
     // NOTE(pag): `ExceptionSpecDeclaration` and `ExceptionSpecTemplate`
     //            are *not* visited because they are not children.
+  }
+}
+
+void EntityVisitor::VisitArrayTypeTraitExpr(
+  const pasta::ArrayTypeTraitExpr &expr) {
+  if (EnterStmt(expr)) {
+    Accept(expr.DimensionExpression());
+  }
+}
+
+void EntityVisitor::VisitCXXConstructExpr(
+  const pasta::CXXConstructExpr  &expr) {
+  if (EnterStmt(expr)) {
+    for (auto &arg : expr.Arguments()) {
+      Accept(arg);
+    }
+  }
+}
+
+void EntityVisitor::VisitCXXTemporaryObjectExpr(
+  const pasta::CXXTemporaryObjectExpr &expr) {
+  if (EnterStmt(expr)) {
+    for (auto &arg : expr.Arguments()) {
+      Accept(arg);
+    }
+  }
+}
+
+void EntityVisitor::VisitCXXOperatorCallExpr(
+  const pasta::CXXOperatorCallExpr &expr) {
+  if (EnterStmt(expr)) {
+    for (auto &arg : expr.Arguments()) {
+      Accept(arg);
+    }
+    Accept(expr.Callee());
   }
 }
 

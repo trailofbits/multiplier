@@ -14,6 +14,7 @@
 
 #include "AST/Attr.h"
 #include "AST/CXXBaseSpecifier.h"
+#include "AST/CXXCtorInitializer.h"
 #include "AST/Designator.h"
 #include "AST/NamedDecl.h"
 #include "AST/Stmt.h"

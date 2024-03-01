@@ -8144,6 +8144,7 @@ PseudoKind FromPasta(pasta::PseudoKind e) {
     case 1: return PseudoKind::TEMPLATE_PARAMETER_LIST;
     case 2: return PseudoKind::CXX_BASE_SPECIFIER;
     case 3: return PseudoKind::DESIGNATOR;
+    case 4: return PseudoKind::CXX_CTOR_INITIALIZER;
     default: __builtin_unreachable();
   }
 }
