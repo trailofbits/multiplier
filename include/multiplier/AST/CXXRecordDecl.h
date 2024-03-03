@@ -173,7 +173,6 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   std::optional<bool> is_effectively_final(void) const;
   std::optional<bool> is_empty(void) const;
   bool is_generic_lambda(void) const;
-  std::optional<bool> is_interface_like(void) const;
   std::optional<bool> is_literal(void) const;
   std::optional<FunctionDecl> is_local_class(void) const;
   bool is_never_dependent_lambda(void) const;

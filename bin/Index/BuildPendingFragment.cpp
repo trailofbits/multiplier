@@ -272,22 +272,12 @@ bool PendingFragment::DoTryAdd(const Entity &entity, EntityIdMap &entity_ids,
 }
 
 bool PendingFragment::TryAdd(const pasta::Decl &entity) {
-  if (ShouldSerializeDeclContext(entity)) {
-    return DoTryAdd(
-        entity,
-        em.token_tree_ids,
-        [&, this] (mx::EntityOffset offset) {
-          mx::DeclId id;
-          id.fragment_id = fragment_index;
-          id.offset = offset;
-          id.kind = mx::FromPasta(entity.Kind());
-          id.is_definition = IsDefinition(entity);
-          return id;
-        });
-  }
+  auto &entity_or_token_map =
+      ShouldSerializeDeclContext(entity) ?
+      em.token_tree_ids : em.entity_ids;
   return DoTryAdd(
       entity,
-      em.entity_ids,
+      entity_or_token_map,
       [&, this] (mx::EntityOffset offset) {
         mx::DeclId id;
         id.fragment_id = fragment_index;
@@ -555,10 +545,10 @@ void BuildPendingFragment(const pasta::AST &ast, PendingFragment &pf) {
   // to token_tree_ids. This will help internally serialize them in
   // the fragments.
   for (auto &tld : pf.top_level_decls) {
-    if (auto dc = tld.DeclarationContext()) {
-      if (ShouldSerializeDeclContext(dc.value())) {
-        builder.MaybeVisitNext(dc.value());
-      }
+    auto dc = tld.DeclarationContext();
+    while (dc && IsSerializableDecl(dc.value())) {
+      builder.MaybeVisitNext(dc.value());
+      dc = dc->LexicalParent();
     }
   }
 
