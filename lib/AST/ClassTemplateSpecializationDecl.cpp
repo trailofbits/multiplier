@@ -247,11 +247,11 @@ ClassTemplateDecl ClassTemplateSpecializationDecl::specialized_template(void) co
 }
 
 unsigned ClassTemplateSpecializationDecl::num_template_arguments(void) const {
-  return impl->reader.getVal350().size();
+  return impl->reader.getVal352().size();
 }
 
 std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_argument(unsigned n) const {
-  auto list = impl->reader.getVal350();
+  auto list = impl->reader.getVal352();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -265,23 +265,23 @@ std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_ar
 }
 
 gap::generator<TemplateArgument> ClassTemplateSpecializationDecl::template_arguments(void) const & {
-  auto list = impl->reader.getVal350();
+  auto list = impl->reader.getVal352();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d350 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d350));
+    if (auto d352 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d352));
     }
   }
   co_return;
 }
 
 unsigned ClassTemplateSpecializationDecl::num_template_instantiation_arguments(void) const {
-  return impl->reader.getVal351().size();
+  return impl->reader.getVal353().size();
 }
 
 std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_instantiation_argument(unsigned n) const {
-  auto list = impl->reader.getVal351();
+  auto list = impl->reader.getVal353();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -295,12 +295,12 @@ std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_in
 }
 
 gap::generator<TemplateArgument> ClassTemplateSpecializationDecl::template_instantiation_arguments(void) const & {
-  auto list = impl->reader.getVal351();
+  auto list = impl->reader.getVal353();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d351 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d351));
+    if (auto d353 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d353));
     }
   }
   co_return;
@@ -324,15 +324,15 @@ std::optional<Type> ClassTemplateSpecializationDecl::type_as_written(void) const
 }
 
 bool ClassTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const {
-  return impl->reader.getVal352();
+  return impl->reader.getVal354();
 }
 
 bool ClassTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
-  return impl->reader.getVal353();
+  return impl->reader.getVal355();
 }
 
 bool ClassTemplateSpecializationDecl::is_explicit_specialization(void) const {
-  return impl->reader.getVal354();
+  return impl->reader.getVal356();
 }
 
 #pragma GCC diagnostic pop

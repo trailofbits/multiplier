@@ -2600,7 +2600,7 @@ void TokenTreeReader::Append(TokenTreeImpl::TokenIndex ti) {
   auto [tok_reader, to] = ti;
 
   TokenKind tk = tok_reader->NthTokenKind(to);
-  VariantId rel_id = EntityId(tok_reader->NthRelatedEntity(to)).Unpack();
+  VariantId rel_id = tok_reader->NthRelatedEntityId(to).Unpack();
   bool is_include_tok = std::holds_alternative<FileId>(rel_id);
   if (std::holds_alternative<MacroId>(rel_id)) {
     switch (std::get<MacroId>(rel_id).kind) {

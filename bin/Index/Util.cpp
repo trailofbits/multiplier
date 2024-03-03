@@ -795,7 +795,7 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
     return true;
   }
 
-  switch(decl.Kind()) {
+  switch (decl.Kind()) {
     case pasta::DeclKind::kFunction: {
       auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
       if(auto pattern_decl = func.TemplateInstantiationPattern()) {
