@@ -256,11 +256,19 @@ bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
 }
 
 unsigned ObjCImplementationDecl::num_initializers(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal314().size();
 }
 
 std::optional<CXXCtorInitializer> ObjCImplementationDecl::nth_initializer(unsigned n) const {
   auto list = impl->reader.getVal314();
+=======
+  return impl->reader.getVal341().size();
+}
+
+std::optional<CXXCtorInitializer> ObjCImplementationDecl::nth_initializer(unsigned n) const {
+  auto list = impl->reader.getVal341();
+>>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -274,18 +282,28 @@ std::optional<CXXCtorInitializer> ObjCImplementationDecl::nth_initializer(unsign
 }
 
 gap::generator<CXXCtorInitializer> ObjCImplementationDecl::initializers(void) const & {
+<<<<<<< HEAD
   auto list = impl->reader.getVal314();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d314 = ep->CXXCtorInitializerFor(ep, v)) {
       co_yield CXXCtorInitializer(std::move(d314));
+=======
+  auto list = impl->reader.getVal341();
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d341 = ep->CXXCtorInitializerFor(ep, v)) {
+      co_yield CXXCtorInitializer(std::move(d341));
+>>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
     }
   }
   co_return;
 }
 
 unsigned ObjCImplementationDecl::num_instance_variables(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal340().size();
 }
 
@@ -301,6 +319,13 @@ unsigned ObjCImplementationDecl::num_instance_variables(void) const {
 std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsigned n) const {
   auto list = impl->reader.getVal339();
 >>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
+=======
+  return impl->reader.getVal352().size();
+}
+
+std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsigned n) const {
+  auto list = impl->reader.getVal352();
+>>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -314,6 +339,7 @@ std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsign
 }
 
 gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const & {
+<<<<<<< HEAD
 <<<<<<< HEAD
   auto list = impl->reader.getVal340();
   EntityProviderPtr ep = impl->ep;
@@ -329,6 +355,14 @@ gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) co
     if (auto d339 = ep->DeclFor(ep, v)) {
       if (auto e = ObjCIvarDecl::from_base(std::move(d339))) {
 >>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
+=======
+  auto list = impl->reader.getVal352();
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d352 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCIvarDecl::from_base(std::move(d352))) {
+>>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
         co_yield std::move(*e);
       }
     }

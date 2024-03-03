@@ -233,6 +233,7 @@ ObjCInterfaceDecl ObjCImplDecl::class_interface(void) const {
 
 unsigned ObjCImplDecl::num_property_implementations(void) const {
 <<<<<<< HEAD
+<<<<<<< HEAD
   return impl->reader.getVal191().size();
 }
 
@@ -245,6 +246,13 @@ std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(un
 std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(unsigned n) const {
   auto list = impl->reader.getVal313();
 >>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
+=======
+  return impl->reader.getVal315().size();
+}
+
+std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(unsigned n) const {
+  auto list = impl->reader.getVal315();
+>>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -258,6 +266,7 @@ std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(un
 }
 
 gap::generator<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void) const & {
+<<<<<<< HEAD
 <<<<<<< HEAD
   auto list = impl->reader.getVal191();
   EntityProviderPtr ep = impl->ep;
@@ -273,6 +282,14 @@ gap::generator<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void
     if (auto d313 = ep->DeclFor(ep, v)) {
       if (auto e = ObjCPropertyImplDecl::from_base(std::move(d313))) {
 >>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
+=======
+  auto list = impl->reader.getVal315();
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d315 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCPropertyImplDecl::from_base(std::move(d315))) {
+>>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
         co_yield std::move(*e);
       }
     }
