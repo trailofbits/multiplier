@@ -148,13 +148,7 @@ std::optional<pasta::MacroToken> EndToken(const pasta::Macro &macro) {
 std::string DeclToString(const pasta::Decl &decl) {
   std::stringstream ss;
   for (pasta::PrintedToken ptok : pasta::PrintedTokenRange::Create(decl)) {
-    for (auto i = 0u, max_i = ptok.NumLeadingNewLines(); i < max_i; ++i) {
-      ss << '\n';
-    }
-    for (auto i = 0u, max_i = ptok.NumLeadingSpaces(); i < max_i; ++i) {
-      ss << ' ';
-    }
-    ss << ptok.Data();
+    ss << ' ' << ptok.Data();
   }
   return ss.str();
 }
@@ -169,7 +163,6 @@ std::string PrefixedName(const pasta::Decl &decl, const char *prefix) {
   }
   return "";
 }
-
 
 // Return the location of a declaration with a leading `prefix`, or nothing.
 std::string PrefixedLocation(const pasta::Decl &decl, const char *prefix) {
@@ -203,6 +196,16 @@ bool IsWhitespaceOrEmpty(std::string_view data) {
     }
   }
   return true;
+}
+
+mx::TokenKind TokenKindFromPasta(pasta::TokenKind kind, std::string_view data) {
+  auto mx_kind = mx::FromPasta(kind);
+  if (mx_kind == mx::TokenKind::UNKNOWN) {
+    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
+      return mx::TokenKind::WHITESPACE;
+    }
+  }
+  return mx_kind;
 }
 
 // Return the token kind.
@@ -317,14 +320,8 @@ mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity) {
     case pasta::ObjCKeywordKind::kAvailable:
       return mx::TokenKind::OBJC_AT_AVAILABLE;
   }
-  auto kind = mx::FromPasta(entity.Kind());
-  if (kind == mx::TokenKind::UNKNOWN) {
-    auto data = entity.Data();
-    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
-      return mx::TokenKind::WHITESPACE;
-    }
-  }
-  return kind;
+
+  return TokenKindFromPasta(entity.Kind(), entity.Data());
 }
 
 // Return the token kind.
@@ -343,28 +340,7 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
       return mx::TokenKind::UNKNOWN;
   }
 
-  // Try to get preprocessor kinds, if possible.
-  //
-  // NOTE(pag): File tokens show `IDENTIFIER` (due to `raw_identifier`) from
-  //            the raw lexer, whereas fragments do better.
-  if (auto ft = entity.FileLocation()) {
-    if (ft->PreProcessorKeywordKind() != pasta::PPKeywordKind::kNotKeyword ||
-        ft->ObjectiveCAtKeywordKind() != pasta::ObjCKeywordKind::kNotKeyword) {
-      if (auto ret = TokenKindFromPasta(ft.value());
-          ret != mx::TokenKind::IDENTIFIER) {
-        return ret;
-      }
-    }
-  }
-
-  auto kind = mx::FromPasta(entity.Kind());
-  if (kind == mx::TokenKind::UNKNOWN) {
-    auto data = entity.Data();
-    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
-      return mx::TokenKind::WHITESPACE;
-    }
-  }
-  return kind;
+  return TokenKindFromPasta(tok.Kind(), tok.Data());
 }
 
 namespace {
@@ -422,7 +398,19 @@ mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity) {
 
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::MacroToken &entity) {
-  return TokenKindFromPasta(entity.ParsedLocation());
+  auto dtok = entity.DerivedLocation();
+  if (std::holds_alternative<pasta::FileToken>(dtok)) {
+    const auto &ft = std::get<pasta::FileToken>(dtok);
+
+  // Try to get preprocessor kinds, if possible.
+  if (ft.PreProcessorKeywordKind() != pasta::PPKeywordKind::kNotKeyword ||
+      ft.ObjectiveCAtKeywordKind() != pasta::ObjCKeywordKind::kNotKeyword) {
+    return TokenKindFromPasta(ft);
+  }
+
+    return TokenKindFromPasta(std::get<pasta::FileToken>(dtok));
+  }
+  return TokenKindFromPasta(entity.TokenKind(), entity.Data());
 }
 
 namespace {

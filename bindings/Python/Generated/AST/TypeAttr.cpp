@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[9]) || tp >= &(gTypes[37])) {
+  if (tp < &(gTypes[10]) || tp >= &(gTypes[38])) {
     return std::nullopt;
   }
 
@@ -90,111 +90,111 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::SPtrAttr::static_kind():
-      tp = &(gTypes[10]);
-      break;
-
-    case mx::Ptr64Attr::static_kind():
       tp = &(gTypes[11]);
       break;
 
-    case mx::Ptr32Attr::static_kind():
+    case mx::Ptr64Attr::static_kind():
       tp = &(gTypes[12]);
       break;
 
-    case mx::OpenCLPrivateAddressSpaceAttr::static_kind():
+    case mx::Ptr32Attr::static_kind():
       tp = &(gTypes[13]);
       break;
 
-    case mx::OpenCLLocalAddressSpaceAttr::static_kind():
+    case mx::OpenCLPrivateAddressSpaceAttr::static_kind():
       tp = &(gTypes[14]);
       break;
 
-    case mx::OpenCLGlobalHostAddressSpaceAttr::static_kind():
+    case mx::OpenCLLocalAddressSpaceAttr::static_kind():
       tp = &(gTypes[15]);
       break;
 
-    case mx::OpenCLGlobalDeviceAddressSpaceAttr::static_kind():
+    case mx::OpenCLGlobalHostAddressSpaceAttr::static_kind():
       tp = &(gTypes[16]);
       break;
 
-    case mx::OpenCLGlobalAddressSpaceAttr::static_kind():
+    case mx::OpenCLGlobalDeviceAddressSpaceAttr::static_kind():
       tp = &(gTypes[17]);
       break;
 
-    case mx::OpenCLGenericAddressSpaceAttr::static_kind():
+    case mx::OpenCLGlobalAddressSpaceAttr::static_kind():
       tp = &(gTypes[18]);
       break;
 
-    case mx::OpenCLConstantAddressSpaceAttr::static_kind():
+    case mx::OpenCLGenericAddressSpaceAttr::static_kind():
       tp = &(gTypes[19]);
       break;
 
-    case mx::ObjCKindOfAttr::static_kind():
+    case mx::OpenCLConstantAddressSpaceAttr::static_kind():
       tp = &(gTypes[20]);
       break;
 
-    case mx::ObjCInertUnsafeUnretainedAttr::static_kind():
+    case mx::ObjCKindOfAttr::static_kind():
       tp = &(gTypes[21]);
       break;
 
-    case mx::ObjCGCAttr::static_kind():
+    case mx::ObjCInertUnsafeUnretainedAttr::static_kind():
       tp = &(gTypes[22]);
       break;
 
-    case mx::NoDerefAttr::static_kind():
+    case mx::ObjCGCAttr::static_kind():
       tp = &(gTypes[23]);
       break;
 
-    case mx::HLSLGroupSharedAddressSpaceAttr::static_kind():
+    case mx::NoDerefAttr::static_kind():
       tp = &(gTypes[24]);
       break;
 
-    case mx::CmseNSCallAttr::static_kind():
+    case mx::HLSLGroupSharedAddressSpaceAttr::static_kind():
       tp = &(gTypes[25]);
       break;
 
-    case mx::BTFTypeTagAttr::static_kind():
+    case mx::CmseNSCallAttr::static_kind():
       tp = &(gTypes[26]);
       break;
 
-    case mx::ArmStreamingAttr::static_kind():
+    case mx::BTFTypeTagAttr::static_kind():
       tp = &(gTypes[27]);
       break;
 
-    case mx::ArmMveStrictPolymorphismAttr::static_kind():
+    case mx::ArmStreamingAttr::static_kind():
       tp = &(gTypes[28]);
       break;
 
-    case mx::AnnotateTypeAttr::static_kind():
+    case mx::ArmMveStrictPolymorphismAttr::static_kind():
       tp = &(gTypes[29]);
       break;
 
-    case mx::AddressSpaceAttr::static_kind():
+    case mx::AnnotateTypeAttr::static_kind():
       tp = &(gTypes[30]);
       break;
 
-    case mx::WebAssemblyFuncrefAttr::static_kind():
+    case mx::AddressSpaceAttr::static_kind():
       tp = &(gTypes[31]);
       break;
 
-    case mx::UPtrAttr::static_kind():
+    case mx::WebAssemblyFuncrefAttr::static_kind():
       tp = &(gTypes[32]);
       break;
 
-    case mx::TypeNullableResultAttr::static_kind():
+    case mx::UPtrAttr::static_kind():
       tp = &(gTypes[33]);
       break;
 
-    case mx::TypeNullableAttr::static_kind():
+    case mx::TypeNullableResultAttr::static_kind():
       tp = &(gTypes[34]);
       break;
 
-    case mx::TypeNullUnspecifiedAttr::static_kind():
+    case mx::TypeNullableAttr::static_kind():
       tp = &(gTypes[35]);
       break;
 
-    case mx::TypeNonNullAttr::static_kind():
+    case mx::TypeNullUnspecifiedAttr::static_kind():
       tp = &(gTypes[36]);
+      break;
+
+    case mx::TypeNonNullAttr::static_kind():
+      tp = &(gTypes[37]);
       break;
 
   }
@@ -368,7 +368,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation, mx::ir::Operation>>(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::ir::Operation>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -420,7 +420,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[9]);
+  PyTypeObject * const tp = &(gTypes[10]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -435,12 +435,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[5].tp_hash;
-  tp->tp_richcompare = gTypes[5].tp_richcompare;
+  tp->tp_hash = gTypes[6].tp_hash;
+  tp->tp_richcompare = gTypes[6].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[5]);
+  tp->tp_base = &(gTypes[6]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

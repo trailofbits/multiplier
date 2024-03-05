@@ -9,6 +9,7 @@
 #include <multiplier/AST/NamespaceAliasDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/NamedDecl.h>
+#include <multiplier/AST/NamespaceDecl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -228,12 +229,17 @@ NamedDecl NamespaceAliasDecl::aliased_namespace(void) const {
   return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
+NamespaceDecl NamespaceAliasDecl::namespace_(void) const {
+  RawEntityId eid = impl->reader.getVal57();
+  return NamespaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
+}
+
 Token NamespaceAliasDecl::namespace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal65());
 }
 
 Token NamespaceAliasDecl::target_name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal65());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 #pragma GCC diagnostic pop

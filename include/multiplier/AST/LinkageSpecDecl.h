@@ -9,6 +9,7 @@
 #pragma once
 
 #include <multiplier/AST/Decl.h>
+#include <multiplier/AST/LinkageSpecDeclLanguageIDs.h>
 
 namespace mx {
 class EntityProvider;
@@ -63,7 +64,10 @@ class MX_EXPORT LinkageSpecDecl : public Decl {
   static std::optional<LinkageSpecDecl> from(const VariantEntity &e);
   static std::optional<LinkageSpecDecl> from(const TokenContext &t);
 
-  gap::generator<Decl> declarations_in_context(void) const &;
+  Token extern_token(void) const;
+  LinkageSpecDeclLanguageIDs language(void) const;
+  Token r_brace_token(void) const;
+  bool has_braces(void) const;
 };
 
 static_assert(sizeof(LinkageSpecDecl) == sizeof(Decl));

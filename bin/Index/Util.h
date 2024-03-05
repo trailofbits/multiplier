@@ -97,6 +97,8 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity);
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity);
 
+mx::TokenKind TokenKindFromPasta(pasta::TokenKind kind, std::string_view data);
+
 // Returns `true` if `decl` is a definition.
 bool IsDefinition(const pasta::Decl &decl);
 

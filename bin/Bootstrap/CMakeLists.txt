@@ -29,7 +29,8 @@ target_compile_features("mx-bootstrap"
 set_target_properties("mx-bootstrap"
   PROPERTIES
     LINKER_LANGUAGE
-      CXX)
+      CXX
+)
 
 # `mx-bootstrap` works by running PASTA on itself. To be successful at this, it
 # needs to know the actual include directories of Multiplier and its

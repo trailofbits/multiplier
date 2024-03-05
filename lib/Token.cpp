@@ -168,7 +168,7 @@ static TokenCategory ClassifyToken(TokenKind kind) {
     case TokenKind::COMMA:
     case TokenKind::HASH:
     case TokenKind::HASH_HASH:
-    case TokenKind::HASHAT:
+    case TokenKind::HASH_AT:
     case TokenKind::PERIOD_STAR:
     case TokenKind::ARROW_STAR:
     case TokenKind::COLON_COLON:
@@ -786,7 +786,7 @@ static TokenCategory ClassifyFile(TokenKind kind,
     case TokenKind::PP___INCLUDE_MACROS:
     case TokenKind::HASH:
     case TokenKind::HASH_HASH:
-    case TokenKind::HASHAT:
+    case TokenKind::HASH_AT:
     case TokenKind::COMMA:
     case TokenKind::L_PARENTHESIS:
     case TokenKind::R_PARENTHESIS:

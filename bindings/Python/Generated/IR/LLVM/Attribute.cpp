@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[866]) || tp >= &(gTypes[903])) {
+  if (tp < &(gTypes[867]) || tp >= &(gTypes[904])) {
     return std::nullopt;
   }
 
@@ -90,147 +90,147 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::llvm::CConvAttr::static_kind():
-      tp = &(gTypes[867]);
-      break;
-
-    case mx::ir::llvm::ComdatAttr::static_kind():
       tp = &(gTypes[868]);
       break;
 
-    case mx::ir::llvm::AccessGroupAttr::static_kind():
+    case mx::ir::llvm::ComdatAttr::static_kind():
       tp = &(gTypes[869]);
       break;
 
-    case mx::ir::llvm::AliasScopeAttr::static_kind():
+    case mx::ir::llvm::AccessGroupAttr::static_kind():
       tp = &(gTypes[870]);
       break;
 
-    case mx::ir::llvm::AliasScopeDomainAttr::static_kind():
+    case mx::ir::llvm::AliasScopeAttr::static_kind():
       tp = &(gTypes[871]);
       break;
 
-    case mx::ir::llvm::DIBasicTypeAttr::static_kind():
+    case mx::ir::llvm::AliasScopeDomainAttr::static_kind():
       tp = &(gTypes[872]);
       break;
 
-    case mx::ir::llvm::DICompileUnitAttr::static_kind():
+    case mx::ir::llvm::DIBasicTypeAttr::static_kind():
       tp = &(gTypes[873]);
       break;
 
-    case mx::ir::llvm::DICompositeTypeAttr::static_kind():
+    case mx::ir::llvm::DICompileUnitAttr::static_kind():
       tp = &(gTypes[874]);
       break;
 
-    case mx::ir::llvm::DIDerivedTypeAttr::static_kind():
+    case mx::ir::llvm::DICompositeTypeAttr::static_kind():
       tp = &(gTypes[875]);
       break;
 
-    case mx::ir::llvm::DIFileAttr::static_kind():
+    case mx::ir::llvm::DIDerivedTypeAttr::static_kind():
       tp = &(gTypes[876]);
       break;
 
-    case mx::ir::llvm::DILabelAttr::static_kind():
+    case mx::ir::llvm::DIFileAttr::static_kind():
       tp = &(gTypes[877]);
       break;
 
-    case mx::ir::llvm::DILexicalBlockAttr::static_kind():
+    case mx::ir::llvm::DILabelAttr::static_kind():
       tp = &(gTypes[878]);
       break;
 
-    case mx::ir::llvm::DILexicalBlockFileAttr::static_kind():
+    case mx::ir::llvm::DILexicalBlockAttr::static_kind():
       tp = &(gTypes[879]);
       break;
 
-    case mx::ir::llvm::DILocalVariableAttr::static_kind():
+    case mx::ir::llvm::DILexicalBlockFileAttr::static_kind():
       tp = &(gTypes[880]);
       break;
 
-    case mx::ir::llvm::DINamespaceAttr::static_kind():
+    case mx::ir::llvm::DILocalVariableAttr::static_kind():
       tp = &(gTypes[881]);
       break;
 
-    case mx::ir::llvm::DINullTypeAttr::static_kind():
+    case mx::ir::llvm::DINamespaceAttr::static_kind():
       tp = &(gTypes[882]);
       break;
 
-    case mx::ir::llvm::DISubprogramAttr::static_kind():
+    case mx::ir::llvm::DINullTypeAttr::static_kind():
       tp = &(gTypes[883]);
       break;
 
-    case mx::ir::llvm::DISubrangeAttr::static_kind():
+    case mx::ir::llvm::DISubprogramAttr::static_kind():
       tp = &(gTypes[884]);
       break;
 
-    case mx::ir::llvm::DISubroutineTypeAttr::static_kind():
+    case mx::ir::llvm::DISubrangeAttr::static_kind():
       tp = &(gTypes[885]);
       break;
 
-    case mx::ir::llvm::FastmathFlagsAttr::static_kind():
+    case mx::ir::llvm::DISubroutineTypeAttr::static_kind():
       tp = &(gTypes[886]);
       break;
 
-    case mx::ir::llvm::MemoryEffectsAttr::static_kind():
+    case mx::ir::llvm::FastmathFlagsAttr::static_kind():
       tp = &(gTypes[887]);
       break;
 
-    case mx::ir::llvm::TBAAMemberAttr::static_kind():
+    case mx::ir::llvm::MemoryEffectsAttr::static_kind():
       tp = &(gTypes[888]);
       break;
 
-    case mx::ir::llvm::TBAARootAttr::static_kind():
+    case mx::ir::llvm::TBAAMemberAttr::static_kind():
       tp = &(gTypes[889]);
       break;
 
-    case mx::ir::llvm::TBAATagAttr::static_kind():
+    case mx::ir::llvm::TBAARootAttr::static_kind():
       tp = &(gTypes[890]);
       break;
 
-    case mx::ir::llvm::TBAATypeDescriptorAttr::static_kind():
+    case mx::ir::llvm::TBAATagAttr::static_kind():
       tp = &(gTypes[891]);
       break;
 
-    case mx::ir::llvm::LinkageAttr::static_kind():
+    case mx::ir::llvm::TBAATypeDescriptorAttr::static_kind():
       tp = &(gTypes[892]);
       break;
 
-    case mx::ir::llvm::LoopAnnotationAttr::static_kind():
+    case mx::ir::llvm::LinkageAttr::static_kind():
       tp = &(gTypes[893]);
       break;
 
-    case mx::ir::llvm::LoopDistributeAttr::static_kind():
+    case mx::ir::llvm::LoopAnnotationAttr::static_kind():
       tp = &(gTypes[894]);
       break;
 
-    case mx::ir::llvm::LoopInterleaveAttr::static_kind():
+    case mx::ir::llvm::LoopDistributeAttr::static_kind():
       tp = &(gTypes[895]);
       break;
 
-    case mx::ir::llvm::LoopLICMAttr::static_kind():
+    case mx::ir::llvm::LoopInterleaveAttr::static_kind():
       tp = &(gTypes[896]);
       break;
 
-    case mx::ir::llvm::LoopPeeledAttr::static_kind():
+    case mx::ir::llvm::LoopLICMAttr::static_kind():
       tp = &(gTypes[897]);
       break;
 
-    case mx::ir::llvm::LoopPipelineAttr::static_kind():
+    case mx::ir::llvm::LoopPeeledAttr::static_kind():
       tp = &(gTypes[898]);
       break;
 
-    case mx::ir::llvm::LoopUnrollAndJamAttr::static_kind():
+    case mx::ir::llvm::LoopPipelineAttr::static_kind():
       tp = &(gTypes[899]);
       break;
 
-    case mx::ir::llvm::LoopUnrollAttr::static_kind():
+    case mx::ir::llvm::LoopUnrollAndJamAttr::static_kind():
       tp = &(gTypes[900]);
       break;
 
-    case mx::ir::llvm::LoopUnswitchAttr::static_kind():
+    case mx::ir::llvm::LoopUnrollAttr::static_kind():
       tp = &(gTypes[901]);
       break;
 
-    case mx::ir::llvm::LoopVectorizeAttr::static_kind():
+    case mx::ir::llvm::LoopUnswitchAttr::static_kind():
       tp = &(gTypes[902]);
+      break;
+
+    case mx::ir::llvm::LoopVectorizeAttr::static_kind():
+      tp = &(gTypes[903]);
       break;
 
   }
@@ -298,7 +298,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[866]);
+  PyTypeObject * const tp = &(gTypes[867]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -313,12 +313,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[842].tp_hash;
-  tp->tp_richcompare = gTypes[842].tp_richcompare;
+  tp->tp_hash = gTypes[843].tp_hash;
+  tp->tp_richcompare = gTypes[843].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[842]);
+  tp->tp_base = &(gTypes[843]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

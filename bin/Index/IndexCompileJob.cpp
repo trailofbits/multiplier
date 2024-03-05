@@ -384,8 +384,8 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 };
 
-static uint64_t ParsedIndexOfMacroDirective(const pasta::Macro &macro) {
-  return macro.BeginToken()->ParsedLocation().Index();
+static uint64_t ParsedIndexOfMacroDirective(const pasta::MacroDirective &macro) {
+  return macro.ParsedLocation().Index();
 }
 
 static bool IsOpeningConditionalDirective(const pasta::MacroDirective &macro) {
@@ -434,7 +434,7 @@ static std::optional<pasta::MacroToken> BeginToken(pasta::Macro macro) {
 
 static std::string MacroLocation(pasta::Macro macro) {
   if (auto tok = BeginToken(RootMacroFrom(macro))) {
-    if (auto ftok = tok->ParsedLocation().FileLocation()) {
+    if (auto ftok = tok->FileLocation()) {
       auto file = pasta::File::Containing(ftok.value());
       std::stringstream ss;
       ss << file.Path().generic_string() << ':' << ftok->Line()
@@ -513,13 +513,13 @@ FindDirectivesInMacro(pasta::Macro mn) {
 // can extend its bounds, possibly as far as the `#endif`.
 //
 // XREF(pag): https://github.com/trailofbits/multiplier/issues/457
-static std::map<uint64_t, pasta::Macro> FindNextPrevConditionalMacros(
+static std::map<uint64_t, pasta::MacroDirective> FindNextPrevConditionalMacros(
     const pasta::AST &ast, std::string_view main_file_path) {
 
-  std::vector<pasta::Macro> prev;
-  std::map<uint64_t, pasta::Macro> next;
+  std::vector<pasta::MacroDirective> prev;
+  std::map<uint64_t, pasta::MacroDirective> next;
 
-  auto add_to_prev = [&] (const pasta::Macro &macro, const char *what) {
+  auto add_to_prev = [&] (const pasta::MacroDirective &macro, const char *what) {
     CHECK(!prev.empty())
         << "Failed to add " << what << " when indexing " << main_file_path
         << " near " << MacroLocation(macro);
@@ -608,7 +608,7 @@ static bool CanElideTokenFromTLD(const pasta::Token &tok) {
     case pasta::TokenRole::kInitialMacroUseToken:
     case pasta::TokenRole::kIntermediateMacroExpansionToken:
     case pasta::TokenRole::kFinalMacroExpansionToken:
-    case pasta::TokenRole::kEndOfInternalMacroEventMarker:
+    case pasta::TokenRole::kMacroDirectiveMarker:
       return false;
   }
   return false;
@@ -646,23 +646,12 @@ static std::pair<uint64_t, uint64_t> BaselineEntityRange(
 }
 
 static pasta::TokenRange BaselineEntityRange(const pasta::Macro &macro) {
-
-  std::optional<pasta::MacroToken> begin_tok = macro.BeginToken();
-  std::optional<pasta::MacroToken> end_tok = EndToken(macro);
-
-  CHECK(begin_tok.has_value());
-  CHECK(end_tok.has_value());
-
-  std::optional<pasta::TokenRange> range = pasta::TokenRange::From(
-      begin_tok->ParsedLocation(), end_tok->ParsedLocation());
-
-  CHECK(range.has_value());
-  return range.value();
+  return pasta::Macro::CompleteExpansionRange(macro);
 }
 
 static uint64_t PreviousConditionalIndex(
-    const std::map<uint64_t, pasta::Macro> &dir_index_to_next_dir,
-    const pasta::Macro &macro) {
+    const std::map<uint64_t, pasta::MacroDirective> &dir_index_to_next_dir,
+    const pasta::MacroDirective &macro) {
 
   uint64_t macro_index = ParsedIndexOfMacroDirective(macro);
   auto it = dir_index_to_next_dir.find(~macro_index);
@@ -675,7 +664,7 @@ static uint64_t PreviousConditionalIndex(
 }
 
 static uint64_t EndOfConditionalSequence(
-    const std::map<uint64_t, pasta::Macro> &dir_index_to_next_dir,
+    const std::map<uint64_t, pasta::MacroDirective> &dir_index_to_next_dir,
     const pasta::Macro &macro) {
 
   uint64_t macro_index = ParsedIndexOfMacroDirective(macro);
@@ -706,7 +695,7 @@ static uint64_t EndOfConditionalSequence(
 //
 // NOTE(pag): `tests/Macros/FragmentWithMultipleBounds.c` covers this case.
 static uint64_t ExpandToEndOfNextDirective(
-    const std::map<uint64_t, pasta::Macro> &dir_index_to_next_dir,
+    const std::map<uint64_t, pasta::MacroDirective> &dir_index_to_next_dir,
     uint64_t begin_index, uint64_t end_index, uint64_t max_index) {
 
   for (auto bi = begin_index; bi <= end_index; ) {
@@ -720,7 +709,7 @@ static uint64_t ExpandToEndOfNextDirective(
       return end_index;
     }
 
-    const pasta::Macro &dir = it->second;
+    const pasta::MacroDirective &dir = it->second;
     uint64_t dir_begin_index = 0u;
     uint64_t dir_end_index = 0u;
 
@@ -900,7 +889,7 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
 // macro expansions, and contracted to try to elide leading/trailing whitespace.
 static std::pair<uint64_t, uint64_t> FindDeclRange(
     const pasta::TokenRange &range,
-    const std::map<uint64_t, pasta::Macro> &dir_index_to_next_dir,
+    const std::map<uint64_t, pasta::MacroDirective> &dir_index_to_next_dir,
     pasta::Decl decl, pasta::Token tok, std::string_view main_file_path) {
 
   auto [begin_tok_index, end_tok_index] = BaselineEntityRange(
@@ -1063,7 +1052,7 @@ static void AddDeclRangeToEntityListFor(
     const pasta::TokenRange &tokens,
     const std::map<uint64_t, uint64_t> &eof_to_include,
     const std::map<uint64_t, uint64_t> &eof_indices,
-    const std::map<uint64_t, pasta::Macro> &dir_index_to_next_dir,
+    const std::map<uint64_t, pasta::MacroDirective> &dir_index_to_next_dir,
     std::string_view main_file_path, pasta::Decl decl,
     std::vector<EntityRange> &entity_ranges) {
 
@@ -1073,7 +1062,7 @@ static void AddDeclRangeToEntityListFor(
   // declarations.
   if (!tok) {
     AddBuiltinDeclRangeToEntityListFor(main_file_path, std::move(decl),
-                                    entity_ranges);
+                                       entity_ranges);
     return;
   }
 
@@ -1302,49 +1291,15 @@ static void AddMacroRangeToEntityListFor(
     std::string_view main_file_path, pasta::Macro node,
     std::vector<EntityRange> &entity_ranges) {
 
-  // NOTE(pag): It's possible we're dealing with a `define` inside of a
-  //            macro expansion.
-  pasta::Macro root_node = RootMacroFrom(node);
+  if (pasta::TokenRange range = pasta::Macro::CompleteExpansionRange(node)) {
+    entity_ranges.emplace_back(
+        std::move(node), range.Front()->Index(), range.Back()->Index());
 
-  std::optional<pasta::MacroToken> bt = root_node.BeginToken();
-  std::optional<pasta::MacroToken> et = root_node.EndToken();
-
-  LOG_IF(FATAL, !bt && !et)
-      << "Unable to find either the beginning or ending of macro node in "
-         "translation unit of main source file "
-      << main_file_path;
-
-  std::optional<pasta::Token> pbt;
-  std::optional<pasta::Token> pet;
-
-  if (bt) {
-    pbt = bt->ParsedLocation();
-  }
-
-  if (et) {
-    pet = et->ParsedLocation();
-  }
-
-  if (!pbt) {
-    pbt = pet;
-  }
-
-  if (!pet) {
-    pet = pbt;
-  }
-
-  if (!pbt || !pet) {
+  } else {
     LOG(ERROR)
-        << "Unable to find beginning/ending of macro node in translation unit "
-           "of main source file "
-        << main_file_path;
-    return;
+        << "Empty parsed token range for macro "
+        << MacroLocation(node);
   }
-
-  auto [begin_index, end_index] = ExpandRange(
-      tok_range, pbt->Index(), pet->Index());
-
-  entity_ranges.emplace_back(std::move(node), begin_index, end_index);
 }
 
 // Sort the top-level declarations so that syntactically overlapping

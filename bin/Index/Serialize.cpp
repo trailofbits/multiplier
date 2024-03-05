@@ -10041,9 +10041,10 @@ void SerializeUsingDirectiveDecl(const PendingFragment &pf, const EntityMapper &
   b.setVal55(et55);
   auto et56 = es.EntityId(e.NamespaceKeyToken());
   b.setVal56(et56);
-  b.setVal57(es.EntityId(e.NominatedNamespaceAsWritten()));
-  auto et65 = es.EntityId(e.UsingToken());
-  b.setVal65(et65);
+  b.setVal57(es.EntityId(e.NominatedNamespace()));
+  b.setVal65(es.EntityId(e.NominatedNamespaceAsWritten()));
+  auto et66 = es.EntityId(e.UsingToken());
+  b.setVal66(et66);
 }
 
 void SerializeUnresolvedUsingIfExistsDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UnresolvedUsingIfExistsDecl &e, const TokenTree *) {
@@ -12241,14 +12242,21 @@ void SerializeNamespaceDecl(const PendingFragment &pf, const EntityMapper &es, m
   (void) es;
   (void) b;
   (void) e;
-  pasta::DeclContext dc50(e);
-  auto v50 = dc50.AlreadyLoadedDeclarations();
-  auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
-  auto i50 = 0u;
-  for (const pasta::Decl &e50 : v50) {
-    sv50.set(i50, es.EntityId(e50));
-    ++i50;
+  SerializeNamedDecl(pf, es, b, e, nullptr);
+  auto v55 = e.AnonymousNamespace();
+  if (v55) {
+    auto id55 = es.EntityId(v55.value());
+    b.setVal55(id55);
+  } else {
+    b.setVal55(mx::kInvalidEntityId);
   }
+  b.setVal56(es.EntityId(e.OriginalNamespace()));
+  auto et57 = es.EntityId(e.RBraceToken());
+  b.setVal57(et57);
+  b.setVal74(e.IsAnonymousNamespace());
+  b.setVal75(e.IsInline());
+  b.setVal76(e.IsNested());
+  b.setVal77(e.IsOriginalNamespace());
 }
 
 void SerializeNamespaceAliasDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::NamespaceAliasDecl &e, const TokenTree *) {
@@ -12260,10 +12268,11 @@ void SerializeNamespaceAliasDecl(const PendingFragment &pf, const EntityMapper &
   auto et55 = es.EntityId(e.AliasToken());
   b.setVal55(et55);
   b.setVal56(es.EntityId(e.AliasedNamespace()));
-  auto et57 = es.EntityId(e.NamespaceToken());
-  b.setVal57(et57);
-  auto et65 = es.EntityId(e.TargetNameToken());
+  b.setVal57(es.EntityId(e.Namespace()));
+  auto et65 = es.EntityId(e.NamespaceToken());
   b.setVal65(et65);
+  auto et66 = es.EntityId(e.TargetNameToken());
+  b.setVal66(et66);
 }
 
 void SerializeLinkageSpecDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::LinkageSpecDecl &e, const TokenTree *) {
@@ -12271,14 +12280,13 @@ void SerializeLinkageSpecDecl(const PendingFragment &pf, const EntityMapper &es,
   (void) es;
   (void) b;
   (void) e;
-  pasta::DeclContext dc50(e);
-  auto v50 = dc50.AlreadyLoadedDeclarations();
-  auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
-  auto i50 = 0u;
-  for (const pasta::Decl &e50 : v50) {
-    sv50.set(i50, es.EntityId(e50));
-    ++i50;
-  }
+  SerializeDecl(pf, es, b, e, nullptr);
+  auto et48 = es.EntityId(e.ExternToken());
+  b.setVal48(et48);
+  b.setVal64(static_cast<unsigned char>(mx::FromPasta(e.Language())));
+  auto et55 = es.EntityId(e.RBraceToken());
+  b.setVal55(et55);
+  b.setVal49(e.HasBraces());
 }
 
 void SerializeLifetimeExtendedTemporaryDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::LifetimeExtendedTemporaryDecl &e, const TokenTree *) {
@@ -12408,14 +12416,7 @@ void SerializeExternCContextDecl(const PendingFragment &pf, const EntityMapper &
   (void) es;
   (void) b;
   (void) e;
-  pasta::DeclContext dc50(e);
-  auto v50 = dc50.AlreadyLoadedDeclarations();
-  auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
-  auto i50 = 0u;
-  for (const pasta::Decl &e50 : v50) {
-    sv50.set(i50, es.EntityId(e50));
-    ++i50;
-  }
+  SerializeDecl(pf, es, b, e, nullptr);
 }
 
 void SerializeExportDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ExportDecl &e, const TokenTree *) {

@@ -5807,7 +5807,7 @@ MX_BEGIN_ENUM_CLASS(TokenKind, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, COMMA, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, HASH, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, HASH_HASH, unsigned short)
-  MX_ENUM_CLASS_ENTRY(TokenKind, HASHAT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, HASH_AT, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, PERIOD_STAR, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, ARROW_STAR, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, COLON_COLON, unsigned short)
@@ -6171,6 +6171,8 @@ MX_BEGIN_ENUM_CLASS(TokenKind, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, ANNOT_MODULE_END, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, ANNOT_HEADER_UNIT, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, ANNOT_REPL_INPUT_END, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, L_ANGLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, R_ANGLE, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, PP_IF, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, PP_IFDEF, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, PP_IFNDEF, unsigned short)
@@ -19294,8 +19296,9 @@ MX_BEGIN_VISIT_DECL(UsingDirectiveDecl)
   MX_VISIT_BASE(UsingDirectiveDecl, NamedDecl)
   MX_VISIT_ENTITY(UsingDirectiveDecl, identifier_token, 55, MX_APPLY_METHOD, IdentifierToken, Token, NthDecl)
   MX_VISIT_ENTITY(UsingDirectiveDecl, namespace_key_token, 56, MX_APPLY_METHOD, NamespaceKeyToken, Token, NthDecl)
-  MX_VISIT_ENTITY(UsingDirectiveDecl, nominated_namespace_as_written, 57, MX_APPLY_METHOD, NominatedNamespaceAsWritten, NamedDecl, NthDecl)
-  MX_VISIT_ENTITY(UsingDirectiveDecl, using_token, 65, MX_APPLY_METHOD, UsingToken, Token, NthDecl)
+  MX_VISIT_ENTITY(UsingDirectiveDecl, nominated_namespace, 57, MX_APPLY_METHOD, NominatedNamespace, NamespaceDecl, NthDecl)
+  MX_VISIT_ENTITY(UsingDirectiveDecl, nominated_namespace_as_written, 65, MX_APPLY_METHOD, NominatedNamespaceAsWritten, NamedDecl, NthDecl)
+  MX_VISIT_ENTITY(UsingDirectiveDecl, using_token, 66, MX_APPLY_METHOD, UsingToken, Token, NthDecl)
   MX_EXIT_VISIT_UsingDirectiveDecl
 MX_END_VISIT_DECL(UsingDirectiveDecl)
 
@@ -20300,7 +20303,14 @@ MX_END_VISIT_DECL(ObjCCompatibleAliasDecl)
 
 MX_BEGIN_VISIT_DECL(NamespaceDecl)
   MX_ENTER_VISIT_NamespaceDecl
-  MX_VISIT_DECL_CONTEXT(NamespaceDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_BASE(NamespaceDecl, NamedDecl)
+  MX_VISIT_OPTIONAL_ENTITY(NamespaceDecl, anonymous_namespace, 55, MX_APPLY_METHOD, AnonymousNamespace, NamespaceDecl, NthDecl)
+  MX_VISIT_ENTITY(NamespaceDecl, original_namespace, 56, MX_APPLY_METHOD, OriginalNamespace, NamespaceDecl, NthDecl)
+  MX_VISIT_ENTITY(NamespaceDecl, r_brace_token, 57, MX_APPLY_METHOD, RBraceToken, Token, NthDecl)
+  MX_VISIT_BOOL(NamespaceDecl, is_anonymous_namespace, 74, MX_APPLY_METHOD, IsAnonymousNamespace, bool, NthDecl)
+  MX_VISIT_BOOL(NamespaceDecl, is_inline, 75, MX_APPLY_METHOD, IsInline, bool, NthDecl)
+  MX_VISIT_BOOL(NamespaceDecl, is_nested, 76, MX_APPLY_METHOD, IsNested, bool, NthDecl)
+  MX_VISIT_BOOL(NamespaceDecl, is_original_namespace, 77, MX_APPLY_METHOD, IsOriginalNamespace, bool, NthDecl)
   MX_EXIT_VISIT_NamespaceDecl
 MX_END_VISIT_DECL(NamespaceDecl)
 
@@ -20316,8 +20326,9 @@ MX_BEGIN_VISIT_DECL(NamespaceAliasDecl)
   MX_VISIT_BASE(NamespaceAliasDecl, NamedDecl)
   MX_VISIT_ENTITY(NamespaceAliasDecl, alias_token, 55, MX_APPLY_METHOD, AliasToken, Token, NthDecl)
   MX_VISIT_ENTITY(NamespaceAliasDecl, aliased_namespace, 56, MX_APPLY_METHOD, AliasedNamespace, NamedDecl, NthDecl)
-  MX_VISIT_ENTITY(NamespaceAliasDecl, namespace_token, 57, MX_APPLY_METHOD, NamespaceToken, Token, NthDecl)
-  MX_VISIT_ENTITY(NamespaceAliasDecl, target_name_token, 65, MX_APPLY_METHOD, TargetNameToken, Token, NthDecl)
+  MX_VISIT_ENTITY(NamespaceAliasDecl, namespace_, 57, MX_APPLY_METHOD, Namespace, NamespaceDecl, NthDecl)
+  MX_VISIT_ENTITY(NamespaceAliasDecl, namespace_token, 65, MX_APPLY_METHOD, NamespaceToken, Token, NthDecl)
+  MX_VISIT_ENTITY(NamespaceAliasDecl, target_name_token, 66, MX_APPLY_METHOD, TargetNameToken, Token, NthDecl)
   MX_EXIT_VISIT_NamespaceAliasDecl
 MX_END_VISIT_DECL(NamespaceAliasDecl)
 
@@ -20330,7 +20341,11 @@ MX_END_VISIT_DECL(NamespaceAliasDecl)
 
 MX_BEGIN_VISIT_DECL(LinkageSpecDecl)
   MX_ENTER_VISIT_LinkageSpecDecl
-  MX_VISIT_DECL_CONTEXT(LinkageSpecDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_BASE(LinkageSpecDecl, Decl)
+  MX_VISIT_ENTITY(LinkageSpecDecl, extern_token, 48, MX_APPLY_METHOD, ExternToken, Token, NthDecl)
+  MX_VISIT_ENUM(LinkageSpecDecl, language, 64, MX_APPLY_METHOD, Language, LinkageSpecDeclLanguageIDs, NthDecl)
+  MX_VISIT_ENTITY(LinkageSpecDecl, r_brace_token, 55, MX_APPLY_METHOD, RBraceToken, Token, NthDecl)
+  MX_VISIT_BOOL(LinkageSpecDecl, has_braces, 49, MX_APPLY_METHOD, HasBraces, bool, NthDecl)
   MX_EXIT_VISIT_LinkageSpecDecl
 MX_END_VISIT_DECL(LinkageSpecDecl)
 
@@ -20439,7 +20454,7 @@ MX_END_VISIT_DECL(FileScopeAsmDecl)
 
 MX_BEGIN_VISIT_DECL(ExternCContextDecl)
   MX_ENTER_VISIT_ExternCContextDecl
-  MX_VISIT_DECL_CONTEXT(ExternCContextDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_BASE(ExternCContextDecl, Decl)
   MX_EXIT_VISIT_ExternCContextDecl
 MX_END_VISIT_DECL(ExternCContextDecl)
 

@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1374]) || tp >= &(gTypes[1401])) {
+  if (tp < &(gTypes[1375]) || tp >= &(gTypes[1402])) {
     return std::nullopt;
   }
 
@@ -90,107 +90,107 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::builtin::ShapedType::static_kind():
-      tp = &(gTypes[1375]);
-      break;
-
-    case mx::ir::builtin::FloatType::static_kind():
       tp = &(gTypes[1376]);
       break;
 
-    case mx::ir::builtin::BFloat16Type::static_kind():
+    case mx::ir::builtin::FloatType::static_kind():
       tp = &(gTypes[1377]);
       break;
 
-    case mx::ir::builtin::ComplexType::static_kind():
+    case mx::ir::builtin::BFloat16Type::static_kind():
       tp = &(gTypes[1378]);
       break;
 
-    case mx::ir::builtin::Float8E4M3B11FNUZType::static_kind():
+    case mx::ir::builtin::ComplexType::static_kind():
       tp = &(gTypes[1379]);
       break;
 
-    case mx::ir::builtin::Float8E4M3FNType::static_kind():
+    case mx::ir::builtin::Float8E4M3B11FNUZType::static_kind():
       tp = &(gTypes[1380]);
       break;
 
-    case mx::ir::builtin::Float8E4M3FNUZType::static_kind():
+    case mx::ir::builtin::Float8E4M3FNType::static_kind():
       tp = &(gTypes[1381]);
       break;
 
-    case mx::ir::builtin::Float8E5M2Type::static_kind():
+    case mx::ir::builtin::Float8E4M3FNUZType::static_kind():
       tp = &(gTypes[1382]);
       break;
 
-    case mx::ir::builtin::Float8E5M2FNUZType::static_kind():
+    case mx::ir::builtin::Float8E5M2Type::static_kind():
       tp = &(gTypes[1383]);
       break;
 
-    case mx::ir::builtin::Float16Type::static_kind():
+    case mx::ir::builtin::Float8E5M2FNUZType::static_kind():
       tp = &(gTypes[1384]);
       break;
 
-    case mx::ir::builtin::Float32Type::static_kind():
+    case mx::ir::builtin::Float16Type::static_kind():
       tp = &(gTypes[1385]);
       break;
 
-    case mx::ir::builtin::Float64Type::static_kind():
+    case mx::ir::builtin::Float32Type::static_kind():
       tp = &(gTypes[1386]);
       break;
 
-    case mx::ir::builtin::Float80Type::static_kind():
+    case mx::ir::builtin::Float64Type::static_kind():
       tp = &(gTypes[1387]);
       break;
 
-    case mx::ir::builtin::Float128Type::static_kind():
+    case mx::ir::builtin::Float80Type::static_kind():
       tp = &(gTypes[1388]);
       break;
 
-    case mx::ir::builtin::FloatTF32Type::static_kind():
+    case mx::ir::builtin::Float128Type::static_kind():
       tp = &(gTypes[1389]);
       break;
 
-    case mx::ir::builtin::FunctionType::static_kind():
+    case mx::ir::builtin::FloatTF32Type::static_kind():
       tp = &(gTypes[1390]);
       break;
 
-    case mx::ir::builtin::IndexType::static_kind():
+    case mx::ir::builtin::FunctionType::static_kind():
       tp = &(gTypes[1391]);
       break;
 
-    case mx::ir::builtin::IntegerType::static_kind():
+    case mx::ir::builtin::IndexType::static_kind():
       tp = &(gTypes[1392]);
       break;
 
-    case mx::ir::builtin::MemRefType::static_kind():
+    case mx::ir::builtin::IntegerType::static_kind():
       tp = &(gTypes[1393]);
       break;
 
-    case mx::ir::builtin::NoneType::static_kind():
+    case mx::ir::builtin::MemRefType::static_kind():
       tp = &(gTypes[1394]);
       break;
 
-    case mx::ir::builtin::OpaqueType::static_kind():
+    case mx::ir::builtin::NoneType::static_kind():
       tp = &(gTypes[1395]);
       break;
 
-    case mx::ir::builtin::RankedTensorType::static_kind():
+    case mx::ir::builtin::OpaqueType::static_kind():
       tp = &(gTypes[1396]);
       break;
 
-    case mx::ir::builtin::TupleType::static_kind():
+    case mx::ir::builtin::RankedTensorType::static_kind():
       tp = &(gTypes[1397]);
       break;
 
-    case mx::ir::builtin::UnrankedMemRefType::static_kind():
+    case mx::ir::builtin::TupleType::static_kind():
       tp = &(gTypes[1398]);
       break;
 
-    case mx::ir::builtin::UnrankedTensorType::static_kind():
+    case mx::ir::builtin::UnrankedMemRefType::static_kind():
       tp = &(gTypes[1399]);
       break;
 
-    case mx::ir::builtin::VectorType::static_kind():
+    case mx::ir::builtin::UnrankedTensorType::static_kind():
       tp = &(gTypes[1400]);
+      break;
+
+    case mx::ir::builtin::VectorType::static_kind():
+      tp = &(gTypes[1401]);
       break;
 
   }
@@ -258,7 +258,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1374]);
+  PyTypeObject * const tp = &(gTypes[1375]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -273,12 +273,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[1373].tp_hash;
-  tp->tp_richcompare = gTypes[1373].tp_richcompare;
+  tp->tp_hash = gTypes[1374].tp_hash;
+  tp->tp_richcompare = gTypes[1374].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[1373]);
+  tp->tp_base = &(gTypes[1374]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

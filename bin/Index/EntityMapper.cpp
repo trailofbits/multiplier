@@ -115,10 +115,6 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Attr &entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
-  if (auto mt = pasta::MacroToken::From(entity)) {
-    return EntityId(mt->ParsedLocation());
-  }
-
   // NOTE(pag): May be part of a directive, which may be referenced by other
   //            fragments, so we use `EntityId`, which falls back on
   //            `PerFragmentEntityId`.
@@ -212,7 +208,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::PrintedToken &entity) const 
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::MacroToken &entity) {
-  return EntityId(entity.ParsedLocation());
+  return EntityId(entity.RawMacro());
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::File &file) const {

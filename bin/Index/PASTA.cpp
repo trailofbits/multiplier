@@ -7277,7 +7277,7 @@ TokenKind FromPasta(pasta::TokenKind e) {
     case 65: return TokenKind::COMMA;
     case 66: return TokenKind::HASH;
     case 67: return TokenKind::HASH_HASH;
-    case 68: return TokenKind::HASHAT;
+    case 68: return TokenKind::HASH_AT;
     case 69: return TokenKind::PERIOD_STAR;
     case 70: return TokenKind::ARROW_STAR;
     case 71: return TokenKind::COLON_COLON;
@@ -7641,6 +7641,8 @@ TokenKind FromPasta(pasta::TokenKind e) {
     case 429: return TokenKind::ANNOT_MODULE_END;
     case 430: return TokenKind::ANNOT_HEADER_UNIT;
     case 431: return TokenKind::ANNOT_REPL_INPUT_END;
+    case 432: return TokenKind::L_ANGLE;
+    case 433: return TokenKind::R_ANGLE;
     default: __builtin_unreachable();
   }
 }
