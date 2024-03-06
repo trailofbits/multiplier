@@ -57,7 +57,7 @@ class TypeMapper final {
 
   // Hash a type, producing a string.
   std::string HashType(
-      const EntityMapper &em, const pasta::Type &type,
+      PendingFragment &pf, const pasta::Type &type,
       const pasta::PrintedTokenRange &range);
 
  public:
@@ -84,7 +84,7 @@ class TypeMapper final {
   mx::RawEntityId EntityId(const pasta::Type &entity) const;
 
   // NOTE(pag): `*entity` may be updated.
-  bool AddEntityId(const EntityMapper &em, pasta::Type *entity,
+  bool AddEntityId(PendingFragment &pf, pasta::Type *entity,
                    EntityList<const clang::Stmt*> *entity_list = nullptr);
 
   mx::PackedTypeId TypeId(const pasta::Type &entity) const;

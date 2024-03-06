@@ -472,7 +472,7 @@ bool PendingFragment::TryAdd(const pasta::Attr &entity) {
 
 bool PendingFragment::TryAdd(pasta::Type entity,
                              EntityList<const clang::Stmt*> *entity_list) {
-  if (!em.tm.AddEntityId(em, &entity, entity_list)) {
+  if (!em.tm.AddEntityId(*this, &entity, entity_list)) {
     return false;
   }
 
@@ -511,9 +511,17 @@ void BuildPendingFragment(const pasta::AST &ast, PendingFragment &pf) {
 
   FragmentBuilder builder(em, pf);
 
+  /*if (pf.top_level_decls.size() > 0) {
+    if (pf.top_level_decls.front().RawDecl()->getLocation().getRawEncoding() == 11103863) {
+      LOG(ERROR) << "Debug building fragment";
+    }
+  }*/
+
   // Make sure to collect everything reachable from token contexts.
   for (pasta::PrintedToken tok : pf.parsed_tokens) {
+    //LOG(ERROR) << tok.Data();
     for (pasta::TokenContext context : TokenContexts(tok)) {
+     // LOG(ERROR) << context.KindName();
       if (auto decl = pasta::Decl::From(context)) {
         builder.MaybeVisitNext(*decl);
 
@@ -599,6 +607,22 @@ void BuildPendingFragment(const pasta::AST &ast, PendingFragment &pf) {
       for (auto &stmt : underlying_stmts) {
         builder.Accept(ast.Adopt(stmt));
       }
+    }
+
+    for (auto changed = true; changed; ) {
+      changed = false;
+
+      do_on_map(pf.decls_to_serialize, prev_num_decls, changed);
+      do_on_map(pf.stmts_to_serialize, prev_num_stmts, changed);
+      do_on_map(pf.attrs_to_serialize, prev_num_attrs, changed);
+      do_on_list(pf.types_to_serialize, prev_num_types, changed);
+      do_on_list(pf.template_arguments_to_serialize, prev_num_template_args,
+                 changed);
+      do_on_list(pf.template_parameter_lists_to_serialize,
+                 prev_num_template_params, changed);
+      do_on_list(pf.designators_to_serialize, prev_num_designators, changed);
+      do_on_list(pf.cxx_base_specifiers_to_serialize,
+                 prev_num_cxx_base_specifiers, changed);
     }
 
     builder.pending_types.clear();

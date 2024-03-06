@@ -210,7 +210,7 @@ clang::QualType TypeMapper::Compress(clang::ASTContext &context,
 
 // Hash a type.
 std::string TypeMapper::HashType(
-    const EntityMapper &em, const pasta::Type &type,
+    PendingFragment &pf, const pasta::Type &type,
     const pasta::PrintedTokenRange &range) {
 
   decls.clear();
@@ -279,11 +279,17 @@ std::string TypeMapper::HashType(
 
     ss << " d";
     for (OpaqueOrderedDecl od : decls) {
-      auto eid = em.EntityId(od.first);
+      auto eid = pf.em.EntityId(od.first);
 
       // NOTE(pag): Eventually this may trigger as a result of top-level
       //            decls that are ignored due to `ShouldHideFromIndexer`.
-      assert(eid != mx::kInvalidEntityId);
+      assert(eid != mx::kInvalidEntityId || ((clang::Decl*)od.first)->isImplicit());
+      if ((eid == mx::kInvalidEntityId) && ((clang::Decl*)od.first)->isImplicit()) {
+        pasta::Decl pasta_decl = pasta::AST::From(type).Adopt(
+              reinterpret_cast<const clang::Decl*>(od.first));
+        pf.TryAdd(pasta_decl);
+      }
+
       ss << ' ' << eid;
     }
   }
@@ -320,7 +326,7 @@ mx::RawEntityId TypeMapper::EntityId(const pasta::Type &entity) const {
 }
 
 // NOTE(pag): `entity` may be updated.
-bool TypeMapper::AddEntityId(const EntityMapper &em, pasta::Type *entity_,
+bool TypeMapper::AddEntityId(PendingFragment &pf, pasta::Type *entity_,
                              EntityList<const clang::Stmt*> *entity_list) {
   assert(!read_only);
 
@@ -360,7 +366,7 @@ bool TypeMapper::AddEntityId(const EntityMapper &em, pasta::Type *entity_,
   auto [type_id, is_new_type_id] = id_store.GetOrCreateTypeIdForHash(
       mx::FromPasta(entity.Kind()),
       raw_qualifiers,
-      HashType(em, entity, token_range),
+      HashType(pf, entity, token_range),
       token_range.size());
 
   auto tid = type_id.Unpack();
