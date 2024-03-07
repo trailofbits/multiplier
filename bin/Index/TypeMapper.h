@@ -84,8 +84,7 @@ class TypeMapper final {
   mx::RawEntityId EntityId(const pasta::Type &entity) const;
 
   // NOTE(pag): `*entity` may be updated.
-  bool AddEntityId(PendingFragment &pf, pasta::Type *entity,
-                   EntityList<const clang::Stmt*> *entity_list = nullptr);
+  bool AddEntityId(PendingFragment &pf, pasta::Type *entity);
 
   mx::PackedTypeId TypeId(const pasta::Type &entity) const;
 

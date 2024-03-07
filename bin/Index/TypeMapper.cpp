@@ -326,8 +326,7 @@ mx::RawEntityId TypeMapper::EntityId(const pasta::Type &entity) const {
 }
 
 // NOTE(pag): `entity` may be updated.
-bool TypeMapper::AddEntityId(PendingFragment &pf, pasta::Type *entity_,
-                             EntityList<const clang::Stmt*> *entity_list) {
+bool TypeMapper::AddEntityId(PendingFragment &pf, pasta::Type *entity_) {
   assert(!read_only);
 
   pasta::Type &entity = *entity_;
@@ -340,8 +339,16 @@ bool TypeMapper::AddEntityId(PendingFragment &pf, pasta::Type *entity_,
     return false;
   }
 
+  EntityList<const clang::Stmt*> underlying_stmts;
   clang::Type *raw_type = BasicTypeDeduplication(
-      const_cast<clang::Type *>(entity.RawType()), raw_qualifiers, entity_list);
+      const_cast<clang::Type *>(entity.RawType()), raw_qualifiers, &underlying_stmts);
+
+  // If there are underlying stmts in type, add them to pending fragment
+  // to serialize.
+  for (auto stmt : underlying_stmts) {
+    pf.TryAdd(pasta::AST::From(entity).Adopt(stmt));
+  }
+
 
   TypeKey dedup_type_key(raw_type, raw_qualifiers);
   assert(dedup_type_key.first != nullptr);

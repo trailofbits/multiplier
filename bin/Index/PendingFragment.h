@@ -163,8 +163,7 @@ class PendingFragment {
   // Types have special serialization that is sort of fragment-specific. We
   // collect the types that are "new" and seen by virtue of this fragment, but
   // the fragment itself is not responsible for their serialization.
-  bool TryAdd(pasta::Type entity,
-              EntityList<const clang::Stmt*> *stmts_list = nullptr);
+  bool TryAdd(pasta::Type entity);
 
   bool TryAdd(const pasta::Decl &entity);
   bool TryAdd(const pasta::Stmt &entity);
