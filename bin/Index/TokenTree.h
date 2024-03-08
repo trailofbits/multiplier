@@ -48,7 +48,6 @@ class TokenTreeNode {
 
  public:
   std::optional<pasta::PrintedToken> PrintedToken(void) const noexcept;
-  std::optional<pasta::FileToken> FileToken(void) const noexcept;
   std::optional<pasta::MacroToken> MacroToken(void) const noexcept;
   std::optional<pasta::Token> Token(void) const noexcept;
   std::optional<TokenTree> SubTree(void) const noexcept;
@@ -168,8 +167,8 @@ class TokenTree {
   TokenTreeNodeRange Children(void) const noexcept;
   TokenTreeNodeRange IntermediateChildren(void) const noexcept;
   TokenTreeNodeRange ReplacementChildren(void) const noexcept;
-  std::optional<pasta::Token> FirstFullySubstitutedToken(void) const noexcept;
-  std::optional<pasta::Token> LastFullySubstitutedToken(void) const noexcept;
+  std::optional<pasta::MacroToken> FirstFullySubstitutedToken(void) const noexcept;
+  std::optional<pasta::MacroToken> LastFullySubstitutedToken(void) const noexcept;
   std::optional<pasta::MacroToken> NameOrOperator(void) const noexcept;
 
   // Return whether or not this node has intermediate children.

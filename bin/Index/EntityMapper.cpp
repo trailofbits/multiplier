@@ -180,18 +180,24 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
   // that `entity.Data()` here likely matches some printed token data over there
   // that has no corresponding derived (parsed) token.
   if (IsParsedToken(entity)) {
-    //TODO(kumarak): The entity id invalid could be issue
-    //               with pasta; Temporairly disable it but look for the bugs
-    //               in pasta.
-    //assert(false);
+    assert(false);
     return mx::kInvalidEntityId;
   }
 
-  if (auto mt = entity.MacroLocation()) {
-    return EntityId(mt->RawMacro());
-  }
-
   return mx::kInvalidEntityId;
+}
+
+mx::RawEntityId EntityMapper::EntityId(const pasta::DerivedToken &entity) const {
+  if (std::holds_alternative<std::monostate>(entity)) {
+    return mx::kInvalidEntityId;
+  } else if (std::holds_alternative<pasta::MacroToken>(entity)) {
+    return EntityId(std::get<pasta::MacroToken>(entity));
+  } else if (std::holds_alternative<pasta::FileToken>(entity)) {
+    return EntityId(std::get<pasta::FileToken>(entity));
+  } else {
+    assert(false);
+    return mx::kInvalidEntityId;
+  }
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::PrintedToken &entity) const {

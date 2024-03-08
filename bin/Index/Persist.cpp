@@ -276,6 +276,7 @@ struct TokenTreeSerializationSchedule {
     if (raw_tt != raw_locator) {
       (void) em.token_tree_ids.emplace(raw_locator, raw_id);
     }
+
     return raw_id;
   }
 
@@ -295,20 +296,38 @@ struct TokenTreeSerializationSchedule {
       id.offset = static_cast<unsigned>(tokens.size());
 
       const void *raw_pt = nullptr;
+      
+      if (std::optional<pasta::PrintedToken> gt = node.PrintedToken()) {
+        id.kind = TokenKindFromPasta(gt.value());
+        raw_pt = gt->RawToken();
+        CHECK(em.token_tree_ids.contains(raw_pt));
+        CHECK(parsed_token_index.emplace(raw_pt, id.offset).second);
 
-      if (std::optional<pasta::PrintedToken> pt = node.PrintedToken()) {
+        auto dt = gt->DerivedLocation();
+        auto nt = node.Token();
+        if (dt) {
+          auto raw_dt = dt->RawToken();
+          CHECK(nt.has_value());
+          CHECK_EQ(raw_dt, nt->RawToken());
+          CHECK(em.token_tree_ids.contains(raw_dt));
+          CHECK(parsed_token_index.emplace(raw_dt, id.offset).second);
+        
+        } else {
+          assert(!nt);
+        }
+
+      } else if (std::optional<pasta::Token> pt = node.Token()) {
+        assert(false);  // Shouldn't get here.
+
         id.kind = TokenKindFromPasta(pt.value());
         raw_pt = pt->RawToken();
         CHECK(em.token_tree_ids.contains(raw_pt));
         CHECK(parsed_token_index.emplace(raw_pt, id.offset).second);
-
-      } else if (std::optional<pasta::Token> mt = node.Token()) {
+      
+      } else if (std::optional<pasta::MacroToken> mt = node.MacroToken()) {
         id.kind = TokenKindFromPasta(mt.value());
-        raw_pt = mt->RawToken();
-        DCHECK(!IsParsedToken(mt.value()) == !em.token_tree_ids.count(raw_pt));
-
-      } else if (std::optional<pasta::FileToken> ft = node.FileToken()) {
-        id.kind = TokenKindFromPasta(ft.value());
+        raw_pt = mt->RawMacro();
+        CHECK(!em.token_tree_ids.contains(raw_pt));
       }
 
       raw_id = mx::EntityId(id).Pack();
@@ -475,12 +494,20 @@ static void PersistTokenTree(
 
   size_t data_reserve = 128u;
   for (const TokenTreeNode &tok_node : sched.tokens) {
-    if (auto pt = tok_node.PrintedToken()) {
-      data_reserve += pt->Data().size();
-    } else if (auto mt = tok_node.Token()) {
-      data_reserve += mt->Data().size();
-    } else if (auto ft = tok_node.FileToken()) {
-      data_reserve += ft->Data().size();
+    if (auto printed = tok_node.PrintedToken()) {
+      data_reserve += printed->Data().size();
+    
+    } else if (auto parsed = tok_node.Token()) {
+      data_reserve += parsed->Data().size();
+    
+    } else if (auto macro = tok_node.MacroToken()) {
+      data_reserve += macro->Data().size();
+
+    } else {
+      LOG(FATAL)
+          << "Missing parsed token for token node in source file "
+          << MainSourceFile(pf) << " with parsed tokens "
+          << DiagnosePrintedTokens(pf.parsed_tokens);
     }
   }
 
@@ -491,14 +518,18 @@ static void PersistTokenTree(
   for (const TokenTreeNode &tok_node : sched.tokens) {
     to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
 
-    std::optional<pasta::Token> mt = tok_node.Token();
-    std::optional<pasta::PrintedToken> pt = tok_node.PrintedToken();
-    std::optional<pasta::FileToken> ft = tok_node.FileToken();
+    std::optional<pasta::Token> pt = tok_node.Token();
+    std::optional<pasta::PrintedToken> gt = tok_node.PrintedToken();
+    std::optional<pasta::MacroToken> mt = tok_node.MacroToken();
 
     dt.set(i, provenance.DerivedTokenId(tok_node));
     re.set(i, provenance.RelatedEntityId(tok_node));
-
-    if (pt) {
+    
+    if (gt) {
+      AccumulateTokenData(utf8_fragment_data, gt.value());
+      tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(gt.value())));
+    
+    } else if (pt) {
       AccumulateTokenData(utf8_fragment_data, pt.value());
       tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(pt.value())));
 
@@ -506,15 +537,8 @@ static void PersistTokenTree(
       AccumulateTokenData(utf8_fragment_data, mt.value());
       tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(mt.value())));
 
-    } else if (ft) {
-      AccumulateTokenData(utf8_fragment_data, ft.value());
-      tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(ft.value())));
-
     } else {
-      LOG(FATAL)
-          << "Missing parsed/file token for token node in source file "
-          << MainSourceFile(pf) << " with parsed tokens "
-          << DiagnosePrintedTokens(pf.parsed_tokens);
+      assert(false);
     }
 
     // Associate this token node with a parsed token. Generally this can be
@@ -526,6 +550,11 @@ static void PersistTokenTree(
     // we serialized a buitlin or forward declaration in a declarator and
     // (intentionally) droppped provenance so that we wouldn't accidentally
     // bring in macros.
+    if (std::holds_alternative<mx::InvalidId>(parsed_vid) && gt) {
+      CHECK(pf.drop_token_provenance);
+      parsed_vid = mx::EntityId(em.EntityId(gt.value())).Unpack();
+    }
+
     if (std::holds_alternative<mx::InvalidId>(parsed_vid) && pt) {
       CHECK(pf.drop_token_provenance);
       parsed_vid = mx::EntityId(em.EntityId(pt.value())).Unpack();

@@ -38,6 +38,7 @@ class TemplateParameterList;
 class Token;
 class TokenContext;
 class Type;
+using DerivedToken = std::variant<std::monostate, pasta::MacroToken, pasta::FileToken>;
 enum class TemplateSpecializationKind : unsigned int;
 }  // namespace pasta
 namespace mx {
@@ -70,6 +71,10 @@ std::optional<pasta::FileToken> AsTopLevelFileToken(const pasta::Token &tok);
 // NOTE(pag): This logic is similarly reflected in `EntityLabeller::Label`.
 bool IsParsedToken(const pasta::Token &tok);
 
+// Like `IsParsedToken`, but returns `false` for whitespace and comments that
+// were made visible to Clang's preprocessor.
+bool IsParsedTokenExcludingWhitespaceAndComments(const pasta::Token &tok);
+
 // Compute the last token of a macro.
 std::optional<pasta::MacroToken> EndToken(const pasta::Macro &macro);
 
@@ -98,6 +103,8 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity);
 mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity);
 
 mx::TokenKind TokenKindFromPasta(pasta::TokenKind kind, std::string_view data);
+
+pasta::DerivedToken DerivedLocation(const pasta::DerivedToken &tok);
 
 // Returns `true` if `decl` is a definition.
 bool IsDefinition(const pasta::Decl &decl);

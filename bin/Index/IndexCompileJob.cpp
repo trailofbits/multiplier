@@ -384,7 +384,8 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 };
 
-static uint64_t ParsedIndexOfMacroDirective(const pasta::MacroDirective &macro) {
+static uint64_t ParsedIndexOfMacroDirective(
+    const pasta::MacroDirective &macro) {
   return macro.ParsedLocation().Index();
 }
 
@@ -399,7 +400,8 @@ static bool IsOpeningConditionalDirective(const pasta::MacroDirective &macro) {
   }
 }
 
-static bool IsContinuingConditionalDirective(const pasta::Macro &macro) {
+static bool IsContinuingConditionalDirective(
+    const pasta::MacroDirective &macro) {
   switch (macro.Kind()) {
     case pasta::MacroKind::kElseIfDirective:
     case pasta::MacroKind::kElseIfDefinedDirective:
@@ -411,7 +413,7 @@ static bool IsContinuingConditionalDirective(const pasta::Macro &macro) {
   }
 }
 
-static bool IsClosingConditionalDirective(const pasta::Macro &macro) {
+static bool IsClosingConditionalDirective(const pasta::MacroDirective &macro) {
   return macro.Kind() == pasta::MacroKind::kEndIfDirective;
 }
 
@@ -665,7 +667,7 @@ static uint64_t PreviousConditionalIndex(
 
 static uint64_t EndOfConditionalSequence(
     const std::map<uint64_t, pasta::MacroDirective> &dir_index_to_next_dir,
-    const pasta::Macro &macro) {
+    const pasta::MacroDirective &macro) {
 
   uint64_t macro_index = ParsedIndexOfMacroDirective(macro);
   auto it = dir_index_to_next_dir.find(macro_index);
@@ -788,7 +790,7 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
       case pasta::TokenRole::kInitialMacroUseToken:
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
-      case pasta::TokenRole::kEndOfInternalMacroEventMarker:
+      case pasta::TokenRole::kMacroDirectiveMarker:
         --begin_tok_index;  // Include it.
         in_macro = true;
         break;
@@ -828,7 +830,7 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
       case pasta::TokenRole::kInitialMacroUseToken:
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
-      case pasta::TokenRole::kEndOfInternalMacroEventMarker:
+      case pasta::TokenRole::kMacroDirectiveMarker:
         ++end_tok_index;  // Include it.
         in_macro = true;
         break;
@@ -848,6 +850,19 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
     }
   }
 
+  // Expand to leading comment.
+  if (2u <= begin_tok_index &&
+      range[begin_tok_index - 2u].Kind() == pasta::TokenKind::kComment) {
+    auto pt = range[begin_tok_index - 1u];
+    auto td = pt.Data();
+    if (pt.Kind() == pasta::TokenKind::kUnknown &&
+        pt.Role() == pasta::TokenRole::kFileToken &&
+        IsWhitespaceOrEmpty(td) &&
+        std::count(td.begin(), td.end(), '\n') <= 1u) {
+      begin_tok_index -= 2u;
+    }
+  }
+
 #ifndef NDEBUG
   // Try to detect these types of issues early, as they'd otherwise manifest
   // downstream in `TokenTree::Create`'s internal function
@@ -860,7 +875,7 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
     case pasta::TokenRole::kInitialMacroUseToken:
     case pasta::TokenRole::kIntermediateMacroExpansionToken:
     case pasta::TokenRole::kFinalMacroExpansionToken:
-    case pasta::TokenRole::kEndOfInternalMacroEventMarker:
+    case pasta::TokenRole::kMacroDirectiveMarker:
     case pasta::TokenRole::kEndOfMacroExpansionMarker:
       assert(false);
       break;
@@ -872,7 +887,7 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
     case pasta::TokenRole::kInitialMacroUseToken:
     case pasta::TokenRole::kIntermediateMacroExpansionToken:
     case pasta::TokenRole::kFinalMacroExpansionToken:
-    case pasta::TokenRole::kEndOfInternalMacroEventMarker:
+    case pasta::TokenRole::kMacroDirectiveMarker:
     case pasta::TokenRole::kBeginOfMacroExpansionMarker:
       assert(false);
       break;
@@ -1164,6 +1179,10 @@ static std::vector<OrderedMacro> FindTLMs(
     // Include all `#include`s, `#pragma`s, `#if`s, etc.
     if (auto dir = pasta::MacroDirective::From(mn);
         dir && dir->Kind() != pasta::MacroKind::kDefineDirective) {
+      
+      // `#define` directives in the macro preamble won't have file locations.
+      // These don't matter here, though, as we're explicitly ignore `#define`s
+      // in this branch, and focusing on other top-lvel directives.
       if (!dir->Hash().FileLocation()) {
         continue;
       }
@@ -1178,39 +1197,54 @@ static std::vector<OrderedMacro> FindTLMs(
         continue;
       }
 
-      // Find the end token of the `#include`.
-      auto ild_et = ild->EndToken();
-      if (!ild_et) {
-        continue;
-      }
-
-      // Scan backward looking for the beginning of macro marker.
-      uint64_t i = ild_et->ParsedLocation().Index();
-      uint64_t j = i;
-      for (; j; --j) {
-        if (tokens[j].Role() == pasta::TokenRole::kBeginOfMacroExpansionMarker) {
+      // All directives have a designated parsed location. Directives exist
+      // inside of macro expansions, bounded by markers in the parsed token
+      // lists. Go and find the ending macro expansion marker following the
+      // directive marker corresponding to this `#include`.
+      auto ild_index = ild->ParsedLocation().Index();
+      auto bom_index = ild_index;
+      auto eom_index = ild_index;
+      auto found = false;
+      for (; eom_index < (num_tokens - 1); ++eom_index) {
+        auto tok = tokens[eom_index];
+        if (tok.Role() == pasta::TokenRole::kEndOfMacroExpansionMarker) {
+          bom_index = tok.OpeningLocation()->Index();
+          found = true;
           break;
         }
       }
 
-      assert(0u < j);
-
-      // Scan forward beyond the end token of the `#include` by a fudge factor
-      // and try to find a beginning of file marker.
-      for (auto max_i = std::min(num_tokens, i + 8u); i < max_i; ++i) {
-        if (tokens[i].Role() != pasta::TokenRole::kBeginOfFileMarker) {
-          continue;
-        }
-
-        auto it = bof_to_eof.find(i);
-        if (it == bof_to_eof.end()) {
-          continue;
-        }
-
-        // Map the EOF marker to the BOM marker token for the `#include`.
-        eof_to_include.emplace(it->second, j);
-        break;
+      if (!found) {
+        assert(false);
+        continue;
       }
+
+      assert(bom_index < eom_index);
+      assert(bom_index < ild_index);
+
+      // The next token immediately following an end-of-expansion marker
+      // containing an include should be the beginning of file marker.
+      //
+      // We may not find it if the file has been heuristically skipped, e.g.
+      // due to a `#pragma once`. The purpose of this code is really to find
+      // the case of files embedded within fragments, e.g. for handling the
+      // x-macro pattern. We don't anticipate include guards/pragmas preventing
+      // redundant inclusion in those cases.
+      auto bof_index = eom_index + 1u;
+      if (tokens[bof_index].Role() != pasta::TokenRole::kBeginOfFileMarker) {
+        continue;
+      }
+
+      auto it = bof_to_eof.find(bof_index);
+      if (it == bof_to_eof.end()) {
+        assert(false);
+        continue;
+      }
+
+      // Map the EOF marker to the BOM marker token for the `#include`. We'll
+      // use this to help expand decl/fragment ranges.
+      eof_to_include.emplace(it->second, bom_index);
+
     } else {
       for (pasta::MacroDirective md : FindDirectivesInMacro(mn)) {
         tlms.emplace_back(md, order++);
@@ -1393,29 +1427,53 @@ static bool StatementsHaveErrors(const pasta::Decl &) {
   return false;
 }
 
-// Count the number of parsed tokens in some macro range.
-static unsigned NumParsedTokens(const pasta::Macro &macro,
-                                const pasta::TokenRange &tokens) {
-  std::optional<pasta::MacroToken> bt = macro.BeginToken();
-  if (!bt) {
-    return 0u;
-  }
+// Should we merge a leading macro with the next entity? We have to deal with
+// one corner case, observed in cURL:
+//
+//    CURL_EXTERN CURLcode curl_easy_pause(...);
+//
+// Here, depending on the configuration, the macro `CURL_EXTERN` either
+// expands to a `__declspec` or attribute, and is thus part of the
+// function declaration, or it expands to nothing, and so looks disjoint
+// from the function declaration. We want to make it logically part of
+// the declaration, fusing the two.
+//
+// XREF: Issue 412 (https://github.com/trailofbits/multiplier/issues/412).
+static bool MergeLeadingMacroWithNextEntity(
+    const pasta::TokenRange &tokens, uint64_t begin_index,
+    uint64_t end_index, uint64_t next_begin_index) {
 
-  std::optional<pasta::MacroToken> et = macro.EndToken();
-  if (!et) {
-    return 0u;
-  }
-
-  uint64_t bi = bt->ParsedLocation().Index();
-  uint64_t ei = et->ParsedLocation().Index();
-  unsigned count = 0u;
-  for (uint64_t i = bi; i < ei; ++i) {
-    if (IsParsedToken(tokens[i])) {
-      ++count;
+  // Make sure there are no parsed tokens inside of the leading macro expansion.
+  // If there were then we should have discovered them as leading keywords (e.g.
+  // storage specifiers) or attributes.
+  for (auto i = begin_index; i <= end_index; ++i) {
+    if (IsParsedTokenExcludingWhitespaceAndComments(tokens[i])) {
+      return false;
     }
   }
 
-  return count;
+  // Nothing between.
+  if ((end_index + 1u) == next_begin_index) {
+    return true;
+  }
+
+  // More than one token between.
+  if ((end_index + 2u) != next_begin_index) {
+    return false;
+  }
+
+  auto bt = tokens[end_index + 1u];
+  auto btk = bt.Kind();
+  if (btk == pasta::TokenKind::kComment) {
+    return true;
+  }
+
+  if (btk != pasta::TokenKind::kUnknown) {
+    return false;
+  }
+
+  auto btd = bt.Data();
+  return std::count(btd.begin(), btd.end(), '\n') <= 1u;
 }
 
 // Try to accumulate the nearby top-level declarations whose token ranges
@@ -1447,6 +1505,7 @@ static std::vector<EntityGroupRange> PartitionEntities(
     uint64_t begin_index = std::get<kBeginIndex>(entity_range);
     uint64_t end_index = std::get<kEndIndex>(entity_range);
     Entity prev_entity;
+    uint64_t prev_begin_index = begin_index;
     uint64_t prev_end_index = end_index;
 
     for (; i < max_i; ++i) {
@@ -1456,25 +1515,13 @@ static std::vector<EntityGroupRange> PartitionEntities(
       uint64_t next_begin = std::get<kBeginIndex>(next_entity_range);
       uint64_t next_end = std::get<kEndIndex>(next_entity_range);
 
-      // We have to deal with one corner case, observed in cURL:
-      //
-      //    CURL_EXTERN CURLcode curl_easy_pause(...);
-      //
-      // Here, depending on the configuration, the macro `CURL_EXTERN` either
-      // expands to a `__declspec` or attribute, and is thus part of the
-      // function declaration, or it expands to nothing, and so looks disjoint
-      // from the function declaration. We want to make it logically part of
-      // the declaration, fusing the two.
-      //
       // XREF: Issue 412 (https://github.com/trailofbits/multiplier/issues/412).
+      //       We can have leading empty macros in cURL and the Linux kernel,
+      //       depending on the configuration, that logically should belong to
+      //       the entity. It's possible we have a sequence of such macros.
       if (std::holds_alternative<pasta::Macro>(prev_entity) &&
-          std::holds_alternative<pasta::Decl>(next_entity) &&
-          (prev_end_index + 1u) == next_begin &&
-          tokens[prev_end_index].MacroLocation() &&
-          tokens[prev_end_index].Kind() != pasta::TokenKind::kSemi &&
-          (std::get<pasta::Macro>(prev_entity).Kind() ==
-              pasta::MacroKind::kExpansion) &&
-          !NumParsedTokens(std::get<pasta::Macro>(prev_entity), tokens)) {
+          MergeLeadingMacroWithNextEntity(tokens, prev_begin_index,
+                                          prev_end_index, next_begin)) {
 
       // Doesn't close over.
       } else if (next_begin > end_index) {
@@ -1491,6 +1538,7 @@ static std::vector<EntityGroupRange> PartitionEntities(
       entities_for_group.push_back(next_entity);
 
       prev_entity = next_entity;
+      prev_begin_index = next_begin;
       prev_end_index = next_end;
     }
 

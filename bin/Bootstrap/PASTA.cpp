@@ -1273,7 +1273,7 @@ void CodeGenerator::RunOnOptional(
              (method_name == "FirstFullySubstitutedToken" ||
               method_name == "LastFullySubstitutedToken")) {
     serialize_cpp_os
-        << "  std::optional<pasta::Token> v" << i << ";\n"
+        << "  std::optional<pasta::MacroToken> v" << i << ";\n"
         << "  if (tt) {\n"
         << "    v" << i << " = tt->" << method_name << "();\n"
         << "  } else {\n"

@@ -34,7 +34,6 @@
 #include <sstream>
 #include <variant>
 
-#include "EntityMapper.h"
 #include "PASTA.h"
 #include "PendingFragment.h"
 #include "TokenTree.h"
@@ -67,6 +66,8 @@ static bool IsDefinableToken(pasta::TokenKind kind) {
   }
 }
 
+// Figure out of a given token kind could plausibly be part of a specific
+// overloaded operator kind.
 static bool AcceptOOK(pasta::OverloadedOperatorKind ook, pasta::TokenKind tk) {
   switch (tk) {
     case pasta::TokenKind::kKeywordOperator:
@@ -169,6 +170,10 @@ static bool AcceptOOK(pasta::OverloadedOperatorKind ook, pasta::TokenKind tk) {
   }
 }
 
+// Visit the `stmt` and try to make `raw_token` or the token data in it.
+// Depending on the quality of information we have, we might go for exact
+// matches (against `raw_token`), or in-name-only matches, e.g. the field is
+// called `foo` and the data of the token is also `foo`.
 static const void *VisitStmt(const pasta::Stmt &stmt,
                              const void *raw_token,
                              std::string_view token_data,
@@ -306,6 +311,14 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
   return nullptr;
 }
 
+// Try to match some token data, e.g. identifier data `foo`, against the name of
+// a type, e.g. `foo` in `struct foo`. We don't use raw token pointers here
+// because types are usually independent of fragments, and type deduplication
+// inside of Clang means that locations embedded in `Type`s (e.g. via `Expr`s)
+// can't be relied upon to be related to this specific fragment. In a lot of
+// ways, we use PASTA's pretty printer and logic in this and other functions
+// to emulate the kinds of information gleaned from `clang::TypeLoc`s. PASTA
+// doesn't wrap `clang::TypeLoc`s, though.
 static const void *VisitType(const pasta::Type &type,
                              std::string_view tok_data,
                              int context_depth) {
@@ -636,7 +649,7 @@ mx::RawEntityId RelatedEntityIdToMacroToken(
   }
 
   if (force) {
-    if (auto assoc_macro = mtok.ParsedLocation().AssociatedMacro()) {
+    if (auto assoc_macro = mtok.AssociatedMacro()) {
       return em.EntityId(assoc_macro.value());
     }
   }
@@ -661,7 +674,9 @@ static std::string_view NameWithoutTilde(const std::string &name,
   return stripped_name;
 }
 
-// Try to see if a token matches a declaration.
+// Try to see if a token matches a declaration. As above, sometimes we have
+// the raw parsed token and want an exact match, whereas other times we only
+// have token data, and will accept an in-name-only match.
 static bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
                              const pasta::Decl &decl,
                              std::string_view token_data) {
@@ -710,7 +725,7 @@ static bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
 
 // Find the entity ID of the declaration that is most related to a particular
 // token.
-mx::RawEntityId RelatedEntityIdToToken(
+mx::RawEntityId RelatedEntityIdToPrintedToken(
     const EntityMapper &em, const pasta::PrintedToken &printed_tok,
     const std::optional<pasta::Token> &parsed_tok) {
 
@@ -908,13 +923,30 @@ mx::RawEntityId RelatedEntityIdToToken(
 // declaration token to render the entity name.
 mx::RawEntityId PendingFragment::DeclTokenEntityId(
     const pasta::Decl &decl) const {
+
   auto decl_id = em.EntityId(decl);
+
+  // If we have a name for this entity, then try to find it.
+  if (auto nd = pasta::NamedDecl::From(decl)) {
+    auto dt = decl.Token();
+    if (!dt.Data().empty() && dt.Data() == nd->Name()) {
+      auto loc_tok_id = em.EntityId(dt);
+      auto pl = mx::EntityId(loc_tok_id).Extract<mx::ParsedTokenId>();
+      if (pl && pl->fragment_id == fragment_index) {
+        return loc_tok_id;
+      }
+    }
+  }
+
+  // Otherwise, scan.
   for (pasta::PrintedToken tok : parsed_tokens) {
-    auto rel_id = RelatedEntityIdToToken(em, tok, tok.DerivedLocation());
+    auto dt = tok.DerivedLocation();
+    auto rel_id = RelatedEntityIdToPrintedToken(em, tok, dt);
     if (decl_id == rel_id) {
       return em.EntityId(tok);
     }
   }
+
   return mx::kInvalidEntityId;
 }
 
@@ -973,7 +1005,10 @@ void TokenProvenanceCalculator::TokenInfo::DeriveFrom(
 }
 
 TokenProvenanceCalculator::TokenProvenanceCalculator(const EntityMapper &em_)
-    : em(em_) {}
+    : em(em_) {
+  empty.emplace(mx::kInvalidEntityId, 0u, mx::kInvalidEntityId,
+                mx::kInvalidEntityId);      
+}
 
 TokenProvenanceCalculator::~TokenProvenanceCalculator(void) {}
 
@@ -988,24 +1023,17 @@ void TokenProvenanceCalculator::Clear(void) {
   fragment_index = mx::kInvalidEntityId;
 }
 
+template <typename T>
 bool TokenProvenanceCalculator::TryConnect(TokenInfo *child_info,
-                                           std::optional<pasta::Token> dt) {
-  while (dt) {
-    if (auto dt_it = info_map.find(dt->RawToken()); dt_it != info_map.end()) {
-      TokenInfo *parent_info = dt_it->second;
-      child_info->DeriveFrom(*this, parent_info);
-      return true;
-
-    } else {
-      auto next_dt = dt->DerivedLocation();
-      if (next_dt.has_value() && next_dt == dt) {
-        break;
-      }
-      dt = next_dt;
-    }
+                                           const T &dt) {
+  auto dt_it = info_map.find(em.EntityId(dt));
+  if (dt_it == info_map.end()) {
+    return false;
   }
 
-  return false;
+  TokenInfo *parent_info = dt_it->second;
+  child_info->DeriveFrom(*this, parent_info);
+  return true;
 }
 
 static void FillExpansionTokens(const pasta::Macro &macro,
@@ -1035,38 +1063,32 @@ void TokenProvenanceCalculator::Connect(TokenInfo *info,
     return;
   }
 
-  // If this token is derived from the body of a macro, and we failed to
-  // connect it above, then that generally means the current fragment is
-  // not the macro definition itself.
-  if (dloc) {
-    if (auto dmloc = dloc->MacroLocation()) {
-      if (dmloc->Parent()->Kind() == pasta::MacroKind::kDefineDirective) {
-        return;
-      }
-    }
-  }
-
-  std::optional<pasta::MacroToken> mtok = tok.MacroLocation();
-  if (!mtok) {
+  if (!std::holds_alternative<pasta::MacroToken>(dloc)) {
     return;
   }
 
-  std::optional<pasta::Macro> parent = mtok->Parent();
+  const pasta::MacroToken &mtok = std::get<pasta::MacroToken>(dloc);
+  std::optional<pasta::Macro> parent = mtok.Parent();
+
   if (!parent) {
     assert(false);
     return;
   }
 
-  expansion_toks.clear();
-
+  // If this token is derived from the body of a macro, and we failed to
+  // connect it above, then that generally means the current fragment is
+  // not the macro definition itself.
   auto parent_kind = parent->Kind();
+  if (parent_kind == pasta::MacroKind::kDefineDirective) {
+    return;
+  }
 
   auto sub = pasta::MacroSubstitution::From(parent.value());
   if (!sub || parent_kind == pasta::MacroKind::kParameterSubstitution) {
     return;
   }
 
-  const void *self = mtok->RawMacro();
+  const void *self = mtok.RawMacro();
   if (parent_kind == pasta::MacroKind::kExpansion) {
     auto &exp = reinterpret_cast<pasta::MacroExpansion &>(parent.value());
     for (pasta::Macro n : exp.IntermediateChildren()) {
@@ -1078,6 +1100,7 @@ void TokenProvenanceCalculator::Connect(TokenInfo *info,
 
   // We want to connect expansion tokens back to expansions of the use tokens,
   // so don't connect anything if we're actually looking at a use token.
+  expansion_toks.clear();
   for (pasta::Macro n : parent->Children()) {
     if (n.RawMacro() == self) {
       return;
@@ -1098,11 +1121,11 @@ void TokenProvenanceCalculator::Connect(TokenInfo *info,
     switch (n.TokenKind()) {
       case pasta::TokenKind::kHash:
       case pasta::TokenKind::kHashHash:
-      case pasta::TokenKind::kHashat:
+      case pasta::TokenKind::kHashAt:
       case pasta::TokenKind::kUnknown:
         continue;
       default:
-        TryConnect(info, n.ParsedLocation());
+        TryConnect(info, n);
         break;
     }
   }
@@ -1185,6 +1208,17 @@ static int Score(mx::RawEntityId fragment_index, mx::EntityId eid) {
     // literal.
     switch (std::get<mx::StmtId>(vid).kind) {
       case mx::StmtKind::STRING_LITERAL:
+        break;
+
+      // We might have things that are strong signals of declarations.
+      case mx::StmtKind::DECL_REF_EXPR:
+      case mx::StmtKind::MEMBER_EXPR:
+      case mx::StmtKind::ADDR_LABEL_EXPR:
+      case mx::StmtKind::GOTO_STMT:
+      case mx::StmtKind::LABEL_STMT:
+      case mx::StmtKind::DESIGNATED_INIT_EXPR:
+      case mx::StmtKind::PREDEFINED_EXPR:
+        score += 15;
         break;
       default:
         score += 1;
@@ -1329,41 +1363,21 @@ bool TokenProvenanceCalculator::Pull(const std::vector<TokenTreeNode> &tokens) {
   // Finally, any token info that doesn't have a derived token id might be
   // related to a file token, or to a token in the definition of a macro body.
   for (const TokenTreeNode &node : tokens) {
-    TokenInfo *info = info_map[node.RawNode()];
+    TokenInfo *info = info_map[em.EntityId(node)];
     if (info->derived_token_id != mx::kInvalidEntityId) {
       continue;
     }
 
-    auto pt = node.Token();
-    auto mt = node.MacroToken();
-
-    if (!pt && mt) {
-      pt = mt->ParsedLocation();
-    }
-
-    if (pt) {
-      pt = pt->DerivedLocation();
-    }
-
-    // If this token is derived from the body of a macro, and we failed to
-    // connect it above, then that generally means the current fragment is
-    // not the macro definition itself.
-    while (pt && info->derived_token_id == mx::kInvalidEntityId) {
-      info->derived_token_id = em.EntityId(pt.value());
-      pt = pt->DerivedLocation();
+    if (auto pt = node.Token()) {
+      info->derived_token_id = em.EntityId(pt->DerivedLocation());
     }
 
     if (info->derived_token_id != mx::kInvalidEntityId) {
       continue;
     }
 
-    auto ft = node.FileToken();
-    if (!ft && mt) {
-      ft = mt->FileLocation();
-    }
-
-    if (ft) {
-      info->derived_token_id = em.EntityId(ft.value());
+    if (auto mt = node.MacroToken()) {
+      info->derived_token_id = em.EntityId(mt->DerivedLocation());
     }
   }
 
@@ -1374,9 +1388,8 @@ bool TokenProvenanceCalculator::Pull(const std::vector<TokenTreeNode> &tokens) {
   // Try to force in some extra macro connections. If we do these too early
   // then we'll miss opportunities to connect things to their parsed tokens.
   for (const TokenTreeNode &node : tokens) {
-    TokenInfo *info = info_map[node.RawNode()];
-    auto old_val = info->related_entity_id;
-    if (old_val != mx::kInvalidEntityId) {
+    TokenInfo *info = info_map[em.EntityId(node)];
+    if (info->related_entity_id != mx::kInvalidEntityId) {
       continue;
     }
 
@@ -1387,6 +1400,9 @@ bool TokenProvenanceCalculator::Pull(const std::vector<TokenTreeNode> &tokens) {
       }
     }
 
+    // NOTE(pag): The `force` option exists to say: if this macro token looks
+    //            like the name of a defined macro, the use that defined macro
+    //            if all else fails.
     if (ml) {
       info->related_entity_id =
           RelatedEntityIdToMacroToken(em, ml.value(), true  /* force */);
@@ -1440,12 +1456,12 @@ void TokenProvenanceCalculator::Run(
 
   // Collect all of our tokens.
   for (const TokenTreeNode &node : tokens) {
+
     std::optional<pasta::Token> pl = node.Token();
     std::optional<pasta::PrintedToken> cl = node.PrintedToken();
     std::optional<pasta::MacroToken> ml = node.MacroToken();
-    std::optional<pasta::FileToken> fl = node.FileToken();
 
-    mx::RawEntityId tok_id = em.EntityId(node.RawNode());
+    mx::RawEntityId tok_id = em.EntityId(node);
     mx::RawEntityId rel_id = mx::kInvalidEntityId;
     mx::RawEntityId parsed_id = mx::kInvalidEntityId;
     uint64_t data_hash = 0u;
@@ -1454,9 +1470,7 @@ void TokenProvenanceCalculator::Run(
       pl = cl->DerivedLocation();
     }
 
-    if (!pl && ml) {
-      pl = ml->ParsedLocation();
-    } else if (pl && !ml) {
+    if (pl && !ml) {
       ml = pl->MacroLocation();
     }
 
@@ -1466,7 +1480,7 @@ void TokenProvenanceCalculator::Run(
       is_parsed = IsParsedToken(parsed_tok);
       if (is_parsed && cl) {
         parsed_id = em.EntityId(parsed_tok);
-        rel_id = RelatedEntityIdToToken(em, cl.value(), pl);
+        rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), pl);
       }
     }
 
@@ -1476,9 +1490,9 @@ void TokenProvenanceCalculator::Run(
     if (!pl && cl && rel_id == mx::kInvalidEntityId) {
       if (auto it = parsed_tokens.find(cl->RawToken());
           it != parsed_tokens.end()) {
-        rel_id = RelatedEntityIdToToken(em, cl.value(), it->second);
+        rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), it->second);
       } else {
-        rel_id = RelatedEntityIdToToken(em, cl.value(), std::nullopt);
+        rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), std::nullopt);
       }
     }
 
@@ -1491,19 +1505,16 @@ void TokenProvenanceCalculator::Run(
       rel_id = RelatedEntityIdToMacroToken(em, ml.value());
     }
 
-    if (tok_id == mx::kInvalidEntityId && fl) {
-      assert(false);
-      tok_id = em.EntityId(fl.value());
-    }
-
     // Hash the data. Data equivalence helps to prioritize the propagation of
     // info.
     if (pl) {
       data_hash = Hash64(pl->Data());
     } else if (ml) {
       data_hash = Hash64(ml->Data());
-    } else if (fl) {
-      data_hash = Hash64(fl->Data());
+    } else if (cl) {
+      data_hash = Hash64(cl->Data());
+    } else {
+      assert(false);
     }
 
     TokenInfo &info = infos.emplace_back(tok_id, data_hash, rel_id, parsed_id);
@@ -1516,27 +1527,30 @@ void TokenProvenanceCalculator::Run(
     }
 #endif
 
-    info_map.emplace(node.RawNode(), &info);
+    info_map.emplace(tok_id  /* node */, &info);
 
     if (pl) {
-      info_map.emplace(pl->RawToken(), &info);
+      info_map.emplace(em.EntityId(pl.value()), &info);
     }
 
     if (cl) {
-      info_map.emplace(cl->RawToken(), &info);
+      info_map.emplace(em.EntityId(cl.value()), &info);
     }
 
     if (ml) {
-      info_map.emplace(ml->RawMacro(), &info);
+      info_map.emplace(em.EntityId(ml.value()), &info);
     }
 
     ordered_tokens.push_back(&info);
   }
 
+  info_map.erase(mx::kInvalidEntityId);
+  info_map.emplace(mx::kInvalidEntityId, &(empty.value()));
+
   // Do single-step connections between the tokens and the what they are
   // derived from.
   for (const TokenTreeNode &node : tokens) {
-    TokenInfo *info = info_map[node.RawNode()];
+    TokenInfo *info = info_map[em.EntityId(node)];
     if (std::optional<pasta::Token> pl = node.Token()) {
       Connect(info, pl.value());
     }
@@ -1570,7 +1584,6 @@ void TokenProvenanceCalculator::Run(
   for (pasta::PrintedToken tok : tokens) {
     std::optional<pasta::Token> pl = tok.DerivedLocation();
     std::optional<pasta::MacroToken> ml;
-    std::optional<pasta::FileToken> fl;
 
     mx::RawEntityId tok_id = em.EntityId(tok);
     mx::RawEntityId rel_id = mx::kInvalidEntityId;
@@ -1579,7 +1592,6 @@ void TokenProvenanceCalculator::Run(
     if (pl) {
       const pasta::Token &parsed_tok = pl.value();
       ml = parsed_tok.MacroLocation();
-      fl = parsed_tok.FileLocation();
 
       if (tok_id == mx::kInvalidEntityId) {
         tok_id = em.EntityId(parsed_tok);
@@ -1587,19 +1599,15 @@ void TokenProvenanceCalculator::Run(
 
       if (IsParsedToken(parsed_tok)) {
         parsed_id = em.EntityId(parsed_tok);
-        rel_id = RelatedEntityIdToToken(em, tok, parsed_tok);
+        rel_id = RelatedEntityIdToPrintedToken(em, tok, parsed_tok);
 
       } else if (ml) {
         assert(false);
         rel_id = RelatedEntityIdToMacroToken(em, ml.value());
       
       } else {
-        rel_id = RelatedEntityIdToToken(em, tok, std::nullopt);
+        rel_id = RelatedEntityIdToPrintedToken(em, tok, std::nullopt);
       }
-    }
-
-    if (tok_id == mx::kInvalidEntityId && fl) {
-      tok_id = em.EntityId(fl.value());
     }
 
     TokenInfo &info = infos.emplace_back(
@@ -1609,23 +1617,26 @@ void TokenProvenanceCalculator::Run(
     info.data = tok.Data();
 #endif
 
-    info_map.emplace(tok.RawToken(), &info);
+    info_map.emplace(tok_id, &info);
 
     if (pl) {
-      info_map.emplace(pl->RawToken(), &info);
+      info_map.emplace(em.EntityId(pl.value()), &info);
     }
 
     if (ml) {
-      info_map.emplace(ml->RawMacro(), &info);
+      info_map.emplace(em.EntityId(ml.value()), &info);
     }
 
     ordered_tokens.push_back(&info);
   }
 
+  info_map.erase(mx::kInvalidEntityId);
+  info_map.emplace(mx::kInvalidEntityId, &(empty.value()));
+
   // Do single-step connections between the tokens.
   for (pasta::PrintedToken tok : tokens) {
     if (std::optional<pasta::Token> pt = tok.DerivedLocation()) {
-      TokenInfo *info = info_map[tok.RawToken()];
+      TokenInfo *info = info_map[em.EntityId(tok)];
       Connect(info, pt.value());
     }
   }
@@ -1647,127 +1658,6 @@ void TokenProvenanceCalculator::Init(
       parsed_tokens.emplace(tok.RawToken(), std::move(parsed_tok.value()));
     }
   }
-}
-
-mx::RawEntityId TokenProvenanceCalculator::RelatedEntityId(
-    const pasta::PrintedToken &tok) {
-  auto info_it = info_map.find(tok.RawToken());
-  if (info_it != info_map.end()) {
-    TokenInfo *info = info_it->second;
-    return info->related_entity_id;
-  }
-  return mx::kInvalidEntityId;
-}
-
-mx::RawEntityId TokenProvenanceCalculator::RelatedEntityId(
-    const pasta::Token &tok) {
-  auto info_it = info_map.find(tok.RawToken());
-  if (info_it != info_map.end()) {
-    TokenInfo *info = info_it->second;
-    return info->related_entity_id;
-  }
-  return mx::kInvalidEntityId;
-}
-
-mx::RawEntityId TokenProvenanceCalculator::RelatedEntityId(
-    const TokenTreeNode &tok) {
-  auto info_it = info_map.find(tok.RawNode());
-  if (info_it != info_map.end()) {
-    TokenInfo *info = info_it->second;
-    return info->related_entity_id;
-  }
-  return mx::kInvalidEntityId;
-}
-
-mx::RawEntityId TokenProvenanceCalculator::DerivedTokenId(
-    const pasta::PrintedToken &tok) {
-  
-  if (auto pl = tok.DerivedLocation()) {
-    return DerivedTokenId(pl.value());
-  }
-
-  auto info_it = info_map.find(tok.RawToken());
-  if (info_it != info_map.end()) {
-    TokenInfo *info = info_it->second;
-    return info->derived_token_id;
-  }
-
-  return mx::kInvalidEntityId;
-}
-
-mx::RawEntityId TokenProvenanceCalculator::DerivedTokenId(
-    const pasta::Token &tok) {
-
-  auto info_it = info_map.find(tok.RawToken());
-  auto derived_id = mx::kInvalidEntityId;
-  if (info_it != info_map.end()) {
-    TokenInfo *info = info_it->second;
-    if (info->derived_token_id != mx::kInvalidEntityId) {
-      return info->derived_token_id;
-    }
-  }
-
-  if (derived_id != mx::kInvalidEntityId) {
-    return derived_id;
-  }
-
-  // If this token is derived from the body of a macro, and we failed to
-  // connect it above, then that generally means the current fragment is
-  // not the macro definition itself.
-  auto dt = tok.DerivedLocation();
-  while (dt && derived_id == mx::kInvalidEntityId) {
-    derived_id = em.EntityId(dt.value());
-    dt = dt->DerivedLocation();
-  }
-
-  if (derived_id != mx::kInvalidEntityId) {
-    return derived_id;
-  }
-
-  // If we've still got nothing, try to get the file location.
-  if (auto fl = tok.FileLocation()) {
-    return em.EntityId(fl.value());
-  }
-
-  return derived_id;
-}
-
-mx::RawEntityId TokenProvenanceCalculator::DerivedTokenId(
-    const TokenTreeNode &tok) {
-  if (auto pt = tok.Token()) {
-    return DerivedTokenId(pt.value());
-  }
-  return mx::kInvalidEntityId;
-}
-
-mx::RawEntityId TokenProvenanceCalculator::ParsedTokenId(
-    const pasta::PrintedToken &tok) {
-  auto info_it = info_map.find(tok.RawToken());
-  if (info_it != info_map.end()) {
-    TokenInfo *info = info_it->second;
-    return info->parsed_token_id;
-  }
-  return mx::kInvalidEntityId;
-}
-
-mx::RawEntityId TokenProvenanceCalculator::ParsedTokenId(
-    const pasta::Token &tok) {
-  auto info_it = info_map.find(tok.RawToken());
-  if (info_it != info_map.end()) {
-    TokenInfo *info = info_it->second;
-    return info->parsed_token_id;
-  }
-  return mx::kInvalidEntityId;
-}
-
-mx::RawEntityId TokenProvenanceCalculator::ParsedTokenId(
-    const TokenTreeNode &tok) {
-  auto info_it = info_map.find(tok.RawNode());
-  if (info_it != info_map.end()) {
-    TokenInfo *info = info_it->second;
-    return info->parsed_token_id;
-  }
-  return mx::kInvalidEntityId;
 }
 
 #ifndef NDEBUG

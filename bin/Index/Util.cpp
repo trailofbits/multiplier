@@ -87,6 +87,26 @@ bool IsParsedToken(const pasta::Token &tok) {
   }
 }
 
+// Like `IsParsedToken`, but returns `false` for whitespace and comments that
+// were made visible to Clang's preprocessor.
+bool IsParsedTokenExcludingWhitespaceAndComments(const pasta::Token &tok) {
+  switch (tok.Role()) {
+    case pasta::TokenRole::kFileToken:
+    case pasta::TokenRole::kFinalMacroExpansionToken:
+      break;
+
+    default:
+      return false;
+  }
+
+  switch (tok.Kind()) {
+    case pasta::TokenKind::kComment:
+      return false;
+    default:
+      return !IsWhitespaceOrEmpty(tok.Data());
+  }
+}
+
 namespace {
 
 // Compute the last token of a macro.
@@ -330,17 +350,30 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
     default:
       break;
 
+    // This comes up with things like PASTA's token splitter, where it will
+    // inject tokens in an invalid role and potentially patch them into things
+    // like `mx::TokenKind::L_ANGLE`.
+    case pasta::TokenRole::kInvalid:
+
+    // Self-explanatory: begin and end files.
     case pasta::TokenRole::kBeginOfFileMarker:
     case pasta::TokenRole::kEndOfFileMarker:
+
+    // Self-explanatory: begin and end macros.
     case pasta::TokenRole::kBeginOfMacroExpansionMarker:
     case pasta::TokenRole::kEndOfMacroExpansionMarker:
-    case pasta::TokenRole::kEndOfInternalMacroEventMarker:
-      LOG(ERROR)
+
+    // Pragmas often need to be retained, so we have this explicit token.
+    // Besides pragmas, it's useful to know where all other directives are
+    // relative to parsed tokens, as this helps us extend the bounds of entities
+    // e.g. to handle Issue #457.
+    case pasta::TokenRole::kMacroDirectiveMarker:
+      LOG(FATAL)
           << "Should not be serializing marker tokens";
       return mx::TokenKind::UNKNOWN;
   }
 
-  return TokenKindFromPasta(tok.Kind(), tok.Data());
+  return TokenKindFromPasta(entity.Kind(), entity.Data());
 }
 
 namespace {
@@ -411,6 +444,13 @@ mx::TokenKind TokenKindFromPasta(const pasta::MacroToken &entity) {
     return TokenKindFromPasta(std::get<pasta::FileToken>(dtok));
   }
   return TokenKindFromPasta(entity.TokenKind(), entity.Data());
+}
+
+pasta::DerivedToken DerivedLocation(const pasta::DerivedToken &tok) {
+  if (std::holds_alternative<pasta::MacroToken>(tok)) {
+    return std::get<pasta::MacroToken>(tok).DerivedLocation();
+  }
+  return std::monostate{};
 }
 
 namespace {
@@ -875,6 +915,9 @@ template void AccumulateTokenData<pasta::Token>(
 
 template void AccumulateTokenData<pasta::PrintedToken>(
     std::string &data, const pasta::PrintedToken &tok);
+
+template void AccumulateTokenData<pasta::MacroToken>(
+    std::string &data, const pasta::MacroToken &tok);
 
 // Combine all parsed tokens into a string for diagnostic purposes.
 std::string DiagnosePrintedTokens(

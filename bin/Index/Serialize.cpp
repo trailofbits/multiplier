@@ -345,7 +345,7 @@ void SerializeMacroSubstitution(const PendingFragment &pf, const EntityMapper &e
       ++i4;
     }
   }
-  std::optional<pasta::Token> v5;
+  std::optional<pasta::MacroToken> v5;
   if (tt) {
     v5 = tt->FirstFullySubstitutedToken();
   } else {
@@ -357,7 +357,7 @@ void SerializeMacroSubstitution(const PendingFragment &pf, const EntityMapper &e
   } else {
     b.setVal5(mx::kInvalidEntityId);
   }
-  std::optional<pasta::Token> v6;
+  std::optional<pasta::MacroToken> v6;
   if (tt) {
     v6 = tt->LastFullySubstitutedToken();
   } else {
