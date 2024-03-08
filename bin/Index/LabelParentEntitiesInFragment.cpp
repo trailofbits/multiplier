@@ -133,8 +133,10 @@ class ParentTrackerVisitor : public EntityVisitor {
     if (!eid) {
       // TODO(kumarak): I see an unlinked instance of TemplateTypeParmDecl that is 
       //                not available in AST. Adding check to avoid assert
-      assert((false || entity.Kind() == pasta::DeclKind::kTemplateTypeParm 
-              || entity.Kind() == pasta::DeclKind::kNonTypeTemplateParm));
+      assert((false
+              || entity.Kind() == pasta::DeclKind::kTemplateTypeParm
+              || entity.Kind() == pasta::DeclKind::kNonTypeTemplateParm
+              || entity.IsImplicit()));
       return;
     }
 

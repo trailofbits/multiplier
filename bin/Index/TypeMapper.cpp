@@ -283,11 +283,24 @@ std::string TypeMapper::HashType(
 
       // NOTE(pag): Eventually this may trigger as a result of top-level
       //            decls that are ignored due to `ShouldHideFromIndexer`.
-      assert(eid != mx::kInvalidEntityId || ((clang::Decl*)od.first)->isImplicit());
+
+      // NOTE(kumarak): The assert will eventually trigger if there are underlying
+      //                or replacable decls beneith types. These decls may not be
+      //                visited because we stop visiting after seeing types while
+      //                building fragments.
+      // e.g:
+      //  SubstTemplateTypeParmType 0x7ffc4ae9c470 'class mx::AcquiredAfterAttr' typename depth 0 index 0 _Up
+      //  |-ClassTemplateSpecialization 0x7ffc4ae9ad90 '_Storage'
+      //  `-RecordType 0x7ffc4ae69270 'class mx::AcquiredAfterAttr'
+      //  `-CXXRecord 0x7ffc4ae69708 'AcquiredAfterAttr'
+      //
+      //assert(eid != mx::kInvalidEntityId || ((clang::Decl*)od.first)->isImplicit());
       if ((eid == mx::kInvalidEntityId) && ((clang::Decl*)od.first)->isImplicit()) {
-        pasta::Decl pasta_decl = pasta::AST::From(type).Adopt(
-              reinterpret_cast<const clang::Decl*>(od.first));
-        pf.TryAdd(pasta_decl);
+        pf.TryAdd(pasta::AST::From(type).Adopt(
+          reinterpret_cast<const clang::Decl*>(od.first)));
+      } else if (eid == mx::kInvalidEntityId) {
+        pf.TryAdd(pasta::AST::From(type).Adopt(
+          reinterpret_cast<const clang::Decl*>(od.first)));
       }
 
       ss << ' ' << eid;
