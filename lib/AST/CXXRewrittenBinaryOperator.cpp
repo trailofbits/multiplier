@@ -197,11 +197,7 @@ Expr CXXRewrittenBinaryOperator::lhs(void) const {
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::opcode(void) const {
-<<<<<<< HEAD
   return static_cast<BinaryOperatorKind>(impl->reader.getVal90());
-=======
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal92());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 std::string_view CXXRewrittenBinaryOperator::opcode_string(void) const {
@@ -210,11 +206,7 @@ std::string_view CXXRewrittenBinaryOperator::opcode_string(void) const {
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::operator_(void) const {
-<<<<<<< HEAD
   return static_cast<BinaryOperatorKind>(impl->reader.getVal92());
-=======
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal94());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 Token CXXRewrittenBinaryOperator::operator_token(void) const {
@@ -232,7 +224,6 @@ Expr CXXRewrittenBinaryOperator::semantic_form(void) const {
 }
 
 bool CXXRewrittenBinaryOperator::is_assignment_operation(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
@@ -242,17 +233,6 @@ bool CXXRewrittenBinaryOperator::is_comparison_operation(void) const {
 
 bool CXXRewrittenBinaryOperator::is_reversed(void) const {
   return impl->reader.getVal86();
-=======
-  return impl->reader.getVal86();
-}
-
-bool CXXRewrittenBinaryOperator::is_comparison_operation(void) const {
-  return impl->reader.getVal87();
-}
-
-bool CXXRewrittenBinaryOperator::is_reversed(void) const {
-  return impl->reader.getVal88();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

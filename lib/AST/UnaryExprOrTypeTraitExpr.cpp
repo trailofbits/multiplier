@@ -219,11 +219,7 @@ std::optional<Type> UnaryExprOrTypeTraitExpr::argument_type(void) const {
 }
 
 UnaryExprOrTypeTrait UnaryExprOrTypeTraitExpr::keyword_kind(void) const {
-<<<<<<< HEAD
   return static_cast<UnaryExprOrTypeTrait>(impl->reader.getVal90());
-=======
-  return static_cast<UnaryExprOrTypeTrait>(impl->reader.getVal92());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 Token UnaryExprOrTypeTraitExpr::operator_token(void) const {
@@ -240,11 +236,7 @@ Type UnaryExprOrTypeTraitExpr::type_of_argument(void) const {
 }
 
 bool UnaryExprOrTypeTraitExpr::is_argument_type(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal84();
-=======
-  return impl->reader.getVal86();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

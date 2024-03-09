@@ -207,19 +207,11 @@ MSPropertyDecl MSPropertyRefExpr::property_declaration(void) const {
 }
 
 bool MSPropertyRefExpr::is_arrow(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
 bool MSPropertyRefExpr::is_implicit_access(void) const {
   return impl->reader.getVal85();
-=======
-  return impl->reader.getVal86();
-}
-
-bool MSPropertyRefExpr::is_implicit_access(void) const {
-  return impl->reader.getVal87();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

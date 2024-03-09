@@ -229,11 +229,7 @@ gap::generator<Expr> CXXConstructExpr::arguments(void) const & {
 }
 
 CXXConstructExprConstructionKind CXXConstructExpr::construction_kind(void) const {
-<<<<<<< HEAD
   return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal90());
-=======
-  return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal92());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 CXXConstructorDecl CXXConstructExpr::constructor(void) const {
@@ -250,7 +246,6 @@ TokenRange CXXConstructExpr::parenthesis_or_brace_range(void) const {
 }
 
 bool CXXConstructExpr::had_multiple_candidates(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
@@ -272,29 +267,6 @@ bool CXXConstructExpr::is_std_initializer_list_initialization(void) const {
 
 bool CXXConstructExpr::requires_zero_initialization(void) const {
   return impl->reader.getVal89();
-=======
-  return impl->reader.getVal86();
-}
-
-bool CXXConstructExpr::is_elidable(void) const {
-  return impl->reader.getVal87();
-}
-
-bool CXXConstructExpr::is_immediate_escalating(void) const {
-  return impl->reader.getVal88();
-}
-
-bool CXXConstructExpr::is_list_initialization(void) const {
-  return impl->reader.getVal89();
-}
-
-bool CXXConstructExpr::is_std_initializer_list_initialization(void) const {
-  return impl->reader.getVal90();
-}
-
-bool CXXConstructExpr::requires_zero_initialization(void) const {
-  return impl->reader.getVal91();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

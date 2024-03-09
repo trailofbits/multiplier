@@ -222,11 +222,7 @@ std::optional<CastExpr> CastExpr::from(const TokenContext &t) {
 }
 
 CastKind CastExpr::cast_kind(void) const {
-<<<<<<< HEAD
   return static_cast<CastKind>(impl->reader.getVal90());
-=======
-  return static_cast<CastKind>(impl->reader.getVal92());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 std::string_view CastExpr::cast_kind_name(void) const {
@@ -271,11 +267,7 @@ std::optional<FieldDecl> CastExpr::target_union_field(void) const {
 }
 
 bool CastExpr::has_stored_fp_features(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal84();
-=======
-  return impl->reader.getVal86();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

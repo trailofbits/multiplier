@@ -192,11 +192,7 @@ std::optional<CharacterLiteral> CharacterLiteral::from(const TokenContext &t) {
 }
 
 CharacterLiteralCharacterKind CharacterLiteral::literal_kind(void) const {
-<<<<<<< HEAD
   return static_cast<CharacterLiteralCharacterKind>(impl->reader.getVal90());
-=======
-  return static_cast<CharacterLiteralCharacterKind>(impl->reader.getVal92());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 Token CharacterLiteral::token(void) const {

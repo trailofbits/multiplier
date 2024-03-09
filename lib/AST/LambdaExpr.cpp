@@ -209,11 +209,7 @@ CXXMethodDecl LambdaExpr::call_operator(void) const {
 }
 
 LambdaCaptureDefault LambdaExpr::capture_default(void) const {
-<<<<<<< HEAD
   return static_cast<LambdaCaptureDefault>(impl->reader.getVal90());
-=======
-  return static_cast<LambdaCaptureDefault>(impl->reader.getVal92());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 Token LambdaExpr::capture_default_token(void) const {
@@ -306,7 +302,6 @@ std::optional<Expr> LambdaExpr::trailing_requires_clause(void) const {
 }
 
 bool LambdaExpr::has_explicit_parameters(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
@@ -320,21 +315,6 @@ bool LambdaExpr::is_generic_lambda(void) const {
 
 bool LambdaExpr::is_mutable(void) const {
   return impl->reader.getVal87();
-=======
-  return impl->reader.getVal86();
-}
-
-bool LambdaExpr::has_explicit_result_type(void) const {
-  return impl->reader.getVal87();
-}
-
-bool LambdaExpr::is_generic_lambda(void) const {
-  return impl->reader.getVal88();
-}
-
-bool LambdaExpr::is_mutable(void) const {
-  return impl->reader.getVal89();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

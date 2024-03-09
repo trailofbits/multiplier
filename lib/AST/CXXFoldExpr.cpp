@@ -240,11 +240,7 @@ Token CXXFoldExpr::l_paren_token(void) const {
 }
 
 BinaryOperatorKind CXXFoldExpr::operator_(void) const {
-<<<<<<< HEAD
   return static_cast<BinaryOperatorKind>(impl->reader.getVal90());
-=======
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal92());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 Expr CXXFoldExpr::pattern(void) const {
@@ -270,19 +266,11 @@ Token CXXFoldExpr::r_paren_token(void) const {
 }
 
 bool CXXFoldExpr::is_left_fold(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
 bool CXXFoldExpr::is_right_fold(void) const {
   return impl->reader.getVal85();
-=======
-  return impl->reader.getVal86();
-}
-
-bool CXXFoldExpr::is_right_fold(void) const {
-  return impl->reader.getVal87();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

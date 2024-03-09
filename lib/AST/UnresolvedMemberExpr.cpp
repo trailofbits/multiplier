@@ -207,7 +207,6 @@ Token UnresolvedMemberExpr::operator_token(void) const {
 }
 
 bool UnresolvedMemberExpr::has_unresolved_using(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal86();
 }
 
@@ -217,17 +216,6 @@ bool UnresolvedMemberExpr::is_arrow(void) const {
 
 bool UnresolvedMemberExpr::is_implicit_access(void) const {
   return impl->reader.getVal88();
-=======
-  return impl->reader.getVal88();
-}
-
-bool UnresolvedMemberExpr::is_arrow(void) const {
-  return impl->reader.getVal89();
-}
-
-bool UnresolvedMemberExpr::is_implicit_access(void) const {
-  return impl->reader.getVal90();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

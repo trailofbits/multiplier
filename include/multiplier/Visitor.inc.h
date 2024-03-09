@@ -15302,7 +15302,6 @@ MX_BEGIN_VISIT_ABSTRACT_STMT(Expr)
   MX_VISIT_BOOL(Expr, is_gl_value, 57, MX_APPLY_METHOD, IsGLValue, bool, NthStmt)
   MX_VISIT_BOOL(Expr, is_implicit_cxx_this, 58, MX_APPLY_METHOD, IsImplicitCXXThis, bool, NthStmt)
   MX_VISIT_BOOL(Expr, is_instantiation_dependent, 59, MX_APPLY_METHOD, IsInstantiationDependent, bool, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(Expr, is_l_value, 70, MX_APPLY_METHOD, IsLValue, bool, NthStmt)
   MX_VISIT_BOOL(Expr, is_objcgc_candidate, 71, MX_APPLY_METHOD, IsOBJCGCCandidate, bool, NthStmt)
   MX_VISIT_BOOL(Expr, is_obj_c_self_expression, 72, MX_APPLY_METHOD, IsObjCSelfExpression, bool, NthStmt)
@@ -15316,22 +15315,6 @@ MX_BEGIN_VISIT_ABSTRACT_STMT(Expr)
   MX_VISIT_BOOL(Expr, refers_to_global_register_variable, 81, MX_APPLY_METHOD, RefersToGlobalRegisterVariable, bool, NthStmt)
   MX_VISIT_BOOL(Expr, refers_to_matrix_element, 82, MX_APPLY_METHOD, RefersToMatrixElement, bool, NthStmt)
   MX_VISIT_BOOL(Expr, refers_to_vector_element, 83, MX_APPLY_METHOD, RefersToVectorElement, bool, NthStmt)
-=======
-  MX_VISIT_OPTIONAL_BOOL(Expr, is_known_to_have_boolean_value, 70, MX_APPLY_METHOD, IsKnownToHaveBooleanValue, bool, NthStmt)
-  MX_VISIT_BOOL(Expr, is_l_value, 72, MX_APPLY_METHOD, IsLValue, bool, NthStmt)
-  MX_VISIT_BOOL(Expr, is_objcgc_candidate, 73, MX_APPLY_METHOD, IsOBJCGCCandidate, bool, NthStmt)
-  MX_VISIT_BOOL(Expr, is_obj_c_self_expression, 74, MX_APPLY_METHOD, IsObjCSelfExpression, bool, NthStmt)
-  MX_VISIT_BOOL(Expr, is_ordinary_or_bit_field_object, 75, MX_APPLY_METHOD, IsOrdinaryOrBitFieldObject, bool, NthStmt)
-  MX_VISIT_BOOL(Expr, is_pr_value, 76, MX_APPLY_METHOD, IsPRValue, bool, NthStmt)
-  MX_VISIT_OPTIONAL_BOOL(Expr, is_read_if_discarded_in_c_plus_plus11, 77, MX_APPLY_METHOD, IsReadIfDiscardedInCPlusPlus11, bool, NthStmt)
-  MX_VISIT_BOOL(Expr, is_type_dependent, 79, MX_APPLY_METHOD, IsTypeDependent, bool, NthStmt)
-  MX_VISIT_BOOL(Expr, is_value_dependent, 80, MX_APPLY_METHOD, IsValueDependent, bool, NthStmt)
-  MX_VISIT_BOOL(Expr, is_x_value, 81, MX_APPLY_METHOD, IsXValue, bool, NthStmt)
-  MX_VISIT_BOOL(Expr, refers_to_bit_field, 82, MX_APPLY_METHOD, RefersToBitField, bool, NthStmt)
-  MX_VISIT_BOOL(Expr, refers_to_global_register_variable, 83, MX_APPLY_METHOD, RefersToGlobalRegisterVariable, bool, NthStmt)
-  MX_VISIT_BOOL(Expr, refers_to_matrix_element, 84, MX_APPLY_METHOD, RefersToMatrixElement, bool, NthStmt)
-  MX_VISIT_BOOL(Expr, refers_to_vector_element, 85, MX_APPLY_METHOD, RefersToVectorElement, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_Expr
 MX_END_VISIT_STMT(Expr)
 
@@ -15364,13 +15347,8 @@ MX_BEGIN_VISIT_STMT(DesignatedInitExpr)
   MX_VISIT_TOKEN_RANGE(DesignatedInitExpr, designators_tokens, 37, 38, NthStmt)
   MX_VISIT_ENTITY(DesignatedInitExpr, equal_or_colon_token, 39, MX_APPLY_METHOD, EqualOrColonToken, Token, NthStmt)
   MX_VISIT_ENTITY(DesignatedInitExpr, initializer, 40, MX_APPLY_METHOD, Initializer, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(DesignatedInitExpr, is_direct_initializer, 84, MX_APPLY_METHOD, IsDirectInitializer, bool, NthStmt)
   MX_VISIT_BOOL(DesignatedInitExpr, uses_gnu_syntax, 85, MX_APPLY_METHOD, UsesGNUSyntax, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(DesignatedInitExpr, is_direct_initializer, 86, MX_APPLY_METHOD, IsDirectInitializer, bool, NthStmt)
-  MX_VISIT_BOOL(DesignatedInitExpr, uses_gnu_syntax, 87, MX_APPLY_METHOD, UsesGNUSyntax, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_ENTITY_LIST(DesignatedInitExpr, sub_expressions, 26, MX_APPLY_METHOD, SubExpressions, Expr, NthStmt)
   MX_EXIT_VISIT_DesignatedInitExpr
 MX_END_VISIT_STMT(DesignatedInitExpr)
@@ -15388,13 +15366,8 @@ MX_BEGIN_VISIT_STMT(DependentScopeDeclRefExpr)
   MX_VISIT_ENTITY(DependentScopeDeclRefExpr, l_angle_token, 37, MX_APPLY_METHOD, LAngleToken, Token, NthStmt)
   MX_VISIT_ENTITY(DependentScopeDeclRefExpr, r_angle_token, 38, MX_APPLY_METHOD, RAngleToken, Token, NthStmt)
   MX_VISIT_ENTITY(DependentScopeDeclRefExpr, template_keyword_token, 39, MX_APPLY_METHOD, TemplateKeywordToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(DependentScopeDeclRefExpr, has_explicit_template_arguments, 84, MX_APPLY_METHOD, HasExplicitTemplateArguments, bool, NthStmt)
   MX_VISIT_BOOL(DependentScopeDeclRefExpr, has_template_keyword, 85, MX_APPLY_METHOD, HasTemplateKeyword, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(DependentScopeDeclRefExpr, has_explicit_template_arguments, 86, MX_APPLY_METHOD, HasExplicitTemplateArguments, bool, NthStmt)
-  MX_VISIT_BOOL(DependentScopeDeclRefExpr, has_template_keyword, 87, MX_APPLY_METHOD, HasTemplateKeyword, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_DependentScopeDeclRefExpr
 MX_END_VISIT_STMT(DependentScopeDeclRefExpr)
 
@@ -15429,7 +15402,6 @@ MX_BEGIN_VISIT_STMT(DeclRefExpr)
   MX_VISIT_ENTITY(DeclRefExpr, l_angle_token, 39, MX_APPLY_METHOD, LAngleToken, Token, NthStmt)
   MX_VISIT_ENTITY(DeclRefExpr, r_angle_token, 40, MX_APPLY_METHOD, RAngleToken, Token, NthStmt)
   MX_VISIT_ENTITY(DeclRefExpr, template_keyword_token, 41, MX_APPLY_METHOD, TemplateKeywordToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(DeclRefExpr, had_multiple_candidates, 84, MX_APPLY_METHOD, HadMultipleCandidates, bool, NthStmt)
   MX_VISIT_BOOL(DeclRefExpr, has_explicit_template_arguments, 85, MX_APPLY_METHOD, HasExplicitTemplateArguments, bool, NthStmt)
   MX_VISIT_BOOL(DeclRefExpr, has_qualifier, 86, MX_APPLY_METHOD, HasQualifier, bool, NthStmt)
@@ -15438,16 +15410,6 @@ MX_BEGIN_VISIT_STMT(DeclRefExpr)
   MX_VISIT_BOOL(DeclRefExpr, is_immediate_escalating, 89, MX_APPLY_METHOD, IsImmediateEscalating, bool, NthStmt)
   MX_VISIT_ENUM(DeclRefExpr, is_non_odr_use, 90, MX_APPLY_METHOD, IsNonOdrUse, NonOdrUseReason, NthStmt)
   MX_VISIT_BOOL(DeclRefExpr, refers_to_enclosing_variable_or_capture, 91, MX_APPLY_METHOD, RefersToEnclosingVariableOrCapture, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(DeclRefExpr, had_multiple_candidates, 86, MX_APPLY_METHOD, HadMultipleCandidates, bool, NthStmt)
-  MX_VISIT_BOOL(DeclRefExpr, has_explicit_template_arguments, 87, MX_APPLY_METHOD, HasExplicitTemplateArguments, bool, NthStmt)
-  MX_VISIT_BOOL(DeclRefExpr, has_qualifier, 88, MX_APPLY_METHOD, HasQualifier, bool, NthStmt)
-  MX_VISIT_BOOL(DeclRefExpr, has_template_keyword_and_arguments_info, 89, MX_APPLY_METHOD, HasTemplateKeywordAndArgumentsInfo, bool, NthStmt)
-  MX_VISIT_BOOL(DeclRefExpr, has_template_keyword, 90, MX_APPLY_METHOD, HasTemplateKeyword, bool, NthStmt)
-  MX_VISIT_BOOL(DeclRefExpr, is_immediate_escalating, 91, MX_APPLY_METHOD, IsImmediateEscalating, bool, NthStmt)
-  MX_VISIT_ENUM(DeclRefExpr, is_non_odr_use, 92, MX_APPLY_METHOD, IsNonOdrUse, NonOdrUseReason, NthStmt)
-  MX_VISIT_BOOL(DeclRefExpr, refers_to_enclosing_variable_or_capture, 93, MX_APPLY_METHOD, RefersToEnclosingVariableOrCapture, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_DeclRefExpr
 MX_END_VISIT_STMT(DeclRefExpr)
 
@@ -15481,11 +15443,7 @@ MX_END_VISIT_STMT(CoroutineSuspendExpr)
 MX_BEGIN_VISIT_STMT(CoawaitExpr)
   MX_ENTER_VISIT_CoawaitExpr
   MX_VISIT_BASE(CoawaitExpr, CoroutineSuspendExpr)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CoawaitExpr, is_implicit, 84, MX_APPLY_METHOD, IsImplicit, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CoawaitExpr, is_implicit, 86, MX_APPLY_METHOD, IsImplicit, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CoawaitExpr
 MX_END_VISIT_STMT(CoawaitExpr)
 
@@ -15545,11 +15503,7 @@ MX_BEGIN_VISIT_STMT(CompoundLiteralExpr)
   MX_VISIT_BASE(CompoundLiteralExpr, Expr)
   MX_VISIT_ENTITY(CompoundLiteralExpr, initializer, 37, MX_APPLY_METHOD, Initializer, Expr, NthStmt)
   MX_VISIT_ENTITY(CompoundLiteralExpr, l_paren_token, 38, MX_APPLY_METHOD, LParenToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CompoundLiteralExpr, is_file_scope, 84, MX_APPLY_METHOD, IsFileScope, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CompoundLiteralExpr, is_file_scope, 86, MX_APPLY_METHOD, IsFileScope, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CompoundLiteralExpr
 MX_END_VISIT_STMT(CompoundLiteralExpr)
 
@@ -15569,13 +15523,8 @@ MX_BEGIN_VISIT_STMT(ChooseExpr)
   MX_VISIT_ENTITY(ChooseExpr, lhs, 40, MX_APPLY_METHOD, LHS, Expr, NthStmt)
   MX_VISIT_ENTITY(ChooseExpr, rhs, 41, MX_APPLY_METHOD, RHS, Expr, NthStmt)
   MX_VISIT_ENTITY(ChooseExpr, r_paren_token, 42, MX_APPLY_METHOD, RParenToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(ChooseExpr, is_condition_dependent, 84, MX_APPLY_METHOD, IsConditionDependent, bool, NthStmt)
   MX_VISIT_BOOL(ChooseExpr, is_condition_true, 85, MX_APPLY_METHOD, IsConditionTrue, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(ChooseExpr, is_condition_dependent, 86, MX_APPLY_METHOD, IsConditionDependent, bool, NthStmt)
-  MX_VISIT_BOOL(ChooseExpr, is_condition_true, 87, MX_APPLY_METHOD, IsConditionTrue, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ChooseExpr
 MX_END_VISIT_STMT(ChooseExpr)
 
@@ -15589,11 +15538,7 @@ MX_END_VISIT_STMT(ChooseExpr)
 MX_BEGIN_VISIT_STMT(CharacterLiteral)
   MX_ENTER_VISIT_CharacterLiteral
   MX_VISIT_BASE(CharacterLiteral, Expr)
-<<<<<<< HEAD
   MX_VISIT_ENUM(CharacterLiteral, literal_kind, 90, MX_APPLY_METHOD, LiteralKind, CharacterLiteralCharacterKind, NthStmt)
-=======
-  MX_VISIT_ENUM(CharacterLiteral, literal_kind, 92, MX_APPLY_METHOD, LiteralKind, CharacterLiteralCharacterKind, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_ENTITY(CharacterLiteral, token, 37, MX_APPLY_METHOD, Token, Token, NthStmt)
   MX_EXIT_VISIT_CharacterLiteral
 MX_END_VISIT_STMT(CharacterLiteral)
@@ -15608,21 +15553,13 @@ MX_END_VISIT_STMT(CharacterLiteral)
 MX_BEGIN_VISIT_ABSTRACT_STMT(CastExpr)
   MX_ENTER_VISIT_CastExpr
   MX_VISIT_BASE(CastExpr, Expr)
-<<<<<<< HEAD
   MX_VISIT_ENUM(CastExpr, cast_kind, 90, MX_APPLY_METHOD, CastKind, CastKind, NthStmt)
-=======
-  MX_VISIT_ENUM(CastExpr, cast_kind, 92, MX_APPLY_METHOD, CastKind, CastKind, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_TEXT(CastExpr, cast_kind_name, 60, MX_APPLY_METHOD, CastKindName, basic_string_view, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(CastExpr, conversion_function, 37, MX_APPLY_METHOD, ConversionFunction, NamedDecl, NthStmt)
   MX_VISIT_ENTITY(CastExpr, sub_expression, 38, MX_APPLY_METHOD, SubExpression, Expr, NthStmt)
   MX_VISIT_ENTITY(CastExpr, sub_expression_as_written, 39, MX_APPLY_METHOD, SubExpressionAsWritten, Expr, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(CastExpr, target_union_field, 40, MX_APPLY_METHOD, TargetUnionField, FieldDecl, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CastExpr, has_stored_fp_features, 84, MX_APPLY_METHOD, HasStoredFPFeatures, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CastExpr, has_stored_fp_features, 86, MX_APPLY_METHOD, HasStoredFPFeatures, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CastExpr
 MX_END_VISIT_STMT(CastExpr)
 
@@ -15636,11 +15573,7 @@ MX_END_VISIT_STMT(CastExpr)
 MX_BEGIN_VISIT_STMT(ImplicitCastExpr)
   MX_ENTER_VISIT_ImplicitCastExpr
   MX_VISIT_BASE(ImplicitCastExpr, CastExpr)
-<<<<<<< HEAD
   MX_VISIT_BOOL(ImplicitCastExpr, is_part_of_explicit_cast, 85, MX_APPLY_METHOD, IsPartOfExplicitCast, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(ImplicitCastExpr, is_part_of_explicit_cast, 87, MX_APPLY_METHOD, IsPartOfExplicitCast, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ImplicitCastExpr
 MX_END_VISIT_STMT(ImplicitCastExpr)
 
@@ -15685,11 +15618,7 @@ MX_END_VISIT_STMT(CXXNamedCastExpr)
 MX_BEGIN_VISIT_STMT(CXXDynamicCastExpr)
   MX_ENTER_VISIT_CXXDynamicCastExpr
   MX_VISIT_BASE(CXXDynamicCastExpr, CXXNamedCastExpr)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXDynamicCastExpr, is_always_null, 85, MX_APPLY_METHOD, IsAlwaysNull, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXDynamicCastExpr, is_always_null, 87, MX_APPLY_METHOD, IsAlwaysNull, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXDynamicCastExpr
 MX_END_VISIT_STMT(CXXDynamicCastExpr)
 
@@ -15757,11 +15686,7 @@ MX_BEGIN_VISIT_STMT(CXXFunctionalCastExpr)
   MX_VISIT_BASE(CXXFunctionalCastExpr, ExplicitCastExpr)
   MX_VISIT_ENTITY(CXXFunctionalCastExpr, l_paren_token, 42, MX_APPLY_METHOD, LParenToken, Token, NthStmt)
   MX_VISIT_ENTITY(CXXFunctionalCastExpr, r_paren_token, 43, MX_APPLY_METHOD, RParenToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXFunctionalCastExpr, is_list_initialization, 85, MX_APPLY_METHOD, IsListInitialization, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXFunctionalCastExpr, is_list_initialization, 87, MX_APPLY_METHOD, IsListInitialization, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXFunctionalCastExpr
 MX_END_VISIT_STMT(CXXFunctionalCastExpr)
 
@@ -15804,11 +15729,7 @@ MX_BEGIN_VISIT_STMT(ObjCBridgedCastExpr)
   MX_ENTER_VISIT_ObjCBridgedCastExpr
   MX_VISIT_BASE(ObjCBridgedCastExpr, ExplicitCastExpr)
   MX_VISIT_ENTITY(ObjCBridgedCastExpr, bridge_keyword_token, 42, MX_APPLY_METHOD, BridgeKeywordToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(ObjCBridgedCastExpr, bridge_kind, 92, MX_APPLY_METHOD, BridgeKind, ObjCBridgeCastKind, NthStmt)
-=======
-  MX_VISIT_ENUM(ObjCBridgedCastExpr, bridge_kind, 94, MX_APPLY_METHOD, BridgeKind, ObjCBridgeCastKind, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_TEXT(ObjCBridgedCastExpr, bridge_kind_name, 65, MX_APPLY_METHOD, BridgeKindName, basic_string_view, NthStmt)
   MX_VISIT_ENTITY(ObjCBridgedCastExpr, l_paren_token, 43, MX_APPLY_METHOD, LParenToken, Token, NthStmt)
   MX_EXIT_VISIT_ObjCBridgedCastExpr
@@ -15825,31 +15746,18 @@ MX_BEGIN_VISIT_STMT(CallExpr)
   MX_ENTER_VISIT_CallExpr
   MX_VISIT_BASE(CallExpr, Expr)
   MX_VISIT_ENTITY_LIST(CallExpr, arguments, 15, MX_APPLY_METHOD, Arguments, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(CallExpr, adl_call_kind, 90, MX_APPLY_METHOD, ADLCallKind, CallExprADLCallKind, NthStmt)
-=======
-  MX_VISIT_ENUM(CallExpr, adl_call_kind, 92, MX_APPLY_METHOD, ADLCallKind, CallExprADLCallKind, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_ENTITY(CallExpr, call_return_type, 37, MX_APPLY_METHOD, CallReturnType, Type, NthStmt)
   MX_VISIT_ENTITY(CallExpr, callee, 38, MX_APPLY_METHOD, Callee, Expr, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(CallExpr, callee_declaration, 39, MX_APPLY_METHOD, CalleeDeclaration, Decl, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(CallExpr, direct_callee, 40, MX_APPLY_METHOD, DirectCallee, FunctionDecl, NthStmt)
   MX_VISIT_ENTITY(CallExpr, r_paren_token, 41, MX_APPLY_METHOD, RParenToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CallExpr, has_stored_fp_features, 84, MX_APPLY_METHOD, HasStoredFPFeatures, bool, NthStmt)
   MX_VISIT_BOOL(CallExpr, has_unused_result_attribute, 85, MX_APPLY_METHOD, HasUnusedResultAttribute, bool, NthStmt)
   MX_VISIT_BOOL(CallExpr, is_builtin_assume_false, 86, MX_APPLY_METHOD, IsBuiltinAssumeFalse, bool, NthStmt)
   MX_VISIT_BOOL(CallExpr, is_call_to_std_move, 87, MX_APPLY_METHOD, IsCallToStdMove, bool, NthStmt)
   MX_VISIT_BOOL(CallExpr, is_unevaluated_builtin_call, 88, MX_APPLY_METHOD, IsUnevaluatedBuiltinCall, bool, NthStmt)
   MX_VISIT_BOOL(CallExpr, uses_adl, 89, MX_APPLY_METHOD, UsesADL, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CallExpr, has_stored_fp_features, 86, MX_APPLY_METHOD, HasStoredFPFeatures, bool, NthStmt)
-  MX_VISIT_BOOL(CallExpr, has_unused_result_attribute, 87, MX_APPLY_METHOD, HasUnusedResultAttribute, bool, NthStmt)
-  MX_VISIT_BOOL(CallExpr, is_builtin_assume_false, 88, MX_APPLY_METHOD, IsBuiltinAssumeFalse, bool, NthStmt)
-  MX_VISIT_BOOL(CallExpr, is_call_to_std_move, 89, MX_APPLY_METHOD, IsCallToStdMove, bool, NthStmt)
-  MX_VISIT_BOOL(CallExpr, is_unevaluated_builtin_call, 90, MX_APPLY_METHOD, IsUnevaluatedBuiltinCall, bool, NthStmt)
-  MX_VISIT_BOOL(CallExpr, uses_adl, 91, MX_APPLY_METHOD, UsesADL, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CallExpr
 MX_END_VISIT_STMT(CallExpr)
 
@@ -15863,19 +15771,11 @@ MX_END_VISIT_STMT(CallExpr)
 MX_BEGIN_VISIT_STMT(CXXOperatorCallExpr)
   MX_ENTER_VISIT_CXXOperatorCallExpr
   MX_VISIT_BASE(CXXOperatorCallExpr, CallExpr)
-<<<<<<< HEAD
   MX_VISIT_ENUM(CXXOperatorCallExpr, operator_, 92, MX_APPLY_METHOD, Operator, OverloadedOperatorKind, NthStmt)
   MX_VISIT_ENTITY(CXXOperatorCallExpr, operator_token, 42, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
   MX_VISIT_BOOL(CXXOperatorCallExpr, is_assignment_operation, 91, MX_APPLY_METHOD, IsAssignmentOperation, bool, NthStmt)
   MX_VISIT_BOOL(CXXOperatorCallExpr, is_comparison_operation, 93, MX_APPLY_METHOD, IsComparisonOperation, bool, NthStmt)
   MX_VISIT_BOOL(CXXOperatorCallExpr, is_infix_binary_operation, 94, MX_APPLY_METHOD, IsInfixBinaryOperation, bool, NthStmt)
-=======
-  MX_VISIT_ENUM(CXXOperatorCallExpr, operator_, 94, MX_APPLY_METHOD, Operator, OverloadedOperatorKind, NthStmt)
-  MX_VISIT_ENTITY(CXXOperatorCallExpr, operator_token, 42, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
-  MX_VISIT_BOOL(CXXOperatorCallExpr, is_assignment_operation, 93, MX_APPLY_METHOD, IsAssignmentOperation, bool, NthStmt)
-  MX_VISIT_BOOL(CXXOperatorCallExpr, is_comparison_operation, 95, MX_APPLY_METHOD, IsComparisonOperation, bool, NthStmt)
-  MX_VISIT_BOOL(CXXOperatorCallExpr, is_infix_binary_operation, 96, MX_APPLY_METHOD, IsInfixBinaryOperation, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXOperatorCallExpr
 MX_END_VISIT_STMT(CXXOperatorCallExpr)
 
@@ -15921,11 +15821,7 @@ MX_BEGIN_VISIT_STMT(UserDefinedLiteral)
   MX_ENTER_VISIT_UserDefinedLiteral
   MX_VISIT_BASE(UserDefinedLiteral, CallExpr)
   MX_VISIT_ENTITY(UserDefinedLiteral, cooked_literal, 42, MX_APPLY_METHOD, CookedLiteral, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(UserDefinedLiteral, literal_operator_kind, 92, MX_APPLY_METHOD, LiteralOperatorKind, UserDefinedLiteralLiteralOperatorKind, NthStmt)
-=======
-  MX_VISIT_ENUM(UserDefinedLiteral, literal_operator_kind, 94, MX_APPLY_METHOD, LiteralOperatorKind, UserDefinedLiteralLiteralOperatorKind, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_ENTITY(UserDefinedLiteral, ud_suffix_token, 43, MX_APPLY_METHOD, UDSuffixToken, Token, NthStmt)
   MX_EXIT_VISIT_UserDefinedLiteral
 MX_END_VISIT_STMT(UserDefinedLiteral)
@@ -15944,11 +15840,7 @@ MX_BEGIN_VISIT_STMT(CXXUuidofExpr)
   MX_VISIT_ENTITY(CXXUuidofExpr, guid_declaration, 38, MX_APPLY_METHOD, GuidDeclaration, MSGuidDecl, NthStmt)
   MX_VISIT_ENTITY(CXXUuidofExpr, type_operand, 39, MX_APPLY_METHOD, TypeOperand, Type, NthStmt)
   MX_VISIT_ENTITY(CXXUuidofExpr, type_operand_source_info, 40, MX_APPLY_METHOD, TypeOperandSourceInfo, Type, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXUuidofExpr, is_type_operand, 84, MX_APPLY_METHOD, IsTypeOperand, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXUuidofExpr, is_type_operand, 86, MX_APPLY_METHOD, IsTypeOperand, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXUuidofExpr
 MX_END_VISIT_STMT(CXXUuidofExpr)
 
@@ -15966,11 +15858,7 @@ MX_BEGIN_VISIT_STMT(CXXUnresolvedConstructExpr)
   MX_VISIT_ENTITY(CXXUnresolvedConstructExpr, l_paren_token, 37, MX_APPLY_METHOD, LParenToken, Token, NthStmt)
   MX_VISIT_ENTITY(CXXUnresolvedConstructExpr, r_paren_token, 38, MX_APPLY_METHOD, RParenToken, Token, NthStmt)
   MX_VISIT_ENTITY(CXXUnresolvedConstructExpr, type_as_written, 39, MX_APPLY_METHOD, TypeAsWritten, Type, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXUnresolvedConstructExpr, is_list_initialization, 84, MX_APPLY_METHOD, IsListInitialization, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXUnresolvedConstructExpr, is_list_initialization, 86, MX_APPLY_METHOD, IsListInitialization, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXUnresolvedConstructExpr
 MX_END_VISIT_STMT(CXXUnresolvedConstructExpr)
 
@@ -15987,15 +15875,9 @@ MX_BEGIN_VISIT_STMT(CXXTypeidExpr)
   MX_VISIT_OPTIONAL_ENTITY(CXXTypeidExpr, expression_operand, 37, MX_APPLY_METHOD, ExpressionOperand, Expr, NthStmt)
   MX_VISIT_ENTITY(CXXTypeidExpr, type_operand, 38, MX_APPLY_METHOD, TypeOperand, Type, NthStmt)
   MX_VISIT_ENTITY(CXXTypeidExpr, type_operand_source_info, 39, MX_APPLY_METHOD, TypeOperandSourceInfo, Type, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_OPTIONAL_BOOL(CXXTypeidExpr, is_most_derived, 84, MX_APPLY_METHOD, IsMostDerived, bool, NthStmt)
   MX_VISIT_BOOL(CXXTypeidExpr, is_potentially_evaluated, 86, MX_APPLY_METHOD, IsPotentiallyEvaluated, bool, NthStmt)
   MX_VISIT_BOOL(CXXTypeidExpr, is_type_operand, 87, MX_APPLY_METHOD, IsTypeOperand, bool, NthStmt)
-=======
-  MX_VISIT_OPTIONAL_BOOL(CXXTypeidExpr, is_most_derived, 86, MX_APPLY_METHOD, IsMostDerived, bool, NthStmt)
-  MX_VISIT_BOOL(CXXTypeidExpr, is_potentially_evaluated, 88, MX_APPLY_METHOD, IsPotentiallyEvaluated, bool, NthStmt)
-  MX_VISIT_BOOL(CXXTypeidExpr, is_type_operand, 89, MX_APPLY_METHOD, IsTypeOperand, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXTypeidExpr
 MX_END_VISIT_STMT(CXXTypeidExpr)
 
@@ -16011,11 +15893,7 @@ MX_BEGIN_VISIT_STMT(CXXThrowExpr)
   MX_VISIT_BASE(CXXThrowExpr, Expr)
   MX_VISIT_OPTIONAL_ENTITY(CXXThrowExpr, sub_expression, 37, MX_APPLY_METHOD, SubExpression, Expr, NthStmt)
   MX_VISIT_ENTITY(CXXThrowExpr, throw_token, 38, MX_APPLY_METHOD, ThrowToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXThrowExpr, is_thrown_variable_in_scope, 84, MX_APPLY_METHOD, IsThrownVariableInScope, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXThrowExpr, is_thrown_variable_in_scope, 86, MX_APPLY_METHOD, IsThrownVariableInScope, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXThrowExpr
 MX_END_VISIT_STMT(CXXThrowExpr)
 
@@ -16030,11 +15908,7 @@ MX_BEGIN_VISIT_STMT(CXXThisExpr)
   MX_ENTER_VISIT_CXXThisExpr
   MX_VISIT_BASE(CXXThisExpr, Expr)
   MX_VISIT_ENTITY(CXXThisExpr, token, 37, MX_APPLY_METHOD, Token, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXThisExpr, is_implicit, 84, MX_APPLY_METHOD, IsImplicit, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXThisExpr, is_implicit, 86, MX_APPLY_METHOD, IsImplicit, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXThisExpr
 MX_END_VISIT_STMT(CXXThisExpr)
 
@@ -16077,7 +15951,6 @@ MX_BEGIN_VISIT_STMT(CXXRewrittenBinaryOperator)
   MX_ENTER_VISIT_CXXRewrittenBinaryOperator
   MX_VISIT_BASE(CXXRewrittenBinaryOperator, Expr)
   MX_VISIT_ENTITY(CXXRewrittenBinaryOperator, lhs, 37, MX_APPLY_METHOD, LHS, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(CXXRewrittenBinaryOperator, opcode, 90, MX_APPLY_METHOD, Opcode, BinaryOperatorKind, NthStmt)
   MX_VISIT_TEXT(CXXRewrittenBinaryOperator, opcode_string, 60, MX_APPLY_METHOD, OpcodeString, basic_string_view, NthStmt)
   MX_VISIT_ENUM(CXXRewrittenBinaryOperator, operator_, 92, MX_APPLY_METHOD, Operator, BinaryOperatorKind, NthStmt)
@@ -16087,17 +15960,6 @@ MX_BEGIN_VISIT_STMT(CXXRewrittenBinaryOperator)
   MX_VISIT_BOOL(CXXRewrittenBinaryOperator, is_assignment_operation, 84, MX_APPLY_METHOD, IsAssignmentOperation, bool, NthStmt)
   MX_VISIT_BOOL(CXXRewrittenBinaryOperator, is_comparison_operation, 85, MX_APPLY_METHOD, IsComparisonOperation, bool, NthStmt)
   MX_VISIT_BOOL(CXXRewrittenBinaryOperator, is_reversed, 86, MX_APPLY_METHOD, IsReversed, bool, NthStmt)
-=======
-  MX_VISIT_ENUM(CXXRewrittenBinaryOperator, opcode, 92, MX_APPLY_METHOD, Opcode, BinaryOperatorKind, NthStmt)
-  MX_VISIT_TEXT(CXXRewrittenBinaryOperator, opcode_string, 60, MX_APPLY_METHOD, OpcodeString, basic_string_view, NthStmt)
-  MX_VISIT_ENUM(CXXRewrittenBinaryOperator, operator_, 94, MX_APPLY_METHOD, Operator, BinaryOperatorKind, NthStmt)
-  MX_VISIT_ENTITY(CXXRewrittenBinaryOperator, operator_token, 38, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
-  MX_VISIT_ENTITY(CXXRewrittenBinaryOperator, rhs, 39, MX_APPLY_METHOD, RHS, Expr, NthStmt)
-  MX_VISIT_ENTITY(CXXRewrittenBinaryOperator, semantic_form, 40, MX_APPLY_METHOD, SemanticForm, Expr, NthStmt)
-  MX_VISIT_BOOL(CXXRewrittenBinaryOperator, is_assignment_operation, 86, MX_APPLY_METHOD, IsAssignmentOperation, bool, NthStmt)
-  MX_VISIT_BOOL(CXXRewrittenBinaryOperator, is_comparison_operation, 87, MX_APPLY_METHOD, IsComparisonOperation, bool, NthStmt)
-  MX_VISIT_BOOL(CXXRewrittenBinaryOperator, is_reversed, 88, MX_APPLY_METHOD, IsReversed, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXRewrittenBinaryOperator
 MX_END_VISIT_STMT(CXXRewrittenBinaryOperator)
 
@@ -16117,13 +15979,8 @@ MX_BEGIN_VISIT_STMT(CXXPseudoDestructorExpr)
   MX_VISIT_ENTITY(CXXPseudoDestructorExpr, destroyed_type_token, 40, MX_APPLY_METHOD, DestroyedTypeToken, Token, NthStmt)
   MX_VISIT_ENTITY(CXXPseudoDestructorExpr, operator_token, 41, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
   MX_VISIT_ENTITY(CXXPseudoDestructorExpr, tilde_token, 42, MX_APPLY_METHOD, TildeToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXPseudoDestructorExpr, has_qualifier, 84, MX_APPLY_METHOD, HasQualifier, bool, NthStmt)
   MX_VISIT_BOOL(CXXPseudoDestructorExpr, is_arrow, 85, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXPseudoDestructorExpr, has_qualifier, 86, MX_APPLY_METHOD, HasQualifier, bool, NthStmt)
-  MX_VISIT_BOOL(CXXPseudoDestructorExpr, is_arrow, 87, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXPseudoDestructorExpr
 MX_END_VISIT_STMT(CXXPseudoDestructorExpr)
 
@@ -16168,11 +16025,7 @@ MX_BEGIN_VISIT_STMT(CXXNoexceptExpr)
   MX_ENTER_VISIT_CXXNoexceptExpr
   MX_VISIT_BASE(CXXNoexceptExpr, Expr)
   MX_VISIT_ENTITY(CXXNoexceptExpr, operand, 37, MX_APPLY_METHOD, Operand, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXNoexceptExpr, value, 84, MX_APPLY_METHOD, Value, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXNoexceptExpr, value, 86, MX_APPLY_METHOD, Value, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXNoexceptExpr
 MX_END_VISIT_STMT(CXXNoexceptExpr)
 
@@ -16186,37 +16039,21 @@ MX_END_VISIT_STMT(CXXNoexceptExpr)
 MX_BEGIN_VISIT_STMT(CXXNewExpr)
   MX_ENTER_VISIT_CXXNewExpr
   MX_VISIT_BASE(CXXNewExpr, Expr)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXNewExpr, does_usual_array_delete_want_size, 84, MX_APPLY_METHOD, DoesUsualArrayDeleteWantSize, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXNewExpr, does_usual_array_delete_want_size, 86, MX_APPLY_METHOD, DoesUsualArrayDeleteWantSize, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_ENTITY(CXXNewExpr, allocated_type, 37, MX_APPLY_METHOD, AllocatedType, Type, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(CXXNewExpr, array_size, 38, MX_APPLY_METHOD, ArraySize, Expr, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(CXXNewExpr, construct_expression, 39, MX_APPLY_METHOD, ConstructExpression, CXXConstructExpr, NthStmt)
   MX_VISIT_TOKEN_RANGE(CXXNewExpr, direct_initializer_range, 40, 41, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(CXXNewExpr, initialization_style, 90, MX_APPLY_METHOD, InitializationStyle, CXXNewExprInitializationStyle, NthStmt)
-=======
-  MX_VISIT_ENUM(CXXNewExpr, initialization_style, 92, MX_APPLY_METHOD, InitializationStyle, CXXNewExprInitializationStyle, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_OPTIONAL_ENTITY(CXXNewExpr, initializer, 42, MX_APPLY_METHOD, Initializer, Expr, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(CXXNewExpr, operator_delete, 43, MX_APPLY_METHOD, OperatorDelete, FunctionDecl, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(CXXNewExpr, operator_new, 44, MX_APPLY_METHOD, OperatorNew, FunctionDecl, NthStmt)
   MX_VISIT_TOKEN_RANGE(CXXNewExpr, type_id_parentheses, 45, 46, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXNewExpr, has_initializer, 85, MX_APPLY_METHOD, HasInitializer, bool, NthStmt)
   MX_VISIT_BOOL(CXXNewExpr, is_array, 86, MX_APPLY_METHOD, IsArray, bool, NthStmt)
   MX_VISIT_BOOL(CXXNewExpr, is_global_new, 87, MX_APPLY_METHOD, IsGlobalNew, bool, NthStmt)
   MX_VISIT_BOOL(CXXNewExpr, is_parenthesis_type_id, 88, MX_APPLY_METHOD, IsParenthesisTypeId, bool, NthStmt)
   MX_VISIT_BOOL(CXXNewExpr, pass_alignment, 89, MX_APPLY_METHOD, PassAlignment, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXNewExpr, has_initializer, 87, MX_APPLY_METHOD, HasInitializer, bool, NthStmt)
-  MX_VISIT_BOOL(CXXNewExpr, is_array, 88, MX_APPLY_METHOD, IsArray, bool, NthStmt)
-  MX_VISIT_BOOL(CXXNewExpr, is_global_new, 89, MX_APPLY_METHOD, IsGlobalNew, bool, NthStmt)
-  MX_VISIT_BOOL(CXXNewExpr, is_parenthesis_type_id, 90, MX_APPLY_METHOD, IsParenthesisTypeId, bool, NthStmt)
-  MX_VISIT_BOOL(CXXNewExpr, pass_alignment, 91, MX_APPLY_METHOD, PassAlignment, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_ENTITY_LIST(CXXNewExpr, placement_arguments, 15, MX_APPLY_METHOD, PlacementArguments, Expr, NthStmt)
   MX_EXIT_VISIT_CXXNewExpr
 MX_END_VISIT_STMT(CXXNewExpr)
@@ -16231,19 +16068,11 @@ MX_END_VISIT_STMT(CXXNewExpr)
 MX_BEGIN_VISIT_STMT(CXXInheritedCtorInitExpr)
   MX_ENTER_VISIT_CXXInheritedCtorInitExpr
   MX_VISIT_BASE(CXXInheritedCtorInitExpr, Expr)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXInheritedCtorInitExpr, constructs_virtual_base, 84, MX_APPLY_METHOD, ConstructsVirtualBase, bool, NthStmt)
   MX_VISIT_ENUM(CXXInheritedCtorInitExpr, construction_kind, 90, MX_APPLY_METHOD, ConstructionKind, CXXConstructExprConstructionKind, NthStmt)
   MX_VISIT_ENTITY(CXXInheritedCtorInitExpr, constructor, 37, MX_APPLY_METHOD, Constructor, CXXConstructorDecl, NthStmt)
   MX_VISIT_ENTITY(CXXInheritedCtorInitExpr, token, 38, MX_APPLY_METHOD, Token, Token, NthStmt)
   MX_VISIT_BOOL(CXXInheritedCtorInitExpr, inherited_from_virtual_base, 85, MX_APPLY_METHOD, InheritedFromVirtualBase, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXInheritedCtorInitExpr, constructs_virtual_base, 86, MX_APPLY_METHOD, ConstructsVirtualBase, bool, NthStmt)
-  MX_VISIT_ENUM(CXXInheritedCtorInitExpr, construction_kind, 92, MX_APPLY_METHOD, ConstructionKind, CXXConstructExprConstructionKind, NthStmt)
-  MX_VISIT_ENTITY(CXXInheritedCtorInitExpr, constructor, 37, MX_APPLY_METHOD, Constructor, CXXConstructorDecl, NthStmt)
-  MX_VISIT_ENTITY(CXXInheritedCtorInitExpr, token, 38, MX_APPLY_METHOD, Token, Token, NthStmt)
-  MX_VISIT_BOOL(CXXInheritedCtorInitExpr, inherited_from_virtual_base, 87, MX_APPLY_METHOD, InheritedFromVirtualBase, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXInheritedCtorInitExpr
 MX_END_VISIT_STMT(CXXInheritedCtorInitExpr)
 
@@ -16262,21 +16091,12 @@ MX_BEGIN_VISIT_STMT(CXXFoldExpr)
   MX_VISIT_OPTIONAL_ENTITY(CXXFoldExpr, initializer, 39, MX_APPLY_METHOD, Initializer, Expr, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(CXXFoldExpr, lhs, 40, MX_APPLY_METHOD, LHS, Expr, NthStmt)
   MX_VISIT_ENTITY(CXXFoldExpr, l_paren_token, 41, MX_APPLY_METHOD, LParenToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(CXXFoldExpr, operator_, 90, MX_APPLY_METHOD, Operator, BinaryOperatorKind, NthStmt)
   MX_VISIT_ENTITY(CXXFoldExpr, pattern, 42, MX_APPLY_METHOD, Pattern, Expr, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(CXXFoldExpr, rhs, 43, MX_APPLY_METHOD, RHS, Expr, NthStmt)
   MX_VISIT_ENTITY(CXXFoldExpr, r_paren_token, 44, MX_APPLY_METHOD, RParenToken, Token, NthStmt)
   MX_VISIT_BOOL(CXXFoldExpr, is_left_fold, 84, MX_APPLY_METHOD, IsLeftFold, bool, NthStmt)
   MX_VISIT_BOOL(CXXFoldExpr, is_right_fold, 85, MX_APPLY_METHOD, IsRightFold, bool, NthStmt)
-=======
-  MX_VISIT_ENUM(CXXFoldExpr, operator_, 92, MX_APPLY_METHOD, Operator, BinaryOperatorKind, NthStmt)
-  MX_VISIT_ENTITY(CXXFoldExpr, pattern, 42, MX_APPLY_METHOD, Pattern, Expr, NthStmt)
-  MX_VISIT_OPTIONAL_ENTITY(CXXFoldExpr, rhs, 43, MX_APPLY_METHOD, RHS, Expr, NthStmt)
-  MX_VISIT_ENTITY(CXXFoldExpr, r_paren_token, 44, MX_APPLY_METHOD, RParenToken, Token, NthStmt)
-  MX_VISIT_BOOL(CXXFoldExpr, is_left_fold, 86, MX_APPLY_METHOD, IsLeftFold, bool, NthStmt)
-  MX_VISIT_BOOL(CXXFoldExpr, is_right_fold, 87, MX_APPLY_METHOD, IsRightFold, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXFoldExpr
 MX_END_VISIT_STMT(CXXFoldExpr)
 
@@ -16298,17 +16118,10 @@ MX_BEGIN_VISIT_STMT(CXXDependentScopeMemberExpr)
   MX_VISIT_ENTITY(CXXDependentScopeMemberExpr, operator_token, 42, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
   MX_VISIT_ENTITY(CXXDependentScopeMemberExpr, r_angle_token, 43, MX_APPLY_METHOD, RAngleToken, Token, NthStmt)
   MX_VISIT_ENTITY(CXXDependentScopeMemberExpr, template_keyword_token, 44, MX_APPLY_METHOD, TemplateKeywordToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXDependentScopeMemberExpr, has_explicit_template_arguments, 84, MX_APPLY_METHOD, HasExplicitTemplateArguments, bool, NthStmt)
   MX_VISIT_BOOL(CXXDependentScopeMemberExpr, has_template_keyword, 85, MX_APPLY_METHOD, HasTemplateKeyword, bool, NthStmt)
   MX_VISIT_BOOL(CXXDependentScopeMemberExpr, is_arrow, 86, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
   MX_VISIT_BOOL(CXXDependentScopeMemberExpr, is_implicit_access, 87, MX_APPLY_METHOD, IsImplicitAccess, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXDependentScopeMemberExpr, has_explicit_template_arguments, 86, MX_APPLY_METHOD, HasExplicitTemplateArguments, bool, NthStmt)
-  MX_VISIT_BOOL(CXXDependentScopeMemberExpr, has_template_keyword, 87, MX_APPLY_METHOD, HasTemplateKeyword, bool, NthStmt)
-  MX_VISIT_BOOL(CXXDependentScopeMemberExpr, is_arrow, 88, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
-  MX_VISIT_BOOL(CXXDependentScopeMemberExpr, is_implicit_access, 89, MX_APPLY_METHOD, IsImplicitAccess, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXDependentScopeMemberExpr
 MX_END_VISIT_STMT(CXXDependentScopeMemberExpr)
 
@@ -16322,7 +16135,6 @@ MX_END_VISIT_STMT(CXXDependentScopeMemberExpr)
 MX_BEGIN_VISIT_STMT(CXXDeleteExpr)
   MX_ENTER_VISIT_CXXDeleteExpr
   MX_VISIT_BASE(CXXDeleteExpr, Expr)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXDeleteExpr, does_usual_array_delete_want_size, 84, MX_APPLY_METHOD, DoesUsualArrayDeleteWantSize, bool, NthStmt)
   MX_VISIT_ENTITY(CXXDeleteExpr, argument, 37, MX_APPLY_METHOD, Argument, Expr, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(CXXDeleteExpr, destroyed_type, 38, MX_APPLY_METHOD, DestroyedType, Type, NthStmt)
@@ -16330,15 +16142,6 @@ MX_BEGIN_VISIT_STMT(CXXDeleteExpr)
   MX_VISIT_BOOL(CXXDeleteExpr, is_array_form, 85, MX_APPLY_METHOD, IsArrayForm, bool, NthStmt)
   MX_VISIT_BOOL(CXXDeleteExpr, is_array_form_as_written, 86, MX_APPLY_METHOD, IsArrayFormAsWritten, bool, NthStmt)
   MX_VISIT_BOOL(CXXDeleteExpr, is_global_delete, 87, MX_APPLY_METHOD, IsGlobalDelete, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXDeleteExpr, does_usual_array_delete_want_size, 86, MX_APPLY_METHOD, DoesUsualArrayDeleteWantSize, bool, NthStmt)
-  MX_VISIT_ENTITY(CXXDeleteExpr, argument, 37, MX_APPLY_METHOD, Argument, Expr, NthStmt)
-  MX_VISIT_OPTIONAL_ENTITY(CXXDeleteExpr, destroyed_type, 38, MX_APPLY_METHOD, DestroyedType, Type, NthStmt)
-  MX_VISIT_OPTIONAL_ENTITY(CXXDeleteExpr, operator_delete, 39, MX_APPLY_METHOD, OperatorDelete, FunctionDecl, NthStmt)
-  MX_VISIT_BOOL(CXXDeleteExpr, is_array_form, 87, MX_APPLY_METHOD, IsArrayForm, bool, NthStmt)
-  MX_VISIT_BOOL(CXXDeleteExpr, is_array_form_as_written, 88, MX_APPLY_METHOD, IsArrayFormAsWritten, bool, NthStmt)
-  MX_VISIT_BOOL(CXXDeleteExpr, is_global_delete, 89, MX_APPLY_METHOD, IsGlobalDelete, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXDeleteExpr
 MX_END_VISIT_STMT(CXXDeleteExpr)
 
@@ -16356,11 +16159,7 @@ MX_BEGIN_VISIT_STMT(CXXDefaultInitExpr)
   MX_VISIT_ENTITY(CXXDefaultInitExpr, field, 38, MX_APPLY_METHOD, Field, FieldDecl, NthStmt)
   MX_VISIT_ENTITY(CXXDefaultInitExpr, rewritten_expression, 39, MX_APPLY_METHOD, RewrittenExpression, Expr, NthStmt)
   MX_VISIT_ENTITY(CXXDefaultInitExpr, used_token, 40, MX_APPLY_METHOD, UsedToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXDefaultInitExpr, has_rewritten_initializer, 84, MX_APPLY_METHOD, HasRewrittenInitializer, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXDefaultInitExpr, has_rewritten_initializer, 86, MX_APPLY_METHOD, HasRewrittenInitializer, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXDefaultInitExpr
 MX_END_VISIT_STMT(CXXDefaultInitExpr)
 
@@ -16378,11 +16177,7 @@ MX_BEGIN_VISIT_STMT(CXXDefaultArgExpr)
   MX_VISIT_ENTITY(CXXDefaultArgExpr, parameter, 38, MX_APPLY_METHOD, Parameter, ParmVarDecl, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(CXXDefaultArgExpr, rewritten_expression, 39, MX_APPLY_METHOD, RewrittenExpression, Expr, NthStmt)
   MX_VISIT_ENTITY(CXXDefaultArgExpr, used_token, 40, MX_APPLY_METHOD, UsedToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXDefaultArgExpr, has_rewritten_initializer, 84, MX_APPLY_METHOD, HasRewrittenInitializer, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXDefaultArgExpr, has_rewritten_initializer, 86, MX_APPLY_METHOD, HasRewrittenInitializer, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXDefaultArgExpr
 MX_END_VISIT_STMT(CXXDefaultArgExpr)
 
@@ -16397,7 +16192,6 @@ MX_BEGIN_VISIT_STMT(CXXConstructExpr)
   MX_ENTER_VISIT_CXXConstructExpr
   MX_VISIT_BASE(CXXConstructExpr, Expr)
   MX_VISIT_ENTITY_LIST(CXXConstructExpr, arguments, 15, MX_APPLY_METHOD, Arguments, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(CXXConstructExpr, construction_kind, 90, MX_APPLY_METHOD, ConstructionKind, CXXConstructExprConstructionKind, NthStmt)
   MX_VISIT_ENTITY(CXXConstructExpr, constructor, 37, MX_APPLY_METHOD, Constructor, CXXConstructorDecl, NthStmt)
   MX_VISIT_ENTITY(CXXConstructExpr, token, 38, MX_APPLY_METHOD, Token, Token, NthStmt)
@@ -16408,18 +16202,6 @@ MX_BEGIN_VISIT_STMT(CXXConstructExpr)
   MX_VISIT_BOOL(CXXConstructExpr, is_list_initialization, 87, MX_APPLY_METHOD, IsListInitialization, bool, NthStmt)
   MX_VISIT_BOOL(CXXConstructExpr, is_std_initializer_list_initialization, 88, MX_APPLY_METHOD, IsStdInitializerListInitialization, bool, NthStmt)
   MX_VISIT_BOOL(CXXConstructExpr, requires_zero_initialization, 89, MX_APPLY_METHOD, RequiresZeroInitialization, bool, NthStmt)
-=======
-  MX_VISIT_ENUM(CXXConstructExpr, construction_kind, 92, MX_APPLY_METHOD, ConstructionKind, CXXConstructExprConstructionKind, NthStmt)
-  MX_VISIT_ENTITY(CXXConstructExpr, constructor, 37, MX_APPLY_METHOD, Constructor, CXXConstructorDecl, NthStmt)
-  MX_VISIT_ENTITY(CXXConstructExpr, token, 38, MX_APPLY_METHOD, Token, Token, NthStmt)
-  MX_VISIT_TOKEN_RANGE(CXXConstructExpr, parenthesis_or_brace_range, 39, 40, NthStmt)
-  MX_VISIT_BOOL(CXXConstructExpr, had_multiple_candidates, 86, MX_APPLY_METHOD, HadMultipleCandidates, bool, NthStmt)
-  MX_VISIT_BOOL(CXXConstructExpr, is_elidable, 87, MX_APPLY_METHOD, IsElidable, bool, NthStmt)
-  MX_VISIT_BOOL(CXXConstructExpr, is_immediate_escalating, 88, MX_APPLY_METHOD, IsImmediateEscalating, bool, NthStmt)
-  MX_VISIT_BOOL(CXXConstructExpr, is_list_initialization, 89, MX_APPLY_METHOD, IsListInitialization, bool, NthStmt)
-  MX_VISIT_BOOL(CXXConstructExpr, is_std_initializer_list_initialization, 90, MX_APPLY_METHOD, IsStdInitializerListInitialization, bool, NthStmt)
-  MX_VISIT_BOOL(CXXConstructExpr, requires_zero_initialization, 91, MX_APPLY_METHOD, RequiresZeroInitialization, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXConstructExpr
 MX_END_VISIT_STMT(CXXConstructExpr)
 
@@ -16447,11 +16229,7 @@ MX_BEGIN_VISIT_STMT(CXXBoolLiteralExpr)
   MX_ENTER_VISIT_CXXBoolLiteralExpr
   MX_VISIT_BASE(CXXBoolLiteralExpr, Expr)
   MX_VISIT_ENTITY(CXXBoolLiteralExpr, token, 37, MX_APPLY_METHOD, Token, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(CXXBoolLiteralExpr, value, 84, MX_APPLY_METHOD, Value, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(CXXBoolLiteralExpr, value, 86, MX_APPLY_METHOD, Value, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXBoolLiteralExpr
 MX_END_VISIT_STMT(CXXBoolLiteralExpr)
 
@@ -16497,7 +16275,6 @@ MX_BEGIN_VISIT_STMT(BinaryOperator)
   MX_ENTER_VISIT_BinaryOperator
   MX_VISIT_BASE(BinaryOperator, Expr)
   MX_VISIT_ENTITY(BinaryOperator, lhs, 37, MX_APPLY_METHOD, LHS, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(BinaryOperator, opcode, 90, MX_APPLY_METHOD, Opcode, BinaryOperatorKind, NthStmt)
   MX_VISIT_TEXT(BinaryOperator, opcode_string, 60, MX_APPLY_METHOD, OpcodeString, basic_string_view, NthStmt)
   MX_VISIT_ENTITY(BinaryOperator, operator_token, 38, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
@@ -16516,26 +16293,6 @@ MX_BEGIN_VISIT_STMT(BinaryOperator)
   MX_VISIT_BOOL(BinaryOperator, is_relational_operation, 97, MX_APPLY_METHOD, IsRelationalOperation, bool, NthStmt)
   MX_VISIT_BOOL(BinaryOperator, is_shift_assign_operation, 98, MX_APPLY_METHOD, IsShiftAssignOperation, bool, NthStmt)
   MX_VISIT_BOOL(BinaryOperator, is_shift_operation, 99, MX_APPLY_METHOD, IsShiftOperation, bool, NthStmt)
-=======
-  MX_VISIT_ENUM(BinaryOperator, opcode, 92, MX_APPLY_METHOD, Opcode, BinaryOperatorKind, NthStmt)
-  MX_VISIT_TEXT(BinaryOperator, opcode_string, 60, MX_APPLY_METHOD, OpcodeString, basic_string_view, NthStmt)
-  MX_VISIT_ENTITY(BinaryOperator, operator_token, 38, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
-  MX_VISIT_ENTITY(BinaryOperator, rhs, 39, MX_APPLY_METHOD, RHS, Expr, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, has_stored_fp_features, 86, MX_APPLY_METHOD, HasStoredFPFeatures, bool, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, is_additive_operation, 87, MX_APPLY_METHOD, IsAdditiveOperation, bool, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, is_assignment_operation, 88, MX_APPLY_METHOD, IsAssignmentOperation, bool, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, is_bitwise_operation, 89, MX_APPLY_METHOD, IsBitwiseOperation, bool, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, is_comma_operation, 90, MX_APPLY_METHOD, IsCommaOperation, bool, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, is_comparison_operation, 91, MX_APPLY_METHOD, IsComparisonOperation, bool, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, is_compound_assignment_operation, 93, MX_APPLY_METHOD, IsCompoundAssignmentOperation, bool, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, is_equality_operation, 95, MX_APPLY_METHOD, IsEqualityOperation, bool, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, is_logical_operation, 96, MX_APPLY_METHOD, IsLogicalOperation, bool, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, is_multiplicative_operation, 97, MX_APPLY_METHOD, IsMultiplicativeOperation, bool, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, is_pointer_memory_operation, 98, MX_APPLY_METHOD, IsPointerMemoryOperation, bool, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, is_relational_operation, 99, MX_APPLY_METHOD, IsRelationalOperation, bool, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, is_shift_assign_operation, 100, MX_APPLY_METHOD, IsShiftAssignOperation, bool, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, is_shift_operation, 101, MX_APPLY_METHOD, IsShiftOperation, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_BinaryOperator
 MX_END_VISIT_STMT(BinaryOperator)
 
@@ -16565,11 +16322,7 @@ MX_BEGIN_VISIT_STMT(AtomicExpr)
   MX_ENTER_VISIT_AtomicExpr
   MX_VISIT_BASE(AtomicExpr, Expr)
   MX_VISIT_ENTITY(AtomicExpr, builtin_token, 37, MX_APPLY_METHOD, BuiltinToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(AtomicExpr, operation, 90, MX_APPLY_METHOD, Operation, AtomicExprAtomicOp, NthStmt)
-=======
-  MX_VISIT_ENUM(AtomicExpr, operation, 92, MX_APPLY_METHOD, Operation, AtomicExprAtomicOp, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_ENTITY(AtomicExpr, order, 38, MX_APPLY_METHOD, Order, Expr, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(AtomicExpr, order_fail, 39, MX_APPLY_METHOD, OrderFail, Expr, NthStmt)
   MX_VISIT_ENTITY(AtomicExpr, pointer, 40, MX_APPLY_METHOD, Pointer, Expr, NthStmt)
@@ -16579,15 +16332,9 @@ MX_BEGIN_VISIT_STMT(AtomicExpr)
   MX_VISIT_OPTIONAL_ENTITY(AtomicExpr, value2, 44, MX_APPLY_METHOD, Value2, Expr, NthStmt)
   MX_VISIT_ENTITY(AtomicExpr, value_type, 45, MX_APPLY_METHOD, ValueType, Type, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(AtomicExpr, weak, 46, MX_APPLY_METHOD, Weak, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(AtomicExpr, is_cmp_x_chg, 84, MX_APPLY_METHOD, IsCmpXChg, bool, NthStmt)
   MX_VISIT_BOOL(AtomicExpr, is_open_cl, 85, MX_APPLY_METHOD, IsOpenCL, bool, NthStmt)
   MX_VISIT_BOOL(AtomicExpr, is_volatile, 86, MX_APPLY_METHOD, IsVolatile, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(AtomicExpr, is_cmp_x_chg, 86, MX_APPLY_METHOD, IsCmpXChg, bool, NthStmt)
-  MX_VISIT_BOOL(AtomicExpr, is_open_cl, 87, MX_APPLY_METHOD, IsOpenCL, bool, NthStmt)
-  MX_VISIT_BOOL(AtomicExpr, is_volatile, 88, MX_APPLY_METHOD, IsVolatile, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_ENTITY_LIST(AtomicExpr, sub_expressions, 15, MX_APPLY_METHOD, SubExpressions, Expr, NthStmt)
   MX_EXIT_VISIT_AtomicExpr
 MX_END_VISIT_STMT(AtomicExpr)
@@ -16620,11 +16367,7 @@ MX_BEGIN_VISIT_STMT(ArrayTypeTraitExpr)
   MX_VISIT_BASE(ArrayTypeTraitExpr, Expr)
   MX_VISIT_ENTITY(ArrayTypeTraitExpr, dimension_expression, 37, MX_APPLY_METHOD, DimensionExpression, Expr, NthStmt)
   MX_VISIT_ENTITY(ArrayTypeTraitExpr, queried_type, 38, MX_APPLY_METHOD, QueriedType, Type, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(ArrayTypeTraitExpr, trait, 90, MX_APPLY_METHOD, Trait, ArrayTypeTrait, NthStmt)
-=======
-  MX_VISIT_ENUM(ArrayTypeTraitExpr, trait, 92, MX_APPLY_METHOD, Trait, ArrayTypeTrait, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ArrayTypeTraitExpr
 MX_END_VISIT_STMT(ArrayTypeTraitExpr)
 
@@ -16751,11 +16494,7 @@ MX_BEGIN_VISIT_STMT(VAArgExpr)
   MX_VISIT_ENTITY(VAArgExpr, builtin_token, 37, MX_APPLY_METHOD, BuiltinToken, Token, NthStmt)
   MX_VISIT_ENTITY(VAArgExpr, r_paren_token, 38, MX_APPLY_METHOD, RParenToken, Token, NthStmt)
   MX_VISIT_ENTITY(VAArgExpr, sub_expression, 39, MX_APPLY_METHOD, SubExpression, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(VAArgExpr, is_microsoft_abi, 84, MX_APPLY_METHOD, IsMicrosoftABI, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(VAArgExpr, is_microsoft_abi, 86, MX_APPLY_METHOD, IsMicrosoftABI, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_VAArgExpr
 MX_END_VISIT_STMT(VAArgExpr)
 
@@ -16769,7 +16508,6 @@ MX_END_VISIT_STMT(VAArgExpr)
 MX_BEGIN_VISIT_STMT(UnaryOperator)
   MX_ENTER_VISIT_UnaryOperator
   MX_VISIT_BASE(UnaryOperator, Expr)
-<<<<<<< HEAD
   MX_VISIT_BOOL(UnaryOperator, can_overflow, 84, MX_APPLY_METHOD, CanOverflow, bool, NthStmt)
   MX_VISIT_ENUM(UnaryOperator, opcode, 90, MX_APPLY_METHOD, Opcode, UnaryOperatorKind, NthStmt)
   MX_VISIT_ENTITY(UnaryOperator, operator_token, 37, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
@@ -16781,19 +16519,6 @@ MX_BEGIN_VISIT_STMT(UnaryOperator)
   MX_VISIT_BOOL(UnaryOperator, is_increment_operation, 89, MX_APPLY_METHOD, IsIncrementOperation, bool, NthStmt)
   MX_VISIT_BOOL(UnaryOperator, is_postfix, 91, MX_APPLY_METHOD, IsPostfix, bool, NthStmt)
   MX_VISIT_BOOL(UnaryOperator, is_prefix, 93, MX_APPLY_METHOD, IsPrefix, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(UnaryOperator, can_overflow, 86, MX_APPLY_METHOD, CanOverflow, bool, NthStmt)
-  MX_VISIT_ENUM(UnaryOperator, opcode, 92, MX_APPLY_METHOD, Opcode, UnaryOperatorKind, NthStmt)
-  MX_VISIT_ENTITY(UnaryOperator, operator_token, 37, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
-  MX_VISIT_ENTITY(UnaryOperator, sub_expression, 38, MX_APPLY_METHOD, SubExpression, Expr, NthStmt)
-  MX_VISIT_BOOL(UnaryOperator, has_stored_fp_features, 87, MX_APPLY_METHOD, HasStoredFPFeatures, bool, NthStmt)
-  MX_VISIT_BOOL(UnaryOperator, is_arithmetic_operation, 88, MX_APPLY_METHOD, IsArithmeticOperation, bool, NthStmt)
-  MX_VISIT_BOOL(UnaryOperator, is_decrement_operation, 89, MX_APPLY_METHOD, IsDecrementOperation, bool, NthStmt)
-  MX_VISIT_BOOL(UnaryOperator, is_increment_decrement_operation, 90, MX_APPLY_METHOD, IsIncrementDecrementOperation, bool, NthStmt)
-  MX_VISIT_BOOL(UnaryOperator, is_increment_operation, 91, MX_APPLY_METHOD, IsIncrementOperation, bool, NthStmt)
-  MX_VISIT_BOOL(UnaryOperator, is_postfix, 93, MX_APPLY_METHOD, IsPostfix, bool, NthStmt)
-  MX_VISIT_BOOL(UnaryOperator, is_prefix, 95, MX_APPLY_METHOD, IsPrefix, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_UnaryOperator
 MX_END_VISIT_STMT(UnaryOperator)
 
@@ -16809,19 +16534,11 @@ MX_BEGIN_VISIT_STMT(UnaryExprOrTypeTraitExpr)
   MX_VISIT_BASE(UnaryExprOrTypeTraitExpr, Expr)
   MX_VISIT_OPTIONAL_ENTITY(UnaryExprOrTypeTraitExpr, argument_expression, 37, MX_APPLY_METHOD, ArgumentExpression, Expr, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(UnaryExprOrTypeTraitExpr, argument_type, 38, MX_APPLY_METHOD, ArgumentType, Type, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(UnaryExprOrTypeTraitExpr, keyword_kind, 90, MX_APPLY_METHOD, KeywordKind, UnaryExprOrTypeTrait, NthStmt)
   MX_VISIT_ENTITY(UnaryExprOrTypeTraitExpr, operator_token, 39, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
   MX_VISIT_ENTITY(UnaryExprOrTypeTraitExpr, r_paren_token, 40, MX_APPLY_METHOD, RParenToken, Token, NthStmt)
   MX_VISIT_ENTITY(UnaryExprOrTypeTraitExpr, type_of_argument, 41, MX_APPLY_METHOD, TypeOfArgument, Type, NthStmt)
   MX_VISIT_BOOL(UnaryExprOrTypeTraitExpr, is_argument_type, 84, MX_APPLY_METHOD, IsArgumentType, bool, NthStmt)
-=======
-  MX_VISIT_ENUM(UnaryExprOrTypeTraitExpr, keyword_kind, 92, MX_APPLY_METHOD, KeywordKind, UnaryExprOrTypeTrait, NthStmt)
-  MX_VISIT_ENTITY(UnaryExprOrTypeTraitExpr, operator_token, 39, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
-  MX_VISIT_ENTITY(UnaryExprOrTypeTraitExpr, r_paren_token, 40, MX_APPLY_METHOD, RParenToken, Token, NthStmt)
-  MX_VISIT_ENTITY(UnaryExprOrTypeTraitExpr, type_of_argument, 41, MX_APPLY_METHOD, TypeOfArgument, Type, NthStmt)
-  MX_VISIT_BOOL(UnaryExprOrTypeTraitExpr, is_argument_type, 86, MX_APPLY_METHOD, IsArgumentType, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_UnaryExprOrTypeTraitExpr
 MX_END_VISIT_STMT(UnaryExprOrTypeTraitExpr)
 
@@ -16848,13 +16565,8 @@ MX_END_VISIT_STMT(TypoExpr)
 MX_BEGIN_VISIT_STMT(TypeTraitExpr)
   MX_ENTER_VISIT_TypeTraitExpr
   MX_VISIT_BASE(TypeTraitExpr, Expr)
-<<<<<<< HEAD
   MX_VISIT_ENUM(TypeTraitExpr, trait, 90, MX_APPLY_METHOD, Trait, TypeTrait, NthStmt)
   MX_VISIT_OPTIONAL_BOOL(TypeTraitExpr, value, 84, MX_APPLY_METHOD, Value, bool, NthStmt)
-=======
-  MX_VISIT_ENUM(TypeTraitExpr, trait, 92, MX_APPLY_METHOD, Trait, TypeTrait, NthStmt)
-  MX_VISIT_OPTIONAL_BOOL(TypeTraitExpr, value, 86, MX_APPLY_METHOD, Value, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_ENTITY_LIST(TypeTraitExpr, arguments, 15, MX_APPLY_METHOD, Arguments, Type, NthStmt)
   MX_EXIT_VISIT_TypeTraitExpr
 MX_END_VISIT_STMT(TypeTraitExpr)
@@ -16887,19 +16599,11 @@ MX_BEGIN_VISIT_STMT(SubstNonTypeTemplateParmExpr)
   MX_VISIT_BASE(SubstNonTypeTemplateParmExpr, Expr)
   MX_VISIT_ENTITY(SubstNonTypeTemplateParmExpr, associated_declaration, 37, MX_APPLY_METHOD, AssociatedDeclaration, Decl, NthStmt)
   MX_VISIT_ENTITY(SubstNonTypeTemplateParmExpr, name_token, 38, MX_APPLY_METHOD, NameToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_OPTIONAL_INT(SubstNonTypeTemplateParmExpr, pack_index, 100, MX_APPLY_METHOD, PackIndex, , NthStmt)
   MX_VISIT_ENTITY(SubstNonTypeTemplateParmExpr, parameter, 39, MX_APPLY_METHOD, Parameter, NonTypeTemplateParmDecl, NthStmt)
   MX_VISIT_ENTITY(SubstNonTypeTemplateParmExpr, parameter_type, 40, MX_APPLY_METHOD, ParameterType, Type, NthStmt)
   MX_VISIT_ENTITY(SubstNonTypeTemplateParmExpr, replacement, 41, MX_APPLY_METHOD, Replacement, Expr, NthStmt)
   MX_VISIT_BOOL(SubstNonTypeTemplateParmExpr, is_reference_parameter, 85, MX_APPLY_METHOD, IsReferenceParameter, bool, NthStmt)
-=======
-  MX_VISIT_OPTIONAL_INT(SubstNonTypeTemplateParmExpr, pack_index, 102, MX_APPLY_METHOD, PackIndex, , NthStmt)
-  MX_VISIT_ENTITY(SubstNonTypeTemplateParmExpr, parameter, 39, MX_APPLY_METHOD, Parameter, NonTypeTemplateParmDecl, NthStmt)
-  MX_VISIT_ENTITY(SubstNonTypeTemplateParmExpr, parameter_type, 40, MX_APPLY_METHOD, ParameterType, Type, NthStmt)
-  MX_VISIT_ENTITY(SubstNonTypeTemplateParmExpr, replacement, 41, MX_APPLY_METHOD, Replacement, Expr, NthStmt)
-  MX_VISIT_BOOL(SubstNonTypeTemplateParmExpr, is_reference_parameter, 87, MX_APPLY_METHOD, IsReferenceParameter, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_SubstNonTypeTemplateParmExpr
 MX_END_VISIT_STMT(SubstNonTypeTemplateParmExpr)
 
@@ -16913,7 +16617,6 @@ MX_END_VISIT_STMT(SubstNonTypeTemplateParmExpr)
 MX_BEGIN_VISIT_STMT(StringLiteral)
   MX_ENTER_VISIT_StringLiteral
   MX_VISIT_BASE(StringLiteral, Expr)
-<<<<<<< HEAD
   MX_VISIT_OPTIONAL_BOOL(StringLiteral, contains_non_ascii, 84, MX_APPLY_METHOD, ContainsNonAscii, bool, NthStmt)
   MX_VISIT_OPTIONAL_BOOL(StringLiteral, contains_non_ascii_or_null, 86, MX_APPLY_METHOD, ContainsNonAsciiOrNull, bool, NthStmt)
   MX_VISIT_TEXT(StringLiteral, bytes, 60, MX_APPLY_METHOD, Bytes, basic_string_view, NthStmt)
@@ -16926,20 +16629,6 @@ MX_BEGIN_VISIT_STMT(StringLiteral)
   MX_VISIT_BOOL(StringLiteral, is_utf8, 95, MX_APPLY_METHOD, IsUTF8, bool, NthStmt)
   MX_VISIT_BOOL(StringLiteral, is_unevaluated, 96, MX_APPLY_METHOD, IsUnevaluated, bool, NthStmt)
   MX_VISIT_BOOL(StringLiteral, is_wide, 97, MX_APPLY_METHOD, IsWide, bool, NthStmt)
-=======
-  MX_VISIT_OPTIONAL_BOOL(StringLiteral, contains_non_ascii, 86, MX_APPLY_METHOD, ContainsNonAscii, bool, NthStmt)
-  MX_VISIT_OPTIONAL_BOOL(StringLiteral, contains_non_ascii_or_null, 88, MX_APPLY_METHOD, ContainsNonAsciiOrNull, bool, NthStmt)
-  MX_VISIT_TEXT(StringLiteral, bytes, 60, MX_APPLY_METHOD, Bytes, basic_string_view, NthStmt)
-  MX_VISIT_ENUM(StringLiteral, literal_kind, 92, MX_APPLY_METHOD, LiteralKind, StringLiteralStringKind, NthStmt)
-  MX_VISIT_OPTIONAL_TEXT(StringLiteral, string, 65, MX_APPLY_METHOD, String, basic_string_view, NthStmt)
-  MX_VISIT_BOOL(StringLiteral, is_ordinary, 91, MX_APPLY_METHOD, IsOrdinary, bool, NthStmt)
-  MX_VISIT_BOOL(StringLiteral, is_pascal, 93, MX_APPLY_METHOD, IsPascal, bool, NthStmt)
-  MX_VISIT_BOOL(StringLiteral, is_utf16, 95, MX_APPLY_METHOD, IsUTF16, bool, NthStmt)
-  MX_VISIT_BOOL(StringLiteral, is_utf32, 96, MX_APPLY_METHOD, IsUTF32, bool, NthStmt)
-  MX_VISIT_BOOL(StringLiteral, is_utf8, 97, MX_APPLY_METHOD, IsUTF8, bool, NthStmt)
-  MX_VISIT_BOOL(StringLiteral, is_unevaluated, 98, MX_APPLY_METHOD, IsUnevaluated, bool, NthStmt)
-  MX_VISIT_BOOL(StringLiteral, is_wide, 99, MX_APPLY_METHOD, IsWide, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_StringLiteral
 MX_END_VISIT_STMT(StringLiteral)
 
@@ -16970,15 +16659,9 @@ MX_BEGIN_VISIT_STMT(SourceLocExpr)
   MX_ENTER_VISIT_SourceLocExpr
   MX_VISIT_BASE(SourceLocExpr, Expr)
   MX_VISIT_TEXT(SourceLocExpr, builtin_string, 60, MX_APPLY_METHOD, BuiltinString, basic_string_view, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(SourceLocExpr, identifier_kind, 90, MX_APPLY_METHOD, IdentifierKind, SourceLocExprIdentKind, NthStmt)
   MX_VISIT_ENTITY(SourceLocExpr, token, 37, MX_APPLY_METHOD, Token, Token, NthStmt)
   MX_VISIT_BOOL(SourceLocExpr, is_int_type, 84, MX_APPLY_METHOD, IsIntType, bool, NthStmt)
-=======
-  MX_VISIT_ENUM(SourceLocExpr, identifier_kind, 92, MX_APPLY_METHOD, IdentifierKind, SourceLocExprIdentKind, NthStmt)
-  MX_VISIT_ENTITY(SourceLocExpr, token, 37, MX_APPLY_METHOD, Token, Token, NthStmt)
-  MX_VISIT_BOOL(SourceLocExpr, is_int_type, 86, MX_APPLY_METHOD, IsIntType, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_SourceLocExpr
 MX_END_VISIT_STMT(SourceLocExpr)
 
@@ -16994,19 +16677,11 @@ MX_BEGIN_VISIT_STMT(SizeOfPackExpr)
   MX_VISIT_BASE(SizeOfPackExpr, Expr)
   MX_VISIT_ENTITY(SizeOfPackExpr, operator_token, 37, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
   MX_VISIT_ENTITY(SizeOfPackExpr, pack, 38, MX_APPLY_METHOD, Pack, NamedDecl, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_OPTIONAL_INT(SizeOfPackExpr, pack_length, 100, MX_APPLY_METHOD, PackLength, , NthStmt)
   MX_VISIT_ENTITY(SizeOfPackExpr, pack_token, 39, MX_APPLY_METHOD, PackToken, Token, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY_LIST(SizeOfPackExpr, partial_arguments, 15, MX_APPLY_METHOD, PartialArguments, TemplateArgument, NthStmt)
   MX_VISIT_ENTITY(SizeOfPackExpr, r_paren_token, 40, MX_APPLY_METHOD, RParenToken, Token, NthStmt)
   MX_VISIT_BOOL(SizeOfPackExpr, is_partially_substituted, 86, MX_APPLY_METHOD, IsPartiallySubstituted, bool, NthStmt)
-=======
-  MX_VISIT_OPTIONAL_INT(SizeOfPackExpr, pack_length, 102, MX_APPLY_METHOD, PackLength, , NthStmt)
-  MX_VISIT_ENTITY(SizeOfPackExpr, pack_token, 39, MX_APPLY_METHOD, PackToken, Token, NthStmt)
-  MX_VISIT_OPTIONAL_ENTITY_LIST(SizeOfPackExpr, partial_arguments, 15, MX_APPLY_METHOD, PartialArguments, TemplateArgument, NthStmt)
-  MX_VISIT_ENTITY(SizeOfPackExpr, r_paren_token, 40, MX_APPLY_METHOD, RParenToken, Token, NthStmt)
-  MX_VISIT_BOOL(SizeOfPackExpr, is_partially_substituted, 88, MX_APPLY_METHOD, IsPartiallySubstituted, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_SizeOfPackExpr
 MX_END_VISIT_STMT(SizeOfPackExpr)
 
@@ -17101,17 +16776,10 @@ MX_BEGIN_VISIT_STMT(PredefinedExpr)
   MX_ENTER_VISIT_PredefinedExpr
   MX_VISIT_BASE(PredefinedExpr, Expr)
   MX_VISIT_OPTIONAL_ENTITY(PredefinedExpr, function_name, 37, MX_APPLY_METHOD, FunctionName, StringLiteral, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(PredefinedExpr, identifier_kind, 90, MX_APPLY_METHOD, IdentifierKind, PredefinedExprIdentKind, NthStmt)
   MX_VISIT_TEXT(PredefinedExpr, identifier_kind_name, 60, MX_APPLY_METHOD, IdentifierKindName, basic_string_view, NthStmt)
   MX_VISIT_ENTITY(PredefinedExpr, token, 38, MX_APPLY_METHOD, Token, Token, NthStmt)
   MX_VISIT_BOOL(PredefinedExpr, is_transparent, 84, MX_APPLY_METHOD, IsTransparent, bool, NthStmt)
-=======
-  MX_VISIT_ENUM(PredefinedExpr, identifier_kind, 92, MX_APPLY_METHOD, IdentifierKind, PredefinedExprIdentKind, NthStmt)
-  MX_VISIT_TEXT(PredefinedExpr, identifier_kind_name, 60, MX_APPLY_METHOD, IdentifierKindName, basic_string_view, NthStmt)
-  MX_VISIT_ENTITY(PredefinedExpr, token, 38, MX_APPLY_METHOD, Token, Token, NthStmt)
-  MX_VISIT_BOOL(PredefinedExpr, is_transparent, 86, MX_APPLY_METHOD, IsTransparent, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_PredefinedExpr
 MX_END_VISIT_STMT(PredefinedExpr)
 
@@ -17172,19 +16840,13 @@ MX_END_VISIT_STMT(PackExpansionExpr)
 MX_BEGIN_VISIT_ABSTRACT_STMT(OverloadExpr)
   MX_ENTER_VISIT_OverloadExpr
   MX_VISIT_BASE(OverloadExpr, Expr)
-  MX_VISIT_ENTITY_LIST(OverloadExpr, declarations, 15, MX_APPLY_METHOD, Declarations, NamedDecl, NthStmt)
   MX_VISIT_ENTITY(OverloadExpr, l_angle_token, 37, MX_APPLY_METHOD, LAngleToken, Token, NthStmt)
   MX_VISIT_ENTITY(OverloadExpr, name_token, 38, MX_APPLY_METHOD, NameToken, Token, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(OverloadExpr, naming_class, 39, MX_APPLY_METHOD, NamingClass, CXXRecordDecl, NthStmt)
   MX_VISIT_ENTITY(OverloadExpr, r_angle_token, 40, MX_APPLY_METHOD, RAngleToken, Token, NthStmt)
   MX_VISIT_ENTITY(OverloadExpr, template_keyword_token, 41, MX_APPLY_METHOD, TemplateKeywordToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(OverloadExpr, has_explicit_template_arguments, 84, MX_APPLY_METHOD, HasExplicitTemplateArguments, bool, NthStmt)
   MX_VISIT_BOOL(OverloadExpr, has_template_keyword, 85, MX_APPLY_METHOD, HasTemplateKeyword, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(OverloadExpr, has_explicit_template_arguments, 86, MX_APPLY_METHOD, HasExplicitTemplateArguments, bool, NthStmt)
-  MX_VISIT_BOOL(OverloadExpr, has_template_keyword, 87, MX_APPLY_METHOD, HasTemplateKeyword, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_OverloadExpr
 MX_END_VISIT_STMT(OverloadExpr)
 
@@ -17201,15 +16863,9 @@ MX_BEGIN_VISIT_STMT(UnresolvedMemberExpr)
   MX_VISIT_ENTITY(UnresolvedMemberExpr, base_type, 42, MX_APPLY_METHOD, BaseType, Type, NthStmt)
   MX_VISIT_ENTITY(UnresolvedMemberExpr, member_token, 43, MX_APPLY_METHOD, MemberToken, Token, NthStmt)
   MX_VISIT_ENTITY(UnresolvedMemberExpr, operator_token, 44, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(UnresolvedMemberExpr, has_unresolved_using, 86, MX_APPLY_METHOD, HasUnresolvedUsing, bool, NthStmt)
   MX_VISIT_BOOL(UnresolvedMemberExpr, is_arrow, 87, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
   MX_VISIT_BOOL(UnresolvedMemberExpr, is_implicit_access, 88, MX_APPLY_METHOD, IsImplicitAccess, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(UnresolvedMemberExpr, has_unresolved_using, 88, MX_APPLY_METHOD, HasUnresolvedUsing, bool, NthStmt)
-  MX_VISIT_BOOL(UnresolvedMemberExpr, is_arrow, 89, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
-  MX_VISIT_BOOL(UnresolvedMemberExpr, is_implicit_access, 90, MX_APPLY_METHOD, IsImplicitAccess, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_UnresolvedMemberExpr
 MX_END_VISIT_STMT(UnresolvedMemberExpr)
 
@@ -17223,13 +16879,8 @@ MX_END_VISIT_STMT(UnresolvedMemberExpr)
 MX_BEGIN_VISIT_STMT(UnresolvedLookupExpr)
   MX_ENTER_VISIT_UnresolvedLookupExpr
   MX_VISIT_BASE(UnresolvedLookupExpr, OverloadExpr)
-<<<<<<< HEAD
   MX_VISIT_BOOL(UnresolvedLookupExpr, is_overloaded, 86, MX_APPLY_METHOD, IsOverloaded, bool, NthStmt)
   MX_VISIT_BOOL(UnresolvedLookupExpr, requires_adl, 87, MX_APPLY_METHOD, RequiresADL, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(UnresolvedLookupExpr, is_overloaded, 88, MX_APPLY_METHOD, IsOverloaded, bool, NthStmt)
-  MX_VISIT_BOOL(UnresolvedLookupExpr, requires_adl, 89, MX_APPLY_METHOD, RequiresADL, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_UnresolvedLookupExpr
 MX_END_VISIT_STMT(UnresolvedLookupExpr)
 
@@ -17245,11 +16896,7 @@ MX_BEGIN_VISIT_STMT(OpaqueValueExpr)
   MX_VISIT_BASE(OpaqueValueExpr, Expr)
   MX_VISIT_ENTITY(OpaqueValueExpr, token, 37, MX_APPLY_METHOD, Token, Token, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(OpaqueValueExpr, source_expression, 38, MX_APPLY_METHOD, SourceExpression, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(OpaqueValueExpr, is_unique, 84, MX_APPLY_METHOD, IsUnique, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(OpaqueValueExpr, is_unique, 86, MX_APPLY_METHOD, IsUnique, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_OpaqueValueExpr
 MX_END_VISIT_STMT(OpaqueValueExpr)
 
@@ -17282,11 +16929,7 @@ MX_BEGIN_VISIT_STMT(ObjCSubscriptRefExpr)
   MX_VISIT_ENTITY(ObjCSubscriptRefExpr, base_expression, 38, MX_APPLY_METHOD, BaseExpression, Expr, NthStmt)
   MX_VISIT_ENTITY(ObjCSubscriptRefExpr, key_expression, 39, MX_APPLY_METHOD, KeyExpression, Expr, NthStmt)
   MX_VISIT_ENTITY(ObjCSubscriptRefExpr, r_bracket_token, 40, MX_APPLY_METHOD, RBracketToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(ObjCSubscriptRefExpr, is_array_subscript_reference_expression, 84, MX_APPLY_METHOD, IsArraySubscriptReferenceExpression, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(ObjCSubscriptRefExpr, is_array_subscript_reference_expression, 86, MX_APPLY_METHOD, IsArraySubscriptReferenceExpression, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ObjCSubscriptRefExpr
 MX_END_VISIT_STMT(ObjCSubscriptRefExpr)
 
@@ -17356,7 +16999,6 @@ MX_BEGIN_VISIT_STMT(ObjCPropertyRefExpr)
   MX_VISIT_ENTITY(ObjCPropertyRefExpr, receiver_token, 43, MX_APPLY_METHOD, ReceiverToken, Token, NthStmt)
   MX_VISIT_ENTITY(ObjCPropertyRefExpr, receiver_type, 44, MX_APPLY_METHOD, ReceiverType, Type, NthStmt)
   MX_VISIT_ENTITY(ObjCPropertyRefExpr, super_receiver_type, 45, MX_APPLY_METHOD, SuperReceiverType, Type, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(ObjCPropertyRefExpr, is_class_receiver, 84, MX_APPLY_METHOD, IsClassReceiver, bool, NthStmt)
   MX_VISIT_BOOL(ObjCPropertyRefExpr, is_explicit_property, 85, MX_APPLY_METHOD, IsExplicitProperty, bool, NthStmt)
   MX_VISIT_BOOL(ObjCPropertyRefExpr, is_implicit_property, 86, MX_APPLY_METHOD, IsImplicitProperty, bool, NthStmt)
@@ -17364,15 +17006,6 @@ MX_BEGIN_VISIT_STMT(ObjCPropertyRefExpr)
   MX_VISIT_BOOL(ObjCPropertyRefExpr, is_messaging_setter, 88, MX_APPLY_METHOD, IsMessagingSetter, bool, NthStmt)
   MX_VISIT_BOOL(ObjCPropertyRefExpr, is_object_receiver, 89, MX_APPLY_METHOD, IsObjectReceiver, bool, NthStmt)
   MX_VISIT_BOOL(ObjCPropertyRefExpr, is_super_receiver, 91, MX_APPLY_METHOD, IsSuperReceiver, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(ObjCPropertyRefExpr, is_class_receiver, 86, MX_APPLY_METHOD, IsClassReceiver, bool, NthStmt)
-  MX_VISIT_BOOL(ObjCPropertyRefExpr, is_explicit_property, 87, MX_APPLY_METHOD, IsExplicitProperty, bool, NthStmt)
-  MX_VISIT_BOOL(ObjCPropertyRefExpr, is_implicit_property, 88, MX_APPLY_METHOD, IsImplicitProperty, bool, NthStmt)
-  MX_VISIT_BOOL(ObjCPropertyRefExpr, is_messaging_getter, 89, MX_APPLY_METHOD, IsMessagingGetter, bool, NthStmt)
-  MX_VISIT_BOOL(ObjCPropertyRefExpr, is_messaging_setter, 90, MX_APPLY_METHOD, IsMessagingSetter, bool, NthStmt)
-  MX_VISIT_BOOL(ObjCPropertyRefExpr, is_object_receiver, 91, MX_APPLY_METHOD, IsObjectReceiver, bool, NthStmt)
-  MX_VISIT_BOOL(ObjCPropertyRefExpr, is_super_receiver, 93, MX_APPLY_METHOD, IsSuperReceiver, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ObjCPropertyRefExpr
 MX_END_VISIT_STMT(ObjCPropertyRefExpr)
 
@@ -17392,32 +17025,19 @@ MX_BEGIN_VISIT_STMT(ObjCMessageExpr)
   MX_VISIT_ENTITY(ObjCMessageExpr, instance_receiver, 39, MX_APPLY_METHOD, InstanceReceiver, Expr, NthStmt)
   MX_VISIT_ENTITY(ObjCMessageExpr, left_token, 40, MX_APPLY_METHOD, LeftToken, Token, NthStmt)
   MX_VISIT_ENTITY(ObjCMessageExpr, method_declaration, 41, MX_APPLY_METHOD, MethodDeclaration, ObjCMethodDecl, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(ObjCMessageExpr, method_family, 90, MX_APPLY_METHOD, MethodFamily, ObjCMethodFamily, NthStmt)
   MX_VISIT_ENTITY(ObjCMessageExpr, receiver_interface, 42, MX_APPLY_METHOD, ReceiverInterface, ObjCInterfaceDecl, NthStmt)
   MX_VISIT_ENUM(ObjCMessageExpr, receiver_kind, 92, MX_APPLY_METHOD, ReceiverKind, ObjCMessageExprReceiverKind, NthStmt)
-=======
-  MX_VISIT_ENUM(ObjCMessageExpr, method_family, 92, MX_APPLY_METHOD, MethodFamily, ObjCMethodFamily, NthStmt)
-  MX_VISIT_ENTITY(ObjCMessageExpr, receiver_interface, 42, MX_APPLY_METHOD, ReceiverInterface, ObjCInterfaceDecl, NthStmt)
-  MX_VISIT_ENUM(ObjCMessageExpr, receiver_kind, 94, MX_APPLY_METHOD, ReceiverKind, ObjCMessageExprReceiverKind, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_TOKEN_RANGE(ObjCMessageExpr, receiver_range, 43, 44, NthStmt)
   MX_VISIT_ENTITY(ObjCMessageExpr, receiver_type, 45, MX_APPLY_METHOD, ReceiverType, Type, NthStmt)
   MX_VISIT_ENTITY(ObjCMessageExpr, right_token, 46, MX_APPLY_METHOD, RightToken, Token, NthStmt)
   MX_VISIT_ENTITY(ObjCMessageExpr, selector_start_token, 47, MX_APPLY_METHOD, SelectorStartToken, Token, NthStmt)
   MX_VISIT_ENTITY(ObjCMessageExpr, super_token, 48, MX_APPLY_METHOD, SuperToken, Token, NthStmt)
   MX_VISIT_ENTITY(ObjCMessageExpr, super_type, 49, MX_APPLY_METHOD, SuperType, Type, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(ObjCMessageExpr, is_class_message, 84, MX_APPLY_METHOD, IsClassMessage, bool, NthStmt)
   MX_VISIT_BOOL(ObjCMessageExpr, is_delegate_initializer_call, 85, MX_APPLY_METHOD, IsDelegateInitializerCall, bool, NthStmt)
   MX_VISIT_BOOL(ObjCMessageExpr, is_implicit, 86, MX_APPLY_METHOD, IsImplicit, bool, NthStmt)
   MX_VISIT_BOOL(ObjCMessageExpr, is_instance_message, 87, MX_APPLY_METHOD, IsInstanceMessage, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(ObjCMessageExpr, is_class_message, 86, MX_APPLY_METHOD, IsClassMessage, bool, NthStmt)
-  MX_VISIT_BOOL(ObjCMessageExpr, is_delegate_initializer_call, 87, MX_APPLY_METHOD, IsDelegateInitializerCall, bool, NthStmt)
-  MX_VISIT_BOOL(ObjCMessageExpr, is_implicit, 88, MX_APPLY_METHOD, IsImplicit, bool, NthStmt)
-  MX_VISIT_BOOL(ObjCMessageExpr, is_instance_message, 89, MX_APPLY_METHOD, IsInstanceMessage, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_ENTITY_LIST(ObjCMessageExpr, selector_tokens, 26, MX_APPLY_METHOD, SelectorTokens, Token, NthStmt)
   MX_EXIT_VISIT_ObjCMessageExpr
 MX_END_VISIT_STMT(ObjCMessageExpr)
@@ -17436,13 +17056,8 @@ MX_BEGIN_VISIT_STMT(ObjCIvarRefExpr)
   MX_VISIT_ENTITY(ObjCIvarRefExpr, declaration, 38, MX_APPLY_METHOD, Declaration, ObjCIvarDecl, NthStmt)
   MX_VISIT_ENTITY(ObjCIvarRefExpr, token, 39, MX_APPLY_METHOD, Token, Token, NthStmt)
   MX_VISIT_ENTITY(ObjCIvarRefExpr, operation_token, 40, MX_APPLY_METHOD, OperationToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(ObjCIvarRefExpr, is_arrow, 84, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
   MX_VISIT_BOOL(ObjCIvarRefExpr, is_free_instance_variable, 85, MX_APPLY_METHOD, IsFreeInstanceVariable, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(ObjCIvarRefExpr, is_arrow, 86, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
-  MX_VISIT_BOOL(ObjCIvarRefExpr, is_free_instance_variable, 87, MX_APPLY_METHOD, IsFreeInstanceVariable, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ObjCIvarRefExpr
 MX_END_VISIT_STMT(ObjCIvarRefExpr)
 
@@ -17460,11 +17075,7 @@ MX_BEGIN_VISIT_STMT(ObjCIsaExpr)
   MX_VISIT_ENTITY(ObjCIsaExpr, base_token_end, 38, MX_APPLY_METHOD, BaseTokenEnd, Token, NthStmt)
   MX_VISIT_ENTITY(ObjCIsaExpr, isa_member_token, 39, MX_APPLY_METHOD, IsaMemberToken, Token, NthStmt)
   MX_VISIT_ENTITY(ObjCIsaExpr, operation_token, 40, MX_APPLY_METHOD, OperationToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(ObjCIsaExpr, is_arrow, 84, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(ObjCIsaExpr, is_arrow, 86, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ObjCIsaExpr
 MX_END_VISIT_STMT(ObjCIsaExpr)
 
@@ -17479,11 +17090,7 @@ MX_BEGIN_VISIT_STMT(ObjCIndirectCopyRestoreExpr)
   MX_ENTER_VISIT_ObjCIndirectCopyRestoreExpr
   MX_VISIT_BASE(ObjCIndirectCopyRestoreExpr, Expr)
   MX_VISIT_ENTITY(ObjCIndirectCopyRestoreExpr, sub_expression, 37, MX_APPLY_METHOD, SubExpression, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(ObjCIndirectCopyRestoreExpr, should_copy, 84, MX_APPLY_METHOD, ShouldCopy, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(ObjCIndirectCopyRestoreExpr, should_copy, 86, MX_APPLY_METHOD, ShouldCopy, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ObjCIndirectCopyRestoreExpr
 MX_END_VISIT_STMT(ObjCIndirectCopyRestoreExpr)
 
@@ -17530,11 +17137,7 @@ MX_BEGIN_VISIT_STMT(ObjCBoxedExpr)
   MX_VISIT_ENTITY(ObjCBoxedExpr, at_token, 37, MX_APPLY_METHOD, AtToken, Token, NthStmt)
   MX_VISIT_ENTITY(ObjCBoxedExpr, boxing_method, 38, MX_APPLY_METHOD, BoxingMethod, ObjCMethodDecl, NthStmt)
   MX_VISIT_ENTITY(ObjCBoxedExpr, sub_expression, 39, MX_APPLY_METHOD, SubExpression, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(ObjCBoxedExpr, is_expressible_as_constant_initializer, 84, MX_APPLY_METHOD, IsExpressibleAsConstantInitializer, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(ObjCBoxedExpr, is_expressible_as_constant_initializer, 86, MX_APPLY_METHOD, IsExpressibleAsConstantInitializer, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ObjCBoxedExpr
 MX_END_VISIT_STMT(ObjCBoxedExpr)
 
@@ -17549,11 +17152,7 @@ MX_BEGIN_VISIT_STMT(ObjCBoolLiteralExpr)
   MX_ENTER_VISIT_ObjCBoolLiteralExpr
   MX_VISIT_BASE(ObjCBoolLiteralExpr, Expr)
   MX_VISIT_ENTITY(ObjCBoolLiteralExpr, token, 37, MX_APPLY_METHOD, Token, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(ObjCBoolLiteralExpr, value, 84, MX_APPLY_METHOD, Value, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(ObjCBoolLiteralExpr, value, 86, MX_APPLY_METHOD, Value, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ObjCBoolLiteralExpr
 MX_END_VISIT_STMT(ObjCBoolLiteralExpr)
 
@@ -17567,11 +17166,7 @@ MX_END_VISIT_STMT(ObjCBoolLiteralExpr)
 MX_BEGIN_VISIT_STMT(ObjCAvailabilityCheckExpr)
   MX_ENTER_VISIT_ObjCAvailabilityCheckExpr
   MX_VISIT_BASE(ObjCAvailabilityCheckExpr, Expr)
-<<<<<<< HEAD
   MX_VISIT_BOOL(ObjCAvailabilityCheckExpr, has_version, 84, MX_APPLY_METHOD, HasVersion, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(ObjCAvailabilityCheckExpr, has_version, 86, MX_APPLY_METHOD, HasVersion, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ObjCAvailabilityCheckExpr
 MX_END_VISIT_STMT(ObjCAvailabilityCheckExpr)
 
@@ -17673,7 +17268,6 @@ MX_BEGIN_VISIT_STMT(MemberExpr)
   MX_VISIT_ENTITY(MemberExpr, operator_token, 41, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
   MX_VISIT_ENTITY(MemberExpr, r_angle_token, 42, MX_APPLY_METHOD, RAngleToken, Token, NthStmt)
   MX_VISIT_ENTITY(MemberExpr, template_keyword_token, 43, MX_APPLY_METHOD, TemplateKeywordToken, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(MemberExpr, had_multiple_candidates, 84, MX_APPLY_METHOD, HadMultipleCandidates, bool, NthStmt)
   MX_VISIT_BOOL(MemberExpr, has_explicit_template_arguments, 85, MX_APPLY_METHOD, HasExplicitTemplateArguments, bool, NthStmt)
   MX_VISIT_BOOL(MemberExpr, has_qualifier, 86, MX_APPLY_METHOD, HasQualifier, bool, NthStmt)
@@ -17681,15 +17275,6 @@ MX_BEGIN_VISIT_STMT(MemberExpr)
   MX_VISIT_BOOL(MemberExpr, is_arrow, 88, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
   MX_VISIT_BOOL(MemberExpr, is_implicit_access, 89, MX_APPLY_METHOD, IsImplicitAccess, bool, NthStmt)
   MX_VISIT_ENUM(MemberExpr, is_non_odr_use, 90, MX_APPLY_METHOD, IsNonOdrUse, NonOdrUseReason, NthStmt)
-=======
-  MX_VISIT_BOOL(MemberExpr, had_multiple_candidates, 86, MX_APPLY_METHOD, HadMultipleCandidates, bool, NthStmt)
-  MX_VISIT_BOOL(MemberExpr, has_explicit_template_arguments, 87, MX_APPLY_METHOD, HasExplicitTemplateArguments, bool, NthStmt)
-  MX_VISIT_BOOL(MemberExpr, has_qualifier, 88, MX_APPLY_METHOD, HasQualifier, bool, NthStmt)
-  MX_VISIT_BOOL(MemberExpr, has_template_keyword, 89, MX_APPLY_METHOD, HasTemplateKeyword, bool, NthStmt)
-  MX_VISIT_BOOL(MemberExpr, is_arrow, 90, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
-  MX_VISIT_BOOL(MemberExpr, is_implicit_access, 91, MX_APPLY_METHOD, IsImplicitAccess, bool, NthStmt)
-  MX_VISIT_ENUM(MemberExpr, is_non_odr_use, 92, MX_APPLY_METHOD, IsNonOdrUse, NonOdrUseReason, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_MemberExpr
 MX_END_VISIT_STMT(MemberExpr)
 
@@ -17707,11 +17292,7 @@ MX_BEGIN_VISIT_STMT(MatrixSubscriptExpr)
   MX_VISIT_ENTITY(MatrixSubscriptExpr, column_index, 38, MX_APPLY_METHOD, ColumnIndex, Expr, NthStmt)
   MX_VISIT_ENTITY(MatrixSubscriptExpr, r_bracket_token, 39, MX_APPLY_METHOD, RBracketToken, Token, NthStmt)
   MX_VISIT_ENTITY(MatrixSubscriptExpr, row_index, 40, MX_APPLY_METHOD, RowIndex, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(MatrixSubscriptExpr, is_incomplete, 84, MX_APPLY_METHOD, IsIncomplete, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(MatrixSubscriptExpr, is_incomplete, 86, MX_APPLY_METHOD, IsIncomplete, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_MatrixSubscriptExpr
 MX_END_VISIT_STMT(MatrixSubscriptExpr)
 
@@ -17727,17 +17308,10 @@ MX_BEGIN_VISIT_STMT(MaterializeTemporaryExpr)
   MX_VISIT_BASE(MaterializeTemporaryExpr, Expr)
   MX_VISIT_OPTIONAL_ENTITY(MaterializeTemporaryExpr, extending_declaration, 37, MX_APPLY_METHOD, ExtendingDeclaration, ValueDecl, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(MaterializeTemporaryExpr, lifetime_extended_temporary_declaration, 38, MX_APPLY_METHOD, LifetimeExtendedTemporaryDeclaration, LifetimeExtendedTemporaryDecl, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(MaterializeTemporaryExpr, storage_duration, 90, MX_APPLY_METHOD, StorageDuration, StorageDuration, NthStmt)
   MX_VISIT_ENTITY(MaterializeTemporaryExpr, sub_expression, 39, MX_APPLY_METHOD, SubExpression, Expr, NthStmt)
   MX_VISIT_BOOL(MaterializeTemporaryExpr, is_bound_to_lvalue_reference, 84, MX_APPLY_METHOD, IsBoundToLvalueReference, bool, NthStmt)
   MX_VISIT_BOOL(MaterializeTemporaryExpr, is_usable_in_constant_expressions, 85, MX_APPLY_METHOD, IsUsableInConstantExpressions, bool, NthStmt)
-=======
-  MX_VISIT_ENUM(MaterializeTemporaryExpr, storage_duration, 92, MX_APPLY_METHOD, StorageDuration, StorageDuration, NthStmt)
-  MX_VISIT_ENTITY(MaterializeTemporaryExpr, sub_expression, 39, MX_APPLY_METHOD, SubExpression, Expr, NthStmt)
-  MX_VISIT_BOOL(MaterializeTemporaryExpr, is_bound_to_lvalue_reference, 86, MX_APPLY_METHOD, IsBoundToLvalueReference, bool, NthStmt)
-  MX_VISIT_BOOL(MaterializeTemporaryExpr, is_usable_in_constant_expressions, 87, MX_APPLY_METHOD, IsUsableInConstantExpressions, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_MaterializeTemporaryExpr
 MX_END_VISIT_STMT(MaterializeTemporaryExpr)
 
@@ -17770,13 +17344,8 @@ MX_BEGIN_VISIT_STMT(MSPropertyRefExpr)
   MX_VISIT_ENTITY(MSPropertyRefExpr, base_expression, 37, MX_APPLY_METHOD, BaseExpression, Expr, NthStmt)
   MX_VISIT_ENTITY(MSPropertyRefExpr, member_token, 38, MX_APPLY_METHOD, MemberToken, Token, NthStmt)
   MX_VISIT_ENTITY(MSPropertyRefExpr, property_declaration, 39, MX_APPLY_METHOD, PropertyDeclaration, MSPropertyDecl, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(MSPropertyRefExpr, is_arrow, 84, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
   MX_VISIT_BOOL(MSPropertyRefExpr, is_implicit_access, 85, MX_APPLY_METHOD, IsImplicitAccess, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(MSPropertyRefExpr, is_arrow, 86, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
-  MX_VISIT_BOOL(MSPropertyRefExpr, is_implicit_access, 87, MX_APPLY_METHOD, IsImplicitAccess, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_MSPropertyRefExpr
 MX_END_VISIT_STMT(MSPropertyRefExpr)
 
@@ -17792,11 +17361,7 @@ MX_BEGIN_VISIT_STMT(LambdaExpr)
   MX_VISIT_BASE(LambdaExpr, Expr)
   MX_VISIT_ENTITY(LambdaExpr, body, 37, MX_APPLY_METHOD, Body, Stmt, NthStmt)
   MX_VISIT_ENTITY(LambdaExpr, call_operator, 38, MX_APPLY_METHOD, CallOperator, CXXMethodDecl, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(LambdaExpr, capture_default, 90, MX_APPLY_METHOD, CaptureDefault, LambdaCaptureDefault, NthStmt)
-=======
-  MX_VISIT_ENUM(LambdaExpr, capture_default, 92, MX_APPLY_METHOD, CaptureDefault, LambdaCaptureDefault, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_ENTITY(LambdaExpr, capture_default_token, 39, MX_APPLY_METHOD, CaptureDefaultToken, Token, NthStmt)
   MX_VISIT_ENTITY(LambdaExpr, compound_statement_body, 40, MX_APPLY_METHOD, CompoundStatementBody, CompoundStmt, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(LambdaExpr, dependent_call_operator, 41, MX_APPLY_METHOD, DependentCallOperator, FunctionTemplateDecl, NthStmt)
@@ -17805,17 +17370,10 @@ MX_BEGIN_VISIT_STMT(LambdaExpr)
   MX_VISIT_ENTITY(LambdaExpr, lambda_class, 44, MX_APPLY_METHOD, LambdaClass, CXXRecordDecl, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(LambdaExpr, template_parameter_list, 45, MX_APPLY_METHOD, TemplateParameterList, TemplateParameterList, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(LambdaExpr, trailing_requires_clause, 46, MX_APPLY_METHOD, TrailingRequiresClause, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(LambdaExpr, has_explicit_parameters, 84, MX_APPLY_METHOD, HasExplicitParameters, bool, NthStmt)
   MX_VISIT_BOOL(LambdaExpr, has_explicit_result_type, 85, MX_APPLY_METHOD, HasExplicitResultType, bool, NthStmt)
   MX_VISIT_BOOL(LambdaExpr, is_generic_lambda, 86, MX_APPLY_METHOD, IsGenericLambda, bool, NthStmt)
   MX_VISIT_BOOL(LambdaExpr, is_mutable, 87, MX_APPLY_METHOD, IsMutable, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(LambdaExpr, has_explicit_parameters, 86, MX_APPLY_METHOD, HasExplicitParameters, bool, NthStmt)
-  MX_VISIT_BOOL(LambdaExpr, has_explicit_result_type, 87, MX_APPLY_METHOD, HasExplicitResultType, bool, NthStmt)
-  MX_VISIT_BOOL(LambdaExpr, is_generic_lambda, 88, MX_APPLY_METHOD, IsGenericLambda, bool, NthStmt)
-  MX_VISIT_BOOL(LambdaExpr, is_mutable, 89, MX_APPLY_METHOD, IsMutable, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_LambdaExpr
 MX_END_VISIT_STMT(LambdaExpr)
 
@@ -17849,7 +17407,6 @@ MX_BEGIN_VISIT_STMT(InitListExpr)
   MX_VISIT_ENTITY(InitListExpr, r_brace_token, 40, MX_APPLY_METHOD, RBraceToken, Token, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(InitListExpr, semantic_form, 41, MX_APPLY_METHOD, SemanticForm, InitListExpr, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(InitListExpr, syntactic_form, 42, MX_APPLY_METHOD, SyntacticForm, InitListExpr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(InitListExpr, had_array_range_designator, 84, MX_APPLY_METHOD, HadArrayRangeDesignator, bool, NthStmt)
   MX_VISIT_BOOL(InitListExpr, has_array_filler, 85, MX_APPLY_METHOD, HasArrayFiller, bool, NthStmt)
   MX_VISIT_BOOL(InitListExpr, has_designated_initializer, 86, MX_APPLY_METHOD, HasDesignatedInitializer, bool, NthStmt)
@@ -17859,17 +17416,6 @@ MX_BEGIN_VISIT_STMT(InitListExpr)
   MX_VISIT_BOOL(InitListExpr, is_string_literal_initializer, 89, MX_APPLY_METHOD, IsStringLiteralInitializer, bool, NthStmt)
   MX_VISIT_BOOL(InitListExpr, is_syntactic_form, 91, MX_APPLY_METHOD, IsSyntacticForm, bool, NthStmt)
   MX_VISIT_OPTIONAL_BOOL(InitListExpr, is_transparent, 93, MX_APPLY_METHOD, IsTransparent, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(InitListExpr, had_array_range_designator, 86, MX_APPLY_METHOD, HadArrayRangeDesignator, bool, NthStmt)
-  MX_VISIT_BOOL(InitListExpr, has_array_filler, 87, MX_APPLY_METHOD, HasArrayFiller, bool, NthStmt)
-  MX_VISIT_BOOL(InitListExpr, has_designated_initializer, 88, MX_APPLY_METHOD, HasDesignatedInitializer, bool, NthStmt)
-  MX_VISIT_ENTITY_LIST(InitListExpr, initializers, 15, MX_APPLY_METHOD, Initializers, Expr, NthStmt)
-  MX_VISIT_BOOL(InitListExpr, is_explicit, 89, MX_APPLY_METHOD, IsExplicit, bool, NthStmt)
-  MX_VISIT_BOOL(InitListExpr, is_semantic_form, 90, MX_APPLY_METHOD, IsSemanticForm, bool, NthStmt)
-  MX_VISIT_BOOL(InitListExpr, is_string_literal_initializer, 91, MX_APPLY_METHOD, IsStringLiteralInitializer, bool, NthStmt)
-  MX_VISIT_BOOL(InitListExpr, is_syntactic_form, 93, MX_APPLY_METHOD, IsSyntacticForm, bool, NthStmt)
-  MX_VISIT_OPTIONAL_BOOL(InitListExpr, is_transparent, 95, MX_APPLY_METHOD, IsTransparent, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_InitListExpr
 MX_END_VISIT_STMT(InitListExpr)
 
@@ -17917,15 +17463,9 @@ MX_BEGIN_VISIT_STMT(GenericSelectionExpr)
   MX_VISIT_ENTITY(GenericSelectionExpr, generic_token, 40, MX_APPLY_METHOD, GenericToken, Token, NthStmt)
   MX_VISIT_ENTITY(GenericSelectionExpr, r_paren_token, 41, MX_APPLY_METHOD, RParenToken, Token, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(GenericSelectionExpr, result_expression, 42, MX_APPLY_METHOD, ResultExpression, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(GenericSelectionExpr, is_expression_predicate, 84, MX_APPLY_METHOD, IsExpressionPredicate, bool, NthStmt)
   MX_VISIT_BOOL(GenericSelectionExpr, is_result_dependent, 85, MX_APPLY_METHOD, IsResultDependent, bool, NthStmt)
   MX_VISIT_BOOL(GenericSelectionExpr, is_type_predicate, 86, MX_APPLY_METHOD, IsTypePredicate, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(GenericSelectionExpr, is_expression_predicate, 86, MX_APPLY_METHOD, IsExpressionPredicate, bool, NthStmt)
-  MX_VISIT_BOOL(GenericSelectionExpr, is_result_dependent, 87, MX_APPLY_METHOD, IsResultDependent, bool, NthStmt)
-  MX_VISIT_BOOL(GenericSelectionExpr, is_type_predicate, 88, MX_APPLY_METHOD, IsTypePredicate, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_GenericSelectionExpr
 MX_END_VISIT_STMT(GenericSelectionExpr)
 
@@ -17983,11 +17523,7 @@ MX_END_VISIT_STMT(FullExpr)
 MX_BEGIN_VISIT_STMT(ExprWithCleanups)
   MX_ENTER_VISIT_ExprWithCleanups
   MX_VISIT_BASE(ExprWithCleanups, FullExpr)
-<<<<<<< HEAD
   MX_VISIT_BOOL(ExprWithCleanups, cleanups_have_side_effects, 84, MX_APPLY_METHOD, CleanupsHaveSideEffects, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(ExprWithCleanups, cleanups_have_side_effects, 86, MX_APPLY_METHOD, CleanupsHaveSideEffects, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ExprWithCleanups
 MX_END_VISIT_STMT(ExprWithCleanups)
 
@@ -18001,15 +17537,9 @@ MX_END_VISIT_STMT(ExprWithCleanups)
 MX_BEGIN_VISIT_STMT(ConstantExpr)
   MX_ENTER_VISIT_ConstantExpr
   MX_VISIT_BASE(ConstantExpr, FullExpr)
-<<<<<<< HEAD
   MX_VISIT_ENUM(ConstantExpr, result_storage_kind, 90, MX_APPLY_METHOD, ResultStorageKind, ConstantExprResultStorageKind, NthStmt)
   MX_VISIT_BOOL(ConstantExpr, has_ap_value_result, 84, MX_APPLY_METHOD, HasAPValueResult, bool, NthStmt)
   MX_VISIT_BOOL(ConstantExpr, is_immediate_invocation, 85, MX_APPLY_METHOD, IsImmediateInvocation, bool, NthStmt)
-=======
-  MX_VISIT_ENUM(ConstantExpr, result_storage_kind, 92, MX_APPLY_METHOD, ResultStorageKind, ConstantExprResultStorageKind, NthStmt)
-  MX_VISIT_BOOL(ConstantExpr, has_ap_value_result, 86, MX_APPLY_METHOD, HasAPValueResult, bool, NthStmt)
-  MX_VISIT_BOOL(ConstantExpr, is_immediate_invocation, 87, MX_APPLY_METHOD, IsImmediateInvocation, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ConstantExpr
 MX_END_VISIT_STMT(ConstantExpr)
 
@@ -18024,11 +17554,7 @@ MX_BEGIN_VISIT_STMT(FloatingLiteral)
   MX_ENTER_VISIT_FloatingLiteral
   MX_VISIT_BASE(FloatingLiteral, Expr)
   MX_VISIT_ENTITY(FloatingLiteral, token, 37, MX_APPLY_METHOD, Token, Token, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_BOOL(FloatingLiteral, is_exact, 84, MX_APPLY_METHOD, IsExact, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(FloatingLiteral, is_exact, 86, MX_APPLY_METHOD, IsExact, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_FloatingLiteral
 MX_END_VISIT_STMT(FloatingLiteral)
 
@@ -18056,17 +17582,10 @@ MX_END_VISIT_STMT(FixedPointLiteral)
 MX_BEGIN_VISIT_STMT(ExtVectorElementExpr)
   MX_ENTER_VISIT_ExtVectorElementExpr
   MX_VISIT_BASE(ExtVectorElementExpr, Expr)
-<<<<<<< HEAD
   MX_VISIT_BOOL(ExtVectorElementExpr, contains_duplicate_elements, 84, MX_APPLY_METHOD, ContainsDuplicateElements, bool, NthStmt)
   MX_VISIT_ENTITY(ExtVectorElementExpr, accessor_token, 37, MX_APPLY_METHOD, AccessorToken, Token, NthStmt)
   MX_VISIT_ENTITY(ExtVectorElementExpr, base, 38, MX_APPLY_METHOD, Base, Expr, NthStmt)
   MX_VISIT_BOOL(ExtVectorElementExpr, is_arrow, 85, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
-=======
-  MX_VISIT_BOOL(ExtVectorElementExpr, contains_duplicate_elements, 86, MX_APPLY_METHOD, ContainsDuplicateElements, bool, NthStmt)
-  MX_VISIT_ENTITY(ExtVectorElementExpr, accessor_token, 37, MX_APPLY_METHOD, AccessorToken, Token, NthStmt)
-  MX_VISIT_ENTITY(ExtVectorElementExpr, base, 38, MX_APPLY_METHOD, Base, Expr, NthStmt)
-  MX_VISIT_BOOL(ExtVectorElementExpr, is_arrow, 87, MX_APPLY_METHOD, IsArrow, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ExtVectorElementExpr
 MX_END_VISIT_STMT(ExtVectorElementExpr)
 
@@ -18081,13 +17600,8 @@ MX_BEGIN_VISIT_STMT(ExpressionTraitExpr)
   MX_ENTER_VISIT_ExpressionTraitExpr
   MX_VISIT_BASE(ExpressionTraitExpr, Expr)
   MX_VISIT_ENTITY(ExpressionTraitExpr, queried_expression, 37, MX_APPLY_METHOD, QueriedExpression, Expr, NthStmt)
-<<<<<<< HEAD
   MX_VISIT_ENUM(ExpressionTraitExpr, trait, 90, MX_APPLY_METHOD, Trait, ExpressionTrait, NthStmt)
   MX_VISIT_BOOL(ExpressionTraitExpr, value, 84, MX_APPLY_METHOD, Value, bool, NthStmt)
-=======
-  MX_VISIT_ENUM(ExpressionTraitExpr, trait, 92, MX_APPLY_METHOD, Trait, ExpressionTrait, NthStmt)
-  MX_VISIT_BOOL(ExpressionTraitExpr, value, 86, MX_APPLY_METHOD, Value, bool, NthStmt)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_ExpressionTraitExpr
 MX_END_VISIT_STMT(ExpressionTraitExpr)
 
@@ -19098,20 +18612,12 @@ MX_BEGIN_VISIT_DECL(CXXConstructorDecl)
   MX_ENTER_VISIT_CXXConstructorDecl
   MX_VISIT_BASE(CXXConstructorDecl, CXXMethodDecl)
   MX_VISIT_OPTIONAL_ENTITY(CXXConstructorDecl, target_constructor, 180, MX_APPLY_METHOD, TargetConstructor, CXXConstructorDecl, NthDecl)
-<<<<<<< HEAD
   MX_VISIT_ENTITY_LIST(CXXConstructorDecl, initializers, 184, MX_APPLY_METHOD, Initializers, CXXCtorInitializer, NthDecl)
   MX_VISIT_BOOL(CXXConstructorDecl, is_default_constructor, 182, MX_APPLY_METHOD, IsDefaultConstructor, bool, NthDecl)
   MX_VISIT_BOOL(CXXConstructorDecl, is_delegating_constructor, 183, MX_APPLY_METHOD, IsDelegatingConstructor, bool, NthDecl)
   MX_VISIT_BOOL(CXXConstructorDecl, is_explicit, 185, MX_APPLY_METHOD, IsExplicit, bool, NthDecl)
   MX_VISIT_BOOL(CXXConstructorDecl, is_inheriting_constructor, 186, MX_APPLY_METHOD, IsInheritingConstructor, bool, NthDecl)
   MX_VISIT_BOOL(CXXConstructorDecl, is_specialization_copying_object, 187, MX_APPLY_METHOD, IsSpecializationCopyingObject, bool, NthDecl)
-=======
-  MX_VISIT_BOOL(CXXConstructorDecl, is_default_constructor, 182, MX_APPLY_METHOD, IsDefaultConstructor, bool, NthDecl)
-  MX_VISIT_BOOL(CXXConstructorDecl, is_delegating_constructor, 183, MX_APPLY_METHOD, IsDelegatingConstructor, bool, NthDecl)
-  MX_VISIT_BOOL(CXXConstructorDecl, is_explicit, 184, MX_APPLY_METHOD, IsExplicit, bool, NthDecl)
-  MX_VISIT_BOOL(CXXConstructorDecl, is_inheriting_constructor, 185, MX_APPLY_METHOD, IsInheritingConstructor, bool, NthDecl)
-  MX_VISIT_BOOL(CXXConstructorDecl, is_specialization_copying_object, 186, MX_APPLY_METHOD, IsSpecializationCopyingObject, bool, NthDecl)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_EXIT_VISIT_CXXConstructorDecl
 MX_END_VISIT_DECL(CXXConstructorDecl)
 
@@ -19436,11 +18942,7 @@ MX_BEGIN_VISIT_DECL(CXXRecordDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, allow_const_default_initializer, 133, MX_APPLY_METHOD, AllowConstDefaultInitializer, bool, NthDecl)
   MX_VISIT_OPTIONAL_ENTITY_LIST(CXXRecordDecl, bases, 179, MX_APPLY_METHOD, Bases, CXXBaseSpecifier, NthDecl)
   MX_VISIT_OPTIONAL_ENUM(CXXRecordDecl, calculate_inheritance_model, 87, MX_APPLY_METHOD, CalculateInheritanceModel, MSInheritanceModel, NthDecl)
-<<<<<<< HEAD
   MX_VISIT_ENTITY_LIST(CXXRecordDecl, constructors, 184, MX_APPLY_METHOD, Constructors, CXXConstructorDecl, NthDecl)
-=======
-  MX_VISIT_ENTITY_LIST(CXXRecordDecl, constructors, 187, MX_APPLY_METHOD, Constructors, CXXConstructorDecl, NthDecl)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_OPTIONAL_ENTITY_LIST(CXXRecordDecl, friends, 188, MX_APPLY_METHOD, Friends, FriendDecl, NthDecl)
   MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, dependent_lambda_call_operator, 82, MX_APPLY_METHOD, DependentLambdaCallOperator, FunctionTemplateDecl, NthDecl)
   MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, described_class_template, 83, MX_APPLY_METHOD, DescribedClassTemplate, ClassTemplateDecl, NthDecl)
@@ -19452,21 +18954,11 @@ MX_BEGIN_VISIT_DECL(CXXRecordDecl)
   MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, lambda_context_declaration, 127, MX_APPLY_METHOD, LambdaContextDeclaration, Decl, NthDecl)
   MX_VISIT_OPTIONAL_ENTITY_LIST(CXXRecordDecl, lambda_explicit_template_parameters, 189, MX_APPLY_METHOD, LambdaExplicitTemplateParameters, NamedDecl, NthDecl)
   MX_VISIT_OPTIONAL_INT(CXXRecordDecl, lambda_mangling_number, 140, MX_APPLY_METHOD, LambdaManglingNumber, , NthDecl)
-<<<<<<< HEAD
-  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, lambda_static_invoker, 128, MX_APPLY_METHOD, LambdaStaticInvoker, CXXMethodDecl, NthDecl)
-  MX_VISIT_OPTIONAL_ENUM(CXXRecordDecl, ms_inheritance_model, 89, MX_APPLY_METHOD, MSInheritanceModel, MSInheritanceModel, NthDecl)
-  MX_VISIT_ENUM(CXXRecordDecl, ms_vtor_disp_mode, 90, MX_APPLY_METHOD, MSVtorDispMode, MSVtorDispMode, NthDecl)
-  MX_VISIT_OPTIONAL_INT(CXXRecordDecl, odr_hash, 190, MX_APPLY_METHOD, ODRHash, , NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, template_instantiation_pattern, 130, MX_APPLY_METHOD, TemplateInstantiationPattern, CXXRecordDecl, NthDecl)
-  MX_VISIT_ENUM(CXXRecordDecl, template_specialization_kind, 92, MX_APPLY_METHOD, TemplateSpecializationKind, TemplateSpecializationKind, NthDecl)
-  MX_VISIT_ENTITY_LIST(CXXRecordDecl, visible_conversion_functions, 191, MX_APPLY_METHOD, VisibleConversionFunctions, NamedDecl, NthDecl)
-=======
   MX_VISIT_OPTIONAL_ENUM(CXXRecordDecl, ms_inheritance_model, 89, MX_APPLY_METHOD, MSInheritanceModel, MSInheritanceModel, NthDecl)
   MX_VISIT_ENUM(CXXRecordDecl, ms_vtor_disp_mode, 90, MX_APPLY_METHOD, MSVtorDispMode, MSVtorDispMode, NthDecl)
   MX_VISIT_OPTIONAL_INT(CXXRecordDecl, odr_hash, 190, MX_APPLY_METHOD, ODRHash, , NthDecl)
   MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, template_instantiation_pattern, 128, MX_APPLY_METHOD, TemplateInstantiationPattern, CXXRecordDecl, NthDecl)
   MX_VISIT_ENUM(CXXRecordDecl, template_specialization_kind, 92, MX_APPLY_METHOD, TemplateSpecializationKind, TemplateSpecializationKind, NthDecl)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_any_dependent_bases, 147, MX_APPLY_METHOD, HasAnyDependentBases, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_constexpr_default_constructor, 149, MX_APPLY_METHOD, HasConstexprDefaultConstructor, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_constexpr_destructor, 151, MX_APPLY_METHOD, HasConstexprDestructor, bool, NthDecl)
@@ -19482,95 +18974,8 @@ MX_BEGIN_VISIT_DECL(CXXRecordDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_inherited_constructor, 175, MX_APPLY_METHOD, HasInheritedConstructor, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_initializer_method, 177, MX_APPLY_METHOD, HasInitializerMethod, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_irrelevant_destructor, 182, MX_APPLY_METHOD, HasIrrelevantDestructor, bool, NthDecl)
-<<<<<<< HEAD
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_known_lambda_internal_linkage, 185, MX_APPLY_METHOD, HasKnownLambdaInternalLinkage, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_move_assignment, 187, MX_APPLY_METHOD, HasMoveAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_move_constructor, 193, MX_APPLY_METHOD, HasMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_mutable_fields, 195, MX_APPLY_METHOD, HasMutableFields, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_literal_type_fields_or_bases, 197, MX_APPLY_METHOD, HasNonLiteralTypeFieldsOrBases, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_copy_assignment, 199, MX_APPLY_METHOD, HasNonTrivialCopyAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_copy_constructor, 201, MX_APPLY_METHOD, HasNonTrivialCopyConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_copy_constructor_for_call, 203, MX_APPLY_METHOD, HasNonTrivialCopyConstructorForCall, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_default_constructor, 205, MX_APPLY_METHOD, HasNonTrivialDefaultConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_destructor, 207, MX_APPLY_METHOD, HasNonTrivialDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_destructor_for_call, 209, MX_APPLY_METHOD, HasNonTrivialDestructorForCall, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_move_assignment, 211, MX_APPLY_METHOD, HasNonTrivialMoveAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_move_constructor, 213, MX_APPLY_METHOD, HasNonTrivialMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_move_constructor_for_call, 215, MX_APPLY_METHOD, HasNonTrivialMoveConstructorForCall, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_private_fields, 217, MX_APPLY_METHOD, HasPrivateFields, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_protected_fields, 219, MX_APPLY_METHOD, HasProtectedFields, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_copy_assignment, 221, MX_APPLY_METHOD, HasSimpleCopyAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_copy_constructor, 223, MX_APPLY_METHOD, HasSimpleCopyConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_destructor, 225, MX_APPLY_METHOD, HasSimpleDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_move_assignment, 227, MX_APPLY_METHOD, HasSimpleMoveAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_move_constructor, 229, MX_APPLY_METHOD, HasSimpleMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_copy_assignment, 231, MX_APPLY_METHOD, HasTrivialCopyAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_copy_constructor, 233, MX_APPLY_METHOD, HasTrivialCopyConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_copy_constructor_for_call, 235, MX_APPLY_METHOD, HasTrivialCopyConstructorForCall, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_default_constructor, 237, MX_APPLY_METHOD, HasTrivialDefaultConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_destructor, 239, MX_APPLY_METHOD, HasTrivialDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_destructor_for_call, 241, MX_APPLY_METHOD, HasTrivialDestructorForCall, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_move_assignment, 243, MX_APPLY_METHOD, HasTrivialMoveAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_move_constructor, 245, MX_APPLY_METHOD, HasTrivialMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_move_constructor_for_call, 247, MX_APPLY_METHOD, HasTrivialMoveConstructorForCall, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_uninitialized_reference_member, 249, MX_APPLY_METHOD, HasUninitializedReferenceMember, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_constructor, 251, MX_APPLY_METHOD, HasUserDeclaredConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_copy_assignment, 253, MX_APPLY_METHOD, HasUserDeclaredCopyAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_copy_constructor, 255, MX_APPLY_METHOD, HasUserDeclaredCopyConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_destructor, 257, MX_APPLY_METHOD, HasUserDeclaredDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_move_assignment, 259, MX_APPLY_METHOD, HasUserDeclaredMoveAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_move_constructor, 261, MX_APPLY_METHOD, HasUserDeclaredMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_move_operation, 263, MX_APPLY_METHOD, HasUserDeclaredMoveOperation, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_provided_default_constructor, 265, MX_APPLY_METHOD, HasUserProvidedDefaultConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_variant_members, 267, MX_APPLY_METHOD, HasVariantMembers, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, implicit_copy_assignment_has_const_parameter, 269, MX_APPLY_METHOD, ImplicitCopyAssignmentHasConstParameter, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, implicit_copy_constructor_has_const_parameter, 271, MX_APPLY_METHOD, ImplicitCopyConstructorHasConstParameter, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_abstract, 273, MX_APPLY_METHOD, IsAbstract, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_aggregate, 275, MX_APPLY_METHOD, IsAggregate, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_any_destructor_no_return, 277, MX_APPLY_METHOD, IsAnyDestructorNoReturn, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_c_like, 279, MX_APPLY_METHOD, IsCLike, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_cxx11_standard_layout, 281, MX_APPLY_METHOD, IsCXX11StandardLayout, bool, NthDecl)
-  MX_VISIT_BOOL(CXXRecordDecl, is_dependent_lambda, 283, MX_APPLY_METHOD, IsDependentLambda, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_dynamic_class, 284, MX_APPLY_METHOD, IsDynamicClass, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_effectively_final, 286, MX_APPLY_METHOD, IsEffectivelyFinal, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_empty, 288, MX_APPLY_METHOD, IsEmpty, bool, NthDecl)
-  MX_VISIT_BOOL(CXXRecordDecl, is_generic_lambda, 290, MX_APPLY_METHOD, IsGenericLambda, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_literal, 291, MX_APPLY_METHOD, IsLiteral, bool, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, is_local_class, 131, MX_APPLY_METHOD, IsLocalClass, FunctionDecl, NthDecl)
-  MX_VISIT_BOOL(CXXRecordDecl, is_never_dependent_lambda, 293, MX_APPLY_METHOD, IsNeverDependentLambda, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_pod, 294, MX_APPLY_METHOD, IsPOD, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_polymorphic, 296, MX_APPLY_METHOD, IsPolymorphic, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_standard_layout, 298, MX_APPLY_METHOD, IsStandardLayout, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_structural, 300, MX_APPLY_METHOD, IsStructural, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_trivial, 302, MX_APPLY_METHOD, IsTrivial, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_trivially_copyable, 304, MX_APPLY_METHOD, IsTriviallyCopyable, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, lambda_is_default_constructible_and_assignable, 306, MX_APPLY_METHOD, LambdaIsDefaultConstructibleAndAssignable, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, may_be_abstract, 308, MX_APPLY_METHOD, MayBeAbstract, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, may_be_dynamic_class, 310, MX_APPLY_METHOD, MayBeDynamicClass, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, may_be_non_dynamic_class, 312, MX_APPLY_METHOD, MayBeNonDynamicClass, bool, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY_LIST(CXXRecordDecl, methods, 314, MX_APPLY_METHOD, Methods, CXXMethodDecl, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_copy_assignment, 316, MX_APPLY_METHOD, NeedsImplicitCopyAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_copy_constructor, 318, MX_APPLY_METHOD, NeedsImplicitCopyConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_default_constructor, 320, MX_APPLY_METHOD, NeedsImplicitDefaultConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_destructor, 322, MX_APPLY_METHOD, NeedsImplicitDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_move_assignment, 324, MX_APPLY_METHOD, NeedsImplicitMoveAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_move_constructor, 326, MX_APPLY_METHOD, NeedsImplicitMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_copy_assignment, 328, MX_APPLY_METHOD, NeedsOverloadResolutionForCopyAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_copy_constructor, 330, MX_APPLY_METHOD, NeedsOverloadResolutionForCopyConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_destructor, 332, MX_APPLY_METHOD, NeedsOverloadResolutionForDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_move_assignment, 334, MX_APPLY_METHOD, NeedsOverloadResolutionForMoveAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_move_constructor, 336, MX_APPLY_METHOD, NeedsOverloadResolutionForMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, null_field_offset_is_zero, 338, MX_APPLY_METHOD, NullFieldOffsetIsZero, bool, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY_LIST(CXXRecordDecl, virtual_bases, 340, MX_APPLY_METHOD, VirtualBases, CXXBaseSpecifier, NthDecl)
-  MX_VISIT_OPTIONAL_INT(CXXRecordDecl, size_without_virtual_bases, 139, MX_APPLY_METHOD, SizeWithoutVirtualBases, , NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, primary_base, 141, MX_APPLY_METHOD, PrimaryBase, CXXRecordDecl, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_own_virtual_function_table_pointer, 343, MX_APPLY_METHOD, HasOwnVirtualFunctionTablePointer, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_extendable_virtual_function_table_pointer, 345, MX_APPLY_METHOD, HasExtendableVirtualFunctionTablePointer, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_virtual_base_table_pointer, 347, MX_APPLY_METHOD, HasVirtualBaseTablePointer, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_own_virtual_base_table_pointer, 349, MX_APPLY_METHOD, HasOwnVirtualBaseTablePointer, bool, NthDecl)
-=======
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_known_lambda_internal_linkage, 184, MX_APPLY_METHOD, HasKnownLambdaInternalLinkage, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_move_assignment, 186, MX_APPLY_METHOD, HasMoveAssignment, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_move_constructor, 192, MX_APPLY_METHOD, HasMoveConstructor, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_mutable_fields, 194, MX_APPLY_METHOD, HasMutableFields, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_literal_type_fields_or_bases, 196, MX_APPLY_METHOD, HasNonLiteralTypeFieldsOrBases, bool, NthDecl)
@@ -19651,18 +19056,10 @@ MX_BEGIN_VISIT_DECL(CXXRecordDecl)
   MX_VISIT_OPTIONAL_ENTITY_LIST(CXXRecordDecl, virtual_bases, 341, MX_APPLY_METHOD, VirtualBases, CXXBaseSpecifier, NthDecl)
   MX_VISIT_OPTIONAL_INT(CXXRecordDecl, size_without_virtual_bases, 131, MX_APPLY_METHOD, SizeWithoutVirtualBases, , NthDecl)
   MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, primary_base, 139, MX_APPLY_METHOD, PrimaryBase, CXXRecordDecl, NthDecl)
-<<<<<<< HEAD
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_own_virtual_function_table_pointer, 342, MX_APPLY_METHOD, HasOwnVirtualFunctionTablePointer, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_extendable_virtual_function_table_pointer, 344, MX_APPLY_METHOD, HasExtendableVirtualFunctionTablePointer, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_virtual_base_table_pointer, 346, MX_APPLY_METHOD, HasVirtualBaseTablePointer, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_own_virtual_base_table_pointer, 348, MX_APPLY_METHOD, HasOwnVirtualBaseTablePointer, bool, NthDecl)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_own_virtual_function_table_pointer, 344, MX_APPLY_METHOD, HasOwnVirtualFunctionTablePointer, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_extendable_virtual_function_table_pointer, 346, MX_APPLY_METHOD, HasExtendableVirtualFunctionTablePointer, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_virtual_base_table_pointer, 348, MX_APPLY_METHOD, HasVirtualBaseTablePointer, bool, NthDecl)
   MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_own_virtual_base_table_pointer, 350, MX_APPLY_METHOD, HasOwnVirtualBaseTablePointer, bool, NthDecl)
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   MX_EXIT_VISIT_CXXRecordDecl
 MX_END_VISIT_DECL(CXXRecordDecl)
 
@@ -19676,19 +19073,6 @@ MX_END_VISIT_DECL(CXXRecordDecl)
 MX_BEGIN_VISIT_DECL(ClassTemplateSpecializationDecl)
   MX_ENTER_VISIT_ClassTemplateSpecializationDecl
   MX_VISIT_BASE(ClassTemplateSpecializationDecl, CXXRecordDecl)
-<<<<<<< HEAD
-  MX_VISIT_ENTITY(ClassTemplateSpecializationDecl, extern_token, 142, MX_APPLY_METHOD, ExternToken, Token, NthDecl)
-  MX_VISIT_ENTITY(ClassTemplateSpecializationDecl, point_of_instantiation, 167, MX_APPLY_METHOD, PointOfInstantiation, Token, NthDecl)
-  MX_VISIT_ENUM(ClassTemplateSpecializationDecl, specialization_kind, 93, MX_APPLY_METHOD, SpecializationKind, TemplateSpecializationKind, NthDecl)
-  MX_VISIT_ENTITY(ClassTemplateSpecializationDecl, specialized_template, 169, MX_APPLY_METHOD, SpecializedTemplate, ClassTemplateDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ClassTemplateSpecializationDecl, template_arguments, 351, MX_APPLY_METHOD, TemplateArguments, TemplateArgument, NthDecl)
-  MX_VISIT_ENTITY_LIST(ClassTemplateSpecializationDecl, template_instantiation_arguments, 352, MX_APPLY_METHOD, TemplateInstantiationArguments, TemplateArgument, NthDecl)
-  MX_VISIT_ENTITY(ClassTemplateSpecializationDecl, template_keyword_token, 170, MX_APPLY_METHOD, TemplateKeywordToken, Token, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(ClassTemplateSpecializationDecl, type_as_written, 180, MX_APPLY_METHOD, TypeAsWritten, Type, NthDecl)
-  MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_class_scope_explicit_specialization, 353, MX_APPLY_METHOD, IsClassScopeExplicitSpecialization, bool, NthDecl)
-  MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_explicit_instantiation_or_specialization, 354, MX_APPLY_METHOD, IsExplicitInstantiationOrSpecialization, bool, NthDecl)
-  MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_explicit_specialization, 355, MX_APPLY_METHOD, IsExplicitSpecialization, bool, NthDecl)
-=======
   MX_VISIT_ENTITY(ClassTemplateSpecializationDecl, extern_token, 141, MX_APPLY_METHOD, ExternToken, Token, NthDecl)
   MX_VISIT_ENTITY(ClassTemplateSpecializationDecl, point_of_instantiation, 142, MX_APPLY_METHOD, PointOfInstantiation, Token, NthDecl)
   MX_VISIT_ENUM(ClassTemplateSpecializationDecl, specialization_kind, 93, MX_APPLY_METHOD, SpecializationKind, TemplateSpecializationKind, NthDecl)
@@ -19697,16 +19081,9 @@ MX_BEGIN_VISIT_DECL(ClassTemplateSpecializationDecl)
   MX_VISIT_ENTITY_LIST(ClassTemplateSpecializationDecl, template_instantiation_arguments, 353, MX_APPLY_METHOD, TemplateInstantiationArguments, TemplateArgument, NthDecl)
   MX_VISIT_ENTITY(ClassTemplateSpecializationDecl, template_keyword_token, 169, MX_APPLY_METHOD, TemplateKeywordToken, Token, NthDecl)
   MX_VISIT_OPTIONAL_ENTITY(ClassTemplateSpecializationDecl, type_as_written, 170, MX_APPLY_METHOD, TypeAsWritten, Type, NthDecl)
-<<<<<<< HEAD
-  MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_class_scope_explicit_specialization, 352, MX_APPLY_METHOD, IsClassScopeExplicitSpecialization, bool, NthDecl)
-  MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_explicit_instantiation_or_specialization, 353, MX_APPLY_METHOD, IsExplicitInstantiationOrSpecialization, bool, NthDecl)
-  MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_explicit_specialization, 354, MX_APPLY_METHOD, IsExplicitSpecialization, bool, NthDecl)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_class_scope_explicit_specialization, 354, MX_APPLY_METHOD, IsClassScopeExplicitSpecialization, bool, NthDecl)
   MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_explicit_instantiation_or_specialization, 355, MX_APPLY_METHOD, IsExplicitInstantiationOrSpecialization, bool, NthDecl)
   MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_explicit_specialization, 356, MX_APPLY_METHOD, IsExplicitSpecialization, bool, NthDecl)
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   MX_EXIT_VISIT_ClassTemplateSpecializationDecl
 MX_END_VISIT_DECL(ClassTemplateSpecializationDecl)
 
@@ -19720,25 +19097,11 @@ MX_END_VISIT_DECL(ClassTemplateSpecializationDecl)
 MX_BEGIN_VISIT_DECL(ClassTemplatePartialSpecializationDecl)
   MX_ENTER_VISIT_ClassTemplatePartialSpecializationDecl
   MX_VISIT_BASE(ClassTemplatePartialSpecializationDecl, ClassTemplateSpecializationDecl)
-<<<<<<< HEAD
-  MX_VISIT_ENTITY(ClassTemplatePartialSpecializationDecl, injected_specialization_type, 181, MX_APPLY_METHOD, InjectedSpecializationType, Type, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(ClassTemplatePartialSpecializationDecl, instantiated_from_member, 356, MX_APPLY_METHOD, InstantiatedFromMember, ClassTemplatePartialSpecializationDecl, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(ClassTemplatePartialSpecializationDecl, instantiated_from_member_template, 357, MX_APPLY_METHOD, InstantiatedFromMemberTemplate, ClassTemplatePartialSpecializationDecl, NthDecl)
-  MX_VISIT_ENTITY(ClassTemplatePartialSpecializationDecl, template_parameters, 358, MX_APPLY_METHOD, TemplateParameters, TemplateParameterList, NthDecl)
-  MX_VISIT_BOOL(ClassTemplatePartialSpecializationDecl, has_associated_constraints, 359, MX_APPLY_METHOD, HasAssociatedConstraints, bool, NthDecl)
-=======
   MX_VISIT_ENTITY(ClassTemplatePartialSpecializationDecl, injected_specialization_type, 180, MX_APPLY_METHOD, InjectedSpecializationType, Type, NthDecl)
   MX_VISIT_OPTIONAL_ENTITY(ClassTemplatePartialSpecializationDecl, instantiated_from_member, 181, MX_APPLY_METHOD, InstantiatedFromMember, ClassTemplatePartialSpecializationDecl, NthDecl)
-<<<<<<< HEAD
-  MX_VISIT_OPTIONAL_ENTITY(ClassTemplatePartialSpecializationDecl, instantiated_from_member_template, 355, MX_APPLY_METHOD, InstantiatedFromMemberTemplate, ClassTemplatePartialSpecializationDecl, NthDecl)
-  MX_VISIT_ENTITY(ClassTemplatePartialSpecializationDecl, template_parameters, 356, MX_APPLY_METHOD, TemplateParameters, TemplateParameterList, NthDecl)
-  MX_VISIT_BOOL(ClassTemplatePartialSpecializationDecl, has_associated_constraints, 357, MX_APPLY_METHOD, HasAssociatedConstraints, bool, NthDecl)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   MX_VISIT_OPTIONAL_ENTITY(ClassTemplatePartialSpecializationDecl, instantiated_from_member_template, 357, MX_APPLY_METHOD, InstantiatedFromMemberTemplate, ClassTemplatePartialSpecializationDecl, NthDecl)
   MX_VISIT_ENTITY(ClassTemplatePartialSpecializationDecl, template_parameters, 358, MX_APPLY_METHOD, TemplateParameters, TemplateParameterList, NthDecl)
   MX_VISIT_BOOL(ClassTemplatePartialSpecializationDecl, has_associated_constraints, 359, MX_APPLY_METHOD, HasAssociatedConstraints, bool, NthDecl)
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   MX_EXIT_VISIT_ClassTemplatePartialSpecializationDecl
 MX_END_VISIT_DECL(ClassTemplatePartialSpecializationDecl)
 
@@ -20074,11 +19437,7 @@ MX_BEGIN_VISIT_ABSTRACT_DECL(ObjCContainerDecl)
   MX_VISIT_ENTITY(ObjCContainerDecl, at_start_token, 57, MX_APPLY_METHOD, AtStartToken, Token, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCContainerDecl, instance_methods, 61, MX_APPLY_METHOD, InstanceMethods, ObjCMethodDecl, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCContainerDecl, instance_properties, 179, MX_APPLY_METHOD, InstanceProperties, ObjCPropertyDecl, NthDecl)
-<<<<<<< HEAD
   MX_VISIT_ENTITY_LIST(ObjCContainerDecl, methods, 184, MX_APPLY_METHOD, Methods, ObjCMethodDecl, NthDecl)
-=======
-  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, methods, 187, MX_APPLY_METHOD, Methods, ObjCMethodDecl, NthDecl)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   MX_VISIT_ENTITY_LIST(ObjCContainerDecl, properties, 188, MX_APPLY_METHOD, Properties, ObjCPropertyDecl, NthDecl)
   MX_VISIT_DECL_CONTEXT(ObjCContainerDecl, declarations_in_context, 189, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_ObjCContainerDecl
@@ -20101,21 +19460,9 @@ MX_BEGIN_VISIT_DECL(ObjCCategoryDecl)
   MX_VISIT_ENTITY(ObjCCategoryDecl, instance_variable_l_brace_token, 78, MX_APPLY_METHOD, InstanceVariableLBraceToken, Token, NthDecl)
   MX_VISIT_ENTITY(ObjCCategoryDecl, instance_variable_r_brace_token, 79, MX_APPLY_METHOD, InstanceVariableRBraceToken, Token, NthDecl)
   MX_VISIT_ENTITY(ObjCCategoryDecl, next_class_category, 81, MX_APPLY_METHOD, NextClassCategory, ObjCCategoryDecl, NthDecl)
-<<<<<<< HEAD
-<<<<<<< HEAD
-  MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, instance_variables, 191, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, protocol_tokens, 314, MX_APPLY_METHOD, ProtocolTokens, Token, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, protocols, 340, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
-=======
-  MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, instance_variables, 313, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, protocol_tokens, 339, MX_APPLY_METHOD, ProtocolTokens, Token, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, protocols, 350, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, instance_variables, 315, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, protocol_tokens, 341, MX_APPLY_METHOD, ProtocolTokens, Token, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, protocols, 352, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   MX_EXIT_VISIT_ObjCCategoryDecl
 MX_END_VISIT_DECL(ObjCCategoryDecl)
 
@@ -20133,18 +19480,8 @@ MX_BEGIN_VISIT_DECL(ObjCProtocolDecl)
   MX_VISIT_BOOL(ObjCProtocolDecl, has_definition, 74, MX_APPLY_METHOD, HasDefinition, bool, NthDecl)
   MX_VISIT_BOOL(ObjCProtocolDecl, is_non_runtime_protocol, 75, MX_APPLY_METHOD, IsNonRuntimeProtocol, bool, NthDecl)
   MX_VISIT_BOOL(ObjCProtocolDecl, is_this_declaration_a_definition, 76, MX_APPLY_METHOD, IsThisDeclarationADefinition, bool, NthDecl)
-<<<<<<< HEAD
-<<<<<<< HEAD
-  MX_VISIT_ENTITY_LIST(ObjCProtocolDecl, protocol_tokens, 191, MX_APPLY_METHOD, ProtocolTokens, Token, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCProtocolDecl, protocols, 314, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
-=======
-  MX_VISIT_ENTITY_LIST(ObjCProtocolDecl, protocol_tokens, 313, MX_APPLY_METHOD, ProtocolTokens, Token, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCProtocolDecl, protocols, 339, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   MX_VISIT_ENTITY_LIST(ObjCProtocolDecl, protocol_tokens, 315, MX_APPLY_METHOD, ProtocolTokens, Token, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCProtocolDecl, protocols, 341, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   MX_EXIT_VISIT_ObjCProtocolDecl
 MX_END_VISIT_DECL(ObjCProtocolDecl)
 
@@ -20158,15 +19495,7 @@ MX_END_VISIT_DECL(ObjCProtocolDecl)
 MX_BEGIN_VISIT_DECL(ObjCInterfaceDecl)
   MX_ENTER_VISIT_ObjCInterfaceDecl
   MX_VISIT_BASE(ObjCInterfaceDecl, ObjCContainerDecl)
-<<<<<<< HEAD
-<<<<<<< HEAD
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, all_referenced_protocols, 191, MX_APPLY_METHOD, AllReferencedProtocols, ObjCProtocolDecl, NthDecl)
-=======
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, all_referenced_protocols, 313, MX_APPLY_METHOD, AllReferencedProtocols, ObjCProtocolDecl, NthDecl)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, all_referenced_protocols, 315, MX_APPLY_METHOD, AllReferencedProtocols, ObjCProtocolDecl, NthDecl)
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   MX_VISIT_BOOL(ObjCInterfaceDecl, declares_or_inherits_designated_initializers, 74, MX_APPLY_METHOD, DeclaresOrInheritsDesignatedInitializers, bool, NthDecl)
   MX_VISIT_ENTITY(ObjCInterfaceDecl, end_of_definition_token, 65, MX_APPLY_METHOD, EndOfDefinitionToken, Token, NthDecl)
   MX_VISIT_ENTITY(ObjCInterfaceDecl, implementation, 66, MX_APPLY_METHOD, Implementation, ObjCImplementationDecl, NthDecl)
@@ -20181,25 +19510,6 @@ MX_BEGIN_VISIT_DECL(ObjCInterfaceDecl)
   MX_VISIT_BOOL(ObjCInterfaceDecl, is_implicit_interface_declaration, 94, MX_APPLY_METHOD, IsImplicitInterfaceDeclaration, bool, NthDecl)
   MX_VISIT_ENTITY(ObjCInterfaceDecl, is_obj_c_requires_property_definitions, 82, MX_APPLY_METHOD, IsObjCRequiresPropertyDefinitions, ObjCInterfaceDecl, NthDecl)
   MX_VISIT_BOOL(ObjCInterfaceDecl, is_this_declaration_a_definition, 95, MX_APPLY_METHOD, IsThisDeclarationADefinition, bool, NthDecl)
-<<<<<<< HEAD
-<<<<<<< HEAD
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, instance_variables, 314, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, known_categories, 340, MX_APPLY_METHOD, KnownCategories, ObjCCategoryDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, known_extensions, 351, MX_APPLY_METHOD, KnownExtensions, ObjCCategoryDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, protocol_tokens, 352, MX_APPLY_METHOD, ProtocolTokens, Token, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, protocols, 360, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, visible_categories, 361, MX_APPLY_METHOD, VisibleCategories, ObjCCategoryDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, visible_extensions, 362, MX_APPLY_METHOD, VisibleExtensions, ObjCCategoryDecl, NthDecl)
-=======
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, instance_variables, 339, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, known_categories, 350, MX_APPLY_METHOD, KnownCategories, ObjCCategoryDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, known_extensions, 351, MX_APPLY_METHOD, KnownExtensions, ObjCCategoryDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, protocol_tokens, 358, MX_APPLY_METHOD, ProtocolTokens, Token, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, protocols, 359, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, visible_categories, 360, MX_APPLY_METHOD, VisibleCategories, ObjCCategoryDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, visible_extensions, 361, MX_APPLY_METHOD, VisibleExtensions, ObjCCategoryDecl, NthDecl)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, instance_variables, 341, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, known_categories, 352, MX_APPLY_METHOD, KnownCategories, ObjCCategoryDecl, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, known_extensions, 353, MX_APPLY_METHOD, KnownExtensions, ObjCCategoryDecl, NthDecl)
@@ -20207,7 +19517,6 @@ MX_BEGIN_VISIT_DECL(ObjCInterfaceDecl)
   MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, protocols, 361, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, visible_categories, 362, MX_APPLY_METHOD, VisibleCategories, ObjCCategoryDecl, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, visible_extensions, 363, MX_APPLY_METHOD, VisibleExtensions, ObjCCategoryDecl, NthDecl)
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   MX_EXIT_VISIT_ObjCInterfaceDecl
 MX_END_VISIT_DECL(ObjCInterfaceDecl)
 
@@ -20222,15 +19531,7 @@ MX_BEGIN_VISIT_ABSTRACT_DECL(ObjCImplDecl)
   MX_ENTER_VISIT_ObjCImplDecl
   MX_VISIT_BASE(ObjCImplDecl, ObjCContainerDecl)
   MX_VISIT_ENTITY(ObjCImplDecl, class_interface, 65, MX_APPLY_METHOD, ClassInterface, ObjCInterfaceDecl, NthDecl)
-<<<<<<< HEAD
-<<<<<<< HEAD
-  MX_VISIT_ENTITY_LIST(ObjCImplDecl, property_implementations, 191, MX_APPLY_METHOD, PropertyImplementations, ObjCPropertyImplDecl, NthDecl)
-=======
-  MX_VISIT_ENTITY_LIST(ObjCImplDecl, property_implementations, 313, MX_APPLY_METHOD, PropertyImplementations, ObjCPropertyImplDecl, NthDecl)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   MX_VISIT_ENTITY_LIST(ObjCImplDecl, property_implementations, 315, MX_APPLY_METHOD, PropertyImplementations, ObjCPropertyImplDecl, NthDecl)
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   MX_EXIT_VISIT_ObjCImplDecl
 MX_END_VISIT_DECL(ObjCImplDecl)
 
@@ -20266,17 +19567,8 @@ MX_BEGIN_VISIT_DECL(ObjCImplementationDecl)
   MX_VISIT_ENTITY(ObjCImplementationDecl, super_class_token, 79, MX_APPLY_METHOD, SuperClassToken, Token, NthDecl)
   MX_VISIT_BOOL(ObjCImplementationDecl, has_destructors, 74, MX_APPLY_METHOD, HasDestructors, bool, NthDecl)
   MX_VISIT_BOOL(ObjCImplementationDecl, has_non_zero_constructors, 75, MX_APPLY_METHOD, HasNonZeroConstructors, bool, NthDecl)
-<<<<<<< HEAD
-<<<<<<< HEAD
-  MX_VISIT_ENTITY_LIST(ObjCImplementationDecl, initializers, 314, MX_APPLY_METHOD, Initializers, CXXCtorInitializer, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCImplementationDecl, instance_variables, 340, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
-=======
-  MX_VISIT_ENTITY_LIST(ObjCImplementationDecl, instance_variables, 339, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   MX_VISIT_ENTITY_LIST(ObjCImplementationDecl, initializers, 341, MX_APPLY_METHOD, Initializers, CXXCtorInitializer, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCImplementationDecl, instance_variables, 352, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   MX_EXIT_VISIT_ObjCImplementationDecl
 MX_END_VISIT_DECL(ObjCImplementationDecl)
 

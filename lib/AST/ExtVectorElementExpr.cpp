@@ -192,11 +192,7 @@ std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const TokenContex
 }
 
 bool ExtVectorElementExpr::contains_duplicate_elements(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal84();
-=======
-  return impl->reader.getVal86();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 Token ExtVectorElementExpr::accessor_token(void) const {
@@ -209,11 +205,7 @@ Expr ExtVectorElementExpr::base(void) const {
 }
 
 bool ExtVectorElementExpr::is_arrow(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal85();
-=======
-  return impl->reader.getVal87();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

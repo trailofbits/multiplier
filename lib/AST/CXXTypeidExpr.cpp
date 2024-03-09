@@ -216,35 +216,20 @@ Type CXXTypeidExpr::type_operand_source_info(void) const {
 }
 
 std::optional<bool> CXXTypeidExpr::is_most_derived(void) const {
-<<<<<<< HEAD
   if (!impl->reader.getVal85()) {
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal84());
-=======
-  if (!impl->reader.getVal87()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal86());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   }
   return std::nullopt;
 }
 
 bool CXXTypeidExpr::is_potentially_evaluated(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal86();
 }
 
 bool CXXTypeidExpr::is_type_operand(void) const {
   return impl->reader.getVal87();
-=======
-  return impl->reader.getVal88();
-}
-
-bool CXXTypeidExpr::is_type_operand(void) const {
-  return impl->reader.getVal89();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

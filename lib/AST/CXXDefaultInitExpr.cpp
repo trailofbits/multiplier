@@ -220,11 +220,7 @@ Token CXXDefaultInitExpr::used_token(void) const {
 }
 
 bool CXXDefaultInitExpr::has_rewritten_initializer(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal84();
-=======
-  return impl->reader.getVal86();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

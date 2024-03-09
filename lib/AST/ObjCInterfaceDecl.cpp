@@ -227,27 +227,11 @@ std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const TokenContext &t) 
 }
 
 unsigned ObjCInterfaceDecl::num_all_referenced_protocols(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  return impl->reader.getVal191().size();
-}
-
-std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_all_referenced_protocol(unsigned n) const {
-  auto list = impl->reader.getVal191();
-=======
-  return impl->reader.getVal313().size();
-}
-
-std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_all_referenced_protocol(unsigned n) const {
-  auto list = impl->reader.getVal313();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   return impl->reader.getVal315().size();
 }
 
 std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_all_referenced_protocol(unsigned n) const {
   auto list = impl->reader.getVal315();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -261,30 +245,12 @@ std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_all_referenced_protocol(u
 }
 
 gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::all_referenced_protocols(void) const & {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  auto list = impl->reader.getVal191();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d191 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from_base(std::move(d191))) {
-=======
-  auto list = impl->reader.getVal313();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d313 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from_base(std::move(d313))) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   auto list = impl->reader.getVal315();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d315 = ep->DeclFor(ep, v)) {
       if (auto e = ObjCProtocolDecl::from_base(std::move(d315))) {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
         co_yield std::move(*e);
       }
     }
@@ -371,27 +337,11 @@ bool ObjCInterfaceDecl::is_this_declaration_a_definition(void) const {
 }
 
 unsigned ObjCInterfaceDecl::num_instance_variables(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  return impl->reader.getVal314().size();
-}
-
-std::optional<ObjCIvarDecl> ObjCInterfaceDecl::nth_instance_variable(unsigned n) const {
-  auto list = impl->reader.getVal314();
-=======
-  return impl->reader.getVal339().size();
-}
-
-std::optional<ObjCIvarDecl> ObjCInterfaceDecl::nth_instance_variable(unsigned n) const {
-  auto list = impl->reader.getVal339();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   return impl->reader.getVal341().size();
 }
 
 std::optional<ObjCIvarDecl> ObjCInterfaceDecl::nth_instance_variable(unsigned n) const {
   auto list = impl->reader.getVal341();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -405,30 +355,12 @@ std::optional<ObjCIvarDecl> ObjCInterfaceDecl::nth_instance_variable(unsigned n)
 }
 
 gap::generator<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const & {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  auto list = impl->reader.getVal314();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d314 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCIvarDecl::from_base(std::move(d314))) {
-=======
-  auto list = impl->reader.getVal339();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d339 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCIvarDecl::from_base(std::move(d339))) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   auto list = impl->reader.getVal341();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d341 = ep->DeclFor(ep, v)) {
       if (auto e = ObjCIvarDecl::from_base(std::move(d341))) {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
         co_yield std::move(*e);
       }
     }
@@ -437,27 +369,11 @@ gap::generator<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const &
 }
 
 unsigned ObjCInterfaceDecl::num_known_categories(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  return impl->reader.getVal340().size();
-}
-
-std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_known_categorie(unsigned n) const {
-  auto list = impl->reader.getVal340();
-=======
-  return impl->reader.getVal350().size();
-}
-
-std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_known_categorie(unsigned n) const {
-  auto list = impl->reader.getVal350();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   return impl->reader.getVal352().size();
 }
 
 std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_known_categorie(unsigned n) const {
   auto list = impl->reader.getVal352();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -471,30 +387,12 @@ std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_known_categorie(unsigned 
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const & {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  auto list = impl->reader.getVal340();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d340 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCCategoryDecl::from_base(std::move(d340))) {
-=======
-  auto list = impl->reader.getVal350();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d350 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCCategoryDecl::from_base(std::move(d350))) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   auto list = impl->reader.getVal352();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d352 = ep->DeclFor(ep, v)) {
       if (auto e = ObjCCategoryDecl::from_base(std::move(d352))) {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
         co_yield std::move(*e);
       }
     }
@@ -535,27 +433,11 @@ gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const
 }
 
 unsigned ObjCInterfaceDecl::num_protocol_tokens(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  return impl->reader.getVal352().size();
-}
-
-std::optional<Token> ObjCInterfaceDecl::nth_protocol_token(unsigned n) const {
-  auto list = impl->reader.getVal352();
-=======
-  return impl->reader.getVal358().size();
-}
-
-std::optional<Token> ObjCInterfaceDecl::nth_protocol_token(unsigned n) const {
-  auto list = impl->reader.getVal358();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   return impl->reader.getVal360().size();
 }
 
 std::optional<Token> ObjCInterfaceDecl::nth_protocol_token(unsigned n) const {
   auto list = impl->reader.getVal360();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -569,15 +451,7 @@ std::optional<Token> ObjCInterfaceDecl::nth_protocol_token(unsigned n) const {
 }
 
 gap::generator<Token> ObjCInterfaceDecl::protocol_tokens(void) const & {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  auto list = impl->reader.getVal352();
-=======
-  auto list = impl->reader.getVal358();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   auto list = impl->reader.getVal360();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   EntityProviderPtr ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
   if (!fragment) {
@@ -587,45 +461,19 @@ gap::generator<Token> ObjCInterfaceDecl::protocol_tokens(void) const & {
   auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
-<<<<<<< HEAD
-<<<<<<< HEAD
-    if (auto t352 = ep->TokenFor(ep, tok_reader, v)) {
-      co_yield t352;
-=======
-    if (auto t358 = ep->TokenFor(ep, tok_reader, v)) {
-      co_yield t358;
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
     if (auto t360 = ep->TokenFor(ep, tok_reader, v)) {
       co_yield t360;
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
     }
   }
   co_return;
 }
 
 unsigned ObjCInterfaceDecl::num_protocols(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  return impl->reader.getVal360().size();
-}
-
-std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_protocol(unsigned n) const {
-  auto list = impl->reader.getVal360();
-=======
-  return impl->reader.getVal359().size();
-}
-
-std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_protocol(unsigned n) const {
-  auto list = impl->reader.getVal359();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   return impl->reader.getVal361().size();
 }
 
 std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_protocol(unsigned n) const {
   auto list = impl->reader.getVal361();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -639,30 +487,12 @@ std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_protocol(unsigned n) cons
 }
 
 gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const & {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  auto list = impl->reader.getVal360();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d360 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from_base(std::move(d360))) {
-=======
-  auto list = impl->reader.getVal359();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d359 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from_base(std::move(d359))) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   auto list = impl->reader.getVal361();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d361 = ep->DeclFor(ep, v)) {
       if (auto e = ObjCProtocolDecl::from_base(std::move(d361))) {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
         co_yield std::move(*e);
       }
     }
@@ -671,27 +501,11 @@ gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const & {
 }
 
 unsigned ObjCInterfaceDecl::num_visible_categories(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  return impl->reader.getVal361().size();
-}
-
-std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_categorie(unsigned n) const {
-  auto list = impl->reader.getVal361();
-=======
-  return impl->reader.getVal360().size();
-}
-
-std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_categorie(unsigned n) const {
-  auto list = impl->reader.getVal360();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   return impl->reader.getVal362().size();
 }
 
 std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_categorie(unsigned n) const {
   auto list = impl->reader.getVal362();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -705,30 +519,12 @@ std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_categorie(unsigne
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) const & {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  auto list = impl->reader.getVal361();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d361 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCCategoryDecl::from_base(std::move(d361))) {
-=======
-  auto list = impl->reader.getVal360();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d360 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCCategoryDecl::from_base(std::move(d360))) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   auto list = impl->reader.getVal362();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d362 = ep->DeclFor(ep, v)) {
       if (auto e = ObjCCategoryDecl::from_base(std::move(d362))) {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
         co_yield std::move(*e);
       }
     }
@@ -737,27 +533,11 @@ gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) con
 }
 
 unsigned ObjCInterfaceDecl::num_visible_extensions(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  return impl->reader.getVal362().size();
-}
-
-std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_extension(unsigned n) const {
-  auto list = impl->reader.getVal362();
-=======
-  return impl->reader.getVal361().size();
-}
-
-std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_extension(unsigned n) const {
-  auto list = impl->reader.getVal361();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   return impl->reader.getVal363().size();
 }
 
 std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_extension(unsigned n) const {
   auto list = impl->reader.getVal363();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -771,30 +551,12 @@ std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_extension(unsigne
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::visible_extensions(void) const & {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  auto list = impl->reader.getVal362();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d362 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCCategoryDecl::from_base(std::move(d362))) {
-=======
-  auto list = impl->reader.getVal361();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d361 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCCategoryDecl::from_base(std::move(d361))) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   auto list = impl->reader.getVal363();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d363 = ep->DeclFor(ep, v)) {
       if (auto e = ObjCCategoryDecl::from_base(std::move(d363))) {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
         co_yield std::move(*e);
       }
     }

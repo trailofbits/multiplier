@@ -223,7 +223,6 @@ Token MemberExpr::template_keyword_token(void) const {
 }
 
 bool MemberExpr::had_multiple_candidates(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
@@ -249,33 +248,6 @@ bool MemberExpr::is_implicit_access(void) const {
 
 NonOdrUseReason MemberExpr::is_non_odr_use(void) const {
   return static_cast<NonOdrUseReason>(impl->reader.getVal90());
-=======
-  return impl->reader.getVal86();
-}
-
-bool MemberExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal87();
-}
-
-bool MemberExpr::has_qualifier(void) const {
-  return impl->reader.getVal88();
-}
-
-bool MemberExpr::has_template_keyword(void) const {
-  return impl->reader.getVal89();
-}
-
-bool MemberExpr::is_arrow(void) const {
-  return impl->reader.getVal90();
-}
-
-bool MemberExpr::is_implicit_access(void) const {
-  return impl->reader.getVal91();
-}
-
-NonOdrUseReason MemberExpr::is_non_odr_use(void) const {
-  return static_cast<NonOdrUseReason>(impl->reader.getVal92());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

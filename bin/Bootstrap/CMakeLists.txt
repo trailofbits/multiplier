@@ -38,6 +38,10 @@ set_target_properties("mx-bootstrap"
 set(install_include_dir "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}")
 list(GET LLVM_INCLUDE_DIRS 0 dependencies_include_dir)
 
+target_include_directories("mx-bootstrap" PUBLIC
+    ${LLVM_INCLUDE_DIRS}
+  )
+
 if(MX_BOOTSTRAP_PASTA)
   add_executable("mx-bootstrap-pasta"
     "PASTA.cpp"

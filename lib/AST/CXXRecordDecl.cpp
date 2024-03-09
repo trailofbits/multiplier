@@ -273,19 +273,11 @@ std::optional<MSInheritanceModel> CXXRecordDecl::calculate_inheritance_model(voi
 }
 
 unsigned CXXRecordDecl::num_constructors(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal184().size();
 }
 
 std::optional<CXXConstructorDecl> CXXRecordDecl::nth_constructor(unsigned n) const {
   auto list = impl->reader.getVal184();
-=======
-  return impl->reader.getVal187().size();
-}
-
-std::optional<CXXConstructorDecl> CXXRecordDecl::nth_constructor(unsigned n) const {
-  auto list = impl->reader.getVal187();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -299,21 +291,12 @@ std::optional<CXXConstructorDecl> CXXRecordDecl::nth_constructor(unsigned n) con
 }
 
 gap::generator<CXXConstructorDecl> CXXRecordDecl::constructors(void) const & {
-<<<<<<< HEAD
   auto list = impl->reader.getVal184();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d184 = ep->DeclFor(ep, v)) {
       if (auto e = CXXConstructorDecl::from_base(std::move(d184))) {
-=======
-  auto list = impl->reader.getVal187();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d187 = ep->DeclFor(ep, v)) {
-      if (auto e = CXXConstructorDecl::from_base(std::move(d187))) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
         co_yield std::move(*e);
       }
     }
@@ -464,22 +447,6 @@ std::optional<uint32_t> CXXRecordDecl::lambda_mangling_number(void) const {
     return std::nullopt;
   } else {
     return static_cast<uint32_t>(impl->reader.getVal140());
-<<<<<<< HEAD
-  }
-  return std::nullopt;
-}
-
-std::optional<CXXMethodDecl> CXXRecordDecl::lambda_static_invoker(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal128();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXMethodDecl::from_base(std::move(eptr));
-    }
-=======
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   }
   return std::nullopt;
 }
@@ -508,11 +475,7 @@ std::optional<uint32_t> CXXRecordDecl::odr_hash(void) const {
 
 std::optional<CXXRecordDecl> CXXRecordDecl::template_instantiation_pattern(void) const {
   if (true) {
-<<<<<<< HEAD
-    RawEntityId eid = impl->reader.getVal130();
-=======
     RawEntityId eid = impl->reader.getVal128();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -525,41 +488,6 @@ std::optional<CXXRecordDecl> CXXRecordDecl::template_instantiation_pattern(void)
 
 TemplateSpecializationKind CXXRecordDecl::template_specialization_kind(void) const {
   return static_cast<TemplateSpecializationKind>(impl->reader.getVal92());
-<<<<<<< HEAD
-}
-
-unsigned CXXRecordDecl::num_visible_conversion_functions(void) const {
-  return impl->reader.getVal191().size();
-}
-
-std::optional<NamedDecl> CXXRecordDecl::nth_visible_conversion_function(unsigned n) const {
-  auto list = impl->reader.getVal191();
-  if (n >= list.size()) {
-    return std::nullopt;
-  }
-  const EntityProviderPtr &ep = impl->ep;
-  auto v = list[n];
-  auto e = ep->DeclFor(ep, v);
-  if (!e) {
-    return std::nullopt;
-  }
-  return NamedDecl::from_base(std::move(e));
-}
-
-gap::generator<NamedDecl> CXXRecordDecl::visible_conversion_functions(void) const & {
-  auto list = impl->reader.getVal191();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d191 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from_base(std::move(d191))) {
-        co_yield std::move(*e);
-      }
-    }
-  }
-  co_return;
-=======
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 std::optional<bool> CXXRecordDecl::has_any_dependent_bases(void) const {
@@ -698,10 +626,10 @@ std::optional<bool> CXXRecordDecl::has_irrelevant_destructor(void) const {
 }
 
 std::optional<bool> CXXRecordDecl::has_known_lambda_internal_linkage(void) const {
-  if (!impl->reader.getVal185()) {
+  if (!impl->reader.getVal186()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal184());
+    return static_cast<bool>(impl->reader.getVal185());
   }
   return std::nullopt;
 }
@@ -710,7 +638,7 @@ std::optional<bool> CXXRecordDecl::has_move_assignment(void) const {
   if (!impl->reader.getVal191()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal186());
+    return static_cast<bool>(impl->reader.getVal187());
   }
   return std::nullopt;
 }
@@ -1152,23 +1080,6 @@ std::optional<bool> CXXRecordDecl::is_empty(void) const {
 }
 
 bool CXXRecordDecl::is_generic_lambda(void) const {
-<<<<<<< HEAD
-  return impl->reader.getVal290();
-}
-
-std::optional<bool> CXXRecordDecl::is_literal(void) const {
-  if (!impl->reader.getVal292()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal291());
-  }
-  return std::nullopt;
-}
-
-std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal131();
-=======
   return impl->reader.getVal289();
 }
 
@@ -1193,7 +1104,6 @@ std::optional<bool> CXXRecordDecl::is_literal(void) const {
 std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal130();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -1205,49 +1115,11 @@ std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const {
 }
 
 bool CXXRecordDecl::is_never_dependent_lambda(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  return impl->reader.getVal293();
-}
-
-std::optional<bool> CXXRecordDecl::is_pod(void) const {
-  if (!impl->reader.getVal295()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal294());
-  }
-  return std::nullopt;
-}
-
-std::optional<bool> CXXRecordDecl::is_polymorphic(void) const {
-  if (!impl->reader.getVal297()) {
-=======
-  return impl->reader.getVal292();
-}
-
-std::optional<bool> CXXRecordDecl::is_pod(void) const {
-  if (!impl->reader.getVal294()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal293());
-  }
-  return std::nullopt;
-}
-
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::is_standard_layout(void) const {
-  if (!impl->reader.getVal299()) {
-=======
-std::optional<bool> CXXRecordDecl::is_polymorphic(void) const {
-=======
   return impl->reader.getVal294();
 }
 
 std::optional<bool> CXXRecordDecl::is_pod(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal296()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal295());
@@ -1255,17 +1127,8 @@ std::optional<bool> CXXRecordDecl::is_pod(void) const {
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::is_structural(void) const {
-  if (!impl->reader.getVal301()) {
-=======
-std::optional<bool> CXXRecordDecl::is_standard_layout(void) const {
-=======
 std::optional<bool> CXXRecordDecl::is_polymorphic(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal298()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal297());
@@ -1273,17 +1136,8 @@ std::optional<bool> CXXRecordDecl::is_polymorphic(void) const {
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::is_trivial(void) const {
-  if (!impl->reader.getVal303()) {
-=======
-std::optional<bool> CXXRecordDecl::is_structural(void) const {
-=======
 std::optional<bool> CXXRecordDecl::is_standard_layout(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal300()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal299());
@@ -1291,17 +1145,8 @@ std::optional<bool> CXXRecordDecl::is_standard_layout(void) const {
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::is_trivially_copyable(void) const {
-  if (!impl->reader.getVal305()) {
-=======
-std::optional<bool> CXXRecordDecl::is_trivial(void) const {
-=======
 std::optional<bool> CXXRecordDecl::is_structural(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal302()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal301());
@@ -1309,17 +1154,8 @@ std::optional<bool> CXXRecordDecl::is_structural(void) const {
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::lambda_is_default_constructible_and_assignable(void) const {
-  if (!impl->reader.getVal307()) {
-=======
-std::optional<bool> CXXRecordDecl::is_trivially_copyable(void) const {
-=======
 std::optional<bool> CXXRecordDecl::is_trivial(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal304()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal303());
@@ -1327,17 +1163,8 @@ std::optional<bool> CXXRecordDecl::is_trivial(void) const {
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::may_be_abstract(void) const {
-  if (!impl->reader.getVal309()) {
-=======
-std::optional<bool> CXXRecordDecl::lambda_is_default_constructible_and_assignable(void) const {
-=======
 std::optional<bool> CXXRecordDecl::is_trivially_copyable(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal306()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal305());
@@ -1345,17 +1172,8 @@ std::optional<bool> CXXRecordDecl::is_trivially_copyable(void) const {
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::may_be_dynamic_class(void) const {
-  if (!impl->reader.getVal311()) {
-=======
-std::optional<bool> CXXRecordDecl::may_be_abstract(void) const {
-=======
 std::optional<bool> CXXRecordDecl::lambda_is_default_constructible_and_assignable(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal308()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal307());
@@ -1363,17 +1181,8 @@ std::optional<bool> CXXRecordDecl::lambda_is_default_constructible_and_assignabl
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::may_be_non_dynamic_class(void) const {
-  if (!impl->reader.getVal313()) {
-=======
-std::optional<bool> CXXRecordDecl::may_be_dynamic_class(void) const {
-=======
 std::optional<bool> CXXRecordDecl::may_be_abstract(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal310()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal309());
@@ -1381,18 +1190,7 @@ std::optional<bool> CXXRecordDecl::may_be_abstract(void) const {
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
-  if (!impl->reader.getVal315()) {
-    return std::nullopt;
-  }
-  auto list = impl->reader.getVal314();
-=======
-std::optional<bool> CXXRecordDecl::may_be_non_dynamic_class(void) const {
-=======
 std::optional<bool> CXXRecordDecl::may_be_dynamic_class(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal312()) {
     return std::nullopt;
   } else {
@@ -1407,10 +1205,6 @@ std::optional<bool> CXXRecordDecl::may_be_non_dynamic_class(void) const {
   } else {
     return static_cast<bool>(impl->reader.getVal313());
   }
-<<<<<<< HEAD
-  auto list = impl->reader.getVal313();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   return std::nullopt;
 }
 
@@ -1419,24 +1213,13 @@ std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
     return std::nullopt;
   }
   auto list = impl->reader.getVal315();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   std::vector<CXXMethodDecl> vec;
   vec.reserve(list.size());
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-<<<<<<< HEAD
-<<<<<<< HEAD
-    if (auto d314 = ep->DeclFor(ep, v)) {
-      if (auto e = CXXMethodDecl::from_base(std::move(d314))) {
-=======
-    if (auto d313 = ep->DeclFor(ep, v)) {
-      if (auto e = CXXMethodDecl::from_base(std::move(d313))) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
     if (auto d315 = ep->DeclFor(ep, v)) {
       if (auto e = CXXMethodDecl::from_base(std::move(d315))) {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
         vec.emplace_back(std::move(*e));
       }
     }
@@ -1445,37 +1228,7 @@ std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_copy_assignment(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  if (!impl->reader.getVal317()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal316());
-  }
-  return std::nullopt;
-}
-
-std::optional<bool> CXXRecordDecl::needs_implicit_copy_constructor(void) const {
-  if (!impl->reader.getVal319()) {
-=======
-  if (!impl->reader.getVal316()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal315());
-  }
-  return std::nullopt;
-}
-
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::needs_implicit_default_constructor(void) const {
-  if (!impl->reader.getVal321()) {
-=======
-std::optional<bool> CXXRecordDecl::needs_implicit_copy_constructor(void) const {
-=======
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal318()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal317());
@@ -1483,17 +1236,8 @@ std::optional<bool> CXXRecordDecl::needs_implicit_copy_constructor(void) const {
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::needs_implicit_destructor(void) const {
-  if (!impl->reader.getVal323()) {
-=======
-std::optional<bool> CXXRecordDecl::needs_implicit_default_constructor(void) const {
-=======
 std::optional<bool> CXXRecordDecl::needs_implicit_copy_constructor(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal320()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal319());
@@ -1501,17 +1245,8 @@ std::optional<bool> CXXRecordDecl::needs_implicit_copy_constructor(void) const {
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::needs_implicit_move_assignment(void) const {
-  if (!impl->reader.getVal325()) {
-=======
-std::optional<bool> CXXRecordDecl::needs_implicit_destructor(void) const {
-=======
 std::optional<bool> CXXRecordDecl::needs_implicit_default_constructor(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal322()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal321());
@@ -1519,17 +1254,8 @@ std::optional<bool> CXXRecordDecl::needs_implicit_default_constructor(void) cons
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::needs_implicit_move_constructor(void) const {
-  if (!impl->reader.getVal327()) {
-=======
-std::optional<bool> CXXRecordDecl::needs_implicit_move_assignment(void) const {
-=======
 std::optional<bool> CXXRecordDecl::needs_implicit_destructor(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal324()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal323());
@@ -1537,17 +1263,8 @@ std::optional<bool> CXXRecordDecl::needs_implicit_destructor(void) const {
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_assignment(void) const {
-  if (!impl->reader.getVal329()) {
-=======
-std::optional<bool> CXXRecordDecl::needs_implicit_move_constructor(void) const {
-=======
 std::optional<bool> CXXRecordDecl::needs_implicit_move_assignment(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal326()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal325());
@@ -1555,17 +1272,8 @@ std::optional<bool> CXXRecordDecl::needs_implicit_move_assignment(void) const {
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_constructor(void) const {
-  if (!impl->reader.getVal331()) {
-=======
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_assignment(void) const {
-=======
 std::optional<bool> CXXRecordDecl::needs_implicit_move_constructor(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal328()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal327());
@@ -1573,17 +1281,8 @@ std::optional<bool> CXXRecordDecl::needs_implicit_move_constructor(void) const {
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_destructor(void) const {
-  if (!impl->reader.getVal333()) {
-=======
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_constructor(void) const {
-=======
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_assignment(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal330()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal329());
@@ -1591,17 +1290,8 @@ std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_assignment
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_assignment(void) const {
-  if (!impl->reader.getVal335()) {
-=======
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_destructor(void) const {
-=======
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_constructor(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal332()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal331());
@@ -1609,17 +1299,8 @@ std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_constructo
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_constructor(void) const {
-  if (!impl->reader.getVal337()) {
-=======
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_assignment(void) const {
-=======
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_destructor(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal334()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal333());
@@ -1627,17 +1308,8 @@ std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_destructor(void
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::null_field_offset_is_zero(void) const {
-  if (!impl->reader.getVal339()) {
-=======
-std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_constructor(void) const {
-=======
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_assignment(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal336()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal335());
@@ -1645,18 +1317,7 @@ std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_assignment
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::virtual_bases(void) const {
-  if (!impl->reader.getVal341()) {
-    return std::nullopt;
-  }
-  auto list = impl->reader.getVal340();
-=======
-std::optional<bool> CXXRecordDecl::null_field_offset_is_zero(void) const {
-=======
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_constructor(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal338()) {
     return std::nullopt;
   } else {
@@ -1671,10 +1332,6 @@ std::optional<bool> CXXRecordDecl::null_field_offset_is_zero(void) const {
   } else {
     return static_cast<bool>(impl->reader.getVal339());
   }
-<<<<<<< HEAD
-  auto list = impl->reader.getVal339();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   return std::nullopt;
 }
 
@@ -1683,56 +1340,30 @@ std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::virtual_bases(void) 
     return std::nullopt;
   }
   auto list = impl->reader.getVal341();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   std::vector<CXXBaseSpecifier> vec;
   vec.reserve(list.size());
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-<<<<<<< HEAD
-<<<<<<< HEAD
-    if (auto d340 = ep->CXXBaseSpecifierFor(ep, v)) {
-      vec.emplace_back(std::move(d340));
-=======
-    if (auto d339 = ep->CXXBaseSpecifierFor(ep, v)) {
-      vec.emplace_back(std::move(d339));
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
     if (auto d341 = ep->CXXBaseSpecifierFor(ep, v)) {
       vec.emplace_back(std::move(d341));
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
     }
   }
   return vec;
 }
 
 std::optional<uint64_t> CXXRecordDecl::size_without_virtual_bases(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  if (!impl->reader.getVal342()) {
-    return std::nullopt;
-  } else {
-    return static_cast<uint64_t>(impl->reader.getVal139());
-=======
-  if (!impl->reader.getVal341()) {
-=======
   if (!impl->reader.getVal343()) {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
     return std::nullopt;
   } else {
     return static_cast<uint64_t>(impl->reader.getVal131());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   }
   return std::nullopt;
 }
 
 std::optional<CXXRecordDecl> CXXRecordDecl::primary_base(void) const {
   if (true) {
-<<<<<<< HEAD
-    RawEntityId eid = impl->reader.getVal141();
-=======
     RawEntityId eid = impl->reader.getVal139();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -1744,37 +1375,7 @@ std::optional<CXXRecordDecl> CXXRecordDecl::primary_base(void) const {
 }
 
 std::optional<bool> CXXRecordDecl::has_own_virtual_function_table_pointer(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  if (!impl->reader.getVal344()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal343());
-  }
-  return std::nullopt;
-}
-
-std::optional<bool> CXXRecordDecl::has_extendable_virtual_function_table_pointer(void) const {
-  if (!impl->reader.getVal346()) {
-=======
-  if (!impl->reader.getVal343()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal342());
-  }
-  return std::nullopt;
-}
-
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::has_virtual_base_table_pointer(void) const {
-  if (!impl->reader.getVal348()) {
-=======
-std::optional<bool> CXXRecordDecl::has_extendable_virtual_function_table_pointer(void) const {
-=======
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal345()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal344());
@@ -1782,17 +1383,8 @@ std::optional<bool> CXXRecordDecl::has_extendable_virtual_function_table_pointer
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-std::optional<bool> CXXRecordDecl::has_own_virtual_base_table_pointer(void) const {
-  if (!impl->reader.getVal350()) {
-=======
-std::optional<bool> CXXRecordDecl::has_virtual_base_table_pointer(void) const {
-=======
 std::optional<bool> CXXRecordDecl::has_extendable_virtual_function_table_pointer(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal347()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal346());
@@ -1800,13 +1392,7 @@ std::optional<bool> CXXRecordDecl::has_extendable_virtual_function_table_pointer
   return std::nullopt;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-std::optional<bool> CXXRecordDecl::has_own_virtual_base_table_pointer(void) const {
-=======
 std::optional<bool> CXXRecordDecl::has_virtual_base_table_pointer(void) const {
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (!impl->reader.getVal349()) {
     return std::nullopt;
   } else {
@@ -1815,9 +1401,6 @@ std::optional<bool> CXXRecordDecl::has_virtual_base_table_pointer(void) const {
   return std::nullopt;
 }
 
-<<<<<<< HEAD
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
 std::optional<bool> CXXRecordDecl::has_own_virtual_base_table_pointer(void) const {
   if (!impl->reader.getVal351()) {
     return std::nullopt;
@@ -1827,7 +1410,6 @@ std::optional<bool> CXXRecordDecl::has_own_virtual_base_table_pointer(void) cons
   return std::nullopt;
 }
 
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

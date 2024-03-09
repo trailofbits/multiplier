@@ -10,7 +10,6 @@
 #include <multiplier/AST/CXXRecordDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Expr.h>
-#include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueStmt.h>
@@ -197,38 +196,6 @@ std::optional<OverloadExpr> OverloadExpr::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-unsigned OverloadExpr::num_declarations(void) const {
-  return impl->reader.getVal15().size();
-}
-
-std::optional<NamedDecl> OverloadExpr::nth_declaration(unsigned n) const {
-  auto list = impl->reader.getVal15();
-  if (n >= list.size()) {
-    return std::nullopt;
-  }
-  const EntityProviderPtr &ep = impl->ep;
-  auto v = list[n];
-  auto e = ep->DeclFor(ep, v);
-  if (!e) {
-    return std::nullopt;
-  }
-  return NamedDecl::from_base(std::move(e));
-}
-
-gap::generator<NamedDecl> OverloadExpr::declarations(void) const & {
-  auto list = impl->reader.getVal15();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d15 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from_base(std::move(d15))) {
-        co_yield std::move(*e);
-      }
-    }
-  }
-  co_return;
-}
-
 Token OverloadExpr::l_angle_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
@@ -259,19 +226,11 @@ Token OverloadExpr::template_keyword_token(void) const {
 }
 
 bool OverloadExpr::has_explicit_template_arguments(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
 bool OverloadExpr::has_template_keyword(void) const {
   return impl->reader.getVal85();
-=======
-  return impl->reader.getVal86();
-}
-
-bool OverloadExpr::has_template_keyword(void) const {
-  return impl->reader.getVal87();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

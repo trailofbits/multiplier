@@ -204,19 +204,11 @@ Token DependentScopeDeclRefExpr::template_keyword_token(void) const {
 }
 
 bool DependentScopeDeclRefExpr::has_explicit_template_arguments(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
 bool DependentScopeDeclRefExpr::has_template_keyword(void) const {
   return impl->reader.getVal85();
-=======
-  return impl->reader.getVal86();
-}
-
-bool DependentScopeDeclRefExpr::has_template_keyword(void) const {
-  return impl->reader.getVal87();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

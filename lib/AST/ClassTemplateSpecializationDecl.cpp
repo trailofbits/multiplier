@@ -230,19 +230,11 @@ std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::
 }
 
 Token ClassTemplateSpecializationDecl::extern_token(void) const {
-<<<<<<< HEAD
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal142());
-}
-
-Token ClassTemplateSpecializationDecl::point_of_instantiation(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal167());
-=======
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal141());
 }
 
 Token ClassTemplateSpecializationDecl::point_of_instantiation(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal142());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 TemplateSpecializationKind ClassTemplateSpecializationDecl::specialization_kind(void) const {
@@ -250,36 +242,16 @@ TemplateSpecializationKind ClassTemplateSpecializationDecl::specialization_kind(
 }
 
 ClassTemplateDecl ClassTemplateSpecializationDecl::specialized_template(void) const {
-<<<<<<< HEAD
-  RawEntityId eid = impl->reader.getVal169();
-=======
   RawEntityId eid = impl->reader.getVal167();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   return ClassTemplateDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 unsigned ClassTemplateSpecializationDecl::num_template_arguments(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  return impl->reader.getVal351().size();
-}
-
-std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_argument(unsigned n) const {
-  auto list = impl->reader.getVal351();
-=======
-  return impl->reader.getVal350().size();
-}
-
-std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_argument(unsigned n) const {
-  auto list = impl->reader.getVal350();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   return impl->reader.getVal352().size();
 }
 
 std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_argument(unsigned n) const {
   auto list = impl->reader.getVal352();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -293,57 +265,23 @@ std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_ar
 }
 
 gap::generator<TemplateArgument> ClassTemplateSpecializationDecl::template_arguments(void) const & {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  auto list = impl->reader.getVal351();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d351 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d351));
-=======
-  auto list = impl->reader.getVal350();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d350 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d350));
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   auto list = impl->reader.getVal352();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d352 = ep->TemplateArgumentFor(ep, v)) {
       co_yield TemplateArgument(std::move(d352));
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
     }
   }
   co_return;
 }
 
 unsigned ClassTemplateSpecializationDecl::num_template_instantiation_arguments(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  return impl->reader.getVal352().size();
-}
-
-std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_instantiation_argument(unsigned n) const {
-  auto list = impl->reader.getVal352();
-=======
-  return impl->reader.getVal351().size();
-}
-
-std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_instantiation_argument(unsigned n) const {
-  auto list = impl->reader.getVal351();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   return impl->reader.getVal353().size();
 }
 
 std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_instantiation_argument(unsigned n) const {
   auto list = impl->reader.getVal353();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -357,30 +295,12 @@ std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_in
 }
 
 gap::generator<TemplateArgument> ClassTemplateSpecializationDecl::template_instantiation_arguments(void) const & {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  auto list = impl->reader.getVal352();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d352 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d352));
-=======
-  auto list = impl->reader.getVal351();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d351 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d351));
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   auto list = impl->reader.getVal353();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d353 = ep->TemplateArgumentFor(ep, v)) {
       co_yield TemplateArgument(std::move(d353));
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
     }
   }
   co_return;
@@ -392,11 +312,7 @@ Token ClassTemplateSpecializationDecl::template_keyword_token(void) const {
 
 std::optional<Type> ClassTemplateSpecializationDecl::type_as_written(void) const {
   if (true) {
-<<<<<<< HEAD
-    RawEntityId eid = impl->reader.getVal180();
-=======
     RawEntityId eid = impl->reader.getVal170();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -408,22 +324,7 @@ std::optional<Type> ClassTemplateSpecializationDecl::type_as_written(void) const
 }
 
 bool ClassTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  return impl->reader.getVal353();
-}
-
-bool ClassTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
   return impl->reader.getVal354();
-}
-
-bool ClassTemplateSpecializationDecl::is_explicit_specialization(void) const {
-  return impl->reader.getVal355();
-=======
-  return impl->reader.getVal352();
-=======
-  return impl->reader.getVal354();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
 }
 
 bool ClassTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
@@ -431,12 +332,7 @@ bool ClassTemplateSpecializationDecl::is_explicit_instantiation_or_specializatio
 }
 
 bool ClassTemplateSpecializationDecl::is_explicit_specialization(void) const {
-<<<<<<< HEAD
-  return impl->reader.getVal354();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
   return impl->reader.getVal356();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
 }
 
 #pragma GCC diagnostic pop

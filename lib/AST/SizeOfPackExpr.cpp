@@ -203,17 +203,10 @@ NamedDecl SizeOfPackExpr::pack(void) const {
 }
 
 std::optional<uint32_t> SizeOfPackExpr::pack_length(void) const {
-<<<<<<< HEAD
   if (!impl->reader.getVal84()) {
     return std::nullopt;
   } else {
     return static_cast<uint32_t>(impl->reader.getVal100());
-=======
-  if (!impl->reader.getVal86()) {
-    return std::nullopt;
-  } else {
-    return static_cast<uint32_t>(impl->reader.getVal102());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   }
   return std::nullopt;
 }
@@ -223,11 +216,7 @@ Token SizeOfPackExpr::pack_token(void) const {
 }
 
 std::optional<std::vector<TemplateArgument>> SizeOfPackExpr::partial_arguments(void) const {
-<<<<<<< HEAD
   if (!impl->reader.getVal85()) {
-=======
-  if (!impl->reader.getVal87()) {
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     return std::nullopt;
   }
   auto list = impl->reader.getVal15();
@@ -248,11 +237,7 @@ Token SizeOfPackExpr::r_paren_token(void) const {
 }
 
 bool SizeOfPackExpr::is_partially_substituted(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal86();
-=======
-  return impl->reader.getVal88();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

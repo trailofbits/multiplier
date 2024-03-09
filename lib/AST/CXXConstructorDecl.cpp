@@ -276,15 +276,15 @@ bool CXXConstructorDecl::is_delegating_constructor(void) const {
 }
 
 bool CXXConstructorDecl::is_explicit(void) const {
-  return impl->reader.getVal184();
-}
-
-bool CXXConstructorDecl::is_inheriting_constructor(void) const {
   return impl->reader.getVal185();
 }
 
-bool CXXConstructorDecl::is_specialization_copying_object(void) const {
+bool CXXConstructorDecl::is_inheriting_constructor(void) const {
   return impl->reader.getVal186();
+}
+
+bool CXXConstructorDecl::is_specialization_copying_object(void) const {
+  return impl->reader.getVal187();
 }
 
 #pragma GCC diagnostic pop

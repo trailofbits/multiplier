@@ -198,11 +198,7 @@ Expr UserDefinedLiteral::cooked_literal(void) const {
 }
 
 UserDefinedLiteralLiteralOperatorKind UserDefinedLiteral::literal_operator_kind(void) const {
-<<<<<<< HEAD
   return static_cast<UserDefinedLiteralLiteralOperatorKind>(impl->reader.getVal92());
-=======
-  return static_cast<UserDefinedLiteralLiteralOperatorKind>(impl->reader.getVal94());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 Token UserDefinedLiteral::ud_suffix_token(void) const {

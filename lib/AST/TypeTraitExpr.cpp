@@ -193,7 +193,6 @@ std::optional<TypeTraitExpr> TypeTraitExpr::from(const TokenContext &t) {
 }
 
 TypeTrait TypeTraitExpr::trait(void) const {
-<<<<<<< HEAD
   return static_cast<TypeTrait>(impl->reader.getVal90());
 }
 
@@ -202,16 +201,6 @@ std::optional<bool> TypeTraitExpr::value(void) const {
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal84());
-=======
-  return static_cast<TypeTrait>(impl->reader.getVal92());
-}
-
-std::optional<bool> TypeTraitExpr::value(void) const {
-  if (!impl->reader.getVal87()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(impl->reader.getVal86());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   }
   return std::nullopt;
 }

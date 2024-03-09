@@ -197,11 +197,7 @@ Token AtomicExpr::builtin_token(void) const {
 }
 
 AtomicExprAtomicOp AtomicExpr::operation(void) const {
-<<<<<<< HEAD
   return static_cast<AtomicExprAtomicOp>(impl->reader.getVal90());
-=======
-  return static_cast<AtomicExprAtomicOp>(impl->reader.getVal92());
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 Expr AtomicExpr::order(void) const {
@@ -289,7 +285,6 @@ std::optional<Expr> AtomicExpr::weak(void) const {
 }
 
 bool AtomicExpr::is_cmp_x_chg(void) const {
-<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
@@ -299,17 +294,6 @@ bool AtomicExpr::is_open_cl(void) const {
 
 bool AtomicExpr::is_volatile(void) const {
   return impl->reader.getVal86();
-=======
-  return impl->reader.getVal86();
-}
-
-bool AtomicExpr::is_open_cl(void) const {
-  return impl->reader.getVal87();
-}
-
-bool AtomicExpr::is_volatile(void) const {
-  return impl->reader.getVal88();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 unsigned AtomicExpr::num_sub_expressions(void) const {

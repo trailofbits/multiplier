@@ -233,11 +233,7 @@ Type ClassTemplatePartialSpecializationDecl::injected_specialization_type(void) 
 
 std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
   if (true) {
-<<<<<<< HEAD
-    RawEntityId eid = impl->reader.getVal356();
-=======
     RawEntityId eid = impl->reader.getVal181();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -250,15 +246,7 @@ std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecia
 
 std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::instantiated_from_member_template(void) const {
   if (true) {
-<<<<<<< HEAD
-<<<<<<< HEAD
     RawEntityId eid = impl->reader.getVal357();
-=======
-    RawEntityId eid = impl->reader.getVal355();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
-    RawEntityId eid = impl->reader.getVal357();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -270,28 +258,12 @@ std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecia
 }
 
 TemplateParameterList ClassTemplatePartialSpecializationDecl::template_parameters(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
   RawEntityId eid = impl->reader.getVal358();
-=======
-  RawEntityId eid = impl->reader.getVal356();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
-  RawEntityId eid = impl->reader.getVal358();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
   return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
 bool ClassTemplatePartialSpecializationDecl::has_associated_constraints(void) const {
-<<<<<<< HEAD
-<<<<<<< HEAD
   return impl->reader.getVal359();
-=======
-  return impl->reader.getVal357();
->>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
-=======
-  return impl->reader.getVal359();
->>>>>>> 5237ef5a9 (Blacklist AlreadrLoadedDecl function)
 }
 
 #pragma GCC diagnostic pop
