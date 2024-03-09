@@ -589,6 +589,7 @@ static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast) {
 static bool CanElideTokenFromTLD(const pasta::Token &tok) {
   switch (tok.Role()) {
     case pasta::TokenRole::kInvalid:
+      return false;
     case pasta::TokenRole::kBeginOfFileMarker:
     case pasta::TokenRole::kEndOfFileMarker:
     case pasta::TokenRole::kEndOfMacroExpansionMarker:
@@ -645,10 +646,6 @@ static std::pair<uint64_t, uint64_t> BaselineEntityRange(
   }
 
   return {begin_tok_index, end_tok_index};
-}
-
-static pasta::TokenRange BaselineEntityRange(const pasta::Macro &macro) {
-  return pasta::Macro::CompleteExpansionRange(macro);
 }
 
 static uint64_t PreviousConditionalIndex(
@@ -756,7 +753,6 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
   CHECK_LT(end_tok_index, max_tok_index);
 
   auto in_macro = false;
-  auto seen_marker = false;
 
   // Now adjust for macros at the beginning and ending. If we find macro
   // expansion ranges, then the expand until we find the beginning of the
@@ -765,10 +761,8 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
   while (!done && 0u < begin_tok_index && begin_tok_index <= end_tok_index) {
     pasta::Token tok = range[begin_tok_index];
     switch (tok.Role()) {
-      default:
       case pasta::TokenRole::kInvalid:
-        assert(false);
-        done = true;
+        --begin_tok_index;  // Split token; include it.
         break;
       case pasta::TokenRole::kFileToken:
         if (CanElideTokenFromTLD(tok)) {
@@ -778,17 +772,24 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
         }
         break;
       case pasta::TokenRole::kBeginOfMacroExpansionMarker:
-        seen_marker = true;
+        in_macro = false;
         done = true;
         break;
+
       case pasta::TokenRole::kBeginOfFileMarker:
       case pasta::TokenRole::kEndOfFileMarker:
       case pasta::TokenRole::kEndOfMacroExpansionMarker:
+        assert(!in_macro);
         ++begin_tok_index;  // Don't include it.
         done = true;
         break;
+
+      // These don't exist in the parsed token list.
       case pasta::TokenRole::kInitialMacroUseToken:
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
+        assert(false);
+        [[fallthrough]];
+
       case pasta::TokenRole::kFinalMacroExpansionToken:
       case pasta::TokenRole::kMacroDirectiveMarker:
         --begin_tok_index;  // Include it.
@@ -797,18 +798,15 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
     }
   }
 
-  assert(!in_macro || seen_marker);
+  assert(!in_macro);
   in_macro = false;
-  seen_marker = false;
 
   done = false;
   while (!done && 0u < end_tok_index && end_tok_index < max_tok_index) {
     pasta::Token tok = range[end_tok_index];
     switch (tok.Role()) {
-      default:
       case pasta::TokenRole::kInvalid:
-        assert(false);
-        --end_tok_index;
+        ++end_tok_index;  // Split token; include it.
         break;
       case pasta::TokenRole::kFileToken:
         if (CanElideTokenFromTLD(tok)) {
@@ -818,17 +816,23 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
         }
         break;
       case pasta::TokenRole::kEndOfMacroExpansionMarker:
-        seen_marker = true;
+        in_macro = false;
         done = true;
         break;
       case pasta::TokenRole::kBeginOfFileMarker:
       case pasta::TokenRole::kEndOfFileMarker:
       case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+        assert(!in_macro);
         --end_tok_index;  // Don't include it.
         done = true;
         break;
+
+      // These don't exist in the parsed token list.
       case pasta::TokenRole::kInitialMacroUseToken:
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
+        assert(false);
+        [[fallthrough]];
+
       case pasta::TokenRole::kFinalMacroExpansionToken:
       case pasta::TokenRole::kMacroDirectiveMarker:
         ++end_tok_index;  // Include it.
@@ -837,9 +841,8 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
     }
   }
 
-  assert(!in_macro || seen_marker);
+  assert(!in_macro);
   (void) in_macro;
-  (void) seen_marker;
 
   // Expand to trailing semicolon.
   if ((end_tok_index + 1u) < max_tok_index) {
@@ -850,7 +853,8 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
     }
   }
 
-  // Expand to leading comment.
+  // Expand to leading comment followed by whitespace containing no more than
+  // one new line.
   if (2u <= begin_tok_index &&
       range[begin_tok_index - 2u].Kind() == pasta::TokenKind::kComment) {
     auto pt = range[begin_tok_index - 1u];
@@ -1174,109 +1178,86 @@ static std::vector<OrderedMacro> FindTLMs(
   const uint64_t num_tokens = tokens.Size();
 
   auto order = 0u;
-  for (pasta::Macro mn : ast.Macros()) {
+  for (pasta::Token tok : tokens) {
+    if (tok.Role() != pasta::TokenRole::kMacroDirectiveMarker) {
+      continue;
+    }
 
-    // Include all `#include`s, `#pragma`s, `#if`s, etc.
-    if (auto dir = pasta::MacroDirective::From(mn);
-        dir && dir->Kind() != pasta::MacroKind::kDefineDirective) {
-      
-      // `#define` directives in the macro preamble won't have file locations.
-      // These don't matter here, though, as we're explicitly ignore `#define`s
-      // in this branch, and focusing on other top-lvel directives.
-      if (!dir->Hash().FileLocation()) {
-        continue;
-      }
+    auto dir = tok.Directive();
+    if (!dir) {
+      assert(false);
+      continue;
+    }
 
-      tlms.emplace_back(mn, order++);
+    auto md = std::move(dir.value());
+    tlms.emplace_back(md, order++);
 
-      // If it's an include-like directive, then we want to be able to associate
-      // begin- and end-of-file markers with this directive. Here we'll find
-      // the relevant begin-of-file markers.
-      auto ild = pasta::IncludeLikeMacroDirective::From(mn);
-      if (!ild) {
-        continue;
-      }
+    // If this is a macro definition, then keep track of it for later so that
+    // we can find all expansions.
+    if (auto dmd = pasta::DefineMacroDirective::From(md)) {
+      defs.push_back(std::move(dmd.value()));
+      continue;
+    }
+    
+    // If it's an include-like directive, then we want to be able to associate
+    // begin- and end-of-file markers with this directive. Here we'll find
+    // the relevant begin-of-file markers.
+    auto ild = pasta::IncludeLikeMacroDirective::From(md);
+    if (!ild) {
+      continue;
+    }
 
-      // All directives have a designated parsed location. Directives exist
-      // inside of macro expansions, bounded by markers in the parsed token
-      // lists. Go and find the ending macro expansion marker following the
-      // directive marker corresponding to this `#include`.
-      auto ild_index = ild->ParsedLocation().Index();
-      auto bom_index = ild_index;
-      auto eom_index = ild_index;
-      auto found = false;
-      for (; eom_index < (num_tokens - 1); ++eom_index) {
-        auto tok = tokens[eom_index];
-        if (tok.Role() == pasta::TokenRole::kEndOfMacroExpansionMarker) {
-          bom_index = tok.OpeningLocation()->Index();
-          found = true;
-          break;
-        }
-      }
-
-      if (!found) {
-        assert(false);
-        continue;
-      }
-
-      assert(bom_index < eom_index);
-      assert(bom_index < ild_index);
-
-      // The next token immediately following an end-of-expansion marker
-      // containing an include should be the beginning of file marker.
-      //
-      // We may not find it if the file has been heuristically skipped, e.g.
-      // due to a `#pragma once`. The purpose of this code is really to find
-      // the case of files embedded within fragments, e.g. for handling the
-      // x-macro pattern. We don't anticipate include guards/pragmas preventing
-      // redundant inclusion in those cases.
-      auto bof_index = eom_index + 1u;
-      if (tokens[bof_index].Role() != pasta::TokenRole::kBeginOfFileMarker) {
-        continue;
-      }
-
-      auto it = bof_to_eof.find(bof_index);
-      if (it == bof_to_eof.end()) {
-        assert(false);
-        continue;
-      }
-
-      // Map the EOF marker to the BOM marker token for the `#include`. We'll
-      // use this to help expand decl/fragment ranges.
-      eof_to_include.emplace(it->second, bom_index);
-
-    } else {
-      for (pasta::MacroDirective md : FindDirectivesInMacro(mn)) {
-        tlms.emplace_back(md, order++);
-
-        auto dmd = pasta::DefineMacroDirective::From(md);
-        if (!dmd) {
-          continue;
-        }
-
-        // If this macro definition doesn't have a name, then it's in a
-        // conditionally disabled region.
-        std::optional<pasta::MacroToken> name = dmd->Name();
-        if (!name) {
-          continue;
-        }
-
-        // Builtin or command-line specified macros have no location.
-        //
-        // NOTE(pag): The persistence for macros re-interprets macros with no
-        //            definition site as substitutions instead of macro
-        //            expansions.
-        //
-        // TODO(pag): Find a way to give these file locations.
-        if (!name->FileLocation()) {
-          continue;
-        }
-
-        defs.push_back(std::move(dmd.value()));
+    // All directives have a designated parsed location. Directives exist
+    // inside of macro expansions, bounded by markers in the parsed token
+    // lists. Go and find the ending macro expansion marker following the
+    // directive marker corresponding to this `#include`.
+    auto ild_index = ild->ParsedLocation().Index();
+    auto bom_index = ild_index;
+    auto eom_index = ild_index;
+    auto found = false;
+    for (; eom_index < (num_tokens - 1); ++eom_index) {
+      auto tok = tokens[eom_index];
+      if (tok.Role() == pasta::TokenRole::kEndOfMacroExpansionMarker) {
+        bom_index = tok.OpeningLocation()->Index();
+        assert(bom_index != eom_index);
+        found = true;
+        break;
       }
     }
+
+    if (!found) {
+      assert(false);
+      continue;
+    }
+
+    assert(bom_index < eom_index);
+    assert(bom_index < ild_index);
+
+    // The next token immediately following an end-of-expansion marker
+    // containing an include should be the beginning of file marker.
+    //
+    // We may not find it if the file has been heuristically skipped, e.g.
+    // due to a `#pragma once`. The purpose of this code is really to find
+    // the case of files embedded within fragments, e.g. for handling the
+    // x-macro pattern. We don't anticipate include guards/pragmas preventing
+    // redundant inclusion in those cases.
+    auto bof_index = eom_index + 1u;
+    if (tokens[bof_index].Role() != pasta::TokenRole::kBeginOfFileMarker) {
+      continue;
+    }
+
+    auto it = bof_to_eof.find(bof_index);
+    if (it == bof_to_eof.end()) {
+      assert(false);
+      continue;
+    }
+
+    // Map the EOF marker to the BOM marker token for the `#include`. We'll
+    // use this to help expand decl/fragment ranges.
+    eof_to_include.emplace(it->second, bom_index);
   }
 
+  // Go find all expansions
   for (pasta::DefineMacroDirective def : defs) {
     for (pasta::Macro use : def.Uses()) {
       tlms.emplace_back(RootMacroFrom(std::move(use)), order++);
@@ -1447,8 +1428,26 @@ static bool MergeLeadingMacroWithNextEntity(
   // If there were then we should have discovered them as leading keywords (e.g.
   // storage specifiers) or attributes.
   for (auto i = begin_index; i <= end_index; ++i) {
-    if (IsParsedTokenExcludingWhitespaceAndComments(tokens[i])) {
-      return false;
+    auto tok = tokens[i];
+    switch (tok.Role()) {
+      case pasta::TokenRole::kFinalMacroExpansionToken:
+      case pasta::TokenRole::kMacroDirectiveMarker:
+      case pasta::TokenRole::kBeginOfFileMarker:
+      case pasta::TokenRole::kEndOfFileMarker:
+        return false;
+      case pasta::TokenRole::kFileToken:
+        if (IsParsedTokenExcludingWhitespaceAndComments(tok)) {
+          return false;
+        }
+        continue;
+      case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+      case pasta::TokenRole::kEndOfMacroExpansionMarker:
+      case pasta::TokenRole::kInvalid:
+        continue;
+      case pasta::TokenRole::kInitialMacroUseToken:
+      case pasta::TokenRole::kIntermediateMacroExpansionToken:
+        assert(false);
+        continue;
     }
   }
 
@@ -1961,15 +1960,21 @@ static void CreateFloatingDirectiveFragment(
     const pasta::Macro &macro,
     std::vector<PendingFragmentPtr> &pending_fragments) {
 
-  pasta::TokenRange directive_range = BaselineEntityRange(macro);
-  CHECK(!directive_range.empty());
+  auto dir = pasta::MacroDirective::From(macro);
+  CHECK(dir.has_value());
+
+  auto marker_tok = dir->ParsedLocation();
+
+  auto directive_range = pasta::TokenRange::From(marker_tok, marker_tok);
+  CHECK(directive_range.has_value());
+  CHECK(!directive_range->empty());
 
   // TODO(pag): Eventually allow floating macro define directives from
   //            compilation commands.
   EntityGroup entities;
   entities.emplace_back(macro);
   auto floc = FindFileLocationOfFragment(
-      em.entity_ids, entities, directive_range);
+      em.entity_ids, entities, directive_range.value());
 
   std::vector<pasta::Macro> macros;
   macros.push_back(macro);
@@ -1977,14 +1982,14 @@ static void CreateFloatingDirectiveFragment(
   auto pf = CreatePendingFragment(
       id_store,
       em,
-      &directive_range  /* original_tokens */,
+      &(directive_range.value())  /* original_tokens */,
       pasta::PrintedTokenRange::CreateEmpty(
           pasta::AST::From(macro))  /* parsed_tokens */,
       nullptr,
       std::move(floc),
       tu_id,
-      directive_range.Front()->Index(),
-      directive_range.Back()->Index(),
+      directive_range->Front()->Index(),
+      directive_range->Back()->Index(),
       {}  /* empty decls */,
       std::move(macros),
       std::nullopt  /* root_fragment_id */);
@@ -2077,6 +2082,7 @@ static void CreatePendingFragments(
         CreateFreestandingDeclFragment(
             id_store, em, floc, tu_id, begin_index, end_index,
             decl, pending_fragments, main_file_path);
+
       } else if (ShouldGoInFloatingFragment(decl)) {
         floating_decls.push_back(decl);
 

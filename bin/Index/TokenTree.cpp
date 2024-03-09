@@ -477,8 +477,7 @@ bool Substitution::HasExpansion(void) const noexcept {
     case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
     case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
     case mx::MacroKind::IMPORT_DIRECTIVE:
-      assert(after.empty());
-      return false;
+      return !after.empty();
 
     case mx::MacroKind::EXPANSION:
     case mx::MacroKind::SUBSTITUTION:
@@ -718,7 +717,7 @@ Substitution *TokenTreeImpl::BuildFromTokenList(
     return BuildFromPrintedTokenList(printed_range, err);
 
   } else {
-    err << "Empty parsed and printed token ranges.";
+    err << "Empty parsed and printed token ranges";
     return nullptr;
   }
 }
@@ -762,14 +761,6 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
   std::vector<std::pair<Substitution *, Substitution::NodeList *>> subs;
   subs.emplace_back(root_sub, &(root_sub->before));
 
-  auto has_parsed_tokens = false;
-  for (pasta::Token tok : range) {
-    if (IsParsedToken(tok)) {
-      has_parsed_tokens = true;
-      break;
-    }
-  }
-
   for (pasta::Token tok : range) {
     TokenInfo *info = nullptr;
 
@@ -784,40 +775,47 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
         assert(!in_macro);
         assert(!pending_macro.has_value());
         in_macro = true;
+        pending_macro = pasta::Macro::FromMarkerToken(tok);
+        if (pending_macro.has_value()) {
+          pending_macro = RootNodeFrom(pending_macro.value());
+        }
         continue;
 
-      // Now that we're 
-      case pasta::TokenRole::kEndOfMacroExpansionMarker:
-        assert(in_macro);
-        in_macro = false;
+      case pasta::TokenRole::kMacroDirectiveMarker:
 
-        // If we haven't gottend it from a directive, then get it from the
-        // end of macro marker.
-        if (!pending_macro.has_value()) {
+        // We're in a floating fragment for a `#define` or `#pagma` directive.
+        // It contains only the marker token for this directive.
+        if (!pending_macro) {
+          assert(!in_macro);
+          assert(range.size() == 1u);
           pending_macro = pasta::Macro::FromMarkerToken(tok);
-        }
-
-        if (pending_macro.has_value()) {
-
-          // If we have actual parsed tokens, or this macro shouldn't go in
-          // a floating fragment, then get the root of this macro and expand it.
-          if (has_parsed_tokens ||
-              !ShouldGoInFloatingFragment(pending_macro.value())) {
-            pending_macro = RootNodeFrom(pending_macro.value());
-          }
-
-          if (!BuildFromMacro(subs.back().first, *(subs.back().second),
+          
+          assert(pending_macro.has_value());
+          if (pending_macro.has_value() &&
+              !BuildFromMacro(subs.back().first, *(subs.back().second),
                               std::move(pending_macro.value()), err)) {
             return nullptr;
           }
+        }
 
-          pending_macro.reset();
+        continue;
 
-        } else {
+      case pasta::TokenRole::kEndOfMacroExpansionMarker:
+        assert(in_macro);
+        assert(pending_macro.has_value());
+        in_macro = false;
+
+        if (!pending_macro.has_value()) {
           assert(false);
-          err << "Got to end-of-macro-expansion marker without a macro to process.";
+          err << "Got to end-of-macro-expansion marker without a macro to process";
           return nullptr;
         }
+
+        if (!BuildFromMacro(subs.back().first, *(subs.back().second),
+                            std::move(pending_macro.value()), err)) {
+          return nullptr;
+        }
+        pending_macro.reset();
         continue;
 
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
@@ -826,23 +824,33 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
         assert(in_macro);
         continue;
 
-      case pasta::TokenRole::kMacroDirectiveMarker:
-        assert(in_macro);
-        pending_macro = pasta::Macro::FromMarkerToken(tok);
-        continue;
-
       // TODO(pag): Maybe a stack of substitutions?
-      case pasta::TokenRole::kBeginOfFileMarker:
+      case pasta::TokenRole::kBeginOfFileMarker: {
         assert(!in_macro);
 
         if (subs.empty()) {
           assert(false);
           has_error = true;
-          err << "Unexpected begin-of-file marker with empty substitution stack.";
+          err << "Unexpected begin-of-file marker with empty substitution stack";
           return nullptr;
         }
 
-        switch (subs.back().first->kind) {
+        if (subs.back().second->empty()) {
+          assert(false);
+          has_error = true;
+          err << "Unexpected begin-of-file marker with empty parent node list";
+          return nullptr;
+        }
+
+        if (!std::holds_alternative<Substitution *>(subs.back().second->back())) {
+          assert(false);
+          has_error = true;
+          err << "Unexpected begin-of-file marker non-substitution on end of parent node list";
+          return nullptr;
+        }
+
+        auto real_parent = std::get<Substitution *>(subs.back().second->back());
+        switch (real_parent->kind) {
           case mx::MacroKind::INCLUDE_DIRECTIVE:
           case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
           case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
@@ -856,9 +864,9 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
         }
 
         // Switch to the "after" of the include directive.
-        subs.back().second = &(subs.back().first->after);
-        assert(subs.back().second->empty());
+        subs.emplace_back(real_parent, &(real_parent->after));
         continue;
+      }
 
       case pasta::TokenRole::kEndOfFileMarker:
         assert(!in_macro);
@@ -866,7 +874,7 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
         if (subs.empty()) {
           assert(false);
           has_error = true;
-          err << "Unexpected end-of-file marker with empty substitution stack.";
+          err << "Unexpected end-of-file marker with empty substitution stack";
           return nullptr;
         }
 
@@ -949,7 +957,7 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
   }
 
   if (in_macro) {
-    err << "Reached end of token list while still in macro.";
+    err << "Reached end of token list while still in macro";
     return nullptr;
   }
 
@@ -1356,7 +1364,7 @@ bool TokenTreeImpl::BuildMacroSubstitution(
         break;
       default:
         assert(false);
-        err << "Unexpected token role for macro token.";
+        err << "Unexpected token role for macro token";
         nodes.has_error = true;
         return false;
     }

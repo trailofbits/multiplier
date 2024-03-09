@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "PendingFragment.h"
 #include "Entity.h"
+#include "PendingFragment.h"
 
 namespace pasta {
 class File;

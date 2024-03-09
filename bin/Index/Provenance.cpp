@@ -988,6 +988,10 @@ TokenProvenanceCalculator::TokenInfo::Children(
 void TokenProvenanceCalculator::TokenInfo::DeriveFrom(
     TokenProvenanceCalculator &self, TokenInfo *new_parent) {
 
+  if (new_parent == &(self.empty.value())) {
+    return;
+  }
+
   // Collect the children. We may have more than one child.
   if (!new_parent->child) {
     new_parent->child = reinterpret_cast<uintptr_t>(this);
@@ -995,6 +999,7 @@ void TokenProvenanceCalculator::TokenInfo::DeriveFrom(
   } else {
     std::vector<TokenInfo *> &others = self.multiple_children[new_parent];
     if (others.empty()) {
+      assert(self.infos.size() < new_parent->child);
       others.push_back(
           reinterpret_cast<TokenInfo *>(new_parent->child));
     }

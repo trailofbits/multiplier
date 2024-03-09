@@ -823,6 +823,14 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
     return true;
   }
 
+  // If, as a result of template specialization, we can tell that some template
+  // is kind of an "empty shell" for another declaration, then we want to
+  // hide this declaration and forward to the other one.
+  auto raw_decl = decl.RawDecl();
+  if (raw_decl->RemappedDecl != raw_decl) {
+    return true;
+  }
+
   switch (decl.Kind()) {
     case pasta::DeclKind::kFunction: {
       auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);

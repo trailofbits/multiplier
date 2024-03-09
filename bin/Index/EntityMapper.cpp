@@ -13,6 +13,18 @@
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wcast-align"
+#include <clang/AST/DeclBase.h>
+#pragma clang diagnostic pop
+
 #include "TypeMapper.h"
 #include "Util.h"
 
@@ -37,7 +49,7 @@ mx::RawEntityId EntityMapper::ParentStmtId(const void *entity) const {
 }
 
 mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Decl &entity) const {
-  return ParentDeclId(entity.RawDecl());
+  return ParentDeclId(entity.RawDecl()->RemappedDecl);
 }
 
 mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Stmt &entity) const {
@@ -61,7 +73,7 @@ mx::RawEntityId EntityMapper::ParentDeclId(const pasta::CXXBaseSpecifier &entity
 }
 
 mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Decl &entity) const {
-  return ParentStmtId(entity.RawDecl());
+  return ParentStmtId(entity.RawDecl()->RemappedDecl);
 }
 
 mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Stmt &entity) const {
@@ -100,7 +112,7 @@ mx::RawEntityId EntityMapper::PerFragmentEntityId(const void *entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Decl &entity) const {
-  return EntityId(entity.RawDecl());
+  return EntityId(entity.RawDecl()->RemappedDecl);
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Stmt &entity) const {
@@ -272,7 +284,7 @@ mx::RawEntityId EntityMapper::EntityIdOfType(
 
 std::optional<const pasta::Decl> EntityMapper::ParentDecl(
     const pasta::AST &ast, const pasta::Decl &entity) const {
-  if (auto it = parent_decls.find(entity.RawDecl());
+  if (auto it = parent_decls.find(entity.RawDecl()->RemappedDecl);
       it != parent_decls.end() && it->second) {
     return ast.Adopt(static_cast<const clang::Decl *>(it->second));
   }
@@ -290,7 +302,7 @@ std::optional<const pasta::Decl> EntityMapper::ParentDecl(
 
 std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
     const pasta::AST &ast, const pasta::Decl &entity) const {
-  if (auto it = parent_stmts.find(entity.RawDecl());
+  if (auto it = parent_stmts.find(entity.RawDecl()->RemappedDecl);
       it != parent_stmts.end() && it->second) {
     return ast.Adopt(static_cast<const clang::Stmt *>(it->second));
   }
