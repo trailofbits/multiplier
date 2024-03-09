@@ -1462,6 +1462,8 @@ void TokenProvenanceCalculator::Run(
     std::optional<pasta::MacroToken> ml = node.MacroToken();
 
     mx::RawEntityId tok_id = em.EntityId(node);
+    assert(tok_id != mx::kInvalidEntityId);
+
     mx::RawEntityId rel_id = mx::kInvalidEntityId;
     mx::RawEntityId parsed_id = mx::kInvalidEntityId;
     uint64_t data_hash = 0u;
@@ -1475,13 +1477,28 @@ void TokenProvenanceCalculator::Run(
     }
 
     bool is_parsed = false;
-    if (pl) {
+    if (cl) {
+      is_parsed = true;
+      parsed_id = em.EntityId(cl.value());
+    }
+
+    if (parsed_id == mx::kInvalidEntityId && pl) {
       const pasta::Token &parsed_tok = pl.value();
       is_parsed = IsParsedToken(parsed_tok);
       if (is_parsed && cl) {
         parsed_id = em.EntityId(parsed_tok);
         rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), pl);
       }
+    }
+
+    // It's possible that the parsed location is technically different than
+    // the printed one, e.g. due to deduplication in places in clang (see
+    // `EntityLabeller::Label(const pasta::PrintedToken &entity)` for additional
+    // details). In those cases, we want to give preference to the parsed ID
+    // that we have from the fragment.
+    if (parsed_id == mx::kInvalidEntityId &&
+        mx::EntityId(tok_id).Extract<mx::ParsedTokenId>()) {
+      parsed_id = tok_id;
     }
 
     // If we dropped provenance, e.g. for a freestanding fragment, then we
@@ -1494,11 +1511,6 @@ void TokenProvenanceCalculator::Run(
       } else {
         rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), std::nullopt);
       }
-    }
-
-    // Make sure that the printed token range matches up with the parsed one.
-    if (parsed_id == mx::kInvalidEntityId) {
-      assert(!pl || !IsParsedToken(pl.value()));
     }
 
     if (!is_parsed && ml) {
@@ -1528,10 +1540,7 @@ void TokenProvenanceCalculator::Run(
 #endif
 
     info_map.emplace(tok_id  /* node */, &info);
-
-    if (pl) {
-      info_map.emplace(em.EntityId(pl.value()), &info);
-    }
+    info_map.emplace(parsed_id, &info);
 
     if (cl) {
       info_map.emplace(em.EntityId(cl.value()), &info);

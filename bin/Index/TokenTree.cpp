@@ -448,19 +448,7 @@ static Substitution *MacroDirective(const Substitution::Node &node) {
 #endif
 
 static pasta::Macro RootNodeFrom(const pasta::Macro &node) {
-  
-  // NOTE(pag): We extract macro directives into their own (nested) fragments,
-  //            even if they are logically nested within a macro use. It's
-  //            possible for a `#define` directive to be nested inside of a
-  //            macro use / expansion. In that case, the parent of the directive
-  //            is the expansion, but we want to put the directive into a
-  //            floating fragment all on its own, and so it wouldn't make sense
-  //            for that floating fragment to contain the expansion, which may
-  //            be polymorphic for other reasons.
-  if (ShouldGoInFloatingFragment(node)) {
-    return node;
-  
-  } else if (auto parent = node.Parent()) {
+  if (auto parent = node.Parent()) {
     return RootNodeFrom(parent.value());
   } else {
     return node;
@@ -774,6 +762,14 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
   std::vector<std::pair<Substitution *, Substitution::NodeList *>> subs;
   subs.emplace_back(root_sub, &(root_sub->before));
 
+  auto has_parsed_tokens = false;
+  for (pasta::Token tok : range) {
+    if (IsParsedToken(tok)) {
+      has_parsed_tokens = true;
+      break;
+    }
+  }
+
   for (pasta::Token tok : range) {
     TokenInfo *info = nullptr;
 
@@ -793,9 +789,23 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
       // Now that we're 
       case pasta::TokenRole::kEndOfMacroExpansionMarker:
         assert(in_macro);
-        assert(pending_macro.has_value());
         in_macro = false;
+
+        // If we haven't gottend it from a directive, then get it from the
+        // end of macro marker.
+        if (!pending_macro.has_value()) {
+          pending_macro = pasta::Macro::FromMarkerToken(tok);
+        }
+
         if (pending_macro.has_value()) {
+
+          // If we have actual parsed tokens, or this macro shouldn't go in
+          // a floating fragment, then get the root of this macro and expand it.
+          if (has_parsed_tokens ||
+              !ShouldGoInFloatingFragment(pending_macro.value())) {
+            pending_macro = RootNodeFrom(pending_macro.value());
+          }
+
           if (!BuildFromMacro(subs.back().first, *(subs.back().second),
                               std::move(pending_macro.value()), err)) {
             return nullptr;
@@ -811,54 +821,15 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
         continue;
 
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
-        assert(in_macro);
-        if (pending_macro.has_value()) {
-          continue;
-        }
-
-        assert(false);
-        [[fallthrough]];
-
       case pasta::TokenRole::kInitialMacroUseToken:
+        assert(false);  // Makes no sense to see these tokens in the parsed list.
         assert(in_macro);
-        if (!pending_macro.has_value()) {
-          if (auto mt = tok.MacroLocation()) {
-            pending_macro = RootNodeFrom(mt.value());
-          } else {
-            assert(false);
-          }
-        } else {
-          assert(tok.MacroLocation().has_value());
-        }
         continue;
 
       case pasta::TokenRole::kMacroDirectiveMarker:
         assert(in_macro);
-        if (!pending_macro.has_value()) {
-          if (auto md = pasta::MacroDirective::From(tok)) {
-            pending_macro = RootNodeFrom(md.value());
-          } else {
-            assert(false);
-          }
-        }
+        pending_macro = pasta::Macro::FromMarkerToken(tok);
         continue;
-
-      // Create token info for each final macro expansion token, but don't
-      // actually link them into the substitution. This will happen as-needed
-      // when we get to the end of the macro expansion region and visit all
-      // of its nodes.
-      case pasta::TokenRole::kFinalMacroExpansionToken:
-        assert(in_macro);
-        info = &(tokens_alloc.emplace_back());
-        info->macro_tok = tok.MacroLocation();
-        info->parsed_tok = std::move(tok);
-        assert(info->parsed_tok->Data() == info->macro_tok->Data());
-        final_toks.emplace(info->macro_tok->RawMacro(), info);
-
-        if (!pending_macro.has_value()) {
-          pending_macro = RootNodeFrom(info->macro_tok.value());
-        }
-        break;
 
       // TODO(pag): Maybe a stack of substitutions?
       case pasta::TokenRole::kBeginOfFileMarker:
@@ -935,6 +906,20 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
         }
         continue;
 
+      // Create token info for each final macro expansion token, but don't
+      // actually link them into the substitution. This will happen as-needed
+      // when we get to the end of the macro expansion region and visit all
+      // of its nodes.
+      case pasta::TokenRole::kFinalMacroExpansionToken:
+        assert(in_macro);
+        info = &(tokens_alloc.emplace_back());
+        info->macro_tok = tok.MacroLocation();
+        info->parsed_tok = std::move(tok);
+        assert(info->parsed_tok->Data() == info->macro_tok->Data());
+        assert(info->macro_tok->TokenRole() == pasta::TokenRole::kFinalMacroExpansionToken);
+        final_toks.emplace(info->macro_tok->RawMacro(), info);
+        break;
+
       case pasta::TokenRole::kFileToken:
         assert(!in_macro);
         assert(!tok.MacroLocation());
@@ -959,6 +944,8 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
 
       npt = printed_range.At(next_printed_tok++);
     }
+
+    assert(info->printed_tok.has_value());
   }
 
   if (in_macro) {

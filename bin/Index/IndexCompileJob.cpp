@@ -1971,10 +1971,6 @@ static void CreateFloatingDirectiveFragment(
   auto floc = FindFileLocationOfFragment(
       em.entity_ids, entities, directive_range);
 
-  pasta::PrintedTokenRange parsed_tokens_in_directive_range =
-      pasta::PrintedTokenRange::Adopt(directive_range);
-  CHECK(parsed_tokens_in_directive_range.empty());
-
   std::vector<pasta::Macro> macros;
   macros.push_back(macro);
 
@@ -1982,7 +1978,8 @@ static void CreateFloatingDirectiveFragment(
       id_store,
       em,
       &directive_range  /* original_tokens */,
-      std::move(parsed_tokens_in_directive_range)  /* parsed_tokens */,
+      pasta::PrintedTokenRange::CreateEmpty(
+          pasta::AST::From(macro))  /* parsed_tokens */,
       nullptr,
       std::move(floc),
       tu_id,
@@ -1993,9 +1990,9 @@ static void CreateFloatingDirectiveFragment(
       std::nullopt  /* root_fragment_id */);
 
   // NOTE(pag): This will not persist token ids, because there are no tokens
-  //            in `parsed_tokens_in_directive_range`, but it will persist
-  //            some macros globally. When the `EntityMapper` is reset for
-  //            a fragment prior to persisting, those macros ids will persist.
+  //            in the empty range, but it will persist  some macros globally.
+  //            When the `EntityMapper` is reset for a fragment prior to
+  //            persisting, those macros ids will persist.
   LabelTokensAndMacrosInFragment(*pf);
 
   if (pf->is_new) {

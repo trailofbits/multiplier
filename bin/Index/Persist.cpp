@@ -251,6 +251,11 @@ struct TokenTreeSerializationSchedule {
       mx::MacroId id = mx::EntityId(raw_id).Extract<mx::MacroId>().value();
       CHECK(id.kind == tt.Kind());
 
+      // An example of a case where we come across a toen tree node that
+      // *isn't* in the current fragment is `tests/Macros/DefineInMacroUse.c`.
+      // We hoist out `#define` directives into floating fragments, and so it
+      // ends up being seen as logically not in the current fragment, even
+      // though it is physically reachable from within the token tree. 
       is_part_of_fragment = id.fragment_id == pf.fragment_index;
       if (is_part_of_fragment) {
         CHECK_LT(id.offset, entity_list.size());
@@ -303,31 +308,28 @@ struct TokenTreeSerializationSchedule {
         CHECK(em.token_tree_ids.contains(raw_pt));
         CHECK(parsed_token_index.emplace(raw_pt, id.offset).second);
 
-        auto dt = gt->DerivedLocation();
         auto nt = node.Token();
-        if (dt) {
+        if (auto dt = gt->DerivedLocation()) {
           auto raw_dt = dt->RawToken();
           CHECK(nt.has_value());
           CHECK_EQ(raw_dt, nt->RawToken());
           CHECK(em.token_tree_ids.contains(raw_dt));
-          CHECK(parsed_token_index.emplace(raw_dt, id.offset).second);
         
         } else {
           assert(!nt);
         }
 
+      } else if (std::optional<pasta::MacroToken> mt = node.MacroToken()) {
+        id.kind = TokenKindFromPasta(mt.value());
+        raw_pt = mt->RawMacro();
+        CHECK(!em.token_tree_ids.contains(raw_pt));
+      
       } else if (std::optional<pasta::Token> pt = node.Token()) {
         assert(false);  // Shouldn't get here.
 
         id.kind = TokenKindFromPasta(pt.value());
         raw_pt = pt->RawToken();
         CHECK(em.token_tree_ids.contains(raw_pt));
-        CHECK(parsed_token_index.emplace(raw_pt, id.offset).second);
-      
-      } else if (std::optional<pasta::MacroToken> mt = node.MacroToken()) {
-        id.kind = TokenKindFromPasta(mt.value());
-        raw_pt = mt->RawMacro();
-        CHECK(!em.token_tree_ids.contains(raw_pt));
       }
 
       raw_id = mx::EntityId(id).Pack();
@@ -545,7 +547,7 @@ static void PersistTokenTree(
     // a one-to-many mapping, but we try to choose a reasonable one.
     mx::VariantId parsed_vid =
         mx::EntityId(provenance.ParsedTokenId(tok_node)).Unpack();
-    
+
     // We might have a backup case if we're serializing a builtin, where
     // we serialized a buitlin or forward declaration in a declarator and
     // (intentionally) droppped provenance so that we wouldn't accidentally
