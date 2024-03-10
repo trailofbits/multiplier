@@ -159,6 +159,7 @@ inline static bool ShouldHideFromIndexer(const T &) {
 // Return an opaque pointer to the underlying representation of a given entity.
 // This uniquely identifies the entity.
 const void *RawEntity(const pasta::Token &entity);
+const void *RawEntity(const pasta::PrintedToken &entity);
 const void *RawEntity(const pasta::Decl &entity);
 const void *RawEntity(const pasta::Stmt &entity);
 const void *RawEntity(const pasta::Attr &entity);
@@ -168,6 +169,11 @@ const void *RawEntity(const pasta::CXXBaseSpecifier &entity);
 const void *RawEntity(const pasta::TemplateArgument &entity);
 const void *RawEntity(const pasta::TemplateParameterList &entity);
 const void *RawEntity(const TokenTree &entity);
+
+template <typename T>
+inline static const void *RawEntity(const std::optional<T> &entity) {
+  return entity ? RawEntity(entity.value()) : nullptr;
+}
 
 template <typename T>
 struct EntityBuilder {

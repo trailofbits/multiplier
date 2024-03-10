@@ -107,7 +107,7 @@ class TokenProvenanceCalculator {
 
   template <typename T>
   bool TryConnect(TokenInfo *, const T &tok);
-  void Connect(TokenInfo *, const pasta::Token &);
+  void ConnectToDerived(TokenInfo *, std::optional<pasta::MacroToken>);
   void Clear(void);
 
  public:

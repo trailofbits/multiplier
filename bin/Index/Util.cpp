@@ -481,7 +481,7 @@ static bool ParamIsDefinition(clang::ParmVarDecl *decl) {
 
 // Returns `true` if `decl` is a definition.
 bool IsDefinition(const pasta::Decl &decl_) {
-  auto decl = const_cast<clang::Decl *>(decl_.RawDecl());
+  auto decl = const_cast<clang::Decl *>(decl_.RawDecl()->RemappedDecl);
 
   if (auto parm_decl = clang::dyn_cast<clang::ParmVarDecl>(decl)) {
     return ParamIsDefinition(parm_decl);
@@ -959,8 +959,12 @@ const void *RawEntity(const pasta::Token &entity) {
   return entity.RawToken();
 }
 
+const void *RawEntity(const pasta::PrintedToken &entity) {
+  return entity.RawToken();
+}
+
 const void *RawEntity(const pasta::Decl &entity) {
-  return entity.RawDecl();
+  return entity.RawDecl()->RemappedDecl;
 }
 
 const void *RawEntity(const pasta::Stmt &entity) {

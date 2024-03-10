@@ -516,9 +516,9 @@ static void PersistTokenTree(
 
   provenance.Run(pf.fragment_index, sched.tokens);
 
-//#ifndef NDEBUG
-//  provenance.Dump(std::cerr);
-//#endif
+// #ifndef NDEBUG
+//   provenance.Dump(std::cerr);
+// #endif
 
   unsigned num_parsed_tokens = static_cast<unsigned>(pf.parsed_tokens.size());
   unsigned num_tokens = static_cast<unsigned>(sched.tokens.size());
