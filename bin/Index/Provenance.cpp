@@ -1598,15 +1598,14 @@ void TokenProvenanceCalculator::Run(
         tok_id = em.EntityId(parsed_tok);
       }
 
-      if (IsParsedToken(parsed_tok)) {
-        parsed_id = em.EntityId(parsed_tok);
-        rel_id = RelatedEntityIdToPrintedToken(em, tok, parsed_tok);
+      parsed_id = em.EntityId(parsed_tok);
+      rel_id = RelatedEntityIdToPrintedToken(em, tok, parsed_tok);
 
-      } else if (ml) {
-        assert(false);
+      if (ml && rel_id == mx::kInvalidEntityId) {
         rel_id = RelatedEntityIdToMacroToken(em, ml.value());
-      
-      } else {
+      }
+
+      if (rel_id == mx::kInvalidEntityId) {
         rel_id = RelatedEntityIdToPrintedToken(em, tok, std::nullopt);
       }
     }

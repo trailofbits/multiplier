@@ -1218,7 +1218,7 @@ static std::vector<OrderedMacro> FindTLMs(
     for (; eom_index < (num_tokens - 1); ++eom_index) {
       auto tok = tokens[eom_index];
       if (tok.Role() == pasta::TokenRole::kEndOfMacroExpansionMarker) {
-        bom_index = tok.OpeningLocation()->Index();
+        bom_index = tok.BalancedLocation()->Index();
         assert(bom_index != eom_index);
         found = true;
         break;
