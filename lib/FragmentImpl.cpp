@@ -237,12 +237,12 @@ EntityId ReadMacroTokensFromFragment::NthFileTokenId(EntityOffset ti) const {
           return kInvalidEntityId;
         }
 
-      // NOTE(pag): We shouldn't actually find ourselves going into another
-      //            fragment.
+      // NOTE(pag): We might find ourselves crossing into a different fragment's
+      //            tokens when a directive is embedded some larger fragment.
       } else if (FragmentImplPtr frag =
           fragment->ep->FragmentFor(fragment->ep, fid)) {
-        assert(false);
         return frag->MacroTokenReader(frag)->NthFileTokenId(tid.offset);
+
       } else {
         assert(false);
         return kInvalidEntityId;

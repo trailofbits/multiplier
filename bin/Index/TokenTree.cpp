@@ -370,8 +370,7 @@ TokenInfo *RightCornerOfUse(const Substitution::NodeList &nodes) {
   auto it = nodes.rbegin();
   auto end = nodes.rend();
   for (; it != end; ++it) {
-    const Substitution::Node &node = *it;
-    if (auto rc = RightCornerOfUse(node)) {
+    if (auto rc = RightCornerOfUse(*it)) {
       return rc;
     }
   }
@@ -398,8 +397,7 @@ static TokenInfo *RightCornerOfExpansionOrUse(const Substitution::NodeList &node
   auto it = nodes.rbegin();
   auto end = nodes.rend();
   for (; it != end; ++it) {
-    const Substitution::Node &node = *it;
-    if (auto rc = RightCornerOfExpansionOrUse(node)) {
+    if (auto rc = RightCornerOfExpansionOrUse(*it)) {
       return rc;
     }
   }
@@ -633,8 +631,14 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
   if (HasExpansion()) {
     os << "s" << reinterpret_cast<const void *>(this)
        << " [label=<<TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"1\""
-       << "><TR><TD colspan=\"2\">" << mx::EnumeratorName(kind)
-       << "</TD></TR><TR><TD port=\"before\">before</TD><TD port=\"after\">"
+       << "><TR><TD colspan=\"" << (2 + int(!body.empty())) << "\">"
+       << mx::EnumeratorName(kind) << "</TD></TR><TR><TD port=\"before\">before</TD>";
+
+    if (body.size()) {
+      os << "<TD port=\"body\">body</TD>";
+    }
+
+    os << "<TD port=\"after\">"
        << "after</TD></TR></TABLE>>];\n";
 
     if (before.size()) {
@@ -653,6 +657,24 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
       os << "</TR></TABLE>>];\n";
 
       link_subs(before, "b");
+    }
+
+    if (body.size()) {
+      os << "s" << self << ":body -> d" << self << ";\n"
+         << "d" << self
+         << " [label=<<TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"1\"";
+      if (body.has_error) {
+        os << " bgcolor=\"red\"";
+      }
+      os << "><TR>";
+
+      has_any = false;
+
+      dump_toks(body);
+
+      os << "</TR></TABLE>>];\n";
+
+      link_subs(body, "d");
     }
 
     if (after.size()) {
@@ -849,8 +871,8 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
           return nullptr;
         }
 
-        auto real_parent = std::get<Substitution *>(subs.back().second->back());
-        switch (real_parent->kind) {
+        auto inc = std::get<Substitution *>(subs.back().second->back());
+        switch (inc->kind) {
           case mx::MacroKind::INCLUDE_DIRECTIVE:
           case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
           case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
@@ -863,8 +885,16 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
             return nullptr;
         }
 
+        // Create a substitution above the `#include` directive.
+        auto inc_sub = CreateSubstitution(mx::MacroKind::SUBSTITUTION);
+        inc_sub->before.emplace_back(inc);
+        inc->parent = inc_sub;
+
+        inc_sub->parent = subs.back().first;
+        subs.back().second->back() = inc_sub;
+
         // Switch to the "after" of the include directive.
-        subs.emplace_back(real_parent, &(real_parent->after));
+        subs.emplace_back(inc_sub, &(inc_sub->after));
         continue;
       }
 
@@ -963,6 +993,8 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
 
   assert(root_sub->after.empty());
 
+  assert(subs.size() == 1u);
+  assert(subs.back().first == root_sub);
   return root_sub;
 }
 
@@ -1157,7 +1189,8 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
       std::cerr
           << indent << "orig_i=" << orig_i << " preexp_i=" << preexp_i
           << " preexp_is_tok=" << preexp_is_tok
-          << " orig_arg=" << (!!orig_arg) << " preexp_arg=" << (!!preexp_arg);
+          << " orig_arg=" << (!!orig_arg) << " preexp_arg=" << (!!preexp_arg)
+          << " orig_rc=" << (!!orig_rc) << " preexp_lc=" << (!!preexp_lc);
 
       std::cerr << '\n';
     )

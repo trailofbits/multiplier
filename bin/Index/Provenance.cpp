@@ -1469,8 +1469,6 @@ void TokenProvenanceCalculator::Run(
     mx::RawEntityId tok_id = em.EntityId(node);
     assert(tok_id != mx::kInvalidEntityId);
 
-    mx::RawEntityId rel_id = mx::kInvalidEntityId;
-    mx::RawEntityId parsed_id = mx::kInvalidEntityId;
     uint64_t data_hash = 0u;
 
     if (!pl && cl) {
@@ -1481,19 +1479,20 @@ void TokenProvenanceCalculator::Run(
       ml = pl->MacroLocation();
     }
 
-    bool is_parsed = false;
+    mx::RawEntityId parsed_id = mx::kInvalidEntityId;
+    mx::RawEntityId rel_id = mx::kInvalidEntityId;
     if (cl) {
-      is_parsed = true;
       parsed_id = em.EntityId(cl.value());
-    }
-
-    if (parsed_id == mx::kInvalidEntityId && pl) {
-      const pasta::Token &parsed_tok = pl.value();
-      is_parsed = IsParsedToken(parsed_tok);
-      if (is_parsed && cl) {
-        parsed_id = em.EntityId(parsed_tok);
+      if (auto it = parsed_tokens.find(cl->RawToken());
+          it != parsed_tokens.end()) {
+        rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), it->second);
+      } else {
         rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), pl);
       }
+    }
+
+    if (pl && parsed_id == mx::kInvalidEntityId) {
+      parsed_id = em.EntityId(pl.value());
     }
 
     // It's possible that the parsed location is technically different than
@@ -1506,19 +1505,7 @@ void TokenProvenanceCalculator::Run(
       parsed_id = tok_id;
     }
 
-    // If we dropped provenance, e.g. for a freestanding fragment, then we
-    // still want to find related entity IDs, and those checks often relate
-    // to the parsed tokens themselves.
-    if (!pl && cl && rel_id == mx::kInvalidEntityId) {
-      if (auto it = parsed_tokens.find(cl->RawToken());
-          it != parsed_tokens.end()) {
-        rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), it->second);
-      } else {
-        rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), std::nullopt);
-      }
-    }
-
-    if (!is_parsed && ml) {
+    if (!cl && !pl && ml && rel_id == mx::kInvalidEntityId) {
       rel_id = RelatedEntityIdToMacroToken(em, ml.value());
     }
 

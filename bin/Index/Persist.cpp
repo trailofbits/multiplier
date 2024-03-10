@@ -214,6 +214,7 @@ struct TokenTreeSerializationSchedule {
   struct Todo {
     const void *parent;
     mx::RawEntityId parent_id;
+    bool is_part_of_define{false};
     TokenTreeNodeRange nodes;
   };
 
@@ -230,6 +231,7 @@ struct TokenTreeSerializationSchedule {
   std::vector<mx::RawEntityId> containing_macro;
 
   mx::RawEntityId RecordEntityId(const TokenTree &tt,
+                                 bool &is_part_of_define,
                                  bool &is_part_of_fragment) {
 
     const void *raw_tt = tt.RawNode();
@@ -242,13 +244,14 @@ struct TokenTreeSerializationSchedule {
 
     auto &entity_list = pf.EntityListFor(tt);
     mx::RawEntityId raw_id = em.EntityId(raw_locator);
+    mx::MacroId id;
 
     // NOTE(pag): This is some collusion with `EntityLabeller::Label` in terms
     //            of labelling the top-level macros. This also happens with
     //            nested macro directives.
     if (raw_id != mx::kInvalidEntityId) {
       CHECK_NE(raw_tt, raw_locator);
-      mx::MacroId id = mx::EntityId(raw_id).Extract<mx::MacroId>().value();
+      id = mx::EntityId(raw_id).Extract<mx::MacroId>().value();
       CHECK(id.kind == tt.Kind());
 
       // An example of a case where we come across a toen tree node that
@@ -265,7 +268,6 @@ struct TokenTreeSerializationSchedule {
 
     // We need to form a new macro id for something we discovered along the way.
     } else {
-      mx::MacroId id;
       id.fragment_id = pf.fragment_index;
       id.kind = tt.Kind();
       id.offset = static_cast<mx::EntityOffset>(entity_list.size());
@@ -275,6 +277,13 @@ struct TokenTreeSerializationSchedule {
       entity_list.push_back(tt);
     }
 
+    // Update `is_part_of_define` by reference so that macro tokens and nodes
+    // inside of a `#define` end up getting globally recorded for the sake
+    // of provenance.
+    if (id.kind == mx::MacroKind::DEFINE_DIRECTIVE) {
+      is_part_of_define = true;
+    }
+
     // Save the ID, mapped from both the token tree and the underlying
     // macro, if any.
     CHECK(em.token_tree_ids.emplace(raw_tt, raw_id).second);
@@ -282,16 +291,29 @@ struct TokenTreeSerializationSchedule {
       (void) em.token_tree_ids.emplace(raw_locator, raw_id);
     }
 
+    // If this is a `#define` or something in a `#define`, then make sure that
+    // the entity ID becomes globally visible.
+    if (is_part_of_define && is_part_of_fragment) {
+      CHECK(em.entity_ids.emplace(raw_tt, raw_id).second);
+
+      if (raw_tt != raw_locator) {
+        (void) em.entity_ids.emplace(raw_locator, raw_id);
+      }
+    }
+
     return raw_id;
   }
 
   mx::RawEntityId RecordEntityId(const TokenTreeNode &node,
                                  mx::RawEntityId parent_id,
+                                 bool &is_part_of_define,
                                  bool &is_part_of_fragment) {
     mx::RawEntityId raw_id = mx::kInvalidEntityId;
+    const void *raw_pt = nullptr;
 
     if (std::optional<TokenTree> sub = node.SubTree()) {
-      raw_id = RecordEntityId(sub.value(), is_part_of_fragment);
+      raw_id = RecordEntityId(sub.value(), is_part_of_define,
+                              is_part_of_fragment);
 
     // Fill in IDs for derived tokens.
     } else {
@@ -299,8 +321,6 @@ struct TokenTreeSerializationSchedule {
       id.kind = mx::TokenKind::UNKNOWN;
       id.fragment_id = pf.fragment_index;
       id.offset = static_cast<unsigned>(tokens.size());
-
-      const void *raw_pt = nullptr;
       
       if (std::optional<pasta::PrintedToken> gt = node.PrintedToken()) {
         id.kind = TokenKindFromPasta(gt.value());
@@ -341,8 +361,20 @@ struct TokenTreeSerializationSchedule {
       tokens.emplace_back(node);
     }
 
+    auto raw_tt = node.RawNode();
     CHECK_NE(raw_id, mx::kInvalidEntityId);
-    CHECK(em.token_tree_ids.emplace(node.RawNode(), raw_id).second);
+    CHECK(em.token_tree_ids.emplace(raw_tt, raw_id).second);
+
+    // Make sure `#define` macro body tokens are globally visible to provenance,
+    // e.g. parameter substitutions.
+    if (is_part_of_define && is_part_of_fragment) {
+      CHECK(em.entity_ids.emplace(node.RawNode(), raw_id).second);
+
+      if (raw_pt && raw_tt != raw_pt) {
+        (void) em.entity_ids.emplace(raw_pt, raw_id);
+      }
+    }
+
     return raw_id;
   }
 
@@ -350,13 +382,13 @@ struct TokenTreeSerializationSchedule {
   // this so that `fragment.parsed_tokens().data()` reflects the final result
   // of macro expansion.
   void Schedule(const void * /* parent */, mx::RawEntityId parent_id,
-                const TokenTreeNodeRange &nodes) {
+                bool is_part_of_define, const TokenTreeNodeRange &nodes) {
 
     for (TokenTreeNode node : nodes) {
 
       bool is_part_of_fragment = true;
-      mx::RawEntityId child_id = RecordEntityId(node, parent_id,
-                                                is_part_of_fragment);
+      mx::RawEntityId child_id = RecordEntityId(
+          node, parent_id, is_part_of_define, is_part_of_fragment);
 
       // If this is a macro directive that is nested inside of another fragment,
       // then assume that we've already extracted the directive from that other
@@ -368,26 +400,30 @@ struct TokenTreeSerializationSchedule {
       if (std::optional<TokenTree> sub = node.SubTree()) {
 
         const void *child = sub->RawNode();
+
         if (sub->HasExpansion()) {
-          Schedule(child, child_id, sub->ReplacementChildren());
+          Schedule(child, child_id, is_part_of_define,
+                   sub->ReplacementChildren());
           if (sub->HasIntermediateChildren()) {
-            todo_list.emplace_back(
-                Todo{child, child_id, sub->IntermediateChildren()});
+            todo_list.emplace_back(Todo{
+                child, child_id, is_part_of_define,
+                sub->IntermediateChildren()});
           }
-          todo_list.emplace_back(Todo{child, child_id, sub->Children()});
+          todo_list.emplace_back(Todo{child, child_id, is_part_of_define,
+                                 sub->Children()});
         } else {
-          Schedule(child, child_id, sub->Children());
+          Schedule(child, child_id, is_part_of_define, sub->Children());
         }
       }
     }
   }
 
   void Schedule(const Todo &todo) {
-    Schedule(todo.parent, todo.parent_id, todo.nodes);
+    Schedule(todo.parent, todo.parent_id, todo.is_part_of_define, todo.nodes);
   }
 
   void Schedule(TokenTreeNodeRange nodes) {
-    Schedule(nullptr, mx::kInvalidEntityId, std::move(nodes));
+    Schedule(nullptr, mx::kInvalidEntityId, false, std::move(nodes));
     for (auto i = 0u; i < todo_list.size(); ++i) {
       Schedule(todo_list[i]);
     }
