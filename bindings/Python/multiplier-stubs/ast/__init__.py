@@ -42838,13 +42838,6 @@ class Expr(multiplier.ast.ValueStmt):
   is_gl_value: bool
   is_implicit_cxx_this: bool
   is_instantiation_dependent: bool
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-  is_known_to_have_boolean_value: Optional[bool]
->>>>>>> 5fb8049e8 (Update python bindings.)
-=======
->>>>>>> a6f0a37b0 (Update python bindings for new nullabls.)
   is_l_value: bool
   is_objcgc_candidate: bool
   is_obj_c_self_expression: bool
@@ -51105,6 +51098,8 @@ class PackExpansionExpr(multiplier.ast.Expr):
     ...
 
 class OverloadExpr(multiplier.ast.Expr):
+  num_declarations: int
+  declarations: Generator[multiplier.ast.NamedDecl]
   l_angle_token: multiplier.frontend.Token
   name_token: multiplier.frontend.Token
   naming_class: Optional[multiplier.ast.CXXRecordDecl]
@@ -51194,6 +51189,9 @@ class OverloadExpr(multiplier.ast.Expr):
 
   @staticmethod
   def from_base(parent: multiplier.ast.Stmt) -> Optional[multiplier.ast.OverloadExpr]:
+    ...
+
+  def nth_declaration(self, n: int) -> Optional[multiplier.ast.NamedDecl]:
     ...
 
 class UnresolvedMemberExpr(multiplier.ast.OverloadExpr):
@@ -61849,11 +61847,14 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   lambda_context_declaration: Optional[multiplier.ast.Decl]
   lambda_explicit_template_parameters: Optional[Sequence[multiplier.ast.NamedDecl]]
   lambda_mangling_number: Optional[int]
+  lambda_static_invoker: Optional[multiplier.ast.CXXMethodDecl]
   ms_inheritance_model: Optional[multiplier.ast.MSInheritanceModel]
   ms_vtor_disp_mode: multiplier.ast.MSVtorDispMode
   odr_hash: Optional[int]
   template_instantiation_pattern: Optional[multiplier.ast.CXXRecordDecl]
   template_specialization_kind: multiplier.ast.TemplateSpecializationKind
+  num_visible_conversion_functions: int
+  visible_conversion_functions: Generator[multiplier.ast.NamedDecl]
   has_any_dependent_bases: Optional[bool]
   has_constexpr_default_constructor: Optional[bool]
   has_constexpr_destructor: Optional[bool]
@@ -61921,6 +61922,7 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   is_effectively_final: Optional[bool]
   is_empty: Optional[bool]
   is_generic_lambda: bool
+  is_interface_like: Optional[bool]
   is_literal: Optional[bool]
   is_local_class: Optional[multiplier.ast.FunctionDecl]
   is_never_dependent_lambda: bool
@@ -62043,6 +62045,9 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
     ...
 
   def nth_constructor(self, n: int) -> Optional[multiplier.ast.CXXConstructorDecl]:
+    ...
+
+  def nth_visible_conversion_function(self, n: int) -> Optional[multiplier.ast.NamedDecl]:
     ...
 
 class ClassTemplateSpecializationDecl(multiplier.ast.CXXRecordDecl):

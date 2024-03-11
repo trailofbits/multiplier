@@ -1034,18 +1034,22 @@ static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
     }
   }
 
-  if ((tsk == pasta::TemplateSpecializationKind::kExplicitSpecialization) ||
-      (tsk == pasta::TemplateSpecializationKind::kExplicitInstantiationDeclaration) ||
-      (tsk == pasta::TemplateSpecializationKind::kExplicitInstantiationDefinition)) {
-    return true;
+  switch (tsk) {
+    case pasta::TemplateSpecializationKind::kExplicitSpecialization:
+    case pasta::TemplateSpecializationKind::kExplicitInstantiationDeclaration:
+    case pasta::TemplateSpecializationKind::kExplicitInstantiationDefinition:
+      return true;
 
-  // NOTE(pag): Have observed situations where `ClassTemplateSpecialization`
-  //            will report `kUndeclared`.
-  } else if (tsk == pasta::TemplateSpecializationKind::kUndeclared) {
-    return has_partial_or_tpl_or_dg;
+    // NOTE(pag): Have observed situations where `ClassTemplateSpecialization`
+    //            will report `kUndeclared`.
+    //
+    // NOTE(pag): Clang patches for `Decl::RemappedDecl` should help with this?
+    case pasta::TemplateSpecializationKind::kUndeclared:
+      assert(false);  // Tracer.
+      return has_partial_or_tpl_or_dg;
 
-  } else {
-    return false;
+    default:
+      return false;
   }
 }
 
@@ -1166,8 +1170,19 @@ static void AddDeclRangeToEntityListFor(
   entity_ranges.emplace_back(std::move(decl), begin_index, end_index);
 }
 
-// Go find the macro definitions, and for each definition, find the uses, then
-// find the "root" of that use.
+// Go find the top-level macros to be indexed. These are basically directives
+// and macro expansions. We find the top-level macro expansions by locating
+// the macro roots of the expansions associated with macro definitions. There
+// are a few ways of going about this. PASTA's `TokenRange` will include marker
+// tokens telling us when a macro expansion area begins and ends. If there's
+// an empty expansion then there will be nothing between these two marker
+// tokens. We can get at some kind of expansion node (likely but not guaranteed
+// to be the root node from the begin/end markers). Alternatively, we can get at
+// all directives via directive marker tokens. This is the most reliable
+// approach, as some directives can be embedded inside of the argument list of
+// some expansions, and so we'd like to treat those separately (as floating
+// fragments). Then we can get the root expansions from looking at just the
+// uses of `#define` directives.
 static std::vector<OrderedMacro> FindTLMs(
     const pasta::AST &ast, const pasta::TokenRange &tokens,
     const std::map<uint64_t, uint64_t> &bof_to_eof,
@@ -1179,6 +1194,8 @@ static std::vector<OrderedMacro> FindTLMs(
 
   auto order = 0u;
   for (pasta::Token tok : tokens) {
+
+    // All macro directives have a corresponding marker token.
     if (tok.Role() != pasta::TokenRole::kMacroDirectiveMarker) {
       continue;
     }
