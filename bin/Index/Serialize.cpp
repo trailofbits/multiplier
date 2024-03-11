@@ -6110,7 +6110,13 @@ void SerializeCoroutineBodyStmt(const PendingFragment &pf, const EntityMapper &e
   } while (false);
   b.setVal19(es.EntityId(e.PromiseDeclaration()));
   b.setVal20(es.EntityId(e.PromiseDeclarationStatement()));
-  b.setVal21(es.EntityId(e.ResultDeclaration()));
+  auto v21 = e.ResultDeclaration();
+  if (v21) {
+    auto id21 = es.EntityId(v21.value());
+    b.setVal21(id21);
+  } else {
+    b.setVal21(mx::kInvalidEntityId);
+  }
   b.setVal22(es.EntityId(e.ReturnStatement()));
   b.setVal30(es.EntityId(e.ReturnStatementOnAllocFailure()));
   b.setVal31(es.EntityId(e.ReturnValue()));

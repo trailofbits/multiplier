@@ -279,9 +279,17 @@ Stmt CoroutineBodyStmt::promise_declaration_statement(void) const {
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
-Stmt CoroutineBodyStmt::result_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal21();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid));
+std::optional<Stmt> CoroutineBodyStmt::result_declaration(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal21();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Stmt(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 Stmt CoroutineBodyStmt::return_statement(void) const {
