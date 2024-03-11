@@ -255,11 +255,11 @@ bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
 }
 
 unsigned ObjCImplementationDecl::num_initializers(void) const {
-  return impl->reader.getVal341().size();
+  return impl->reader.getVal316().size();
 }
 
 std::optional<CXXCtorInitializer> ObjCImplementationDecl::nth_initializer(unsigned n) const {
-  auto list = impl->reader.getVal341();
+  auto list = impl->reader.getVal316();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -273,23 +273,23 @@ std::optional<CXXCtorInitializer> ObjCImplementationDecl::nth_initializer(unsign
 }
 
 gap::generator<CXXCtorInitializer> ObjCImplementationDecl::initializers(void) const & {
-  auto list = impl->reader.getVal341();
+  auto list = impl->reader.getVal316();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d341 = ep->CXXCtorInitializerFor(ep, v)) {
-      co_yield CXXCtorInitializer(std::move(d341));
+    if (auto d316 = ep->CXXCtorInitializerFor(ep, v)) {
+      co_yield CXXCtorInitializer(std::move(d316));
     }
   }
   co_return;
 }
 
 unsigned ObjCImplementationDecl::num_instance_variables(void) const {
-  return impl->reader.getVal352().size();
+  return impl->reader.getVal342().size();
 }
 
 std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsigned n) const {
-  auto list = impl->reader.getVal352();
+  auto list = impl->reader.getVal342();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -303,12 +303,12 @@ std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsign
 }
 
 gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const & {
-  auto list = impl->reader.getVal352();
+  auto list = impl->reader.getVal342();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d352 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCIvarDecl::from_base(std::move(d352))) {
+    if (auto d342 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCIvarDecl::from_base(std::move(d342))) {
         co_yield std::move(*e);
       }
     }

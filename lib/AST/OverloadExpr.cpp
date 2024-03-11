@@ -10,6 +10,7 @@
 #include <multiplier/AST/CXXRecordDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Expr.h>
+#include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueStmt.h>
@@ -194,6 +195,38 @@ std::optional<OverloadExpr> OverloadExpr::from(const TokenContext &t) {
     return from_base(base.value());
   }
   return std::nullopt;
+}
+
+unsigned OverloadExpr::num_declarations(void) const {
+  return impl->reader.getVal15().size();
+}
+
+std::optional<NamedDecl> OverloadExpr::nth_declaration(unsigned n) const {
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
+  }
+  const EntityProviderPtr &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return NamedDecl::from_base(std::move(e));
+}
+
+gap::generator<NamedDecl> OverloadExpr::declarations(void) const & {
+  auto list = impl->reader.getVal15();
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d15 = ep->DeclFor(ep, v)) {
+      if (auto e = NamedDecl::from_base(std::move(d15))) {
+        co_yield std::move(*e);
+      }
+    }
+  }
+  co_return;
 }
 
 Token OverloadExpr::l_angle_token(void) const {
