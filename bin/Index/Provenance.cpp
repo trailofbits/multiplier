@@ -1059,11 +1059,11 @@ TokenProvenanceCalculator::TokenInfo::Children(
   }
 }
 
-void TokenProvenanceCalculator::TokenInfo::DeriveFrom(
+bool TokenProvenanceCalculator::TokenInfo::DeriveFrom(
     TokenProvenanceCalculator &self, TokenInfo *new_parent) {
 
   if (new_parent == &(self.empty.value())) {
-    return;
+    return false;
   }
 
   // Collect the children. We may have more than one child.
@@ -1081,6 +1081,7 @@ void TokenProvenanceCalculator::TokenInfo::DeriveFrom(
     others.push_back(this);
     new_parent->child = others.size();
   }
+  return true;
 }
 
 TokenProvenanceCalculator::TokenProvenanceCalculator(const EntityMapper &em_)
@@ -1111,8 +1112,7 @@ bool TokenProvenanceCalculator::TryConnect(TokenInfo *child_info,
   }
 
   TokenInfo *parent_info = dt_it->second;
-  child_info->DeriveFrom(*this, parent_info);
-  return true;
+  return child_info->DeriveFrom(*this, parent_info);
 }
 
 static void FillExpansionTokens(const pasta::Macro &macro,
@@ -1138,8 +1138,8 @@ static void FillExpansionTokens(const pasta::Macro &macro,
 void TokenProvenanceCalculator::ConnectToDerived(
     TokenInfo *info, std::optional<pasta::MacroToken> mtok) {
   auto derived_it = info_map.find(info->derived_token_id);
-  if (derived_it != info_map.end()) {
-    info->DeriveFrom(*this, derived_it->second);
+  if (derived_it != info_map.end() &&
+      info->DeriveFrom(*this, derived_it->second)) {
     return;
   }
 
@@ -1651,7 +1651,7 @@ void TokenProvenanceCalculator::Run(
       continue;
     }
 
-    if (data_hash == Hash64("\"c\"")) {
+    if (data_hash == Hash64("TWO")) {
       (void) em.EntityId(nullptr);
     }
   }
@@ -1663,9 +1663,7 @@ void TokenProvenanceCalculator::Run(
   // derived from.
   for (const TokenTreeNode &node : tokens) {
     TokenInfo *info = info_map[em.EntityId(node)];
-    if (info->derived_token_id != mx::kInvalidEntityId) {
-      ConnectToDerived(info, node.MacroToken());
-    }
+    ConnectToDerived(info, node.MacroToken());
   }
 
   // NOTE(pag): Depth values are actually very very large positive numbers.
@@ -1756,9 +1754,7 @@ void TokenProvenanceCalculator::Run(
     }
 
     TokenInfo *info = info_map[em.EntityId(tok)];
-    if (info->derived_token_id != mx::kInvalidEntityId) {
-      ConnectToDerived(info, mt);
-    }
+    ConnectToDerived(info, mt);
   }
 
   Sort();

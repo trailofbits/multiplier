@@ -76,7 +76,7 @@ class TokenProvenanceCalculator {
 
     gap::generator<TokenInfo *> Children(TokenProvenanceCalculator &self);
 
-    void DeriveFrom(TokenProvenanceCalculator &self, TokenInfo *parent);
+    bool DeriveFrom(TokenProvenanceCalculator &self, TokenInfo *parent);
   };
 
   template <typename T>

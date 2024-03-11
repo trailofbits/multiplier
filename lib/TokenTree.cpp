@@ -106,16 +106,17 @@ static std::optional<bool> EndsWithEmptyVAArgs(
   }
 
   const Token *comma = std::get_if<Token>(&(before[num_entries - 3u]));
-  const Token *hash_hash = std::get_if<Token>(&(before[num_entries - 2u]));
-  const Macro *param_sub = std::get_if<Macro>(&(before[num_entries - 1u]));
-
-  if (!comma || !hash_hash || !param_sub) {
+  if (!comma || comma->kind() != TokenKind::COMMA) {
     return std::nullopt;
   }
 
-  if (comma->kind() != TokenKind::COMMA ||
-      hash_hash->kind() != TokenKind::HASH_HASH ||
-      param_sub->kind() != MacroKind::PARAMETER_SUBSTITUTION) {
+  const Token *hash_hash = std::get_if<Token>(&(before[num_entries - 2u]));
+  if (!hash_hash || hash_hash->kind() != TokenKind::HASH_HASH) {
+    return std::nullopt;
+  }
+
+  const Macro *param_sub = std::get_if<Macro>(&(before[num_entries - 1u]));
+  if (!param_sub || param_sub->kind() != MacroKind::PARAMETER_SUBSTITUTION) {
     return std::nullopt;
   }
 
@@ -966,11 +967,12 @@ void TokenTreeImpl::MacroExpansionProcessor::Init(
     // this into `, <stuff>` or nothing.
     if (auto is_empty = EndsWithEmptyVAArgs(body_children)) {
       D( std::cerr << "BT(" << (body_children.size() - 3)
-                   << ") has `, ## __VA_ARGS__`\n"; )
+                   << ") has `, ## __VA_ARGS__` empty="
+                   << is_empty.value() << "\n"; )
 
-      assert(body_children.size() == body_use.size());
+      assert(3u <= body_use.size());
 
-      mt = std::move(body_children.back());
+      MacroOrToken va_args_sub = std::move(body_children.back());
       body_children.pop_back();
       body_children.pop_back();  // `##`.
       MacroOrToken comma = std::move(body_children.back());
@@ -984,7 +986,8 @@ void TokenTreeImpl::MacroExpansionProcessor::Init(
         body_use.emplace_back(comma);
         body_children.push_back(std::move(comma));
 
-        FlattenExpansionUses(std::move(mt), 0u, body_children, body_use);
+        FlattenExpansionUses(std::move(va_args_sub), 0u, body_children,
+                             body_use);
       }
     }
   }
@@ -1487,7 +1490,26 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
   auto begin = std::max(bounds.begin_index, rci.second + 1u);
   auto end = std::min(bounds.end_index, fti.second - 1u);
 
-  D( std::cerr << INDENT << "AddLeadingTokensInBounds: begin=" << begin << ", end=" << end << '\n'; )
+  // If we're inside a macro expansion, then we only want to add whitespace
+  // and comments. Otherwise, we risk re-introducing intentional elisions, such
+  // as `, ## __VA_ARGS__`.
+  auto orig_begin = begin;
+  if (depth && begin <= end) {
+    auto j = 0u;
+    for (auto i = end - begin; (begin + i) <= end; ++i, ++j) {
+      auto tk = fti.first->NthTokenKind(end - j);
+      if (tk == TokenKind::WHITESPACE || tk == TokenKind::COMMENT) {
+        continue;
+
+      } else {
+        begin = end - j + 1u;
+        break;
+      }
+    }
+  }
+
+  (void) orig_begin;
+  D( std::cerr << INDENT << "AddLeadingTokensInBounds: orig_begin=" << orig_begin << " begin=" << begin << ", end=" << end << '\n'; )
   for (auto i = begin; i <= end; ++i) {
     seq = AddTokenToSequence(seq, TokenIndex(fti.first, i));
   }
