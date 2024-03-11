@@ -107,7 +107,7 @@ void EntityVisitor::VisitVarTemplateDecl(const pasta::VarTemplateDecl &decl) {
 }
 
 void EntityVisitor::VisitFunctionTemplateDecl(
-  const pasta::FunctionTemplateDecl &decl) {
+    const pasta::FunctionTemplateDecl &decl) {
   EnterTemplateDecl(decl);
 }
 
@@ -261,12 +261,12 @@ void EntityVisitor::VisitTypeAliasTemplateDecl(
 }
 
 void EntityVisitor::VisitTemplateTemplateParmDecl(
-  const pasta::TemplateTemplateParmDecl &decl) {
+    const pasta::TemplateTemplateParmDecl &decl) {
   EnterTemplateDecl(decl);
 }
 
 void EntityVisitor::VisitCXXDeductionGuideDecl(
-  const pasta::CXXDeductionGuideDecl &decl) {
+    const pasta::CXXDeductionGuideDecl &decl) {
   EnterFunctionDecl(decl);
 }
 
@@ -543,9 +543,7 @@ void EntityVisitor::VisitDesignatedInitExpr(
 }
 
 void EntityVisitor::VisitMaterializeTemporaryExpr(
-  const pasta::MaterializeTemporaryExpr &expr) {
-
-}
+    const pasta::MaterializeTemporaryExpr &expr) {}
 
 void EntityVisitor::VisitExprWithCleanups(const pasta::ExprWithCleanups &expr) {
   if(EnterStmt(expr)) {

@@ -73,7 +73,7 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   // Tracks declarations for which we've seen the specializations. This is
   // to prevent us from double-adding specializations.
-  std::unordered_set<pasta::Decl> seen_specs;
+  std::unordered_set<const void *> seen_specs;
 
   // Depth of a decl context.
   std::unordered_map<const void *, unsigned> dc_depth;
@@ -113,7 +113,18 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 
   void VisitDeclContext(const pasta::DeclContext &dc) {
-    dc_depth.emplace(dc.RawDeclContext(), depth);
+
+    // Prevent us from revisiting the same decl context twice. It can be the
+    // case that we see a decl context nested inside itself. This is due to
+    // injected class names in Clang (`C++ [class]p2`) where a class is injected
+    // into itself to help with things like `friend` and argument-dependent
+    // lookups. In those cases, we mark that injected class with
+    // `Decl::RemappedDecl` back to its parent, and then PASTA follows the
+    // `->RemappedDecl` links, thus hiding its uniqueness from us, and making
+    // the resulting visit circular.
+    if (!dc_depth.emplace(RawEntity(dc), depth).second) {
+      return;  // Already visited.
+    }
 
     for (const pasta::Decl &decl : dc.AlreadyLoadedDeclarations()) {
       if (!decl.IsInvalidDeclaration()) {
@@ -217,7 +228,7 @@ class TLDFinder final : public pasta::DeclVisitor {
     //                 canonical declaration to avoid redeclaration getting into a fragment?
     //                 The missing redeclaration fragment causes assert during reference
     //                 lookup in mx-api.
-    if (!seen_specs.emplace(decl).second) {
+    if (!seen_specs.emplace(RawEntity(decl)).second) {
       return;
     }
 
@@ -254,7 +265,7 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 
   void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) final {
-    if (!seen_specs.emplace(decl).second) {
+    if (!seen_specs.emplace(RawEntity(decl)).second) {
       return;
     }
 
@@ -377,7 +388,7 @@ class TLDFinder final : public pasta::DeclVisitor {
 
     // Check if we found something that is semantically at the top level.
     } else if (auto sema_dc = decl.DeclarationContext()) {
-      if (!dc_depth[sema_dc->RawDeclContext()]) {
+      if (!dc_depth[RawEntity(sema_dc.value())]) {
         AddDecl(decl);
       }
     }
@@ -558,11 +569,11 @@ static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast) {
   tld_finder.VisitTranslationUnitDecl(ast.TranslationUnit());
 
   auto decl_eq = +[] (const OrderedDecl &a, const OrderedDecl &b) {
-    return a.first.RawDecl() == b.first.RawDecl();
+    return RawEntity(a.first) == RawEntity(b.first);
   };
 
   auto decl_less = +[] (const OrderedDecl &a, const OrderedDecl &b) {
-    return a.first.RawDecl() < b.first.RawDecl();
+    return RawEntity(a.first) < RawEntity(b.first);
   };
 
   auto order_less = +[] (const OrderedDecl &a, const OrderedDecl &b) {
@@ -1044,8 +1055,10 @@ static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
     //            will report `kUndeclared`.
     //
     // NOTE(pag): Clang patches for `Decl::RemappedDecl` should help with this?
+    //
+    // NOTE(pag): This will also trigger for basicall all non-template things,
+    //            e.g. all C code.
     case pasta::TemplateSpecializationKind::kUndeclared:
-      assert(false);  // Tracer.
       return has_partial_or_tpl_or_dg;
 
     default:
@@ -1282,12 +1295,12 @@ static std::vector<OrderedMacro> FindTLMs(
   }
 
   auto eq = +[] (const OrderedMacro &a, const OrderedMacro &b) {
-    return a.first.RawMacro() == b.first.RawMacro();
+    return RawEntity(a.first) == RawEntity(b.first);
   };
 
   auto less = +[] (const OrderedMacro &a, const OrderedMacro &b) {
-    auto a_id = a.first.RawMacro();
-    auto b_id = b.first.RawMacro();
+    auto a_id = RawEntity(a.first);
+    auto b_id = RawEntity(b.first);
     if (a_id < b_id) {
       return true;
     } else if (a_id > b_id) {
@@ -2372,7 +2385,7 @@ static void MaybePersistParsedFile(
     context.PersistFile(file_id, file);
   }
 
-  em.entity_ids.emplace(file.RawFile(), file_id.Pack());
+  em.entity_ids.emplace(RawEntity(file), file_id.Pack());
 }
 
 // This persists any not-yet-seen files and their tokens. It also creates the

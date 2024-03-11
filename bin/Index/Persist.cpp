@@ -254,7 +254,7 @@ struct TokenTreeSerializationSchedule {
       id = mx::EntityId(raw_id).Extract<mx::MacroId>().value();
       CHECK(id.kind == tt.Kind());
 
-      // An example of a case where we come across a toen tree node that
+      // An example of a case where we come across a token tree node that
       // *isn't* in the current fragment is `tests/Macros/DefineInMacroUse.c`.
       // We hoist out `#define` directives into floating fragments, and so it
       // ends up being seen as logically not in the current fragment, even

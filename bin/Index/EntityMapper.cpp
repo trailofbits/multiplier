@@ -49,43 +49,43 @@ mx::RawEntityId EntityMapper::ParentStmtId(const void *entity) const {
 }
 
 mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Decl &entity) const {
-  return ParentDeclId(entity.RawDecl()->RemappedDecl);
+  return ParentDeclId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Stmt &entity) const {
-  return ParentDeclId(entity.RawStmt());
+  return ParentDeclId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Designator &entity) const {
-  return ParentDeclId(entity.RawDesignator());
+  return ParentDeclId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::ParentDeclId(const pasta::TemplateArgument &entity) const {
-  return ParentDeclId(entity.RawTemplateArgument());
+  return ParentDeclId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::ParentDeclId(const pasta::TemplateParameterList &entity) const {
-  return ParentDeclId(entity.RawTemplateParameterList());
+  return ParentDeclId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::ParentDeclId(const pasta::CXXBaseSpecifier &entity) const {
-  return ParentDeclId(entity.RawCXXBaseSpecifier());
+  return ParentDeclId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Decl &entity) const {
-  return ParentStmtId(entity.RawDecl()->RemappedDecl);
+  return ParentStmtId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Stmt &entity) const {
-  return ParentStmtId(entity.RawStmt());
+  return ParentStmtId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Designator &entity) const {
-  return ParentStmtId(entity.RawDesignator());
+  return ParentStmtId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::ParentStmtId(const pasta::TemplateArgument &entity) const {
-  return ParentStmtId(entity.RawTemplateArgument());
+  return ParentStmtId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::EntityId(const void *entity) const {
@@ -112,25 +112,26 @@ mx::RawEntityId EntityMapper::PerFragmentEntityId(const void *entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Decl &entity) const {
-  return EntityId(entity.RawDecl()->RemappedDecl);
+  return EntityId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Stmt &entity) const {
-  return SelectiveEntityId(entity.RawStmt());
+  return SelectiveEntityId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Attr &entity) const {
-  if (auto it = attr_ids.find(entity.RawAttr()); it != attr_ids.end()) {
+  auto raw_attr = RawEntity(entity);
+  if (auto it = attr_ids.find(raw_attr); it != attr_ids.end()) {
     return it->second.Pack();
   }
-  return SelectiveEntityId(entity.RawAttr());
+  return SelectiveEntityId(raw_attr);
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
   // NOTE(pag): May be part of a directive, which may be referenced by other
   //            fragments, so we use `EntityId`, which falls back on
   //            `PerFragmentEntityId`.
-  auto ret = EntityId(entity.RawMacro());
+  auto ret = EntityId(RawEntity(entity));
   if (ret || entity.Kind() != pasta::MacroKind::kExpansion) {
     return ret;
   }
@@ -158,11 +159,11 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const TokenTree &entity) const {
-  return EntityId(entity.RawNode());
+  return EntityId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::EntityId(const TokenTreeNode &entity) const {
-  return EntityId(entity.RawNode());
+  return EntityId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
@@ -173,7 +174,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
   // NOTE(pag): May be part of a directive, which may be referenced by other
   //            fragments, so we use `EntityId`, which falls back on
   //            `PerFragmentEntityId`.
-  auto eid = EntityId(entity.RawToken());
+  auto eid = EntityId(RawEntity(entity));
   if (eid != mx::kInvalidEntityId) {
     return eid;
   }
@@ -192,6 +193,14 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
   // that `entity.Data()` here likely matches some printed token data over there
   // that has no corresponding derived (parsed) token.
   if (IsParsedToken(entity)) {
+
+    // NOTE(pag): Is it technically common to observe these types of issues
+    //            when serializing things like namespaces, which are semi-
+    //            internalized into fragments.
+    if (auto ft = entity.FileLocation()) {
+      return EntityId(ft.value());
+    }
+
     assert(false);
     return mx::kInvalidEntityId;
   }
@@ -213,7 +222,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::DerivedToken &entity) const 
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::PrintedToken &entity) const {
-  if (auto id = PerFragmentEntityId(entity.RawToken());
+  if (auto id = PerFragmentEntityId(RawEntity(entity));
       id != mx::kInvalidEntityId) {
     return id;
   }
@@ -226,11 +235,11 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::PrintedToken &entity) const 
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::MacroToken &entity) {
-  return EntityId(entity.RawMacro());
+  return EntityId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::File &file) const {
-  return EntityId(file.RawFile());
+  return EntityId(RawEntity(file));
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::FileToken &entity) const {
@@ -254,27 +263,27 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Type &entity) const {
 
 mx::RawEntityId EntityMapper::EntityId(
     const pasta::TemplateArgument &pseudo) const {
-  return PerFragmentEntityId(pseudo.RawTemplateArgument());
+  return PerFragmentEntityId(RawEntity(pseudo));
 }
 
 mx::RawEntityId EntityMapper::EntityId(
     const pasta::TemplateParameterList &pseudo) const {
-  return PerFragmentEntityId(pseudo.RawTemplateParameterList());
+  return PerFragmentEntityId(RawEntity(pseudo));
 }
 
 mx::RawEntityId EntityMapper::EntityId(
     const pasta::CXXBaseSpecifier &pseudo) const {
-  return PerFragmentEntityId(pseudo.RawCXXBaseSpecifier());
+  return PerFragmentEntityId(RawEntity(pseudo));
 }
 
 mx::RawEntityId EntityMapper::EntityId(
     const pasta::Designator &pseudo) const {
-  return PerFragmentEntityId(pseudo.RawDesignator());
+  return PerFragmentEntityId(RawEntity(pseudo));
 }
 
 mx::RawEntityId EntityMapper::EntityId(
     const pasta::CXXCtorInitializer &pseudo) const {
-  return PerFragmentEntityId(pseudo.RawCXXCtorInitializer());
+  return PerFragmentEntityId(RawEntity(pseudo));
 }
 
 mx::RawEntityId EntityMapper::EntityIdOfType(
@@ -284,7 +293,7 @@ mx::RawEntityId EntityMapper::EntityIdOfType(
 
 std::optional<const pasta::Decl> EntityMapper::ParentDecl(
     const pasta::AST &ast, const pasta::Decl &entity) const {
-  if (auto it = parent_decls.find(entity.RawDecl()->RemappedDecl);
+  if (auto it = parent_decls.find(RawEntity(entity));
       it != parent_decls.end() && it->second) {
     return ast.Adopt(static_cast<const clang::Decl *>(it->second));
   }
@@ -293,7 +302,7 @@ std::optional<const pasta::Decl> EntityMapper::ParentDecl(
 
 std::optional<const pasta::Decl> EntityMapper::ParentDecl(
     const pasta::AST &ast, const pasta::Stmt &entity) const {
-  if (auto it = parent_decls.find(entity.RawStmt());
+  if (auto it = parent_decls.find(RawEntity(entity));
       it != parent_decls.end() && it->second) {
     return ast.Adopt(static_cast<const clang::Decl *>(it->second));
   }
@@ -302,7 +311,7 @@ std::optional<const pasta::Decl> EntityMapper::ParentDecl(
 
 std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
     const pasta::AST &ast, const pasta::Decl &entity) const {
-  if (auto it = parent_stmts.find(entity.RawDecl()->RemappedDecl);
+  if (auto it = parent_stmts.find(RawEntity(entity));
       it != parent_stmts.end() && it->second) {
     return ast.Adopt(static_cast<const clang::Stmt *>(it->second));
   }
@@ -311,7 +320,7 @@ std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
 
 std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
     const pasta::AST &ast, const pasta::Stmt &entity) const {
-  if (auto it = parent_stmts.find(entity.RawStmt());
+  if (auto it = parent_stmts.find(RawEntity(entity));
       it != parent_stmts.end() && it->second) {
     return ast.Adopt(static_cast<const clang::Stmt *>(it->second));
   }

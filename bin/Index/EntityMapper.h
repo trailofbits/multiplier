@@ -8,6 +8,7 @@
 
 #include "Entity.h"
 #include "PendingFragment.h"
+#include "Util.h"
 
 namespace pasta {
 class File;
@@ -80,6 +81,10 @@ class EntityMapper final {
   mx::RawEntityId ParentStmtId(const pasta::Stmt &entity) const;
   mx::RawEntityId ParentStmtId(const pasta::Designator &entity) const;
   mx::RawEntityId ParentStmtId(const pasta::TemplateArgument &entity) const;
+
+  inline mx::RawEntityId EntityId(std::nullptr_t entity) const noexcept {
+    return mx::kInvalidEntityId;
+  }
 
   mx::RawEntityId EntityId(const void *entity) const;
   mx::RawEntityId PerFragmentEntityId(const void *entity) const;

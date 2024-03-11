@@ -1650,10 +1650,6 @@ void TokenProvenanceCalculator::Run(
     if (info.derived_token_id != mx::kInvalidEntityId) {
       continue;
     }
-
-    if (data_hash == Hash64("TWO")) {
-      (void) em.EntityId(nullptr);
-    }
   }
 
   info_map.erase(mx::kInvalidEntityId);

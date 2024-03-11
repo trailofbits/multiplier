@@ -24,7 +24,9 @@ namespace pasta {
 class AST;
 class Attr;
 class CXXBaseSpecifier;
+class CXXCtorInitializer;
 class Decl;
+class DeclContext;
 class Designator;
 class File;
 class FileToken;
@@ -58,6 +60,7 @@ struct PseudoOffsetMap final : public std::unordered_map<const void *, uint32_t>
 struct EntityLocationMap final : public std::unordered_map<const void*, EntityLocation> {};
 class EntityMapper;
 class TokenTree;
+class TokenTreeNode;
 
 // Return `true` of `tok` is in the context of `decl`.
 bool TokenIsInContextOfDecl(const pasta::Token &tok, const pasta::Decl &decl);
@@ -160,15 +163,19 @@ inline static bool ShouldHideFromIndexer(const T &) {
 // This uniquely identifies the entity.
 const void *RawEntity(const pasta::Token &entity);
 const void *RawEntity(const pasta::PrintedToken &entity);
+const void *RawEntity(const pasta::File &entity);
 const void *RawEntity(const pasta::Decl &entity);
+const void *RawEntity(const pasta::DeclContext &entity);
 const void *RawEntity(const pasta::Stmt &entity);
 const void *RawEntity(const pasta::Attr &entity);
 const void *RawEntity(const pasta::Macro &entity);
 const void *RawEntity(const pasta::Designator &entity);
 const void *RawEntity(const pasta::CXXBaseSpecifier &entity);
+const void *RawEntity(const pasta::CXXCtorInitializer &entity);
 const void *RawEntity(const pasta::TemplateArgument &entity);
 const void *RawEntity(const pasta::TemplateParameterList &entity);
 const void *RawEntity(const TokenTree &entity);
+const void *RawEntity(const TokenTreeNode &entity);
 
 template <typename T>
 inline static const void *RawEntity(const std::optional<T> &entity) {
@@ -275,5 +282,27 @@ inline static gap::generator<Entity> Entities(
     co_yield std::move(entity);
   }
 }
+
+template <typename T>
+class PrevValueTracker {
+  T const prev_dc;
+  T &dc_ref;
+  const bool is_new;
+ public:
+  inline PrevValueTracker(T &dc_ref_, T new_dc)
+      : prev_dc(dc_ref_),
+        dc_ref(dc_ref_),
+        is_new(prev_dc != new_dc) {
+    dc_ref = new_dc;
+  }
+
+  inline operator bool(void) const noexcept {
+    return is_new;
+  }
+
+  inline ~PrevValueTracker(void) {
+    dc_ref = prev_dc;
+  }
+};
 
 }  // namespace indexer

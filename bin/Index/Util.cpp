@@ -963,8 +963,16 @@ const void *RawEntity(const pasta::PrintedToken &entity) {
   return entity.RawToken();
 }
 
+const void *RawEntity(const pasta::File &entity) {
+  return entity.RawFile();
+}
+
 const void *RawEntity(const pasta::Decl &entity) {
   return entity.RawDecl()->RemappedDecl;
+}
+
+const void *RawEntity(const pasta::DeclContext &entity) {
+  return entity.RawDeclContext();
 }
 
 const void *RawEntity(const pasta::Stmt &entity) {
@@ -987,6 +995,10 @@ const void *RawEntity(const pasta::CXXBaseSpecifier &entity) {
   return entity.RawCXXBaseSpecifier();
 }
 
+const void *RawEntity(const pasta::CXXCtorInitializer &entity) {
+  return entity.RawCXXCtorInitializer();
+}
+
 const void *RawEntity(const pasta::TemplateArgument &entity) {
   return entity.RawTemplateArgument();
 }
@@ -996,6 +1008,10 @@ const void *RawEntity(const pasta::TemplateParameterList &entity) {
 }
 
 const void *RawEntity(const TokenTree &entity) {
+  return entity.RawNode();
+}
+
+const void *RawEntity(const TokenTreeNode &entity) {
   return entity.RawNode();
 }
 

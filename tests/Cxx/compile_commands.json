@@ -1,9 +1,4 @@
-[
-{
-"file": "LexicalExternSpecialization.cpp",
-"command": "/usr/bin/c++ LexicalExternSpecialization.cpp",
-"directory": ""
-},
+[ 
 {
 "file": "Templates.cpp",
 "command": "/usr/bin/c++ Templates.cpp",
@@ -26,12 +21,7 @@
 },
 {
 "file": "TemplateDeduction.cpp",
-"command": "/usr/bin/c++ -x c++ -std=c++20 TemplateDeduction.cpp",
-"directory": ""
-},
-{
-"file": "TemplateDeductionGuide.cpp",
-"command": "/usr/bin/c++ -x c++ -std=c++20 TemplateDeductionGuide.cpp",
+"command": "/usr/bin/c++ TemplateDeduction.cpp",
 "directory": ""
 },
 {
