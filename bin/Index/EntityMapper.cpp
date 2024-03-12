@@ -201,11 +201,84 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
       return EntityId(ft.value());
     }
 
-    assert(false);
+    // assert(false);
     return mx::kInvalidEntityId;
   }
 
   return mx::kInvalidEntityId;
+}
+
+namespace {
+
+std::pair<mx::RawEntityId, mx::RawEntityId> FirstLastFromDerived(
+    const EntityMapper &em, const pasta::Token &tok) {
+  auto dt = tok.DerivedLocation();
+  auto first_eid = mx::kInvalidEntityId;
+  auto last_eid = mx::kInvalidEntityId;
+
+  if (std::holds_alternative<pasta::FileToken>(dt)) {
+    first_eid = em.EntityId(std::get<pasta::FileToken>(dt));
+    last_eid = first_eid;
+  
+  // Recover by finding the first/last file tokens associated with the macro
+  // use.
+  } else if (std::holds_alternative<pasta::MacroToken>(dt)) {
+    pasta::Macro root = RootMacroFrom(std::get<pasta::MacroToken>(dt));
+    auto ft = root.BeginToken();
+    auto et = root.EndToken();
+    if (ft && et) {
+      auto ft_fl = ft->FileLocation();
+      auto et_fl = et->FileLocation();
+      if (ft_fl && et_fl) {
+        first_eid = em.EntityId(ft_fl.value());
+        last_eid = em.EntityId(et_fl.value());
+      }
+    }
+  }
+
+  return {first_eid, last_eid};
+}
+
+}  // namespace
+
+// Get a pair of entity IDs given a parsed token range. This will generally
+// try to fix up situations where we can't resolve to parsed tokens by falling
+// back to ranges of file tokens.
+std::pair<mx::RawEntityId, mx::RawEntityId> EntityMapper::EntityIds(
+    const pasta::TokenRange &range) const {
+  auto size = range.Size();
+  if (!size) {
+    return {mx::kInvalidEntityId, mx::kInvalidEntityId};
+  }
+
+  auto first_tok = range[0];
+  auto first_eid = EntityId(RawEntity(first_tok));
+  auto last_eid = first_eid;
+
+  if (first_eid == mx::kInvalidEntityId) {
+    std::tie(first_eid, last_eid) = FirstLastFromDerived(*this, first_tok);
+  }
+
+  if (size == 1u) {
+    return {first_eid, last_eid};
+  }
+
+  auto last_tok = range[size - 1u];
+  last_eid = EntityId(RawEntity(last_tok));
+  if (last_eid == mx::kInvalidEntityId) {
+    auto new_first_eid = mx::kInvalidEntityId;
+    std::tie(new_first_eid, last_eid) = FirstLastFromDerived(*this, last_tok);
+    
+    if (first_eid == mx::kInvalidEntityId) {
+      first_eid = new_first_eid;
+    }
+  }
+
+  if (last_eid == mx::kInvalidEntityId) {
+    last_eid = first_eid;
+  }
+
+  return {first_eid, last_eid};
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::DerivedToken &entity) const {

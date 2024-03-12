@@ -3311,15 +3311,9 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "}\n\n";
 
         serialize_cpp_os
-            << "  if (auto r" << i << " = e." << method_name << "(); auto rs"
-            << i << " = r" << i << ".Size()) {\n"
-            << "    b." << begin_setter_name << "(es.EntityId(r" << i << "[0]));\n"
-            << "    b." << end_setter_name << "(es.EntityId(r"
-            << i << "[rs" << i << " - 1u]));\n"
-            << "  } else {\n"
-            << "    b." << begin_setter_name << "(0);\n"
-            << "    b." << end_setter_name << "(0);\n"
-            << "  }\n";
+            << "  auto p" << i << " = es.EntityIds(e." << method_name << "());\n"
+            << "  b." << begin_setter_name << "(p" << i << ".first);\n"
+            << "  b." << end_setter_name << "(p" << i << ".second);\n";
 
       // Handle `pasta::MacroRange`.
       } else if (record_name == "MacroRange") {

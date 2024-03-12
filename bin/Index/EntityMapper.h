@@ -107,6 +107,18 @@ class EntityMapper final {
   mx::RawEntityId EntityId(const pasta::Designator &pseudo) const;
   mx::RawEntityId EntityId(const pasta::CXXCtorInitializer &pseudo) const;
 
+  std::pair<mx::RawEntityId, mx::RawEntityId> EntityIds(
+      const pasta::TokenRange &range) const;
+
+  template <typename T>
+  inline mx::RawEntityId EntityId(const std::optional<T> &val) const {
+    if (val) {
+      return EntityId(val.value());
+    }
+    return mx::kInvalidEntityId;
+  }
+
+
   inline mx::RawEntityId SelectiveEntityId(const void *entity) const {
     if (generate_source_ir) {
       return EntityId(entity);

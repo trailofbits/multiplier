@@ -207,6 +207,8 @@ std::string DiagnosePrintedTokens(const pasta::PrintedTokenRange &);
 // Returns `c` if `c` isn't an alias, otherwise `c.Aliasee().value()`.
 pasta::TokenContext UnaliasedContext(const pasta::TokenContext &c);
 
+pasta::Macro RootMacroFrom(const pasta::Macro &node);
+
 uint32_t Hash32(std::string_view data);
 uint64_t Hash64(std::string_view data);
 

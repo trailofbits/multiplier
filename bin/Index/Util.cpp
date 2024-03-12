@@ -852,6 +852,14 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
   return false;
 }
 
+pasta::Macro RootMacroFrom(const pasta::Macro &node) {
+  if (auto parent = node.Parent()) {
+    return RootMacroFrom(parent.value());
+  } else {
+    return node;
+  }
+}
+
 namespace {
 
 class StringOutputStream final : public kj::OutputStream {

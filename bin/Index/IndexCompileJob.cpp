@@ -428,14 +428,6 @@ static bool IsClosingConditionalDirective(const pasta::MacroDirective &macro) {
   return macro.Kind() == pasta::MacroKind::kEndIfDirective;
 }
 
-static pasta::Macro RootMacroFrom(pasta::Macro node) {
-  if (auto parent = node.Parent()) {
-    return RootMacroFrom(parent.value());
-  } else {
-    return node;
-  }
-}
-
 static std::optional<pasta::MacroToken> BeginToken(pasta::Macro macro) {
   auto tok = pasta::MacroToken::From(macro);
   if (tok) {
