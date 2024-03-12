@@ -544,7 +544,7 @@ void BuildPendingFragment(const pasta::AST &ast, PendingFragment &pf) {
   // to token_tree_ids. This will help internally serialize them in
   // the fragments.
   for (auto &tld : pf.top_level_decls) {
-    auto dc = tld.DeclarationContext();
+    auto dc = tld.LexicalDeclarationContext();
     while (dc && IsSerializableDecl(dc.value())) {
       builder.MaybeVisitNext(dc.value());
       dc = dc->LexicalParent();
