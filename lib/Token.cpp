@@ -125,6 +125,8 @@ static TokenCategory ClassifyToken(TokenKind kind) {
     case TokenKind::R_PARENTHESIS:
     case TokenKind::L_BRACE:
     case TokenKind::R_BRACE:
+    case TokenKind::L_ANGLE:
+    case TokenKind::R_ANGLE:
     case TokenKind::PERIOD:
     case TokenKind::ELLIPSIS:
     case TokenKind::AMP:
