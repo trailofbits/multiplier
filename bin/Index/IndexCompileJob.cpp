@@ -2408,14 +2408,14 @@ void IndexCompileJobAction::Run(void) {
     return;
   }
 
-  TypeMapper tm(context.id_store);
-  EntityMapper em(tm, context.codegen.IsEnabled());
-
   pasta::AST ast = std::move(maybe_ast.value());
   pasta::File main_file = ast.MainFile();
   std::string main_file_path = main_file.Path().generic_string();
   DLOG(INFO)
       << "Built AST for main source file " << main_file_path;
+
+  TypeMapper tm(ast, context.id_store);
+  EntityMapper em(tm, context.codegen.IsEnabled());
 
   PersistParsedFiles(context, ast, em);
 

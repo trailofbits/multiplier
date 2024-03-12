@@ -63,12 +63,14 @@ class TypeMapper final {
  public:
   TypeIdMap type_ids;
 
+  pasta::AST &ast;
+
   IdStore &id_store;
 
   bool read_only{false};
 
-  inline explicit TypeMapper(IdStore &id_store_)
-      : id_store(id_store_) {
+  inline explicit TypeMapper(pasta::AST &ast_, IdStore &id_store_)
+      : ast(ast_), id_store(id_store_) {
     decls.reserve(64);
   }
 

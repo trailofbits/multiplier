@@ -51,25 +51,25 @@ static bool IsSizedBuiltinType(const pasta::Type &type) {
 // `auto` or `decltype(...)` types to the true underlying type, or selecting
 // the adjusted version of an adjusted type. This also helps us persist fewer
 // overall types.
-static clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals,
-                                           EntityList<const clang::Stmt*> *list = nullptr,
-                                           clang::ASTContext *ctx = nullptr);
+static clang::Type *BasicTypeDeduplication(clang::ASTContext &ctx,
+                                           clang::Type *type, uint32_t &up_quals,
+                                           EntityList<const clang::Stmt*> *list = nullptr);
 
-static clang::Type *BasicTypeDeduplication(clang::QualType type, uint32_t &up_quals,
-                                           EntityList<const clang::Stmt*> *list = nullptr,
-                                           clang::ASTContext *ctx = nullptr) {
+static clang::Type *BasicTypeDeduplication(clang::ASTContext &ctx,
+                                           clang::QualType type, uint32_t &up_quals,
+                                           EntityList<const clang::Stmt*> *list = nullptr) {
   clang::Type *tp = const_cast<clang::Type *>(type.getTypePtrOrNull());
   if (!tp) {
     return tp;
   }
 
   up_quals |= type.getQualifiers().getAsOpaqueValue();
-  return BasicTypeDeduplication(tp, up_quals, list, ctx);
+  return BasicTypeDeduplication(ctx, tp, up_quals, list);
 }
 
-clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals,
-                                    EntityList<const clang::Stmt*> *list,
-                                    clang::ASTContext *ctx) {
+clang::Type *BasicTypeDeduplication(clang::ASTContext &ctx,
+                                    clang::Type *type, uint32_t &up_quals,
+                                    EntityList<const clang::Stmt*> *list) {
   if (!type) {
     return nullptr;
   }
@@ -80,7 +80,7 @@ clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals,
     case clang::Type::Auto: {
       clang::AutoType *at = clang::dyn_cast<clang::AutoType>(type);
       if (at->isSugared()) {
-        new_type = BasicTypeDeduplication(at->desugar(), up_quals, list, ctx);
+        new_type = BasicTypeDeduplication(ctx, at->desugar(), up_quals, list);
       }
       break;
     }
@@ -88,7 +88,7 @@ clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals,
     case clang::Type::TypeOfExpr: {
       clang::TypeOfExprType *et = clang::dyn_cast<clang::TypeOfExprType>(type);
       if (et->isSugared()) {
-        new_type = BasicTypeDeduplication(et->desugar(), up_quals, list, ctx);
+        new_type = BasicTypeDeduplication(ctx, et->desugar(), up_quals, list);
       }
       if (auto underlying_expr = et->getUnderlyingExpr()) {
         if (list) {
@@ -99,36 +99,36 @@ clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals,
     }
 
     case clang::Type::TypeOf:
-      new_type = BasicTypeDeduplication(
+      new_type = BasicTypeDeduplication(ctx,
           clang::dyn_cast<clang::TypeOfType>(type)->desugar(),
-          up_quals, list, ctx);
+          up_quals, list);
       break;
 
     case clang::Type::Decltype: {
       clang::DecltypeType *dt = clang::dyn_cast<clang::DecltypeType>(type);
       if (auto underlying_expr = dt->getUnderlyingExpr()) {
         if (dt->isSugared()) {
-          new_type = BasicTypeDeduplication(dt->desugar(), up_quals, list, ctx);
+          new_type = BasicTypeDeduplication(ctx, dt->desugar(), up_quals, list);
         }
         if (list) {
           list->emplace_back(reinterpret_cast<const clang::Stmt*>(underlying_expr));
         }
       } else {
-        new_type = BasicTypeDeduplication(dt->getUnderlyingType(), up_quals, list, ctx);
+        new_type = BasicTypeDeduplication(ctx, dt->getUnderlyingType(), up_quals, list);
       }
       break;
     }
 
     case clang::Type::Adjusted:
-      new_type = BasicTypeDeduplication(
+      new_type = BasicTypeDeduplication(ctx,
           clang::dyn_cast<clang::AdjustedType>(type)->desugar(),
-          up_quals, list, ctx);
+          up_quals, list);
       break;
 
     case clang::Type::UnaryTransform: {
       auto ut = clang::dyn_cast<clang::UnaryTransformType>(type);
       if (ut->isSugared()) {
-        new_type = BasicTypeDeduplication(ut->desugar(), up_quals, list, ctx);
+        new_type = BasicTypeDeduplication(ctx, ut->desugar(), up_quals, list);
       }
       break;
     }
@@ -145,21 +145,21 @@ clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals,
           break;
         }
       }
-      new_type = BasicTypeDeduplication(et->desugar(), up_quals, list, ctx);
+      new_type = BasicTypeDeduplication(ctx, et->desugar(), up_quals, list);
       break;
     }
     case clang::Type::DeducedTemplateSpecialization: {
       auto dt = clang::dyn_cast<clang::DeducedTemplateSpecializationType>(type);
       if (dt->isSugared()) {
-        new_type = BasicTypeDeduplication(dt->desugar(), up_quals, list, ctx);
+        new_type = BasicTypeDeduplication(ctx, dt->desugar(), up_quals, list);
       }
       break;
     }
 
     case clang::Type::Decayed:
-      new_type = BasicTypeDeduplication(
+      new_type = BasicTypeDeduplication(ctx,
           clang::dyn_cast<clang::DecayedType>(type)->desugar(),
-          up_quals, list, ctx);
+          up_quals, list);
       break;
 
     default:
@@ -167,16 +167,8 @@ clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals,
   }
 
   if (type->isDependentType()) {
-    // If ASTContext is valid and it is dependent type, return
-    // Unresolved type else return new type ptr
-    if (!ctx) {
-      up_quals = orig_qualifier;
-      new_type = type;
-    } else {
-      up_quals = 0u;
-      new_type = const_cast<clang::Type*>(ctx->UnresolvedTy.getTypePtr());
-    }
-    return new_type;
+    up_quals = orig_qualifier;
+    return const_cast<clang::Type*>(ctx.UnresolvedTy.getTypePtr());
   }
 
   if (!new_type) {
@@ -209,7 +201,7 @@ bool TypePrintingPolicy::ShouldPrintOriginalTypeOfDecayedType(void) const {
 clang::QualType TypeMapper::Compress(clang::ASTContext &context,
                                      const clang::QualType &type) {
   uint32_t qualifiers = 0u;
-  clang::Type *type_ptr = BasicTypeDeduplication(type, qualifiers, nullptr, &context);
+  clang::Type *type_ptr = BasicTypeDeduplication(context, type, qualifiers, nullptr);
   clang::QualType fast_qtype(type_ptr, qualifiers & clang::Qualifiers::FastMask);
   return context.getQualifiedType(
       fast_qtype, clang::Qualifiers::fromOpaqueValue(qualifiers));
@@ -308,11 +300,9 @@ std::string TypeMapper::HashType(
       //
       //assert(eid != mx::kInvalidEntityId || ((clang::Decl*)od.first)->isImplicit());
       if ((eid == mx::kInvalidEntityId) && ((clang::Decl*)od.first)->isImplicit()) {
-        pf.TryAdd(pasta::AST::From(type).Adopt(
-          reinterpret_cast<const clang::Decl*>(od.first)));
+        pf.TryAdd(ast.Adopt(reinterpret_cast<const clang::Decl*>(od.first)));
       } else if (eid == mx::kInvalidEntityId) {
-        pf.TryAdd(pasta::AST::From(type).Adopt(
-          reinterpret_cast<const clang::Decl*>(od.first)));
+        pf.TryAdd(ast.Adopt(reinterpret_cast<const clang::Decl*>(od.first)));
       }
 
       ss << ' ' << eid;
@@ -325,7 +315,7 @@ std::string TypeMapper::HashType(
 mx::RawEntityId TypeMapper::EntityId(const void *raw_type_,
                                      uint32_t raw_qualifiers) const {
 
-  clang::Type *raw_type = BasicTypeDeduplication(
+  clang::Type *raw_type = BasicTypeDeduplication(ast.UnderlyingAST(),
       reinterpret_cast<clang::Type *>(const_cast<void *>(raw_type_)),
       raw_qualifiers);
 
@@ -339,7 +329,7 @@ mx::RawEntityId TypeMapper::EntityId(const void *raw_type_,
 
 mx::RawEntityId TypeMapper::EntityId(const pasta::Type &entity) const {
   uint32_t raw_qualifiers = entity.RawQualifiers();
-  clang::Type *raw_type = BasicTypeDeduplication(
+  clang::Type *raw_type = BasicTypeDeduplication(ast.UnderlyingAST(),
       const_cast<clang::Type *>(entity.RawType()), raw_qualifiers);
 
   TypeKey type_key(raw_type, raw_qualifiers);
@@ -359,16 +349,15 @@ bool TypeMapper::AddEntityId(PendingFragment &pf, pasta::Type *entity_) {
   // First, check the non-shallow deduplicatd type.
   uint32_t raw_qualifiers = entity.RawQualifiers();
   TypeKey orig_type_key(entity.RawType(), raw_qualifiers);
-  auto ast = pasta::AST::From(entity);
   auto it = type_ids.find(orig_type_key);
   if (it != type_ids.end()) {
     return false;
   }
 
   EntityList<const clang::Stmt*> underlying_stmts;
-  clang::Type *raw_type = BasicTypeDeduplication(
-      const_cast<clang::Type *>(entity.RawType()), raw_qualifiers, &underlying_stmts,
-      &(ast.UnderlyingAST()));
+  clang::Type *raw_type = BasicTypeDeduplication(ast.UnderlyingAST(),
+      const_cast<clang::Type *>(entity.RawType()), raw_qualifiers,
+      &underlying_stmts);
 
   // If there are underlying stmts in type, add them to pending fragment
   // to serialize.
