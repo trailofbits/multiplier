@@ -1,4 +1,4 @@
-
+namespace TemplatePartialSpecialization {
 template <class _Tp, class _Dp, bool > struct __pointer_type1 {};
 
 template <class _Tp, class _Dp> struct __pointer_type1<_Tp, _Dp, false>
@@ -24,3 +24,4 @@ class C {
 };
 
 void foo(C &c) {}
+} // namespace TemplatePartialSpecialization

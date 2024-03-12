@@ -1,4 +1,4 @@
-
+namespace TemplateFunctionSpecialization {
 template <typename T> T Max(T x, T y)
 {
   return (x > y) ? x : y;
@@ -23,3 +23,4 @@ int test_pi(void) {
   (void)val;
   return 0;
 }
+} // namespace TemplateFunctionSpecialization

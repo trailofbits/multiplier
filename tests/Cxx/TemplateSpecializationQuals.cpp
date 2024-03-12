@@ -1,4 +1,4 @@
-
+namespace TemplateSpecializationQuals {
 template<typename _CharT>
 struct basic_string {
 
@@ -13,4 +13,4 @@ void foo (const char *c) {
   basic_string<char> str;
   str.assign(c, str);
 }
-
+} // namespace TemplateSpecializationQuals

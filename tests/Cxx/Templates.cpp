@@ -1,4 +1,4 @@
-
+namespace Templates {
 namespace __1 {
 // Out-Of-Line Method definition getting instantiated
 template <typename T>
@@ -116,8 +116,8 @@ Foo<int>::Bar<int> bar1;
 
 }
 
-
-/*template <typename... T>
+namespace __7 {
+template <typename... T>
 void f1() {}
 
 template <typename T, T V>
@@ -181,4 +181,6 @@ void f() {
   int fnrt() __attribute__((noreturn));
   f1<decltype(fnrt)>();
   f4<UnnamedEnum1>();
-}*/
+}
+}
+} // namespace Templates

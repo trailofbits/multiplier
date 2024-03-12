@@ -1,3 +1,4 @@
+namespace FriendFunctionDecl {
 class _char {};
 
 template<class T>
@@ -26,3 +27,4 @@ basic_string<_char, _traits<char>, Alloc> operator+(
 void test(void) {
     basic_string<_char, _traits<char>, Alloc> str;
 }
+} // namespace FriendFunctionDecl

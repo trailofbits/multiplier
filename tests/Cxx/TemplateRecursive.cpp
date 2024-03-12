@@ -1,4 +1,4 @@
-
+namespace TemplateRecursive {
 class base { };
 
 template <class T> class foo : public base  {
@@ -8,4 +8,4 @@ template <class T> class foo : public base  {
 class bar : public foo<void> { };
 bar filters;
 
-
+} // namespace TemplateRecursive

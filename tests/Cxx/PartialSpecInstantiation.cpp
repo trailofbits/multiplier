@@ -1,6 +1,6 @@
 
 // Template partial specialization instantiation
-
+namespace PartialSpecInstantiation {
 template <class T> struct X {};
 
 template <> struct X<char>
@@ -72,3 +72,4 @@ namespace _2 {
     takesWrapperInContainer(c);
   }
 }
+} // namespace PartialSpecInstantiation

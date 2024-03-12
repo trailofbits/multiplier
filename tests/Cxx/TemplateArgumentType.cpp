@@ -1,3 +1,4 @@
+namespace TemplateArgumentType {
 template <class T> class X {};
 template <class T> void func(T t) {}
 struct {} unnamed_object;
@@ -14,3 +15,4 @@ void func(void) {
     func(unnamed_object);
     func(b);
 }
+} // namespace TemplateArgumentType

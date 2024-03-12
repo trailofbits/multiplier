@@ -1,5 +1,5 @@
 
-
+namespace BuiltinTemplates {
 template <class T, T... I>
 struct Seq {
     static constexpr T PackSize = sizeof...(I);
@@ -46,3 +46,4 @@ static_assert(__is_same(MakeSeq<unsigned long long, 3ULL>, Seq<unsigned long lon
 static_assert(__is_same(MakeSeq<unsigned long long, 4ULL>, Seq<unsigned long long, 0ULL, 1ULL, 2ULL, 3ULL>), "");
 }
 
+} // namespace BuiltinTemplates

@@ -1,4 +1,4 @@
-
+namespace TemplateExplicitSpecialization {
 // 1
 template <typename T>
 struct a {
@@ -80,3 +80,4 @@ template <>
 struct k<int>;
 template struct k<int>;
 
+} // namespace TemplateExplicitSpecialization

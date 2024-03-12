@@ -1,6 +1,6 @@
 
 // Template deduce specialization
-
+namespace TemplateDeduction {
 template <class T>
 struct S {
   S(T) {}
@@ -21,3 +21,4 @@ int a1 = f1(X<int, int, double>(), X<double, int, double>());
 int a2 = f1(X<int, int>());
 int b1 = f2(P<X<int, double>, int>(), P<X<int, double>, double>());
 }
+} // namespace TemplateDeduction
