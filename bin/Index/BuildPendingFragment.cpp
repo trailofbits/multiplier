@@ -376,7 +376,7 @@ bool PendingFragment::TryAdd(const pasta::Attr &entity) {
   id.offset = static_cast<mx::EntityOffset>(entity_list.size());
   id.kind = mx::FromPasta(entity.Kind());
 
-  if (auto tok = entity.Token(); auto raw_tok = tok.RawToken()) {
+  if (auto tok = entity.Token(); auto raw_tok = RawEntity(tok)) {
     // If we have something like:
     //
     //      struct CGPoint { int x; int y; };

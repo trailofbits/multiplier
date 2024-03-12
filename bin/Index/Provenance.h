@@ -16,6 +16,7 @@
 #include <vector>
 #include <unordered_map>
 
+#include "EntityMapper.h"
 #include "Util.h"
 
 namespace pasta {
@@ -49,6 +50,7 @@ class TokenProvenanceCalculator {
     // entity id of the parsed token, otherwise it is the leftmost parsed token.
     mx::RawEntityId parsed_token_id{mx::kInvalidEntityId};
 
+    // A file token ID or a macro token ID.
     mx::RawEntityId derived_token_id{mx::kInvalidEntityId};
 
     // How many children does this node have, OR the address of the only child.
@@ -74,25 +76,38 @@ class TokenProvenanceCalculator {
 
     gap::generator<TokenInfo *> Children(TokenProvenanceCalculator &self);
 
-    void DeriveFrom(TokenProvenanceCalculator &self, TokenInfo *parent);
+    bool DeriveFrom(TokenProvenanceCalculator &self, TokenInfo *parent);
   };
+
+  template <typename T>
+  TokenInfo *InfoOrEmpty(const T &entity) {
+    auto info_it = info_map.find(em.EntityId(entity));
+    if (info_it != info_map.end()) {
+      return info_it->second;
+    } else {
+      return &(empty.value());
+    }
+  }
 
  private:
   const EntityMapper &em;
   mx::RawEntityId fragment_index{mx::kInvalidEntityId};
   std::deque<TokenInfo> infos;
-  std::unordered_map<const void *, TokenInfo *> info_map;
+  std::unordered_map<mx::RawEntityId, TokenInfo *> info_map;
   std::unordered_map<const void *, pasta::Token> parsed_tokens;
   std::unordered_map<TokenInfo *, std::vector<TokenInfo *>> multiple_children;
   std::vector<TokenInfo *> ordered_tokens;
   std::vector<pasta::MacroToken> expansion_toks;
+  std::optional<TokenInfo> empty;
 
   void Sort(void);
   bool Pull(const std::vector<TokenTreeNode> &tokens);
   bool Pull(void);
   bool Push(void);
-  bool TryConnect(TokenInfo *, std::optional<pasta::Token> tok);
-  void Connect(TokenInfo *, const pasta::Token &);
+
+  template <typename T>
+  bool TryConnect(TokenInfo *, const T &tok);
+  void ConnectToDerived(TokenInfo *, std::optional<pasta::MacroToken>);
   void Clear(void);
 
  public:
@@ -111,17 +126,20 @@ class TokenProvenanceCalculator {
   void Run(mx::RawEntityId fragment_index_,
            const pasta::PrintedTokenRange &printed_toks);
 
-  mx::RawEntityId RelatedEntityId(const pasta::PrintedToken &tok);
-  mx::RawEntityId RelatedEntityId(const pasta::Token &tok);
-  mx::RawEntityId RelatedEntityId(const TokenTreeNode &tok);
+  template <typename T>
+  mx::RawEntityId RelatedEntityId(const T &tok) {
+    return InfoOrEmpty(tok)->related_entity_id;
+  }
 
-  mx::RawEntityId DerivedTokenId(const pasta::PrintedToken &tok);
-  mx::RawEntityId DerivedTokenId(const pasta::Token &tok);
-  mx::RawEntityId DerivedTokenId(const TokenTreeNode &tok);
+  template <typename T>
+  mx::RawEntityId DerivedTokenId(const T &tok) {
+    return InfoOrEmpty(tok)->derived_token_id;
+  }
 
-  mx::RawEntityId ParsedTokenId(const pasta::PrintedToken &tok);
-  mx::RawEntityId ParsedTokenId(const pasta::Token &tok);
-  mx::RawEntityId ParsedTokenId(const TokenTreeNode &tok);
+  template <typename T>
+  mx::RawEntityId ParsedTokenId(const T &tok) {
+    return InfoOrEmpty(tok)->parsed_token_id;
+  }
 };
 
 }  // namespace indexer

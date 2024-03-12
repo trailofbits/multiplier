@@ -60,6 +60,7 @@ class ParentTrackerVisitor : public EntityVisitor {
 
   const void *parent_decl{nullptr};
   const void *parent_stmt{nullptr};
+  const void *parent_dc{nullptr};
 
   std::unordered_set<const void *> not_yet_seen;
 
@@ -89,6 +90,14 @@ class ParentTrackerVisitor : public EntityVisitor {
     return !not_yet_seen.count(RawEntity(entity));
   }
 
+  void VisitDeclContext(const pasta::DeclContext &dc) final {
+    PrevValueTracker<const void *> dc_guard(parent_dc, RawEntity(dc));
+
+    if (dc_guard) {
+      this->EntityVisitor::VisitDeclContext(dc);
+    }
+  }
+
   void VisitOtherInitListExprImpl(const pasta::InitListExpr &stmt,
                                   std::optional<pasta::InitListExpr> other) {
     if (other.has_value() &&
@@ -107,20 +116,56 @@ class ParentTrackerVisitor : public EntityVisitor {
     VisitOtherInitListExprImpl(stmt, stmt.SemanticForm());
   }
 
-  void AddToMaps(const void *entity) {
+  bool AddToMaps(const void *entity) {
     if (parent_decl_id != mx::kInvalidEntityId && parent_decl) {
-      assert(entity != parent_decl);
-      assert(mx::EntityId(parent_decl_id).Extract<mx::DeclId>());
+      if (entity == parent_decl) {
+        return false;
+      }
+
+      auto parent_eid = mx::EntityId(parent_decl_id).Extract<mx::DeclId>();
+      if (!parent_eid) {
+        assert(false);
+        return false;
+      }
+
       em.parent_decl_ids.emplace(entity, parent_decl_id);
       em.parent_decls.emplace(entity, parent_decl);
     }
 
     if (parent_stmt_id != mx::kInvalidEntityId && parent_stmt) {
-      assert(entity != parent_stmt);
-      assert(mx::EntityId(parent_stmt_id).Extract<mx::StmtId>());
+      if (entity == parent_stmt) {
+        assert(false);
+        return false;
+      }
+
+      auto parent_eid = mx::EntityId(parent_stmt_id).Extract<mx::StmtId>();
+      if (!parent_eid) {
+        assert(false);
+        return false;
+      }
+
       em.parent_stmt_ids.emplace(entity, parent_stmt_id);
       em.parent_stmts.emplace(entity, parent_stmt);
     }
+
+    return true;
+  }
+
+  void AcceptTopLevel(const pasta::Decl &entity) {
+    // Clang will put records of classes inside themselves for `friend` lookups
+    // and such. Our Clang patches set those to have the equivalent of
+    // `Child->RemappedDecl = Parent`, and PASTA always follows `->RemappedDecl`
+    // thus introducing apparent cycles into the AST. Here we go and protect
+    // against re-visiting such things.
+    std::optional<PrevValueTracker<const void *>> dc_guard;
+    if (auto dc = pasta::DeclContext::From(entity)) {
+      dc_guard.emplace(parent_dc, RawEntity(dc.value()));
+      if (!dc_guard) {
+        return;
+      }
+    }
+
+    Accept(entity);
   }
 
   void Accept(const pasta::Decl &entity) final {
@@ -131,8 +176,8 @@ class ParentTrackerVisitor : public EntityVisitor {
     // Handle the serializable decl context differently
     auto eid = em.SpecificEntityId<mx::DeclId>(entity);
     if (!eid) {
-      // TODO(kumarak): I see an unlinked instance of TemplateTypeParmDecl that is 
-      //                not available in AST. Adding check to avoid assert
+      // TODO(kumarak): I see an unlinked instance of TemplateTypeParmDecl that
+      //                is not available in AST. Adding check to avoid assert
       assert((false
               || entity.Kind() == pasta::DeclKind::kTemplateTypeParm
               || entity.Kind() == pasta::DeclKind::kNonTypeTemplateParm
@@ -140,21 +185,16 @@ class ParentTrackerVisitor : public EntityVisitor {
       return;
     }
 
-    // This entity doesn't belong in this code chunk. Not sure if/when this will
-    // happen.
-    //
-    // TODO(pag): Assert as a signal to find when it happens?
-    // Putting assert here will always be triggered for templates specialization if
-    // we add all template and its specialization node as top-level decls in fragments.
-    // Adding them as TLD may make it reachable from two fragments cause the fragment ids
-    // to mismatch.
+    // This entity doesn't belong in this code chunk. This happens when crossing
+    // fragments due to template specializations.
     if (eid->fragment_id != fragment.fragment_index) {
-      // assert(false);
       return;
     }
 
     auto raw_entity = RawEntity(entity);
-    AddToMaps(raw_entity);
+    if (!AddToMaps(raw_entity)) {
+      return;
+    }
 
     SaveRestoreEntity save_parent_decl(
         parent_decl_id, parent_decl, eid.value(), raw_entity);
@@ -167,9 +207,8 @@ class ParentTrackerVisitor : public EntityVisitor {
       // TODO(kumarak): Log error instead of assert. See the assert
       //                while visiting dependent types.
       LOG(ERROR)
-        << "Fragment has statment missing from Entity Mapper: "
-        << DiagnosePrintedTokens(
-              pasta::PrintedTokenRange::Create(entity));
+          << "Fragment has statment missing from Entity Mapper: "
+          << pasta::PrintedTokenRange::Create(entity).Data();
       //assert(false);
       return;
     }
@@ -184,7 +223,9 @@ class ParentTrackerVisitor : public EntityVisitor {
     }
 
     auto raw_entity = RawEntity(entity);
-    AddToMaps(raw_entity);
+    if (!AddToMaps(raw_entity)) {
+      return;
+    }
 
     SaveRestoreEntity save_parent_stmt(
         parent_stmt_id, parent_stmt, eid.value(), raw_entity);
@@ -192,8 +233,9 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 
   void Accept(const pasta::Attr &entity) final {
-    AddToMaps(RawEntity(entity));
-    this->EntityVisitor::Accept(entity);
+    if (AddToMaps(RawEntity(entity))) {
+      this->EntityVisitor::Accept(entity);
+    }
   }
 
   bool Enter(const pasta::Decl &entity) final {
@@ -220,23 +262,27 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 
   void Accept(const pasta::TemplateParameterList &entity) final {
-    AddToMaps(RawEntity(entity));
-    this->EntityVisitor::Accept(entity);
+    if (AddToMaps(RawEntity(entity))) {
+      this->EntityVisitor::Accept(entity);
+    }
   }
 
   void Accept(const pasta::TemplateArgument &entity) final {
-    AddToMaps(RawEntity(entity));
-    this->EntityVisitor::Accept(entity);
+    if (AddToMaps(RawEntity(entity))) {
+      this->EntityVisitor::Accept(entity);
+    }
   }
 
   void Accept(const pasta::Designator &entity) final {
-    AddToMaps(RawEntity(entity));
-    this->EntityVisitor::Accept(entity);
+    if (AddToMaps(RawEntity(entity))) {
+      this->EntityVisitor::Accept(entity);
+    }
   }
 
   void Accept(const pasta::CXXBaseSpecifier &entity) final {
-    AddToMaps(RawEntity(entity));
-    this->EntityVisitor::Accept(entity);
+    if (AddToMaps(RawEntity(entity))) {
+      this->EntityVisitor::Accept(entity);
+    }
   }
 
   bool ResolveParentIds(void) {
@@ -388,7 +434,7 @@ static void FindMissingParentageFromAttributeTokens(
 
     auto context = tok.Context();
     if (context && context->Kind() == pasta::TokenContextKind::kAttr) {
-      tok_to_attr.emplace(parsed_tok->RawToken(), context->Data());
+      tok_to_attr.emplace(RawEntity(parsed_tok.value()), context->Data());
     }
   }
 
@@ -399,7 +445,7 @@ static void FindMissingParentageFromAttributeTokens(
 
     // Look at the tokens of the statement
     for (const pasta::Token &tok : stmt.Tokens()) {
-      auto attr_it = tok_to_attr.find(tok.RawToken());
+      auto attr_it = tok_to_attr.find(RawEntity(tok));
       if (attr_it == tok_to_attr.end()) {
         continue;
       }
@@ -425,7 +471,7 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
   // Visit the top-level decls first.
 
   for (pasta::Decl decl : Entities(pf.top_level_decls)) {
-    vis.Accept(decl);
+    vis.AcceptTopLevel(decl);
   }
 
 #ifndef NDEBUG
@@ -438,7 +484,7 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
       continue;
     }
 
-    vis.Accept(decl);
+    vis.AcceptTopLevel(decl);
     
     // NOTE(pag): If this assertion is hit, then it suggests that the
     //            manually-written traversals in `Visitor.cpp` are missing
@@ -488,8 +534,7 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
       << PrefixedLocation(pf.top_level_decls.front(), " at or near ")
       << " main job file " << ast.MainFile().Path().generic_string()
       << " has statements without parents: "
-      << DiagnosePrintedTokens(
-             pasta::PrintedTokenRange::Create(first_missing_stmt.value()));
+      << pasta::PrintedTokenRange::Create(first_missing_stmt.value()).Data();
 }
 
 }  // namespace indexer

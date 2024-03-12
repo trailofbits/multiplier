@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[786]) || tp >= &(gTypes[787])) {
+  if (tp < &(gTypes[787]) || tp >= &(gTypes[788])) {
     return std::nullopt;
   }
 
@@ -90,7 +90,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::NamespaceDecl::static_kind():
-      tp = &(gTypes[786]);
+      tp = &(gTypes[787]);
       break;
 
   }
@@ -155,13 +155,73 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "declarations_in_context",
+    "anonymous_namespace",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->declarations_in_context());
+          return ::mx::to_python(T_cast(self)->anonymous_namespace());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::NamespaceDecl::declarations_in_context"),
+    PyDoc_STR("Wrapper for mx::NamespaceDecl::anonymous_namespace"),
+    nullptr,
+  },
+  {
+    "original_namespace",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->original_namespace());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamespaceDecl::original_namespace"),
+    nullptr,
+  },
+  {
+    "r_brace_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->r_brace_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamespaceDecl::r_brace_token"),
+    nullptr,
+  },
+  {
+    "is_anonymous_namespace",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_anonymous_namespace());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamespaceDecl::is_anonymous_namespace"),
+    nullptr,
+  },
+  {
+    "is_inline",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_inline());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamespaceDecl::is_inline"),
+    nullptr,
+  },
+  {
+    "is_nested",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_nested());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamespaceDecl::is_nested"),
+    nullptr,
+  },
+  {
+    "is_original_namespace",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_original_namespace());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::NamespaceDecl::is_original_namespace"),
     nullptr,
   },
   {}  // Sentinel.
@@ -331,7 +391,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation, mx::ir::Operation>>(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::ir::Operation>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -399,7 +459,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[786]);
+  PyTypeObject * const tp = &(gTypes[787]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -414,12 +474,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[713].tp_hash;
-  tp->tp_richcompare = gTypes[713].tp_richcompare;
+  tp->tp_hash = gTypes[714].tp_hash;
+  tp->tp_richcompare = gTypes[714].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[713]);
+  tp->tp_base = &(gTypes[714]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

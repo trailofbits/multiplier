@@ -218,14 +218,20 @@ std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-gap::generator<Decl> LinkageSpecDecl::declarations_in_context(void) const & {
-  EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal50();
-  for (auto v : list) {
-    if (auto eptr = ep->DeclFor(ep, v)) {
-      co_yield std::move(eptr);
-    }
-  }
+Token LinkageSpecDecl::extern_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
+}
+
+LinkageSpecDeclLanguageIDs LinkageSpecDecl::language(void) const {
+  return static_cast<LinkageSpecDeclLanguageIDs>(impl->reader.getVal64());
+}
+
+Token LinkageSpecDecl::r_brace_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
+}
+
+bool LinkageSpecDecl::has_braces(void) const {
+  return impl->reader.getVal49();
 }
 
 #pragma GCC diagnostic pop

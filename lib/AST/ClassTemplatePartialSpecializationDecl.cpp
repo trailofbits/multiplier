@@ -233,7 +233,7 @@ Type ClassTemplatePartialSpecializationDecl::injected_specialization_type(void) 
 
 std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal356();
+    RawEntityId eid = impl->reader.getVal358();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -246,7 +246,7 @@ std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecia
 
 std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::instantiated_from_member_template(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal357();
+    RawEntityId eid = impl->reader.getVal359();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -258,12 +258,12 @@ std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecia
 }
 
 TemplateParameterList ClassTemplatePartialSpecializationDecl::template_parameters(void) const {
-  RawEntityId eid = impl->reader.getVal358();
+  RawEntityId eid = impl->reader.getVal360();
   return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
 bool ClassTemplatePartialSpecializationDecl::has_associated_constraints(void) const {
-  return impl->reader.getVal359();
+  return impl->reader.getVal361();
 }
 
 #pragma GCC diagnostic pop

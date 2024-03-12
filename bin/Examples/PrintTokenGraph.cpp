@@ -586,6 +586,22 @@ int main(int argc, char *argv[]) {
       bgcolor = " bgcolor=\"thistle3\"";
       kind_name = "DESIGNATOR";
 
+    } else if (context.as_cxx_base_specifier()) {
+      bgcolor = " bgcolor=\"darkslategray2\"";
+      kind_name = "CXX_BASE_SPECIFIER";
+
+    } else if (context.as_cxx_ctor_initializer()) {
+      bgcolor = " bgcolor=\"greenyellow\"";
+      kind_name = "CXX_CTOR_INITIALIZER";
+
+    } else if (context.as_template_argument()) {
+      bgcolor = " bgcolor=\"lemonchiffon2\"";
+      kind_name = "TEMPLATE_ARGUMENT";
+
+    } else if (context.as_template_parameter_list()) {
+      bgcolor = " bgcolor=\"mistyrose3\"";
+      kind_name = "TEMPLATE_PARAMETER_LIST";
+
     } else {
       assert(false);
     }

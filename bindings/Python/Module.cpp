@@ -655,6 +655,7 @@ static LoaderFunc * const gASTLoaders[] = {
   PythonBinding<mx::AttributeSyntax>::load,
   PythonBinding<mx::DeclCategory>::load,
   PythonBinding<mx::PseudoKind>::load,
+  PythonBinding<mx::CXXCtorInitializer>::load,
   PythonBinding<mx::Designator>::load,
   PythonBinding<mx::CXXBaseSpecifier>::load,
   PythonBinding<mx::TemplateParameterList>::load,

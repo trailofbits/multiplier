@@ -43,7 +43,7 @@ class EntityVisitor : protected pasta::DeclVisitor,
   bool EnterTemplateDecl(const pasta::TemplateDecl &decl);
 
  protected:
-  void VisitDeclContext(const pasta::DeclContext &dc);
+  virtual void VisitDeclContext(const pasta::DeclContext &dc);
   void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final;
   void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final;
   void VisitExternCContextDecl(const pasta::ExternCContextDecl &decl) final;

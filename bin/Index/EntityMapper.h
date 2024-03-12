@@ -6,8 +6,9 @@
 
 #pragma once
 
-#include "PendingFragment.h"
 #include "Entity.h"
+#include "PendingFragment.h"
+#include "Util.h"
 
 namespace pasta {
 class File;
@@ -81,12 +82,17 @@ class EntityMapper final {
   mx::RawEntityId ParentStmtId(const pasta::Designator &entity) const;
   mx::RawEntityId ParentStmtId(const pasta::TemplateArgument &entity) const;
 
+  inline mx::RawEntityId EntityId(std::nullptr_t entity) const noexcept {
+    return mx::kInvalidEntityId;
+  }
+
   mx::RawEntityId EntityId(const void *entity) const;
   mx::RawEntityId PerFragmentEntityId(const void *entity) const;
   mx::RawEntityId EntityId(const pasta::File &file) const;
   mx::RawEntityId EntityId(const pasta::Decl &entity) const;
   mx::RawEntityId EntityId(const pasta::Stmt &entity) const;
   mx::RawEntityId EntityId(const pasta::Token &entity) const;
+  mx::RawEntityId EntityId(const pasta::DerivedToken &entity) const;
   mx::RawEntityId EntityId(const pasta::PrintedToken &entity) const;
   mx::RawEntityId EntityId(const pasta::FileToken &entity) const;
   mx::RawEntityId EntityId(const pasta::MacroToken &entity);

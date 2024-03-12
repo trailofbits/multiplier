@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[556]) || tp >= &(gTypes[557])) {
+  if (tp < &(gTypes[557]) || tp >= &(gTypes[558])) {
     return std::nullopt;
   }
 
@@ -90,7 +90,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::GCCAsmStmt::static_kind():
-      tp = &(gTypes[556]);
+      tp = &(gTypes[557]);
       break;
 
   }
@@ -175,36 +175,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "num_clobber_string_literals",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_clobber_string_literals());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::num_clobber_string_literals"),
-    nullptr,
-  },
-  {
-    "clobber_string_literals",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->clobber_string_literals());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::clobber_string_literals"),
-    nullptr,
-  },
-  {
-    "output_names",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->output_names());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::output_names"),
-    nullptr,
-  },
-  {
     "num_output_constraint_literals",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -225,13 +195,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "input_names",
+    "output_names",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->input_names());
+          return ::mx::to_python(T_cast(self)->output_names());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::input_names"),
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::output_names"),
     nullptr,
   },
   {
@@ -252,6 +222,36 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::input_constraint_literals"),
+    nullptr,
+  },
+  {
+    "input_names",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->input_names());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::input_names"),
+    nullptr,
+  },
+  {
+    "num_clobber_string_literals",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_clobber_string_literals());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::num_clobber_string_literals"),
+    nullptr,
+  },
+  {
+    "clobber_string_literals",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->clobber_string_literals());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::clobber_string_literals"),
     nullptr,
   },
   {
@@ -451,7 +451,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation, mx::ir::Operation>>(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::ir::Operation>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -535,28 +535,6 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::nth_label"),
   },
   {
-    "nth_clobber_string_literal",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          T *obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<uint32_t>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->nth_clobber_string_literal(std::move(arg_0.value())));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'nth_clobber_string_literal'";
-          return nullptr;
-        }),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for mx::GCCAsmStmt::nth_clobber_string_literal"),
-  },
-  {
     "nth_output_constraint_literal",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
@@ -601,6 +579,28 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::nth_input_constraint_literal"),
   },
   {
+    "nth_clobber_string_literal",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          T *obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<uint32_t>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nth_clobber_string_literal(std::move(arg_0.value())));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nth_clobber_string_literal'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::GCCAsmStmt::nth_clobber_string_literal"),
+  },
+  {
     "nth_label_expression",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
@@ -629,7 +629,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[556]);
+  PyTypeObject * const tp = &(gTypes[557]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -644,12 +644,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[554].tp_hash;
-  tp->tp_richcompare = gTypes[554].tp_richcompare;
+  tp->tp_hash = gTypes[555].tp_hash;
+  tp->tp_richcompare = gTypes[555].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[554]);
+  tp->tp_base = &(gTypes[555]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

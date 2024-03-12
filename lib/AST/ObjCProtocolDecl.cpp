@@ -275,11 +275,11 @@ gap::generator<Token> ObjCProtocolDecl::protocol_tokens(void) const & {
 }
 
 unsigned ObjCProtocolDecl::num_protocols(void) const {
-  return impl->reader.getVal314().size();
+  return impl->reader.getVal316().size();
 }
 
 std::optional<ObjCProtocolDecl> ObjCProtocolDecl::nth_protocol(unsigned n) const {
-  auto list = impl->reader.getVal314();
+  auto list = impl->reader.getVal316();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -293,12 +293,12 @@ std::optional<ObjCProtocolDecl> ObjCProtocolDecl::nth_protocol(unsigned n) const
 }
 
 gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const & {
-  auto list = impl->reader.getVal314();
+  auto list = impl->reader.getVal316();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d314 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from_base(std::move(d314))) {
+    if (auto d316 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCProtocolDecl::from_base(std::move(d316))) {
         co_yield std::move(*e);
       }
     }

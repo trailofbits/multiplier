@@ -82,7 +82,7 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::COMMA: return "COMMA";
     case TokenKind::HASH: return "HASH";
     case TokenKind::HASH_HASH: return "HASH_HASH";
-    case TokenKind::HASHAT: return "HASHAT";
+    case TokenKind::HASH_AT: return "HASH_AT";
     case TokenKind::PERIOD_STAR: return "PERIOD_STAR";
     case TokenKind::ARROW_STAR: return "ARROW_STAR";
     case TokenKind::COLON_COLON: return "COLON_COLON";
@@ -446,6 +446,8 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::ANNOT_MODULE_END: return "ANNOT_MODULE_END";
     case TokenKind::ANNOT_HEADER_UNIT: return "ANNOT_HEADER_UNIT";
     case TokenKind::ANNOT_REPL_INPUT_END: return "ANNOT_REPL_INPUT_END";
+    case TokenKind::L_ANGLE: return "L_ANGLE";
+    case TokenKind::R_ANGLE: return "R_ANGLE";
     case TokenKind::PP_IF: return "PP_IF";
     case TokenKind::PP_IFDEF: return "PP_IFDEF";
     case TokenKind::PP_IFNDEF: return "PP_IFNDEF";

@@ -9,6 +9,7 @@
 #include <multiplier/AST/UsingDirectiveDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/NamedDecl.h>
+#include <multiplier/AST/NamespaceDecl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -227,13 +228,18 @@ Token UsingDirectiveDecl::namespace_key_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
-NamedDecl UsingDirectiveDecl::nominated_namespace_as_written(void) const {
+NamespaceDecl UsingDirectiveDecl::nominated_namespace(void) const {
   RawEntityId eid = impl->reader.getVal57();
+  return NamespaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
+}
+
+NamedDecl UsingDirectiveDecl::nominated_namespace_as_written(void) const {
+  RawEntityId eid = impl->reader.getVal65();
   return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token UsingDirectiveDecl::using_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal65());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 #pragma GCC diagnostic pop

@@ -40,14 +40,20 @@ namespace {
 
 class HashVisitor final : public pasta::DeclVisitor {
  public:
+  const void *parent_dc{nullptr};
+
   virtual ~HashVisitor(void) = default;
 
   explicit HashVisitor(std::stringstream &ss_)
       : ss(ss_) {}
 
   void VisitDeclContext(const pasta::DeclContext &dc) {
-    for (const pasta::Decl &decl : dc.AlreadyLoadedDeclarations()) {
-      Accept(decl);
+    PrevValueTracker<const void *> dc_guard(parent_dc, dc.RawDeclContext());
+
+    if (dc_guard) {
+      for (const pasta::Decl &decl : dc.AlreadyLoadedDeclarations()) {
+        Accept(decl);
+      }
     }
   }
 

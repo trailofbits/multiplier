@@ -7,6 +7,7 @@
 #include "Util.h"
 
 #include <glog/logging.h>
+#include <iostream>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
@@ -87,6 +88,26 @@ bool IsParsedToken(const pasta::Token &tok) {
   }
 }
 
+// Like `IsParsedToken`, but returns `false` for whitespace and comments that
+// were made visible to Clang's preprocessor.
+bool IsParsedTokenExcludingWhitespaceAndComments(const pasta::Token &tok) {
+  switch (tok.Role()) {
+    case pasta::TokenRole::kFileToken:
+    case pasta::TokenRole::kFinalMacroExpansionToken:
+      break;
+
+    default:
+      return false;
+  }
+
+  switch (tok.Kind()) {
+    case pasta::TokenKind::kComment:
+      return false;
+    default:
+      return !IsWhitespaceOrEmpty(tok.Data());
+  }
+}
+
 namespace {
 
 // Compute the last token of a macro.
@@ -148,13 +169,7 @@ std::optional<pasta::MacroToken> EndToken(const pasta::Macro &macro) {
 std::string DeclToString(const pasta::Decl &decl) {
   std::stringstream ss;
   for (pasta::PrintedToken ptok : pasta::PrintedTokenRange::Create(decl)) {
-    for (auto i = 0u, max_i = ptok.NumLeadingNewLines(); i < max_i; ++i) {
-      ss << '\n';
-    }
-    for (auto i = 0u, max_i = ptok.NumLeadingSpaces(); i < max_i; ++i) {
-      ss << ' ';
-    }
-    ss << ptok.Data();
+    ss << ' ' << ptok.Data();
   }
   return ss.str();
 }
@@ -169,7 +184,6 @@ std::string PrefixedName(const pasta::Decl &decl, const char *prefix) {
   }
   return "";
 }
-
 
 // Return the location of a declaration with a leading `prefix`, or nothing.
 std::string PrefixedLocation(const pasta::Decl &decl, const char *prefix) {
@@ -203,6 +217,16 @@ bool IsWhitespaceOrEmpty(std::string_view data) {
     }
   }
   return true;
+}
+
+mx::TokenKind TokenKindFromPasta(pasta::TokenKind kind, std::string_view data) {
+  auto mx_kind = mx::FromPasta(kind);
+  if (mx_kind == mx::TokenKind::UNKNOWN) {
+    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
+      return mx::TokenKind::WHITESPACE;
+    }
+  }
+  return mx_kind;
 }
 
 // Return the token kind.
@@ -317,14 +341,8 @@ mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity) {
     case pasta::ObjCKeywordKind::kAvailable:
       return mx::TokenKind::OBJC_AT_AVAILABLE;
   }
-  auto kind = mx::FromPasta(entity.Kind());
-  if (kind == mx::TokenKind::UNKNOWN) {
-    auto data = entity.Data();
-    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
-      return mx::TokenKind::WHITESPACE;
-    }
-  }
-  return kind;
+
+  return TokenKindFromPasta(entity.Kind(), entity.Data());
 }
 
 // Return the token kind.
@@ -333,38 +351,30 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
     default:
       break;
 
+    // This comes up with things like PASTA's token splitter, where it will
+    // inject tokens in an invalid role and potentially patch them into things
+    // like `mx::TokenKind::L_ANGLE`.
+    case pasta::TokenRole::kInvalid:
+
+    // Self-explanatory: begin and end files.
     case pasta::TokenRole::kBeginOfFileMarker:
     case pasta::TokenRole::kEndOfFileMarker:
+
+    // Self-explanatory: begin and end macros.
     case pasta::TokenRole::kBeginOfMacroExpansionMarker:
     case pasta::TokenRole::kEndOfMacroExpansionMarker:
-    case pasta::TokenRole::kEndOfInternalMacroEventMarker:
-      LOG(ERROR)
+
+    // Pragmas often need to be retained, so we have this explicit token.
+    // Besides pragmas, it's useful to know where all other directives are
+    // relative to parsed tokens, as this helps us extend the bounds of entities
+    // e.g. to handle Issue #457.
+    case pasta::TokenRole::kMacroDirectiveMarker:
+      LOG(FATAL)
           << "Should not be serializing marker tokens";
       return mx::TokenKind::UNKNOWN;
   }
 
-  // Try to get preprocessor kinds, if possible.
-  //
-  // NOTE(pag): File tokens show `IDENTIFIER` (due to `raw_identifier`) from
-  //            the raw lexer, whereas fragments do better.
-  if (auto ft = entity.FileLocation()) {
-    if (ft->PreProcessorKeywordKind() != pasta::PPKeywordKind::kNotKeyword ||
-        ft->ObjectiveCAtKeywordKind() != pasta::ObjCKeywordKind::kNotKeyword) {
-      if (auto ret = TokenKindFromPasta(ft.value());
-          ret != mx::TokenKind::IDENTIFIER) {
-        return ret;
-      }
-    }
-  }
-
-  auto kind = mx::FromPasta(entity.Kind());
-  if (kind == mx::TokenKind::UNKNOWN) {
-    auto data = entity.Data();
-    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
-      return mx::TokenKind::WHITESPACE;
-    }
-  }
-  return kind;
+  return TokenKindFromPasta(entity.Kind(), entity.Data());
 }
 
 namespace {
@@ -422,7 +432,26 @@ mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity) {
 
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::MacroToken &entity) {
-  return TokenKindFromPasta(entity.ParsedLocation());
+  auto dtok = entity.DerivedLocation();
+  if (std::holds_alternative<pasta::FileToken>(dtok)) {
+    const auto &ft = std::get<pasta::FileToken>(dtok);
+
+  // Try to get preprocessor kinds, if possible.
+  if (ft.PreProcessorKeywordKind() != pasta::PPKeywordKind::kNotKeyword ||
+      ft.ObjectiveCAtKeywordKind() != pasta::ObjCKeywordKind::kNotKeyword) {
+    return TokenKindFromPasta(ft);
+  }
+
+    return TokenKindFromPasta(std::get<pasta::FileToken>(dtok));
+  }
+  return TokenKindFromPasta(entity.TokenKind(), entity.Data());
+}
+
+pasta::DerivedToken DerivedLocation(const pasta::DerivedToken &tok) {
+  if (std::holds_alternative<pasta::MacroToken>(tok)) {
+    return std::get<pasta::MacroToken>(tok).DerivedLocation();
+  }
+  return std::monostate{};
 }
 
 namespace {
@@ -453,7 +482,7 @@ static bool ParamIsDefinition(clang::ParmVarDecl *decl) {
 
 // Returns `true` if `decl` is a definition.
 bool IsDefinition(const pasta::Decl &decl_) {
-  auto decl = const_cast<clang::Decl *>(decl_.RawDecl());
+  auto decl = const_cast<clang::Decl *>(decl_.RawDecl()->RemappedDecl);
 
   if (auto parm_decl = clang::dyn_cast<clang::ParmVarDecl>(decl)) {
     return ParamIsDefinition(parm_decl);
@@ -795,6 +824,14 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
     return true;
   }
 
+  // If, as a result of template specialization, we can tell that some template
+  // is kind of an "empty shell" for another declaration, then we want to
+  // hide this declaration and forward to the other one.
+  auto raw_decl = decl.RawDecl();
+  if (raw_decl->RemappedDecl != raw_decl) {
+    return true;
+  }
+
   switch (decl.Kind()) {
     case pasta::DeclKind::kFunction: {
       auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
@@ -888,6 +925,15 @@ template void AccumulateTokenData<pasta::Token>(
 template void AccumulateTokenData<pasta::PrintedToken>(
     std::string &data, const pasta::PrintedToken &tok);
 
+template void AccumulateTokenData<pasta::MacroToken>(
+    std::string &data, const pasta::MacroToken &tok);
+
+// Helpful function to be called from a debugger where a `std::ostream`
+// argument is needed.
+std::ostream &StdErr(void) {
+  return std::cerr;
+}
+
 // Combine all parsed tokens into a string for diagnostic purposes.
 std::string DiagnosePrintedTokens(
     const pasta::PrintedTokenRange &parsed_tokens) {
@@ -920,8 +966,20 @@ const void *RawEntity(const pasta::Token &entity) {
   return entity.RawToken();
 }
 
+const void *RawEntity(const pasta::PrintedToken &entity) {
+  return entity.RawToken();
+}
+
+const void *RawEntity(const pasta::File &entity) {
+  return entity.RawFile();
+}
+
 const void *RawEntity(const pasta::Decl &entity) {
-  return entity.RawDecl();
+  return entity.RawDecl()->RemappedDecl;
+}
+
+const void *RawEntity(const pasta::DeclContext &entity) {
+  return entity.RawDeclContext();
 }
 
 const void *RawEntity(const pasta::Stmt &entity) {
@@ -944,6 +1002,10 @@ const void *RawEntity(const pasta::CXXBaseSpecifier &entity) {
   return entity.RawCXXBaseSpecifier();
 }
 
+const void *RawEntity(const pasta::CXXCtorInitializer &entity) {
+  return entity.RawCXXCtorInitializer();
+}
+
 const void *RawEntity(const pasta::TemplateArgument &entity) {
   return entity.RawTemplateArgument();
 }
@@ -953,6 +1015,10 @@ const void *RawEntity(const pasta::TemplateParameterList &entity) {
 }
 
 const void *RawEntity(const TokenTree &entity) {
+  return entity.RawNode();
+}
+
+const void *RawEntity(const TokenTreeNode &entity) {
   return entity.RawNode();
 }
 

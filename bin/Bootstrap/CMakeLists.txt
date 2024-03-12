@@ -29,13 +29,18 @@ target_compile_features("mx-bootstrap"
 set_target_properties("mx-bootstrap"
   PROPERTIES
     LINKER_LANGUAGE
-      CXX)
+      CXX
+)
 
 # `mx-bootstrap` works by running PASTA on itself. To be successful at this, it
 # needs to know the actual include directories of Multiplier and its
 # dependencies. We pass those in at the first two arguments.
 set(install_include_dir "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}")
 list(GET LLVM_INCLUDE_DIRS 0 dependencies_include_dir)
+
+target_include_directories("mx-bootstrap" PUBLIC
+    ${LLVM_INCLUDE_DIRS}
+  )
 
 if(MX_BOOTSTRAP_PASTA)
   add_executable("mx-bootstrap-pasta"

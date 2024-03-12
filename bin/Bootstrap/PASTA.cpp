@@ -109,12 +109,13 @@ static const std::unordered_set<std::string> gAbstractTypes{
 
 static const std::unordered_set<std::string> gUnserializableTypes{
   // These are not contained in fragments.
-  "NamespaceDecl",
   "TranslationUnitDecl",
-  "ExternCContextDecl",
+};
 
-  // TODO(pag): If we add more fine-grained handling of these in PASTA then
-  //            maybe remove this.
+// These are replicated into fragments.
+static const std::unordered_set<std::string> gSpecialDeclContexts{
+  "NamespaceDecl",
+  "ExternCContextDecl",
   "LinkageSpecDecl",
 };
 
@@ -386,8 +387,7 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   // ordering the expansion tokens.
   {"Macro", "BeginToken"},
   {"Macro", "EndToken"},
-  {"MacroSubstitution", "CoveredStmt"},
-  {"MacroSubstitution", "CoveredDecl"},
+  {"MacroDirective", "ParsedLocation"},
 
   // We'll manually record these in the indexer.
   {"DefineMacroDirective", "Uses"},
@@ -691,9 +691,6 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "IsFirstDeclaration"},
   {"Decl", "IdentifierNamespace"},
 
-  // IsInterfaceLike may fail if CXXRecordDecl bases are in-complete. Add it
-  // to the blacklist function to avoid nullptr access during serialization.
-  {"CXXRecordDecl", "IsInterfaceLike"},
   {"MemberPointerType", "MostRecentCXXRecordDeclaration"},
   {"Expr", "Dependence"},
   {"Expr", "IsIntegerConstantExpression"},
@@ -1276,7 +1273,7 @@ void CodeGenerator::RunOnOptional(
              (method_name == "FirstFullySubstitutedToken" ||
               method_name == "LastFullySubstitutedToken")) {
     serialize_cpp_os
-        << "  std::optional<pasta::Token> v" << i << ";\n"
+        << "  std::optional<pasta::MacroToken> v" << i << ";\n"
         << "  if (tt) {\n"
         << "    v" << i << " = tt->" << method_name << "();\n"
         << "  } else {\n"
@@ -3658,7 +3655,8 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   // If this is a `DeclContext`, then try to add the `DeclarationsInContext`
   // method.
-  if (kDeclContextTypes.count(class_name)) {
+  if (kDeclContextTypes.count(class_name) &&
+      !gSpecialDeclContexts.count(class_name)) {
     static const std::string method_name = "DeclarationsInContext";
     static const std::string snake_name = "declarations_in_context";
     static const std::string api_name = SnakeCaseToAPICase(snake_name);

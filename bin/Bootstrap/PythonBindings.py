@@ -88,6 +88,7 @@ StmtId = int
 TypeId = int
 MacroId = int
 DesignatorId = int
+CXXCtorInitializer = int
 CXXBaseSpecifierId = int
 TemplateArgumentId = int
 TemplateParameterListId = int
@@ -1761,6 +1762,7 @@ ENTITY_KINDS: Tuple[str] = (
   "Attr",
   "Type",
   "Designator",
+  "CXXCtorInitializer",
   "CXXBaseSpecifier",
   "TemplateArgument",
   "TemplateParameterList",

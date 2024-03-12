@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class NamedDecl;
+class NamespaceDecl;
 class Stmt;
 class Token;
 class UsingDirectiveDecl;
@@ -67,6 +68,7 @@ class MX_EXPORT UsingDirectiveDecl : public NamedDecl {
 
   Token identifier_token(void) const;
   Token namespace_key_token(void) const;
+  NamespaceDecl nominated_namespace(void) const;
   NamedDecl nominated_namespace_as_written(void) const;
   Token using_token(void) const;
 };

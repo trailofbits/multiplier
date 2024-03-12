@@ -82,7 +82,7 @@ enum class TokenKind : unsigned short {
   COMMA,
   HASH,
   HASH_HASH,
-  HASHAT,
+  HASH_AT,
   PERIOD_STAR,
   ARROW_STAR,
   COLON_COLON,
@@ -446,6 +446,8 @@ enum class TokenKind : unsigned short {
   ANNOT_MODULE_END,
   ANNOT_HEADER_UNIT,
   ANNOT_REPL_INPUT_END,
+  L_ANGLE,
+  R_ANGLE,
   PP_IF,
   PP_IFDEF,
   PP_IFNDEF,
@@ -504,7 +506,7 @@ inline static const char *EnumerationName(TokenKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(TokenKind) {
-  return 483;
+  return 485;
 }
 
 MX_EXPORT const char *EnumeratorName(TokenKind);

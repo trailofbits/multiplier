@@ -102,13 +102,12 @@ void EntityVisitor::VisitClassTemplateDecl(
   EnterTemplateDecl(decl);
 }
 
-void EntityVisitor::VisitVarTemplateDecl(
-  const pasta::VarTemplateDecl &decl) {
+void EntityVisitor::VisitVarTemplateDecl(const pasta::VarTemplateDecl &decl) {
   EnterTemplateDecl(decl);
 }
 
 void EntityVisitor::VisitFunctionTemplateDecl(
-  const pasta::FunctionTemplateDecl &decl) {
+    const pasta::FunctionTemplateDecl &decl) {
   EnterTemplateDecl(decl);
 }
 
@@ -262,22 +261,20 @@ void EntityVisitor::VisitTypeAliasTemplateDecl(
 }
 
 void EntityVisitor::VisitTemplateTemplateParmDecl(
-  const pasta::TemplateTemplateParmDecl &decl) {
+    const pasta::TemplateTemplateParmDecl &decl) {
   EnterTemplateDecl(decl);
 }
 
 void EntityVisitor::VisitCXXDeductionGuideDecl(
-  const pasta::CXXDeductionGuideDecl &decl) {
+    const pasta::CXXDeductionGuideDecl &decl) {
   EnterFunctionDecl(decl);
 }
 
-void EntityVisitor::VisitTypeAliasDecl(
-  const pasta::TypeAliasDecl &decl) {
+void EntityVisitor::VisitTypeAliasDecl(const pasta::TypeAliasDecl &decl) {
   if (EnterDecl(decl)) {
     Accept(decl.UnderlyingType());
   }
 }
-
 
 void EntityVisitor::VisitDeclStmt(const pasta::DeclStmt &stmt) {
   if (EnterStmt(stmt)) {
@@ -546,12 +543,9 @@ void EntityVisitor::VisitDesignatedInitExpr(
 }
 
 void EntityVisitor::VisitMaterializeTemporaryExpr(
-  const pasta::MaterializeTemporaryExpr &expr) {
+    const pasta::MaterializeTemporaryExpr &expr) {}
 
-}
-
-void EntityVisitor::VisitExprWithCleanups(
-  const pasta::ExprWithCleanups &expr) {
+void EntityVisitor::VisitExprWithCleanups(const pasta::ExprWithCleanups &expr) {
   if(EnterStmt(expr)) {
     Accept(expr.SubExpression());
   }
@@ -647,14 +641,14 @@ void EntityVisitor::VisitFunctionProtoType(
 }
 
 void EntityVisitor::VisitArrayTypeTraitExpr(
-  const pasta::ArrayTypeTraitExpr &expr) {
+    const pasta::ArrayTypeTraitExpr &expr) {
   if (EnterStmt(expr)) {
     Accept(expr.DimensionExpression());
   }
 }
 
 void EntityVisitor::VisitCXXConstructExpr(
-  const pasta::CXXConstructExpr  &expr) {
+    const pasta::CXXConstructExpr  &expr) {
   if (EnterStmt(expr)) {
     for (auto &arg : expr.Arguments()) {
       Accept(arg);
@@ -663,7 +657,7 @@ void EntityVisitor::VisitCXXConstructExpr(
 }
 
 void EntityVisitor::VisitCXXTemporaryObjectExpr(
-  const pasta::CXXTemporaryObjectExpr &expr) {
+    const pasta::CXXTemporaryObjectExpr &expr) {
   if (EnterStmt(expr)) {
     for (auto &arg : expr.Arguments()) {
       Accept(arg);
@@ -672,7 +666,7 @@ void EntityVisitor::VisitCXXTemporaryObjectExpr(
 }
 
 void EntityVisitor::VisitCXXOperatorCallExpr(
-  const pasta::CXXOperatorCallExpr &expr) {
+    const pasta::CXXOperatorCallExpr &expr) {
   if (EnterStmt(expr)) {
     for (auto &arg : expr.Arguments()) {
       Accept(arg);

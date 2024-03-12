@@ -218,16 +218,6 @@ std::optional<ExternCContextDecl> ExternCContextDecl::from(const TokenContext &t
   return std::nullopt;
 }
 
-gap::generator<Decl> ExternCContextDecl::declarations_in_context(void) const & {
-  EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal50();
-  for (auto v : list) {
-    if (auto eptr = ep->DeclFor(ep, v)) {
-      co_yield std::move(eptr);
-    }
-  }
-}
-
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

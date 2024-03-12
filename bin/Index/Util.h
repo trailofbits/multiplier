@@ -10,6 +10,7 @@
 #include <capnp/message.h>
 #include <cstdint>
 #include <gap/core/generator.hpp>
+#include <iosfwd>
 #include <map>
 #include <multiplier/Iterator.h>
 #include <multiplier/Types.h>
@@ -24,7 +25,9 @@ namespace pasta {
 class AST;
 class Attr;
 class CXXBaseSpecifier;
+class CXXCtorInitializer;
 class Decl;
+class DeclContext;
 class Designator;
 class File;
 class FileToken;
@@ -38,6 +41,7 @@ class TemplateParameterList;
 class Token;
 class TokenContext;
 class Type;
+using DerivedToken = std::variant<std::monostate, pasta::MacroToken, pasta::FileToken>;
 enum class TemplateSpecializationKind : unsigned int;
 }  // namespace pasta
 namespace mx {
@@ -57,6 +61,7 @@ struct PseudoOffsetMap final : public std::unordered_map<const void *, uint32_t>
 struct EntityLocationMap final : public std::unordered_map<const void*, EntityLocation> {};
 class EntityMapper;
 class TokenTree;
+class TokenTreeNode;
 
 // Return `true` of `tok` is in the context of `decl`.
 bool TokenIsInContextOfDecl(const pasta::Token &tok, const pasta::Decl &decl);
@@ -69,6 +74,10 @@ std::optional<pasta::FileToken> AsTopLevelFileToken(const pasta::Token &tok);
 //
 // NOTE(pag): This logic is similarly reflected in `EntityLabeller::Label`.
 bool IsParsedToken(const pasta::Token &tok);
+
+// Like `IsParsedToken`, but returns `false` for whitespace and comments that
+// were made visible to Clang's preprocessor.
+bool IsParsedTokenExcludingWhitespaceAndComments(const pasta::Token &tok);
 
 // Compute the last token of a macro.
 std::optional<pasta::MacroToken> EndToken(const pasta::Macro &macro);
@@ -96,6 +105,10 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity);
 
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity);
+
+mx::TokenKind TokenKindFromPasta(pasta::TokenKind kind, std::string_view data);
+
+pasta::DerivedToken DerivedLocation(const pasta::DerivedToken &tok);
 
 // Returns `true` if `decl` is a definition.
 bool IsDefinition(const pasta::Decl &decl);
@@ -150,15 +163,25 @@ inline static bool ShouldHideFromIndexer(const T &) {
 // Return an opaque pointer to the underlying representation of a given entity.
 // This uniquely identifies the entity.
 const void *RawEntity(const pasta::Token &entity);
+const void *RawEntity(const pasta::PrintedToken &entity);
+const void *RawEntity(const pasta::File &entity);
 const void *RawEntity(const pasta::Decl &entity);
+const void *RawEntity(const pasta::DeclContext &entity);
 const void *RawEntity(const pasta::Stmt &entity);
 const void *RawEntity(const pasta::Attr &entity);
 const void *RawEntity(const pasta::Macro &entity);
 const void *RawEntity(const pasta::Designator &entity);
 const void *RawEntity(const pasta::CXXBaseSpecifier &entity);
+const void *RawEntity(const pasta::CXXCtorInitializer &entity);
 const void *RawEntity(const pasta::TemplateArgument &entity);
 const void *RawEntity(const pasta::TemplateParameterList &entity);
 const void *RawEntity(const TokenTree &entity);
+const void *RawEntity(const TokenTreeNode &entity);
+
+template <typename T>
+inline static const void *RawEntity(const std::optional<T> &entity) {
+  return entity ? RawEntity(entity.value()) : nullptr;
+}
 
 template <typename T>
 struct EntityBuilder {
@@ -174,6 +197,11 @@ std::string GetSerializedData(capnp::MessageBuilder &builder);
 template <typename Tok>
 void AccumulateTokenData(std::string &data, const Tok &tok);
 
+// Helpful function to be called from a debugger where a `std::ostream`
+// argument is needed.
+std::ostream &StdErr(void);
+
+// This is a helpful function to be called from a debugger.
 std::string DiagnosePrintedTokens(const pasta::PrintedTokenRange &);
 
 // Returns `c` if `c` isn't an alias, otherwise `c.Aliasee().value()`.
@@ -260,5 +288,27 @@ inline static gap::generator<Entity> Entities(
     co_yield std::move(entity);
   }
 }
+
+template <typename T>
+class PrevValueTracker {
+  T const prev_dc;
+  T &dc_ref;
+  const bool is_new;
+ public:
+  inline PrevValueTracker(T &dc_ref_, T new_dc)
+      : prev_dc(dc_ref_),
+        dc_ref(dc_ref_),
+        is_new(prev_dc != new_dc) {
+    dc_ref = new_dc;
+  }
+
+  inline operator bool(void) const noexcept {
+    return is_new;
+  }
+
+  inline ~PrevValueTracker(void) {
+    dc_ref = prev_dc;
+  }
+};
 
 }  // namespace indexer
