@@ -545,7 +545,7 @@ static void PersistTokenTree(
       LOG(FATAL)
           << "Missing parsed token for token node in source file "
           << MainSourceFile(pf) << " with parsed tokens "
-          << DiagnosePrintedTokens(pf.parsed_tokens);
+          << pf.parsed_tokens.Data();
     }
   }
 
@@ -647,7 +647,7 @@ static void PersistTokenTree(
           << "' at index " << i << " (PTI " << parsed_tok.Index()
           << ") in parsed token list from source file "
           << MainSourceFile(pf) << " with parsed tokens "
-          << DiagnosePrintedTokens(pf.parsed_tokens);
+          << pf.parsed_tokens.Data();
     }
     ++i;
   }

@@ -10,6 +10,7 @@
 #include <capnp/message.h>
 #include <cstdint>
 #include <gap/core/generator.hpp>
+#include <iosfwd>
 #include <map>
 #include <multiplier/Iterator.h>
 #include <multiplier/Types.h>
@@ -196,6 +197,11 @@ std::string GetSerializedData(capnp::MessageBuilder &builder);
 template <typename Tok>
 void AccumulateTokenData(std::string &data, const Tok &tok);
 
+// Helpful function to be called from a debugger where a `std::ostream`
+// argument is needed.
+std::ostream &StdErr(void);
+
+// This is a helpful function to be called from a debugger.
 std::string DiagnosePrintedTokens(const pasta::PrintedTokenRange &);
 
 // Returns `c` if `c` isn't an alias, otherwise `c.Aliasee().value()`.

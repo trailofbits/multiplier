@@ -122,14 +122,28 @@ class ParentTrackerVisitor : public EntityVisitor {
         return false;
       }
 
-      assert(mx::EntityId(parent_decl_id).Extract<mx::DeclId>());
+      auto parent_eid = mx::EntityId(parent_decl_id).Extract<mx::DeclId>();
+      if (!parent_eid) {
+        assert(false);
+        return false;
+      }
+
       em.parent_decl_ids.emplace(entity, parent_decl_id);
       em.parent_decls.emplace(entity, parent_decl);
     }
 
     if (parent_stmt_id != mx::kInvalidEntityId && parent_stmt) {
-      assert(entity != parent_stmt);
-      assert(mx::EntityId(parent_stmt_id).Extract<mx::StmtId>());
+      if (entity == parent_stmt) {
+        assert(false);
+        return false;
+      }
+
+      auto parent_eid = mx::EntityId(parent_stmt_id).Extract<mx::StmtId>();
+      if (!parent_eid) {
+        assert(false);
+        return false;
+      }
+
       em.parent_stmt_ids.emplace(entity, parent_stmt_id);
       em.parent_stmts.emplace(entity, parent_stmt);
     }
@@ -162,8 +176,8 @@ class ParentTrackerVisitor : public EntityVisitor {
     // Handle the serializable decl context differently
     auto eid = em.SpecificEntityId<mx::DeclId>(entity);
     if (!eid) {
-      // TODO(kumarak): I see an unlinked instance of TemplateTypeParmDecl that is 
-      //                not available in AST. Adding check to avoid assert
+      // TODO(kumarak): I see an unlinked instance of TemplateTypeParmDecl that
+      //                is not available in AST. Adding check to avoid assert
       assert((false
               || entity.Kind() == pasta::DeclKind::kTemplateTypeParm
               || entity.Kind() == pasta::DeclKind::kNonTypeTemplateParm
@@ -171,16 +185,9 @@ class ParentTrackerVisitor : public EntityVisitor {
       return;
     }
 
-    // This entity doesn't belong in this code chunk. Not sure if/when this will
-    // happen.
-    //
-    // TODO(pag): Assert as a signal to find when it happens?
-    // Putting assert here will always be triggered for templates specialization if
-    // we add all template and its specialization node as top-level decls in fragments.
-    // Adding them as TLD may make it reachable from two fragments cause the fragment ids
-    // to mismatch.
+    // This entity doesn't belong in this code chunk. This happens when crossing
+    // fragments due to template specializations.
     if (eid->fragment_id != fragment.fragment_index) {
-      // assert(false);
       return;
     }
 
@@ -200,9 +207,8 @@ class ParentTrackerVisitor : public EntityVisitor {
       // TODO(kumarak): Log error instead of assert. See the assert
       //                while visiting dependent types.
       LOG(ERROR)
-        << "Fragment has statment missing from Entity Mapper: "
-        << DiagnosePrintedTokens(
-              pasta::PrintedTokenRange::Create(entity));
+          << "Fragment has statment missing from Entity Mapper: "
+          << pasta::PrintedTokenRange::Create(entity).Data();
       //assert(false);
       return;
     }
@@ -528,8 +534,7 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
       << PrefixedLocation(pf.top_level_decls.front(), " at or near ")
       << " main job file " << ast.MainFile().Path().generic_string()
       << " has statements without parents: "
-      << DiagnosePrintedTokens(
-             pasta::PrintedTokenRange::Create(first_missing_stmt.value()));
+      << pasta::PrintedTokenRange::Create(first_missing_stmt.value()).Data();
 }
 
 }  // namespace indexer

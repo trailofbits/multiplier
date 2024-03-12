@@ -41355,7 +41355,7 @@ class CoroutineBodyStmt(multiplier.ast.Stmt):
   parameter_moves: Generator[multiplier.ast.Stmt]
   promise_declaration: multiplier.ast.VarDecl
   promise_declaration_statement: multiplier.ast.Stmt
-  result_declaration: multiplier.ast.Stmt
+  result_declaration: Optional[multiplier.ast.Stmt]
   return_statement: multiplier.ast.Stmt
   return_statement_on_alloc_failure: multiplier.ast.Stmt
   return_value: multiplier.ast.Expr

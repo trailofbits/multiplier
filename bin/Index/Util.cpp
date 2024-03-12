@@ -7,6 +7,7 @@
 #include "Util.h"
 
 #include <glog/logging.h>
+#include <iostream>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
@@ -926,6 +927,12 @@ template void AccumulateTokenData<pasta::PrintedToken>(
 
 template void AccumulateTokenData<pasta::MacroToken>(
     std::string &data, const pasta::MacroToken &tok);
+
+// Helpful function to be called from a debugger where a `std::ostream`
+// argument is needed.
+std::ostream &StdErr(void) {
+  return std::cerr;
+}
 
 // Combine all parsed tokens into a string for diagnostic purposes.
 std::string DiagnosePrintedTokens(
