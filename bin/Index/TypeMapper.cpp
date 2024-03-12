@@ -183,13 +183,9 @@ clang::Type *BasicTypeDeduplication(
       break;
   }
 
-  if (is_dependent) {
+  if (!new_type || is_dependent) {
     up_quals = orig_qualifier;
     return const_cast<clang::Type *>(ctx.UnresolvedTy.getTypePtr());
-  }
-
-  if (!new_type) {
-    new_type = type;
   }
 
   return new_type;
@@ -218,7 +214,7 @@ bool TypePrintingPolicy::ShouldPrintOriginalTypeOfDecayedType(void) const {
 clang::QualType TypeMapper::Compress(clang::ASTContext &context,
                                      const clang::QualType &type) {
   uint32_t qualifiers = 0u;
-  clang::Type *type_ptr = BasicTypeDeduplication(context, type, qualifiers, nullptr);
+  clang::Type *type_ptr = BasicTypeDeduplication(context, type, qualifiers);
   clang::QualType fast_qtype(type_ptr, qualifiers & clang::Qualifiers::FastMask);
   return context.getQualifiedType(
       fast_qtype, clang::Qualifiers::fromOpaqueValue(qualifiers));
@@ -332,7 +328,8 @@ std::string TypeMapper::HashType(
 mx::RawEntityId TypeMapper::EntityId(const void *raw_type_,
                                      uint32_t raw_qualifiers) const {
 
-  clang::Type *raw_type = BasicTypeDeduplication(ast.UnderlyingAST(),
+  clang::Type *raw_type = BasicTypeDeduplication(
+      ast.UnderlyingAST(),
       reinterpret_cast<clang::Type *>(const_cast<void *>(raw_type_)),
       raw_qualifiers);
 
@@ -346,8 +343,9 @@ mx::RawEntityId TypeMapper::EntityId(const void *raw_type_,
 
 mx::RawEntityId TypeMapper::EntityId(const pasta::Type &entity) const {
   uint32_t raw_qualifiers = entity.RawQualifiers();
-  clang::Type *raw_type = BasicTypeDeduplication(ast.UnderlyingAST(),
-      const_cast<clang::Type *>(entity.RawType()), raw_qualifiers);
+  clang::Type *raw_type = BasicTypeDeduplication(
+      ast.UnderlyingAST(), const_cast<clang::Type *>(entity.RawType()),
+      raw_qualifiers);
 
   TypeKey type_key(raw_type, raw_qualifiers);
   if (auto it = type_ids.find(type_key); it != type_ids.end()) {
