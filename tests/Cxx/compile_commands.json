@@ -78,5 +78,15 @@
     "file": "FriendFunctionDecl2.cpp",
     "command": "/usr/bin/c++ FriendFunctionDecl2.cpp",
     "directory": ""
+},
+{
+    "file": "NestedTemplate.cpp",
+    "command": "/usr/bin/c++ NestedTemplate.cpp",
+    "directory": ""
+},
+{
+    "file": "PartialOrdering.cpp",
+    "command": "/usr/bin/c++ PartialOrdering.cpp",
+    "directory": ""
 }
 ]

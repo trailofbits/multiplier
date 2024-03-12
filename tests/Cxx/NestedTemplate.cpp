@@ -1,5 +1,5 @@
 // Nested templates
-
+namespace NestedTemplate {
 class A;
 
 class S {
@@ -117,8 +117,6 @@ template<typename T, int Value>
 
 X2<int>::Inner<X2_arg> x2i1;
 X2<float> x2a;
-X2<long>::Inner<X2_arg> x2i3;
-
 
 class Outer1 {
     template <typename T> struct X;
@@ -130,4 +128,4 @@ namespace _2 {
   int arr[10];
   void g() { A<k>().f(arr); }
 }
-
+} // namespace NestedTemplate
