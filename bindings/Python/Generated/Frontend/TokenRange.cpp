@@ -362,13 +362,12 @@ PyTypeObject *InitType(void) noexcept {
     }
 
     while (num_args == 1) {
-      auto obj_0 = PySequence_GetItem(args, 0);
+      SharedPyPtr obj_0(PySequence_GetItem(args, 0));
       PyErr_Clear();
       if (!obj_0) {
         break;
       }
-      auto arg_0 = ::mx::from_python<mx::Token>(obj_0);
-      Py_DECREF(obj_0);
+      auto arg_0 = ::mx::from_python<mx::Token>(obj_0.Get());
       if (!arg_0.has_value()) {
         break;
       }
