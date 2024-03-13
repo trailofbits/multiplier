@@ -137,7 +137,7 @@ PyTypeObject *InitType(void) noexcept {
 
     auto obj = O_cast(self);
     obj->data = new (obj->backing_storage) T;
-    
+
     return 0;
   };
   tp->tp_alloc = PyType_GenericAlloc;

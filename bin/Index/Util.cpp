@@ -609,14 +609,21 @@ bool IsOutOfLine(const pasta::Decl &decl) {
     return false;
   }
 
-  switch(decl.Kind()) {
-    case pasta::DeclKind::kCXXRecord:
-    case pasta::DeclKind::kCXXMethod:
-    case pasta::DeclKind::kVar:
-    case pasta::DeclKind::kFunctionTemplate:
+  switch (decl.Kind()) {
     case pasta::DeclKind::kClassTemplate:
     case pasta::DeclKind::kClassTemplateSpecialization:
-    case pasta::DeclKind::kClassTemplatePartialSpecialization: {
+    case pasta::DeclKind::kClassTemplatePartialSpecialization:
+    case pasta::DeclKind::kCXXRecord:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod:
+    case pasta::DeclKind::kFunction:
+    case pasta::DeclKind::kFunctionTemplate:
+    case pasta::DeclKind::kVar:
+    case pasta::DeclKind::kVarTemplate:
+    case pasta::DeclKind::kVarTemplateSpecialization:
+    case pasta::DeclKind::kVarTemplatePartialSpecialization:  {
       return IsLexicallyOutOfLine(decl, dc.value());
     }
     default:
@@ -638,6 +645,45 @@ bool ShouldSerializeDeclContext(const pasta::Decl &decl) {
   return false;
 }
 
+// This this decl a specialization of a template? If so, then we will want
+// to render the printed tokens of the specialization into the fragment, rather
+// than the parsed tokens.
+bool IsTemplateSpecialication(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    // Treat templates kind of like specializations if they exist inside of
+    // another specialization. This is because they may actually use the outer
+    // template arguments/parameters.
+    case pasta::DeclKind::kVarTemplate:
+    case pasta::DeclKind::kClassTemplate:
+    case pasta::DeclKind::kFunctionTemplate:
+    case pasta::DeclKind::kFriendTemplate:
+    case pasta::DeclKind::kVarTemplatePartialSpecialization:
+    case pasta::DeclKind::kClassTemplatePartialSpecialization:
+      if (auto dc = decl.DeclarationContext()) {
+        if (auto dc_decl = pasta::Decl::From(dc.value())) {
+          return IsTemplateSpecialication(dc_decl.value());
+        }
+      }
+      return false;
+
+    case pasta::DeclKind::kVarTemplateSpecialization:
+    case pasta::DeclKind::kClassTemplateSpecialization:
+      return true;
+
+    case pasta::DeclKind::kFunction:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod: {
+      auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
+      return func.TemplateSpecializationKind() !=
+             pasta::TemplateSpecializationKind::kUndeclared;
+    }
+    default:
+      return false;
+  }
+}
+
 // Determines whether or not a TLD is likely to have to go into a child
 // fragment. This happens when the TLD is a forward declaration, e.g. of a
 // struct.
@@ -645,19 +691,23 @@ bool ShouldSerializeDeclContext(const pasta::Decl &decl) {
 // TODO(pag): Thing about forward declarations in template parameter lists.
 bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
   switch (decl.Kind()) {
-    // The class template specialization should be made as root fragment
-    // and not as the nested fragment. We are dealing here with only
-    // variable template specialization.
-    case pasta::DeclKind::kVarTemplateSpecialization: {
-      // The variable template specialization should be nested if lexically 
-      // it is class scoped.
-      if (auto vsd = pasta::VarTemplateSpecializationDecl::From(decl)) {
-        if (auto lc = vsd->LexicalDeclarationContext()) {
-          return lc->IsRecord();
-        }
+    case pasta::DeclKind::kFriendTemplate:
+    // TODO(pag): FriendDecl for FriendTemplateDecl.
+      return true;
+
+    case pasta::DeclKind::kClassTemplate:
+    case pasta::DeclKind::kClassTemplatePartialSpecialization:
+    case pasta::DeclKind::kFunctionTemplate:
+    case pasta::DeclKind::kVarTemplate:
+    case pasta::DeclKind::kVarTemplatePartialSpecialization:
+      if (auto lc = decl.LexicalDeclarationContext()) {
+        return lc->IsRecord();
       }
-      return false;
-    }
+      return true;  // Safe backup.
+
+    case pasta::DeclKind::kVarTemplateSpecialization:
+    case pasta::DeclKind::kClassTemplateSpecialization:
+      return true;
 
     case pasta::DeclKind::kVar: {
       if (auto lc = decl.LexicalDeclarationContext()) {
@@ -667,44 +717,20 @@ bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
     }
 
     // TODO(pag): This might not be the right type of check.
-    case pasta::DeclKind::kFunction: {
-      auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
-      if (func.TemplateSpecializationKind() !=
-          pasta::TemplateSpecializationKind::kUndeclared) {
-        return !IsExplicitSpecialization(func.TemplateSpecializationKind());
-      }
-      return false;
-    }
-
-    case pasta::DeclKind::kClassTemplate: {
-      if (decl.DeclarationContext() &&
-          decl.DeclarationContext()->IsRecord() &&
-          !IsOutOfLine(decl)) {
-        return true;
-      }
-      return false;
-    }
-
-    case pasta::DeclKind::kFunctionTemplate: {
-      auto ft = reinterpret_cast<const pasta::FunctionTemplateDecl &>(decl);
-      if (auto method = pasta::CXXMethodDecl::From(ft.TemplatedDeclaration())) {
-        if (method->IsThisDeclarationADefinition()) {
-          return !method->IsOutOfLine();
-        }
-        return true;
-      }
-      return false;
-    }
-
-
+    case pasta::DeclKind::kFunction:
     case pasta::DeclKind::kCXXConversion:
     case pasta::DeclKind::kCXXConstructor:
     case pasta::DeclKind::kCXXDestructor:
     case pasta::DeclKind::kCXXMethod: {
       auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
-      return !func.IsOutOfLine();
+      if (func.TemplateSpecializationKind() !=
+          pasta::TemplateSpecializationKind::kUndeclared) {
+        return true;
+      }
+
+      return false;
     }
-    // TODO(pag): FriendDecl for FriendTemplateDecl.
+
     default:
       return false;
   }
@@ -750,48 +776,6 @@ bool ShouldGoInFloatingFragment(const pasta::Macro &macro) {
     default:
       return true;
   }
-}
-
-bool ShouldGoInFloatingFragment(const pasta::Decl &decl) {
-  switch (decl.Kind()) {
-    case pasta::DeclKind::kVarTemplateSpecialization: {
-      // The variable template specialization that is not in the lexical
-      // context of record should be in floating fragment
-      if (auto vsd = pasta::VarTemplateSpecializationDecl::From(decl)) {
-        if (auto lc = vsd->LexicalDeclarationContext()) {
-          return !lc->IsRecord();
-        }
-      }
-      return false;
-    }
-    case pasta::DeclKind::kClassTemplateSpecialization: {
-      if (auto csd = pasta::ClassTemplateSpecializationDecl::From(decl)) {
-        if (auto lc = csd->LexicalDeclarationContext()) {
-          return !lc->IsRecord();
-        }
-      }
-      return false;
-    }
-    case pasta::DeclKind::kClassTemplate: {
-      return true;
-    }
-    case pasta::DeclKind::kFunction:
-    case pasta::DeclKind::kCXXConversion:
-    case pasta::DeclKind::kCXXConstructor:
-    case pasta::DeclKind::kCXXDestructor:
-    case pasta::DeclKind::kCXXMethod: {
-      auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
-      if (func.TemplateSpecializationKind() !=
-          pasta::TemplateSpecializationKind::kUndeclared) {
-        return !IsExplicitSpecialization(func.TemplateSpecializationKind());
-      }
-      break;
-    }
-    default:
-      break;
-  }
-
-  return false;
 }
 
 // Returns `true` if a macro is visible across fragments, and should have an

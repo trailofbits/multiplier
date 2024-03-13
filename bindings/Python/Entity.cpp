@@ -113,7 +113,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_CONVERT_TO_PYTHON,
                             MX_CONVERT_TO_PYTHON,
                             MX_CONVERT_TO_PYTHON)
 #undef MX_CONVERT_TO_PYTHON
-  
+
   Py_RETURN_NONE;
 }
 

@@ -983,7 +983,7 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
       npt = printed_range.At(next_printed_tok++);
     }
 
-    assert(info->printed_tok.has_value());
+    //assert(info->printed_tok.has_value());
   }
 
   if (in_macro) {

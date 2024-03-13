@@ -128,6 +128,11 @@ bool IsOutOfLine(const pasta::Decl &decl);
 // fragment
 bool ShouldSerializeDeclContext(const pasta::Decl &decl);
 
+// This this decl a specialization of a template? If so, then we will want
+// to render the printed tokens of the specialization into the fragment, rather
+// than the parsed tokens.
+bool IsTemplateSpecialication(const pasta::Decl &decl);
+
 // Determines whether or not a TLD is likely to have to go into a child
 // fragment. This happens when the TLD is a forward declaration, e.g. of a
 // struct.
@@ -136,10 +141,6 @@ bool ShouldGoInNestedFragment(const pasta::Decl &decl);
 // Determines whether or not a TLM is likely to have to go into a floating
 // fragment. This generally happens when a TLM is a directive.
 bool ShouldGoInFloatingFragment(const pasta::Macro &macro);
-
-// Determines whether or not a TLD is likely to have to go into a floating
-// fragment. This generally happens if a TLD is template or its explict specialization
-bool ShouldGoInFloatingFragment(const pasta::Decl &decl);
 
 // Returns `true` if a macro is visible across fragments, and should have an
 // entity id stored in the global mapper.

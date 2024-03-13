@@ -1308,7 +1308,7 @@ def wrap_class(schema: ClassSchema,
   py_base_class = "object"
 
   is_entity_type = _has_id_method(schema)
-  
+
   if schema.bases:
     assert len(schema.bases) == 1
     base_schema = schema.bases[0]
@@ -1364,7 +1364,7 @@ def wrap_class(schema: ClassSchema,
   out.append(PYTHON_BINDING_FROM_PYTHON.format(
       type_offset=type_offsets[0],
       type_offset_upper_bound=type_offsets[1]))
-  
+
   # Figure out if this class can use kind-based dispatch.
   kind_method = _get_method(schema, "kind")
   if isinstance(kind_method, MethodSchema) and \
@@ -1390,7 +1390,7 @@ def wrap_class(schema: ClassSchema,
        not method.is_const or \
        0 < method.max_num_parameters:
        continue
-    
+
     # Output the properties. Skip `id` if this is an entity.    
     if not is_entity_type or method.name != "id":
       stubs_out.append(CLASS_PROPERTY_STUB.format(
@@ -1398,7 +1398,7 @@ def wrap_class(schema: ClassSchema,
           method.return_type.python_value_name))
 
     _wrap_property(schema, method, renamer, out)
-  
+
   out.append(PROPERTY_LIST_SUFFIX)
 
   # Add in the methods.
@@ -1726,13 +1726,13 @@ def wrap(schemas: Iterable[Schema], renamer: Renamer):
     if line not in seen_bindings:
       bindings_out.append(line)
       seen_bindings.add(line)
-  
+
   for schema in TO_EXPORTS:
     line = TEMPLATE_SPEC_TO_PYTHON.format(schema.cxx_value_name)
     if line not in seen_bindings:
       bindings_out.append(line)
       seen_bindings.add(line)
-  
+
   bindings_out.append(BINDING_CPP_FOOTER)
   _save_output_file(os.path.join(MX_BINDINGS_PYTHON_DIR, "Generated", "Bindings.cpp"), bindings_out)
 
@@ -1822,7 +1822,7 @@ if __name__ == "__main__":
   renamer = BasicRenamer()
   cmd = CompileCommand.create_from_arguments(argv, args.working_dir)
   maybe_jobs = cxx.create_jobs_for_command(cmd)
-  
+
   if isinstance(maybe_jobs, str):
     print(maybe_jobs)
     sys.exit(1)

@@ -43,7 +43,7 @@ target_compile_definitions("mx-python"
 )
 
 set(site_packages_dir "python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages")
-  
+
 set_target_properties("mx-python"
   PROPERTIES
     LINKER_LANGUAGE

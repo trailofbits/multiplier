@@ -73,7 +73,7 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   // Tracks declarations for which we've seen the specializations. This is
   // to prevent us from double-adding specializations.
-  std::unordered_set<const void *> seen_specs;
+  std::unordered_set<const void *> seen;
 
   // Depth of a decl context.
   std::unordered_map<const void *, unsigned> dc_depth;
@@ -86,6 +86,14 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   unsigned depth{0u};
 
+  void AddDeclAlways(const pasta::Decl &decl) {
+    if (IsProbablyABuiltinDecl(decl)) {
+      tlds.emplace_back(decl, builtin_order++);
+    } else {
+      tlds.emplace_back(decl, order++);
+    }
+  }
+
   // Clang will invent some builtins just-in-time, and "just-in-time" ends up
   // appearing logically after they're needed. E.g. when declaring
   // `operator new`, Clang will invent the `std` namespace, and then invent
@@ -93,10 +101,8 @@ class TLDFinder final : public pasta::DeclVisitor {
   // appear *after* any uses of these things in the translation unit. So we
   // need to arrange for them to be in the right order.
   void AddDecl(const pasta::Decl &decl) {
-    if (IsProbablyABuiltinDecl(decl)) {
-      tlds.emplace_back(decl, builtin_order++);
-    } else {
-      tlds.emplace_back(decl, order++);
+    if (seen.emplace(RawEntity(decl)).second) {
+      AddDeclAlways(decl);
     }
   }
 
@@ -209,8 +215,8 @@ class TLDFinder final : public pasta::DeclVisitor {
 
     VisitDeeperDeclContext(decl);
 
-    if(IsExplicitSpecialization(decl.TemplateSpecializationKind()) &&
-       !decl.IsCanonicalDeclaration()) {
+    if (IsExplicitSpecialization(decl.TemplateSpecializationKind()) &&
+        !decl.IsCanonicalDeclaration()) {
       Accept(decl.CanonicalDeclaration());
     }
     AddDecl(decl);
@@ -222,13 +228,14 @@ class TLDFinder final : public pasta::DeclVisitor {
   // }
 
   void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &decl) final {
-    // Note: The canonical declaration of specialization always points to the base
-    //       decl. Disable it temporarily.
-    // TODO(kumarak) : Discuss with pag before finalizing the change. Should we check for
-    //                 canonical declaration to avoid redeclaration getting into a fragment?
-    //                 The missing redeclaration fragment causes assert during reference
-    //                 lookup in mx-api.
-    if (!seen_specs.emplace(RawEntity(decl)).second) {
+    // Note: The canonical declaration of specialization always points to the
+    //       base decl. Disable it temporarily.
+    //
+    // TODO(kumarak): Discuss with pag before finalizing the change. Should we
+    //                check for canonical declaration to avoid redeclaration
+    //                getting into a fragment? The missing redeclaration
+    //                fragment causes assert during reference lookup in mx-api.
+    if (!seen.emplace(RawEntity(decl)).second) {
       return;
     }
 
@@ -237,14 +244,21 @@ class TLDFinder final : public pasta::DeclVisitor {
 
       // We should observe the explicit specializations and instantiations
       // separately.
-      if(IsExplicitSpecialization(spec.TemplateSpecializationKind())) {
+      if (IsExplicitSpecialization(spec.TemplateSpecializationKind())) {
         continue;
       }
       Accept(spec);
     }
 
-    VisitDeeperDeclContext(decl.TemplatedDeclaration());
-    AddDecl(decl);
+    // We want to visit the stuff in the pattern, but not add the pattern as a
+    // top-level declaration. Also, clang tends to inject a class into itself
+    // that our patched remap back to the class, so we want to prevent that from
+    // being observed as a top-levelable thing.
+    auto pattern = decl.TemplatedDeclaration();
+    seen.insert(RawEntity(pattern));
+
+    VisitDeeperDeclContext(pattern);
+    AddDeclAlways(decl);
   }
 
   void VisitVarTemplateDecl(const pasta::VarTemplateDecl &decl) final {
@@ -264,8 +278,12 @@ class TLDFinder final : public pasta::DeclVisitor {
     AddDecl(decl);
   }
 
+  void VisitFriendTemplateDecl(const pasta::FriendTemplateDecl &decl) final {
+    AddDecl(decl);
+  }
+
   void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) final {
-    if (!seen_specs.emplace(RawEntity(decl)).second) {
+    if (!seen.emplace(RawEntity(decl)).second) {
       return;
     }
 
@@ -273,13 +291,15 @@ class TLDFinder final : public pasta::DeclVisitor {
 
       // We should observe the explicit specializations and instantiations
       // separately.
+      //
       // Note: In case of function template, an implicit specialization may
       //       appear out-of-line and a friend of class template. In that case
-      //       the same node will be rechable from the class template specialization
-      //       decl as well. The check for out-of-line instantiation avoid adding
-      //       them immediately to the node and handle when it appears next.
-      if(IsExplicitSpecialization(spec.TemplateSpecializationKind())
-        || spec.IsOutOfLine()) {
+      //       the same node will be rechable from the class template
+      //       specialization decl as well. The check for out-of-line
+      //       instantiation avoid adding them immediately to the node and
+      //       handle when it appears next.
+      if (IsExplicitSpecialization(spec.TemplateSpecializationKind()) ||
+          spec.IsOutOfLine()) {
         continue;
       }
 
@@ -302,7 +322,8 @@ class TLDFinder final : public pasta::DeclVisitor {
     if (auto lc = decl.LexicalDeclarationContext(); lc && lc->IsRecord()) {
       return;
     }
-    VisitDecl(decl);
+
+    AddDeclAlways(decl);
   }
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
@@ -343,8 +364,8 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   void VisitCXXMethodDecl(const pasta::CXXMethodDecl &decl) final {
 
-    // If the CXXMethodDecl is implicit, don't need to visit
-    // the declaration; return early.
+    // If the CXXMethodDecl is implicit, don't need to visit the declaration;
+    // return early.
     if (decl.IsImplicit()) {
       return;
     }
@@ -389,6 +410,7 @@ class TLDFinder final : public pasta::DeclVisitor {
     // Check if we found something that is semantically at the top level.
     } else if (auto sema_dc = decl.DeclarationContext()) {
       if (!dc_depth[RawEntity(sema_dc.value())]) {
+        assert(!decl.LexicalDeclarationContext()->IsRecord());
         AddDecl(decl);
       }
     }
@@ -1831,6 +1853,17 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
   // for each of the parsed tokens.
   auto err = pasta::PrintedTokenRange::Align(parsed_tokens, printed_tokens);
 
+  // If any of the decls to be printed are actually specializations, then we
+  // don't want to return the parsed tokens, as those will likely represent
+  // things like 
+  for (const auto &decl : decls_to_print) {
+    if (IsTemplateSpecialication(decl)) {
+      parsed_tokens = pasta::PrintedTokenRange::AdoptWhitespace(
+          printed_tokens, parsed_tokens);
+      break;
+    }
+  }
+
   // It's not fatal if we can't match them here, because this is really a
   // kind of implicit fragment anyway.
   LOG_IF(ERROR, err.has_value())
@@ -1914,6 +1947,10 @@ static void CreateFreestandingDeclFragment(
   //            `printed_tokens`.
   if (parsed_tokens) {
     (void) pasta::PrintedTokenRange::Align(parsed_tokens, printed_tokens);
+    if (IsTemplateSpecialication(decl)) {
+      parsed_tokens = pasta::PrintedTokenRange::AdoptWhitespace(
+          printed_tokens, parsed_tokens);
+    }
 
   } else {
 
@@ -2075,7 +2112,6 @@ static void CreatePendingFragments(
   std::vector<pasta::Decl> root_decls;
   std::vector<std::vector<pasta::Decl>> nested_decls;
   std::vector<pasta::Macro> top_level_macros;
-  std::vector<pasta::Decl> floating_decls;
 
   std::vector<pasta::Decl> forward_decls;
   std::optional<mx::PackedFragmentId> root_fragment_id;
@@ -2104,9 +2140,6 @@ static void CreatePendingFragments(
         CreateFreestandingDeclFragment(
             id_store, em, floc, tu_id, begin_index, end_index,
             decl, pending_fragments, main_file_path);
-
-      } else if (ShouldGoInFloatingFragment(decl)) {
-        floating_decls.push_back(decl);
 
       // These are generally template instantiations.
       } else if (ShouldGoInNestedFragment(decl)) {
@@ -2192,47 +2225,6 @@ static void CreatePendingFragments(
         std::move(decls),
         top_level_macros  /* copied */,
         root_fragment_id);
-
-    LabelDeclsInFragment(*pf);
-
-    if (pf->is_new) {
-      pending_fragments.emplace_back(std::move(pf));
-    }
-  }
-
-  for(auto &decl : floating_decls) {
-    // NOTE(kumarak) Use default printing policy for floating
-    //               fragment tokens
-    const pasta::PrintingPolicy pp;
-
-    pasta::PrintedTokenRange parsed_tokens =
-      pasta::PrintedTokenRange::Adopt(decl.Tokens());
-
-    pasta::PrintedTokenRange printed_tokens =
-      pasta::PrintedTokenRange::Create(decl, pp);
-
-    auto err = pasta::PrintedTokenRange::Align(parsed_tokens, printed_tokens);
-    LOG_IF(ERROR, err.has_value())
-      << "Unable to align tokens: " << err.value();
-
-    CHECK(!parsed_tokens.empty());
-
-    std::vector<pasta::Decl> decls;
-    decls.push_back(decl);
-
-    auto pf = CreatePendingFragment(
-        id_store,
-        em,
-        nullptr, //&frag_tok_range  /* original_tokens */,
-        std::move(parsed_tokens)  /* parsed_tokens */,
-        &printed_tokens,
-        floc  /* copied */,
-        tu_id,
-        begin_index,
-        end_index,
-        std::move(decls),
-        {}  /* copied */,
-        std::nullopt);
 
     LabelDeclsInFragment(*pf);
 
