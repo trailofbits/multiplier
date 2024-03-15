@@ -293,12 +293,9 @@ struct TokenTreeSerializationSchedule {
 
     // If this is a `#define` or something in a `#define`, then make sure that
     // the entity ID becomes globally visible.
-    if (is_part_of_define && is_part_of_fragment) {
-      CHECK(em.entity_ids.emplace(raw_tt, raw_id).second);
-
-      if (raw_tt != raw_locator) {
-        (void) em.entity_ids.emplace(raw_locator, raw_id);
-      }
+    if (is_part_of_define && is_part_of_fragment && raw_locator &&
+        raw_tt != raw_locator) {
+      (void) em.entity_ids.emplace(raw_locator, raw_id);
     }
 
     return raw_id;
@@ -361,18 +358,15 @@ struct TokenTreeSerializationSchedule {
       tokens.emplace_back(node);
     }
 
-    auto raw_tt = node.RawNode();
+    auto raw_tt = RawEntity(node);
     CHECK_NE(raw_id, mx::kInvalidEntityId);
     CHECK(em.token_tree_ids.emplace(raw_tt, raw_id).second);
 
     // Make sure `#define` macro body tokens are globally visible to provenance,
     // e.g. parameter substitutions.
-    if (is_part_of_define && is_part_of_fragment) {
-      CHECK(em.entity_ids.emplace(node.RawNode(), raw_id).second);
-
-      if (raw_pt && raw_tt != raw_pt) {
-        (void) em.entity_ids.emplace(raw_pt, raw_id);
-      }
+    if (is_part_of_define && is_part_of_fragment && raw_pt &&
+        raw_tt != raw_pt) {
+      em.entity_ids.emplace(raw_pt, raw_id);
     }
 
     return raw_id;
