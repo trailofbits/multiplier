@@ -820,7 +820,7 @@ void GlobalIndexingState::PersistFragment(
   // fragment or its data.
   std::stringstream tok_tree_err;
   std::optional<TokenTreeNodeRange> maybe_tt = TokenTree::Create(
-      pf.original_tokens, pf.parsed_tokens, tok_tree_err);
+      pf.original_tokens, pf.parsed_tokens, pf.top_level_decls, tok_tree_err);
 
   if (maybe_tt) {
     PersistTokenTree(pf, fb, std::move(maybe_tt.value()), provenance);

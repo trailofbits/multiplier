@@ -9,8 +9,10 @@
 #include <iosfwd>
 #include <memory>
 #include <optional>
+#include <vector>
 
 namespace pasta {
+class Decl;
 class DefineMacroDirective;
 class FileToken;
 class Macro;
@@ -139,6 +141,7 @@ class TokenTree {
   static std::optional<TokenTreeNodeRange>
   Create(const std::optional<pasta::TokenRange> &range,
          const pasta::PrintedTokenRange &printed_range,
+         const std::vector<pasta::Decl> &top_level_decls,
          std::ostream &err);
 
   // Dump.
