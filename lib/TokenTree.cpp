@@ -1490,11 +1490,18 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
   auto begin = std::max(bounds.begin_index, rci.second + 1u);
   auto end = std::min(bounds.end_index, fti.second - 1u);
 
-  // If we're inside a macro expansion, then we only want to add whitespace
-  // and comments. Otherwise, we risk re-introducing intentional elisions, such
-  // as `, ## __VA_ARGS__`.
+  // If we're inside a macro expansion, or if this fragment corresponds to a
+  // nested fragment (e.g. a template specialization), then we only want to add
+  // whitespace and comments. Otherwise, we risk re-introducing intentional
+  // elisions, such as `, ## __VA_ARGS__`. In the case of template
+  // specializations, the original code might be `template <params> class Foo`
+  // and the specialization might be `template <> class Foo<args>` and so we
+  // don't want to risk re-introducing `params`, thereby forming
+  // `template <params> class Foo<args>`.
   auto orig_begin = begin;
-  if (depth && begin <= end) {
+  if (begin <= end &&
+      (depth ||
+       (fragment && fragment->parent_fragment_id != kInvalidEntityId))) {
     auto j = 0u;
     for (auto i = end - begin; (begin + i) <= end; ++i, ++j) {
       auto tk = fti.first->NthTokenKind(end - j);
@@ -1612,7 +1619,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
   MacroExpansionProcessor mep;
   mep.Init(me, me_def, def_bounds);
   if (!mep.Run(false)) {
-    // assert(!mep.HasAfterChildren());  // Probably a bug.
+    assert(!mep.HasAfterChildren());  // Probably a bug.
     return ExtendWithSubstitution(seq, me, user_bounds, trailing_tokens);
   }
 

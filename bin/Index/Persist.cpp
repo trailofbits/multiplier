@@ -776,22 +776,30 @@ void GlobalIndexingState::PersistFragment(
   SerializePendingFragment(fb, database, pf);
 
   // List of fragments IDs, where index `0` is this fragment's immediate parent.
-  auto ids = fb.initParentIds(
-      static_cast<unsigned>(pf.parent_fragment_ids.size()));
-  auto i = 0u;
-  for (mx::PackedFragmentId parent_id : pf.parent_fragment_ids) {
-    ids.set(i++, parent_id.Pack());
+  //
+  // TODO(pag): Support more than depth 1.
+  mx::EntityId parent_eid(em.EntityId(pf.raw_parent_entity));
+  if (auto parent_decl_id = parent_eid.Extract<mx::DeclId>()) {
+    mx::FragmentId fid(parent_decl_id->fragment_id);
+    database.AddAsync(mx::NestedFragmentRecord{fid, pf.fragment_id});
+
+    auto parent_ids = fb.initParentIds(1u);
+    parent_ids.set(0u, mx::EntityId(fid).Pack());
+
+  } else if (auto parent_macro_id = parent_eid.Extract<mx::MacroId>()) {
+    mx::FragmentId fid(parent_macro_id->fragment_id);
+    database.AddAsync(mx::NestedFragmentRecord{fid, pf.fragment_id});
+
+    auto parent_ids = fb.initParentIds(1u);
+    parent_ids.set(0u, mx::EntityId(fid).Pack());
+
+  } else {
+    CHECK(!pf.raw_parent_entity);
+    fb.initParentIds(0u);
   }
 
   // The compilation containing this fragment.
   fb.setCompilationId(pf.compilation_id.Pack());
-
-  if (!pf.parent_fragment_ids.empty()) {
-    database.AddAsync(
-        mx::NestedFragmentRecord{
-          pf.parent_fragment_ids.front(),
-          pf.fragment_id});
-  }
 
   if (pf.file_location) {
     fb.setFirstFileTokenId(pf.file_location->first_file_token_id.Pack());
@@ -811,7 +819,7 @@ void GlobalIndexingState::PersistFragment(
   }
 
   auto tlds = fb.initTopLevelDeclarations(pf.num_top_level_declarations);
-  for (i = 0u; i < pf.num_top_level_declarations; ++i) {
+  for (auto i = 0u; i < pf.num_top_level_declarations; ++i) {
     tlds.set(i, em.EntityId(pf.top_level_decls[i]));
   }
 

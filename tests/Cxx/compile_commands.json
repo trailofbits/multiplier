@@ -88,5 +88,10 @@
     "file": "PartialOrdering.cpp",
     "command": "/usr/bin/c++ PartialOrdering.cpp",
     "directory": ""
+},
+{
+    "file": "SplitToken.cpp",
+    "command": "/usr/bin/c++ -std=c++20 SplitToken.cpp",
+    "directory": ""
 }
 ]

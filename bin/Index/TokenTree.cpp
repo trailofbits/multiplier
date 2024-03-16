@@ -2026,11 +2026,11 @@ std::optional<TokenTreeNodeRange> TokenTree::Create(
       return std::nullopt;
     }
 
-    std::cerr << "--------------------------------------------------------\n";
-    sub->Print(std::cerr);
-    std::cerr << "\n\n\n";
-    sub->PrintDOT(std::cerr);
-    std::cerr << "\n\n";
+    // std::cerr << "--------------------------------------------------------\n";
+    // sub->Print(std::cerr);
+    // std::cerr << "\n\n\n";
+    // sub->PrintDOT(std::cerr);
+    // std::cerr << "\n\n";
 
     std::shared_ptr<const SubstitutionNodeList> ret(
         std::move(impl), &(sub->before));
