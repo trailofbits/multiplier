@@ -119,7 +119,20 @@ gap::generator<pasta::TokenContext> TokenContexts(pasta::PrintedToken tok);
 // Checks if the declaration is valid and serializable
 bool IsSerializableDecl(const pasta::Decl &decl);
 
+// Is the specialization kind explicit? This corresponds to a template
+// specialization being fully spelled out in the code, rather than being derived
+// from a template pattern or a partial specialization pattern.
 bool IsExplicitSpecialization(const pasta::TemplateSpecializationKind &kind);
+
+// Is the specialization kind explicit? This corresponds to a template
+// specialization being fully spelled out in the code, rather than being derived
+// from a template pattern or a partial specialization pattern.
+bool IsExplicitSpecialization(const pasta::Decl &kind);
+
+// This this decl a specialization of a template? If so, then we will want
+// to render the printed tokens of the specialization into the fragment, rather
+// than the parsed tokens.
+bool IsSpecializationOrTemplateInSpecialization(const pasta::Decl &decl);
 
 // Check of the declaration is Out of Line
 bool IsOutOfLine(const pasta::Decl &decl);
@@ -127,11 +140,6 @@ bool IsOutOfLine(const pasta::Decl &decl);
 // Checks should the decl context be serialized with pending
 // fragment
 bool ShouldSerializeDeclContext(const pasta::Decl &decl);
-
-// This this decl a specialization of a template? If so, then we will want
-// to render the printed tokens of the specialization into the fragment, rather
-// than the parsed tokens.
-bool IsTemplateSpecialication(const pasta::Decl &decl);
 
 // Determines whether or not a TLD is likely to have to go into a child
 // fragment. This happens when the TLD is a forward declaration, e.g. of a

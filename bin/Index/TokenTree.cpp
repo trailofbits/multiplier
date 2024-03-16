@@ -1051,7 +1051,7 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
   // It's not a specialization of any kind, so we don't need to check if tokens
   // are contiguous or rebuild things.
   if (top_level_decls.size() != 1u ||
-      !IsTemplateSpecialication(top_level_decls.front())) {
+      !IsSpecializationOrTemplateInSpecialization(top_level_decls.front())) {
     return root_sub;
   }
 
@@ -1266,6 +1266,23 @@ process_old_nodes:
       continue;
     }
     
+    // Whitespace or comment, bring it in.
+    auto stk = spec_tok->Kind();
+    if (stk == pasta::TokenKind::kUnknown ||
+        stk == pasta::TokenKind::kComment) {
+      auto new_tok = &(tokens_alloc.emplace_back());
+      if (spec_dtok) {
+        prev_parsed_token = new_tok;
+      }
+
+      new_tok->printed_tok = std::move(spec_tok);
+      new_tok->parsed_tok = std::move(spec_dtok);
+      injection_site->emplace_back(new_tok);
+
+      spec_tok = printed_range.At(++next_printed_index);
+      continue;
+    }
+
     // TODO(pag): Unsure about this.
     assert(false);
   }

@@ -1975,7 +1975,7 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
   // don't want to return the parsed tokens, as those will likely represent
   // things like 
   for (const auto &decl : decls_to_print) {
-    if (IsTemplateSpecialication(decl)) {
+    if (IsSpecializationOrTemplateInSpecialization(decl)) {
       parsed_tokens = pasta::PrintedTokenRange::AdoptWhitespace(
           printed_tokens, parsed_tokens);
       break;
@@ -2065,7 +2065,7 @@ static void CreateFreestandingDeclFragment(
   //            `printed_tokens`.
   if (parsed_tokens) {
     (void) pasta::PrintedTokenRange::Align(parsed_tokens, printed_tokens);
-    if (IsTemplateSpecialication(decl)) {
+    if (IsSpecializationOrTemplateInSpecialization(decl)) {
       parsed_tokens = pasta::PrintedTokenRange::AdoptWhitespace(
           printed_tokens, parsed_tokens);
     }

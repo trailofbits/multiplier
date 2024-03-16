@@ -318,35 +318,47 @@ struct TokenTreeSerializationSchedule {
       id.kind = mx::TokenKind::UNKNOWN;
       id.fragment_id = pf.fragment_index;
       id.offset = static_cast<unsigned>(tokens.size());
-      
-      if (std::optional<pasta::PrintedToken> gt = node.PrintedToken()) {
-        id.kind = TokenKindFromPasta(gt.value());
-        raw_pt = gt->RawToken();
-        CHECK(em.token_tree_ids.contains(raw_pt));
-        CHECK(parsed_token_index.emplace(raw_pt, id.offset).second);
 
-        auto nt = node.Token();
+      std::optional<pasta::PrintedToken> gt = node.PrintedToken();
+      std::optional<pasta::MacroToken> mt = node.MacroToken();
+      std::optional<pasta::Token> pt = node.Token();
+
+      if (gt) {
+        id.kind = TokenKindFromPasta(gt.value());
+        auto raw_gt = gt->RawToken();
+        CHECK(em.token_tree_ids.contains(raw_gt));
+        CHECK(parsed_token_index.emplace(raw_gt, id.offset).second);
+
+        // NOTE(pag): Can't set `raw_gt` or `raw_tt` to `raw_pt` because this
+        //            goes into the `EntityMapper::entity_ids`, which is global,
+        //            but the lifetime of `raw_tt` and `raw_gt` are limited
+        //            to fragment serialization.
+
+        if (mt) {
+          raw_pt = RawEntity(mt.value());
+        } else if (pt) {
+          raw_pt = RawEntity(pt.value());
+        }
+
         if (auto dt = gt->DerivedLocation()) {
           auto raw_dt = dt->RawToken();
-          CHECK(nt.has_value());
-          CHECK_EQ(raw_dt, nt->RawToken());
+          CHECK(pt.has_value());
+          CHECK_EQ(raw_dt, pt->RawToken());
           CHECK(em.token_tree_ids.contains(raw_dt));
         
         } else {
-          assert(!nt);
+          assert(!pt);
         }
 
-      } else if (std::optional<pasta::MacroToken> mt = node.MacroToken()) {
+      } else if (mt) {
         id.kind = TokenKindFromPasta(mt.value());
         raw_pt = mt->RawMacro();
-        CHECK(!em.token_tree_ids.contains(raw_pt));
       
-      } else if (std::optional<pasta::Token> pt = node.Token()) {
+      } else if (pt) {
         assert(false);  // Shouldn't get here.
 
         id.kind = TokenKindFromPasta(pt.value());
         raw_pt = pt->RawToken();
-        CHECK(em.token_tree_ids.contains(raw_pt));
       }
 
       raw_id = mx::EntityId(id).Pack();
