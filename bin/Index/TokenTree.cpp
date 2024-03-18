@@ -1283,7 +1283,17 @@ process_old_nodes:
       continue;
     }
 
-    // TODO(pag): Unsure about this.
+    // TODO(pag): Often this is the result of a bug in PASTA's pretty printer,
+    //            or PASTA's token alignment procedure. In the case of the
+    //            pretty printer, it could be related to over-aggressively
+    //            assigning a derived source location to a printed token, and
+    //            then that may cause other interferences within the token
+    //            alignment algorithm. The way to diagnose this often involves
+    //            turing on the token aligner debug information logging, and
+    //            then printing out `spec_dtok->Index()`, and then looking at
+    //            what tokens in the alignment dump have the same parsed token
+    //            index. Then, look at nearby tokens, and compare the tokens
+    //            with `spec_dtok->Data()` and `spec_tok->Data()`.
     assert(false);
   }
 

@@ -26,6 +26,7 @@
 #include <pasta/Util/File.h>
 #include <variant>
 
+#include "LabelEntitiesInFragment.h"
 #include "PASTA.h"
 #include "TokenTree.h"
 #include "Util.h"
@@ -33,6 +34,7 @@
 namespace indexer {
 
 class EntityMapper;
+class EntityLabeller;
 class TypeMapper;
 
 using Pseudo = std::variant<pasta::TemplateArgument,
@@ -141,6 +143,9 @@ class PendingFragment {
   EntityList<pasta::TemplateParameterList> template_parameter_lists_to_serialize;
   EntityList<pasta::CXXBaseSpecifier> cxx_base_specifiers_to_serialize;
   EntityList<pasta::Designator> designators_to_serialize;
+
+  // The entity labeller for this fragment.
+  std::unique_ptr<EntityLabeller> labeller;
 
   // Did we encounter an error during serialization?
   bool has_error{false};

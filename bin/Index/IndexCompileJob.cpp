@@ -29,6 +29,7 @@
 #include "EntityMapper.h"
 #include "Hash.h"
 #include "IdStore.h"
+#include "LabelEntitiesInFragment.h"
 #include "NameMangler.h"
 #include "PendingFragment.h"
 #include "Provenance.h"
@@ -36,15 +37,6 @@
 #include "Util.h"
 
 namespace indexer {
-
-// Label the initial entities of this fragment. This focuses on finding the
-// entities that syntactically belong to this fragment, and assigning them
-// IDs. Labeling happens first for all fragments, then we run `Build` for
-// new fragments that we want to serialize.
-extern void LabelDeclsInFragment(PendingFragment &);
-
-extern void LabelTokensAndMacrosInFragment(PendingFragment &);
-
 namespace {
 
 struct OrderedDecl {
@@ -419,11 +411,17 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 
   void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) final {
-    if (!seen.emplace(RawEntity(decl)).second) {
+    auto raw_decl = RawEntity(decl);
+    if (!seen.emplace(raw_decl).second) {
       return;
     }
 
     for (const pasta::FunctionDecl &spec : decl.Specializations()) {
+
+      // TODO(pag): Connect out-of-line specializations to a differently
+      // TODO(pag): What about forward declarations? E.g. with `friend`s?
+      //            Probably need to organize the specializations to be attached
+      //            to different places.
 
       // We should observe the explicit specializations and instantiations
       // separately.
@@ -445,27 +443,22 @@ class TLDFinder final : public pasta::DeclVisitor {
         continue;
       }
 
-      VisitDeeperDeclContext(spec, spec);
-    }
-
-    // Note: A FunctionTemplateDecl node can be inline to a Record context and
-    //       should not be added to the list of TLDs since Record is already
-    //       a TLD. The check about the lexical context avoid this scenario.
-    //
-    //       It also avoid inconsistencies with tagging FunctionTemplateDecl as
-    //       TLD where a decl can be beneath an Expr and not getting tagged as TLD.
-    //       Only FunctionTemplateDecl that are top-level will be tagged as TLDs.
-    if (auto lc = decl.LexicalDeclarationContext(); lc && lc->IsRecord()) {
-      return;
+      PrevValueTracker<const void *> save_restore(parent_decl, raw_decl);
+      Accept(spec);
     }
 
     AddDeclAlways(decl);
   }
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
+    if (seen.count(RawEntity(decl))) {
+      return;
+    }
+
     for (const pasta::TemplateParameterList &params :
              decl.TemplateParameterLists()) {
       if (params.NumParameters() || params.HasUnexpandedParameterPack()) {
+        assert(false);  // Should have seen this via another mechanism?
         return;
       }
     }
@@ -486,15 +479,26 @@ class TLDFinder final : public pasta::DeclVisitor {
       }
     }
 
+    // This is a function template specialization.
+    if (decl.IsFunctionTemplateSpecialization()) {
+      AddDeclAlways(decl);
+      return;
+    }
+
     VisitDecl(decl);
   }
 
   void VisitRecordDecl(const pasta::RecordDecl &decl) final {
+    auto raw_decl = RawEntity(decl);
+    if (!seen.emplace(raw_decl).second) {
+      return;
+    }
 
     // Forward declarations embedded in declarators within a record may have
     // a semantic decl context that is at the top level.
     VisitDeeperDeclContext(decl, decl);
 
+    seen.erase(raw_decl);
     VisitDecl(decl);
   }
 
@@ -521,7 +525,8 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   void VisitUsingShadowDecl(const pasta::UsingShadowDecl &) final {}
 
-  void VisitTypeAliasTemplateDecl(const pasta::TypeAliasTemplateDecl &decl) final {
+  void VisitTypeAliasTemplateDecl(
+      const pasta::TypeAliasTemplateDecl &decl) final {
     VisitDecl(decl);
   }
 
@@ -542,13 +547,18 @@ class TLDFinder final : public pasta::DeclVisitor {
   void VisitDecl(const pasta::Decl &decl) final {
     if (!depth) {
       AddDecl(decl);
+      return;
+    }
 
     // Check if we found something that is semantically at the top level.
-    } else if (auto sema_dc = decl.DeclarationContext()) {
+    if (auto sema_dc = decl.DeclarationContext()) {
       if (!dc_depth[RawEntity(sema_dc.value())]) {
         AddDecl(decl);
+        return;
       }
     }
+
+    assert(!ShouldGoInNestedFragment(decl));
   }
 };
 
@@ -750,31 +760,33 @@ static bool CanElideTokenFromTLD(const pasta::Token &tok) {
   switch (tok.Role()) {
     case pasta::TokenRole::kInvalid:
       return false;
+
     case pasta::TokenRole::kBeginOfFileMarker:
     case pasta::TokenRole::kEndOfFileMarker:
     case pasta::TokenRole::kEndOfMacroExpansionMarker:
       return true;
 
-    case pasta::TokenRole::kFileToken:
-      switch (tok.Kind()) {
-        case pasta::TokenKind::kComment:
-        case pasta::TokenKind::kEndOfFile:
-        case pasta::TokenKind::kEndOfDirective:
-        case pasta::TokenKind::kCodeCompletion:
-          return true;
-        case pasta::TokenKind::kUnknown:
-          return IsWhitespaceOrEmpty(tok.Data());
-        default:
-          return false;
-      }
     case pasta::TokenRole::kBeginOfMacroExpansionMarker:
     case pasta::TokenRole::kInitialMacroUseToken:
     case pasta::TokenRole::kIntermediateMacroExpansionToken:
     case pasta::TokenRole::kFinalMacroExpansionToken:
     case pasta::TokenRole::kMacroDirectiveMarker:
       return false;
+
+    case pasta::TokenRole::kFileToken:
+      break;
   }
-  return false;
+
+  switch (tok.Kind()) {
+    case pasta::TokenKind::kComment:
+    case pasta::TokenKind::kEndOfFile:
+    case pasta::TokenKind::kEndOfDirective:
+    case pasta::TokenKind::kCodeCompletion:
+    case pasta::TokenKind::kUnknown:
+      return IsWhitespaceOrEmpty(tok.Data());
+    default:
+      return false;
+  }
 }
 
 // Do some minor stuff to find begin/ending tokens.
@@ -2122,11 +2134,8 @@ static void CreateFreestandingDeclFragment(
   //            `EntityMapper` for the fragment.
   pf->drop_token_provenance = true;
 
-  LabelDeclsInFragment(*pf);
-
-  if (pf->is_new) {
-    pending_fragments.emplace_back(std::move(pf));
-  }
+  InitializeEntityLabeller(*pf);
+  pending_fragments.emplace_back(std::move(pf));
 }
 
 // Create a floating fragment for the top-level directives.
@@ -2176,15 +2185,14 @@ static void CreateFloatingDirectiveFragment(
       std::move(macros),
       raw_parent);
 
+  InitializeEntityLabeller(*pf);
+
   // NOTE(pag): This will not persist token ids, because there are no tokens
   //            in the empty range, but it will persist  some macros globally.
   //            When the `EntityMapper` is reset for a fragment prior to
   //            persisting, those macros ids will persist.
   LabelTokensAndMacrosInFragment(*pf);
-
-  if (pf->is_new) {
-    pending_fragments.emplace_back(std::move(pf));
-  }
+  pending_fragments.emplace_back(std::move(pf));
 }
 
 static void CreatePendingFragments(
@@ -2315,11 +2323,8 @@ static void CreatePendingFragments(
         top_level_macros  /* copied */,
         nullptr  /* parent entity */);
 
-    LabelDeclsInFragment(*pf);
-
-    if (pf->is_new) {
-      pending_fragments.emplace_back(std::move(pf));
-    }
+    InitializeEntityLabeller(*pf);
+    pending_fragments.emplace_back(std::move(pf));
   }
 
   // Create the nested fragments for the root fragment. These correspond to
@@ -2353,11 +2358,8 @@ static void CreatePendingFragments(
         top_level_macros  /* copied */,
         er.parent);
 
-    LabelDeclsInFragment(*pf);
-
-    if (pf->is_new) {
-      pending_fragments.emplace_back(std::move(pf));
-    }
+    InitializeEntityLabeller(*pf);
+    pending_fragments.emplace_back(std::move(pf));
   }
 }
 
@@ -2419,14 +2421,30 @@ static void PersistParsedFragments(
   TokenProvenanceCalculator provenance(em);
 
   std::string main_source_file = ast.MainFile().Path().generic_string();
-  DLOG(INFO)
-      << "Main source file " << main_source_file
-      << " has " << pending_fragments.size() << " unique fragments";
-
   std::vector<mx::PackedFragmentId> fragment_ids;
   fragment_ids.reserve(pending_fragments.size());
 
+  auto num_new = 0u;
+
   for (PendingFragmentPtr &pf : pending_fragments) {
+    LabelDeclsInFragment(*pf);
+    if (pf->is_new) {
+      ++num_new;
+    } else {
+      pf.reset();  // We don't need it anymore.
+    }
+  }
+
+  DLOG(INFO)
+      << "Main source file " << main_source_file
+      << " has " << num_new << " / " << pending_fragments.size()
+      << " unique fragments";
+
+  for (PendingFragmentPtr &pf : pending_fragments) {
+    if (!pf) {
+      continue;
+    }
+
     auto start_time = std::chrono::system_clock::now();
     try {
       em.ResetForFragment();

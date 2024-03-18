@@ -44,6 +44,7 @@
 
 #include "Codegen.h"
 #include "EntityMapper.h"
+#include "LabelEntitiesInFragment.h"
 #include "PASTA.h"
 #include "PendingFragment.h"
 #include "Provenance.h"
@@ -76,9 +77,6 @@ extern void BuildPendingFragment(const pasta::AST &ast, PendingFragment &pf);
 
 // Label the parent entity ids.
 extern void LabelParentsInPendingFragment(PendingFragment &pf);
-
-// Label tokens and macros.
-extern void LabelTokensAndMacrosInFragment(PendingFragment &pf);
 
 // Store information persistently to enable linking of declarations across
 // fragments.

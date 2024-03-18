@@ -206,6 +206,17 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
   } else if (auto me = pasta::MemberExpr::From(stmt)) {
     pasta::ValueDecl md = me->MemberDeclaration();
     pasta::Token mt = me->MemberToken();
+
+    // With a `CxxMemberCallExpr` to an overloaded operator, we might see the
+    // full spelling, e.g. `operator<<`, which is two tokens: `operator` and
+    // `<<`.
+    if (auto func = pasta::FunctionDecl::From(md)) {
+      auto ook = func->OverloadedOperator();
+      if (AcceptOOK(ook, token_kind)) {
+        return RawEntity(md);
+      }
+    }
+
     if (raw_token) {
       if (RawEntity(mt) == raw_token) {
         return RawEntity(md);
@@ -378,6 +389,32 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
         }
       } else {
         return RawEntity(comp.value());
+      }
+    }
+  
+  // Binary operator.
+  } else if (auto binary = pasta::BinaryOperator::From(stmt)) {
+    auto ot = binary->OperatorToken();
+    if (token_kind == ot.Kind()) {
+      if (raw_token) {
+        if (raw_token == RawEntity(ot)) {
+          return RawEntity(stmt);
+        }
+      } else {
+        return RawEntity(stmt);
+      }
+    }
+  
+  // Unary operator.
+  } else if (auto unary = pasta::UnaryOperator::From(stmt)) {
+    auto ot = unary->OperatorToken();
+    if (token_kind == ot.Kind()) {
+      if (raw_token) {
+        if (raw_token == RawEntity(ot)) {
+          return RawEntity(stmt);
+        }
+      } else {
+        return RawEntity(stmt);
       }
     }
   }
