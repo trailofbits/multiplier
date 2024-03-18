@@ -131,7 +131,7 @@ bool Decl::contains(const Stmt &stmt) {
 std::optional<Decl> Decl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    index.declaration(eid.Pack());
+    return index.declaration(eid.Pack());
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }

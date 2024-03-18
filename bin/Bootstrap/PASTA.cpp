@@ -2916,7 +2916,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     if (base_name == class_name) {
       lib_cpp_os
-          << "    index." << lower_name << "(eid.Pack());\n";
+          << "    return index." << lower_name << "(eid.Pack());\n";
     } else {
       lib_cpp_os
           << "    if (auto base = index." << lower_name << "(eid.Pack())) {\n"

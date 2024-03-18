@@ -52,7 +52,7 @@ bool Type::contains(const Token &tok) const {
 std::optional<Type> Type::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<TypeId>(vid)) {
-    index.type(eid.Pack());
+    return index.type(eid.Pack());
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }

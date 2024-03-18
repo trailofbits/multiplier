@@ -183,9 +183,14 @@ clang::Type *BasicTypeDeduplication(
       break;
   }
 
-  if (!new_type || is_dependent) {
+  if (is_dependent) {
     up_quals = orig_qualifier;
     return const_cast<clang::Type *>(ctx.UnresolvedTy.getTypePtr());
+  }
+
+  // if new_type is nullptr use type as new_type
+  if (!new_type) {
+    new_type = type;
   }
 
   return new_type;
