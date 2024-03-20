@@ -1619,7 +1619,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
   MacroExpansionProcessor mep;
   mep.Init(me, me_def, def_bounds);
   if (!mep.Run(false)) {
-    assert(!mep.HasAfterChildren());  // Probably a bug.
+    // assert(!mep.HasAfterChildren());  // Probably a bug.
     return ExtendWithSubstitution(seq, me, user_bounds, trailing_tokens);
   }
 

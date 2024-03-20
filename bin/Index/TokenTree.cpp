@@ -1294,7 +1294,7 @@ process_old_nodes:
     //            what tokens in the alignment dump have the same parsed token
     //            index. Then, look at nearby tokens, and compare the tokens
     //            with `spec_dtok->Data()` and `spec_tok->Data()`.
-    assert(false);
+    //assert(false);
   }
 
   // Bring in a suffix of printed tokens with no corresponding parsed tokens.

@@ -293,10 +293,16 @@ class TLDFinder final : public pasta::DeclVisitor {
 
     VisitDeeperDeclContext(decl, decl);
 
-    if (IsExplicitSpecialization(decl.TemplateSpecializationKind()) &&
-        !decl.IsCanonicalDeclaration()) {
-      Accept(decl.CanonicalDeclaration());
+    auto tsk = decl.TemplateSpecializationKind();
+    if (!IsExplicitSpecialization(tsk) &&
+        !(IsExplicitInstantiation(tsk) && decl.ExternToken())) {
+      CHECK_NOTNULL(parent_decl);
     }
+
+    // if (IsExplicitSpecialization(decl.TemplateSpecializationKind()) &&
+    //     !decl.IsCanonicalDeclaration()) {
+    //   Accept(decl.CanonicalDeclaration());
+    // }
 
     AddDeclAlways(decl);
   }
@@ -320,12 +326,20 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
-    for (const pasta::ClassTemplateSpecializationDecl &spec :
-             decl.Specializations()) {
+    auto specs = ExpandSpecializations(decl.Specializations());
+    for (pasta::ClassTemplateSpecializationDecl spec : specs) {
+
+      auto tsk = spec.TemplateSpecializationKind();
 
       // We should observe the explicit specializations and instantiations
       // separately.
-      if (IsExplicitSpecialization(spec.TemplateSpecializationKind())) {
+      if (IsExplicitSpecialization(tsk)) {
+        continue;
+      }
+
+      // We should observe the specializations as a result of explicit
+      // instantiations later. E.g. `extern template class foo<int>;`.
+      if (IsExplicitInstantiation(tsk) && spec.ExternToken()) {
         continue;
       }
 
@@ -362,14 +376,23 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
-    for (const pasta::VarTemplateSpecializationDecl &spec : decl.Specializations()) {
+    auto specs = ExpandSpecializations(decl.Specializations());
+    for (const pasta::VarTemplateSpecializationDecl &spec : specs) {
+      auto tsk = spec.TemplateSpecializationKind();
 
       // We should observe the explicit specializations and instantiations
       // separately.
-      if (IsExplicitSpecialization(spec.TemplateSpecializationKind()) ||
-          spec.IsOutOfLine()) {
+      if (IsExplicitSpecialization(tsk)) {
         continue;
       }
+
+      // We should observe the specializations as a result of explicit
+      // instantiations later. E.g. `extern template int foo<int>;`.
+      if (IsExplicitInstantiation(tsk) && spec.ExternToken()) {
+        continue;
+      }
+
+        // || spec.IsOutOfLine()
 
       // Specializations of partial specializations are collected into the
       // template itself, but lexically "belong" to the partial specialization
@@ -403,6 +426,13 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   void VisitVarTemplateSpecializationDecl(
       const pasta::VarTemplateSpecializationDecl &decl) {
+
+    auto tsk = decl.TemplateSpecializationKind();
+    if (!IsExplicitSpecialization(tsk) &&
+        !(IsExplicitInstantiation(tsk) && decl.ExternToken())) {
+      CHECK_NOTNULL(parent_decl);
+    }
+
     AddDecl(decl);
   }
 
@@ -416,12 +446,14 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
-    for (const pasta::FunctionDecl &spec : decl.Specializations()) {
+    auto specs = ExpandSpecializations(decl.Specializations());
+    for (const pasta::FunctionDecl &spec : specs) {
 
       // TODO(pag): Connect out-of-line specializations to a differently
       // TODO(pag): What about forward declarations? E.g. with `friend`s?
       //            Probably need to organize the specializations to be attached
       //            to different places.
+      auto tsk = spec.TemplateSpecializationKind();
 
       // We should observe the explicit specializations and instantiations
       // separately.
@@ -432,8 +464,7 @@ class TLDFinder final : public pasta::DeclVisitor {
       //       specialization decl as well. The check for out-of-line
       //       instantiation avoid adding them immediately to the node and
       //       handle when it appears next.
-      if (IsExplicitSpecialization(spec.TemplateSpecializationKind()) ||
-          spec.IsOutOfLine()) {
+      if (IsExplicitSpecialization(tsk) || spec.IsOutOfLine()) {
         continue;
       }
 
@@ -455,14 +486,6 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
-    for (const pasta::TemplateParameterList &params :
-             decl.TemplateParameterLists()) {
-      if (params.NumParameters() || params.HasUnexpandedParameterPack()) {
-        assert(false);  // Should have seen this via another mechanism?
-        return;
-      }
-    }
-
     // Go hunting for things like `std::align_val_t`.
     //
     // NOTE(pag): The parameters of an implicit `operator new` lack types?!
@@ -480,9 +503,30 @@ class TLDFinder final : public pasta::DeclVisitor {
     }
 
     // This is a function template specialization.
-    if (decl.IsFunctionTemplateSpecialization()) {
+    if (IsSpecialization(decl)) {
       AddDeclAlways(decl);
       return;
+    }
+
+    // An out-of-line line method defined on a class template.
+    if (decl.NumTemplateParameterLists()) {
+#ifndef NDEBUG
+    auto dc = decl.LexicalDeclarationContext();
+#endif
+      assert(dc && !dc->IsRecord() && decl.IsOutOfLine() &&
+             pasta::CXXMethodDecl::From(decl).has_value());
+      AddDeclAlways(decl);
+      return;
+    }
+
+    // This is an specialization of a non-template method.
+    if (decl.IsTemplateInstantiation() && decl.IsOutOfLine()) {
+      if (auto from = decl.InstantiatedFromMemberFunction()) {
+        PrevValueTracker<const void *> save_restore(
+            parent_decl, RawEntity(from.value()));
+        AddDeclAlways(decl);
+        return;
+      }
     }
 
     VisitDecl(decl);

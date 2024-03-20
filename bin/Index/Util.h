@@ -119,6 +119,10 @@ gap::generator<pasta::TokenContext> TokenContexts(pasta::PrintedToken tok);
 // Checks if the declaration is valid and serializable
 bool IsSerializableDecl(const pasta::Decl &decl);
 
+// This the specialization kind explicit? This corresponds to something like
+// `extern template class foo<type>;`.
+bool IsExplicitInstantiation(const pasta::TemplateSpecializationKind &kind);
+
 // Is the specialization kind explicit? This corresponds to a template
 // specialization being fully spelled out in the code, rather than being derived
 // from a template pattern or a partial specialization pattern.
@@ -129,7 +133,14 @@ bool IsExplicitSpecialization(const pasta::TemplateSpecializationKind &kind);
 // from a template pattern or a partial specialization pattern.
 bool IsExplicitSpecialization(const pasta::Decl &kind);
 
-// This this decl a specialization of a template? If so, then we will want
+// Returns whether or not `decl` is a specialization of a template. Clang
+// reports methods derived from methods inside of class templates as being
+// specializations, but this function focuses on determining that something is
+// actually derived from a template, i.e. a method is a specialization if it is
+// derived from a method inside of a function template.
+bool IsSpecialization(const pasta::Decl &decl);
+
+// Is this decl a specialization of a template? If so, then we will want
 // to render the printed tokens of the specialization into the fragment, rather
 // than the parsed tokens.
 bool IsSpecializationOrTemplateInSpecialization(const pasta::Decl &decl);
@@ -285,6 +296,36 @@ inline static gap::generator<Entity> Entities(
       co_yield std::move(entity);
     }
   }
+}
+
+// Generate all specializations of a template. Our Clang patches will sometimes
+// create specializations that are linked into redecl chains but not linked into
+// the template's specialization list due to it being a set and not being
+// prepared to handle duplicates.
+template <typename S>
+static std::vector<S> ExpandSpecializations(std::vector<S> specs) {
+  auto size = specs.size();
+  for (auto i = 0u; i < size; ++i) {
+    for (const auto &redecl : specs[i].Redeclarations()) {
+      if (redecl != specs[i]) {
+        if (auto derived = S::From(redecl)) {
+          specs.emplace_back(derived.value());
+        }
+      }
+    }
+  }
+
+  std::sort(specs.begin(), specs.end(), [] (const S &a, const S &b) {
+    return RawEntity(a) < RawEntity(b);
+  });
+
+  auto it = std::unique(specs.begin(), specs.end(), [] (const S &a, const S &b) {
+    return RawEntity(a) == RawEntity(b);
+  });
+
+  specs.erase(it, specs.end());
+
+  return specs;
 }
 
 // Generate the entities in an list.
