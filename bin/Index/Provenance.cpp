@@ -328,7 +328,7 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
         if (raw_token == RawEntity(r_paren)) {
           return RawEntity(call.value());
         }
-      } else {
+      } else if (r_paren.Kind() == pasta::TokenKind::kRParenthesis) {
         return RawEntity(call.value());
       }
     }
@@ -348,7 +348,7 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
       if (raw_token == RawEntity(l_paren.value())) {
         return RawEntity(call.value());
       }
-    } else {
+    } else if (l_paren->Kind() == pasta::TokenKind::kLParenthesis) {
       return RawEntity(call.value());
     }
     
@@ -375,19 +375,21 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
   // Braces.
   } else if (auto comp = pasta::CompoundStmt::From(stmt)) {
     if (token_kind == pasta::TokenKind::kLBrace) {
+      auto l_brace = comp->LeftBraceToken();
       if (raw_token) {
-        if (raw_token == RawEntity(comp->LeftBraceToken())) {
+        if (raw_token == RawEntity(l_brace)) {
           return RawEntity(comp.value());
         }
-      } else {
+      } else if (l_brace.Kind() == token_kind) {
         return RawEntity(comp.value());
       }
     } else if (token_kind == pasta::TokenKind::kRBrace) {
+      auto r_brace = comp->RightBraceToken();
       if (raw_token) {
-        if (raw_token == RawEntity(comp->RightBraceToken())) {
+        if (raw_token == RawEntity(r_brace)) {
           return RawEntity(comp.value());
         }
-      } else {
+      } else if (r_brace.Kind() == pasta::TokenKind::kRBrace) {
         return RawEntity(comp.value());
       }
     }
@@ -1458,6 +1460,7 @@ bool TokenProvenanceCalculator::Pull(const std::vector<TokenTreeNode> &tokens) {
 
     for (TokenInfo *child : parent->Children(*this)) {
       if (child->data_hash == parent->data_hash) {
+        assert(parent->entity_id != child->entity_id);
         child->derived_token_id = parent->entity_id;
         break;
       }
@@ -1472,6 +1475,7 @@ bool TokenProvenanceCalculator::Pull(const std::vector<TokenTreeNode> &tokens) {
 
     for (TokenInfo *child : parent->Children(*this)) {
       if (child->derived_token_id == mx::kInvalidEntityId) {
+        assert(parent->entity_id != child->entity_id);
         child->derived_token_id = parent->entity_id;
       }
     }
@@ -1656,9 +1660,11 @@ void TokenProvenanceCalculator::Run(
 
     ordered_tokens.push_back(&info);
 
-
     if (pl) {
-      info.derived_token_id = em.EntityId(pl->DerivedLocation());
+      auto pl_dl_id = em.EntityId(pl->DerivedLocation());
+      if (pl_dl_id != info.entity_id) {
+        info.derived_token_id = pl_dl_id;
+      }
     }
 
     if (info.derived_token_id != mx::kInvalidEntityId) {
@@ -1672,6 +1678,8 @@ void TokenProvenanceCalculator::Run(
     if (ml) {
       auto dl = ml->DerivedLocation();
       info.derived_token_id = em.EntityId(dl);
+      assert(info.derived_token_id != info.entity_id);
+
       if (info.derived_token_id != mx::kInvalidEntityId) {
         continue;
       }
@@ -1681,6 +1689,7 @@ void TokenProvenanceCalculator::Run(
       if (std::holds_alternative<pasta::MacroToken>(dl)) {
         info.derived_token_id = em.EntityId(
             std::get<pasta::MacroToken>(dl).DerivedLocation());
+        assert(info.derived_token_id != info.entity_id);
       }
     }
 

@@ -2342,10 +2342,27 @@ static void CreatePendingFragments(
 
   pasta::PrintingPolicy pp;
 
-  // Create the root fragment. We do this if we have any top-level declarations,
-  // or any top-level non-directive macro uses.
-  if (!root_decls.empty() || !top_level_macros.empty()) {
+  // Top-level expansion or `#include`. 
+  if (root_decls.empty() && !top_level_macros.empty()) {
+    auto pf = CreatePendingFragment(
+        id_store,
+        em,
+        &frag_tok_range  /* original_tokens */,
+        pasta::PrintedTokenRange::Adopt(frag_tok_range)  /* parsed_tokens */,
+        nullptr /* printed tokens */,
+        floc  /* copied */,
+        tu_id,
+        begin_index,
+        end_index,
+        std::move(root_decls),
+        top_level_macros  /* copied */,
+        nullptr  /* parent entity */);
 
+    InitializeEntityLabeller(*pf);
+    pending_fragments.emplace_back(std::move(pf));
+  
+  // Top-level declarations, possibly with macro expansions.
+  } else if (!root_decls.empty()) {
     pasta::PrintedTokenRange aligned_tokens =
         CreateParsedTokenRange(
             pasta::PrintedTokenRange::Adopt(frag_tok_range),

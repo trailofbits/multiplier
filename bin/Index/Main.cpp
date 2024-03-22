@@ -284,10 +284,12 @@ int main(int argc, char *argv[], char *envp[]) {
 
   // Parse the target, be it a compile commands JSON database or a binary
   // with embedded commands.
-  if (!indexer::Parser(llvm_context, importer).Parse(*maybe_buff.get(), env)) {
-    std::cerr
-          << "An error occurred when trying to import " << FLAGS_target;
-    return EXIT_FAILURE;
+  auto success = indexer::Parser(
+      llvm_context, importer).Parse(*maybe_buff.get(), env);
+  if (!success) {
+    LOG(WARNING)
+          << "An error may have occurred when trying to import "
+          << FLAGS_target << "; continuing anyway";
   }
 
   // This goes an does a lot of sub-process execution, re-running all of the

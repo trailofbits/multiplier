@@ -1018,7 +1018,12 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
         info = &(tokens_alloc.emplace_back());
         info->macro_tok = tok.MacroLocation();
         info->parsed_tok = std::move(tok);
-        assert(info->parsed_tok->Data() == info->macro_tok->Data());
+
+        // They should match, but it could also be a split token case, e.g.
+        // the parsed token is `>` or `=`, and the macro token is `>=`.
+        assert(info->macro_tok->Data().starts_with(info->parsed_tok->Data()) ||
+               info->macro_tok->Data().ends_with(info->parsed_tok->Data()));
+
         assert(info->macro_tok->TokenRole() ==
                pasta::TokenRole::kFinalMacroExpansionToken);
         final_toks.emplace(info->macro_tok->RawMacro(), info);
