@@ -1013,7 +1013,7 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
       // actually link them into the substitution. This will happen as-needed
       // when we get to the end of the macro expansion region and visit all
       // of its nodes.
-      case pasta::TokenRole::kFinalMacroExpansionToken:
+      case pasta::TokenRole::kFinalMacroExpansionToken: {
         assert(in_macro);
         info = &(tokens_alloc.emplace_back());
         info->macro_tok = tok.MacroLocation();
@@ -1026,8 +1026,23 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
 
         assert(info->macro_tok->TokenRole() ==
                pasta::TokenRole::kFinalMacroExpansionToken);
-        final_toks.emplace(info->macro_tok->RawMacro(), info);
+        auto [it, added] = final_toks.emplace(
+            info->macro_tok->RawMacro(), info);
+
+        // If we didn't add it in, then we're likely dealing with a split token
+        // case, e.g. two parsed tokens (`>` and `>`) derived from one macro
+        // token (`>>`).
+        if (!added) {
+          TokenInfo **next_ptr = nullptr;
+          for (auto i = it->second; i; i = *next_ptr) {
+            next_ptr = &(i->next);
+          }
+
+          // Chain it in at the end.
+          *next_ptr = info;
+        }
         break;
+      }
 
       case pasta::TokenRole::kFileToken:
         assert(!in_macro);
@@ -1060,8 +1075,8 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
     return root_sub;
   }
 
-  std::cerr << "\n-- REBUILDING TREE ----------\n";
-  std::cerr << printed_range.Data() << "\n";
+  // std::cerr << "\n-- REBUILDING TREE ----------\n";
+  // std::cerr << printed_range.Data() << "\n";
 
   return RebuildTree(root_sub, range, printed_range, top_level_decls.front(),
                      err);
@@ -1808,6 +1823,8 @@ bool TokenTreeImpl::BuildMacroSubstitution(
       info = new_info;
     }
 
+    final_toks.erase(it);
+
   } else {
     switch (node.TokenRole()) {
       case pasta::TokenRole::kInitialMacroUseToken:
@@ -1826,6 +1843,14 @@ bool TokenTreeImpl::BuildMacroSubstitution(
   if (!node.Data().empty()) {
     info->parent = sub;
     nodes.emplace_back(info);
+  }
+
+  // Fill in the rest of the split tokens.
+  while (auto next_info = info->next) {
+    info->next = nullptr;
+    next_info->parent = sub;
+    nodes.emplace_back(next_info);
+    info = next_info;
   }
 
   return true;

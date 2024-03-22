@@ -98,5 +98,10 @@
     "file": "ExternSpecializationOfSizeless.cpp",
     "command": "/usr/bin/c++ -std=c++20 ExternSpecializationOfSizeless.cpp",
     "directory": ""
+},
+{
+    "file": "NoExceptSplitTokenTest.cpp",
+    "command": "/usr/bin/c++ -std=c++20 NoExceptSplitTokenTest.cpp",
+    "directory": ""
 }
 ]
