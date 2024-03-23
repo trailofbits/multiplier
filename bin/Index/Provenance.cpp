@@ -180,19 +180,44 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
                              pasta::TokenKind token_kind,
                              bool is_identifier) {
 
+  auto check_token = [=] (const pasta::Token &et) {
+    if (raw_token) {
+      return RawEntity(et) == raw_token;
+    } else {
+      return et.Data() == token_data;
+    }
+  };
+
   // Try to match the named declaration referenced by a `DeclRefExpr`.
   if (auto dre = pasta::DeclRefExpr::From(stmt)) {
     auto decl = dre->Declaration();
     if (is_identifier) {
       if (auto nd = pasta::NamedDecl::From(decl)) {
-        auto et = dre->ExpressionToken();
-        if (raw_token) {
-          if (RawEntity(et) == raw_token) {
-            return RawEntity(nd.value());
-          }
-        } else if (et.Data() == token_data) {
+
+        // Common case for C code.
+        if (check_token(dre->ExpressionToken())) {
           return RawEntity(nd.value());
         }
+
+        // Sometimes the expression token is waaaay off, e.g. in the
+        // `tests/Cxx/NoExceptSplitTokenTest.cpp` test case, the expression
+        // token for `__and_<....>::value` is `__and_`. In this case, we use
+        // the end token.
+        if (check_token(dre->EndToken())) {
+          return RawEntity(nd.value());
+        }
+
+        // For C++ code, something like `B::name<...>` where `B` is the
+        // `ExpressionToken`, `>` is the `EndToken`, `<` is the `LAngeToken`,
+        // and `name` is the token previous to the `LAngleToken`.
+        if (auto before_l_angle = dre->LAngleToken().PreviousLocation()) {
+          if (check_token(before_l_angle.value())) {
+            return RawEntity(nd.value());
+          }
+        }
+
+        // Good way to find things we missed.
+        assert(nd->Name() != token_data);
       }
     }
 
@@ -205,7 +230,6 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
   // Try to match on `member` in `base->member` or `base.member`.
   } else if (auto me = pasta::MemberExpr::From(stmt)) {
     pasta::ValueDecl md = me->MemberDeclaration();
-    pasta::Token mt = me->MemberToken();
 
     // With a `CxxMemberCallExpr` to an overloaded operator, we might see the
     // full spelling, e.g. `operator<<`, which is two tokens: `operator` and
@@ -217,11 +241,7 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
       }
     }
 
-    if (raw_token) {
-      if (RawEntity(mt) == raw_token) {
-        return RawEntity(md);
-      }
-    } else if (mt.Data() == token_data) {
+    if (check_token(me->MemberToken())) {
       return RawEntity(md);
     }
 
@@ -231,53 +251,29 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
 
   // The label name in an `asm goto`.
   } else if (auto addr = pasta::AddrLabelExpr::From(stmt)) {
-    auto lt = addr->LabelToken();
-    auto ld = RawEntity(addr->Label());
-    if (raw_token) {
-      if (RawEntity(lt) == raw_token) {
-        return ld;
-      }
-    } else if (lt.Data() == token_data) {
-      return ld;
+    if (check_token(addr->LabelToken())) {
+      return RawEntity(addr->Label());
     }
 
   } else if (auto ce = pasta::CXXConstructExpr::From(stmt)) {
     pasta::CXXConstructorDecl cd = ce->Constructor();
-    auto ct = ce->Token();
-    if (raw_token) {
-      if (RawEntity(ct) == raw_token) {
-        return RawEntity(cd);
-      }
-    } else if (ct.Data() == token_data) {
+    if (check_token(ce->Token())) {
       return RawEntity(cd);
     }
 
   // Try to match on `label` in `goto label;`.
   } else if (auto gt = pasta::GotoStmt::From(stmt)) {
-    auto lt = gt->LabelToken();
-    if (raw_token) {
-      if (RawEntity(lt) == raw_token) {
-        return RawEntity(gt->Label());
-      }
-    } else if (lt.Data() == token_data) {
+    if (check_token(gt->LabelToken())) {
       return RawEntity(gt->Label());
     }
 
   // Try to match on `member` in `{ .member = ... }`.
   } else if (auto di = pasta::DesignatedInitExpr::From(stmt)) {
     for (pasta::Designator de : di->Designators()) {
-      auto f = de.Field();
-      if (!f) {
-        continue;
-      }
-
-      auto ft = de.FieldToken();
-      if (raw_token) {
-        if (RawEntity(ft) == raw_token) {
-          return RawEntity(f);
+      if (auto f = de.Field()) {
+        if (check_token(de.FieldToken())) {
+          return RawEntity(f.value());
         }
-      } else if (ft.Data() == token_data) {
-        return RawEntity(f);
       }
     }
 
@@ -292,25 +288,13 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
 
   // Try to match on `label` in `label:`.
   } else if (auto ls = pasta::LabelStmt::From(stmt)) {
-    auto lt = ls->IdentifierToken();
-    if (raw_token) {
-      if (RawEntity(lt) == raw_token) {
-        return RawEntity(ls->Declaration());
-      }
-    } else if (lt.Data() == token_data) {
+    if (check_token(ls->IdentifierToken())) {
       return RawEntity(ls->Declaration());
     }
 
   } else if (auto pde = pasta::PredefinedExpr::From(stmt)) {
-    auto et = pde->ExpressionToken();
-    if (is_identifier) {
-      if (raw_token) {
-        if (RawEntity(et) == raw_token) {
-          return RawEntity(pde);
-        }
-      } else if (et.Data() == token_data) {
-        return RawEntity(pde);
-      }
+    if (is_identifier && check_token(pde->ExpressionToken())) {
+      return RawEntity(pde.value());
     }
 
   // Try to match on `func`, `(`, or `)` in `func()`.
@@ -355,19 +339,11 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
   // Parentheses.
   } else if (auto paren = pasta::ParenExpr::From(stmt)) {
     if (token_kind == pasta::TokenKind::kLParenthesis) {
-      if (raw_token) {
-        if (raw_token == RawEntity(paren->BeginToken())) {
-          return RawEntity(paren.value());
-        }
-      } else {
+      if (check_token(paren->BeginToken())) {
         return RawEntity(paren.value());
       }
     } else if (token_kind == pasta::TokenKind::kRParenthesis) {
-      if (raw_token) {
-        if (raw_token == RawEntity(paren->EndToken())) {
-          return RawEntity(paren.value());
-        }
-      } else {
+      if (check_token(paren->EndToken())) {
         return RawEntity(paren.value());
       }
     }

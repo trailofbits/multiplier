@@ -1075,8 +1075,8 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
     return root_sub;
   }
 
-  // std::cerr << "\n-- REBUILDING TREE ----------\n";
-  // std::cerr << printed_range.Data() << "\n";
+  std::cerr << "\n-- REBUILDING TREE ----------\n";
+  std::cerr << printed_range.Data() << "\n";
 
   return RebuildTree(root_sub, range, printed_range, top_level_decls.front(),
                      err);

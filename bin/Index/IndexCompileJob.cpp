@@ -376,6 +376,10 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
+#ifndef NDEBUG
+    auto templated_decl = decl.TemplatedDeclaration();
+#endif
+
     auto specs = ExpandSpecializations(decl.Specializations());
     for (const pasta::VarTemplateSpecializationDecl &spec : specs) {
       auto tsk = spec.TemplateSpecializationKind();
@@ -383,16 +387,16 @@ class TLDFinder final : public pasta::DeclVisitor {
       // We should observe the explicit specializations and instantiations
       // separately.
       if (IsExplicitSpecialization(tsk)) {
+        assert(spec.Token() != templated_decl.Token());
         continue;
       }
 
       // We should observe the specializations as a result of explicit
       // instantiations later. E.g. `extern template int foo<int>;`.
       if (IsExplicitInstantiation(tsk) && spec.ExternToken()) {
+        assert(spec.Token() != templated_decl.Token());
         continue;
       }
-
-        // || spec.IsOutOfLine()
 
       // Specializations of partial specializations are collected into the
       // template itself, but lexically "belong" to the partial specialization
@@ -402,8 +406,11 @@ class TLDFinder final : public pasta::DeclVisitor {
           std::get_if<pasta::VarTemplatePartialSpecializationDecl>(&pattern);
       if (partial) {
         partial_specialization_specializtions[RawEntity(*partial)].emplace_back(spec);
+        assert(spec.Token() != templated_decl.Token());
         continue;
       }
+
+      assert(spec.Token() == templated_decl.Token());
 
       // Make the parent of specializations be the template itself.
       PrevValueTracker<const void *> save_restore(parent_decl, raw_decl);
@@ -427,13 +434,18 @@ class TLDFinder final : public pasta::DeclVisitor {
   void VisitVarTemplateSpecializationDecl(
       const pasta::VarTemplateSpecializationDecl &decl) {
 
+    auto raw_decl = RawEntity(decl);
+    if (!seen.emplace(raw_decl).second) {
+      return;
+    }
+
     auto tsk = decl.TemplateSpecializationKind();
     if (!IsExplicitSpecialization(tsk) &&
         !(IsExplicitInstantiation(tsk) && decl.ExternToken())) {
       CHECK_NOTNULL(parent_decl);
     }
 
-    AddDecl(decl);
+    AddDeclAlways(decl);
   }
 
   void VisitFriendTemplateDecl(const pasta::FriendTemplateDecl &decl) final {
@@ -571,7 +583,7 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   void VisitTypeAliasTemplateDecl(
       const pasta::TypeAliasTemplateDecl &decl) final {
-    VisitDecl(decl);
+    AddDecl(decl);
   }
 
   void VisitFriendDecl(const pasta::FriendDecl &decl) final {
@@ -1069,10 +1081,28 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
     }
   }
 
+  // Expand to leading empty macro, followed by whitespace containing no more
+  // than one new line.
+  while (3u <= begin_tok_index &&
+         range[begin_tok_index - 3u].Role() == pasta::TokenRole::kBeginOfMacroExpansionMarker &&
+         range[begin_tok_index - 2u].Role() == pasta::TokenRole::kEndOfMacroExpansionMarker) {
+    
+    auto pt = range[begin_tok_index - 1u];
+    auto td = pt.Data();
+    if (pt.Kind() == pasta::TokenKind::kUnknown &&
+        pt.Role() == pasta::TokenRole::kFileToken &&
+        IsWhitespaceOrEmpty(td) &&
+        std::count(td.begin(), td.end(), '\n') <= 1u) {
+      begin_tok_index -= 3u;
+    } else {
+      break;
+    }
+  }
+
   // Expand to leading comment followed by whitespace containing no more than
   // one new line.
-  if (2u <= begin_tok_index &&
-      range[begin_tok_index - 2u].Kind() == pasta::TokenKind::kComment) {
+  while (2u <= begin_tok_index &&
+         range[begin_tok_index - 2u].Kind() == pasta::TokenKind::kComment) {
     auto pt = range[begin_tok_index - 1u];
     auto td = pt.Data();
     if (pt.Kind() == pasta::TokenKind::kUnknown &&
@@ -1080,6 +1110,8 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
         IsWhitespaceOrEmpty(td) &&
         std::count(td.begin(), td.end(), '\n') <= 1u) {
       begin_tok_index -= 2u;
+    } else {
+      break;
     }
   }
 
@@ -1986,7 +2018,8 @@ static PendingFragmentPtr CreatePendingFragment(
 // represent the parsed tokens.
 static pasta::PrintedTokenRange CreateParsedTokenRange(
     pasta::PrintedTokenRange parsed_tokens,
-    const std::vector<pasta::Decl> &decls, const pasta::PrintingPolicy &pp) {
+    const std::vector<pasta::Decl> &decls, const pasta::PrintingPolicy &pp,
+    std::string_view main_job_file) {
 
   CHECK(!decls.empty());
 
@@ -2038,10 +2071,23 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
     }
   }
 
-  // It's not fatal if we can't match them here, because this is really a
-  // kind of implicit fragment anyway.
+  if (!err.has_value()) {
+    return parsed_tokens;
+  }
+
+  // Report the error and try to recover.
+  LOG(WARNING)
+      << "Unable to align tokens in main job file " << main_job_file
+      << PrefixedLocation(decls.front(), " at or near ") << ": "
+      << err.value();
+
+  err = pasta::PrintedTokenRange::Align(parsed_tokens, printed_tokens,
+                                        true  /* recovery mode */);
+
   LOG_IF(ERROR, err.has_value())
-      << "Unable to align tokens: " << err.value();
+      << "Unable to align tokens in recovery mode in main job file "
+      << main_job_file << PrefixedLocation(decls.front(), " at or near ")
+      << ": " << err.value();
 
   return parsed_tokens;
 }
@@ -2288,8 +2334,6 @@ static void CreatePendingFragments(
   std::vector<EntityRange> nested_decls;
   std::vector<pasta::Macro> top_level_macros;
 
-  std::vector<pasta::Decl> forward_decls;
-
   // Partition the top-level declarations so that ones that definitely won't
   // need to go in a nested fragment show up first. This acts as a minor
   // mitigation to #396 (https://github.com/trailofbits/multiplier/issues/396).
@@ -2366,7 +2410,7 @@ static void CreatePendingFragments(
     pasta::PrintedTokenRange aligned_tokens =
         CreateParsedTokenRange(
             pasta::PrintedTokenRange::Adopt(frag_tok_range),
-            root_decls, pp);
+            root_decls, pp, main_file_path);
 
     CHECK(!aligned_tokens.empty() || !top_level_macros.empty());
 
@@ -2401,7 +2445,7 @@ static void CreatePendingFragments(
 
     pasta::PrintedTokenRange aligned_tokens = CreateParsedTokenRange(
         pasta::PrintedTokenRange::Adopt(sub_tok_range.value()),
-        decls, pp);
+        decls, pp, main_file_path);
 
     CHECK(!aligned_tokens.empty());
 
@@ -2483,7 +2527,6 @@ static void PersistParsedFragments(
 
   std::string main_source_file = ast.MainFile().Path().generic_string();
   std::vector<mx::PackedFragmentId> fragment_ids;
-  fragment_ids.reserve(pending_fragments.size());
 
   auto num_new = 0u;
 
@@ -2500,6 +2543,8 @@ static void PersistParsedFragments(
       << "Main source file " << main_source_file
       << " has " << num_new << " / " << pending_fragments.size()
       << " unique fragments";
+
+  fragment_ids.reserve(num_new);
 
   for (PendingFragmentPtr &pf : pending_fragments) {
     if (!pf) {

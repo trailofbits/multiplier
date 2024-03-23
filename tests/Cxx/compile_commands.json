@@ -103,5 +103,20 @@
     "file": "NoExceptSplitTokenTest.cpp",
     "command": "/usr/bin/c++ -std=c++20 NoExceptSplitTokenTest.cpp",
     "directory": ""
+},
+{
+    "file": "VarBounds.cpp",
+    "command": "/usr/bin/c++ -std=c++20 VarBounds.cpp",
+    "directory": ""
+},
+{
+    "file": "MixingMethodBounds.cpp",
+    "command": "/usr/bin/c++ -std=c++20 MixingMethodBounds.cpp",
+    "directory": ""
+},
+{
+    "file": "EvilNamespaceNesting.cpp",
+    "command": "/usr/bin/c++ EvilNamespaceNesting.cpp",
+    "directory": ""
 }
 ]

@@ -731,7 +731,7 @@ bool IsSpecialization(const pasta::Decl &decl) {
         return pattern->DescribedFunctionTemplate().has_value();
       }
 
-      return false;
+      return func.TemplateInstantiationPattern().has_value();
     }
 
     case pasta::DeclKind::kFunction: {
@@ -749,7 +749,7 @@ bool IsSpecialization(const pasta::Decl &decl) {
         return pattern->DescribedFunctionTemplate().has_value();
       }
 
-      return false;
+      return func.TemplateInstantiationPattern().has_value();
     }
 
     default:
