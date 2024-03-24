@@ -2240,7 +2240,6 @@ static void CreateFloatingDirectiveFragment(
   CHECK(dir.has_value());
 
   auto root_macro = RootMacroFrom(macro);
-  auto raw_parent = root_macro != macro ? RawEntity(root_macro) : nullptr;
 
   auto marker_tok = dir->ParsedLocation();
 
@@ -2273,7 +2272,7 @@ static void CreateFloatingDirectiveFragment(
       end_index,
       {}  /* empty decls */,
       std::move(macros),
-      raw_parent);
+      nullptr  /* parent entity */);
 
   InitializeEntityLabeller(*pf);
 

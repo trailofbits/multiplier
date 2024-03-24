@@ -192,7 +192,11 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
   if (auto dre = pasta::DeclRefExpr::From(stmt)) {
     auto decl = dre->Declaration();
     if (is_identifier) {
+
       if (auto nd = pasta::NamedDecl::From(decl)) {
+        if (nd->Name() == token_data) {
+          return RawEntity(nd.value());
+        }
 
         // Common case for C code.
         if (check_token(dre->ExpressionToken())) {
@@ -215,9 +219,6 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
             return RawEntity(nd.value());
           }
         }
-
-        // Good way to find things we missed.
-        assert(nd->Name() != token_data);
       }
     }
 
