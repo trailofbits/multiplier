@@ -148,10 +148,12 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
   id.fragment_id = fragment.fragment_index;
   id.kind = TokenKindFromPasta(entity);
 
-  CHECK(em.token_tree_ids.emplace(entity.RawToken(), id).second);
+  CHECK(em.token_tree_ids.emplace(RawEntity(entity), id).second);
 
   if (std::optional<pasta::Token> pt = entity.DerivedLocation()) {
     CHECK(IsParsedToken(pt.value()));
+
+    auto raw_pt = RawEntity(pt.value());
 
     // NOTE(pag): We may see the same token come up multiple times, especially
     //            if this is purely printed tokens, rather than parsed tokens
@@ -160,7 +162,7 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
     //            each attribute in its own `__attribute__` block, whereas in
     //            the pasrsed source code, multiple attributes may belong to the
     //            same syntactical block.
-    if (!em.token_tree_ids.emplace(pt->RawToken(), id).second) {
+    if (!em.token_tree_ids.emplace(raw_pt, id).second) {
       LOG_IF(ERROR, !IsAcceptableRepeatedToken(pt.value()))
             << "Token kind " << pt.value().KindName()
             << " is repeated and exist in the token tree!";

@@ -307,33 +307,25 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
 
     // Try to match the `)` in `func()`.
     auto r_paren = call->RParenToken();
+    if (r_paren.Kind() != pasta::TokenKind::kRParenthesis) {
+      return nullptr;
+    }
+
     if (token_kind == pasta::TokenKind::kRParenthesis) {
-      if (raw_token) {
-        if (raw_token == RawEntity(r_paren)) {
-          return RawEntity(call.value());
-        }
-      } else if (r_paren.Kind() == pasta::TokenKind::kRParenthesis) {
+      if (check_token(r_paren)) {
         return RawEntity(call.value());
       }
-    }
 
-    // Try to match the `(` in `func()`.
-    if (token_kind != pasta::TokenKind::kLParenthesis) {
-      return nullptr;
-    }
+    } else if (token_kind == pasta::TokenKind::kLParenthesis) {
+      auto l_paren = r_paren.BalancedLocation();
+      if (!l_paren || l_paren->Kind() != pasta::TokenKind::kLParenthesis) {
+        assert(false);
+        return nullptr;
+      }
 
-    auto l_paren = r_paren.BalancedLocation();
-    if (!l_paren) {
-      assert(false);
-      return nullptr;
-    }
-
-    if (raw_token) {
-      if (raw_token == RawEntity(l_paren.value())) {
+      if (check_token(l_paren.value())) {
         return RawEntity(call.value());
       }
-    } else if (l_paren->Kind() == pasta::TokenKind::kLParenthesis) {
-      return RawEntity(call.value());
     }
     
   // Parentheses.
