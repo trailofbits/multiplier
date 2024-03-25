@@ -1075,6 +1075,8 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
     return root_sub;
   }
 
+  root_sub->PrintDOT(std::cerr);
+
   std::cerr << "\n-- REBUILDING TREE ----------\n";
   std::cerr << printed_range.Data() << "\n";
 
@@ -2066,6 +2068,9 @@ std::optional<TokenTreeNodeRange> TokenTree::Create(
     const pasta::PrintedTokenRange &printed_range,
     const std::vector<pasta::Decl> &top_level_decls,
     std::ostream &err) {
+
+  err << "Skipping";
+  return std::nullopt;
 
   auto impl = std::make_shared<TokenTreeImpl>();
 
