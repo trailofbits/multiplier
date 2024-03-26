@@ -167,6 +167,9 @@ class MX_EXPORT File {
     return EntityCategory::FILE;
   }
 
+  // Generate all files in the index.
+  static gap::generator<File> in(const Index &index);
+
   // Return the entity ID of this file.
   PackedFileId id(void) const noexcept;
 

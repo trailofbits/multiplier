@@ -112,6 +112,9 @@ class MX_EXPORT Fragment {
   // Try to convert a variant entity into a fragment.
   static std::optional<Fragment> from(const VariantEntity &) noexcept;
 
+  // Generate all fragments in the index.
+  static gap::generator<Fragment> in(const Index &index);
+
   inline static constexpr EntityCategory entity_category(void) noexcept {
     return EntityCategory::FRAGMENT;
   }

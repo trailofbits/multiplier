@@ -298,6 +298,11 @@ SpecificEntityId<FileId> File::id(void) const noexcept {
   return FileId{impl->file_id};
 }
 
+// Generate all files in the index.
+gap::generator<File> File::in(const Index &index) {
+  return index.files();
+}
+
 gap::generator<Fragment> File::fragments(void) const & {
   FileId fid(impl->file_id);
   EntityProviderPtr ep = impl->ep;

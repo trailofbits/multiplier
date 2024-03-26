@@ -191,6 +191,11 @@ static void FixEnvVariablesAndPath(Command &command, PathCache *cache) {
   envp["LANG"] = "C";
   envp["CWD"] = command.working_dir;
   envp["PWD"] = command.working_dir;
+  envp["NO_COLOR"] = "1";
+
+  envp.erase("TERM");
+  envp.erase("CLICOLOR");
+  envp.erase("CLICOLOR_FORCE");
 }
 
 struct CompilerPathInfo {
@@ -376,9 +381,6 @@ BuildCommandAction::GetCompilerInfo(void) {
   new_args.emplace_back("-Wno-everything");  // Disable all warnings (Clang).
   new_args.emplace_back("-P");  // Disable preprocessor line markers.
   new_args.emplace_back("-v");
-
-  // Disable color diagnostics so that we can match on things like `error:`.
-  new_args.emplace_back("-fdiagnostics-color=never");
 
   if (!specifies_language) {
     new_args.push_back("-x");

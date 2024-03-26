@@ -534,6 +534,7 @@ bool IsSerializableDecl(const pasta::Decl &decl) {
   auto kind = decl.Kind();
   switch (kind) {
     case pasta::DeclKind::kTranslationUnit:
+    case pasta::DeclKind::kCXXDeductionGuide:
       return false;
     default:
       if (decl.IsInvalidDeclaration()) {
@@ -792,7 +793,23 @@ bool IsSpecializationOrTemplateInSpecialization(const pasta::Decl &decl) {
 //
 // NOTE(pag): This logic is closely related to what is in `TLDFinder`.
 bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
+
   auto lc = decl.LexicalDeclarationContext();
+
+  // Methods (static or member) inside of class template specializations are
+  // always nested fragments. This is because their bodies may not be fully
+  // instantiated, and so we don't want them screwing up the fragment
+  // deduplication.
+  if (lc) {
+    auto parent_spec = pasta::ClassTemplateSpecializationDecl::From(lc.value());
+    if (parent_spec) {
+      if (parent_spec->Kind() != pasta::DeclKind::kClassTemplatePartialSpecialization &&
+          pasta::FunctionDecl::From(decl)) {
+        return true;
+      }
+    }
+  }
+
   switch (decl.Kind()) {
     case pasta::DeclKind::kFriendTemplate:
     // TODO(pag): FriendDecl for FriendTemplateDecl.

@@ -74,6 +74,9 @@ class MX_EXPORT Compilation {
   static Compilation containing(const Macro &);
   static std::optional<Compilation> containing(const VariantEntity &);
 
+  // Generate all compilations in the index.
+  static gap::generator<Compilation> in(const Index &index);
+
   // Return the unique ID of this compilation.
   PackedCompilationId id(void) const noexcept;
 

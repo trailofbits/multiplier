@@ -448,6 +448,25 @@ class TLDFinder final : public pasta::DeclVisitor {
     AddDeclAlways(decl);
   }
 
+  void VisitVarDecl(const pasta::VarDecl &decl) {
+
+    // An out-of-line defined variable on a class template, but where the
+    // variable itself is not a template. Make the parent fragment into the
+    // out-of-line pattern.
+    if (decl.IsOutOfLine()) {
+      if (auto pattern = decl.TemplateInstantiationPattern()) {
+        DCHECK(decl.Token() == pattern->Token());
+        if (!pattern->DescribedVariableTemplate()) {
+          PrevValueTracker<const void *> save_restore(parent_decl, RawEntity(pattern.value()));
+          VisitDeclaratorDecl(decl);
+          return;
+        }
+      }
+    }
+
+    VisitDeclaratorDecl(decl);
+  }
+
   void VisitFriendTemplateDecl(const pasta::FriendTemplateDecl &decl) final {
     AddDecl(decl);
   }
@@ -541,7 +560,22 @@ class TLDFinder final : public pasta::DeclVisitor {
       }
     }
 
-    VisitDecl(decl);
+    // Methods (static or member) inside of class template specializations are
+    // always nested fragments. This is because their bodies may not be fully
+    // instantiated, and so we don't want them screwing up the fragment
+    // deduplication.
+    if (auto lc = decl.LexicalDeclarationContext()) {
+      auto parent_spec = pasta::ClassTemplateSpecializationDecl::From(lc.value());
+      if (parent_spec) {
+        if (parent_spec->Kind() != pasta::DeclKind::kClassTemplatePartialSpecialization &&
+            pasta::FunctionDecl::From(decl)) {
+          AddDeclAlways(decl);
+          return;
+        }
+      }
+    }
+
+    VisitDeclaratorDecl(decl);
   }
 
   void VisitRecordDecl(const pasta::RecordDecl &decl) final {
@@ -555,11 +589,10 @@ class TLDFinder final : public pasta::DeclVisitor {
     VisitDeeperDeclContext(decl, decl);
 
     seen.erase(raw_decl);
-    VisitDecl(decl);
+    VisitTagDecl(decl);
   }
 
   void VisitCXXMethodDecl(const pasta::CXXMethodDecl &decl) final {
-
     // If the CXXMethodDecl is implicit, don't need to visit the declaration;
     // return early.
     if (decl.IsImplicit()) {
@@ -567,16 +600,6 @@ class TLDFinder final : public pasta::DeclVisitor {
     }
 
     VisitFunctionDecl(decl);
-
-    // The method can be explicitly instantiated and out of line. If true
-    // add them to the tld's if the decl is templated or the definition.
-    // For out of line methods, the clang patches preserves the lexical
-    // structure of the AST node and method definition does not get
-    // merged with the declarations.
-    // if (decl.IsOutOfLine() && (decl.IsTemplated() ||
-    //    decl.IsThisDeclarationADefinition())) {
-    //  AddDecl(decl);
-    // }
   }
 
   void VisitUsingShadowDecl(const pasta::UsingShadowDecl &) final {}
@@ -596,9 +619,9 @@ class TLDFinder final : public pasta::DeclVisitor {
     }
   }
 
-  void VisitConceptDecl(const pasta::ConceptDecl &decl) {
-    VisitDecl(decl);
-  }
+  // void VisitConceptDecl(const pasta::ConceptDecl &decl) {
+  //   VisitTemplateDecl(decl);
+  // }
 
   void VisitDecl(const pasta::Decl &decl) final {
     if (!depth) {

@@ -118,5 +118,10 @@
     "file": "EvilNamespaceNesting.cpp",
     "command": "/usr/bin/c++ EvilNamespaceNesting.cpp",
     "directory": ""
+},
+{
+    "file": "ExplicitFunctionTemplateSpecialization.cpp",
+    "command": "/usr/bin/c++ ExplicitFunctionTemplateSpecialization.cpp",
+    "directory": ""
 }
 ]

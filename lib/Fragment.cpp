@@ -156,6 +156,14 @@ std::optional<Fragment> Fragment::containing(const TokenTree &tree) noexcept {
   }
 }
 
+// Generate all fragments in the index.
+gap::generator<Fragment> Fragment::in(const Index &index) {
+  auto impl = index.impl;
+  for (auto eptr : impl->FragmentsFor(impl)) {
+    co_yield Fragment(std::move(eptr));
+  }
+}
+
 // Try to convert a variant entity into a fragment.
 std::optional<Fragment> Fragment::from(const VariantEntity &entity) noexcept {
   if (std::holds_alternative<Fragment>(entity)) {

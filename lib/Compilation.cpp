@@ -115,6 +115,11 @@ std::optional<Compilation> Compilation::containing(
   return Compilation::containing(Fragment::containing(entity));
 }
 
+// Generate all compilations in the index.
+gap::generator<Compilation> Compilation::in(const Index &index) {
+  return index.compilations();
+}
+
 // The fragments owned by this compilation. This will be a subset of all
 // observable fragments by this compilation, because some of them may be
 // owned by a different compilation.
