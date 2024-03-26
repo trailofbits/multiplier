@@ -22,6 +22,7 @@ namespace {
 
 static bool IsAcceptableRepeatedToken(const pasta::Token &tok) {
   switch (tok.Kind()) {
+    case pasta::TokenKind::kUnknown:
     case pasta::TokenKind::kKeyword__Attribute:
     case pasta::TokenKind::kKeyword__Declspec:
     case pasta::TokenKind::kLParenthesis:
@@ -151,7 +152,19 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
   CHECK(em.token_tree_ids.emplace(RawEntity(entity), id).second);
 
   if (std::optional<pasta::Token> pt = entity.DerivedLocation()) {
-    CHECK(IsParsedToken(pt.value()));
+
+    // NOTE(pag): This can happen where a printed attribute ends up referring
+    //            back to a macro directive marker, where the macro directive
+    //            is something like the following:
+    //
+    //    #pragma clang attribute push(__attribute__((...)), apply_to=...)
+    //
+    //            These kinds of attributes are annoying because they don't
+    //            communicate that they were implicitly applied.
+    if (!IsParsedToken(pt.value())) {
+      CHECK(pt->Role() == pasta::TokenRole::kMacroDirectiveMarker);
+      return true;
+    }
 
     auto raw_pt = RawEntity(pt.value());
 
