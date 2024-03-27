@@ -123,5 +123,10 @@
     "file": "ExplicitFunctionTemplateSpecialization.cpp",
     "command": "/usr/bin/c++ ExplicitFunctionTemplateSpecialization.cpp",
     "directory": ""
+},
+{
+    "file": "AutoDeducedMemberExpr.cpp",
+    "command": "/usr/bin/c++ -std=c++20 AutoDeducedMemberExpr.cpp",
+    "directory": ""
 }
 ]
