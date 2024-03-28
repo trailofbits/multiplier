@@ -71,7 +71,7 @@ class MX_EXPORT BindingDecl : public ValueDecl {
 
   std::optional<Expr> binding(void) const;
   ValueDecl decomposed_declaration(void) const;
-  VarDecl holding_variable(void) const;
+  std::optional<VarDecl> holding_variable(void) const;
 };
 
 static_assert(sizeof(BindingDecl) == sizeof(ValueDecl));

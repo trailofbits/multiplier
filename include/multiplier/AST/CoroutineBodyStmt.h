@@ -78,7 +78,7 @@ class MX_EXPORT CoroutineBodyStmt : public Stmt {
   Stmt promise_declaration_statement(void) const;
   std::optional<Stmt> result_declaration(void) const;
   Stmt return_statement(void) const;
-  Stmt return_statement_on_alloc_failure(void) const;
+  std::optional<Stmt> return_statement_on_alloc_failure(void) const;
   Expr return_value(void) const;
   Expr return_value_initializer(void) const;
   bool has_dependent_promise_type(void) const;

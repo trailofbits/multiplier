@@ -6086,7 +6086,13 @@ void SerializeCoroutineBodyStmt(const PendingFragment &pf, const EntityMapper &e
     b.setVal21(mx::kInvalidEntityId);
   }
   b.setVal22(es.EntityId(e.ReturnStatement()));
-  b.setVal30(es.EntityId(e.ReturnStatementOnAllocFailure()));
+  auto v30 = e.ReturnStatementOnAllocFailure();
+  if (v30) {
+    auto id30 = es.EntityId(v30.value());
+    b.setVal30(id30);
+  } else {
+    b.setVal30(mx::kInvalidEntityId);
+  }
   b.setVal31(es.EntityId(e.ReturnValue()));
   b.setVal32(es.EntityId(e.ReturnValueInitializer()));
   b.setVal12(e.HasDependentPromiseType());
@@ -6097,7 +6103,13 @@ void SerializeCoreturnStmt(const PendingFragment &pf, const EntityMapper &es, mx
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.KeywordToken());
   b.setVal9(et9);
-  b.setVal10(es.EntityId(e.Operand()));
+  auto v10 = e.Operand();
+  if (v10) {
+    auto id10 = es.EntityId(v10.value());
+    b.setVal10(id10);
+  } else {
+    b.setVal10(mx::kInvalidEntityId);
+  }
   b.setVal11(es.EntityId(e.PromiseCall()));
   b.setVal12(e.IsImplicit());
 }
@@ -9885,7 +9897,13 @@ void SerializeBindingDecl(const PendingFragment &pf, const EntityMapper &es, mx:
     b.setVal57(mx::kInvalidEntityId);
   }
   b.setVal65(es.EntityId(e.DecomposedDeclaration()));
-  b.setVal66(es.EntityId(e.HoldingVariable()));
+  auto v66 = e.HoldingVariable();
+  if (v66) {
+    auto id66 = es.EntityId(v66.value());
+    b.setVal66(id66);
+  } else {
+    b.setVal66(mx::kInvalidEntityId);
+  }
 }
 
 void SerializeOMPDeclarativeDirectiveValueDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPDeclarativeDirectiveValueDecl &e, const TokenTree *) {

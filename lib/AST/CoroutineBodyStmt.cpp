@@ -297,9 +297,17 @@ Stmt CoroutineBodyStmt::return_statement(void) const {
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
-Stmt CoroutineBodyStmt::return_statement_on_alloc_failure(void) const {
-  RawEntityId eid = impl->reader.getVal30();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid));
+std::optional<Stmt> CoroutineBodyStmt::return_statement_on_alloc_failure(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal30();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Stmt(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 Expr CoroutineBodyStmt::return_value(void) const {

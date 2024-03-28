@@ -240,9 +240,17 @@ ValueDecl BindingDecl::decomposed_declaration(void) const {
   return ValueDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
-VarDecl BindingDecl::holding_variable(void) const {
-  RawEntityId eid = impl->reader.getVal66();
-  return VarDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
+std::optional<VarDecl> BindingDecl::holding_variable(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal66();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return VarDecl::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

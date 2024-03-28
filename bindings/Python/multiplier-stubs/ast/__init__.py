@@ -41357,7 +41357,7 @@ class CoroutineBodyStmt(multiplier.ast.Stmt):
   promise_declaration_statement: multiplier.ast.Stmt
   result_declaration: Optional[multiplier.ast.Stmt]
   return_statement: multiplier.ast.Stmt
-  return_statement_on_alloc_failure: multiplier.ast.Stmt
+  return_statement_on_alloc_failure: Optional[multiplier.ast.Stmt]
   return_value: multiplier.ast.Expr
   return_value_initializer: multiplier.ast.Expr
   has_dependent_promise_type: bool
@@ -41454,7 +41454,7 @@ class CoroutineBodyStmt(multiplier.ast.Stmt):
 
 class CoreturnStmt(multiplier.ast.Stmt):
   keyword_token: multiplier.frontend.Token
-  operand: multiplier.ast.Expr
+  operand: Optional[multiplier.ast.Expr]
   promise_call: multiplier.ast.Expr
   is_implicit: bool
 
@@ -60653,7 +60653,7 @@ class BindingDecl(multiplier.ast.ValueDecl):
   redeclarations: Generator[multiplier.ast.BindingDecl]
   binding: Optional[multiplier.ast.Expr]
   decomposed_declaration: multiplier.ast.ValueDecl
-  holding_variable: multiplier.ast.VarDecl
+  holding_variable: Optional[multiplier.ast.VarDecl]
 
   @overload
   @staticmethod
