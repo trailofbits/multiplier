@@ -128,5 +128,10 @@
     "file": "AutoDeducedMemberExpr.cpp",
     "command": "/usr/bin/c++ -std=c++20 AutoDeducedMemberExpr.cpp",
     "directory": ""
+},
+{
+    "file": "TypedefFunction.cpp",
+    "command": "/usr/bin/c++ TypedefFunction.cpp",
+    "directory": ""
 }
 ]
