@@ -305,6 +305,7 @@ void TokenContextSaver::Persist(ContextListBuilder tcb_list,
       if (already_created[info.offset]) {
         break;
       }
+
       already_created[info.offset] = true;
 
       tcb.reset();
@@ -336,21 +337,6 @@ void PersistTokenContexts(
   tcs.ResolveAliases();
   tcs.Persist(fb.initParsedTokenContexts(num_contexts),
               fb.initParsedTokenContextOffsets(num_tokens));
-}
-
-// The implementation of PersistTokenContexts is same as for parsed tokens. Some
-// of the checks here are redundant for printed token. Move to the specialized
-// implementation for printed tokens
-void PersistTokenContexts(
-    const EntityMapper &em, const pasta::PrintedTokenRange &parsed_tokens,
-    mx::rpc::Type::Builder &fb) {
-
-  TokenContextSaver tcs(em, parsed_tokens, 0u);
-  auto num_tokens = tcs.CollectContextsFromTokens();
-  auto num_contexts = tcs.ConvertContextsToPendingContexts();
-  tcs.ResolveAliases();
-  tcs.Persist(fb.initTypeTokenContexts(num_contexts),
-              fb.initTypeTokenContextOffsets(num_tokens));
 }
 
 }  // namespace indexer

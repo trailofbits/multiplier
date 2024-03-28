@@ -68,7 +68,7 @@ class TypeImpl {
   friend class TokenReader;
 
   using FragmentReader = typename rpc::Type::Reader;
-  using TypeReader  = typename ast::Type::Reader;
+  using TypeReader = typename ast::Type::Reader;
 
   // Stores the Cap'n-Proto serialized data.;
   const kj::Array<capnp::word> data;
@@ -76,7 +76,7 @@ class TypeImpl {
 
   // Type token reader
   const ReadTypeTokens type_token_reader;
-  const TypeTokenContextReader token_context_reader;
+
  public:
   // Needed for us to be able to look up entities related to other types
   // or fragments.
@@ -97,9 +97,6 @@ class TypeImpl {
 
   TokenReaderPtr
   TypeTokenReader(const TypeImplPtr &) const;
-
-  TokenContextReader::Ptr
-  TokenContextReader(const TokenImplPtr &) const;
 
   std::string_view Data(void) const & noexcept;
 
