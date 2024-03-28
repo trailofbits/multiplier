@@ -223,6 +223,10 @@ class Fragment(multiplier.Entity):
     ...
 
   @staticmethod
+  def IN(index: multiplier.Index) -> Generator[multiplier.Fragment]:
+    ...
+
+  @staticmethod
   def entity_category() -> multiplier.EntityCategory:
     ...
 

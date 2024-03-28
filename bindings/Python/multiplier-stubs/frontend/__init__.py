@@ -717,6 +717,10 @@ class Compilation(multiplier.Entity):
   def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.Compilation]:
     ...
 
+  @staticmethod
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.Compilation]:
+    ...
+
 class Token(multiplier.Entity):
   kind: multiplier.frontend.TokenKind
   data: str
@@ -904,6 +908,10 @@ class File(multiplier.Entity):
 
   @staticmethod
   def entity_category() -> multiplier.EntityCategory:
+    ...
+
+  @staticmethod
+  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.File]:
     ...
 
 class Macro(multiplier.Entity):

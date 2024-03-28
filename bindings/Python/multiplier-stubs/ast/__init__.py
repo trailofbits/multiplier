@@ -45710,7 +45710,7 @@ class CUDAKernelCallExpr(multiplier.ast.CallExpr):
     ...
 
 class UserDefinedLiteral(multiplier.ast.CallExpr):
-  cooked_literal: multiplier.ast.Expr
+  cooked_literal: Optional[multiplier.ast.Expr]
   literal_operator_kind: multiplier.ast.UserDefinedLiteralLiteralOperatorKind
   ud_suffix_token: multiplier.frontend.Token
 

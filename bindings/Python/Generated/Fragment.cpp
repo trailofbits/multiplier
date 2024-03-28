@@ -355,6 +355,27 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::Fragment::from"),
   },
   {
+    "IN",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Index>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::in(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'IN'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::Fragment::in"),
+  },
+  {
     "entity_category",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {

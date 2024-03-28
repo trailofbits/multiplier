@@ -832,7 +832,7 @@ void GlobalIndexingState::PersistFragment(
   for (auto i = 0u; i < pf.num_top_level_declarations; ++i) {
     tlds.set(i, em.EntityId(pf.top_level_decls[i]));
   }
-CXXMemberCallExpr
+
   // Derive the macro substitution tree. Failing to build the tree is an error
   // condition, but we can't let it stop us from actually serializing the
   // fragment or its data.

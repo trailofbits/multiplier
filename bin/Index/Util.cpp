@@ -6,6 +6,7 @@
 
 #include "Util.h"
 
+#include <algorithm>
 #include <glog/logging.h>
 #include <iostream>
 
@@ -981,15 +982,6 @@ bool IsInjectedForwardDeclaration(const pasta::Decl &decl) {
   }
 }
 
-// List the indexable declarations in this declcontext.
-std::vector<pasta::Decl> DeclarationsInDeclContext(
-    const pasta::DeclContext &dc) {
-  auto decls = dc.AlreadyLoadedDeclarations();
-  auto it = std::remove_if(decls.begin(), decls.end(), ShouldHideFromIndexer);
-  decls.erase(it, decls.end());
-  return decls;
-}
-
 // Should a declaration be hidden from the indexer?
 // The function will go away in the final version as we are only
 // hiding TranslationUnitDecl from the indexer.
@@ -1025,6 +1017,18 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
   }
 
   return false;
+}
+
+// List the indexable declarations in this declcontext.
+std::vector<pasta::Decl> DeclarationsInDeclContext(
+    const pasta::DeclContext &dc) {
+  auto decls = dc.AlreadyLoadedDeclarations();
+  auto it = std::remove_if(decls.begin(), decls.end(),
+                           [] (const pasta::Decl &d) {
+                             return ShouldHideFromIndexer(d);
+                           });
+  decls.erase(it, decls.end());
+  return decls;
 }
 
 pasta::Macro RootMacroFrom(const pasta::Macro &node) {
