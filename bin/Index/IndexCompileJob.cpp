@@ -2608,7 +2608,8 @@ static void PersistParsedFragments(
     if (elapsed_time_s >= 30 && !pf->top_level_decls.empty()) {
       const pasta::Decl &leader_decl = pf->top_level_decls.front();
       LOG(WARNING)
-          << "Fragment" << PrefixedLocation(leader_decl, " at or near ")
+          << "Fragment with ID " << pf->fragment_id.Pack()
+          << PrefixedLocation(leader_decl, " at or near ")
           << " on main job file " << main_source_file
           << " took " << static_cast<uint64_t>(elapsed_time_s)
           << " seconds to persist";

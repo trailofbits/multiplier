@@ -2403,7 +2403,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  bool is_definition(void) const;\n"
           << "  Decl canonical_declaration(void) const;\n"
           << "  gap::generator<Decl> redeclarations(void) const &;\n"
-          << " public:\n";
+          << "\n";
 
       seen_methods->emplace("uses");  // Manual.
       seen_methods->emplace("definition");  // Manual.
@@ -2428,7 +2428,7 @@ MethodListPtr CodeGenerator::RunOnClass(
       class_os
           << "  std::optional<PackedDeclId> referenced_declaration_id(void) const;\n"
           << "  std::optional<Decl> referenced_declaration(void) const;\n"
-          << " public:\n";
+          << "\n";
 
       // `Stmt::referenced_declaration`.
       const auto ref = storage.AddMethod("UInt64");
@@ -3697,9 +3697,21 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   // Additional special methods for specific derived classes go here
 
+  if (class_name == "CXXRecordDecl") {
+    class_os
+        << "  // List of base and derived classes.\n"
+        << "  gap::generator<CXXRecordDecl> derived_classes(void) const &;\n"
+        << "  gap::generator<CXXRecordDecl> base_classes(void) const &;\n";
+  }
+
+  if (class_name == "CXXMethodDecl") {
+    class_os
+        << "  // List of methods that can override this method.\n"
+        << "  gap::generator<CXXMethodDecl> overridden_by_methods(void) const &;\n";
+  }
+
   // `FunctionDecl::callers`.
   if (class_name == "FunctionDecl") {
-    forward_decls.insert("CallExpr");
     class_os
         << "  // Callers of a `FunctionDecl` can be `CallExpr`, `CxxNewExpr`,\n"
         << "  // `CxxConstructExpr`, etc. Even `CastExpr` can sometimes be a call\n"

@@ -211,6 +211,9 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   std::optional<bool> has_extendable_virtual_function_table_pointer(void) const;
   std::optional<bool> has_virtual_base_table_pointer(void) const;
   std::optional<bool> has_own_virtual_base_table_pointer(void) const;
+  // List of base and derived classes.
+  gap::generator<CXXRecordDecl> derived_classes(void) const &;
+  gap::generator<CXXRecordDecl> base_classes(void) const &;
 };
 
 static_assert(sizeof(CXXRecordDecl) == sizeof(RecordDecl));

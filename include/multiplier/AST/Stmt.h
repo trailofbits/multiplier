@@ -85,7 +85,7 @@ class MX_EXPORT Stmt {
 
   std::optional<PackedDeclId> referenced_declaration_id(void) const;
   std::optional<Decl> referenced_declaration(void) const;
- public:
+
   static gap::generator<Stmt> in(const Index &index, std::span<const StmtKind> kinds);
   static gap::generator<Stmt> in(const Fragment &frag, std::span<const StmtKind> kinds);
   static gap::generator<Stmt> in(const File &file, std::span<const StmtKind> kinds);

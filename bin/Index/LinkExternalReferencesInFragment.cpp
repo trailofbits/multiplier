@@ -73,6 +73,88 @@ static void AddDeclReferencesFrom(
   }
 }
 
+// Add C++ base specifier extension relationships to the database.
+static void AddBaseSpecifierReferenceFrom(
+    const EntityMapper &em, mx::DatabaseWriter &database,
+    const pasta::CXXBaseSpecifier &spec) {
+  
+  auto raw_spec_id = em.EntityId(spec);
+
+  auto raw_cls_id = em.ParentDeclId(spec);
+  auto cls_id = mx::EntityId(raw_cls_id).Extract<mx::DeclId>();
+  if (!cls_id) {
+    return;
+  }
+
+  auto base_cls = spec.BaseType().AsCXXRecordDeclaration();
+  if (!base_cls) {
+    return;
+  }
+
+  auto raw_base_cls_id = em.EntityId(base_cls.value());
+  auto base_cls_id = mx::EntityId(raw_base_cls_id).Extract<mx::DeclId>();
+  if (!base_cls_id) {
+    return;
+  }
+
+  // The referer context id will be same as `from_id` by default. The
+  // DeclReferenceKind function updates it based on the AST analysis
+  // of the context in which declaration is referred.
+  mx::ReferenceRecord record{raw_cls_id, raw_base_cls_id, raw_spec_id,
+                             mx::BuiltinReferenceKind::EXTENDS};
+  database.AddAsync(record);
+}
+
+// Add C++ method override relationships to the database.
+static void AddMethodOverrideReferences(
+    const EntityMapper &em, mx::DatabaseWriter &database,
+    const pasta::CXXMethodDecl &method) {
+
+  auto raw_derived_id = em.EntityId(method);
+  auto derived_id = mx::EntityId(raw_derived_id).Extract<mx::DeclId>();
+  if (!derived_id) {
+    return;
+  }
+
+  for (const auto &base_method : method.OverriddenMethods()) {
+    auto raw_base_id = em.EntityId(base_method);
+    auto base_id = mx::EntityId(raw_base_id).Extract<mx::DeclId>();
+    if (!base_id) {
+      return;
+    }
+
+    mx::ReferenceRecord record{raw_derived_id, raw_base_id, raw_derived_id,
+                               mx::BuiltinReferenceKind::OVERRIDES};
+    database.AddAsync(record);
+  }
+}
+
+// Add C++ method override relationships to the database.
+static void AddMethodOverrideReferences(
+    const EntityMapper &em, mx::DatabaseWriter &database,
+    const PendingFragment &pf) {
+
+  constexpr mx::DeclKind kinds[] = {
+    mx::DeclKind::CXX_CONVERSION,
+    mx::DeclKind::CXX_CONSTRUCTOR,
+    mx::DeclKind::CXX_DEDUCTION_GUIDE,
+    mx::DeclKind::CXX_DESTRUCTOR,
+    mx::DeclKind::CXX_METHOD,
+  };
+
+  for (auto kind : kinds) {
+    auto decls_it = pf.decls_to_serialize.find(kind);
+    if (decls_it == pf.decls_to_serialize.end()) {
+      continue;
+    }
+
+    for (const auto &decl : decls_it->second) {
+      AddMethodOverrideReferences(
+          em, database, reinterpret_cast<const pasta::CXXMethodDecl &>(decl));
+    }
+  }
+}
+
 }  // namespace
 
 // Identify all unique entity IDs referenced by this fragment,
@@ -93,14 +175,15 @@ void LinkExternalReferencesInFragment(
   AddDeclReferencesFrom<mx::StmtId>(ast, database, pf, pf.stmts_to_serialize,
                                     EnumerateStmtToDeclReferences);
 
-  // XREF(pag): Issue #192. Make sure we record references from designators
-  //            to fields.
   AddDeclReferencesFrom<mx::DesignatorId>(
       ast, database, pf, pf.designators_to_serialize,
       EnumerateDesignatorToDeclReferences);
 
-  // TODO(pag): Issue #464. Add support for `CXXBaseSpecifier`s to the
-  //            references.
+  for (const auto &spec : pf.cxx_base_specifiers_to_serialize) {
+    AddBaseSpecifierReferenceFrom(em, database, spec);
+  }
+
+  AddMethodOverrideReferences(em, database, pf);
 
   for (auto maybe_tt : Entities(pf.macros_to_serialize)) {
     if (!maybe_tt) {

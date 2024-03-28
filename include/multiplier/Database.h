@@ -279,7 +279,9 @@ struct ReferenceRecord {
                  (9, "CALLS"),
                  (10, "TAKES_ADDRESS"),
                  (11, "INCLUDES_FILE"),
-                 (12, "EXPANSION_OF")
+                 (12, "EXPANSION_OF"),
+                 (13, "EXTENDS"),
+                 (14, "OVERRIDES"),
           )"};
 
   static constexpr const char *kExitStatements[] = {nullptr};

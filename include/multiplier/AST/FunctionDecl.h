@@ -22,7 +22,6 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
-class CallExpr;
 class Decl;
 class DeclaratorDecl;
 class FunctionDecl;
