@@ -6899,7 +6899,13 @@ void SerializeCUDAKernelCallExpr(const PendingFragment &pf, const EntityMapper &
 void SerializeUserDefinedLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UserDefinedLiteral &e, const TokenTree *) {
   (void) pf;
   SerializeCallExpr(pf, es, b, e, nullptr);
-  b.setVal42(es.EntityId(e.CookedLiteral()));
+  auto v42 = e.CookedLiteral();
+  if (v42) {
+    auto id42 = es.EntityId(v42.value());
+    b.setVal42(id42);
+  } else {
+    b.setVal42(mx::kInvalidEntityId);
+  }
   b.setVal92(static_cast<unsigned char>(mx::FromPasta(e.LiteralOperatorKind())));
   auto et43 = es.EntityId(e.UDSuffixToken());
   b.setVal43(et43);
@@ -8724,7 +8730,7 @@ void SerializeCapturedDecl(const PendingFragment &pf, const EntityMapper &es, mx
     }
   } while (false);
   pasta::DeclContext dc51(e);
-  auto v51 = dc51.AlreadyLoadedDeclarations();
+  auto v51 = DeclarationsInDeclContext(dc51);
   auto sv51 = b.initVal51(static_cast<unsigned>(v51.size()));
   auto i51 = 0u;
   for (const pasta::Decl &e51 : v51) {
@@ -8776,7 +8782,7 @@ void SerializeBlockDecl(const PendingFragment &pf, const EntityMapper &es, mx::a
     }
   } while (false);
   pasta::DeclContext dc61(e);
-  auto v61 = dc61.AlreadyLoadedDeclarations();
+  auto v61 = DeclarationsInDeclContext(dc61);
   auto sv61 = b.initVal61(static_cast<unsigned>(v61.size()));
   auto i61 = 0u;
   for (const pasta::Decl &e61 : v61) {
@@ -8853,7 +8859,7 @@ void SerializeTranslationUnitDecl(const PendingFragment &pf, const EntityMapper 
   (void) b;
   (void) e;
   pasta::DeclContext dc50(e);
-  auto v50 = dc50.AlreadyLoadedDeclarations();
+  auto v50 = DeclarationsInDeclContext(dc50);
   auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
   auto i50 = 0u;
   for (const pasta::Decl &e50 : v50) {
@@ -8898,7 +8904,7 @@ void SerializeRequiresExprBodyDecl(const PendingFragment &pf, const EntityMapper
   (void) e;
   SerializeDecl(pf, es, b, e, nullptr);
   pasta::DeclContext dc50(e);
-  auto v50 = dc50.AlreadyLoadedDeclarations();
+  auto v50 = DeclarationsInDeclContext(dc50);
   auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
   auto i50 = 0u;
   for (const pasta::Decl &e50 : v50) {
@@ -9120,7 +9126,7 @@ void SerializeOMPDeclareReductionDecl(const PendingFragment &pf, const EntityMap
   b.setVal79(es.EntityId(e.Initializer()));
   b.setVal80(static_cast<unsigned char>(mx::FromPasta(e.InitializerKind())));
   pasta::DeclContext dc50(e);
-  auto v50 = dc50.AlreadyLoadedDeclarations();
+  auto v50 = DeclarationsInDeclContext(dc50);
   auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
   auto i50 = 0u;
   for (const pasta::Decl &e50 : v50) {
@@ -9662,7 +9668,7 @@ void SerializeFunctionDecl(const PendingFragment &pf, const EntityMapper &es, mx
     b.setVal167(mx::kInvalidEntityId);
   }
   pasta::DeclContext dc61(e);
-  auto v61 = dc61.AlreadyLoadedDeclarations();
+  auto v61 = DeclarationsInDeclContext(dc61);
   auto sv61 = b.initVal61(static_cast<unsigned>(v61.size()));
   auto i61 = 0u;
   for (const pasta::Decl &e61 : v61) {
@@ -9886,7 +9892,7 @@ void SerializeOMPDeclareMapperDecl(const PendingFragment &pf, const EntityMapper
   SerializeOMPDeclarativeDirectiveValueDecl(pf, es, b, e, nullptr);
   b.setVal57(es.EntityId(e.MapperVariableReference()));
   pasta::DeclContext dc50(e);
-  auto v50 = dc50.AlreadyLoadedDeclarations();
+  auto v50 = DeclarationsInDeclContext(dc50);
   auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
   auto i50 = 0u;
   for (const pasta::Decl &e50 : v50) {
@@ -10069,7 +10075,7 @@ void SerializeTagDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast
     }
   } while (false);
   pasta::DeclContext dc51(e);
-  auto v51 = dc51.AlreadyLoadedDeclarations();
+  auto v51 = DeclarationsInDeclContext(dc51);
   auto sv51 = b.initVal51(static_cast<unsigned>(v51.size()));
   auto i51 = 0u;
   for (const pasta::Decl &e51 : v51) {
@@ -11412,7 +11418,7 @@ void SerializeObjCMethodDecl(const PendingFragment &pf, const EntityMapper &es, 
     }
   } while (false);
   pasta::DeclContext dc61(e);
-  auto v61 = dc61.AlreadyLoadedDeclarations();
+  auto v61 = DeclarationsInDeclContext(dc61);
   auto sv61 = b.initVal61(static_cast<unsigned>(v61.size()));
   auto i61 = 0u;
   for (const pasta::Decl &e61 : v61) {
@@ -11487,7 +11493,7 @@ void SerializeObjCContainerDecl(const PendingFragment &pf, const EntityMapper &e
     }
   } while (false);
   pasta::DeclContext dc189(e);
-  auto v189 = dc189.AlreadyLoadedDeclarations();
+  auto v189 = DeclarationsInDeclContext(dc189);
   auto sv189 = b.initVal189(static_cast<unsigned>(v189.size()));
   auto i189 = 0u;
   for (const pasta::Decl &e189 : v189) {
@@ -11953,7 +11959,7 @@ void SerializeExportDecl(const PendingFragment &pf, const EntityMapper &es, mx::
   b.setVal55(et55);
   b.setVal49(e.HasBraces());
   pasta::DeclContext dc50(e);
-  auto v50 = dc50.AlreadyLoadedDeclarations();
+  auto v50 = DeclarationsInDeclContext(dc50);
   auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
   auto i50 = 0u;
   for (const pasta::Decl &e50 : v50) {

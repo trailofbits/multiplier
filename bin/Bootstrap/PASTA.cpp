@@ -3663,7 +3663,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       serialize_inc_os
           << "  MX_VISIT_DECL_CONTEXT(" << class_name << ", " << api_name
-          << ", " << i << ", MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, "
+          << ", " << i << ", MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, "
           << nth_entity_reader << ")\n";
 
       class_os
@@ -3684,7 +3684,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       serialize_cpp_os
           << "  pasta::DeclContext dc" << i << "(e);\n"
-          << "  auto v" << i << " = dc" << i << ".AlreadyLoadedDeclarations();\n"
+          << "  auto v" << i << " = DeclarationsInDeclContext(dc" << i << ");\n"
           << "  auto sv" << i << " = b." << init_name << "(static_cast<unsigned>(v"
           << i << ".size()));\n"
           << "  auto i" << i << " = 0u;\n"

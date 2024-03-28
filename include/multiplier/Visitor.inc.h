@@ -15820,7 +15820,7 @@ MX_END_VISIT_STMT(CUDAKernelCallExpr)
 MX_BEGIN_VISIT_STMT(UserDefinedLiteral)
   MX_ENTER_VISIT_UserDefinedLiteral
   MX_VISIT_BASE(UserDefinedLiteral, CallExpr)
-  MX_VISIT_ENTITY(UserDefinedLiteral, cooked_literal, 42, MX_APPLY_METHOD, CookedLiteral, Expr, NthStmt)
+  MX_VISIT_OPTIONAL_ENTITY(UserDefinedLiteral, cooked_literal, 42, MX_APPLY_METHOD, CookedLiteral, Expr, NthStmt)
   MX_VISIT_ENUM(UserDefinedLiteral, literal_operator_kind, 92, MX_APPLY_METHOD, LiteralOperatorKind, UserDefinedLiteralLiteralOperatorKind, NthStmt)
   MX_VISIT_ENTITY(UserDefinedLiteral, ud_suffix_token, 43, MX_APPLY_METHOD, UDSuffixToken, Token, NthStmt)
   MX_EXIT_VISIT_UserDefinedLiteral
@@ -17781,7 +17781,7 @@ MX_BEGIN_VISIT_DECL(CapturedDecl)
   MX_VISIT_ENTITY(CapturedDecl, context_parameter, 48, MX_APPLY_METHOD, ContextParameter, ImplicitParamDecl, NthDecl)
   MX_VISIT_BOOL(CapturedDecl, is_nothrow, 49, MX_APPLY_METHOD, IsNothrow, bool, NthDecl)
   MX_VISIT_ENTITY_LIST(CapturedDecl, parameters, 50, MX_APPLY_METHOD, Parameters, ImplicitParamDecl, NthDecl)
-  MX_VISIT_DECL_CONTEXT(CapturedDecl, declarations_in_context, 51, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(CapturedDecl, declarations_in_context, 51, MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, NthDecl)
   MX_EXIT_VISIT_CapturedDecl
 MX_END_VISIT_DECL(CapturedDecl)
 
@@ -17808,7 +17808,7 @@ MX_BEGIN_VISIT_DECL(BlockDecl)
   MX_VISIT_BOOL(BlockDecl, is_variadic, 60, MX_APPLY_METHOD, IsVariadic, bool, NthDecl)
   MX_VISIT_ENTITY_LIST(BlockDecl, parameters, 50, MX_APPLY_METHOD, Parameters, ParmVarDecl, NthDecl)
   MX_VISIT_ENTITY_LIST(BlockDecl, parameter_declarations, 51, MX_APPLY_METHOD, ParameterDeclarations, ParmVarDecl, NthDecl)
-  MX_VISIT_DECL_CONTEXT(BlockDecl, declarations_in_context, 61, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(BlockDecl, declarations_in_context, 61, MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, NthDecl)
   MX_EXIT_VISIT_BlockDecl
 MX_END_VISIT_DECL(BlockDecl)
 
@@ -17890,7 +17890,7 @@ MX_END_VISIT_DECL(OMPAllocateDecl)
 
 MX_BEGIN_VISIT_DECL(TranslationUnitDecl)
   MX_ENTER_VISIT_TranslationUnitDecl
-  MX_VISIT_DECL_CONTEXT(TranslationUnitDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(TranslationUnitDecl, declarations_in_context, 50, MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, NthDecl)
   MX_EXIT_VISIT_TranslationUnitDecl
 MX_END_VISIT_DECL(TranslationUnitDecl)
 
@@ -17936,7 +17936,7 @@ MX_END_VISIT_DECL(StaticAssertDecl)
 MX_BEGIN_VISIT_DECL(RequiresExprBodyDecl)
   MX_ENTER_VISIT_RequiresExprBodyDecl
   MX_VISIT_BASE(RequiresExprBodyDecl, Decl)
-  MX_VISIT_DECL_CONTEXT(RequiresExprBodyDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(RequiresExprBodyDecl, declarations_in_context, 50, MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, NthDecl)
   MX_EXIT_VISIT_RequiresExprBodyDecl
 MX_END_VISIT_DECL(RequiresExprBodyDecl)
 
@@ -18178,7 +18178,7 @@ MX_BEGIN_VISIT_DECL(OMPDeclareReductionDecl)
   MX_VISIT_ENTITY(OMPDeclareReductionDecl, initializer_private, 78, MX_APPLY_METHOD, InitializerPrivate, Expr, NthDecl)
   MX_VISIT_ENTITY(OMPDeclareReductionDecl, initializer, 79, MX_APPLY_METHOD, Initializer, Expr, NthDecl)
   MX_VISIT_ENUM(OMPDeclareReductionDecl, initializer_kind, 80, MX_APPLY_METHOD, InitializerKind, OMPDeclareReductionDeclInitKind, NthDecl)
-  MX_VISIT_DECL_CONTEXT(OMPDeclareReductionDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(OMPDeclareReductionDecl, declarations_in_context, 50, MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, NthDecl)
   MX_EXIT_VISIT_OMPDeclareReductionDecl
 MX_END_VISIT_DECL(OMPDeclareReductionDecl)
 
@@ -18542,7 +18542,7 @@ MX_BEGIN_VISIT_DECL(FunctionDecl)
   MX_VISIT_BOOL(FunctionDecl, uses_seh_try, 165, MX_APPLY_METHOD, UsesSEHTry, bool, NthDecl)
   MX_VISIT_BOOL(FunctionDecl, will_have_body, 166, MX_APPLY_METHOD, WillHaveBody, bool, NthDecl)
   MX_VISIT_OPTIONAL_ENTITY(FunctionDecl, body, 167, MX_APPLY_METHOD, Body, Stmt, NthDecl)
-  MX_VISIT_DECL_CONTEXT(FunctionDecl, declarations_in_context, 61, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(FunctionDecl, declarations_in_context, 61, MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, NthDecl)
   MX_EXIT_VISIT_FunctionDecl
 MX_END_VISIT_DECL(FunctionDecl)
 
@@ -18738,7 +18738,7 @@ MX_BEGIN_VISIT_DECL(OMPDeclareMapperDecl)
   MX_ENTER_VISIT_OMPDeclareMapperDecl
   MX_VISIT_BASE(OMPDeclareMapperDecl, OMPDeclarativeDirectiveValueDecl)
   MX_VISIT_ENTITY(OMPDeclareMapperDecl, mapper_variable_reference, 57, MX_APPLY_METHOD, MapperVariableReference, Expr, NthDecl)
-  MX_VISIT_DECL_CONTEXT(OMPDeclareMapperDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(OMPDeclareMapperDecl, declarations_in_context, 50, MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, NthDecl)
   MX_EXIT_VISIT_OMPDeclareMapperDecl
 MX_END_VISIT_DECL(OMPDeclareMapperDecl)
 
@@ -18888,7 +18888,7 @@ MX_BEGIN_VISIT_ABSTRACT_DECL(TagDecl)
   MX_VISIT_BOOL(TagDecl, is_union, 102, MX_APPLY_METHOD, IsUnion, bool, NthDecl)
   MX_VISIT_BOOL(TagDecl, may_have_out_of_date_definition, 103, MX_APPLY_METHOD, MayHaveOutOfDateDefinition, bool, NthDecl)
   MX_VISIT_ENTITY_LIST(TagDecl, template_parameter_lists, 50, MX_APPLY_METHOD, TemplateParameterLists, TemplateParameterList, NthDecl)
-  MX_VISIT_DECL_CONTEXT(TagDecl, declarations_in_context, 51, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(TagDecl, declarations_in_context, 51, MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, NthDecl)
   MX_EXIT_VISIT_TagDecl
 MX_END_VISIT_DECL(TagDecl)
 
@@ -19420,7 +19420,7 @@ MX_BEGIN_VISIT_DECL(ObjCMethodDecl)
   MX_VISIT_BOOL(ObjCMethodDecl, is_variadic, 107, MX_APPLY_METHOD, IsVariadic, bool, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCMethodDecl, parameters, 50, MX_APPLY_METHOD, Parameters, ParmVarDecl, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCMethodDecl, selector_tokens, 51, MX_APPLY_METHOD, SelectorTokens, Token, NthDecl)
-  MX_VISIT_DECL_CONTEXT(ObjCMethodDecl, declarations_in_context, 61, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(ObjCMethodDecl, declarations_in_context, 61, MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, NthDecl)
   MX_EXIT_VISIT_ObjCMethodDecl
 MX_END_VISIT_DECL(ObjCMethodDecl)
 
@@ -19442,7 +19442,7 @@ MX_BEGIN_VISIT_ABSTRACT_DECL(ObjCContainerDecl)
   MX_VISIT_ENTITY_LIST(ObjCContainerDecl, instance_properties, 179, MX_APPLY_METHOD, InstanceProperties, ObjCPropertyDecl, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCContainerDecl, methods, 184, MX_APPLY_METHOD, Methods, ObjCMethodDecl, NthDecl)
   MX_VISIT_ENTITY_LIST(ObjCContainerDecl, properties, 188, MX_APPLY_METHOD, Properties, ObjCPropertyDecl, NthDecl)
-  MX_VISIT_DECL_CONTEXT(ObjCContainerDecl, declarations_in_context, 189, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(ObjCContainerDecl, declarations_in_context, 189, MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, NthDecl)
   MX_EXIT_VISIT_ObjCContainerDecl
 MX_END_VISIT_DECL(ObjCContainerDecl)
 
@@ -19766,7 +19766,7 @@ MX_BEGIN_VISIT_DECL(ExportDecl)
   MX_VISIT_ENTITY(ExportDecl, export_token, 48, MX_APPLY_METHOD, ExportToken, Token, NthDecl)
   MX_VISIT_ENTITY(ExportDecl, r_brace_token, 55, MX_APPLY_METHOD, RBraceToken, Token, NthDecl)
   MX_VISIT_BOOL(ExportDecl, has_braces, 49, MX_APPLY_METHOD, HasBraces, bool, NthDecl)
-  MX_VISIT_DECL_CONTEXT(ExportDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(ExportDecl, declarations_in_context, 50, MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, NthDecl)
   MX_EXIT_VISIT_ExportDecl
 MX_END_VISIT_DECL(ExportDecl)
 

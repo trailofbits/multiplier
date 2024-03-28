@@ -172,8 +172,8 @@ bool IsInjectedForwardDeclaration(const pasta::Decl &decl);
 // Should a declaration be hidden from the indexer?
 bool ShouldHideFromIndexer(const pasta::Decl &decl);
 
-// Should a declaration be added to entity mapper
-bool ShouldAddToEntityMapper(const pasta::Decl &decl);
+// List the indexable declarations in this declcontext.
+std::vector<pasta::Decl> DeclarationsInDeclContext(const pasta::DeclContext &dc);
 
 template <typename T>
 inline static bool ShouldHideFromIndexer(const T &) {

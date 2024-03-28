@@ -192,9 +192,17 @@ std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const TokenContext &t
   return std::nullopt;
 }
 
-Expr UserDefinedLiteral::cooked_literal(void) const {
-  RawEntityId eid = impl->reader.getVal42();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+std::optional<Expr> UserDefinedLiteral::cooked_literal(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal42();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 UserDefinedLiteralLiteralOperatorKind UserDefinedLiteral::literal_operator_kind(void) const {
