@@ -41925,7 +41925,7 @@ class CXXForRangeStmt(multiplier.ast.Stmt):
   condition: Optional[multiplier.ast.Expr]
   end_statement: Optional[multiplier.ast.DeclStmt]
   for_token: multiplier.frontend.Token
-  increment: multiplier.ast.Expr
+  increment: Optional[multiplier.ast.Expr]
   initializer: Optional[multiplier.ast.Stmt]
   loop_variable_statement: multiplier.ast.DeclStmt
   loop_variable: multiplier.ast.VarDecl

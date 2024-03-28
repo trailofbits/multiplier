@@ -248,9 +248,17 @@ Token CXXForRangeStmt::for_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal18());
 }
 
-Expr CXXForRangeStmt::increment(void) const {
-  RawEntityId eid = impl->reader.getVal19();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+std::optional<Expr> CXXForRangeStmt::increment(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal19();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 std::optional<Stmt> CXXForRangeStmt::initializer(void) const {

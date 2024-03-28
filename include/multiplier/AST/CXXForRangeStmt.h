@@ -70,7 +70,7 @@ class MX_EXPORT CXXForRangeStmt : public Stmt {
   std::optional<Expr> condition(void) const;
   std::optional<DeclStmt> end_statement(void) const;
   Token for_token(void) const;
-  Expr increment(void) const;
+  std::optional<Expr> increment(void) const;
   std::optional<Stmt> initializer(void) const;
   DeclStmt loop_variable_statement(void) const;
   VarDecl loop_variable(void) const;

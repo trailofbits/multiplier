@@ -2580,9 +2580,11 @@ static void PersistParsedFragments(
       context.PersistTypes(ast, mangler, em, *pf);
       fragment_ids.push_back(pf->fragment_id);
 
+    // NOTE(pag): To debug these, you should set a breakpoint on `__cxa_throw`.
     } catch (...) {
-      pf->has_error = true;
+      assert(false);
 
+      pf->has_error = true;
       if (!pf->top_level_decls.empty()) {
         const pasta::Decl &leader_decl = pf->top_level_decls.front();
         LOG(ERROR)

@@ -6183,7 +6183,13 @@ void SerializeCXXForRangeStmt(const PendingFragment &pf, const EntityMapper &es,
   }
   auto et18 = es.EntityId(e.ForToken());
   b.setVal18(et18);
-  b.setVal19(es.EntityId(e.Increment()));
+  auto v19 = e.Increment();
+  if (v19) {
+    auto id19 = es.EntityId(v19.value());
+    b.setVal19(id19);
+  } else {
+    b.setVal19(mx::kInvalidEntityId);
+  }
   auto v20 = e.Initializer();
   if (v20) {
     auto id20 = es.EntityId(v20.value());
