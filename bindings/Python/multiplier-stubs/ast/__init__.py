@@ -59872,6 +59872,7 @@ class CXXMethodDecl(multiplier.ast.FunctionDecl):
   is_volatile: bool
   num_overridden_methods: int
   overridden_methods: Generator[multiplier.ast.CXXMethodDecl]
+  overridden_by_methods: Generator[multiplier.ast.CXXMethodDecl]
 
   @overload
   @staticmethod
@@ -61956,6 +61957,8 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   has_extendable_virtual_function_table_pointer: Optional[bool]
   has_virtual_base_table_pointer: Optional[bool]
   has_own_virtual_base_table_pointer: Optional[bool]
+  derived_classes: Generator[multiplier.ast.CXXRecordDecl]
+  base_classes: Generator[multiplier.ast.CXXRecordDecl]
 
   @overload
   @staticmethod

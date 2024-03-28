@@ -1412,6 +1412,26 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::has_own_virtual_base_table_pointer"),
     nullptr,
   },
+  {
+    "derived_classes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->derived_classes());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRecordDecl::derived_classes"),
+    nullptr,
+  },
+  {
+    "base_classes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base_classes());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRecordDecl::base_classes"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

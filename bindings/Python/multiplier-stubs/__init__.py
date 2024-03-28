@@ -77,6 +77,8 @@ class BuiltinReferenceKind(IntEnum):
   TAKES_ADDRESS = 10
   INCLUDES_FILE = 11
   EXPANSION_OF = 12
+  EXTENDS = 13
+  OVERRIDES = 14
 
 class IndexStatus(IntEnum):
   UNINITIALIZED = 0

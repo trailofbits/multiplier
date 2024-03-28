@@ -296,6 +296,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::CXXMethodDecl::overridden_methods"),
     nullptr,
   },
+  {
+    "overridden_by_methods",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->overridden_by_methods());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXMethodDecl::overridden_by_methods"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace
