@@ -2582,9 +2582,8 @@ static void PersistParsedFragments(
 
     // NOTE(pag): To debug these, you should set a breakpoint on `__cxa_throw`.
     } catch (...) {
-      assert(false);
-
       pf->has_error = true;
+
       if (!pf->top_level_decls.empty()) {
         const pasta::Decl &leader_decl = pf->top_level_decls.front();
         LOG(ERROR)

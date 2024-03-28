@@ -60651,7 +60651,7 @@ class BindingDecl(multiplier.ast.ValueDecl):
   canonical_declaration: multiplier.ast.BindingDecl
   definition: Optional[multiplier.ast.BindingDecl]
   redeclarations: Generator[multiplier.ast.BindingDecl]
-  binding: multiplier.ast.Expr
+  binding: Optional[multiplier.ast.Expr]
   decomposed_declaration: multiplier.ast.ValueDecl
   holding_variable: multiplier.ast.VarDecl
 

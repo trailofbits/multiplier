@@ -222,9 +222,17 @@ std::optional<BindingDecl> BindingDecl::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-Expr BindingDecl::binding(void) const {
-  RawEntityId eid = impl->reader.getVal57();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+std::optional<Expr> BindingDecl::binding(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal57();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 ValueDecl BindingDecl::decomposed_declaration(void) const {

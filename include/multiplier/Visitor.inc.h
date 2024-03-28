@@ -18708,7 +18708,7 @@ MX_END_VISIT_DECL(ObjCAtDefsFieldDecl)
 MX_BEGIN_VISIT_DECL(BindingDecl)
   MX_ENTER_VISIT_BindingDecl
   MX_VISIT_BASE(BindingDecl, ValueDecl)
-  MX_VISIT_ENTITY(BindingDecl, binding, 57, MX_APPLY_METHOD, Binding, Expr, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(BindingDecl, binding, 57, MX_APPLY_METHOD, Binding, Expr, NthDecl)
   MX_VISIT_ENTITY(BindingDecl, decomposed_declaration, 65, MX_APPLY_METHOD, DecomposedDeclaration, ValueDecl, NthDecl)
   MX_VISIT_ENTITY(BindingDecl, holding_variable, 66, MX_APPLY_METHOD, HoldingVariable, VarDecl, NthDecl)
   MX_EXIT_VISIT_BindingDecl

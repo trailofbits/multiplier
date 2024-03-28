@@ -9877,7 +9877,13 @@ void SerializeBindingDecl(const PendingFragment &pf, const EntityMapper &es, mx:
   (void) b;
   (void) e;
   SerializeValueDecl(pf, es, b, e, nullptr);
-  b.setVal57(es.EntityId(e.Binding()));
+  auto v57 = e.Binding();
+  if (v57) {
+    auto id57 = es.EntityId(v57.value());
+    b.setVal57(id57);
+  } else {
+    b.setVal57(mx::kInvalidEntityId);
+  }
   b.setVal65(es.EntityId(e.DecomposedDeclaration()));
   b.setVal66(es.EntityId(e.HoldingVariable()));
 }
