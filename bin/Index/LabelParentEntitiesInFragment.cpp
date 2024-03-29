@@ -151,7 +151,7 @@ class ParentTrackerVisitor : public EntityVisitor {
     return true;
   }
 
-  void AcceptTopLevel(const pasta::Decl &entity) {
+  void AcceptTopLevel(const pasta::Decl &entity, bool actually_top_level) {
     // Clang will put records of classes inside themselves for `friend` lookups
     // and such. Our Clang patches set those to have the equivalent of
     // `Child->RemappedDecl = Parent`, and PASTA always follows `->RemappedDecl`
@@ -162,6 +162,34 @@ class ParentTrackerVisitor : public EntityVisitor {
       dc_guard.emplace(parent_dc, RawEntity(dc.value()));
       if (!dc_guard) {
         return;
+      }
+    }
+
+    // Go build parents for the semantic decl contexts. In the case of things
+    // like out-of-line static/member variables/fields/methods, we want the
+    // parent to be the class itself. We also want to be able to follow the
+    // namespaces up.
+    auto child_entity = RawEntity(entity);
+    if (actually_top_level && !em.parent_decl_ids.count(child_entity)) {
+      auto dc = entity.DeclarationContext();
+      while (dc) {
+        auto dc_decl = pasta::Decl::From(dc.value());
+        if (!dc_decl || ShouldHideFromIndexer(dc_decl.value())) {
+          break;
+        }
+
+        auto raw_dc_decl = RawEntity(dc_decl.value());
+        auto dc_eid = em.EntityId(raw_dc_decl);
+        if (dc_eid == mx::kInvalidEntityId) {
+          assert(false);
+          break;
+        }
+
+        em.parent_decl_ids.emplace(child_entity, dc_eid);
+        em.parent_decls.emplace(child_entity, raw_dc_decl);
+
+        child_entity = raw_dc_decl;
+        dc = dc_decl->DeclarationContext();
       }
     }
 
@@ -471,7 +499,7 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
   // Visit the top-level decls first.
 
   for (pasta::Decl decl : Entities(pf.top_level_decls)) {
-    vis.AcceptTopLevel(decl);
+    vis.AcceptTopLevel(decl, true);
   }
 
 #ifndef NDEBUG
@@ -484,7 +512,7 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
       continue;
     }
 
-    vis.AcceptTopLevel(decl);
+    vis.AcceptTopLevel(decl, false);
     
     // NOTE(pag): If this assertion is hit, then it suggests that the
     //            manually-written traversals in `Visitor.cpp` are missing

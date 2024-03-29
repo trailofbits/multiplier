@@ -125,6 +125,20 @@ enum class BuiltinReferenceKind : int {
   // `override`- or `final`-marked version of `Method`, then we say that
   // `Child::Method` overrides `Parent::Method`.
   OVERRIDES,
+
+  // In C++, an instantiation `Class<ConcreteType>` is said to specialize the
+  // template class `Class<TemplateTypeParam>`. This also applies for function
+  // templates and variable templates. Due to Clang not representing them, this
+  // doesn't apply to using type templates. In the case of class and variable
+  // template specializations, if this is a specialization of a partial
+  // specialization, then the partial specialization is the context, otherwise
+  // the template itself is the context.
+  //
+  // TODO(pag): Consider whether or not the `ClassTemplate` should be the
+  //            context, and the `CXXRecordDecl` that is the class pattern be
+  //            to the `to`. Ditto for variable and functions. This, however,
+  //            doesn't fit well with specializations of members.
+  SPECIALIZES,
 };
 
 inline static const char *EnumerationName(BuiltinReferenceKind) {
@@ -134,7 +148,7 @@ inline static const char *EnumerationName(BuiltinReferenceKind) {
 MX_EXPORT const char *EnumeratorName(BuiltinReferenceKind);
 
 inline static constexpr unsigned NumEnumerators(BuiltinReferenceKind) {
-  return 15;
+  return 16;
 }
 
 class MX_EXPORT ReferenceKind {

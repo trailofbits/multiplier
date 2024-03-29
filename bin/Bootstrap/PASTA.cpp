@@ -2403,6 +2403,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  bool is_definition(void) const;\n"
           << "  Decl canonical_declaration(void) const;\n"
           << "  gap::generator<Decl> redeclarations(void) const &;\n"
+          << "  gap::generator<Decl> specializations(void) const &;\n"
           << "\n";
 
       seen_methods->emplace("uses");  // Manual.

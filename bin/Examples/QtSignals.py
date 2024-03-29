@@ -3,7 +3,7 @@
 import argparse
 import multiplier as mx
 import sys
-from typing import List, Optional, Iterable, Set
+from typing import List, Optional, Iterable, Set, Tuple
 
 
 def debug(data: str, *args):
@@ -58,8 +58,8 @@ def find_signals(activate: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[mx.
         seen.add(caller_id)
 
         # Signals methods don't return anything.
-        assert isinstance(caller.return_type, mx.ast.BuiltinType)
-        assert caller.return_type.builtin_kind == mx.ast.BuiltinTypeKind.VOID
+        assert isinstance(caller.return_type, mx.ast.BuiltinType), f"Return type kind is {caller.return_type.kind.name}"
+        assert caller.return_type.builtin_kind == mx.ast.BuiltinTypeKind.VOID, f"Return builtin kind name is {caller.return_type.builtin_kind.name}"
 
         # The fragment must be part of a file.
         containing_file = mx.frontend.File.containing(caller)
@@ -157,8 +157,9 @@ def find_qobject_connect(index: mx.Index, seen: Set[int]) -> Iterable[mx.ast.CXX
 #     print("---")
 #     return False
 
-def find_slots(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[mx.ast.CXXMethodDecl]:
-    """Go and find all slots, given calls to `connect`."""
+
+def find_connections(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[Tuple[mx.ast.CXXMethodDecl, mx.ast.CXXMethodDecl]]:
+    """Given calls to `connect`, go and find the (signal, slot) or (signal, signal) pairs."""
     for call in connect.callers:
         if not isinstance(call, mx.ast.CallExpr):
             continue
@@ -172,21 +173,27 @@ def find_slots(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[mx.ast
         #     print("Connect in connect!")
         #     continue
 
+        input_signal: Optional[mx.ast.CXXMethodDecl] = None
+
         signal_method = call.nth_argument(1).ignore_casts
         signal_method_type = signal_method.type
         if isinstance(signal_method_type, mx.ast.SubstTemplateTypeParmType):
             signal_method_type = signal_method_type.replacement_type
 
+        print((signal_method.kind.name, signal_method_type.kind.name))
+
         # New style: The argument is a member pointer to a signal method.
         if isinstance(signal_method_type, mx.ast.MemberPointerType):
-            pass
+            assert isinstance(signal_method, mx.ast.UnaryOperator)
+            assert signal_method.opcode == mx.ast.UnaryOperatorKind.ADDRESS_OF
+            print(signal_method.sub_expression.kind.name)
 
         # Old style using a string literal.
         elif isinstance(signal_method_type, mx.ast.PointerType) and \
              isinstance(signal_method_type.pointee_type.unqualified_type, mx.ast.BuiltinType) and \
              signal_method_type.pointee_type.unqualified_type.builtin_kind in (mx.ast.BuiltinTypeKind.CHARACTER_S,
                                                                                mx.ast.BuiltinTypeKind.CHARACTER_U):
-            #print(" ".join(t.data for t in signal_method.tokens))
+
             if isinstance(signal_method, mx.ast.StringLiteral):
                 debug("Unhandled string literal signal argument '{}' to connect",
                       " ".join(t.data for t in signal_method.tokens))
@@ -203,7 +210,7 @@ def find_slots(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[mx.ast
                   " ".join(t.data for t in signal_method.tokens),
                   signal_method.type.kind.name)
             continue
-        yield 1
+        yield 1, 1
 
 
 def main():
@@ -215,10 +222,10 @@ def main():
 
     for activate in find_qmetaobject_activate(index, seen):
         for signal in find_signals(activate, seen):
-            print(signal.name)
+            pass
 
     for connect in find_qobject_connect(index, seen):
-        for slot in find_slots(connect, seen):
+        for slot, signal in find_connections(connect, seen):
             pass
 
     return 0

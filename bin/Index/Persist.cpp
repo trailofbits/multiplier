@@ -795,6 +795,7 @@ void GlobalIndexingState::PersistFragment(
 
     auto parent_ids = fb.initParentIds(1u);
     parent_ids.set(0u, mx::EntityId(fid).Pack());
+    CHECK_NE(pf.fragment_id.Pack(), parent_ids[0]);
 
   } else if (auto parent_macro_id = parent_eid.Extract<mx::MacroId>()) {
     mx::FragmentId fid(parent_macro_id->fragment_id);
@@ -802,6 +803,7 @@ void GlobalIndexingState::PersistFragment(
 
     auto parent_ids = fb.initParentIds(1u);
     parent_ids.set(0u, mx::EntityId(fid).Pack());
+    CHECK_NE(pf.fragment_id.Pack(), parent_ids[0]);
 
   } else {
     CHECK(!pf.raw_parent_entity);

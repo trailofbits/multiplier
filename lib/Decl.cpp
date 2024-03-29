@@ -6,8 +6,12 @@
 
 #include "Decl.h"
 
+#include <multiplier/AST/ClassTemplateDecl.h>
 #include <multiplier/AST/CXXMethodDecl.h>
 #include <multiplier/AST/CXXRecordDecl.h>
+#include <multiplier/AST/FunctionTemplateDecl.h>
+#include <multiplier/AST/VarTemplateDecl.h>
+#include <multiplier/AST/VarDecl.h>
 #include <multiplier/Index.h>
 
 #include "Fragment.h"
@@ -348,6 +352,70 @@ CXXMethodDecl::overridden_by_methods(void) const & {
       default:
         continue;
     }
+  }
+}
+
+gap::generator<Decl> Decl::specializations(void) const & {
+    static constexpr auto kSpecializesKindId =
+      static_cast<RawEntityId>(BuiltinReferenceKind::SPECIALIZES);
+
+  // If `this` is a pattern, then go and get the entity ID for the template.
+  auto self_id = id().Pack();
+  switch (kind()) {
+    case DeclKind::CXX_RECORD: {
+      const auto &self = reinterpret_cast<const CXXRecordDecl &>(*this);
+      if (auto tpl = self.described_class_template()) {
+        self_id = tpl->id().Pack();
+      }
+      break;
+    }
+
+    case DeclKind::VAR: {
+      const auto &self = reinterpret_cast<const VarDecl &>(*this);
+      if (auto tpl = self.described_variable_template()) {
+        self_id = tpl->id().Pack();
+      }
+      break;
+    }
+
+    case DeclKind::CXX_CONSTRUCTOR:
+    case DeclKind::CXX_CONVERSION:
+    case DeclKind::CXX_DESTRUCTOR:
+    case DeclKind::CXX_DEDUCTION_GUIDE:
+    case DeclKind::CXX_METHOD:
+    case DeclKind::FUNCTION: {
+      const auto &self = reinterpret_cast<const FunctionDecl &>(*this);
+      if (auto tpl = self.described_function_template()) {
+        self_id = tpl->id().Pack();
+      }
+      break;
+    }
+
+    default:
+      break;
+  }
+
+  // Emit the specializations.
+  auto ep = impl->ep;
+  for (auto [from_id, context_id, kind_id] :
+        ep->References(ep, self_id, EntityProvider::kReferenceTo)) {
+
+    if (kSpecializesKindId != kind_id) {
+      continue;
+    }
+
+    auto decl_id = EntityId(from_id).Extract<DeclId>();
+    if (!decl_id) {
+      continue;
+    }
+
+    auto eptr = ep->DeclFor(ep, from_id);
+    if (!eptr) {
+      assert(false);
+      continue;
+    }
+
+    co_yield Decl(std::move(eptr));
   }
 }
 

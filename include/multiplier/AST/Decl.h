@@ -95,6 +95,7 @@ class MX_EXPORT Decl {
   bool is_definition(void) const;
   Decl canonical_declaration(void) const;
   gap::generator<Decl> redeclarations(void) const &;
+  gap::generator<Decl> specializations(void) const &;
 
   static gap::generator<Decl> in(const Index &index, std::span<const DeclKind> kinds);
   static gap::generator<Decl> in(const Fragment &frag, std::span<const DeclKind> kinds);

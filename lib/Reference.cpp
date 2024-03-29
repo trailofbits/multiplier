@@ -123,6 +123,7 @@ const char *EnumeratorName(BuiltinReferenceKind kind) {
     case BuiltinReferenceKind::EXPANSION_OF: return "EXPANSION_OF";
     case BuiltinReferenceKind::EXTENDS: return "EXTENDS";
     case BuiltinReferenceKind::OVERRIDES: return "OVERRIDES";
+    case BuiltinReferenceKind::SPECIALIZES: return "SPECIALIZES";
   }
 }
 
