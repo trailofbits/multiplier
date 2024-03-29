@@ -65,5 +65,35 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
   std::optional<unsigned> TokenContextOffsets(EntityOffset) const final;
 };
 
+class TypeTokenContextReader : public TokenContextReader {
+ private:
+  friend class Token;
+  friend class TokenReader;
+
+  const TypeImpl *impl;
+
+ public:
+  inline TypeTokenContextReader(const TypeImpl *impl_)
+      : impl(impl_) {}
+
+  virtual ~TypeTokenContextReader(void) noexcept {}
+
+#define MX_FORWARD_DECLARE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
+    std::optional<type_name> as_ ## lower_name(RawEntityId entity_id) const final;
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_FORWARD_DECLARE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_FORWARD_DECLARE_GETTER,
+                            MX_FORWARD_DECLARE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY)
+#undef MX_FORWARD_DECLARE_GETTER
+
+  std::optional<TokenContextReader::Reader> TokenContexts(EntityOffset) const final;
+  std::optional<unsigned> TokenContextOffsets(EntityOffset) const final;
+};
+
 } // namespace mx
 

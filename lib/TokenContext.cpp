@@ -59,6 +59,47 @@ FragmentTokenContextReader::TokenContextOffsets(EntityOffset offset) const {
   return tagged_offset;
 }
 
+#define MX_DEFINE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
+    std::optional<type_name> TypeTokenContextReader::as_ ## lower_name(RawEntityId entity_id) const { \
+      if (impl && CategoryFromEntityId(entity_id) == EntityCategory::enum_name) { \
+        if (auto ptr = impl->ep->type_name ## For(impl->ep, entity_id)) { \
+         return type_name(std::move(ptr)); \
+        } \
+        assert(false); \
+      } \
+      return std::nullopt; \
+    }
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DEFINE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DEFINE_GETTER,
+                            MX_DEFINE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY)
+#undef MX_DEFINE_GETTER
+
+std::optional<TokenContextReader::Reader>
+TypeTokenContextReader::TokenContexts(EntityOffset offset) const {
+  auto contexts_reader = impl->frag_reader.getTypeTokenContexts();
+  if (offset >= contexts_reader.size()) {
+    assert(false);
+    return std::nullopt;
+  }
+  return contexts_reader[offset];
+}
+
+std::optional<unsigned>
+TypeTokenContextReader::TokenContextOffsets(EntityOffset offset) const {
+  unsigned tagged_offset = impl->frag_reader.getTypeTokenContextOffsets()[offset];
+  if (!(tagged_offset & 1u)) {
+    assert(!tagged_offset);
+    return std::nullopt;
+  }
+  return tagged_offset;
+}
+
 // Return the context node that identifies how this token relates to the AST.
 //
 // NOTE(pag): This works parsed and type tokens, and not all tokens

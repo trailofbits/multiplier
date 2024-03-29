@@ -190,19 +190,27 @@ struct Compilation @0xc8b5fa5dd0739e82 {
 
 struct Type @0xd2d91de1b5fe2e03 {
   
+  # List of token contexts.
+  typeTokenContexts @0 :List(TokenContext);
+  
+  # List of offsets of token contexts for each of the tokens.
+  #
+  # Indexed by `TypeTokenId::offset`.
+  typeTokenContextOffsets @1 :List(UInt32);
+  
   # The type token data in text buffer format.
-  tokenData @0 :Text;
+  tokenData @2 :Text;
   
   # Offsets of the beginning of tokens into `tokenData`. There is one extra
   # element in here than there are tokens, which represents the size of the data.
-  tokenOffsets @1 :List(UInt32);
+  tokenOffsets @3 :List(UInt32);
   
   # List of token kinds in this type fragment.
-  tokenKinds @2 :List(UInt16);
+  tokenKinds @4 :List(UInt16);
   
   # The single best related entity ID to the corresponding token. This helps
   # with improving the speed of syntax highlighting.
-  relatedEntityId @3 :List(UInt64);
+  relatedEntityId @5 :List(UInt64);
 
-  type @4 :AST.Type;
+  type @6 :AST.Type;
 }

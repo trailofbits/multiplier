@@ -43,6 +43,13 @@ extern mx::RawEntityId RelatedEntityIdToPrintedToken(
     const EntityMapper &em, const pasta::PrintedToken &printed_tok,
     const std::optional<pasta::Token> &parsed_tok);
 
+// The implementation of PersistTokenContexts is same as for parsed tokens. Some
+// of the checks here are redundant for printed token. Move to the specialized
+// implementation for printed tokens
+extern void PersistTokenContexts(
+    const EntityMapper &em, const pasta::PrintedTokenRange &parsed_tokens,
+    mx::rpc::Type::Builder &fb);
+
 namespace {
 
 // Persist the printed tokens in the fragment builder if not
@@ -121,6 +128,7 @@ void GlobalIndexingState::PersistTypes(
 
     auto tb = fb.initType();
     PersistPrintedTokens(em, fb, token_range, tid);
+    PersistTokenContexts(em, token_range, fb);
 
     (void) SerializeType(type, pf, tid.type_id, tb);
 

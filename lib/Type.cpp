@@ -122,19 +122,27 @@ TypeImpl::TypeImpl(std::shared_ptr<EntityProvider> ep_,
                    RawEntityId id_)
     : data(kj::mv(data_)), message(data, kOptions),
       type_token_reader(this),
+      token_context_reader(this),
       ep(std::move(ep_)),
       frag_reader(message.getRoot<rpc::Type>()),
       reader(frag_reader.getType()),
       type_id(TypeIdFromEntityId(id_).value()),
-      num_type_tokens(frag_reader.getTokenKinds().size()) {
+      num_type_tokens(frag_reader.getTypeTokenContextOffsets().size()) {
 
   assert((num_type_tokens + 1u) == frag_reader.getTokenOffsets().size());
+  assert(num_type_tokens == frag_reader.getTokenKinds().size());
   assert(num_type_tokens == frag_reader.getRelatedEntityId().size());
+  assert(num_type_tokens == frag_reader.getTypeTokenContextOffsets().size());
 }
 
 // Return a reader for the type tokens associated with the type
 TokenReaderPtr TypeImpl::TypeTokenReader(const TypeImplPtr &self) const {
   return TokenReaderPtr(self, &type_token_reader);
+}
+
+TokenContextReader::Ptr
+TypeImpl::TokenContextReader(const TokenImplPtr &ptr) const {
+  return TokenContextReader::Ptr(ptr, &token_context_reader);
 }
 
 std::string_view TypeImpl::Data(void) const & noexcept {
