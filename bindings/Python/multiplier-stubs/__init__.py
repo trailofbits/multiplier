@@ -79,6 +79,7 @@ class BuiltinReferenceKind(IntEnum):
   EXPANSION_OF = 12
   EXTENDS = 13
   OVERRIDES = 14
+  SPECIALIZES = 15
 
 class IndexStatus(IntEnum):
   UNINITIALIZED = 0
@@ -133,11 +134,11 @@ class Reference(object):
     ...
 
   @staticmethod
-  def FROM(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Generator[multiplier.Reference]:
+  def FROM(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Iterable[multiplier.Reference]:
     ...
 
   @staticmethod
-  def to(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Generator[multiplier.Reference]:
+  def to(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Iterable[multiplier.Reference]:
     ...
 
 class Fragment(multiplier.Entity):
@@ -146,9 +147,9 @@ class Fragment(multiplier.Entity):
   compilation: multiplier.frontend.Compilation
   file_tokens: multiplier.frontend.TokenRange
   parsed_tokens: multiplier.frontend.TokenRange
-  nested_fragments: Generator[multiplier.Fragment]
-  top_level_declarations: Generator[multiplier.ast.Decl]
-  preprocessed_code: Generator[multiplier.frontend.Macro | multiplier.frontend.Token]
+  nested_fragments: Iterable[multiplier.Fragment]
+  top_level_declarations: Iterable[multiplier.ast.Decl]
+  preprocessed_code: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token]
 
   @overload
   @staticmethod
@@ -225,20 +226,20 @@ class Fragment(multiplier.Entity):
     ...
 
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.Fragment]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.Fragment]:
     ...
 
   @staticmethod
   def entity_category() -> multiplier.EntityCategory:
     ...
 
-  def query(self, query: multiplier.RegexQuery) -> Generator[multiplier.frontend.RegexQueryMatch]:
+  def query(self, query: multiplier.RegexQuery) -> Iterable[multiplier.frontend.RegexQueryMatch]:
     ...
 
 class Index(object):
   file_paths: FilePathMap
-  compilations: Generator[multiplier.frontend.Compilation]
-  files: Generator[multiplier.frontend.File]
+  compilations: Iterable[multiplier.frontend.Compilation]
+  files: Iterable[multiplier.frontend.File]
 
   @overload
   @staticmethod
@@ -430,7 +431,7 @@ class Index(object):
   def entity(self, eid: int) -> multiplier.Entity:
     ...
 
-  def query_entities(self, name: str) -> Generator[multiplier.ast.NamedDecl | multiplier.frontend.DefineMacroDirective | multiplier.frontend.File]:
+  def query_entities(self, name: str) -> Iterable[multiplier.ast.NamedDecl | multiplier.frontend.DefineMacroDirective | multiplier.frontend.File]:
     ...
 
 class RegexQuery(object):
@@ -442,9 +443,9 @@ class RegexQuery(object):
     ...
 
   @overload
-  def match_fragments(self, arg_0: multiplier.frontend.File) -> Generator[multiplier.frontend.RegexQueryMatch]:
+  def match_fragments(self, arg_0: multiplier.frontend.File) -> Iterable[multiplier.frontend.RegexQueryMatch]:
     ...
 
   @overload
-  def match_fragments(self, arg_0: multiplier.Fragment) -> Generator[multiplier.frontend.RegexQueryMatch]:
+  def match_fragments(self, arg_0: multiplier.Fragment) -> Iterable[multiplier.frontend.RegexQueryMatch]:
     ...

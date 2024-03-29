@@ -33,7 +33,7 @@ class Operation(multiplier.ir.Operation):
     ...
 
 class CallArgsOp(multiplier.ir.abi.Operation):
-  results: Generator[multiplier.ir.Result]
+  results: Iterable[multiplier.ir.Result]
   body: multiplier.ir.Region
 
   @staticmethod
@@ -49,11 +49,11 @@ class CallArgsOp(multiplier.ir.abi.Operation):
     ...
 
 class CallExecutionOp(multiplier.ir.abi.Operation):
-  args: Generator[multiplier.ir.Operand]
+  args: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
   body: multiplier.ir.Region
   callee: str
-  arg_operands: Generator[multiplier.ir.Operand]
+  arg_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -68,10 +68,10 @@ class CallExecutionOp(multiplier.ir.abi.Operation):
     ...
 
 class CallOp(multiplier.ir.abi.Operation):
-  args: Generator[multiplier.ir.Operand]
-  results: Generator[multiplier.ir.Result]
+  args: Iterable[multiplier.ir.Operand]
+  results: Iterable[multiplier.ir.Result]
   callee: str
-  arg_operands: Generator[multiplier.ir.Operand]
+  arg_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -86,7 +86,7 @@ class CallOp(multiplier.ir.abi.Operation):
     ...
 
 class CallRetsOp(multiplier.ir.abi.Operation):
-  results: Generator[multiplier.ir.Result]
+  results: Iterable[multiplier.ir.Result]
   body: multiplier.ir.Region
 
   @staticmethod
@@ -102,8 +102,8 @@ class CallRetsOp(multiplier.ir.abi.Operation):
     ...
 
 class DirectOp(multiplier.ir.abi.Operation):
-  value: Generator[multiplier.ir.Operand]
-  result: Generator[multiplier.ir.Result]
+  value: Iterable[multiplier.ir.Operand]
+  result: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -118,7 +118,7 @@ class DirectOp(multiplier.ir.abi.Operation):
     ...
 
 class EpilogueOp(multiplier.ir.abi.Operation):
-  results: Generator[multiplier.ir.Result]
+  results: Iterable[multiplier.ir.Result]
   body: multiplier.ir.Region
 
   @staticmethod
@@ -153,7 +153,7 @@ class FuncOp(multiplier.ir.abi.Operation):
     ...
 
 class PrologueOp(multiplier.ir.abi.Operation):
-  results: Generator[multiplier.ir.Result]
+  results: Iterable[multiplier.ir.Result]
   body: multiplier.ir.Region
 
   @staticmethod
@@ -170,7 +170,7 @@ class PrologueOp(multiplier.ir.abi.Operation):
 
 class RetDirectOp(multiplier.ir.abi.Operation):
   value: multiplier.ir.Value
-  result: Generator[multiplier.ir.Result]
+  result: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -186,7 +186,7 @@ class RetDirectOp(multiplier.ir.abi.Operation):
 
 class TodoOp(multiplier.ir.abi.Operation):
   value: multiplier.ir.Value
-  result: Generator[multiplier.ir.Result]
+  result: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -220,8 +220,8 @@ class WrapFuncOp(multiplier.ir.abi.Operation):
     ...
 
 class YieldOp(multiplier.ir.abi.Operation):
-  values: Generator[multiplier.ir.Operand]
-  result: Generator[multiplier.ir.Result]
+  values: Iterable[multiplier.ir.Operand]
+  result: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

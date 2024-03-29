@@ -296,8 +296,8 @@ class ModuleOp(multiplier.ir.builtin.Operation):
     ...
 
 class UnrealizedConversionCastOp(multiplier.ir.builtin.Operation):
-  inputs: Generator[multiplier.ir.Operand]
-  outputs: Generator[multiplier.ir.Result]
+  inputs: Iterable[multiplier.ir.Operand]
+  outputs: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

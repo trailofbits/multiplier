@@ -33,7 +33,7 @@ class Operation(multiplier.ir.Operation):
     ...
 
 class BrOp(multiplier.ir.lowlevel.Operation):
-  operands: Generator[multiplier.ir.Operand]
+  operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -48,7 +48,7 @@ class BrOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class ConcatOp(multiplier.ir.lowlevel.Operation):
-  args: Generator[multiplier.ir.Operand]
+  args: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
 
   @staticmethod
@@ -65,8 +65,8 @@ class ConcatOp(multiplier.ir.lowlevel.Operation):
 
 class CondBrOp(multiplier.ir.lowlevel.Operation):
   cond: multiplier.ir.Value
-  true_operands: Generator[multiplier.ir.Operand]
-  false_operands: Generator[multiplier.ir.Operand]
+  true_operands: Iterable[multiplier.ir.Operand]
+  false_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -82,7 +82,7 @@ class CondBrOp(multiplier.ir.lowlevel.Operation):
 
 class CondScopeRetOp(multiplier.ir.lowlevel.Operation):
   cond: multiplier.ir.Value
-  dest_operands: Generator[multiplier.ir.Operand]
+  dest_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -114,7 +114,7 @@ class ExtractOp(multiplier.ir.lowlevel.Operation):
 
 class InitializeVarOp(multiplier.ir.lowlevel.Operation):
   var: multiplier.ir.Value
-  elements: Generator[multiplier.ir.Operand]
+  elements: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
 
   @staticmethod
@@ -182,7 +182,7 @@ class StructGEPOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class ReturnOp(multiplier.ir.lowlevel.Operation):
-  result: Generator[multiplier.ir.Operand]
+  result: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

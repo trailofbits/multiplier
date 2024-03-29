@@ -539,6 +539,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "specializations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->specializations());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Decl::specializations"),
+    nullptr,
+  },
+  {
     "num_attributes",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
