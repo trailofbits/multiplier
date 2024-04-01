@@ -105,33 +105,12 @@ void EntityLabeller::Run(void) {
 }
 
 bool EntityLabeller::ShouldLabelDecl(const pasta::Decl &decl) {
-  switch (decl.Kind()) {
-    case pasta::DeclKind::kClassTemplate:
-    case pasta::DeclKind::kClassTemplateSpecialization:
-    case pasta::DeclKind::kClassTemplatePartialSpecialization: {
-       auto it = std::find(fragment.top_level_decls.begin(),
-        fragment.top_level_decls.end(), decl);
-       if (it == fragment.top_level_decls.end()) {
-         return false;
-       }
-       return true;
-    }
-    case pasta::DeclKind::kVarTemplateSpecialization: {
-     if (auto var_decl = pasta::VarTemplateSpecializationDecl::From(decl)) {
-       if (var_decl->StorageClass() == pasta::StorageClass::kStatic) {
-         auto it = std::find(fragment.top_level_decls.begin(),
-        fragment.top_level_decls.end(), decl);
-         if (it == fragment.top_level_decls.end()) {
-           return false;
-         }
-       }
-     }
-     return true;
-    }
-    default:
-      break;
+  if (!em.IsTopLevel(decl)) {
+    return true;
   }
-  return true;
+
+  auto end = fragment.top_level_decls.end();
+  return std::find(fragment.top_level_decls.begin(), end, decl) != end;
 }
 
 // Create initial fragment token IDs for all of the tokens in the range of

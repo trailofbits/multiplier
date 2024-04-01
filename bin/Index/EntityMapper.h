@@ -22,6 +22,9 @@ class TypeMapper;
 // Provides entity IDs and offsets to the serialization code.
 class EntityMapper final {
  public:
+  // Set of all top-level declarations (from the perspective of fragments).
+  std::unordered_set<const void *> top_level_decls;
+
   // Globally (within a translation unit) entity ids. Generally, these are
   // things that can be referenced across fragments.
   EntityIdMap entity_ids;
@@ -129,7 +132,6 @@ class EntityMapper final {
 
   mx::RawEntityId EntityIdOfType(const void *type, uint32_t quals=0u) const;
 
-
   template <typename IdType>
   inline std::optional<IdType> SpecificEntityId(const void *raw_entity) const {
     return mx::EntityId(this->EntityId(raw_entity)).Extract<IdType>();
@@ -150,6 +152,14 @@ class EntityMapper final {
       const pasta::AST &ast, const pasta::Stmt &entity) const;
 
   void ResetForFragment(void);
+
+  inline void MarkAsTopLevel(const pasta::Decl &decl) {
+    top_level_decls.insert(RawEntity(decl));
+  }
+
+  inline bool IsTopLevel(const pasta::Decl &decl) {
+    return top_level_decls.count(RawEntity(decl)) != 0u;
+  }
 };
 
 }  // namespace indexer

@@ -109,7 +109,11 @@ class FragmentBuilder final {
   }
 
   void MaybeVisitNext(const pasta::CXXCtorInitializer &pseudo) {
-    fragment.TryAdd(pseudo);
+    if (fragment.TryAdd(pseudo)) {
+      if (auto init = pseudo.Initializer()) {
+        MaybeVisitNext(init.value());
+      }
+    }
   }
 
   void MaybeVisitDeclContext(const pasta::DeclContext &dc) {

@@ -254,8 +254,8 @@ class ParentTrackerVisitor : public EntityVisitor {
       LOG(ERROR)
           << "Fragment"
           << PrefixedLocation(fragment.top_level_decls.front(), " at or near ")
-          << " has unidentified: "
-          << pasta::PrintedTokenRange::Create(entity).Data();
+          << " has statement without an ID: "
+          << entity.Tokens().Data();
       //assert(false);
       return;
     }

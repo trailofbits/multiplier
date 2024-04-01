@@ -106,6 +106,8 @@ class TLDFinder final : public pasta::DeclVisitor {
  private:
   std::vector<OrderedDecl> &tlds;
 
+  EntityMapper &em;
+
   const void *parent_decl{nullptr};
 
   // Tracks declarations for which we've seen the specializations. This is
@@ -132,6 +134,8 @@ class TLDFinder final : public pasta::DeclVisitor {
   unsigned depth{0u};
 
   void AddDeclAlways(const pasta::Decl &decl) {
+    em.MarkAsTopLevel(decl);
+
     if (IsProbablyABuiltinDecl(decl)) {
       tlds.emplace_back(decl, parent_decl, builtin_order++);
     } else {
@@ -154,8 +158,9 @@ class TLDFinder final : public pasta::DeclVisitor {
  public:
   virtual ~TLDFinder(void) = default;
 
-  explicit TLDFinder(std::vector<OrderedDecl> &tlds_)
-      : tlds(tlds_) {}
+  explicit TLDFinder(std::vector<OrderedDecl> &tlds_, EntityMapper &em_)
+      : tlds(tlds_),
+        em(em_) {}
 
   void VisitDeeperDeclContext(const pasta::Decl &dc_decl,
                               const pasta::DeclContext &dc) {
@@ -841,10 +846,11 @@ static std::map<uint64_t, pasta::MacroDirective> FindNextPrevConditionalMacros(
 }
 
 // Find all top-level declarations.
-static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast) {
+static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast,
+                                         EntityMapper &em) {
 
   std::vector<OrderedDecl> tlds;
-  TLDFinder tld_finder(tlds);
+  TLDFinder tld_finder(tlds, em);
   tld_finder.VisitTranslationUnitDecl(ast.TranslationUnit());
 
   auto decl_eq = +[] (const OrderedDecl &a, const OrderedDecl &b) {
@@ -1661,7 +1667,8 @@ static void AddMacroRangeToEntityListFor(
 // declarations are in the correct order, and are side-by-side in the output
 // vector.
 static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
-                                             std::string_view main_file_path) {
+                                             std::string_view main_file_path,
+                                             EntityMapper &em) {
 
   pasta::TokenRange tokens = ast.Tokens();
   std::vector<EntityRange> entity_ranges;
@@ -1708,7 +1715,7 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
   auto dir_index_to_next_dir = FindNextPrevConditionalMacros(
       ast, main_file_path);
 
-  for (OrderedDecl ordered_entry : FindTLDs(ast)) {
+  for (OrderedDecl ordered_entry : FindTLDs(ast, em)) {
     AddDeclRangeToEntityListFor(tokens, eof_index_to_include, bof_to_eof,
                                 dir_index_to_next_dir, main_file_path, 
                                 std::move(ordered_entry.decl),
@@ -1825,14 +1832,16 @@ static bool MergeLeadingMacroWithNextEntity(
 //
 // TODO(pag): Handle top-level statements, e.g. `asm`, `static_assert`, etc.
 static std::vector<EntityGroupRange> PartitionEntities(
-    GlobalIndexingState &context, const pasta::AST &ast) {
+    GlobalIndexingState &context, const pasta::AST &ast,
+    EntityMapper &em) {
 
   pasta::TokenRange tokens = ast.Tokens();
   std::string main_file_path = ast.MainFile().Path().generic_string();
 
   ProgressBarWork partitioning_progress_tracker(context.partitioning_progress);
 
-  std::vector<EntityRange> entity_ranges = SortEntities(ast, main_file_path);
+  std::vector<EntityRange> entity_ranges = SortEntities(
+      ast, main_file_path, em);
   std::vector<EntityGroupRange> entity_group_ranges;
   entity_group_ranges.reserve(entity_ranges.size());
 
@@ -2775,7 +2784,7 @@ void IndexCompileJobAction::Run(void) {
       context, compiler, job, ast, em, tu_id,
       CreatePendingFragments(
           context, em, ast, tu_id,
-          PartitionEntities(context, ast)));
+          PartitionEntities(context, ast, em)));
 }
 
 }  // namespace indexer

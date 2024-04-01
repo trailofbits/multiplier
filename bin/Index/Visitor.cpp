@@ -567,18 +567,29 @@ void EntityVisitor::VisitDesignatedInitExpr(
 
 void EntityVisitor::VisitMaterializeTemporaryExpr(
     const pasta::MaterializeTemporaryExpr &expr) {
-  if (EnterStmt(expr)) {
+
+  // NOTE(pag): Not doing `EnterStmt` so that we can get the nested
+  //            sub-expression inside of the temporary declaration.
+  if (Enter(expr)) {
     if (auto decl = expr.LifetimeExtendedTemporaryDeclaration()) {
       Accept(decl.value());
+
     } else {
-      Accept(expr.SubExpression());
+      Accept(stmt.SubExpression());
     }
   }
 }
 
 void EntityVisitor::VisitExprWithCleanups(const pasta::ExprWithCleanups &expr) {
   if (EnterStmt(expr)) {
-    Accept(expr.SubExpression());
+    for (auto &object : expr.Objects()) {
+      if (std::holds_alternative<pasta::BlockDecl>(object)) {
+        Accept(std::get<pasta::BlockDecl>(object));
+
+      } else if (std::holds_alternative<pasta::CompoundLiteralExpr>(object)) {
+        Accept(std::get<pasta::CompoundLiteralExpr>(object));
+      }
+    }
   }
 }
 
