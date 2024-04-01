@@ -669,6 +669,7 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Type", "CanonicalTypeInternal"},
   {"Type", "ContainedAutoType"},
   {"Type", "ContainedDeducedType"},
+  {"Type", "Desugar"},  // Already have `Type::DesugaredType`.
 
   // The bit packing in here are not well described, so we should just omit
   // them.

@@ -186,6 +186,16 @@ clang::Type *BasicTypeDeduplication(
           up_quals, list);
       break;
 
+    case clang::Type::TemplateSpecialization: {
+      auto tst = clang::dyn_cast<clang::TemplateSpecializationType>(type);
+      if (tst->isSugared()) {
+        new_type = BasicTypeDeduplication(ctx, tst->desugar(), up_quals, list);
+      }
+      break;
+    }
+
+    // TODO(pag): ObjCTypeParamType
+
     default:
       break;
   }

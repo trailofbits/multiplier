@@ -137,6 +137,28 @@ def find_qobject_connect(index: mx.Index, seen: Set[int]) -> Iterable[mx.ast.CXX
     debug_if(not found, "Failed to find QObject::connect")
 
 
+def referenced_method(expr: mx.ast.Expr) -> Optional[mx.ast.CXXMethodDecl]:
+    """Return the method that is addressed by an expression of the form `&Class::Method`."""
+    if not isinstance(expr.type, mx.ast.MemberPointerType):
+        return None
+
+    if not isinstance(expr, mx.ast.UnaryOperator):
+        return None
+
+    if expr.opcode != mx.ast.UnaryOperatorKind.ADDRESS_OF:
+        return None
+
+    meth_ref = expr.sub_expression
+    if not isinstance(meth_ref, mx.ast.DeclRefExpr):
+        return None
+
+    meth = meth_ref.referenced_declaration
+    if not isinstance(meth, mx.ast.CXXMethodDecl):
+        return None
+
+    return meth
+
+
 def find_connections(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[Tuple[mx.ast.CXXMethodDecl, mx.ast.CXXMethodDecl]]:
     """Given calls to `connect`, go and find the (signal, slot) or (signal, signal) pairs."""
     for call in connect.callers:
@@ -148,41 +170,26 @@ def find_connections(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[
         if not isinstance(containing_func, mx.ast.FunctionDecl):
             pass
 
-        signal_method: mx.ast.Expr = call.nth_argument(1).ignore_casts
-        signal_method_type = signal_method.type
-        if isinstance(signal_method_type, mx.ast.SubstTemplateTypeParmType):
-            signal_method_type = signal_method_type.replacement_type
-
-        # The argument must be a member pointer to a signal method. Otherwise, it might be a call to `connect` in
-        # a `connect`, or it might be an old-style `connect` call, e.g. taking a string literal.
-        if not isinstance(signal_method_type, mx.ast.MemberPointerType) or \
-           not isinstance(signal_method, mx.ast.UnaryOperator) or \
-           signal_method.opcode != mx.ast.UnaryOperatorKind.ADDRESS_OF or \
-           not isinstance(signal_method.sub_expression, mx.ast.DeclRefExpr):
+        signal_method_arg: mx.ast.Expr = call.nth_argument(1).ignore_casts
+        signal_method: Optional[mx.ast.CXXMethodDecl] = referenced_method(signal_method_arg)
+        if not signal_method:
             debug("Skipping call ({}) to connect ({}) with signal argument '{}' ({}) that isn't the address of a method",
-                  call.id, connect.id, " ".join(t.data for t in signal_method.tokens), signal_method.id)
+                  call.id, connect.id, " ".join(t.data for t in signal_method_arg.tokens), signal_method_arg.id)
             continue
 
-        slot: mx.ast.NamedDecl = signal_method.sub_expression.found_declaration
-        assert isinstance(slot, mx.ast.CXXMethodDecl)
+        found = False
+        for i in range(2, 4):
+            slot_method_arg = call.nth_argument(i).ignore_casts
+            slot_method: Optional[mx.ast.CXXMethodDecl] = referenced_method(slot_method_arg)
+            if not slot_method:
+                continue
 
-        for i in range(2, 5):
-            arg = call.nth_argument(i).ignore_casts
+            assert not found
+            yield signal_method, slot_method
+            found = True
 
-        debug(f"{slot.kind.name} {slot.name} {slot.parent_declaration}")
-        debug("CONNECT({}::{})", slot.parent_declaration.name, slot.name)
-        #print(" ".join(t.data for t in connect.type.tokens))
-        print(call.num_arguments)
-        input_signal = signal_method.sub_expression.foun
-        print(input_signal.kind.name)
-
-
-
-        receiver_or_slot = call.nth_argument(2).ignore_casts
-
-        # NOTE(pag): The slot method may itself be a signal.
-        slot_method: mx.ast.Expr
-        yield 1, 1
+        debug_if(not found, "Unable to find slot method for call ({}) to connect ({}) with signal {}::{} ({})",
+                 call.id, connect.id, signal_method.parent_declaration.name, signal_method.name, signal_method.id)
 
 
 def main():
@@ -198,9 +205,10 @@ def main():
             pass
 
     for connect in find_qobject_connect(index, seen):
-        #debug("CONNECT: {}", " ".join(t.data for t in connect.type.tokens))
-        for slot, signal in find_connections(connect, seen):
-            pass
+        for signal, slot in find_connections(connect, seen):
+            debug("CONNECT({}::{}, {}::{})",
+                  signal.parent_declaration.name, signal.name,
+                  slot.parent_declaration.name, slot.name)
 
     return 0
 
