@@ -83,8 +83,7 @@ bool EntityVisitor::EnterTemplateDecl(const pasta::TemplateDecl &decl) {
   return true;
 }
 
-void EntityVisitor::VisitTemplateDecl(const pasta::TemplateDecl &) {
-}
+void EntityVisitor::VisitTemplateDecl(const pasta::TemplateDecl &) {}
 
 void EntityVisitor::VisitFriendTemplateDecl(
     const pasta::FriendTemplateDecl &decl) {
@@ -471,6 +470,13 @@ void EntityVisitor::VisitConceptDecl(const pasta::ConceptDecl &decl) {
   }
 }
 
+void EntityVisitor::VisitLifetimeExtendedTemporaryDecl(
+    const pasta::LifetimeExtendedTemporaryDecl &decl) {
+  if (EnterDecl(decl)) {
+    Accept(decl.TemporaryExpression());
+  }
+}
+
 bool EntityVisitor::EnterValueDecl(const pasta::ValueDecl &decl) {
   if (EnterDecl(decl)) {
     Accept(decl.Type());
@@ -560,10 +566,18 @@ void EntityVisitor::VisitDesignatedInitExpr(
 }
 
 void EntityVisitor::VisitMaterializeTemporaryExpr(
-    const pasta::MaterializeTemporaryExpr &expr) {}
+    const pasta::MaterializeTemporaryExpr &expr) {
+  if (EnterStmt(expr)) {
+    if (auto decl = expr.LifetimeExtendedTemporaryDeclaration()) {
+      Accept(decl.value());
+    } else {
+      Accept(expr.SubExpression());
+    }
+  }
+}
 
 void EntityVisitor::VisitExprWithCleanups(const pasta::ExprWithCleanups &expr) {
-  if(EnterStmt(expr)) {
+  if (EnterStmt(expr)) {
     Accept(expr.SubExpression());
   }
 }

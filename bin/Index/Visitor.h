@@ -71,6 +71,7 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitTypedefNameDecl(const pasta::TypedefNameDecl &decl) final;
   void VisitBuiltinTemplateDecl(const pasta::BuiltinTemplateDecl &decl) final;
   void VisitTypeAliasTemplateDecl(const pasta::TypeAliasTemplateDecl &decl) final;
+  void VisitLifetimeExtendedTemporaryDecl(const pasta::LifetimeExtendedTemporaryDecl &decl) final;
   void VisitDeclStmt(const pasta::DeclStmt &stmt) final;
   void VisitConceptSpecializationExpr(const pasta::ConceptSpecializationExpr &stmt) final;
   void VisitSizeOfPackExpr(const pasta::SizeOfPackExpr &stmt) final;

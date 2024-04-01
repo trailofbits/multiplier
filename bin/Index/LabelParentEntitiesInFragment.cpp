@@ -589,10 +589,6 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
         << " main job file " << ast.MainFile().Path().generic_string()
         << " has statement without parents: "
         << first_missing_stmt->Tokens().Data();
-
-    auto compound = pasta::CompoundStmt::From(first_missing_stmt.value());
-    CHECK(!compound.has_value());
-
     return;
   }
 
