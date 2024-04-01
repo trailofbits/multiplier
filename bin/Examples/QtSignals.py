@@ -134,7 +134,6 @@ def find_qobject_connect(index: mx.Index, seen: Set[int]) -> Iterable[mx.ast.CXX
                 found = True
 
     # NOTE(pag): We can also find implementations of `connect` via calls to `QObject::connectImpl`.
-
     debug_if(not found, "Failed to find QObject::connect")
 
 
@@ -165,12 +164,17 @@ def find_connections(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[
             continue
 
         slot: mx.ast.NamedDecl = signal_method.sub_expression.found_declaration
+        assert isinstance(slot, mx.ast.CXXMethodDecl)
+
+        for i in range(2, 5):
+            arg = call.nth_argument(i).ignore_casts
+
         debug(f"{slot.kind.name} {slot.name} {slot.parent_declaration}")
         debug("CONNECT({}::{})", slot.parent_declaration.name, slot.name)
         #print(" ".join(t.data for t in connect.type.tokens))
         print(call.num_arguments)
-        input_signal = signal_method.sub_expression
-        print(input_signal.kind)
+        input_signal = signal_method.sub_expression.foun
+        print(input_signal.kind.name)
 
 
 

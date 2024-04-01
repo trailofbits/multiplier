@@ -575,7 +575,7 @@ void EntityVisitor::VisitMaterializeTemporaryExpr(
       Accept(decl.value());
 
     } else {
-      Accept(stmt.SubExpression());
+      Accept(expr.SubExpression());
     }
   }
 }

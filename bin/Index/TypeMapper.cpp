@@ -179,6 +179,13 @@ clang::Type *BasicTypeDeduplication(
           up_quals, list);
       break;
 
+    case clang::Type::SubstTemplateTypeParm:
+      new_type = BasicTypeDeduplication(
+          ctx,
+          clang::dyn_cast<clang::SubstTemplateTypeParmType>(type)->desugar(),
+          up_quals, list);
+      break;
+
     default:
       break;
   }
