@@ -406,8 +406,15 @@ bool EntityVisitor::EnterTagDecl(const pasta::TagDecl &decl) {
 bool EntityVisitor::EnterRecordDecl(const pasta::RecordDecl &decl) {
   if (EnterTagDecl(decl)) {
     if (decl.IsThisDeclarationADefinition()) {
-      for (const pasta::FieldDecl &field : decl.Fields()) {
-        Accept(field);
+      pasta::DeclContext dc(decl);
+      for (const auto &nested_decl : dc.AlreadyLoadedDeclarations()) {
+        if (nested_decl == decl) {
+          continue;
+        }
+
+        if (!nested_decl.IsOutOfLine()) {
+          Accept(nested_decl);
+        }
       }
     }
     return true;

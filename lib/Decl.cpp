@@ -186,7 +186,7 @@ gap::generator<Decl> Decl::redeclarations(void) const & {
 // `CxxConstructExpr`s.
 //
 // TODO(pag): Handle `CXXNewExpr` that doesn't contain a `CxxConstructExpr`.
-gap::generator<Stmt> FunctionDecl::callers() const & {
+gap::generator<Stmt> FunctionDecl::callers(void) const & {
   static constexpr auto kCallerKindId =
       static_cast<RawEntityId>(BuiltinReferenceKind::CALLS);
 

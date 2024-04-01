@@ -47,10 +47,6 @@ def find_signals(activate: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[mx.
     for call in activate.callers:
         caller = call.parent_declaration
         if not isinstance(caller, mx.ast.CXXMethodDecl) or not caller.is_definition or not caller.is_out_of_line:
-            print(" ".join(t.data for t in call.tokens))
-            print(call.kind.name)
-            print(call.parent_declaration.kind.name)
-            print(call.parent_statement.parent_declaration.kind.name)
             debug(f"Found non-method caller {caller.id} of QMetaObject::activate of kind {caller.kind.name}")
             continue
 
@@ -72,101 +68,80 @@ def find_signals(activate: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[mx.
         if not isinstance(containing_file, mx.frontend.File):
             continue
 
-        # Signals are implemented in file paths that look like:
-        # /path/to/code/<cmake_target>_autogen/<id>/moc_<file name>
-        path = str(next(containing_file.paths))
-        if "moc_" not in path or "_autogen" not in path:
-            continue
+        # # Signals are implemented in file paths that look like:
+        # # /path/to/code/<cmake_target>_autogen/<id>/moc_<file name>
+        # path = str(next(containing_file.paths))
+        # if "moc_" not in path or "_autogen" not in path:
+        #     continue
 
         yield caller
+
+
+def find_connects(decl: mx.ast.NamedDecl) -> Iterable[mx.ast.CXXMethodDecl]:
+    """Given that `decl` is named `connect, go and yield back `decl` if it is a method, otherwise if it's a
+    template, then yield out the specializations."""
+    if isinstance(decl, mx.ast.CXXMethodDecl) and not decl.is_instance:
+        yield decl
+        return
+
+    if not isinstance(decl, mx.ast.FunctionTemplateDecl):
+        return
+
+    for meth in decl.specializations:
+        assert isinstance(meth, mx.ast.CXXMethodDecl)
+        assert not meth.is_instance
+        yield meth
 
 
 def find_qobject_connect(index: mx.Index, seen: Set[int]) -> Iterable[mx.ast.CXXMethodDecl]:
     """Finds `QObject::connect`. There are ~2 static methods, and a bunch of templates."""
     found = False
-    impls: List[mx.ast.CXXMethodDecl] = []
     for ent in index.query_entities("QObject"):
         if not isinstance(ent, mx.ast.CXXRecordDecl) or not ent.is_definition:
             continue
 
-        methods = ent.methods
-        if methods is None:
-            continue
-
-        # Don't repeat visiting the class.
-        canon_id = ent.canonical_declaration.id
-        if canon_id in seen:
-            continue
-        seen.add(canon_id)
-
-        for meth in methods:
-            assert isinstance(meth, mx.ast.CXXMethodDecl)
-            if meth.is_instance:
+        # Go through all declarations in the class body. We want to see methods and function templates, as most
+        # definitions of `connect` are actually method templates.
+        for decl in ent.declarations_in_context:
+            if not isinstance(decl, mx.ast.NamedDecl) or decl.name != "connect":
                 continue
 
-            rt: mx.ast.Type = meth.return_type
-            if not isinstance(rt, mx.ast.RecordType):
-                continue
+            for meth in find_connects(decl):
+                canon_id = meth.canonical_declaration.id
+                if canon_id in seen:
+                    continue
 
-            # The return type of `QObject::connect` and `QObject::connectImpl` should be
-            # `QMetaObject::Connection`.
-            rt_decl = rt.declaration
-            if not isinstance(rt_decl, mx.ast.CXXRecordDecl) or rt_decl.name != "Connection":
-                continue
+                seen.add(canon_id)
 
-            if meth.name == "connect":
-                seen.add(meth.id)
+                # There should be between three and four arguments. The three argument form is something like:
+                # `connect(sender, signal, receiver_lambda)`, and the four argument form is something like:
+                # `connect(sender, signal, receiver, slot)`. There is a 5-argument form, with a connection type as
+                # well.
+                if 3 > meth.num_parameters:
+                    continue
+
+                rt: mx.ast.Type = meth.return_type
+                if not isinstance(rt, mx.ast.RecordType):
+                    continue
+
+                # The return type of `QObject::connect` and `QObject::connectImpl` should be
+                # `QMetaObject::Connection`.
+                rt_decl = rt.declaration
+                if not isinstance(rt_decl, mx.ast.CXXRecordDecl) or rt_decl.name != "Connection":
+                    continue
+
                 yield meth
+                found = True
 
-            # `QObject::connectImpl` is called by the template specializations of `QObject::connect`.
-            elif meth.name == "connectImpl":
-                impls.append(meth)
-
-    # Template specializations of `QObject::connect` call `QObject::connectImpl`, go find those.
-    for impl in impls:
-        for call in impl.callers:
-            caller = call.parent_declaration
-            if not isinstance(caller, mx.ast.CXXMethodDecl):
-                continue
-
-            if caller.name != "connect":
-                continue
-
-            # Don't repeat visiting the class.
-            caller_id = caller.id
-            if caller_id in seen:
-                continue
-
-            seen.add(caller_id)
-            yield caller
-            found = True
+    # NOTE(pag): We can also find implementations of `connect` via calls to `QObject::connectImpl`.
 
     debug_if(not found, "Failed to find QObject::connect")
-
-
-# def looks_like_connect(func: mx.ast.FunctionDecl):
-#     if func.name != "connect":
-#         return False
-#     print("!!!")
-#     parent_frag = mx.Fragment.containing(func).parent
-#     if parent_frag is None:
-#         return False
-#
-#     print("???")
-#     for tld in parent_frag.top_level_declarations:
-#         print("+++" + tld.name)
-#         if isinstance(tld, mx.ast.CXXRecordDecl) and tld.name == "QObject":
-#             return True
-#         elif isinstance(tld, mx.ast.FunctionDecl) and looks_like_connect(tld):
-#             return True
-#
-#     print("---")
-#     return False
 
 
 def find_connections(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[Tuple[mx.ast.CXXMethodDecl, mx.ast.CXXMethodDecl]]:
     """Given calls to `connect`, go and find the (signal, slot) or (signal, signal) pairs."""
     for call in connect.callers:
+        assert connect.num_parameters == call.num_arguments
         if not isinstance(call, mx.ast.CallExpr):
             continue
 
@@ -174,53 +149,35 @@ def find_connections(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[
         if not isinstance(containing_func, mx.ast.FunctionDecl):
             pass
 
-        # # One `QObject::connect` calling another.
-        # if looks_like_connect(containing_func):
-        #     print("Connect in connect!")
-        #     continue
-
-        input_signal: Optional[mx.ast.CXXMethodDecl] = None
-
-        signal_method = call.nth_argument(1).ignore_casts
+        signal_method: mx.ast.Expr = call.nth_argument(1).ignore_casts
         signal_method_type = signal_method.type
         if isinstance(signal_method_type, mx.ast.SubstTemplateTypeParmType):
             signal_method_type = signal_method_type.replacement_type
 
-        print((signal_method.kind.name, signal_method_type.kind.name))
-
-        # New style: The argument is a member pointer to a signal method.
-        if isinstance(signal_method_type, mx.ast.MemberPointerType):
-            if isinstance(signal_method, mx.ast.DeclRefExpr):
-                debug("Skipping DeclRefExpr {} of signal method: {}",
-                      signal_method.id, ' '.join(t.data for t in signal_method.tokens))
-                continue
-
-            assert isinstance(signal_method, mx.ast.UnaryOperator), f"Unexpected member pointer kind: {signal_method.kind.name}"
-            assert signal_method.opcode == mx.ast.UnaryOperatorKind.ADDRESS_OF, f"Unexpected unary operator kind: {signal_method.opcode.name}"
-            print(signal_method.sub_expression.kind.name)
-
-        # Old style using a string literal.
-        elif isinstance(signal_method_type, mx.ast.PointerType) and \
-             isinstance(signal_method_type.pointee_type.unqualified_type, mx.ast.BuiltinType) and \
-             signal_method_type.pointee_type.unqualified_type.builtin_kind in (mx.ast.BuiltinTypeKind.CHARACTER_S,
-                                                                               mx.ast.BuiltinTypeKind.CHARACTER_U):
-
-            if isinstance(signal_method, mx.ast.StringLiteral):
-                debug("Unhandled string literal signal argument '{}' to connect",
-                      " ".join(t.data for t in signal_method.tokens))
-            elif isinstance(signal_method, mx.ast.DeclRefExpr) and \
-                 isinstance(signal_method.referenced_declaration, mx.ast.ParmVarDecl):
-                debug("Unhandled parameter variable signal argument '{}' to connect",
-                      " ".join(t.data for t in signal_method.tokens))
-            else:
-                debug("Unhandled string-typed signal argument '{}' to connect",
-                      " ".join(t.data for t in signal_method.tokens))
-        # Something else.
-        else:
-            debug("Unhandled signal argument '{}' with type '{}' to connect",
-                  " ".join(t.data for t in signal_method.tokens),
-                  signal_method.type.kind.name)
+        # The argument must be a member pointer to a signal method. Otherwise, it might be a call to `connect` in
+        # a `connect`, or it might be an old-style `connect` call, e.g. taking a string literal.
+        if not isinstance(signal_method_type, mx.ast.MemberPointerType) or \
+           not isinstance(signal_method, mx.ast.UnaryOperator) or \
+           signal_method.opcode != mx.ast.UnaryOperatorKind.ADDRESS_OF or \
+           not isinstance(signal_method.sub_expression, mx.ast.DeclRefExpr):
+            debug("Skipping call ({}) to connect ({}) with signal argument '{}' ({}) that isn't the address of a method",
+                  call.id, connect.id, " ".join(t.data for t in signal_method.tokens), signal_method.id)
             continue
+
+        slot: mx.ast.NamedDecl = signal_method.sub_expression.found_declaration
+        debug(f"{slot.kind.name} {slot.name} {slot.parent_declaration}")
+        debug("CONNECT({}::{})", slot.parent_declaration.name, slot.name)
+        #print(" ".join(t.data for t in connect.type.tokens))
+        print(call.num_arguments)
+        input_signal = signal_method.sub_expression
+        print(input_signal.kind)
+
+
+
+        receiver_or_slot = call.nth_argument(2).ignore_casts
+
+        # NOTE(pag): The slot method may itself be a signal.
+        slot_method: mx.ast.Expr
         yield 1, 1
 
 
@@ -233,9 +190,11 @@ def main():
 
     for activate in find_qmetaobject_activate(index, seen):
         for signal in find_signals(activate, seen):
+            #debug("SIGNAL {}::{}: {}", signal.parent_declaration.name, signal.name, " ".join(t.data for t in signal.type.tokens))
             pass
 
     for connect in find_qobject_connect(index, seen):
+        #debug("CONNECT: {}", " ".join(t.data for t in connect.type.tokens))
         for slot, signal in find_connections(connect, seen):
             pass
 
