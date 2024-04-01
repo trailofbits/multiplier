@@ -148,9 +148,10 @@ bool IsSpecializationOrTemplateInSpecialization(const pasta::Decl &decl);
 // Check of the declaration is Out of Line
 bool IsOutOfLine(const pasta::Decl &decl);
 
-// Checks should the decl context be serialized with pending
-// fragment
-bool ShouldSerializeDeclContext(const pasta::Decl &decl);
+// If `decl` is a declaration context, then this will return `true` if `decl`
+// should be internalized into the fragment, otherwise `false`. Returns `false`
+// if `decl` isn't a declaration context.
+bool ShouldInternalizeDeclContextIntoFragment(const pasta::Decl &decl);
 
 // Determines whether or not a TLD is likely to have to go into a child
 // fragment. This happens when the TLD is a forward declaration, e.g. of a

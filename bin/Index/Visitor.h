@@ -113,6 +113,8 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitCXXConstructExpr(const pasta::CXXConstructExpr  &expr) final;
   void VisitCXXTemporaryObjectExpr(const pasta::CXXTemporaryObjectExpr &expr) final;
   void VisitCXXOperatorCallExpr(const pasta::CXXOperatorCallExpr &expr) final;
+  void VisitRequiresExprBodyDecl(const pasta::RequiresExprBodyDecl &expr) final;
+  void VisitRequiresExpr(const pasta::RequiresExpr &expr) final;
   void VisitAlignedAttr(const pasta::AlignedAttr &attr) final;
   void VisitDecl(const pasta::Decl &decl) final;
   void VisitStmt(const pasta::Stmt &stmt) final;
@@ -135,6 +137,7 @@ class EntityVisitor : protected pasta::DeclVisitor,
   virtual void Accept(const pasta::TemplateArgument &entity);
   virtual void Accept(const pasta::Designator &entity);
   virtual void Accept(const pasta::CXXBaseSpecifier &entity);
+  virtual void Accept(const pasta::CXXCtorInitializer &entity);
 };
 
 }  // namespace indexer

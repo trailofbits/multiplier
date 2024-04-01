@@ -328,7 +328,7 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
         return RawEntity(call.value());
       }
     }
-    
+
   // Parentheses.
   } else if (auto paren = pasta::ParenExpr::From(stmt)) {
     if (token_kind == pasta::TokenKind::kLParenthesis) {
@@ -340,7 +340,7 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
         return RawEntity(paren.value());
       }
     }
-  
+
   // Braces.
   } else if (auto comp = pasta::CompoundStmt::From(stmt)) {
     if (token_kind == pasta::TokenKind::kLBrace) {

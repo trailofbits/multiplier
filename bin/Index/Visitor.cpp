@@ -29,21 +29,21 @@ void EntityVisitor::VisitNamespaceDecl(
     const pasta::NamespaceDecl &decl) {
   // Handle NamespaceDecl as a simple declaration and don't
   // visit the decl context to avoid serializing all.
-  (void)EnterDecl(decl);
+  (void) EnterDecl(decl);
 }
 
 void EntityVisitor::VisitExternCContextDecl(
     const pasta::ExternCContextDecl &decl) {
   // Handle ExternCContextDecl as a simple declaration and don't
   // visit the decl context to avoid serializing all.
-  (void)EnterDecl(decl);
+  (void) EnterDecl(decl);
 }
 
 void EntityVisitor::VisitLinkageSpecDecl(
     const pasta::LinkageSpecDecl &decl) {
   // Handle LinkageSpecDecl as a simple declaration and don't
   // visit the decl context to avoid serializing all.
-  (void)EnterDecl(decl);
+  (void) EnterDecl(decl);
 }
 
 void EntityVisitor::VisitClassTemplatePartialSpecializationDecl(
@@ -175,19 +175,28 @@ void EntityVisitor::VisitNonTypeTemplateParmDecl(
 }
 
 bool EntityVisitor::EnterFunctionDecl(const pasta::FunctionDecl &decl) {
-  if (EnterDeclaratorDecl(decl)) {
-    Accept(decl.Type());
-    VisitDeclContext(decl);
-    for (const pasta::ParmVarDecl &param : decl.Parameters()) {
-      Accept(param);
-    }
-    if (auto body = decl.Body()) {
-      Accept(body.value());
-    }
-    return true;
-  } else {
+  if (!EnterDeclaratorDecl(decl)) {
     return false;
   }
+
+  Accept(decl.Type());
+  VisitDeclContext(decl);
+  for (const pasta::ParmVarDecl &param : decl.Parameters()) {
+    Accept(param);
+  }
+
+  if (auto fty = decl.FunctionType()) {
+    if (auto proto = pasta::FunctionProtoType::From(fty.value())) {
+      if (auto except = proto->NoexceptExpression()) {
+        Accept(except.value());
+      }
+    }
+  }
+  if (auto body = decl.Body()) {
+    Accept(body.value());
+  }
+
+  return true;
 }
 
 void EntityVisitor::VisitFunctionDecl(const pasta::FunctionDecl &decl) {
@@ -354,18 +363,17 @@ void EntityVisitor::VisitVarTemplateSpecializationDecl(
 
 void EntityVisitor::VisitCXXMethodDecl(
     const pasta::CXXMethodDecl &decl) {
-  (void)EnterFunctionDecl(decl);
+  (void) EnterFunctionDecl(decl);
 }
 
 void EntityVisitor::VisitCXXConstructorDecl(
     const pasta::CXXConstructorDecl &decl) {
-    if (EnterFunctionDecl(decl)) {
-      auto init_list = decl.Initializers();
-      for (auto init : init_list) {
-        if (auto init_expr = init.Initializer()) {
-          Accept(init_expr.value());
-        }
-      }
+
+  if (EnterFunctionDecl(decl)) {
+    auto init_list = decl.Initializers();
+    for (const pasta::CXXCtorInitializer &init : init_list) {
+      Accept(init);
+    }
   }
 }
 
@@ -451,7 +459,9 @@ void EntityVisitor::VisitClassTemplateSpecializationDecl(
 }
 
 void EntityVisitor::VisitConceptDecl(const pasta::ConceptDecl &decl) {
-  EnterTemplateDecl(decl);
+  if (EnterTemplateDecl(decl)) {
+    Accept(decl.ConstraintExpression());
+  }
 }
 
 bool EntityVisitor::EnterValueDecl(const pasta::ValueDecl &decl) {
@@ -648,7 +658,7 @@ void EntityVisitor::VisitArrayTypeTraitExpr(
 }
 
 void EntityVisitor::VisitCXXConstructExpr(
-    const pasta::CXXConstructExpr  &expr) {
+    const pasta::CXXConstructExpr &expr) {
   if (EnterStmt(expr)) {
     for (auto &arg : expr.Arguments()) {
       Accept(arg);
@@ -672,6 +682,22 @@ void EntityVisitor::VisitCXXOperatorCallExpr(
       Accept(arg);
     }
     Accept(expr.Callee());
+  }
+}
+
+void EntityVisitor::VisitRequiresExprBodyDecl(
+    const pasta::RequiresExprBodyDecl &decl) {
+  if (EnterDecl(decl)) {
+    VisitDeclContext(decl);
+  }
+}
+
+void EntityVisitor::VisitRequiresExpr(const pasta::RequiresExpr &expr) {
+  if (EnterStmt(expr)) {
+    Accept(expr.Body());
+    for (const auto &param : expr.LocalParameters()) {
+      Accept(param);
+    }
   }
 }
 
@@ -766,6 +792,12 @@ void EntityVisitor::Accept(const pasta::Designator &) {
 void EntityVisitor::Accept(const pasta::CXXBaseSpecifier &) {
   // NOTE(pag): Don't need to enter the bases; they're likely top-level
   //            declarations.
+}
+
+void EntityVisitor::Accept(const pasta::CXXCtorInitializer &init) {
+  if (auto init_expr = init.Initializer()) {
+    Accept(init_expr.value());
+  }
 }
 
 EntityVisitor::~EntityVisitor(void) {}

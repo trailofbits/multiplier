@@ -39,7 +39,8 @@ enum IdentifiedPseudo : uint64_t {
   kTemplateArgument,
   kTemplateParameterList,
   kCXXBaseSpecifier,
-  kDesignator
+  kDesignator,
+  kCXXCtorInitializer
 };
 
 static constexpr uint64_t kActualNumDeclKinds = NumEnumerators(DeclKind{});
@@ -51,7 +52,10 @@ static constexpr uint64_t kNumTokenKinds = NumEnumerators(TokenKind{});
 static constexpr uint64_t kNumMacroKinds = NumEnumerators(MacroKind{});
 static constexpr uint64_t kNumOperationKinds
     = NumEnumerators(ir::OperationKind{});
-static constexpr uint64_t kNumPseudoKinds = 4u;
+
+// NOTE(pag): Keep up-to-date with `IdentifiedPseudo`.
+static constexpr uint64_t kNumPseudoKinds = 5u;
+
 static constexpr unsigned kSubKindNumBits = 11u;
 static_assert((kNumDeclKinds + kNumStmtKinds + kNumAttrKinds +
                kNumTokenKinds /* fragment tokens */ +
@@ -674,6 +678,41 @@ EntityId::EntityId(DesignatorId id) {
   }
 }
 
+EntityId::EntityId(CXXCtorInitializerId id) {
+  if (id.fragment_id) {
+    PackedEntityId packed = {};
+    if (id.fragment_id >= kMaxBigFragmentId) {
+      packed.small_entity.fragment_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.is_big = 0u;
+      packed.small_entity.is_fragment_entity = 1u;
+      packed.small_entity.sub_kind =
+          kNumDeclKinds + kNumStmtKinds + kNumAttrKinds +
+          kNumTokenKinds + kNumTokenKinds + kNumMacroKinds +
+          static_cast<uint64_t>(IdentifiedPseudo::kCXXCtorInitializer);
+      packed.small_entity.offset = id.offset;
+      RETURN_EARLY_IF_NOT(packed.small_entity.offset == id.offset);
+
+    } else {
+      packed.big_entity.fragment_id = id.fragment_id;
+      packed.big_entity.is_big = 1u;
+      packed.big_entity.is_fragment_entity = 1u;
+      packed.big_entity.sub_kind =
+          kNumDeclKinds + kNumStmtKinds + kNumAttrKinds +
+          kNumTokenKinds + kNumTokenKinds + kNumMacroKinds +
+          static_cast<uint64_t>(IdentifiedPseudo::kCXXCtorInitializer);
+      packed.big_entity.offset = id.offset;
+      RETURN_EARLY_IF_NOT(packed.big_entity.offset == id.offset);
+    }
+    opaque = packed.opaque;
+
+#ifndef NDEBUG
+    auto unpacked = Unpack();
+    assert(std::holds_alternative<CXXCtorInitializerId>(unpacked));
+    assert(std::get<CXXCtorInitializerId>(unpacked) == id);
+#endif
+  }
+}
+
 EntityId::EntityId(CompilationId id) {
   if (id.compilation_id) {
     PackedEntityId packed = {};
@@ -811,6 +850,7 @@ struct IDKind {
   inline int operator()(TemplateArgumentId) const noexcept { return -1; }
   inline int operator()(TemplateParameterListId) const noexcept { return -1; }
   inline int operator()(CXXBaseSpecifierId) const noexcept { return -1; }
+  inline int operator()(CXXCtorInitializerId) const noexcept { return -1; }
   inline int operator()(CompilationId) const noexcept { return -1; }
 
   // Applies to tokens, operations, decls, statements, types, attributes, etc.
@@ -868,6 +908,9 @@ struct IDCategory {
   }
   inline EntityCategory operator()(CXXBaseSpecifierId) const noexcept {
     return EntityCategory::CXX_BASE_SPECIFIER;
+  }
+  inline EntityCategory operator()(CXXCtorInitializerId) const noexcept {
+    return EntityCategory::CXX_CTOR_INITIALIZER;
   }
   inline EntityCategory operator()(CompilationId) const noexcept {
     return EntityCategory::COMPILATION;
@@ -999,6 +1042,12 @@ VariantId EntityId::Unpack(void) const noexcept {
             id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
             return id;
           }
+          case IdentifiedPseudo::kCXXCtorInitializer: {
+            CXXCtorInitializerId id;
+            id.fragment_id = packed.big_entity.fragment_id;
+            id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
+            return id;
+          }
         } 
       }
 
@@ -1091,6 +1140,12 @@ VariantId EntityId::Unpack(void) const noexcept {
           }
           case IdentifiedPseudo::kDesignator: {
             DesignatorId id;
+            id.fragment_id = packed.small_entity.fragment_id + kMaxBigFragmentId;
+            id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
+            return id;
+          }
+          case IdentifiedPseudo::kCXXCtorInitializer: {
+            CXXCtorInitializerId id;
             id.fragment_id = packed.small_entity.fragment_id + kMaxBigFragmentId;
             id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
             return id;

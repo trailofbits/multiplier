@@ -411,6 +411,8 @@ struct MX_EXPORT FragmentId final {
       : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const DesignatorId &id_)
       : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const CXXCtorInitializerId &id_)
+      : fragment_id(id_.fragment_id) {}
 
   static std::optional<FragmentId> from(const EntityId &);
 };
@@ -475,6 +477,7 @@ class MX_EXPORT EntityId final {
   /* implicit */ EntityId(TemplateParameterListId id);
   /* implicit */ EntityId(CXXBaseSpecifierId id);
   /* implicit */ EntityId(DesignatorId id);
+  /* implicit */ EntityId(CXXCtorInitializerId id);
   /* implicit */ EntityId(CompilationId id);
   /* implicit */ EntityId(OperationId id);
 

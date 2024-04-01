@@ -260,22 +260,28 @@ std::string TypeMapper::HashType(
   for (pasta::PrintedToken tok : range) {
     ss << ' ' << tok.Data();
 
-    for (std::optional<pasta::TokenContext> c = tok.Context();
-         c; c = c->Parent()) {
-      if (c->Kind() == pasta::TokenContextKind::kDecl) {
-        if (const void *decl = c->Data(); decl != last_decl) {
-          last_decl = decl;
-          if (!ShouldHideFromIndexer(pasta::Decl::From(c.value()).value()) &&
-            !ShouldSerializeDeclContext(pasta::Decl::From(c.value()).value())) {
-            decls.emplace_back(decl, i++);
-          }
-        }
-
-        // We only care about the shallowest decl in the context chain; anything
-        // deeper (i.e. closer to the root of the AST) will end up being present
-        // somewhere in `decls`.
-        break;
+    for (const pasta::TokenContext &c : TokenContexts(tok)) {
+      if (c.Kind() != pasta::TokenContextKind::kDecl) {
+        continue;
       }
+
+      const void *raw_decl = c.Data();
+      if (raw_decl == last_decl) {
+        continue;
+      }
+
+      last_decl = raw_decl;
+
+      auto decl = pasta::Decl::From(c).value();
+      if (!ShouldHideFromIndexer(decl) &&
+          !ShouldInternalizeDeclContextIntoFragment(decl)) {
+        decls.emplace_back(raw_decl, i++);
+      }
+
+      // We only care about the shallowest decl in the context chain; anything
+      // deeper (i.e. closer to the root of the AST) will end up being present
+      // somewhere in `decls`.
+      break;
     }
   }
 

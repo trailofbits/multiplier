@@ -122,11 +122,13 @@ class ParentTrackerVisitor : public EntityVisitor {
         return false;
       }
 
+#ifndef NDEBUG
       auto parent_eid = mx::EntityId(parent_decl_id).Extract<mx::DeclId>();
       if (!parent_eid) {
         assert(false);
         return false;
       }
+#endif
 
       em.parent_decl_ids.emplace(entity, parent_decl_id);
       em.parent_decls.emplace(entity, parent_decl);
@@ -138,11 +140,13 @@ class ParentTrackerVisitor : public EntityVisitor {
         return false;
       }
 
+#ifndef NDEBUG
       auto parent_eid = mx::EntityId(parent_stmt_id).Extract<mx::StmtId>();
       if (!parent_eid) {
         assert(false);
         return false;
       }
+#endif
 
       em.parent_stmt_ids.emplace(entity, parent_stmt_id);
       em.parent_stmts.emplace(entity, parent_stmt);
@@ -151,7 +155,31 @@ class ParentTrackerVisitor : public EntityVisitor {
     return true;
   }
 
+  void LabelDeclContext(const void *child_entity,
+                        std::optional<pasta::DeclContext> dc) {
+
+    if (!dc) {
+      return;
+    }
+
+    auto dc_decl = pasta::Decl::From(dc.value());
+    if (!dc_decl || !IsSerializableDecl(dc_decl.value())) {
+      return;
+    }
+
+    auto raw_dc_decl = RawEntity(dc_decl.value());
+    auto dc_eid = em.EntityId(raw_dc_decl);
+    if (dc_eid == mx::kInvalidEntityId) {
+      assert(false);
+      return;
+    }
+
+    em.parent_decl_ids.emplace(child_entity, dc_eid);
+    em.parent_decls.emplace(child_entity, raw_dc_decl);
+  }
+
   void AcceptTopLevel(const pasta::Decl &entity, bool actually_top_level) {
+
     // Clang will put records of classes inside themselves for `friend` lookups
     // and such. Our Clang patches set those to have the equivalent of
     // `Child->RemappedDecl = Parent`, and PASTA always follows `->RemappedDecl`
@@ -165,35 +193,19 @@ class ParentTrackerVisitor : public EntityVisitor {
       }
     }
 
+    Accept(entity);
+
     // Go build parents for the semantic decl contexts. In the case of things
     // like out-of-line static/member variables/fields/methods, we want the
     // parent to be the class itself. We also want to be able to follow the
     // namespaces up.
-    auto child_entity = RawEntity(entity);
-    if (actually_top_level && !em.parent_decl_ids.count(child_entity)) {
-      auto dc = entity.DeclarationContext();
-      while (dc) {
-        auto dc_decl = pasta::Decl::From(dc.value());
-        if (!dc_decl || ShouldHideFromIndexer(dc_decl.value())) {
-          break;
-        }
-
-        auto raw_dc_decl = RawEntity(dc_decl.value());
-        auto dc_eid = em.EntityId(raw_dc_decl);
-        if (dc_eid == mx::kInvalidEntityId) {
-          assert(false);
-          break;
-        }
-
-        em.parent_decl_ids.emplace(child_entity, dc_eid);
-        em.parent_decls.emplace(child_entity, raw_dc_decl);
-
-        child_entity = raw_dc_decl;
-        dc = dc_decl->DeclarationContext();
-      }
+    if (actually_top_level) {
+      CHECK(!ShouldInternalizeDeclContextIntoFragment(entity));
+      LabelDeclContext(RawEntity(entity), entity.DeclarationContext());
     }
 
-    Accept(entity);
+    parent_decl = nullptr;
+    parent_decl_id = mx::kInvalidEntityId;
   }
 
   void Accept(const pasta::Decl &entity) final {
@@ -201,15 +213,20 @@ class ParentTrackerVisitor : public EntityVisitor {
       return;
     }
 
+    auto raw_entity = RawEntity(entity);
+
+    // These are declaration contexts. We do invent them and add them in, but
+    // we don't want to go visiting everything inside of them. Instead, we want
+    // to add their parentage.
+    if (ShouldInternalizeDeclContextIntoFragment(entity)) {
+      not_yet_seen.erase(raw_entity);
+      LabelDeclContext(raw_entity, entity.DeclarationContext());
+      return;
+    }
+
     // Handle the serializable decl context differently
     auto eid = em.SpecificEntityId<mx::DeclId>(entity);
     if (!eid) {
-      // TODO(kumarak): I see an unlinked instance of TemplateTypeParmDecl that
-      //                is not available in AST. Adding check to avoid assert
-      assert((false
-              || entity.Kind() == pasta::DeclKind::kTemplateTypeParm
-              || entity.Kind() == pasta::DeclKind::kNonTypeTemplateParm
-              || entity.IsImplicit()));
       return;
     }
 
@@ -219,13 +236,13 @@ class ParentTrackerVisitor : public EntityVisitor {
       return;
     }
 
-    auto raw_entity = RawEntity(entity);
     if (!AddToMaps(raw_entity)) {
       return;
     }
 
     SaveRestoreEntity save_parent_decl(
         parent_decl_id, parent_decl, eid.value(), raw_entity);
+
     this->EntityVisitor::Accept(entity);
   }
 
@@ -235,7 +252,9 @@ class ParentTrackerVisitor : public EntityVisitor {
       // TODO(kumarak): Log error instead of assert. See the assert
       //                while visiting dependent types.
       LOG(ERROR)
-          << "Fragment has statment missing from Entity Mapper: "
+          << "Fragment"
+          << PrefixedLocation(fragment.top_level_decls.front(), " at or near ")
+          << " has unidentified: "
           << pasta::PrintedTokenRange::Create(entity).Data();
       //assert(false);
       return;
@@ -246,12 +265,13 @@ class ParentTrackerVisitor : public EntityVisitor {
     //
     // TODO(pag): Assert as a signal to find when it happens?
     if (eid->fragment_id != fragment.fragment_index) {
-      assert(false);
+      // assert(false);
       return;
     }
 
     auto raw_entity = RawEntity(entity);
     if (!AddToMaps(raw_entity)) {
+      assert(false);
       return;
     }
 
@@ -308,6 +328,12 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 
   void Accept(const pasta::CXXBaseSpecifier &entity) final {
+    if (AddToMaps(RawEntity(entity))) {
+      this->EntityVisitor::Accept(entity);
+    }
+  }
+
+  void Accept(const pasta::CXXCtorInitializer &entity) final {
     if (AddToMaps(RawEntity(entity))) {
       this->EntityVisitor::Accept(entity);
     }
@@ -513,7 +539,7 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
     }
 
     vis.AcceptTopLevel(decl, false);
-    
+
     // NOTE(pag): If this assertion is hit, then it suggests that the
     //            manually-written traversals in `Visitor.cpp` are missing
     //            something that the automatically generated visitors created
@@ -547,22 +573,52 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
   // Log the error.
 
   std::optional<pasta::Stmt> first_missing_stmt;
-  for (pasta::Stmt stmt : Entities(pf.stmts_to_serialize)) {
+  for (const pasta::Stmt &stmt : Entities(pf.stmts_to_serialize)) {
     if (!vis.HasBeenSeen(stmt)) {
       first_missing_stmt.emplace(stmt);
       break;
     }
   }
 
-  CHECK(first_missing_stmt.has_value());
-
   auto ast = pasta::AST::From(pf.top_level_decls.front());
-  LOG(ERROR)
+
+  if (first_missing_stmt.has_value()) {
+    LOG(ERROR)
+        << "Fragment"
+        << PrefixedLocation(pf.top_level_decls.front(), " at or near ")
+        << " main job file " << ast.MainFile().Path().generic_string()
+        << " has statement without parents: "
+        << first_missing_stmt->Tokens().Data();
+
+    auto compound = pasta::CompoundStmt::From(first_missing_stmt.value());
+    CHECK(!compound.has_value());
+
+    return;
+  }
+
+  std::optional<pasta::Decl> first_missing_decl;
+  for (const pasta::Decl &decl : Entities(pf.decls_to_serialize)) {
+    if (!vis.HasBeenSeen(decl)) {
+      first_missing_decl.emplace(decl);
+      break;
+    }
+  }
+
+  if (first_missing_decl.has_value()) {
+    LOG(ERROR)
+        << "Fragment"
+        << PrefixedLocation(pf.top_level_decls.front(), " at or near ")
+        << " main job file " << ast.MainFile().Path().generic_string()
+        << " has declaration without parents: "
+        << first_missing_decl->Tokens().Data();
+    return;
+  }
+
+  LOG(FATAL)
       << "Fragment"
       << PrefixedLocation(pf.top_level_decls.front(), " at or near ")
       << " main job file " << ast.MainFile().Path().generic_string()
-      << " has statements without parents: "
-      << pasta::PrintedTokenRange::Create(first_missing_stmt.value()).Data();
+      << " has something without parents.";
 }
 
 }  // namespace indexer

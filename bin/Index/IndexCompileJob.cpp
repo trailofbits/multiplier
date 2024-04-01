@@ -184,16 +184,35 @@ class TLDFinder final : public pasta::DeclVisitor {
     if (track_parent) {
       save_restore.emplace(parent_decl, RawEntity(dc_decl));
     }
-    
+
     for (const pasta::Decl &decl : dc.AlreadyLoadedDeclarations()) {
-      if (!decl.IsInvalidDeclaration()) {
+      if (!decl.IsInvalidDeclaration() && !ShouldHideFromIndexer(decl)) {
         Accept(decl);
       }
     }
   }
 
   void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final {
+    auto partials = partial_specialization_specializtions;
+
     VisitDeclContext(decl, decl, false  /* don't track parentage */);
+
+    // Flush out remaining partial specializations.
+    while (!partial_specialization_specializtions.empty()) {
+      partials.swap(partial_specialization_specializtions);
+
+      for (const auto &raw_partial_specs : partials) {
+        auto raw_partial = raw_partial_specs.first;
+        CHECK(seen.count(raw_partial));
+
+        for (const pasta::Decl &spec : raw_partial_specs.second) {
+          PrevValueTracker<const void *> save_restore(parent_decl, raw_partial);
+          Accept(spec);
+        }
+      }
+
+      partials.clear();
+    }
   }
 
   void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final {
@@ -250,12 +269,17 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
+    auto partials = std::move(it->second);
+
     // Make the parent of specializations be the partial specialization.
     PrevValueTracker<const void *> save_restore(parent_decl, raw_decl);
 
-    for (const auto &spec : it->second) {
+    for (const auto &spec : partials) {
       Accept(spec);
     }
+
+    CHECK(it->second.empty());
+    partial_specialization_specializtions.erase(it);
   }
 
   // Specializations / instantiations of a partial template specialization end
@@ -272,6 +296,7 @@ class TLDFinder final : public pasta::DeclVisitor {
       const pasta::ClassTemplatePartialSpecializationDecl &decl) final {
     auto raw_decl = RawEntity(decl);
     if (!seen.emplace(raw_decl).second) {
+      DCHECK(!partial_specialization_specializtions.count(raw_decl));
       return;
     }
 
@@ -312,6 +337,18 @@ class TLDFinder final : public pasta::DeclVisitor {
   //   // Do nothing.
   // }
 
+  template <typename T>
+  T FindParentRedecl(T &tpl, pasta::Token loc) {
+    for (const auto &redecl_ : tpl.Redeclarations()) {
+      auto redecl = reinterpret_cast<const T &>(redecl_);
+      if (redecl.Token() == loc) {
+        return redecl;
+      }
+    }
+    assert(false);
+    return tpl;
+  }
+
   void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &decl) final {
     auto raw_decl = RawEntity(decl);
 
@@ -326,8 +363,22 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
+    // We want to visit the stuff in the pattern, but not add the pattern as a
+    // top-level declaration. Also, clang tends to inject a class into itself
+    // that our patched remap back to the class, so we want to prevent that from
+    // being observed as a top-levelable thing.
+    auto pattern = decl.TemplatedDeclaration();
+    seen.insert(RawEntity(pattern));
+
+    VisitDeeperDeclContext(pattern, pattern);
+    AddDeclAlways(decl);
+
+    if (decl.CanonicalDeclaration() != decl) {
+      return;
+    }
+
     auto specs = ExpandSpecializations(decl.Specializations());
-    for (pasta::ClassTemplateSpecializationDecl spec : specs) {
+    for (const pasta::ClassTemplateSpecializationDecl &spec : specs) {
 
       auto tsk = spec.TemplateSpecializationKind();
 
@@ -347,27 +398,19 @@ class TLDFinder final : public pasta::DeclVisitor {
       // template itself, but lexically "belong" to the partial specialization
       // itself.
       auto pattern = spec.SpecializedTemplateOrPartial();
-      auto partial =
-          std::get_if<pasta::ClassTemplatePartialSpecializationDecl>(&pattern);
-      if (partial) {
-        partial_specialization_specializtions[RawEntity(*partial)].emplace_back(spec);
+      if (std::holds_alternative<pasta::ClassTemplatePartialSpecializationDecl>(pattern)) {
+        const auto &partial = std::get<pasta::ClassTemplatePartialSpecializationDecl>(pattern);
+        partial_specialization_specializtions[RawEntity(partial)].emplace_back(spec);
+        assert(spec.Token() == partial.Token());
         continue;
       }
 
       // Make the parent of specializations be the template itself.
-      PrevValueTracker<const void *> save_restore(parent_decl, raw_decl);
+      auto spec_parent = FindParentRedecl(decl, spec.Token());
+      PrevValueTracker<const void *> save_restore(
+          parent_decl, RawEntity(spec_parent));
       Accept(spec);
     }
-
-    // We want to visit the stuff in the pattern, but not add the pattern as a
-    // top-level declaration. Also, clang tends to inject a class into itself
-    // that our patched remap back to the class, so we want to prevent that from
-    // being observed as a top-levelable thing.
-    auto pattern = decl.TemplatedDeclaration();
-    seen.insert(RawEntity(pattern));
-
-    VisitDeeperDeclContext(pattern, pattern);
-    AddDeclAlways(decl);
   }
 
   void VisitVarTemplateDecl(const pasta::VarTemplateDecl &decl) final {
@@ -376,10 +419,12 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
-#ifndef NDEBUG
-    auto templated_decl = decl.TemplatedDeclaration();
-#endif
+    AddDeclAlways(decl);
 
+    if (decl.CanonicalDeclaration() != decl) {
+      return;
+    }
+  
     auto specs = ExpandSpecializations(decl.Specializations());
     for (const pasta::VarTemplateSpecializationDecl &spec : specs) {
       auto tsk = spec.TemplateSpecializationKind();
@@ -387,14 +432,12 @@ class TLDFinder final : public pasta::DeclVisitor {
       // We should observe the explicit specializations and instantiations
       // separately.
       if (IsExplicitSpecialization(tsk)) {
-        assert(spec.Token() != templated_decl.Token());
         continue;
       }
 
       // We should observe the specializations as a result of explicit
       // instantiations later. E.g. `extern template int foo<int>;`.
       if (IsExplicitInstantiation(tsk) && spec.ExternToken()) {
-        assert(spec.Token() != templated_decl.Token());
         continue;
       }
 
@@ -402,28 +445,26 @@ class TLDFinder final : public pasta::DeclVisitor {
       // template itself, but lexically "belong" to the partial specialization
       // itself.
       auto pattern = spec.SpecializedTemplateOrPartial();
-      auto partial =
-          std::get_if<pasta::VarTemplatePartialSpecializationDecl>(&pattern);
-      if (partial) {
-        partial_specialization_specializtions[RawEntity(*partial)].emplace_back(spec);
-        assert(spec.Token() != templated_decl.Token());
+      if (std::holds_alternative<pasta::VarTemplatePartialSpecializationDecl>(pattern)) {
+        const auto &partial = std::get<pasta::VarTemplatePartialSpecializationDecl>(pattern);
+        partial_specialization_specializtions[RawEntity(partial)].emplace_back(spec);
+        assert(spec.Token() == partial.Token());
         continue;
       }
 
-      assert(spec.Token() == templated_decl.Token());
-
       // Make the parent of specializations be the template itself.
-      PrevValueTracker<const void *> save_restore(parent_decl, raw_decl);
+      auto spec_parent = FindParentRedecl(decl, spec.Token());
+      PrevValueTracker<const void *> save_restore(
+          parent_decl, RawEntity(spec_parent));
       Accept(spec);
     }
-
-    AddDeclAlways(decl);
   }
 
   void VisitVarTemplatePartialSpecializationDecl(
       const pasta::VarTemplatePartialSpecializationDecl &decl) final {
     auto raw_decl = RawEntity(decl);
     if (!seen.emplace(raw_decl).second) {
+      DCHECK(!partial_specialization_specializtions.count(raw_decl));
       return;
     }
 
@@ -1342,6 +1383,13 @@ static void AddBuiltinDeclRangeToEntityListFor(
   entity_ranges.emplace_back(std::move(decl), nullptr  /* no parent */, 0u, 0u);
 }
 
+static bool LooksLikeFunctionTemplateOfLambda(const pasta::Token &tok,
+                                              const pasta::Decl &decl) {
+  return tok.Kind() == pasta::TokenKind::kLSquare &&
+         decl.IsImplicit() &&
+         decl.Kind() == pasta::DeclKind::kFunctionTemplate;
+}
+
 // Figure out the inclusive token index bounds of `decl` and add it to
 // `entity_ranges`.
 static void AddDeclRangeToEntityListFor(
@@ -1371,7 +1419,8 @@ static void AddDeclRangeToEntityListFor(
   LOG_IF(ERROR, ShouldFindDeclInTokenContexts(decl) &&
                 decl.Kind() != pasta::DeclKind::kBlock &&
                 !TokenIsInContextOfDecl(tok, decl) &&
-                !IsProbablyABuiltinDecl(decl))
+                !IsProbablyABuiltinDecl(decl) &&
+                !LooksLikeFunctionTemplateOfLambda(tok, decl))
       << "Could not find location of " << decl.KindName()
       << " declaration: " << DeclToString(decl)
       << PrefixedLocation(decl, " at or near ")

@@ -134,6 +134,12 @@ class PendingFragment {
 
   // Macros, declarations, statements, types, and pseudo-entities to serialize,
   // in their order of appearance and serialization.
+  //
+  // NOTE(pag): When adding a new list, be sure to look at all the places to
+  //            update. E.g. `PendingFragment::EntityListFor`,
+  //            `PendingFragment::TryAdd`, `SerializePendingFragment`,
+  //            `BuildPendingFragment`, `IdentifiedPseudo`, `EntityId`,
+  //            `EntityVisitor` and its derived classes, etc.
   KindGroupedEntityLists<mx::MacroKind, std::optional<TokenTree>> macros_to_serialize;
   KindGroupedEntityLists<mx::DeclKind, pasta::Decl> decls_to_serialize;
   KindGroupedEntityLists<mx::StmtKind, pasta::Stmt> stmts_to_serialize;
@@ -143,6 +149,7 @@ class PendingFragment {
   EntityList<pasta::TemplateParameterList> template_parameter_lists_to_serialize;
   EntityList<pasta::CXXBaseSpecifier> cxx_base_specifiers_to_serialize;
   EntityList<pasta::Designator> designators_to_serialize;
+  EntityList<pasta::CXXCtorInitializer> cxx_ctor_initializers_to_serialize;
 
   // The entity labeller for this fragment.
   std::unique_ptr<EntityLabeller> labeller;
@@ -177,6 +184,7 @@ class PendingFragment {
   bool TryAdd(const pasta::CXXBaseSpecifier &pseudo);
   bool TryAdd(const pasta::TemplateParameterList &pseudo);
   bool TryAdd(const pasta::Designator &pseudo);
+  bool TryAdd(const pasta::CXXCtorInitializer &pseudo);
 
   // Go and try to find the entity ID to be used for `Decl::Token`. We might
   // not have any return values for that for builtin types/declarations, and
@@ -234,6 +242,11 @@ class PendingFragment {
   inline EntityList<pasta::TemplateParameterList> &EntityListFor(
       const pasta::TemplateParameterList &) {
     return template_parameter_lists_to_serialize;
+  }
+
+  inline EntityList<pasta::CXXCtorInitializer> &EntityListFor(
+      const pasta::CXXCtorInitializer &) {
+    return cxx_ctor_initializers_to_serialize;
   }
 
  private:

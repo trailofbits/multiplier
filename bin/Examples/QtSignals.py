@@ -47,8 +47,14 @@ def find_signals(activate: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[mx.
     for call in activate.callers:
         caller = call.parent_declaration
         if not isinstance(caller, mx.ast.CXXMethodDecl) or not caller.is_definition or not caller.is_out_of_line:
-            debug("Found non-method caller of QMetaObject::activate: {}", " ".join(t.data for t in caller.tokens))
+            print(" ".join(t.data for t in call.tokens))
+            print(call.kind.name)
+            print(call.parent_declaration.kind.name)
+            print(call.parent_statement.parent_declaration.kind.name)
+            debug(f"Found non-method caller {caller.id} of QMetaObject::activate of kind {caller.kind.name}")
             continue
+
+        assert caller.is_out_of_line, "Signals are expected to be defined out-of-line"
 
         # Don't repeatedly visit the same function
         caller_id: int = caller.id
@@ -184,8 +190,13 @@ def find_connections(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[
 
         # New style: The argument is a member pointer to a signal method.
         if isinstance(signal_method_type, mx.ast.MemberPointerType):
-            assert isinstance(signal_method, mx.ast.UnaryOperator)
-            assert signal_method.opcode == mx.ast.UnaryOperatorKind.ADDRESS_OF
+            if isinstance(signal_method, mx.ast.DeclRefExpr):
+                debug("Skipping DeclRefExpr {} of signal method: {}",
+                      signal_method.id, ' '.join(t.data for t in signal_method.tokens))
+                continue
+
+            assert isinstance(signal_method, mx.ast.UnaryOperator), f"Unexpected member pointer kind: {signal_method.kind.name}"
+            assert signal_method.opcode == mx.ast.UnaryOperatorKind.ADDRESS_OF, f"Unexpected unary operator kind: {signal_method.opcode.name}"
             print(signal_method.sub_expression.kind.name)
 
         # Old style using a string literal.

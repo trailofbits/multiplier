@@ -532,18 +532,13 @@ bool IsDefinition(const pasta::Decl &decl_) {
 
 // Checks if the declaration is valid and serializable
 bool IsSerializableDecl(const pasta::Decl &decl) {
-  auto kind = decl.Kind();
-  switch (kind) {
+  switch (decl.Kind()) {
     case pasta::DeclKind::kTranslationUnit:
     case pasta::DeclKind::kCXXDeductionGuide:
       return false;
     default:
-      if (decl.IsInvalidDeclaration()) {
-        return false;
-      }
-      break;
+      return !decl.IsInvalidDeclaration();
   }
-  return true;
 }
 
 namespace {
@@ -624,16 +619,18 @@ bool IsOutOfLine(const pasta::Decl &decl) {
   return false;
 }
 
-bool ShouldSerializeDeclContext(const pasta::Decl &decl) {
-  switch(decl.Kind()) {
+// If `decl` is a declaration context, then this will return `true` if `decl`
+// should be internalized into the fragment, otherwise `false`. Returns `false`
+// if `decl` isn't a declaration context.
+bool ShouldInternalizeDeclContextIntoFragment(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
     case pasta::DeclKind::kExternCContext:
     case pasta::DeclKind::kLinkageSpec:
     case pasta::DeclKind::kNamespace:
       return true;
     default:
-      break;
+      return false;
   }
-  return false;
 }
 
 // This the specialization kind explicit? This corresponds to something like
@@ -1001,7 +998,7 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
   switch (decl.Kind()) {
     case pasta::DeclKind::kFunction: {
       auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
-      if(auto pattern_decl = func.TemplateInstantiationPattern()) {
+      if (auto pattern_decl = func.TemplateInstantiationPattern()) {
         // Return true if
         //        1) isReferenced() is false
         //        2) pattern->doesThisDeclarationHaveABody() is true
@@ -1010,8 +1007,12 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
                !func.DoesThisDeclarationHaveABody() &&
                !func.IsReferenced();
       }
-
+      break;
     }
+
+    case pasta::DeclKind::kUsingDirective:
+      return decl.IsImplicit();
+
     default:
       break;
   }

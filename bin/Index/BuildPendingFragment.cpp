@@ -71,7 +71,9 @@ class FragmentBuilder final {
   void MaybeVisitNext(const pasta::Token &) {}
 
   void MaybeVisitNext(const pasta::Decl &entity) {
-    fragment.TryAdd(entity);
+    if (fragment.TryAdd(entity)) {
+      AddParentDeclContexts(entity);
+    }
   }
 
   void MaybeVisitNext(const pasta::Stmt &entity) {
@@ -107,8 +109,24 @@ class FragmentBuilder final {
   }
 
   void MaybeVisitNext(const pasta::CXXCtorInitializer &pseudo) {
-    if (auto init_expr = pseudo.Initializer()) {
-      fragment.TryAdd(init_expr.value());
+    fragment.TryAdd(pseudo);
+  }
+
+  void MaybeVisitDeclContext(const pasta::DeclContext &dc) {
+    if (auto dc_decl = pasta::Decl::From(dc)) {
+      if (IsSerializableDecl(dc_decl.value())) {
+        MaybeVisitNext(dc_decl.value());
+      }
+    }
+  }
+
+  void AddParentDeclContexts(const pasta::Decl &decl) {
+    if (auto sdc = decl.DeclarationContext()) {
+      MaybeVisitDeclContext(sdc.value());
+    }
+
+    if (auto ldc = decl.LexicalDeclarationContext()) {
+      MaybeVisitDeclContext(ldc.value());
     }
   }
 
@@ -273,8 +291,9 @@ bool PendingFragment::DoTryAdd(const Entity &entity, EntityIdMap &entity_ids,
 
 bool PendingFragment::TryAdd(const pasta::Decl &entity) {
   auto &entity_or_token_map =
-      ShouldSerializeDeclContext(entity) ?
+      ShouldInternalizeDeclContextIntoFragment(entity) ?
       em.token_tree_ids : em.entity_ids;
+
   return DoTryAdd(
       entity,
       entity_or_token_map,
@@ -343,6 +362,18 @@ bool PendingFragment::TryAdd(const pasta::Designator &entity) {
       em.token_tree_ids,
       [&, this] (mx::EntityOffset offset) {
         mx::DesignatorId id;
+        id.fragment_id = fragment_index;
+        id.offset = offset;
+        return id;
+      });
+}
+
+bool PendingFragment::TryAdd(const pasta::CXXCtorInitializer &entity) {
+  return DoTryAdd(
+      entity,
+      em.token_tree_ids,
+      [&, this] (mx::EntityOffset offset) {
+        mx::CXXCtorInitializerId id;
         id.fragment_id = fragment_index;
         id.offset = offset;
         return id;
@@ -507,48 +538,79 @@ void BuildPendingFragment(const pasta::AST &ast, PendingFragment &pf) {
   size_t prev_num_template_args = 0ul;
   size_t prev_num_template_params = 0ul;
   size_t prev_num_cxx_base_specifiers = 0ul;
+  size_t prev_num_cxx_ctor_initializers = 0ul;
 
   FragmentBuilder builder(em, pf);
+
+  std::vector<pasta::TokenContext> contexts;
 
   // Make sure to collect everything reachable from token contexts.
   for (pasta::PrintedToken tok : pf.parsed_tokens) {
     for (pasta::TokenContext context : TokenContexts(tok)) {
+      
+      // The contexts go from the tokens back into the AST. When we pretty
+      // print things like class templates, we end up with a situation where
+      // we print the bodies of nested templates / other things that go in
+      // floating fragments. So, if we come across something that should go in
+      // such a fragment, then exclude it from here.
+      auto eid = mx::EntityId(em.EntityId(context.Data())).Unpack();
+      if (std::holds_alternative<mx::InvalidId>(eid)) {
+        // Do nothing.
+
+      } else if (std::holds_alternative<mx::DeclId>(eid) &&
+                 std::get<mx::DeclId>(eid).fragment_id != pf.fragment_index) {
+        contexts.clear();
+      
+      } else if (std::holds_alternative<mx::StmtId>(eid) &&
+                 std::get<mx::StmtId>(eid).fragment_id != pf.fragment_index) {
+        contexts.clear();
+
+      } else if (std::holds_alternative<mx::AttrId>(eid) &&
+                 std::get<mx::AttrId>(eid).fragment_id != pf.fragment_index) {
+        contexts.clear();
+      }
+
+      contexts.emplace_back(std::move(context));
+    }
+
+    for (const auto &context : contexts) {
       if (auto decl = pasta::Decl::From(context)) {
-        builder.MaybeVisitNext(*decl);
+        builder.MaybeVisitNext(decl.value());
 
       } else if (auto stmt = pasta::Stmt::From(context)) {
-        builder.MaybeVisitNext(*stmt);
+        builder.MaybeVisitNext(stmt.value());
 
       } else if (auto type = pasta::Type::From(context)) {
-        builder.MaybeVisitNext(*type);
+        builder.MaybeVisitNext(type.value());
 
       } else if (auto attr = pasta::Attr::From(context)) {
-        builder.MaybeVisitNext(*attr);
+        builder.MaybeVisitNext(attr.value());
 
       } else if (auto designator = pasta::Designator::From(context)) {
-        builder.MaybeVisitNext(*designator);
+        builder.MaybeVisitNext(designator.value());
 
       } else if (auto arg = pasta::TemplateArgument::From(context)) {
-        builder.MaybeVisitNext(*arg);
+        builder.MaybeVisitNext(arg.value());
       
       } else if (auto params = pasta::TemplateParameterList::From(context)) {
-        builder.MaybeVisitNext(*params);
+        builder.MaybeVisitNext(params.value());
       
       } else if (auto spec = pasta::CXXBaseSpecifier::From(context)) {
-        builder.MaybeVisitNext(*spec);
+        builder.MaybeVisitNext(spec.value());
+      
+      } else if (auto init = pasta::CXXCtorInitializer::From(context)) {
+        builder.MaybeVisitNext(init.value());
       }
     }
+
+    contexts.clear();
   }
 
   // Get the decl context of the top-level declarations and add them
   // to token_tree_ids. This will help internally serialize them in
   // the fragments.
   for (auto &tld : pf.top_level_decls) {
-    auto dc = tld.LexicalDeclarationContext();
-    while (dc && IsSerializableDecl(dc.value())) {
-      builder.MaybeVisitNext(dc.value());
-      dc = dc->LexicalParent();
-    }
+    builder.AddParentDeclContexts(tld);
   }
 
   auto do_on_list = [&] (auto &list, size_t &prev_size, bool &changed) {
@@ -577,6 +639,8 @@ void BuildPendingFragment(const pasta::AST &ast, PendingFragment &pf) {
       do_on_map(pf.stmts_to_serialize, prev_num_stmts, changed);
       do_on_map(pf.attrs_to_serialize, prev_num_attrs, changed);
       do_on_list(pf.types_to_serialize, prev_num_types, changed);
+      
+      // NOTE(pag): Keep these up-to-date with `PendingFragment`.
       do_on_list(pf.template_arguments_to_serialize, prev_num_template_args,
                  changed);
       do_on_list(pf.template_parameter_lists_to_serialize,
@@ -584,6 +648,8 @@ void BuildPendingFragment(const pasta::AST &ast, PendingFragment &pf) {
       do_on_list(pf.designators_to_serialize, prev_num_designators, changed);
       do_on_list(pf.cxx_base_specifiers_to_serialize,
                  prev_num_cxx_base_specifiers, changed);
+      do_on_list(pf.cxx_ctor_initializers_to_serialize,
+                 prev_num_cxx_ctor_initializers, changed);
     }
 
     // We defer the processing of types as late as possible, as deduplicating
