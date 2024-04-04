@@ -281,39 +281,39 @@ bool FieldDecl::has_in_class_initializer(void) const {
 }
 
 bool FieldDecl::has_non_null_in_class_initializer(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal93();
 }
 
 bool FieldDecl::is_anonymous_struct_or_union(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal94();
 }
 
 bool FieldDecl::is_bit_field(void) const {
-  return impl->reader.getVal96();
+  return impl->reader.getVal95();
 }
 
 bool FieldDecl::is_mutable(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal96();
 }
 
 bool FieldDecl::is_potentially_overlapping(void) const {
-  return impl->reader.getVal98();
+  return impl->reader.getVal97();
 }
 
 bool FieldDecl::is_unnamed_bitfield(void) const {
-  return impl->reader.getVal99();
+  return impl->reader.getVal98();
 }
 
 bool FieldDecl::is_zero_length_bit_field(void) const {
-  return impl->reader.getVal100();
+  return impl->reader.getVal99();
 }
 
 bool FieldDecl::is_zero_size(void) const {
-  return impl->reader.getVal101();
+  return impl->reader.getVal100();
 }
 
 std::optional<uint64_t> FieldDecl::offset_in_bits(void) const {
-  if (!impl->reader.getVal102()) {
+  if (!impl->reader.getVal101()) {
     return std::nullopt;
   } else {
     return static_cast<uint64_t>(impl->reader.getVal83());

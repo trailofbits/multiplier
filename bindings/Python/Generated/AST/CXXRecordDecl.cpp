@@ -183,13 +183,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "calculate_inheritance_model",
+    "inheritance_model",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->calculate_inheritance_model());
+          return ::mx::to_python(T_cast(self)->inheritance_model());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRecordDecl::calculate_inheritance_model"),
+    PyDoc_STR("Wrapper for mx::CXXRecordDecl::inheritance_model"),
     nullptr,
   },
   {
@@ -353,16 +353,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "odr_hash",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->odr_hash());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRecordDecl::odr_hash"),
-    nullptr,
-  },
-  {
     "template_instantiation_pattern",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -380,26 +370,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::template_specialization_kind"),
-    nullptr,
-  },
-  {
-    "num_visible_conversion_functions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_visible_conversion_functions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRecordDecl::num_visible_conversion_functions"),
-    nullptr,
-  },
-  {
-    "visible_conversion_functions",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->visible_conversion_functions());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRecordDecl::visible_conversion_functions"),
     nullptr,
   },
   {
@@ -1681,28 +1651,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::nth_constructor"),
-  },
-  {
-    "nth_visible_conversion_function",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          T *obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<uint32_t>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->nth_visible_conversion_function(std::move(arg_0.value())));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'nth_visible_conversion_function'";
-          return nullptr;
-        }),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for mx::CXXRecordDecl::nth_visible_conversion_function"),
   },
   {}  // Sentinel.
 };

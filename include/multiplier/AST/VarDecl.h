@@ -83,7 +83,6 @@ class MX_EXPORT VarDecl : public DeclaratorDecl {
   std::optional<Expr> initializer(void) const;
   VarDeclInitializationStyle initializer_style(void) const;
   std::optional<VarDecl> initializing_declaration(void) const;
-  std::optional<VarDecl> instantiated_from_static_data_member(void) const;
   LanguageLinkage language_linkage(void) const;
   Token point_of_instantiation(void) const;
   StorageClass storage_class(void) const;

@@ -708,6 +708,32 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"LinkageSpecDecl","AlreadyLoadedDeclarations"},
   {"ExternCContextDecl","AlreadyLoadedDeclarations"},
 
+  {"EnumDecl", "ODRHash"},
+  {"CXXRecordDecl", "ODRHash"},
+  {"FunctionDecl", "ODRHash"},
+  {"CXXRecordDecl", "VisibleConversionFunctions"},
+  {"FunctionDecl", "WillHaveBody"},
+
+  // These will apply to functions, enums, classes, etc.
+  {"Decl", "TypeAsWritten"},
+  {"Decl", "PointOfInstantiation"},
+  {"Decl", "TemplateSpecialization"},
+  {"Decl", "TemplateSpecializationKind"},
+  {"Decl", "TemplateSpecializationKindForInstantiation"},
+  {"Decl", "TemplateInstantiationPattern"},
+  {"Decl", "TemplateSpecializationKindForInstantiation"},
+  {"Decl", "TemplateInstantiationArguments"},
+  {"Decl", "InstantiatedFrom"},
+  {"Decl", "InstantiatedFromMember"},
+  {"Decl", "InstantiatedFromMemberTemplate"},
+  {"Decl", "PrimaryTemplate"},
+  {"EnumDecl", "InstantiatedFromMemberEnum"},
+  {"UsingPackDecl", "InstantiatedFromUsingDeclaration"},
+  {"FunctionDecl", "InstantiatedFromDeclaration"},
+  {"FunctionDecl", "InstantiatedFromMemberFunction"},
+  {"FunctionDecl", "IsThisDeclarationInstantiatedFromAFriendDefinition"},
+  {"VarDecl", "InstantiatedFromStaticDataMember"},
+
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
 };
@@ -3195,6 +3221,8 @@ MethodListPtr CodeGenerator::RunOnClass(
       if (class_name == "TagDecl") {
         snake_name = "tag_kind_name";
       }
+    } else if (snake_name == "calculate_inheritance_model") {
+      snake_name = "inheritance_model";
     }
 
     if (snake_name.ends_with("_type_info")) {

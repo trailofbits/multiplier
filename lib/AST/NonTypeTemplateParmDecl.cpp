@@ -262,15 +262,15 @@ bool NonTypeTemplateParmDecl::has_default_argument(void) const {
 }
 
 bool NonTypeTemplateParmDecl::has_placeholder_type_constraint(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal93();
 }
 
 bool NonTypeTemplateParmDecl::is_expanded_parameter_pack(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal94();
 }
 
 bool NonTypeTemplateParmDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal96();
+  return impl->reader.getVal95();
 }
 
 unsigned NonTypeTemplateParmDecl::num_expansion_types(void) const {

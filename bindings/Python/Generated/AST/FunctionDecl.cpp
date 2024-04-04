@@ -305,26 +305,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "instantiated_from_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instantiated_from_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionDecl::instantiated_from_declaration"),
-    nullptr,
-  },
-  {
-    "instantiated_from_member_function",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instantiated_from_member_function());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionDecl::instantiated_from_member_function"),
-    nullptr,
-  },
-  {
     "language_linkage",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -342,16 +322,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::FunctionDecl::multi_version_kind"),
-    nullptr,
-  },
-  {
-    "odr_hash",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->odr_hash());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionDecl::odr_hash"),
     nullptr,
   },
   {
@@ -925,16 +895,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "is_this_declaration_instantiated_from_a_friend_definition",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_this_declaration_instantiated_from_a_friend_definition());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionDecl::is_this_declaration_instantiated_from_a_friend_definition"),
-    nullptr,
-  },
-  {
     "is_trivial",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -1012,16 +972,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::FunctionDecl::uses_seh_try"),
-    nullptr,
-  },
-  {
-    "will_have_body",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->will_have_body());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionDecl::will_have_body"),
     nullptr,
   },
   {

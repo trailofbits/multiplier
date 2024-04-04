@@ -5394,7 +5394,7 @@ class CXXCtorInitializer(multiplier.Entity):
   is_in_class_member_initializer: bool
   is_delegating_initializer: bool
   is_pack_expansion: bool
-  is_base_virtual: bool
+  is_base_virtual: Optional[bool]
   member: Optional[multiplier.ast.FieldDecl]
   any_member: Optional[multiplier.ast.FieldDecl]
   indirect_member: Optional[multiplier.ast.IndirectFieldDecl]
@@ -58752,7 +58752,6 @@ class VarDecl(multiplier.ast.DeclaratorDecl):
   initializer: Optional[multiplier.ast.Expr]
   initializer_style: multiplier.ast.VarDeclInitializationStyle
   initializing_declaration: Optional[multiplier.ast.VarDecl]
-  instantiated_from_static_data_member: Optional[multiplier.ast.VarDecl]
   language_linkage: multiplier.ast.LanguageLinkage
   point_of_instantiation: multiplier.frontend.Token
   storage_class: multiplier.ast.StorageClass
@@ -59690,11 +59689,8 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
   ellipsis_token: multiplier.frontend.Token
   exception_spec_tokens: multiplier.frontend.TokenRange
   exception_spec_type: multiplier.ast.ExceptionSpecificationType
-  instantiated_from_declaration: Optional[multiplier.ast.FunctionDecl]
-  instantiated_from_member_function: Optional[multiplier.ast.FunctionDecl]
   language_linkage: multiplier.ast.LanguageLinkage
   multi_version_kind: multiplier.ast.MultiVersionKind
-  odr_hash: Optional[int]
   overloaded_operator: multiplier.ast.OverloadedOperatorKind
   parameters_tokens: multiplier.frontend.TokenRange
   point_of_instantiation: multiplier.frontend.Token
@@ -59752,7 +59748,6 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
   is_target_multi_version: bool
   is_template_instantiation: bool
   is_this_declaration_a_definition: bool
-  is_this_declaration_instantiated_from_a_friend_definition: bool
   is_trivial: bool
   is_trivial_for_call: bool
   is_user_provided: bool
@@ -59761,7 +59756,6 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
   num_parameters: int
   parameters: Iterable[multiplier.ast.ParmVarDecl]
   uses_seh_try: bool
-  will_have_body: bool
   body: Optional[multiplier.ast.Stmt]
   declarations_in_context: Iterable[multiplier.ast.Decl]
   callers: Iterable[multiplier.ast.Stmt]
@@ -61124,7 +61118,6 @@ class UsingPackDecl(multiplier.ast.NamedDecl):
   redeclarations: Iterable[multiplier.ast.UsingPackDecl]
   num_expansions: int
   expansions: Iterable[multiplier.ast.NamedDecl]
-  instantiated_from_using_declaration: multiplier.ast.NamedDecl
 
   @overload
   @staticmethod
@@ -61835,7 +61828,7 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   redeclarations: Iterable[multiplier.ast.CXXRecordDecl]
   allow_const_default_initializer: Optional[bool]
   bases: Optional[Sequence[multiplier.ast.CXXBaseSpecifier]]
-  calculate_inheritance_model: Optional[multiplier.ast.MSInheritanceModel]
+  inheritance_model: Optional[multiplier.ast.MSInheritanceModel]
   num_constructors: int
   constructors: Iterable[multiplier.ast.CXXConstructorDecl]
   friends: Optional[Sequence[multiplier.ast.FriendDecl]]
@@ -61852,11 +61845,8 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   lambda_static_invoker: Optional[multiplier.ast.CXXMethodDecl]
   ms_inheritance_model: Optional[multiplier.ast.MSInheritanceModel]
   ms_vtor_disp_mode: multiplier.ast.MSVtorDispMode
-  odr_hash: Optional[int]
   template_instantiation_pattern: Optional[multiplier.ast.CXXRecordDecl]
   template_specialization_kind: multiplier.ast.TemplateSpecializationKind
-  num_visible_conversion_functions: int
-  visible_conversion_functions: Iterable[multiplier.ast.NamedDecl]
   has_any_dependent_bases: Optional[bool]
   has_constexpr_default_constructor: Optional[bool]
   has_constexpr_destructor: Optional[bool]
@@ -62049,9 +62039,6 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
     ...
 
   def nth_constructor(self, n: int) -> Optional[multiplier.ast.CXXConstructorDecl]:
-    ...
-
-  def nth_visible_conversion_function(self, n: int) -> Optional[multiplier.ast.NamedDecl]:
     ...
 
 class ClassTemplateSpecializationDecl(multiplier.ast.CXXRecordDecl):
@@ -62268,10 +62255,8 @@ class EnumDecl(multiplier.ast.TagDecl):
   redeclarations: Iterable[multiplier.ast.EnumDecl]
   num_enumerators: int
   enumerators: Iterable[multiplier.ast.EnumConstantDecl]
-  instantiated_from_member_enum: Optional[multiplier.ast.EnumDecl]
   integer_type: Optional[multiplier.ast.Type]
   integer_type_range: multiplier.frontend.TokenRange
-  odr_hash: Optional[int]
   promotion_type: Optional[multiplier.ast.Type]
   template_instantiation_pattern: Optional[multiplier.ast.EnumDecl]
   template_specialization_kind: multiplier.ast.TemplateSpecializationKind

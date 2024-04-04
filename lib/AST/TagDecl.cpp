@@ -282,43 +282,43 @@ bool TagDecl::is_complete_definition(void) const {
 }
 
 bool TagDecl::is_complete_definition_required(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal93();
 }
 
 bool TagDecl::is_dependent_type(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal94();
 }
 
 bool TagDecl::is_enum(void) const {
-  return impl->reader.getVal96();
+  return impl->reader.getVal95();
 }
 
 bool TagDecl::is_free_standing(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal96();
 }
 
 bool TagDecl::is_interface(void) const {
-  return impl->reader.getVal98();
+  return impl->reader.getVal97();
 }
 
 bool TagDecl::is_struct(void) const {
-  return impl->reader.getVal99();
+  return impl->reader.getVal98();
 }
 
 bool TagDecl::is_this_declaration_a_definition(void) const {
-  return impl->reader.getVal100();
+  return impl->reader.getVal99();
 }
 
 bool TagDecl::is_this_declaration_a_demoted_definition(void) const {
-  return impl->reader.getVal101();
+  return impl->reader.getVal100();
 }
 
 bool TagDecl::is_union(void) const {
-  return impl->reader.getVal102();
+  return impl->reader.getVal101();
 }
 
 bool TagDecl::may_have_out_of_date_definition(void) const {
-  return impl->reader.getVal103();
+  return impl->reader.getVal102();
 }
 
 unsigned TagDecl::num_template_parameter_lists(void) const {

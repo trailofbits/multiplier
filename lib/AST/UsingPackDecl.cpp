@@ -251,11 +251,6 @@ gap::generator<NamedDecl> UsingPackDecl::expansions(void) const & {
   co_return;
 }
 
-NamedDecl UsingPackDecl::instantiated_from_using_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal55();
-  return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
-}
-
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

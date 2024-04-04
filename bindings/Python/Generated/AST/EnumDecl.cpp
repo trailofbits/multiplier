@@ -175,16 +175,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "instantiated_from_member_enum",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instantiated_from_member_enum());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::instantiated_from_member_enum"),
-    nullptr,
-  },
-  {
     "integer_type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -202,16 +192,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::EnumDecl::integer_type_range"),
-    nullptr,
-  },
-  {
-    "odr_hash",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->odr_hash());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::odr_hash"),
     nullptr,
   },
   {

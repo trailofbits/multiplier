@@ -174,16 +174,6 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::UsingPackDecl::expansions"),
     nullptr,
   },
-  {
-    "instantiated_from_using_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instantiated_from_using_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::UsingPackDecl::instantiated_from_using_declaration"),
-    nullptr,
-  },
   {}  // Sentinel.
 };
 }  // namespace

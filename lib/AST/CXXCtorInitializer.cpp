@@ -79,24 +79,16 @@ bool CXXCtorInitializer::is_pack_expansion(void) const {
   return impl->reader.getVal6();
 }
 
-bool CXXCtorInitializer::is_base_virtual(void) const {
-  return impl->reader.getVal7();
-}
-
-std::optional<FieldDecl> CXXCtorInitializer::member(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal8();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FieldDecl::from_base(std::move(eptr));
-    }
+std::optional<bool> CXXCtorInitializer::is_base_virtual(void) const {
+  if (!impl->reader.getVal8()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal7());
   }
   return std::nullopt;
 }
 
-std::optional<FieldDecl> CXXCtorInitializer::any_member(void) const {
+std::optional<FieldDecl> CXXCtorInitializer::member(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal9();
     if (eid == kInvalidEntityId) {
@@ -109,9 +101,22 @@ std::optional<FieldDecl> CXXCtorInitializer::any_member(void) const {
   return std::nullopt;
 }
 
-std::optional<IndirectFieldDecl> CXXCtorInitializer::indirect_member(void) const {
+std::optional<FieldDecl> CXXCtorInitializer::any_member(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal10();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FieldDecl::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
+}
+
+std::optional<IndirectFieldDecl> CXXCtorInitializer::indirect_member(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal11();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -124,7 +129,7 @@ std::optional<IndirectFieldDecl> CXXCtorInitializer::indirect_member(void) const
 
 std::optional<Stmt> CXXCtorInitializer::initializer(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal11();
+    RawEntityId eid = impl->reader.getVal12();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -136,23 +141,23 @@ std::optional<Stmt> CXXCtorInitializer::initializer(void) const {
 }
 
 Token CXXCtorInitializer::ellipsis_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
-}
-
-Token CXXCtorInitializer::member_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
 }
 
-Token CXXCtorInitializer::left_angle_token(void) const {
+Token CXXCtorInitializer::member_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
-Token CXXCtorInitializer::right_angle_token(void) const {
+Token CXXCtorInitializer::left_angle_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal15());
 }
 
+Token CXXCtorInitializer::right_angle_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal16());
+}
+
 TokenRange CXXCtorInitializer::tokens(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal16(), impl->reader.getVal17());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal17(), impl->reader.getVal18());
 }
 
 #pragma GCC diagnostic pop

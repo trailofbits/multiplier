@@ -229,16 +229,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "instantiated_from_static_data_member",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instantiated_from_static_data_member());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::VarDecl::instantiated_from_static_data_member"),
-    nullptr,
-  },
-  {
     "language_linkage",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

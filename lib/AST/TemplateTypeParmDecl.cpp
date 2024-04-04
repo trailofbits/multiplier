@@ -268,11 +268,11 @@ bool TemplateTypeParmDecl::is_expanded_parameter_pack(void) const {
 }
 
 bool TemplateTypeParmDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal93();
 }
 
 bool TemplateTypeParmDecl::was_declared_with_typename(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal94();
 }
 
 #pragma GCC diagnostic pop

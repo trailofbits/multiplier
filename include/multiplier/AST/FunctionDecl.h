@@ -94,11 +94,8 @@ class MX_EXPORT FunctionDecl : public DeclaratorDecl {
   Token ellipsis_token(void) const;
   TokenRange exception_spec_tokens(void) const;
   ExceptionSpecificationType exception_spec_type(void) const;
-  std::optional<FunctionDecl> instantiated_from_declaration(void) const;
-  std::optional<FunctionDecl> instantiated_from_member_function(void) const;
   LanguageLinkage language_linkage(void) const;
   MultiVersionKind multi_version_kind(void) const;
-  std::optional<uint32_t> odr_hash(void) const;
   OverloadedOperatorKind overloaded_operator(void) const;
   TokenRange parameters_tokens(void) const;
   Token point_of_instantiation(void) const;
@@ -156,7 +153,6 @@ class MX_EXPORT FunctionDecl : public DeclaratorDecl {
   bool is_target_multi_version(void) const;
   bool is_template_instantiation(void) const;
   bool is_this_declaration_a_definition(void) const;
-  bool is_this_declaration_instantiated_from_a_friend_definition(void) const;
   bool is_trivial(void) const;
   bool is_trivial_for_call(void) const;
   bool is_user_provided(void) const;
@@ -166,7 +162,6 @@ class MX_EXPORT FunctionDecl : public DeclaratorDecl {
   unsigned num_parameters(void) const;
   gap::generator<ParmVarDecl> parameters(void) const &;
   bool uses_seh_try(void) const;
-  bool will_have_body(void) const;
   std::optional<Stmt> body(void) const;
   gap::generator<Decl> declarations_in_context(void) const &;
   // Callers of a `FunctionDecl` can be `CallExpr`, `CxxNewExpr`,

@@ -103,7 +103,7 @@ class MX_EXPORT CXXCtorInitializer {
   bool is_in_class_member_initializer(void) const;
   bool is_delegating_initializer(void) const;
   bool is_pack_expansion(void) const;
-  bool is_base_virtual(void) const;
+  std::optional<bool> is_base_virtual(void) const;
   std::optional<FieldDecl> member(void) const;
   std::optional<FieldDecl> any_member(void) const;
   std::optional<IndirectFieldDecl> indirect_member(void) const;

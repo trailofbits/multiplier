@@ -699,6 +699,11 @@ class Compilation(multiplier.Entity):
 
   @overload
   @staticmethod
+  def containing(arg_0: multiplier.ast.CXXCtorInitializer) -> multiplier.frontend.Compilation:
+    ...
+
+  @overload
+  @staticmethod
   def containing(arg_0: multiplier.ast.Designator) -> multiplier.frontend.Compilation:
     ...
 

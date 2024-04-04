@@ -242,16 +242,6 @@ static void AddTemplateSpecialization(
 static void AddFunctionSpecialization(
     const EntityMapper &em, mx::DatabaseWriter &database,
     const pasta::FunctionDecl &func) {
-  auto tsk = func.TemplateSpecializationKind();
-  if (tsk == pasta::TemplateSpecializationKind::kUndeclared) {
-    return;
-  }
-
-  auto raw_spec_id = em.EntityId(func);
-  auto spec_id = mx::EntityId(raw_spec_id).Extract<mx::DeclId>();
-  if (!spec_id) {
-    return;
-  }
 
   mx::RawEntityId raw_tpl_id = mx::kInvalidEntityId;
 
@@ -282,23 +272,20 @@ static void AddFunctionSpecialization(
     return;
   }
 
+  auto raw_spec_id = em.EntityId(func);
+  auto spec_id = mx::EntityId(raw_spec_id).Extract<mx::DeclId>();
+  if (!spec_id) {
+    return;
+  }
+
   mx::ReferenceRecord record{raw_spec_id, raw_tpl_id, raw_tpl_id,
                              mx::BuiltinReferenceKind::SPECIALIZES};
   database.AddAsync(record);
 }
 
-static void AddVarSpecialization(const EntityMapper &em, mx::DatabaseWriter &database,
+static void AddVarSpecialization(
+    const EntityMapper &em, mx::DatabaseWriter &database,
     const pasta::VarDecl &var) {
-  auto tsk = var.TemplateSpecializationKind();
-  if (tsk == pasta::TemplateSpecializationKind::kUndeclared) {
-    return;
-  }
-
-  auto raw_spec_id = em.EntityId(var);
-  auto spec_id = mx::EntityId(raw_spec_id).Extract<mx::DeclId>();
-  if (!spec_id) {
-    return;
-  }
 
   mx::RawEntityId raw_tpl_id = mx::kInvalidEntityId;
 
@@ -319,6 +306,39 @@ static void AddVarSpecialization(const EntityMapper &em, mx::DatabaseWriter &dat
 
   auto tpl_id = mx::EntityId(raw_tpl_id).Extract<mx::DeclId>();
   if (!tpl_id) {
+    return;
+  }
+
+  auto raw_spec_id = em.EntityId(var);
+  auto spec_id = mx::EntityId(raw_spec_id).Extract<mx::DeclId>();
+  if (!spec_id) {
+    return;
+  }
+
+  mx::ReferenceRecord record{raw_spec_id, raw_tpl_id, raw_tpl_id,
+                             mx::BuiltinReferenceKind::SPECIALIZES};
+  database.AddAsync(record);
+}
+
+static void AddEnumSpecialization(
+    const EntityMapper &em, mx::DatabaseWriter &database,
+    const pasta::EnumDecl &spec) {
+
+  mx::RawEntityId raw_tpl_id = mx::kInvalidEntityId;
+  if (auto enum_pattern = spec.TemplateInstantiationPattern()) {
+    raw_tpl_id = em.EntityId(enum_pattern.value());
+  } else if (auto inst_pattern = spec.InstantiatedFromMemberEnum()) {
+    raw_tpl_id = em.EntityId(inst_pattern.value());
+  }
+
+  auto tpl_id = mx::EntityId(raw_tpl_id).Extract<mx::DeclId>();
+  if (!tpl_id) {
+    return;
+  }
+
+  auto raw_spec_id = em.EntityId(spec);
+  auto spec_id = mx::EntityId(raw_spec_id).Extract<mx::DeclId>();
+  if (!spec_id) {
     return;
   }
 
@@ -367,8 +387,12 @@ static void AddTemplateSpecializations(
   //            `VAR_TEMPLATE`.
   //
   // TODO(pag): Do `ParmVarDecl`s and such have specialization info from Clang?
-  for (const auto &var : SpecificDeclList<pasta::VarDecl>(pf, mx::DeclKind::VAR)) {
-    AddVarSpecialization(em, database, var);
+  for (const auto &spec : SpecificDeclList<pasta::VarDecl>(pf, mx::DeclKind::VAR)) {
+    AddVarSpecialization(em, database, spec);
+  }
+
+  for (const auto &spec : SpecificDeclList<pasta::EnumDecl>(pf, mx::DeclKind::ENUM)) {
+    AddEnumSpecialization(em, database, spec);
   }
 }
 
