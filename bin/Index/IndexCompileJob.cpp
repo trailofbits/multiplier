@@ -1966,10 +1966,9 @@ static PendingFragmentPtr CreatePendingFragment(
   // as many of them), or the small one (i.e. doesn't have as much stuff, and
   // we can encode substantially more of them).
   size_t num_tokens = 0u;
-  if (original_tokens && *original_tokens) {
+  if (original_tokens) {
     num_tokens = original_tokens->Size();
   }
-
   num_tokens = std::max(num_tokens, parsed_tokens.Size());
 
   // Compute the fragment ID, and in doing so, figure out if this is actually

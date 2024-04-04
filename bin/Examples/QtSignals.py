@@ -5,7 +5,7 @@ import collections
 
 import multiplier as mx
 import sys
-from typing import List, Optional, Iterable, Set, Tuple, DefaultDict, Dict
+from typing import List, Optional, Iterable, Set, Tuple, Dict
 
 
 def debug(data: str, *args):
@@ -26,6 +26,26 @@ def name(decl: mx.ast.Decl) -> str:
                 names.pop()
         decl = decl.parent_declaration
     return "::".join(reversed(names))
+
+
+def location(decl_or_expr: mx.ast.Decl | mx.ast.Expr, flc: mx.frontend.FileLocationCache) -> str:
+    for tok in decl_or_expr.tokens:
+        tok = tok.file_token
+        if tok is None or tok.id == 0:
+            continue
+
+        file = mx.frontend.File.containing(tok)
+        if not file:
+            continue
+
+        path = str(next(file.paths))
+        line_col = tok.location(flc)
+        if line_col is None:
+            return path
+
+        return f"{path}:{line_col[0]}:{line_col[1]}"
+    return "<unknown>"
+
 
 _DECL_OBJECTS: Dict[int, 'DeclObject'] = {}
 
@@ -63,6 +83,8 @@ class Object(abc.ABC):
             return isinstance(rhs, AnyObject) and lhs or rhs
         elif isinstance(expr, (mx.ast.UnaryOperator, mx.ast.CastExpr)):
             return Object.create_from_expr(expr.sub_expression, context)
+        elif isinstance(expr, mx.ast.ArraySubscriptExpr):
+            return Object.create_from_expr(expr.base, context)
 
         global _ANY_OBJECT
         debug("Unsupported object ({}) of type '{}': {}",
@@ -135,8 +157,8 @@ class DeclInstance(Object):
         if isinstance(self.decl, mx.ast.NamedDecl):
             decl_name: str = name(self.decl)
             if len(decl_name):
-                return decl_name
-        return f"Decl({self.decl.id})"
+                return decl_name + "::this"
+        return f"{self.decl.id}::this"
 
 
 _ANY_OBJECT = AnyObject()
@@ -196,11 +218,11 @@ def find_signals(activate: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[mx.
         if not isinstance(containing_file, mx.frontend.File):
             continue
 
-        # # Signals are implemented in file paths that look like:
-        # # /path/to/code/<cmake_target>_autogen/<id>/moc_<file name>
-        # path = str(next(containing_file.paths))
-        # if "moc_" not in path or "_autogen" not in path:
-        #     continue
+        # Signals are implemented in file paths that look like:
+        # /path/to/code/<cmake_target>_autogen/<id>/moc_<file name>
+        path = str(next(containing_file.paths))
+        if "moc_" not in path or "_autogen" not in path:
+            continue
 
         yield caller
 
@@ -298,7 +320,7 @@ def find_connections(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[
         sender = Object.create_from_expr(call.nth_argument(0), call)
         signal_method_arg: mx.ast.Expr = call.nth_argument(1).ignore_casts
         signal_method: Optional[mx.ast.CXXMethodDecl] = referenced_method(signal_method_arg)
-        if isinstance(signal_method_arg, mx.ast)
+
         if not signal_method:
             debug(
                 "Skipping call ({}) to connect ({}) with signal argument '{}' ({}) that isn't the address of a method",
@@ -431,39 +453,59 @@ class CallGraph:
 
         self.calls = new_calls
 
-    def dump(self):
+    def dump(self) -> str:
         out: List[str] = []
         out.append("digraph {")
+        seen_objects = set()
         for func, calls in self.calls.items():
-            out.append(f"f{func.id} [label=\"{name(func)}\"];")
+            out.append(f"f{func.id} [label=\"{name(func)}\", shape=\"box\"];")
             for call in calls:
-                out.append(f"f{func.id} -> f{call.target.id} [label=\"{call.object.name}\"];")
+                if call.object not in seen_objects:
+                    seen_objects.add(call.object)
+                    out.append(f"o{id(call.object)} [label=\"{call.object.name}\", shape=\"hexagon\"];")
+                out.append(f"f{func.id} -> o{id(call.object)};")
+                out.append(f"o{id(call.object)} -> f{call.target.id};")
         out.append("}")
+        return "\n".join(out)
+
+    def dump_callsites(self) -> str:
+        out: List[str] = []
+        flc = mx.frontend.FileLocationCache()
+        for func, calls in self.calls.items():
+            out.append(f"{name(func)} at {location(func, flc)} calls:")
+            for call in calls:
+                out.append(f"\t{name(call.target)} at {location(call.call, flc)}")
         return "\n".join(out)
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--db", type=str, required=True, help="Path to the database")
+    parser.add_argument("--dot", type=str, help="Path to the output DOT file")
+    parser.add_argument("--locations", type=str, help="Path to the output locations file")
     args = parser.parse_args()
     index = mx.Index.in_memory_cache(mx.Index.from_database(args.db))
     seen: Set[int] = set()
     cg: CallGraph = CallGraph()
     for activate in find_qmetaobject_activate(index, seen):
         for signal in find_signals(activate, seen):
-            # debug("SIGNAL {}::{}: {}", signal.parent_declaration.name, signal.name, " ".join(t.data for t in signal.type.tokens))
-            pass
+            debug("SIGNAL {}: {}", name(signal), " ".join(t.data for t in signal.type.tokens))
 
     for connect in find_qobject_connect(index, seen):
         for connect_call, sender, signal, receiver, slot in find_connections(connect, seen):
             debug("CONNECT({}, {})", name(signal), name(slot))
-            call_edge: Call = Call(receiver, connect_call, slot.canonical_declaration)
-            cg.inject_call(signal, call_edge)
+            rx_edge: Call = Call(receiver, connect_call, slot.canonical_declaration)
+            cg.inject_call(signal, rx_edge)
 
-    #cg.remove_acyclic()
+    cg.remove_acyclic()
 
-    with open("/tmp/test.dot", "w") as f:
-        f.write(cg.dump())
+    if args.dot:
+        with open(args.dot, "w") as f:
+            f.write(cg.dump())
+
+    if args.locations:
+        with open(args.locations, "w") as f:
+            f.write(cg.dump_callsites())
 
     return 0
 
