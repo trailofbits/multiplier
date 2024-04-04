@@ -324,8 +324,7 @@ class TLDFinder final : public pasta::DeclVisitor {
     VisitDeeperDeclContext(decl, decl);
 
     auto tsk = decl.TemplateSpecializationKind();
-    if (!IsExplicitSpecialization(tsk) &&
-        !(IsExplicitInstantiation(tsk) && decl.ExternToken())) {
+    if (!(IsExplicitSpecialization(tsk) || IsExplicitInstantiation(tsk))) {
       CHECK_NOTNULL(parent_decl);
     }
 
@@ -394,8 +393,8 @@ class TLDFinder final : public pasta::DeclVisitor {
       }
 
       // We should observe the specializations as a result of explicit
-      // instantiations later. E.g. `extern template class foo<int>;`.
-      if (IsExplicitInstantiation(tsk) && spec.ExternToken()) {
+      // instantiations later. E.g. `template class foo<int>;`.
+      if (IsExplicitInstantiation(tsk)) {
         continue;
       }
 

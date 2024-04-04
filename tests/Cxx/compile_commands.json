@@ -133,5 +133,50 @@
     "file": "TypedefFunction.cpp",
     "command": "/usr/bin/c++ TypedefFunction.cpp",
     "directory": ""
+},
+{
+    "file": "ByteOperand.cpp",
+    "command": "/usr/bin/c++ ByteOperand.cpp",
+    "directory": ""
+},
+{
+    "file": "VarBounds.cpp",
+    "command": "/usr/bin/c++ VarBounds.cpp",
+    "directory": ""
+},
+{ 
+    "file": "ParamVarBounds.cpp",
+    "command": "/usr/bin/c++ ParamVarBounds.cpp",
+    "directory": ""
+},
+{
+    "file": "BasicStream.cpp",
+    "command": "/usr/bin/c++ BasicStream.cpp",
+    "directory": ""
+},
+{
+    "file": "TypeAliasTemplate.cpp",
+    "command": "/usr/bin/c++ TypeAliasTemplate.cpp",
+    "directory": ""
+},
+{
+    "file": "VarTemplateSpecializationWithNoParent.cpp",
+    "command": "/usr/bin/c++ VarTemplateSpecializationWithNoParent.cpp",
+    "directory": ""
+},
+{
+    "file": "VarDeclWithNoParent.cpp",
+    "command": "/usr/bin/c++ VarDeclWithNoParent.cpp",
+    "directory": ""
+},
+{
+    "file": "StaticMethod.cpp",
+    "command": "/usr/bin/c++ StaticMethod.cpp",
+    "directory": ""
+},
+{
+    "file": "ExplicitInstantiationDefinition.cpp",
+    "command": "/usr/bin/c++ ExplicitInstantiationDefinition.cpp",
+    "directory": ""
 }
 ]
