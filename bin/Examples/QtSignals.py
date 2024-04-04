@@ -20,7 +20,6 @@ def debug_if(cond: bool, data: str, *args):
 def name(decl: mx.ast.Decl) -> str:
     names = []
     while decl:
-        print(decl.id)
         if isinstance(decl, mx.ast.NamedDecl):
             names.append(decl.name)
             if not len(names[-1]):
@@ -299,6 +298,7 @@ def find_connections(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[
         sender = Object.create_from_expr(call.nth_argument(0), call)
         signal_method_arg: mx.ast.Expr = call.nth_argument(1).ignore_casts
         signal_method: Optional[mx.ast.CXXMethodDecl] = referenced_method(signal_method_arg)
+        if isinstance(signal_method_arg, mx.ast)
         if not signal_method:
             debug(
                 "Skipping call ({}) to connect ({}) with signal argument '{}' ({}) that isn't the address of a method",
@@ -456,9 +456,7 @@ def main():
 
     for connect in find_qobject_connect(index, seen):
         for connect_call, sender, signal, receiver, slot in find_connections(connect, seen):
-            debug("CONNECT({}, {}::{}, {}, {}::{})",
-                  sender.name, signal.parent_declaration.name, signal.name,
-                  receiver.name, slot.parent_declaration.name, slot.name)
+            debug("CONNECT({}, {})", name(signal), name(slot))
             call_edge: Call = Call(receiver, connect_call, slot.canonical_declaration)
             cg.inject_call(signal, call_edge)
 

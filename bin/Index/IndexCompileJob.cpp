@@ -1968,10 +1968,9 @@ static PendingFragmentPtr CreatePendingFragment(
   size_t num_tokens = 0u;
   if (original_tokens && *original_tokens) {
     num_tokens = original_tokens->Size();
-
-  } else {
-    num_tokens = parsed_tokens.Size();
   }
+
+  num_tokens = std::max(num_tokens, parsed_tokens.Size());
 
   // Compute the fragment ID, and in doing so, figure out if this is actually
   // a new fragment.
