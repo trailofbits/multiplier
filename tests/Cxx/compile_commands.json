@@ -178,5 +178,10 @@
     "file": "ExplicitInstantiationDefinition.cpp",
     "command": "/usr/bin/c++ ExplicitInstantiationDefinition.cpp",
     "directory": ""
+},
+{
+    "file": "ExplicitInstantiationDefinitionMethod.cpp",
+    "command": "/usr/bin/c++ ExplicitInstantiationDefinitionMethod.cpp",
+    "directory": ""
 }
 ]
