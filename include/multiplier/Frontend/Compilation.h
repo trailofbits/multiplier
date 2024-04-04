@@ -69,6 +69,7 @@ class MX_EXPORT Compilation {
   static Compilation containing(const TemplateArgument &);
   static Compilation containing(const TemplateParameterList &);
   static Compilation containing(const CXXBaseSpecifier &);
+  static Compilation containing(const CXXCtorInitializer &);
   static Compilation containing(const Designator &);
   static std::optional<Compilation> containing(const Token &);
   static Compilation containing(const Macro &);

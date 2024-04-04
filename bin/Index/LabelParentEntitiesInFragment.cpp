@@ -110,10 +110,58 @@ class ParentTrackerVisitor : public EntityVisitor {
 
   // `InitListExpr`s can have a semantic/syntactic form, and they logically
   // belong to the same parent.
-  void VisitInitListExpr(const pasta::InitListExpr &stmt) {
+  void VisitInitListExpr(const pasta::InitListExpr &stmt) final {
     this->EntityVisitor::VisitInitListExpr(stmt);
     VisitOtherInitListExprImpl(stmt, stmt.SyntacticForm());
     VisitOtherInitListExprImpl(stmt, stmt.SemanticForm());
+  }
+
+  // What we find through the `friend` isn't really our child. If we find
+  // something lexically nested here, then the `friend`ed decl still isn't
+  // logically our child, but that of its semantic decl context.
+  void VisitFriendDecl(const pasta::FriendDecl &decl) final {
+    if (!EnterDecl(decl)) {
+      return;
+    }
+
+    for (pasta::TemplateParameterList ls :
+             decl.FriendTypeTemplateParameterLists()) {
+      Accept(ls);
+    }
+
+    // Find the friended decl.
+    std::optional<pasta::Decl> friended_decl;
+    if (auto fd = decl.FriendDeclaration()) {
+      friended_decl = std::move(fd.value());
+    } else if (auto tsi = decl.FriendType()) {
+      if (auto tag_decl = tsi->AsTagDeclaration()) {
+        friended_decl = std::move(tag_decl.value());
+      }
+    }
+
+    // If the friended decl is in a different fragmnent, then ignore it.
+    auto eid = mx::EntityId(em.EntityId(friended_decl)).Extract<mx::DeclId>();
+    if (!eid || eid->fragment_id != fragment.fragment_index) {
+      return;
+    }
+
+    auto dc = friended_decl->DeclarationContext();
+    if (!dc) {
+      return;
+    }
+
+    // Find the declaration associated with the friend decl's semantic decl
+    // context. That is who the friend decl's parent is going to be.
+    auto dc_decl = pasta::Decl::From(dc.value());
+    eid = mx::EntityId(em.EntityId(dc_decl)).Extract<mx::DeclId>();
+    if (!eid) {
+      return;
+    }
+
+    SaveRestoreEntity save_parent_decl(
+        parent_decl_id, parent_decl, eid.value(), RawEntity(dc_decl.value()));
+
+    this->EntityVisitor::Accept(friended_decl.value());
   }
 
   bool AddToMaps(const void *entity) {

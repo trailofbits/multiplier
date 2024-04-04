@@ -96,6 +96,11 @@ Fragment Fragment::containing(const CXXBaseSpecifier &entity) noexcept {
       entity.impl->ep, entity.impl->fragment_id));
 }
 
+Fragment Fragment::containing(const CXXCtorInitializer &entity) noexcept {
+  return Fragment(entity.impl->ep->FragmentFor(
+      entity.impl->ep, entity.impl->fragment_id));
+}
+
 Fragment Fragment::containing(const Designator &entity) noexcept {
   return Fragment(entity.impl->ep->FragmentFor(
       entity.impl->ep, entity.impl->fragment_id));

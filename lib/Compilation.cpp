@@ -98,6 +98,10 @@ Compilation Compilation::containing(const CXXBaseSpecifier &entity) {
   return Compilation::containing(Fragment::containing(entity));
 }
 
+Compilation Compilation::containing(const CXXCtorInitializer &entity) {
+  return Compilation::containing(Fragment::containing(entity));
+}
+
 Compilation Compilation::containing(const Designator &entity) {
   return Compilation::containing(Fragment::containing(entity));
 }

@@ -59,7 +59,7 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &) final;
   void VisitVarTemplateDecl(const pasta::VarTemplateDecl &) final;
   void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &) final;
-  void VisitFriendDecl(const pasta::FriendDecl &decl) final;
+  void VisitFriendDecl(const pasta::FriendDecl &decl) override;
   void VisitVarDecl(const pasta::VarDecl &decl) final;
   void VisitParmVarDecl(const pasta::ParmVarDecl &decl) final;
   void VisitNonTypeTemplateParmDecl(const pasta::NonTypeTemplateParmDecl &decl) final;

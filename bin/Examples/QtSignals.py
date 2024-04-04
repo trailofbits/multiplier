@@ -1,9 +1,11 @@
 """Analyzes a Qt codebase to identify signal/slot relationships."""
-
+import abc
 import argparse
+import collections
+
 import multiplier as mx
 import sys
-from typing import List, Optional, Iterable, Set, Tuple
+from typing import List, Optional, Iterable, Set, Tuple, DefaultDict, Dict
 
 
 def debug(data: str, *args):
@@ -13,6 +15,133 @@ def debug(data: str, *args):
 def debug_if(cond: bool, data: str, *args):
     if cond:
         print(data.format(*args), file=sys.stderr)
+
+
+def name(decl: mx.ast.Decl) -> str:
+    names = []
+    while decl:
+        print(decl.id)
+        if isinstance(decl, mx.ast.NamedDecl):
+            names.append(decl.name)
+            if not len(names[-1]):
+                names.pop()
+        decl = decl.parent_declaration
+    return "::".join(reversed(names))
+
+_DECL_OBJECTS: Dict[int, 'DeclObject'] = {}
+
+
+class Object(abc.ABC):
+    @staticmethod
+    def create_from_call(call: mx.ast.CallExpr, callee: mx.ast.FunctionDecl) -> 'Object':
+        global _ANY_OBJECT
+        if not isinstance(callee, mx.ast.CXXMethodDecl) or \
+            not callee.is_instance or \
+            not isinstance(call, mx.ast.CXXMemberCallExpr):
+            return _ANY_OBJECT
+
+        arg = call.implicit_object_argument
+        if isinstance(arg, mx.ast.Expr):
+            return Object.create_from_expr(arg, call)
+
+        return _ANY_OBJECT
+
+    @staticmethod
+    def create_from_expr(expr: mx.ast.Expr, context: mx.ast.Expr) -> 'Object':
+        if isinstance(expr, mx.ast.DeclRefExpr):
+            return Object.create_from_decl(expr.referenced_declaration)
+        elif isinstance(expr, mx.ast.MemberExpr):
+            return Object.create_from_decl(expr.member_declaration)
+        elif isinstance(expr, mx.ast.CXXThisExpr):
+            return Object.create_from_instance(expr)
+        elif isinstance(expr, mx.ast.CallExpr):
+            callee = expr.direct_callee
+            if isinstance(callee, mx.ast.Decl):
+                return Object.create_from_decl(callee)
+        elif isinstance(expr, mx.ast.BinaryOperator):
+            lhs = Object.create_from_expr(expr.lhs, context)
+            rhs = Object.create_from_expr(expr.rhs, context)
+            return isinstance(rhs, AnyObject) and lhs or rhs
+        elif isinstance(expr, (mx.ast.UnaryOperator, mx.ast.CastExpr)):
+            return Object.create_from_expr(expr.sub_expression, context)
+
+        global _ANY_OBJECT
+        debug("Unsupported object ({}) of type '{}': {}",
+              expr.id, expr.kind.name, " ".join(t.data for t in expr.tokens),
+              " ".join(t.data for t in context.tokens))
+        return _ANY_OBJECT
+
+
+    @staticmethod
+    def create_from_instance(expr: mx.ast.CXXThisExpr) -> 'Object':
+        global _ANY_INSTANCE
+        pointer_type = expr.type.unqualified_type
+        assert isinstance(pointer_type, mx.ast.PointerType)
+        record_type = pointer_type.pointee_type.unqualified_type
+        assert isinstance(record_type, mx.ast.RecordType)
+        decl = record_type.declaration.canonical_declaration
+        decl_id = decl.id
+        if decl_id in _ANY_INSTANCE:
+            return _ANY_INSTANCE[decl_id]
+
+        obj = DeclInstance(decl)
+        _ANY_INSTANCE[decl_id] = obj
+        return obj
+
+    @staticmethod
+    def create_from_decl(decl: mx.ast.Decl) -> 'Object':
+        global _DECL_OBJECTS
+        decl = decl.canonical_declaration
+        decl_id = decl.id
+        if decl_id in _DECL_OBJECTS:
+            return _DECL_OBJECTS[decl_id]
+        obj = DeclObject(decl)
+        _DECL_OBJECTS[decl_id] = obj
+        return obj
+
+    @property
+    def name(self) -> str:
+        ...
+
+
+class AnyObject(Object):
+    @property
+    def name(self) -> str:
+        return "ANY"
+
+
+class DeclObject(Object):
+    decl: mx.ast.Decl
+
+    def __init__(self, decl):
+        self.decl = decl
+
+    @property
+    def name(self) -> str:
+        if isinstance(self.decl, mx.ast.NamedDecl):
+            decl_name: str = name(self.decl)
+            if len(decl_name):
+                return decl_name
+        return f"Decl({self.decl.id})"
+
+
+class DeclInstance(Object):
+    decl: mx.ast.TypeDecl
+
+    def __init__(self, decl):
+        self.decl = decl
+
+    @property
+    def name(self) -> str:
+        if isinstance(self.decl, mx.ast.NamedDecl):
+            decl_name: str = name(self.decl)
+            if len(decl_name):
+                return decl_name
+        return f"Decl({self.decl.id})"
+
+
+_ANY_OBJECT = AnyObject()
+_ANY_INSTANCE: Dict[int, DeclInstance] = {}
 
 
 def find_qmetaobject_activate(index: mx.Index, seen: Set[int]) -> Iterable[mx.ast.CXXMethodDecl]:
@@ -113,10 +242,6 @@ def find_qobject_connect(index: mx.Index, seen: Set[int]) -> Iterable[mx.ast.CXX
 
                 seen.add(canon_id)
 
-                # There should be between three and four arguments. The three argument form is something like:
-                # `connect(sender, signal, receiver_lambda)`, and the four argument form is something like:
-                # `connect(sender, signal, receiver, slot)`. There is a 5-argument form, with a connection type as
-                # well.
                 if 3 > meth.num_parameters:
                     continue
 
@@ -159,7 +284,8 @@ def referenced_method(expr: mx.ast.Expr) -> Optional[mx.ast.CXXMethodDecl]:
     return meth
 
 
-def find_connections(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[Tuple[mx.ast.CXXMethodDecl, mx.ast.CXXMethodDecl]]:
+def find_connections(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[
+    Tuple[mx.ast.CallExpr, Object, mx.ast.CXXMethodDecl, Object, mx.ast.CXXMethodDecl]]:
     """Given calls to `connect`, go and find the (signal, slot) or (signal, signal) pairs."""
     for call in connect.callers:
         assert connect.num_parameters == call.num_arguments
@@ -170,11 +296,13 @@ def find_connections(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[
         if not isinstance(containing_func, mx.ast.FunctionDecl):
             pass
 
+        sender = Object.create_from_expr(call.nth_argument(0), call)
         signal_method_arg: mx.ast.Expr = call.nth_argument(1).ignore_casts
         signal_method: Optional[mx.ast.CXXMethodDecl] = referenced_method(signal_method_arg)
         if not signal_method:
-            debug("Skipping call ({}) to connect ({}) with signal argument '{}' ({}) that isn't the address of a method",
-                  call.id, connect.id, " ".join(t.data for t in signal_method_arg.tokens), signal_method_arg.id)
+            debug(
+                "Skipping call ({}) to connect ({}) with signal argument '{}' ({}) that isn't the address of a method",
+                call.id, connect.id, " ".join(t.data for t in signal_method_arg.tokens), signal_method_arg.id)
             continue
 
         found = False
@@ -185,11 +313,130 @@ def find_connections(connect: mx.ast.CXXMethodDecl, seen: Set[int]) -> Iterable[
                 continue
 
             assert not found
-            yield signal_method, slot_method
+            yield call, sender, signal_method.canonical_declaration, \
+                  Object.create_from_expr(call.nth_argument(i - 1), call), slot_method.canonical_declaration
             found = True
 
         debug_if(not found, "Unable to find slot method for call ({}) to connect ({}) with signal {}::{} ({})",
                  call.id, connect.id, signal_method.parent_declaration.name, signal_method.name, signal_method.id)
+
+
+class Call:
+    """A triple representing a function/method call."""
+    object: Object
+    call: mx.ast.CallExpr
+    target: mx.ast.FunctionDecl
+
+    def __init__(self, object, call, target):
+        self.object = object
+        self.call = call
+        self.target = target.canonical_declaration
+
+    @staticmethod
+    def create_from(call: mx.ast.CallExpr) -> Iterable['Call']:
+        callee = call.direct_callee
+        if not callee:
+            debug(f"Skipping indirect call ({call.id})")
+            return
+
+        object = Object.create_from_call(call, callee)
+        yield Call(object, call, callee)
+
+        if not isinstance(callee, mx.ast.CXXMethodDecl) or \
+            not callee.is_instance or \
+            not isinstance(call, mx.ast.CXXMemberCallExpr):
+            return
+
+
+class CallGraph:
+    calls: Dict[mx.ast.FunctionDecl, List[Call]]
+
+    def __init__(self):
+        self.calls = {}
+
+    @staticmethod
+    def _is_in(call: mx.ast.CallExpr, func_body: mx.ast.Stmt):
+        """Check if `call` is nested inside of `func_body`. Generally, `func_body` have the type `mx.ast.CompoundStmt`,
+        but it might also be a try/catch statement as well."""
+        for containing_stmt in mx.ast.Stmt.containing(call):
+            return containing_stmt == func_body
+        return False
+
+    @staticmethod
+    def _overloads(meth: mx.ast.CXXMethodDecl):
+        yield meth
+
+    def _add_callees(self, func: mx.ast.FunctionDecl, work_list: List[mx.ast.FunctionDecl]):
+        if func in self.calls:
+            return
+
+        call_list: List[Call] = []
+        self.calls[func] = call_list
+
+        func_body = func.body
+        if not func_body:
+            return
+
+        for call in mx.ast.CallExpr.IN(mx.Fragment.containing(func)):
+            if not CallGraph._is_in(call, func_body):
+                continue
+
+            for triple in Call.create_from(call):
+                call_list.append(triple)
+                work_list.append(triple.target)
+
+    def add_callees(self, func: mx.ast.FunctionDecl):
+        next_work_list = [func.canonical_declaration]
+        while len(next_work_list):
+            work_list, next_work_list = next_work_list, []
+            for next_func in work_list:
+                self._add_callees(next_func, next_work_list)
+
+    def inject_call(self, from_func: mx.ast.FunctionDecl, edge: Call):
+        if from_func not in self.calls:
+            self.add_callees(from_func)
+
+        if edge.target not in self.calls:
+            self.add_callees(edge.target)
+
+        self.calls[from_func].append(edge)
+
+    def remove_acyclic(self):
+        cyclic_funcs: Set[mx.ast.FunctionDecl] = set()
+        for func in self.calls.keys():
+            seen = set()
+            next_work_list = [call.target for call in self.calls[func]]
+            while func not in cyclic_funcs and len(next_work_list):
+                work_list, next_work_list = next_work_list, []
+                for work_func in work_list:
+                    if work_func not in seen:
+                        seen.add(work_func)
+                        next_work_list.extend(call.target for call in self.calls[work_func])
+            if func in seen:
+                cyclic_funcs.add(func)
+
+        new_calls: Dict[mx.ast.FunctionDecl, List[Call]] = {}
+        for old_func, old_calls in self.calls.items():
+            if old_func not in cyclic_funcs:
+                continue
+            new_edges: List[Call] = []
+            for old_call in old_calls:
+                if old_call.target in cyclic_funcs:
+                    new_edges.append(old_call)
+
+            new_calls[old_func] = new_edges
+
+        self.calls = new_calls
+
+    def dump(self):
+        out: List[str] = []
+        out.append("digraph {")
+        for func, calls in self.calls.items():
+            out.append(f"f{func.id} [label=\"{name(func)}\"];")
+            for call in calls:
+                out.append(f"f{func.id} -> f{call.target.id} [label=\"{call.object.name}\"];")
+        out.append("}")
+        return "\n".join(out)
 
 
 def main():
@@ -198,17 +445,24 @@ def main():
     args = parser.parse_args()
     index = mx.Index.in_memory_cache(mx.Index.from_database(args.db))
     seen: Set[int] = set()
-
+    cg: CallGraph = CallGraph()
     for activate in find_qmetaobject_activate(index, seen):
         for signal in find_signals(activate, seen):
-            #debug("SIGNAL {}::{}: {}", signal.parent_declaration.name, signal.name, " ".join(t.data for t in signal.type.tokens))
+            # debug("SIGNAL {}::{}: {}", signal.parent_declaration.name, signal.name, " ".join(t.data for t in signal.type.tokens))
             pass
 
     for connect in find_qobject_connect(index, seen):
-        for signal, slot in find_connections(connect, seen):
-            debug("CONNECT({}::{}, {}::{})",
-                  signal.parent_declaration.name, signal.name,
-                  slot.parent_declaration.name, slot.name)
+        for connect_call, sender, signal, receiver, slot in find_connections(connect, seen):
+            debug("CONNECT({}, {}::{}, {}, {}::{})",
+                  sender.name, signal.parent_declaration.name, signal.name,
+                  receiver.name, slot.parent_declaration.name, slot.name)
+            call_edge: Call = Call(receiver, connect_call, slot.canonical_declaration)
+            cg.inject_call(signal, call_edge)
+
+    #cg.remove_acyclic()
+
+    with open("/tmp/test.dot", "w") as f:
+        f.write(cg.dump())
 
     return 0
 

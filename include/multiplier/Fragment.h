@@ -103,6 +103,7 @@ class MX_EXPORT Fragment {
   static Fragment containing(const TemplateArgument &) noexcept;
   static Fragment containing(const TemplateParameterList &) noexcept;
   static Fragment containing(const CXXBaseSpecifier &) noexcept;
+  static Fragment containing(const CXXCtorInitializer &) noexcept;
   static Fragment containing(const Designator &) noexcept;
   static std::optional<Fragment> containing(const Token &) noexcept;
   static Fragment containing(const Macro &) noexcept;
