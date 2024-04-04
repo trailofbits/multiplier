@@ -155,7 +155,7 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
     //            the pasrsed source code, multiple attributes may belong to the
     //            same syntactical block.
     if (!em.token_tree_ids.emplace(raw_pt, id).second) {
-      LOG_IF(ERROR, !IsAcceptableRepeatedToken(pt.value()))
+      LOG_IF(WARNING, !IsAcceptableRepeatedToken(pt.value()))
             << "Token kind " << pt.value().KindName()
             << " is repeated and exist in the token tree!";
     }
