@@ -59868,6 +59868,7 @@ class CXXMethodDecl(multiplier.ast.FunctionDecl):
   num_overridden_methods: int
   overridden_methods: Iterable[multiplier.ast.CXXMethodDecl]
   overridden_by_methods: Iterable[multiplier.ast.CXXMethodDecl]
+  transitive_overridden_by_methods: Iterable[multiplier.ast.CXXMethodDecl]
 
   @overload
   @staticmethod

@@ -3737,7 +3737,8 @@ MethodListPtr CodeGenerator::RunOnClass(
   if (class_name == "CXXMethodDecl") {
     class_os
         << "  // List of methods that can override this method.\n"
-        << "  gap::generator<CXXMethodDecl> overridden_by_methods(void) const &;\n";
+        << "  gap::generator<CXXMethodDecl> overridden_by_methods(void) const &;\n"
+        << "  gap::generator<CXXMethodDecl> transitive_overridden_by_methods(void) const &;\n";
   }
 
   // `FunctionDecl::callers`.

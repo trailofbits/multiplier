@@ -120,11 +120,6 @@ class TLDFinder final : public pasta::DeclVisitor {
   // Parent entities for fragment tracking.
   std::unordered_map<const void *, const void *> parent_entity;
 
-  // Go find the specializations of the partial specializations. They are
-  // usually attached to the template itself.
-  std::unordered_map<const void *, std::vector<pasta::Decl>>
-      partial_specialization_specializtions;
-
   // If it doesn't look like a builtin declaration, then shift the order
   // by a fudge factor. Clang can invent a lot of builtins, though definitely
   // not more than 100,000.
@@ -198,26 +193,7 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 
   void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final {
-    auto partials = partial_specialization_specializtions;
-
     VisitDeclContext(decl, decl, false  /* don't track parentage */);
-
-    // Flush out remaining partial specializations.
-    while (!partial_specialization_specializtions.empty()) {
-      partials.swap(partial_specialization_specializtions);
-
-      for (const auto &raw_partial_specs : partials) {
-        auto raw_partial = raw_partial_specs.first;
-        CHECK(seen.count(raw_partial));
-
-        for (const pasta::Decl &spec : raw_partial_specs.second) {
-          PrevValueTracker<const void *> save_restore(parent_decl, raw_partial);
-          Accept(spec);
-        }
-      }
-
-      partials.clear();
-    }
   }
 
   void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final {
@@ -268,25 +244,6 @@ class TLDFinder final : public pasta::DeclVisitor {
     VisitTypedefNameDecl(decl);
   }
 
-  void VisitSpecializationsOfPartial(const void *raw_decl) {
-    auto it = partial_specialization_specializtions.find(raw_decl);
-    if (it == partial_specialization_specializtions.end()) {
-      return;
-    }
-
-    auto partials = std::move(it->second);
-
-    // Make the parent of specializations be the partial specialization.
-    PrevValueTracker<const void *> save_restore(parent_decl, raw_decl);
-
-    for (const auto &spec : partials) {
-      Accept(spec);
-    }
-
-    CHECK(it->second.empty());
-    partial_specialization_specializtions.erase(it);
-  }
-
   // Specializations / instantiations of a partial template specialization end
   // up attaching to the `ClassTemplateDecl`, however, partial specializations
   // can contain their own `ClassTemplateDecl`s, which themselves can be
@@ -301,11 +258,9 @@ class TLDFinder final : public pasta::DeclVisitor {
       const pasta::ClassTemplatePartialSpecializationDecl &decl) final {
     auto raw_decl = RawEntity(decl);
     if (!seen.emplace(raw_decl).second) {
-      DCHECK(!partial_specialization_specializtions.count(raw_decl));
       return;
     }
 
-    VisitSpecializationsOfPartial(raw_decl);
     VisitDeeperDeclContext(decl, decl);
     AddDeclAlways(decl);
   }
@@ -322,17 +277,6 @@ class TLDFinder final : public pasta::DeclVisitor {
     //       and any reference of canonical reference will not get resolved
 
     VisitDeeperDeclContext(decl, decl);
-
-    auto tsk = decl.TemplateSpecializationKind();
-    if (!(IsExplicitSpecialization(tsk) || IsExplicitInstantiation(tsk))) {
-      CHECK_NOTNULL(parent_decl);
-    }
-
-    // if (IsExplicitSpecialization(decl.TemplateSpecializationKind()) &&
-    //     !decl.IsCanonicalDeclaration()) {
-    //   Accept(decl.CanonicalDeclaration());
-    // }
-
     AddDeclAlways(decl);
   }
 
@@ -342,15 +286,14 @@ class TLDFinder final : public pasta::DeclVisitor {
   // }
 
   template <typename T>
-  T FindParentRedecl(T &tpl, pasta::Token loc) {
+  std::optional<T> FindParentRedecl(T &tpl, pasta::Token loc) {
     for (const auto &redecl_ : tpl.Redeclarations()) {
       auto redecl = reinterpret_cast<const T &>(redecl_);
       if (redecl.Token() == loc) {
         return redecl;
       }
     }
-    assert(false);
-    return tpl;
+    return std::nullopt;
   }
 
   void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &decl) final {
@@ -383,20 +326,7 @@ class TLDFinder final : public pasta::DeclVisitor {
 
     auto specs = ExpandSpecializations(decl.Specializations());
     for (const pasta::ClassTemplateSpecializationDecl &spec : specs) {
-
-      auto tsk = spec.TemplateSpecializationKind();
-
-      // We should observe the explicit specializations and instantiations
-      // separately.
-      if (IsExplicitSpecialization(tsk)) {
-        continue;
-      }
-
-      // We should observe the specializations as a result of explicit
-      // instantiations later. E.g. `template class foo<int>;`.
-      if (IsExplicitInstantiation(tsk)) {
-        continue;
-      }
+      const void *spec_parent = nullptr;
 
       // Specializations of partial specializations are collected into the
       // template itself, but lexically "belong" to the partial specialization
@@ -404,16 +334,16 @@ class TLDFinder final : public pasta::DeclVisitor {
       auto pattern = spec.SpecializedTemplateOrPartial();
       if (std::holds_alternative<pasta::ClassTemplatePartialSpecializationDecl>(pattern)) {
         const auto &partial = std::get<pasta::ClassTemplatePartialSpecializationDecl>(pattern);
-        partial_specialization_specializtions[RawEntity(partial)].emplace_back(spec);
-        assert(spec.Token() == partial.Token());
-        continue;
+        spec_parent = RawEntity(FindParentRedecl(partial, spec.Token()));
+      
+      } else {
+        spec_parent = RawEntity(FindParentRedecl(decl, spec.Token()));
       }
 
-      // Make the parent of specializations be the template itself.
-      auto spec_parent = FindParentRedecl(decl, spec.Token());
-      PrevValueTracker<const void *> save_restore(
-          parent_decl, RawEntity(spec_parent));
-      Accept(spec);
+      if (spec_parent) {
+        PrevValueTracker<const void *> save_restore(parent_decl, spec_parent);
+        Accept(spec);
+      }
     }
   }
 
@@ -431,19 +361,7 @@ class TLDFinder final : public pasta::DeclVisitor {
   
     auto specs = ExpandSpecializations(decl.Specializations());
     for (const pasta::VarTemplateSpecializationDecl &spec : specs) {
-      auto tsk = spec.TemplateSpecializationKind();
-
-      // We should observe the explicit specializations and instantiations
-      // separately.
-      if (IsExplicitSpecialization(tsk)) {
-        continue;
-      }
-
-      // We should observe the specializations as a result of explicit
-      // instantiations later. E.g. `extern template int foo<int>;`.
-      if (IsExplicitInstantiation(tsk) && spec.ExternToken()) {
-        continue;
-      }
+      const void *spec_parent = nullptr;
 
       // Specializations of partial specializations are collected into the
       // template itself, but lexically "belong" to the partial specialization
@@ -451,16 +369,16 @@ class TLDFinder final : public pasta::DeclVisitor {
       auto pattern = spec.SpecializedTemplateOrPartial();
       if (std::holds_alternative<pasta::VarTemplatePartialSpecializationDecl>(pattern)) {
         const auto &partial = std::get<pasta::VarTemplatePartialSpecializationDecl>(pattern);
-        partial_specialization_specializtions[RawEntity(partial)].emplace_back(spec);
-        assert(spec.Token() == partial.Token());
-        continue;
+        spec_parent = RawEntity(FindParentRedecl(partial, spec.Token()));
+      
+      } else {
+        spec_parent = RawEntity(FindParentRedecl(decl, spec.Token()));
       }
 
-      // Make the parent of specializations be the template itself.
-      auto spec_parent = FindParentRedecl(decl, spec.Token());
-      PrevValueTracker<const void *> save_restore(
-          parent_decl, RawEntity(spec_parent));
-      Accept(spec);
+      if (spec_parent) {
+        PrevValueTracker<const void *> save_restore(parent_decl, spec_parent);
+        Accept(spec);
+      }
     }
   }
 
@@ -468,11 +386,9 @@ class TLDFinder final : public pasta::DeclVisitor {
       const pasta::VarTemplatePartialSpecializationDecl &decl) final {
     auto raw_decl = RawEntity(decl);
     if (!seen.emplace(raw_decl).second) {
-      DCHECK(!partial_specialization_specializtions.count(raw_decl));
       return;
     }
 
-    VisitSpecializationsOfPartial(raw_decl);
     AddDeclAlways(decl);
   }
 
@@ -482,12 +398,6 @@ class TLDFinder final : public pasta::DeclVisitor {
     auto raw_decl = RawEntity(decl);
     if (!seen.emplace(raw_decl).second) {
       return;
-    }
-
-    auto tsk = decl.TemplateSpecializationKind();
-    if (!IsExplicitSpecialization(tsk) &&
-        !(IsExplicitInstantiation(tsk) && decl.ExternToken())) {
-      CHECK_NOTNULL(parent_decl);
     }
 
     AddDeclAlways(decl);
@@ -522,42 +432,41 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
-    auto specs = ExpandSpecializations(decl.Specializations());
-    for (const pasta::FunctionDecl &spec : specs) {
+    AddDeclAlways(decl);
 
-      // TODO(pag): Connect out-of-line specializations to a differently
-      // TODO(pag): What about forward declarations? E.g. with `friend`s?
-      //            Probably need to organize the specializations to be attached
-      //            to different places.
-      auto tsk = spec.TemplateSpecializationKind();
-
-      // We should observe the explicit specializations and instantiations
-      // separately.
-      //
-      // Note: In case of function template, an implicit specialization may
-      //       appear out-of-line and a friend of class template. In that case
-      //       the same node will be rechable from the class template
-      //       specialization decl as well. The check for out-of-line
-      //       instantiation avoid adding them immediately to the node and
-      //       handle when it appears next.
-      if (IsExplicitSpecialization(tsk) || spec.IsOutOfLine()) {
-        continue;
-      }
-
-      // TODO(kumarak): Not sure how to handle CXXDeductionGuide. Don't add them 
-      //                to top-level declarations.
-      if (spec.Kind() == pasta::DeclKind::kCXXDeductionGuide) {
-        continue;
-      }
-
-      PrevValueTracker<const void *> save_restore(parent_decl, raw_decl);
-      Accept(spec);
+    if (decl.CanonicalDeclaration() != decl) {
+      return;
     }
 
-    AddDeclAlways(decl);
+    auto specs = ExpandSpecializations(decl.Specializations());
+    for (const pasta::FunctionDecl &spec : specs) {
+      const void *spec_parent = nullptr;
+
+      // Specializations of partial specializations are collected into the
+      // template itself, but lexically "belong" to the partial specialization
+      // itself.
+      if (auto pattern = spec.TemplateInstantiationPattern()) {
+        if (auto tpl = pattern->DescribedFunctionTemplate()) {
+          spec_parent = RawEntity(FindParentRedecl(tpl.value(), spec.Token()));
+        } else {
+          assert(false);
+        }
+      }
+
+      if (spec_parent) {
+        PrevValueTracker<const void *> save_restore(parent_decl, spec_parent);
+        Accept(spec);
+      }
+    }
   }
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
+    // TODO(kumarak): Not sure how to handle CXXDeductionGuide. Don't add them 
+    //                to top-level declarations.
+    if (decl.Kind() == pasta::DeclKind::kCXXDeductionGuide) {
+      return;
+    }
+
     if (seen.count(RawEntity(decl))) {
       return;
     }

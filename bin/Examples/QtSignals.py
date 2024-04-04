@@ -347,6 +347,9 @@ class Call:
             not isinstance(call, mx.ast.CXXMemberCallExpr):
             return
 
+        for override in callee.transitive_overridden_by_methods:
+            yield Call(object, call, override)
+
 
 class CallGraph:
     calls: Dict[mx.ast.FunctionDecl, List[Call]]

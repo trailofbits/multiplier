@@ -89,6 +89,7 @@ class MX_EXPORT CXXMethodDecl : public FunctionDecl {
   gap::generator<CXXMethodDecl> overridden_methods(void) const &;
   // List of methods that can override this method.
   gap::generator<CXXMethodDecl> overridden_by_methods(void) const &;
+  gap::generator<CXXMethodDecl> transitive_overridden_by_methods(void) const &;
 };
 
 static_assert(sizeof(CXXMethodDecl) == sizeof(FunctionDecl));

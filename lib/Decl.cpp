@@ -334,6 +334,17 @@ CXXMethodDecl::overridden_by_methods(void) const & {
       continue;
     }
 
+    switch (decl_id->kind) {
+      case mx::DeclKind::CXX_CONVERSION:
+      case mx::DeclKind::CXX_CONSTRUCTOR:
+      case mx::DeclKind::CXX_DEDUCTION_GUIDE:
+      case mx::DeclKind::CXX_DESTRUCTOR:
+      case mx::DeclKind::CXX_METHOD:
+        break;
+      default:
+        continue;
+    }
+
     auto eptr = ep->DeclFor(ep, from_id);
     if (!eptr) {
       assert(false);
@@ -341,16 +352,58 @@ CXXMethodDecl::overridden_by_methods(void) const & {
     }
 
     Decl method_ref(std::move(eptr));
-    switch (method_ref.kind()) {
-      case mx::DeclKind::CXX_CONVERSION:
-      case mx::DeclKind::CXX_CONSTRUCTOR:
-      case mx::DeclKind::CXX_DEDUCTION_GUIDE:
-      case mx::DeclKind::CXX_DESTRUCTOR:
-      case mx::DeclKind::CXX_METHOD:
-        co_yield std::move(reinterpret_cast<CXXMethodDecl &>(method_ref));
-        break;
-      default:
+    co_yield std::move(reinterpret_cast<CXXMethodDecl &>(method_ref));
+  }
+}
+
+gap::generator<CXXMethodDecl>
+CXXMethodDecl::transitive_overridden_by_methods(void) const & {
+  static constexpr auto kOverridesKindId =
+      static_cast<RawEntityId>(BuiltinReferenceKind::OVERRIDES);
+
+  std::vector<RawEntityId> found_ids;
+
+  found_ids.push_back(id().Pack());
+
+  auto ep = impl->ep;
+  for (auto i = 0u; i < found_ids.size(); ++i) {
+    for (auto [from_id, context_id, kind_id] :
+        ep->References(ep, found_ids[i], EntityProvider::kReferenceTo)) {
+
+      if (kOverridesKindId != kind_id) {
         continue;
+      }
+
+      auto decl_id = EntityId(from_id).Extract<DeclId>();
+      if (!decl_id) {
+        continue;
+      }
+
+      switch (decl_id->kind) {
+        case mx::DeclKind::CXX_CONVERSION:
+        case mx::DeclKind::CXX_CONSTRUCTOR:
+        case mx::DeclKind::CXX_DEDUCTION_GUIDE:
+        case mx::DeclKind::CXX_DESTRUCTOR:
+        case mx::DeclKind::CXX_METHOD:
+          break;
+        default:
+          continue;
+      }
+
+      if (std::find(found_ids.begin(), found_ids.end(), from_id) !=
+          found_ids.end()) {
+        continue;
+      }
+
+      auto eptr = ep->DeclFor(ep, from_id);
+      if (!eptr) {
+        assert(false);
+        continue;
+      }
+
+      Decl method_ref(std::move(eptr));
+      co_yield std::move(reinterpret_cast<CXXMethodDecl &>(method_ref));
+      found_ids.push_back(from_id);
     }
   }
 }
