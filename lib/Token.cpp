@@ -718,6 +718,12 @@ static TokenCategory ClassifyStmt(StmtId id, TokenKind kind,
     case StmtKind::FIXED_POINT_LITERAL:
       return TokenCategory::LITERAL;
 
+    case StmtKind::ATOMIC_EXPR:
+      if (kind == TokenKind::IDENTIFIER) {
+        return TokenCategory::FUNCTION;
+      }
+      break;
+
     // E.g. `__func__`.
     case StmtKind::PREDEFINED_EXPR:
       if (kind == TokenKind::KEYWORD___FUNC__) {
@@ -727,8 +733,9 @@ static TokenCategory ClassifyStmt(StmtId id, TokenKind kind,
       }
 
     default:
-      return baseline_category;
+      break;
   }
+  return baseline_category;
 }
 
 static TokenCategory ClassifyType(TypeId id, TokenKind,
