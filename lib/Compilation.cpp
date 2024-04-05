@@ -98,6 +98,10 @@ Compilation Compilation::containing(const CXXBaseSpecifier &entity) {
   return Compilation::containing(Fragment::containing(entity));
 }
 
+Compilation Compilation::containing(const CXXCtorInitializer &entity) {
+  return Compilation::containing(Fragment::containing(entity));
+}
+
 Compilation Compilation::containing(const Designator &entity) {
   return Compilation::containing(Fragment::containing(entity));
 }
@@ -113,6 +117,11 @@ std::optional<Compilation> Compilation::containing(const Token &entity) {
 std::optional<Compilation> Compilation::containing(
     const VariantEntity &entity) {
   return Compilation::containing(Fragment::containing(entity));
+}
+
+// Generate all compilations in the index.
+gap::generator<Compilation> Compilation::in(const Index &index) {
+  return index.compilations();
 }
 
 // The fragments owned by this compilation. This will be a subset of all

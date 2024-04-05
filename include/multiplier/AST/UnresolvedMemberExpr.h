@@ -67,7 +67,6 @@ class MX_EXPORT UnresolvedMemberExpr : public OverloadExpr {
   static std::optional<UnresolvedMemberExpr> from(const VariantEntity &e);
   static std::optional<UnresolvedMemberExpr> from(const TokenContext &t);
 
-  Expr base(void) const;
   Type base_type(void) const;
   Token member_token(void) const;
   Token operator_token(void) const;

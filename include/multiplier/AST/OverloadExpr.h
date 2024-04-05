@@ -17,6 +17,7 @@ class Index;
 class CXXRecordDecl;
 class Decl;
 class Expr;
+class NamedDecl;
 class OverloadExpr;
 class Stmt;
 class Token;
@@ -61,6 +62,9 @@ class MX_EXPORT OverloadExpr : public Expr {
   static std::optional<OverloadExpr> from(const VariantEntity &e);
   static std::optional<OverloadExpr> from(const TokenContext &t);
 
+  std::optional<NamedDecl> nth_declaration(unsigned n) const;
+  unsigned num_declarations(void) const;
+  gap::generator<NamedDecl> declarations(void) const &;
   Token l_angle_token(void) const;
   Token name_token(void) const;
   std::optional<CXXRecordDecl> naming_class(void) const;

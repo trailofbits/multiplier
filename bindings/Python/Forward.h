@@ -577,6 +577,7 @@ enum class DeclCategory : uint8_t;
 enum class PseudoKind : uint8_t;
 enum class EntityCategory : int32_t;
 class TokenContext;
+class CXXCtorInitializer;
 class Designator;
 class CXXBaseSpecifier;
 class TemplateParameterList;

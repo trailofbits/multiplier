@@ -69,9 +69,9 @@ class MX_EXPORT BindingDecl : public ValueDecl {
   static std::optional<BindingDecl> from(const VariantEntity &e);
   static std::optional<BindingDecl> from(const TokenContext &t);
 
-  Expr binding(void) const;
+  std::optional<Expr> binding(void) const;
   ValueDecl decomposed_declaration(void) const;
-  VarDecl holding_variable(void) const;
+  std::optional<VarDecl> holding_variable(void) const;
 };
 
 static_assert(sizeof(BindingDecl) == sizeof(ValueDecl));

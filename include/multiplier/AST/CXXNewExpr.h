@@ -87,7 +87,6 @@ class MX_EXPORT CXXNewExpr : public Expr {
   std::optional<Expr> nth_placement_argument(unsigned n) const;
   unsigned num_placement_arguments(void) const;
   gap::generator<Expr> placement_arguments(void) const &;
-  bool should_null_check_allocation(void) const;
 };
 
 static_assert(sizeof(CXXNewExpr) == sizeof(Expr));

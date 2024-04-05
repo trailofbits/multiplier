@@ -134,7 +134,8 @@ bool Parser::ParseObject(llvm::object::ObjectFile *object) {
 bool Parser::ParseArchive(llvm::object::Archive *archive) {
   auto err = llvm::Error::success();
   auto ret = true;
-  for (const llvm::object::Archive::Child &child : archive->children(err)) {
+  for (const llvm::object::Archive::Child &child
+          : archive->children(err, false  /* SkipInternal */)) {
     auto maybe_bin = child.getAsBinary(&context);
     if (llvm::errorToBool(maybe_bin.takeError())) {
       ret = false;
@@ -143,7 +144,7 @@ bool Parser::ParseArchive(llvm::object::Archive *archive) {
 
     ret &= ParseBinary(maybe_bin.get().get());
   }
-  return ret;
+  return err ? false : ret;
 }
 
 // Parse compile commands from an LLVM module.

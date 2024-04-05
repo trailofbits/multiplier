@@ -116,8 +116,10 @@ std::optional<TokenContext> Token::context(void) const {
   }
 
   std::optional<unsigned> tagged_offset = reader->TokenContextOffsets(offset);
+  
+  // NOTE(pag): We really should have token contexts, but sometimes we don't
+  //            due to token alignment with specialized templates.
   if (!tagged_offset.has_value()) {
-    assert(false);
     return std::nullopt;
   }
 

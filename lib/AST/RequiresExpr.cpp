@@ -238,10 +238,6 @@ Token RequiresExpr::requires_keyword_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
-bool RequiresExpr::is_satisfied(void) const {
-  return impl->reader.getVal89();
-}
-
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

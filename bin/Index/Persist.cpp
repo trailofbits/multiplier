@@ -44,6 +44,7 @@
 
 #include "Codegen.h"
 #include "EntityMapper.h"
+#include "LabelEntitiesInFragment.h"
 #include "PASTA.h"
 #include "PendingFragment.h"
 #include "Provenance.h"
@@ -72,13 +73,10 @@ extern void DispatchSerializeMacro(const PendingFragment &pf,
 // Build the fragment. This fills out the decls/stmts/types to serialize.
 //
 // NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
-extern void BuildPendingFragment(PendingFragment &pf);
+extern void BuildPendingFragment(const pasta::AST &ast, PendingFragment &pf);
 
 // Label the parent entity ids.
 extern void LabelParentsInPendingFragment(PendingFragment &pf);
-
-// Label tokens and macros.
-extern void LabelTokensAndMacrosInFragment(PendingFragment &pf);
 
 // Store information persistently to enable linking of declarations across
 // fragments.
@@ -214,6 +212,7 @@ struct TokenTreeSerializationSchedule {
   struct Todo {
     const void *parent;
     mx::RawEntityId parent_id;
+    bool is_part_of_define{false};
     TokenTreeNodeRange nodes;
   };
 
@@ -230,6 +229,7 @@ struct TokenTreeSerializationSchedule {
   std::vector<mx::RawEntityId> containing_macro;
 
   mx::RawEntityId RecordEntityId(const TokenTree &tt,
+                                 bool &is_part_of_define,
                                  bool &is_part_of_fragment) {
 
     const void *raw_tt = tt.RawNode();
@@ -242,15 +242,21 @@ struct TokenTreeSerializationSchedule {
 
     auto &entity_list = pf.EntityListFor(tt);
     mx::RawEntityId raw_id = em.EntityId(raw_locator);
+    mx::MacroId id;
 
     // NOTE(pag): This is some collusion with `EntityLabeller::Label` in terms
     //            of labelling the top-level macros. This also happens with
     //            nested macro directives.
     if (raw_id != mx::kInvalidEntityId) {
       CHECK_NE(raw_tt, raw_locator);
-      mx::MacroId id = mx::EntityId(raw_id).Extract<mx::MacroId>().value();
+      id = mx::EntityId(raw_id).Extract<mx::MacroId>().value();
       CHECK(id.kind == tt.Kind());
 
+      // An example of a case where we come across a token tree node that
+      // *isn't* in the current fragment is `tests/Macros/DefineInMacroUse.c`.
+      // We hoist out `#define` directives into floating fragments, and so it
+      // ends up being seen as logically not in the current fragment, even
+      // though it is physically reachable from within the token tree. 
       is_part_of_fragment = id.fragment_id == pf.fragment_index;
       if (is_part_of_fragment) {
         CHECK_LT(id.offset, entity_list.size());
@@ -260,7 +266,6 @@ struct TokenTreeSerializationSchedule {
 
     // We need to form a new macro id for something we discovered along the way.
     } else {
-      mx::MacroId id;
       id.fragment_id = pf.fragment_index;
       id.kind = tt.Kind();
       id.offset = static_cast<mx::EntityOffset>(entity_list.size());
@@ -270,22 +275,40 @@ struct TokenTreeSerializationSchedule {
       entity_list.push_back(tt);
     }
 
+    // Update `is_part_of_define` by reference so that macro tokens and nodes
+    // inside of a `#define` end up getting globally recorded for the sake
+    // of provenance.
+    if (id.kind == mx::MacroKind::DEFINE_DIRECTIVE) {
+      is_part_of_define = true;
+    }
+
     // Save the ID, mapped from both the token tree and the underlying
     // macro, if any.
     CHECK(em.token_tree_ids.emplace(raw_tt, raw_id).second);
     if (raw_tt != raw_locator) {
       (void) em.token_tree_ids.emplace(raw_locator, raw_id);
     }
+
+    // If this is a `#define` or something in a `#define`, then make sure that
+    // the entity ID becomes globally visible.
+    if (is_part_of_define && is_part_of_fragment && raw_locator &&
+        raw_tt != raw_locator) {
+      (void) em.entity_ids.emplace(raw_locator, raw_id);
+    }
+
     return raw_id;
   }
 
   mx::RawEntityId RecordEntityId(const TokenTreeNode &node,
                                  mx::RawEntityId parent_id,
+                                 bool &is_part_of_define,
                                  bool &is_part_of_fragment) {
     mx::RawEntityId raw_id = mx::kInvalidEntityId;
+    const void *raw_pt = nullptr;
 
     if (std::optional<TokenTree> sub = node.SubTree()) {
-      raw_id = RecordEntityId(sub.value(), is_part_of_fragment);
+      raw_id = RecordEntityId(sub.value(), is_part_of_define,
+                              is_part_of_fragment);
 
     // Fill in IDs for derived tokens.
     } else {
@@ -294,21 +317,46 @@ struct TokenTreeSerializationSchedule {
       id.fragment_id = pf.fragment_index;
       id.offset = static_cast<unsigned>(tokens.size());
 
-      const void *raw_pt = nullptr;
+      std::optional<pasta::PrintedToken> gt = node.PrintedToken();
+      std::optional<pasta::MacroToken> mt = node.MacroToken();
+      std::optional<pasta::Token> pt = node.Token();
 
-      if (std::optional<pasta::PrintedToken> pt = node.PrintedToken()) {
+      if (gt) {
+        id.kind = TokenKindFromPasta(gt.value());
+        auto raw_gt = gt->RawToken();
+        CHECK(em.token_tree_ids.contains(raw_gt));
+        CHECK(parsed_token_index.emplace(raw_gt, id.offset).second);
+
+        // NOTE(pag): Can't set `raw_gt` or `raw_tt` to `raw_pt` because this
+        //            goes into the `EntityMapper::entity_ids`, which is global,
+        //            but the lifetime of `raw_tt` and `raw_gt` are limited
+        //            to fragment serialization.
+
+        if (mt) {
+          raw_pt = RawEntity(mt.value());
+        } else if (pt) {
+          raw_pt = RawEntity(pt.value());
+        }
+
+        if (auto dt = gt->DerivedLocation()) {
+          auto raw_dt = dt->RawToken();
+          CHECK(pt.has_value());
+          CHECK_EQ(raw_dt, pt->RawToken());
+          CHECK(em.token_tree_ids.contains(raw_dt));
+        
+        } else {
+          assert(!pt);
+        }
+
+      } else if (mt) {
+        id.kind = TokenKindFromPasta(mt.value());
+        raw_pt = mt->RawMacro();
+      
+      } else if (pt) {
+        assert(false);  // Shouldn't get here.
+
         id.kind = TokenKindFromPasta(pt.value());
         raw_pt = pt->RawToken();
-        CHECK(em.token_tree_ids.contains(raw_pt));
-        CHECK(parsed_token_index.emplace(raw_pt, id.offset).second);
-
-      } else if (std::optional<pasta::Token> mt = node.Token()) {
-        id.kind = TokenKindFromPasta(mt.value());
-        raw_pt = mt->RawToken();
-        DCHECK(!IsParsedToken(mt.value()) == !em.token_tree_ids.count(raw_pt));
-
-      } else if (std::optional<pasta::FileToken> ft = node.FileToken()) {
-        id.kind = TokenKindFromPasta(ft.value());
       }
 
       raw_id = mx::EntityId(id).Pack();
@@ -320,8 +368,17 @@ struct TokenTreeSerializationSchedule {
       tokens.emplace_back(node);
     }
 
+    auto raw_tt = RawEntity(node);
     CHECK_NE(raw_id, mx::kInvalidEntityId);
-    CHECK(em.token_tree_ids.emplace(node.RawNode(), raw_id).second);
+    CHECK(em.token_tree_ids.emplace(raw_tt, raw_id).second);
+
+    // Make sure `#define` macro body tokens are globally visible to provenance,
+    // e.g. parameter substitutions.
+    if (is_part_of_define && is_part_of_fragment && raw_pt &&
+        raw_tt != raw_pt) {
+      em.entity_ids.emplace(raw_pt, raw_id);
+    }
+
     return raw_id;
   }
 
@@ -329,13 +386,13 @@ struct TokenTreeSerializationSchedule {
   // this so that `fragment.parsed_tokens().data()` reflects the final result
   // of macro expansion.
   void Schedule(const void * /* parent */, mx::RawEntityId parent_id,
-                const TokenTreeNodeRange &nodes) {
+                bool is_part_of_define, const TokenTreeNodeRange &nodes) {
 
     for (TokenTreeNode node : nodes) {
 
       bool is_part_of_fragment = true;
-      mx::RawEntityId child_id = RecordEntityId(node, parent_id,
-                                                is_part_of_fragment);
+      mx::RawEntityId child_id = RecordEntityId(
+          node, parent_id, is_part_of_define, is_part_of_fragment);
 
       // If this is a macro directive that is nested inside of another fragment,
       // then assume that we've already extracted the directive from that other
@@ -347,26 +404,30 @@ struct TokenTreeSerializationSchedule {
       if (std::optional<TokenTree> sub = node.SubTree()) {
 
         const void *child = sub->RawNode();
+
         if (sub->HasExpansion()) {
-          Schedule(child, child_id, sub->ReplacementChildren());
+          Schedule(child, child_id, is_part_of_define,
+                   sub->ReplacementChildren());
           if (sub->HasIntermediateChildren()) {
-            todo_list.emplace_back(
-                Todo{child, child_id, sub->IntermediateChildren()});
+            todo_list.emplace_back(Todo{
+                child, child_id, is_part_of_define,
+                sub->IntermediateChildren()});
           }
-          todo_list.emplace_back(Todo{child, child_id, sub->Children()});
+          todo_list.emplace_back(Todo{child, child_id, is_part_of_define,
+                                 sub->Children()});
         } else {
-          Schedule(child, child_id, sub->Children());
+          Schedule(child, child_id, is_part_of_define, sub->Children());
         }
       }
     }
   }
 
   void Schedule(const Todo &todo) {
-    Schedule(todo.parent, todo.parent_id, todo.nodes);
+    Schedule(todo.parent, todo.parent_id, todo.is_part_of_define, todo.nodes);
   }
 
   void Schedule(TokenTreeNodeRange nodes) {
-    Schedule(nullptr, mx::kInvalidEntityId, std::move(nodes));
+    Schedule(nullptr, mx::kInvalidEntityId, false, std::move(nodes));
     for (auto i = 0u; i < todo_list.size(); ++i) {
       Schedule(todo_list[i]);
     }
@@ -459,9 +520,9 @@ static void PersistTokenTree(
 
   provenance.Run(pf.fragment_index, sched.tokens);
 
-//#ifndef NDEBUG
-//  provenance.Dump(std::cerr);
-//#endif
+// #ifndef NDEBUG
+//   provenance.Dump(std::cerr);
+// #endif
 
   unsigned num_parsed_tokens = static_cast<unsigned>(pf.parsed_tokens.size());
   unsigned num_tokens = static_cast<unsigned>(sched.tokens.size());
@@ -475,12 +536,20 @@ static void PersistTokenTree(
 
   size_t data_reserve = 128u;
   for (const TokenTreeNode &tok_node : sched.tokens) {
-    if (auto pt = tok_node.PrintedToken()) {
-      data_reserve += pt->Data().size();
-    } else if (auto mt = tok_node.Token()) {
-      data_reserve += mt->Data().size();
-    } else if (auto ft = tok_node.FileToken()) {
-      data_reserve += ft->Data().size();
+    if (auto printed = tok_node.PrintedToken()) {
+      data_reserve += printed->Data().size();
+    
+    } else if (auto parsed = tok_node.Token()) {
+      data_reserve += parsed->Data().size();
+    
+    } else if (auto macro = tok_node.MacroToken()) {
+      data_reserve += macro->Data().size();
+
+    } else {
+      LOG(FATAL)
+          << "Missing parsed token for token node in source file "
+          << MainSourceFile(pf) << " with parsed tokens "
+          << pf.parsed_tokens.Data();
     }
   }
 
@@ -491,14 +560,18 @@ static void PersistTokenTree(
   for (const TokenTreeNode &tok_node : sched.tokens) {
     to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
 
-    std::optional<pasta::Token> mt = tok_node.Token();
-    std::optional<pasta::PrintedToken> pt = tok_node.PrintedToken();
-    std::optional<pasta::FileToken> ft = tok_node.FileToken();
+    std::optional<pasta::Token> pt = tok_node.Token();
+    std::optional<pasta::PrintedToken> gt = tok_node.PrintedToken();
+    std::optional<pasta::MacroToken> mt = tok_node.MacroToken();
 
     dt.set(i, provenance.DerivedTokenId(tok_node));
     re.set(i, provenance.RelatedEntityId(tok_node));
-
-    if (pt) {
+    
+    if (gt) {
+      AccumulateTokenData(utf8_fragment_data, gt.value());
+      tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(gt.value())));
+    
+    } else if (pt) {
       AccumulateTokenData(utf8_fragment_data, pt.value());
       tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(pt.value())));
 
@@ -506,26 +579,24 @@ static void PersistTokenTree(
       AccumulateTokenData(utf8_fragment_data, mt.value());
       tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(mt.value())));
 
-    } else if (ft) {
-      AccumulateTokenData(utf8_fragment_data, ft.value());
-      tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(ft.value())));
-
     } else {
-      LOG(FATAL)
-          << "Missing parsed/file token for token node in source file "
-          << MainSourceFile(pf) << " with parsed tokens "
-          << DiagnosePrintedTokens(pf.parsed_tokens);
+      assert(false);
     }
 
     // Associate this token node with a parsed token. Generally this can be
     // a one-to-many mapping, but we try to choose a reasonable one.
     mx::VariantId parsed_vid =
         mx::EntityId(provenance.ParsedTokenId(tok_node)).Unpack();
-    
+
     // We might have a backup case if we're serializing a builtin, where
     // we serialized a buitlin or forward declaration in a declarator and
     // (intentionally) droppped provenance so that we wouldn't accidentally
     // bring in macros.
+    if (std::holds_alternative<mx::InvalidId>(parsed_vid) && gt) {
+      CHECK(pf.drop_token_provenance);
+      parsed_vid = mx::EntityId(em.EntityId(gt.value())).Unpack();
+    }
+
     if (std::holds_alternative<mx::InvalidId>(parsed_vid) && pt) {
       CHECK(pf.drop_token_provenance);
       parsed_vid = mx::EntityId(em.EntityId(pt.value())).Unpack();
@@ -580,7 +651,7 @@ static void PersistTokenTree(
           << "' at index " << i << " (PTI " << parsed_tok.Index()
           << ") in parsed token list from source file "
           << MainSourceFile(pf) << " with parsed tokens "
-          << DiagnosePrintedTokens(pf.parsed_tokens);
+          << pf.parsed_tokens.Data();
     }
     ++i;
   }
@@ -706,7 +777,7 @@ void GlobalIndexingState::PersistFragment(
 
   // Identify all of the declarations, statements, types, and pseudo-entities,
   // and build lists of the entities to serialize.
-  BuildPendingFragment(pf);
+  BuildPendingFragment(ast, pf);
 
   // Figure out parentage/inheritance between the entities.
   LabelParentsInPendingFragment(pf);
@@ -715,22 +786,32 @@ void GlobalIndexingState::PersistFragment(
   SerializePendingFragment(fb, database, pf);
 
   // List of fragments IDs, where index `0` is this fragment's immediate parent.
-  auto ids = fb.initParentIds(
-      static_cast<unsigned>(pf.parent_fragment_ids.size()));
-  auto i = 0u;
-  for (mx::PackedFragmentId parent_id : pf.parent_fragment_ids) {
-    ids.set(i++, parent_id.Pack());
+  //
+  // TODO(pag): Support more than depth 1.
+  mx::EntityId parent_eid(em.EntityId(pf.raw_parent_entity));
+  if (auto parent_decl_id = parent_eid.Extract<mx::DeclId>()) {
+    mx::FragmentId fid(parent_decl_id->fragment_id);
+    database.AddAsync(mx::NestedFragmentRecord{fid, pf.fragment_id});
+
+    auto parent_ids = fb.initParentIds(1u);
+    parent_ids.set(0u, mx::EntityId(fid).Pack());
+    CHECK_NE(pf.fragment_id.Pack(), parent_ids[0]);
+
+  } else if (auto parent_macro_id = parent_eid.Extract<mx::MacroId>()) {
+    mx::FragmentId fid(parent_macro_id->fragment_id);
+    database.AddAsync(mx::NestedFragmentRecord{fid, pf.fragment_id});
+
+    auto parent_ids = fb.initParentIds(1u);
+    parent_ids.set(0u, mx::EntityId(fid).Pack());
+    CHECK_NE(pf.fragment_id.Pack(), parent_ids[0]);
+
+  } else {
+    CHECK(!pf.raw_parent_entity);
+    fb.initParentIds(0u);
   }
 
   // The compilation containing this fragment.
   fb.setCompilationId(pf.compilation_id.Pack());
-
-  if (!pf.parent_fragment_ids.empty()) {
-    database.AddAsync(
-        mx::NestedFragmentRecord{
-          pf.parent_fragment_ids.front(),
-          pf.fragment_id});
-  }
 
   if (pf.file_location) {
     fb.setFirstFileTokenId(pf.file_location->first_file_token_id.Pack());
@@ -750,7 +831,7 @@ void GlobalIndexingState::PersistFragment(
   }
 
   auto tlds = fb.initTopLevelDeclarations(pf.num_top_level_declarations);
-  for (i = 0u; i < pf.num_top_level_declarations; ++i) {
+  for (auto i = 0u; i < pf.num_top_level_declarations; ++i) {
     tlds.set(i, em.EntityId(pf.top_level_decls[i]));
   }
 
@@ -759,7 +840,7 @@ void GlobalIndexingState::PersistFragment(
   // fragment or its data.
   std::stringstream tok_tree_err;
   std::optional<TokenTreeNodeRange> maybe_tt = TokenTree::Create(
-      pf.original_tokens, pf.parsed_tokens, tok_tree_err);
+      pf.original_tokens, pf.parsed_tokens, pf.top_level_decls, tok_tree_err);
 
   if (maybe_tt) {
     PersistTokenTree(pf, fb, std::move(maybe_tt.value()), provenance);

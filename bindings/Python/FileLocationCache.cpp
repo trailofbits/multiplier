@@ -28,7 +28,10 @@ struct O final : public ::PyObject {
 };
 
 static PyTypeObject gTypeDef = {
+
   .tp_name = "multiplier.frontend.FileLocationCache",
+  .tp_basicsize = sizeof(O),
+  .tp_itemsize = 0,
   .tp_hash = PyObject_HashNotImplemented,
   .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_IMMUTABLETYPE,
   .tp_doc = PyDoc_STR("Cache of files to pre-computed line/column number locations."),

@@ -146,7 +146,7 @@ bool Stmt::contains(const Stmt &stmt) {
 std::optional<Stmt> Stmt::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<StmtId>(vid)) {
-    index.statement(eid.Pack());
+    return index.statement(eid.Pack());
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }

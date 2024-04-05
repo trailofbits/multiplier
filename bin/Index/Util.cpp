@@ -6,7 +6,9 @@
 
 #include "Util.h"
 
+#include <algorithm>
 #include <glog/logging.h>
+#include <iostream>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
@@ -87,6 +89,26 @@ bool IsParsedToken(const pasta::Token &tok) {
   }
 }
 
+// Like `IsParsedToken`, but returns `false` for whitespace and comments that
+// were made visible to Clang's preprocessor.
+bool IsParsedTokenExcludingWhitespaceAndComments(const pasta::Token &tok) {
+  switch (tok.Role()) {
+    case pasta::TokenRole::kFileToken:
+    case pasta::TokenRole::kFinalMacroExpansionToken:
+      break;
+
+    default:
+      return false;
+  }
+
+  switch (tok.Kind()) {
+    case pasta::TokenKind::kComment:
+      return false;
+    default:
+      return !IsWhitespaceOrEmpty(tok.Data());
+  }
+}
+
 namespace {
 
 // Compute the last token of a macro.
@@ -148,13 +170,7 @@ std::optional<pasta::MacroToken> EndToken(const pasta::Macro &macro) {
 std::string DeclToString(const pasta::Decl &decl) {
   std::stringstream ss;
   for (pasta::PrintedToken ptok : pasta::PrintedTokenRange::Create(decl)) {
-    for (auto i = 0u, max_i = ptok.NumLeadingNewLines(); i < max_i; ++i) {
-      ss << '\n';
-    }
-    for (auto i = 0u, max_i = ptok.NumLeadingSpaces(); i < max_i; ++i) {
-      ss << ' ';
-    }
-    ss << ptok.Data();
+    ss << ' ' << ptok.Data();
   }
   return ss.str();
 }
@@ -169,7 +185,6 @@ std::string PrefixedName(const pasta::Decl &decl, const char *prefix) {
   }
   return "";
 }
-
 
 // Return the location of a declaration with a leading `prefix`, or nothing.
 std::string PrefixedLocation(const pasta::Decl &decl, const char *prefix) {
@@ -203,6 +218,16 @@ bool IsWhitespaceOrEmpty(std::string_view data) {
     }
   }
   return true;
+}
+
+mx::TokenKind TokenKindFromPasta(pasta::TokenKind kind, std::string_view data) {
+  auto mx_kind = mx::FromPasta(kind);
+  if (mx_kind == mx::TokenKind::UNKNOWN) {
+    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
+      return mx::TokenKind::WHITESPACE;
+    }
+  }
+  return mx_kind;
 }
 
 // Return the token kind.
@@ -317,14 +342,8 @@ mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity) {
     case pasta::ObjCKeywordKind::kAvailable:
       return mx::TokenKind::OBJC_AT_AVAILABLE;
   }
-  auto kind = mx::FromPasta(entity.Kind());
-  if (kind == mx::TokenKind::UNKNOWN) {
-    auto data = entity.Data();
-    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
-      return mx::TokenKind::WHITESPACE;
-    }
-  }
-  return kind;
+
+  return TokenKindFromPasta(entity.Kind(), entity.Data());
 }
 
 // Return the token kind.
@@ -333,38 +352,30 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
     default:
       break;
 
+    // This comes up with things like PASTA's token splitter, where it will
+    // inject tokens in an invalid role and potentially patch them into things
+    // like `mx::TokenKind::L_ANGLE`.
+    case pasta::TokenRole::kInvalid:
+
+    // Self-explanatory: begin and end files.
     case pasta::TokenRole::kBeginOfFileMarker:
     case pasta::TokenRole::kEndOfFileMarker:
+
+    // Self-explanatory: begin and end macros.
     case pasta::TokenRole::kBeginOfMacroExpansionMarker:
     case pasta::TokenRole::kEndOfMacroExpansionMarker:
-    case pasta::TokenRole::kEndOfInternalMacroEventMarker:
-      LOG(ERROR)
+
+    // Pragmas often need to be retained, so we have this explicit token.
+    // Besides pragmas, it's useful to know where all other directives are
+    // relative to parsed tokens, as this helps us extend the bounds of entities
+    // e.g. to handle Issue #457.
+    case pasta::TokenRole::kMacroDirectiveMarker:
+      LOG(FATAL)
           << "Should not be serializing marker tokens";
       return mx::TokenKind::UNKNOWN;
   }
 
-  // Try to get preprocessor kinds, if possible.
-  //
-  // NOTE(pag): File tokens show `IDENTIFIER` (due to `raw_identifier`) from
-  //            the raw lexer, whereas fragments do better.
-  if (auto ft = entity.FileLocation()) {
-    if (ft->PreProcessorKeywordKind() != pasta::PPKeywordKind::kNotKeyword ||
-        ft->ObjectiveCAtKeywordKind() != pasta::ObjCKeywordKind::kNotKeyword) {
-      if (auto ret = TokenKindFromPasta(ft.value());
-          ret != mx::TokenKind::IDENTIFIER) {
-        return ret;
-      }
-    }
-  }
-
-  auto kind = mx::FromPasta(entity.Kind());
-  if (kind == mx::TokenKind::UNKNOWN) {
-    auto data = entity.Data();
-    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
-      return mx::TokenKind::WHITESPACE;
-    }
-  }
-  return kind;
+  return TokenKindFromPasta(entity.Kind(), entity.Data());
 }
 
 namespace {
@@ -422,7 +433,26 @@ mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity) {
 
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::MacroToken &entity) {
-  return TokenKindFromPasta(entity.ParsedLocation());
+  auto dtok = entity.DerivedLocation();
+  if (std::holds_alternative<pasta::FileToken>(dtok)) {
+    const auto &ft = std::get<pasta::FileToken>(dtok);
+
+  // Try to get preprocessor kinds, if possible.
+  if (ft.PreProcessorKeywordKind() != pasta::PPKeywordKind::kNotKeyword ||
+      ft.ObjectiveCAtKeywordKind() != pasta::ObjCKeywordKind::kNotKeyword) {
+    return TokenKindFromPasta(ft);
+  }
+
+    return TokenKindFromPasta(std::get<pasta::FileToken>(dtok));
+  }
+  return TokenKindFromPasta(entity.TokenKind(), entity.Data());
+}
+
+pasta::DerivedToken DerivedLocation(const pasta::DerivedToken &tok) {
+  if (std::holds_alternative<pasta::MacroToken>(tok)) {
+    return std::get<pasta::MacroToken>(tok).DerivedLocation();
+  }
+  return std::monostate{};
 }
 
 namespace {
@@ -453,7 +483,7 @@ static bool ParamIsDefinition(clang::ParmVarDecl *decl) {
 
 // Returns `true` if `decl` is a definition.
 bool IsDefinition(const pasta::Decl &decl_) {
-  auto decl = const_cast<clang::Decl *>(decl_.RawDecl());
+  auto decl = const_cast<clang::Decl *>(decl_.RawDecl()->RemappedDecl);
 
   if (auto parm_decl = clang::dyn_cast<clang::ParmVarDecl>(decl)) {
     return ParamIsDefinition(parm_decl);
@@ -502,20 +532,255 @@ bool IsDefinition(const pasta::Decl &decl_) {
 
 // Checks if the declaration is valid and serializable
 bool IsSerializableDecl(const pasta::Decl &decl) {
-  auto kind = decl.Kind();
-  switch (kind) {
+  switch (decl.Kind()) {
     case pasta::DeclKind::kTranslationUnit:
-    case pasta::DeclKind::kNamespace:
-    case pasta::DeclKind::kExternCContext:
-    case pasta::DeclKind::kLinkageSpec:
+    case pasta::DeclKind::kCXXDeductionGuide:
       return false;
     default:
-      if (decl.IsInvalidDeclaration()) {
-        return false;
-      }
+      return !decl.IsInvalidDeclaration();
+  }
+}
+
+namespace {
+
+static std::optional<pasta::FileToken> DeclStart(const pasta::Decl &decl) {
+  auto ft = decl.Token().FileLocation();
+  if (!ft) {
+    for (auto tok : decl.Tokens()) {
+        ft = decl.Token().FileLocation();
+        if (ft) {
+          break;
+        }
+    }
+  }
+  return ft;
+}
+
+static std::optional<pasta::FileToken> DeclEnd(const pasta::Decl &decl) {
+  auto ft = decl.Token().FileLocation();
+  for (auto tok : decl.Tokens()) {
+    if (auto new_ft = decl.Token().FileLocation()) {
+      ft = new_ft;
+    }
+  }
+  return ft;
+}
+
+static bool IsLexicallyOutOfLine(const pasta::Decl &decl,
+                                 const pasta::Decl &parent_decl) {
+
+  auto loc = DeclStart(decl);
+  auto parent_loc = DeclStart(parent_decl);
+  auto parent_end_loc = DeclEnd(parent_decl);
+
+  if (!(loc && parent_loc && parent_end_loc)) {
+    return false;
+  }
+
+  return parent_loc->Index() < parent_end_loc->Index() &&
+      loc->Index() >= parent_loc->Index() &&
+      loc->Index() <= parent_end_loc->Index();
+}
+
+}  // namespace
+
+bool IsOutOfLine(const pasta::Decl &decl) {
+  if (decl.IsOutOfLine()){
+    return true;
+  }
+
+  auto dc = decl.DeclarationContext();
+  if (!dc) {
+    return false;
+  }
+
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kClassTemplate:
+    case pasta::DeclKind::kClassTemplateSpecialization:
+    case pasta::DeclKind::kClassTemplatePartialSpecialization:
+    case pasta::DeclKind::kCXXRecord:
+    case pasta::DeclKind::kFunction:
+    case pasta::DeclKind::kFunctionTemplate:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod:
+    case pasta::DeclKind::kVar:
+    case pasta::DeclKind::kVarTemplate:
+    case pasta::DeclKind::kVarTemplateSpecialization:
+    case pasta::DeclKind::kVarTemplatePartialSpecialization:  {
+      return IsLexicallyOutOfLine(decl, dc.value());
+    }
+    default:
       break;
   }
-  return true;
+
+  return false;
+}
+
+// If `decl` is a declaration context, then this will return `true` if `decl`
+// should be internalized into the fragment, otherwise `false`. Returns `false`
+// if `decl` isn't a declaration context.
+bool ShouldInternalizeDeclContextIntoFragment(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kExternCContext:
+    case pasta::DeclKind::kLinkageSpec:
+    case pasta::DeclKind::kNamespace:
+      return true;
+    default:
+      return false;
+  }
+}
+
+// This the specialization kind explicit? This corresponds to something like
+// `extern template class foo<type>;`.
+bool IsExplicitInstantiation(const pasta::TemplateSpecializationKind &kind) {
+  switch (kind) {
+    case pasta::TemplateSpecializationKind::kExplicitInstantiationDeclaration:
+    case pasta::TemplateSpecializationKind::kExplicitInstantiationDefinition:
+      return true;
+    default:
+      return false;
+  }
+}
+
+// Is the specialization kind explicit? This corresponds to a template
+// specialization being fully spelled out in the code, rather than being derived
+// from a template pattern or a partial specialization pattern.
+bool IsExplicitSpecialization(const pasta::TemplateSpecializationKind &kind) {
+  return kind == pasta::TemplateSpecializationKind::kExplicitSpecialization;
+}
+
+// Is the specialization kind explicit? This corresponds to a template
+// specialization being fully spelled out in the code, rather than being derived
+// from a template pattern or a partial specialization pattern.
+bool IsExplicitSpecialization(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kVarTemplateSpecialization:
+      return IsExplicitSpecialization(
+          reinterpret_cast<const pasta::VarTemplateSpecializationDecl &>(decl).
+              TemplateSpecializationKind());
+    case pasta::DeclKind::kClassTemplateSpecialization:
+      return IsExplicitSpecialization(
+          reinterpret_cast<const pasta::ClassTemplateSpecializationDecl &>(decl).
+              TemplateSpecializationKind());
+    case pasta::DeclKind::kFunction:
+    case pasta::DeclKind::kCXXMethod:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXDeductionGuide:
+      return IsExplicitSpecialization(
+          reinterpret_cast<const pasta::FunctionDecl &>(decl).
+              TemplateSpecializationKind());
+
+    case pasta::DeclKind::kVarTemplatePartialSpecialization:
+    case pasta::DeclKind::kClassTemplatePartialSpecialization:
+      return true;
+
+    default:
+      return false;
+  }
+}
+
+// Returns whether or not `decl` is a specialization of a template. Clang
+// reports methods derived from methods inside of class templates as being
+// specializations, but this function focuses on determining that something is
+// actually derived from a template, i.e. a method is a specialization if it is
+// derived from a method inside of a function template.
+bool IsSpecialization(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    // Treat templates kind of like specializations if they exist inside of
+    // another specialization. This is because they may actually use the outer
+    // template arguments/parameters.
+    case pasta::DeclKind::kVarTemplate:
+    case pasta::DeclKind::kClassTemplate:
+    case pasta::DeclKind::kFunctionTemplate:
+    case pasta::DeclKind::kFriendTemplate:
+    case pasta::DeclKind::kVarTemplatePartialSpecialization:
+    case pasta::DeclKind::kClassTemplatePartialSpecialization:
+    case pasta::DeclKind::kTypeAliasTemplate:
+      return false;
+
+    case pasta::DeclKind::kVarTemplateSpecialization:
+    case pasta::DeclKind::kClassTemplateSpecialization:
+      return true;
+
+    // NOTE(pag): Type alias templates cannot be explicitly specialized.
+    case pasta::DeclKind::kTypeAlias:
+      return false;
+
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod: {
+      auto func = reinterpret_cast<const pasta::CXXMethodDecl &>(decl);
+      auto tsk = func.TemplateSpecializationKind();
+      if (tsk == pasta::TemplateSpecializationKind::kUndeclared) {
+        return false;
+      }
+
+      if (IsExplicitSpecialization(tsk)) {
+        return true;
+      }
+
+      if (auto pattern = func.InstantiatedFromMemberFunction()) {
+        return pattern->DescribedFunctionTemplate().has_value();
+      }
+
+      return func.TemplateInstantiationPattern().has_value();
+    }
+
+    case pasta::DeclKind::kFunction: {
+      auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
+      auto tsk = func.TemplateSpecializationKind();
+      if (tsk == pasta::TemplateSpecializationKind::kUndeclared) {
+        return false;
+      }
+
+      if (IsExplicitSpecialization(tsk)) {
+        return true;
+      }
+
+      if (auto pattern = func.InstantiatedFromDeclaration()) {
+        return pattern->DescribedFunctionTemplate().has_value();
+      }
+
+      return func.TemplateInstantiationPattern().has_value();
+    }
+
+    default:
+      return false;
+  }
+}
+
+// Is this decl a specialization of a template? If so, then we will want
+// to render the printed tokens of the specialization into the fragment, rather
+// than the parsed tokens.
+bool IsSpecializationOrTemplateInSpecialization(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    // Treat templates kind of like specializations if they exist inside of
+    // another specialization. This is because they may actually use the outer
+    // template arguments/parameters.
+    case pasta::DeclKind::kVarTemplate:
+    case pasta::DeclKind::kClassTemplate:
+    case pasta::DeclKind::kFunctionTemplate:
+    case pasta::DeclKind::kFriendTemplate:
+    case pasta::DeclKind::kVarTemplatePartialSpecialization:
+    case pasta::DeclKind::kClassTemplatePartialSpecialization:
+    case pasta::DeclKind::kTypeAliasTemplate:
+      if (auto dc = decl.DeclarationContext()) {
+        if (auto dc_decl = pasta::Decl::From(dc.value())) {
+          return IsSpecializationOrTemplateInSpecialization(dc_decl.value());
+        }
+      }
+      return false;
+
+    default:
+      return IsSpecialization(decl);
+  }
 }
 
 // Determines whether or not a TLD is likely to have to go into a child
@@ -523,24 +788,128 @@ bool IsSerializableDecl(const pasta::Decl &decl) {
 // struct.
 //
 // TODO(pag): Thing about forward declarations in template parameter lists.
+//
+// NOTE(pag): This logic is closely related to what is in `TLDFinder`.
 bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
+
+  auto lc = decl.LexicalDeclarationContext();
+
+  // Methods (static or member) inside of class template specializations are
+  // always nested fragments. This is because their bodies may not be fully
+  // instantiated, and so we don't want them screwing up the fragment
+  // deduplication.
+  if (lc) {
+    auto parent_spec = pasta::ClassTemplateSpecializationDecl::From(lc.value());
+    if (parent_spec) {
+      if (parent_spec->Kind() != pasta::DeclKind::kClassTemplatePartialSpecialization &&
+          pasta::FunctionDecl::From(decl)) {
+        return true;
+      }
+    }
+  }
+
   switch (decl.Kind()) {
-    case pasta::DeclKind::kClassTemplateSpecialization:
-    case pasta::DeclKind::kVarTemplateSpecialization:
+    case pasta::DeclKind::kFriendTemplate:
+    // TODO(pag): FriendDecl for FriendTemplateDecl.
       return true;
+
+    case pasta::DeclKind::kClassTemplate:
+    case pasta::DeclKind::kClassTemplatePartialSpecialization:
+    case pasta::DeclKind::kFunctionTemplate:
+    case pasta::DeclKind::kTypeAliasTemplate:
+    case pasta::DeclKind::kVarTemplate:
+    case pasta::DeclKind::kVarTemplatePartialSpecialization:
+      return lc && lc->IsRecord();
+
+    case pasta::DeclKind::kVarTemplateSpecialization: {
+      auto var = reinterpret_cast<const pasta::VarTemplateSpecializationDecl &>(decl);
+      if (lc && lc->IsRecord()) {
+        return true;
+      }
+
+      auto tsk = var.TemplateSpecializationKind();
+      if (IsExplicitSpecialization(tsk)) {
+        return false;
+      }
+
+      if (IsExplicitInstantiation(tsk) && var.ExternToken()) {
+        return false;
+      }
+
+      return true;
+    }
+
+    case pasta::DeclKind::kClassTemplateSpecialization: {
+      auto cls = reinterpret_cast<const pasta::ClassTemplateSpecializationDecl &>(decl);
+      if (lc && lc->IsRecord()) {
+        return true;
+      }
+
+      auto tsk = cls.TemplateSpecializationKind();
+      if (IsExplicitSpecialization(tsk)) {
+        return false;
+      }
+
+      if (IsExplicitInstantiation(tsk) && cls.ExternToken()) {
+        return false;
+      }
+
+      return true;
+    }
+
+    case pasta::DeclKind::kVar: {
+      auto var = reinterpret_cast<const pasta::VarDecl &>(decl);
+      if (var.TemplateSpecializationKind() ==
+          pasta::TemplateSpecializationKind::kUndeclared) {
+        return false;
+      }
+
+      // This is an instantiation of a non-template, out-of-line static data
+      // member in a class template.
+      if (var.IsOutOfLine()) {
+        if (auto from = var.InstantiatedFromStaticDataMember()) {
+          if (0u < from->NumTemplateParameterLists()) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+      // return !IsExplicitSpecialization(decl);
+    }
 
     // TODO(pag): This might not be the right type of check.
     case pasta::DeclKind::kFunction:
     case pasta::DeclKind::kCXXConversion:
     case pasta::DeclKind::kCXXConstructor:
-    case pasta::DeclKind::kCXXDestructor:
     case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXDestructor:
     case pasta::DeclKind::kCXXMethod: {
       auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
-      return pasta::TemplateSpecializationKind::kUndeclared !=
-             func.TemplateSpecializationKind();
+      auto tsk = func.TemplateSpecializationKind();
+      if (tsk == pasta::TemplateSpecializationKind::kUndeclared) {
+        return false;
+      }
+
+      if (lc && lc->IsRecord()) {
+        return IsSpecialization(decl);
+      }
+
+      // This is an instantiation of a non-template, out-of-line method in a
+      // class template.
+      if (func.IsTemplateInstantiation() && func.IsOutOfLine()) {
+        if (auto from = func.InstantiatedFromMemberFunction()) {
+          if (0u < from->NumTemplateParameterLists()) {
+            return true;
+          }
+        }
+      }
+
+      return !IsExplicitSpecialization(tsk);
     }
-    // TODO(pag): FriendDecl for FriendTemplateDecl.
+
+    // TODO(pag): Where do type alias template specializations go?
+
     default:
       return false;
   }
@@ -611,33 +980,63 @@ bool IsInjectedForwardDeclaration(const pasta::Decl &decl) {
 }
 
 // Should a declaration be hidden from the indexer?
+// The function will go away in the final version as we are only
+// hiding TranslationUnitDecl from the indexer.
 bool ShouldHideFromIndexer(const pasta::Decl &decl) {
   if (!IsSerializableDecl(decl)) {
     return true;
   }
 
+  // If, as a result of template specialization, we can tell that some template
+  // is kind of an "empty shell" for another declaration, then we want to
+  // hide this declaration and forward to the other one.
+  auto raw_decl = decl.RawDecl();
+  if (raw_decl->RemappedDecl != raw_decl) {
+    return true;
+  }
+
   switch (decl.Kind()) {
-    case pasta::DeclKind::kClassScopeFunctionSpecialization:
-    case pasta::DeclKind::kClassTemplate:
-    case pasta::DeclKind::kClassTemplatePartialSpecialization:
-    case pasta::DeclKind::kFunctionTemplate:
-    case pasta::DeclKind::kVarTemplate:
-    case pasta::DeclKind::kVarTemplatePartialSpecialization:
-    case pasta::DeclKind::kFriendTemplate:
-      return true;
-    case pasta::DeclKind::kFunction:
-    case pasta::DeclKind::kCXXConversion:
-    case pasta::DeclKind::kCXXConstructor:
-    case pasta::DeclKind::kCXXDestructor:
-    case pasta::DeclKind::kCXXDeductionGuide:
-    case pasta::DeclKind::kCXXMethod: {
-      const auto &func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
-      return func.TemplatedKind() ==
-             pasta::FunctionDeclTemplatedKind::kFunctionTemplate;
+    case pasta::DeclKind::kFunction: {
+      auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
+      if (auto pattern_decl = func.TemplateInstantiationPattern()) {
+        // Return true if
+        //        1) isReferenced() is false
+        //        2) pattern->doesThisDeclarationHaveABody() is true
+        //        3) decl->doesThisDeclarationHaveABody() is false
+        return pattern_decl->DoesThisDeclarationHaveABody() &&
+               !func.DoesThisDeclarationHaveABody() &&
+               !func.IsReferenced();
+      }
+      break;
     }
 
+    case pasta::DeclKind::kUsingDirective:
+      return decl.IsImplicit();
+
     default:
-      return false;
+      break;
+  }
+
+  return false;
+}
+
+// List the indexable declarations in this declcontext.
+std::vector<pasta::Decl> DeclarationsInDeclContext(
+    const pasta::DeclContext &dc) {
+  auto decls = dc.AlreadyLoadedDeclarations();
+  auto it = std::remove_if(decls.begin(), decls.end(),
+                           [] (const pasta::Decl &d) {
+                             return ShouldHideFromIndexer(d);
+                           });
+  decls.erase(it, decls.end());
+  return decls;
+}
+
+pasta::Macro RootMacroFrom(const pasta::Macro &node) {
+  if (auto parent = node.Parent()) {
+    return RootMacroFrom(parent.value());
+  } else {
+    return node;
   }
 }
 
@@ -714,6 +1113,15 @@ template void AccumulateTokenData<pasta::Token>(
 template void AccumulateTokenData<pasta::PrintedToken>(
     std::string &data, const pasta::PrintedToken &tok);
 
+template void AccumulateTokenData<pasta::MacroToken>(
+    std::string &data, const pasta::MacroToken &tok);
+
+// Helpful function to be called from a debugger where a `std::ostream`
+// argument is needed.
+std::ostream &StdErr(void) {
+  return std::cerr;
+}
+
 // Combine all parsed tokens into a string for diagnostic purposes.
 std::string DiagnosePrintedTokens(
     const pasta::PrintedTokenRange &parsed_tokens) {
@@ -746,8 +1154,20 @@ const void *RawEntity(const pasta::Token &entity) {
   return entity.RawToken();
 }
 
+const void *RawEntity(const pasta::PrintedToken &entity) {
+  return entity.RawToken();
+}
+
+const void *RawEntity(const pasta::File &entity) {
+  return entity.RawFile();
+}
+
 const void *RawEntity(const pasta::Decl &entity) {
-  return entity.RawDecl();
+  return entity.RawDecl()->RemappedDecl;
+}
+
+const void *RawEntity(const pasta::DeclContext &entity) {
+  return entity.RawDeclContext();
 }
 
 const void *RawEntity(const pasta::Stmt &entity) {
@@ -770,6 +1190,10 @@ const void *RawEntity(const pasta::CXXBaseSpecifier &entity) {
   return entity.RawCXXBaseSpecifier();
 }
 
+const void *RawEntity(const pasta::CXXCtorInitializer &entity) {
+  return entity.RawCXXCtorInitializer();
+}
+
 const void *RawEntity(const pasta::TemplateArgument &entity) {
   return entity.RawTemplateArgument();
 }
@@ -779,6 +1203,10 @@ const void *RawEntity(const pasta::TemplateParameterList &entity) {
 }
 
 const void *RawEntity(const TokenTree &entity) {
+  return entity.RawNode();
+}
+
+const void *RawEntity(const TokenTreeNode &entity) {
   return entity.RawNode();
 }
 

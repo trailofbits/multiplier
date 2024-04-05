@@ -125,6 +125,8 @@ static TokenCategory ClassifyToken(TokenKind kind) {
     case TokenKind::R_PARENTHESIS:
     case TokenKind::L_BRACE:
     case TokenKind::R_BRACE:
+    case TokenKind::L_ANGLE:
+    case TokenKind::R_ANGLE:
     case TokenKind::PERIOD:
     case TokenKind::ELLIPSIS:
     case TokenKind::AMP:
@@ -168,7 +170,7 @@ static TokenCategory ClassifyToken(TokenKind kind) {
     case TokenKind::COMMA:
     case TokenKind::HASH:
     case TokenKind::HASH_HASH:
-    case TokenKind::HASHAT:
+    case TokenKind::HASH_AT:
     case TokenKind::PERIOD_STAR:
     case TokenKind::ARROW_STAR:
     case TokenKind::COLON_COLON:
@@ -786,7 +788,7 @@ static TokenCategory ClassifyFile(TokenKind kind,
     case TokenKind::PP___INCLUDE_MACROS:
     case TokenKind::HASH:
     case TokenKind::HASH_HASH:
-    case TokenKind::HASHAT:
+    case TokenKind::HASH_AT:
     case TokenKind::COMMA:
     case TokenKind::L_PARENTHESIS:
     case TokenKind::R_PARENTHESIS:

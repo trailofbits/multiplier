@@ -106,16 +106,17 @@ static std::optional<bool> EndsWithEmptyVAArgs(
   }
 
   const Token *comma = std::get_if<Token>(&(before[num_entries - 3u]));
-  const Token *hash_hash = std::get_if<Token>(&(before[num_entries - 2u]));
-  const Macro *param_sub = std::get_if<Macro>(&(before[num_entries - 1u]));
-
-  if (!comma || !hash_hash || !param_sub) {
+  if (!comma || comma->kind() != TokenKind::COMMA) {
     return std::nullopt;
   }
 
-  if (comma->kind() != TokenKind::COMMA ||
-      hash_hash->kind() != TokenKind::HASH_HASH ||
-      param_sub->kind() != MacroKind::PARAMETER_SUBSTITUTION) {
+  const Token *hash_hash = std::get_if<Token>(&(before[num_entries - 2u]));
+  if (!hash_hash || hash_hash->kind() != TokenKind::HASH_HASH) {
+    return std::nullopt;
+  }
+
+  const Macro *param_sub = std::get_if<Macro>(&(before[num_entries - 1u]));
+  if (!param_sub || param_sub->kind() != MacroKind::PARAMETER_SUBSTITUTION) {
     return std::nullopt;
   }
 
@@ -966,11 +967,12 @@ void TokenTreeImpl::MacroExpansionProcessor::Init(
     // this into `, <stuff>` or nothing.
     if (auto is_empty = EndsWithEmptyVAArgs(body_children)) {
       D( std::cerr << "BT(" << (body_children.size() - 3)
-                   << ") has `, ## __VA_ARGS__`\n"; )
+                   << ") has `, ## __VA_ARGS__` empty="
+                   << is_empty.value() << "\n"; )
 
-      assert(body_children.size() == body_use.size());
+      assert(3u <= body_use.size());
 
-      mt = std::move(body_children.back());
+      MacroOrToken va_args_sub = std::move(body_children.back());
       body_children.pop_back();
       body_children.pop_back();  // `##`.
       MacroOrToken comma = std::move(body_children.back());
@@ -984,7 +986,8 @@ void TokenTreeImpl::MacroExpansionProcessor::Init(
         body_use.emplace_back(comma);
         body_children.push_back(std::move(comma));
 
-        FlattenExpansionUses(std::move(mt), 0u, body_children, body_use);
+        FlattenExpansionUses(std::move(va_args_sub), 0u, body_children,
+                             body_use);
       }
     }
   }
@@ -1487,7 +1490,33 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
   auto begin = std::max(bounds.begin_index, rci.second + 1u);
   auto end = std::min(bounds.end_index, fti.second - 1u);
 
-  D( std::cerr << INDENT << "AddLeadingTokensInBounds: begin=" << begin << ", end=" << end << '\n'; )
+  // If we're inside a macro expansion, or if this fragment corresponds to a
+  // nested fragment (e.g. a template specialization), then we only want to add
+  // whitespace and comments. Otherwise, we risk re-introducing intentional
+  // elisions, such as `, ## __VA_ARGS__`. In the case of template
+  // specializations, the original code might be `template <params> class Foo`
+  // and the specialization might be `template <> class Foo<args>` and so we
+  // don't want to risk re-introducing `params`, thereby forming
+  // `template <params> class Foo<args>`.
+  auto orig_begin = begin;
+  if (begin <= end &&
+      (depth ||
+       (fragment && fragment->parent_fragment_id != kInvalidEntityId))) {
+    auto j = 0u;
+    for (auto i = end - begin; (begin + i) <= end; ++i, ++j) {
+      auto tk = fti.first->NthTokenKind(end - j);
+      if (tk == TokenKind::WHITESPACE || tk == TokenKind::COMMENT) {
+        continue;
+
+      } else {
+        begin = end - j + 1u;
+        break;
+      }
+    }
+  }
+
+  (void) orig_begin;
+  D( std::cerr << INDENT << "AddLeadingTokensInBounds: orig_begin=" << orig_begin << " begin=" << begin << ", end=" << end << '\n'; )
   for (auto i = begin; i <= end; ++i) {
     seq = AddTokenToSequence(seq, TokenIndex(fti.first, i));
   }
@@ -1590,7 +1619,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
   MacroExpansionProcessor mep;
   mep.Init(me, me_def, def_bounds);
   if (!mep.Run(false)) {
-    assert(!mep.HasAfterChildren());  // Probably a bug.
+    // assert(!mep.HasAfterChildren());  // Probably a bug.
     return ExtendWithSubstitution(seq, me, user_bounds, trailing_tokens);
   }
 
@@ -2600,7 +2629,7 @@ void TokenTreeReader::Append(TokenTreeImpl::TokenIndex ti) {
   auto [tok_reader, to] = ti;
 
   TokenKind tk = tok_reader->NthTokenKind(to);
-  VariantId rel_id = EntityId(tok_reader->NthRelatedEntity(to)).Unpack();
+  VariantId rel_id = tok_reader->NthRelatedEntityId(to).Unpack();
   bool is_include_tok = std::holds_alternative<FileId>(rel_id);
   if (std::holds_alternative<MacroId>(rel_id)) {
     switch (std::get<MacroId>(rel_id).kind) {

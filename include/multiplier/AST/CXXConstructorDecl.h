@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class CXXConstructorDecl;
+class CXXCtorInitializer;
 class CXXMethodDecl;
 class Decl;
 class DeclaratorDecl;
@@ -74,6 +75,9 @@ class MX_EXPORT CXXConstructorDecl : public CXXMethodDecl {
   static std::optional<CXXConstructorDecl> from(const TokenContext &t);
 
   std::optional<CXXConstructorDecl> target_constructor(void) const;
+  std::optional<CXXCtorInitializer> nth_initializer(unsigned n) const;
+  unsigned num_initializers(void) const;
+  gap::generator<CXXCtorInitializer> initializers(void) const &;
   bool is_default_constructor(void) const;
   bool is_delegating_constructor(void) const;
   bool is_explicit(void) const;

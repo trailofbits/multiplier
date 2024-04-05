@@ -14,6 +14,7 @@
 
 #include "AST/Attr.h"
 #include "AST/CXXBaseSpecifier.h"
+#include "AST/CXXCtorInitializer.h"
 #include "AST/Designator.h"
 #include "AST/NamedDecl.h"
 #include "AST/Stmt.h"
@@ -26,6 +27,7 @@
 #include "Frontend/Macro.h"
 #include "Frontend/TokenKind.h"
 #include "Frontend/TokenCategory.h"
+#include "IR/Operation.h"
 #include "Fragment.h"
 #include "IR/Operation.h"
 #include "Iterator.h"

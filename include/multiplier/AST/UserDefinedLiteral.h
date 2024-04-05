@@ -67,7 +67,7 @@ class MX_EXPORT UserDefinedLiteral : public CallExpr {
   static std::optional<UserDefinedLiteral> from(const VariantEntity &e);
   static std::optional<UserDefinedLiteral> from(const TokenContext &t);
 
-  Expr cooked_literal(void) const;
+  std::optional<Expr> cooked_literal(void) const;
   UserDefinedLiteralLiteralOperatorKind literal_operator_kind(void) const;
   Token ud_suffix_token(void) const;
 };

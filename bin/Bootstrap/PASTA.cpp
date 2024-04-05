@@ -109,12 +109,13 @@ static const std::unordered_set<std::string> gAbstractTypes{
 
 static const std::unordered_set<std::string> gUnserializableTypes{
   // These are not contained in fragments.
-  "NamespaceDecl",
   "TranslationUnitDecl",
-  "ExternCContextDecl",
+};
 
-  // TODO(pag): If we add more fine-grained handling of these in PASTA then
-  //            maybe remove this.
+// These are replicated into fragments.
+static const std::unordered_set<std::string> gSpecialDeclContexts{
+  "NamespaceDecl",
+  "ExternCContextDecl",
   "LinkageSpecDecl",
 };
 
@@ -160,6 +161,10 @@ static const std::unordered_set<std::string> gCXXBaseSpecifierNames{
 
 static const std::unordered_set<std::string> gDesignatorNames{
   "Designator"
+};
+
+static const std::unordered_set<std::string> gCXXCtorInitializerNames{
+  "CXXCtorInitializer"
 };
 
 static const std::unordered_set<std::string> gFileNames{
@@ -382,8 +387,7 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   // ordering the expansion tokens.
   {"Macro", "BeginToken"},
   {"Macro", "EndToken"},
-  {"MacroSubstitution", "CoveredStmt"},
-  {"MacroSubstitution", "CoveredDecl"},
+  {"MacroDirective", "ParsedLocation"},
 
   // We'll manually record these in the indexer.
   {"DefineMacroDirective", "Uses"},
@@ -665,6 +669,7 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Type", "CanonicalTypeInternal"},
   {"Type", "ContainedAutoType"},
   {"Type", "ContainedDeducedType"},
+  {"Type", "Desugar"},  // Already have `Type::DesugaredType`.
 
   // The bit packing in here are not well described, so we should just omit
   // them.
@@ -686,6 +691,48 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "IsCanonicalDeclaration"},
   {"Decl", "IsFirstDeclaration"},
   {"Decl", "IdentifierNamespace"},
+
+  {"MemberPointerType", "MostRecentCXXRecordDeclaration"},
+  {"Expr", "Dependence"},
+  {"Expr", "IsIntegerConstantExpression"},
+  {"VarDecl", "HasICEInitializer"},
+  {"UnresolvedMemberExpr", "Base"}, // asserts because of isImplicitAccess() is true
+  {"CXXDefaultArgExpr", "AdjustedRewrittenExpression"},
+  {"CXXNewExpr", "ShouldNullCheckAllocation"},
+  {"RequiresExpr", "IsSatisfied"},
+  {"ConceptSpecializationExpr", "IsSatisfied"},
+  {"Decl", "Access"},
+  {"Expr","IsKnownToHaveBooleanValue"},
+
+  {"NamespaceDecl","AlreadyLoadedDeclarations"},
+  {"LinkageSpecDecl","AlreadyLoadedDeclarations"},
+  {"ExternCContextDecl","AlreadyLoadedDeclarations"},
+
+  {"EnumDecl", "ODRHash"},
+  {"CXXRecordDecl", "ODRHash"},
+  {"FunctionDecl", "ODRHash"},
+  {"CXXRecordDecl", "VisibleConversionFunctions"},
+  {"FunctionDecl", "WillHaveBody"},
+
+  // These will apply to functions, enums, classes, etc.
+  {"Decl", "TypeAsWritten"},
+  {"Decl", "PointOfInstantiation"},
+  {"Decl", "TemplateSpecialization"},
+  {"Decl", "TemplateSpecializationKind"},
+  {"Decl", "TemplateSpecializationKindForInstantiation"},
+  {"Decl", "TemplateInstantiationPattern"},
+  {"Decl", "TemplateSpecializationKindForInstantiation"},
+  {"Decl", "TemplateInstantiationArguments"},
+  {"Decl", "InstantiatedFrom"},
+  {"Decl", "InstantiatedFromMember"},
+  {"Decl", "InstantiatedFromMemberTemplate"},
+  {"Decl", "PrimaryTemplate"},
+  {"EnumDecl", "InstantiatedFromMemberEnum"},
+  {"UsingPackDecl", "InstantiatedFromUsingDeclaration"},
+  {"FunctionDecl", "InstantiatedFromDeclaration"},
+  {"FunctionDecl", "InstantiatedFromMemberFunction"},
+  {"FunctionDecl", "IsThisDeclarationInstantiatedFromAFriendDefinition"},
+  {"VarDecl", "InstantiatedFromStaticDataMember"},
 
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
@@ -1253,7 +1300,7 @@ void CodeGenerator::RunOnOptional(
              (method_name == "FirstFullySubstitutedToken" ||
               method_name == "LastFullySubstitutedToken")) {
     serialize_cpp_os
-        << "  std::optional<pasta::Token> v" << i << ";\n"
+        << "  std::optional<pasta::MacroToken> v" << i << ";\n"
         << "  if (tt) {\n"
         << "    v" << i << " = tt->" << method_name << "();\n"
         << "  } else {\n"
@@ -2383,7 +2430,8 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  bool is_definition(void) const;\n"
           << "  Decl canonical_declaration(void) const;\n"
           << "  gap::generator<Decl> redeclarations(void) const &;\n"
-          << " public:\n";
+          << "  gap::generator<Decl> specializations(void) const &;\n"
+          << "\n";
 
       seen_methods->emplace("uses");  // Manual.
       seen_methods->emplace("definition");  // Manual.
@@ -2408,7 +2456,7 @@ MethodListPtr CodeGenerator::RunOnClass(
       class_os
           << "  std::optional<PackedDeclId> referenced_declaration_id(void) const;\n"
           << "  std::optional<Decl> referenced_declaration(void) const;\n"
-          << " public:\n";
+          << "\n";
 
       // `Stmt::referenced_declaration`.
       const auto ref = storage.AddMethod("UInt64");
@@ -2896,7 +2944,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     if (base_name == class_name) {
       lib_cpp_os
-          << "    index." << lower_name << "(eid.Pack());\n";
+          << "    return index." << lower_name << "(eid.Pack());\n";
     } else {
       lib_cpp_os
           << "    if (auto base = index." << lower_name << "(eid.Pack())) {\n"
@@ -3173,6 +3221,8 @@ MethodListPtr CodeGenerator::RunOnClass(
       if (class_name == "TagDecl") {
         snake_name = "tag_kind_name";
       }
+    } else if (snake_name == "calculate_inheritance_model") {
+      snake_name = "inheritance_model";
     }
 
     if (snake_name.ends_with("_type_info")) {
@@ -3291,15 +3341,9 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "}\n\n";
 
         serialize_cpp_os
-            << "  if (auto r" << i << " = e." << method_name << "(); auto rs"
-            << i << " = r" << i << ".Size()) {\n"
-            << "    b." << begin_setter_name << "(es.EntityId(r" << i << "[0]));\n"
-            << "    b." << end_setter_name << "(es.EntityId(r"
-            << i << "[rs" << i << " - 1u]));\n"
-            << "  } else {\n"
-            << "    b." << begin_setter_name << "(0);\n"
-            << "    b." << end_setter_name << "(0);\n"
-            << "  }\n";
+            << "  auto p" << i << " = es.EntityIds(e." << method_name << "());\n"
+            << "  b." << begin_setter_name << "(p" << i << ".first);\n"
+            << "  b." << end_setter_name << "(p" << i << ".second);\n";
 
       // Handle `pasta::MacroRange`.
       } else if (record_name == "MacroRange") {
@@ -3635,7 +3679,8 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   // If this is a `DeclContext`, then try to add the `DeclarationsInContext`
   // method.
-  if (kDeclContextTypes.count(class_name)) {
+  if (kDeclContextTypes.count(class_name) &&
+      !gSpecialDeclContexts.count(class_name)) {
     static const std::string method_name = "DeclarationsInContext";
     static const std::string snake_name = "declarations_in_context";
     static const std::string api_name = SnakeCaseToAPICase(snake_name);
@@ -3648,7 +3693,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       serialize_inc_os
           << "  MX_VISIT_DECL_CONTEXT(" << class_name << ", " << api_name
-          << ", " << i << ", MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, "
+          << ", " << i << ", MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, "
           << nth_entity_reader << ")\n";
 
       class_os
@@ -3669,7 +3714,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       serialize_cpp_os
           << "  pasta::DeclContext dc" << i << "(e);\n"
-          << "  auto v" << i << " = dc" << i << ".AlreadyLoadedDeclarations();\n"
+          << "  auto v" << i << " = DeclarationsInDeclContext(dc" << i << ");\n"
           << "  auto sv" << i << " = b." << init_name << "(static_cast<unsigned>(v"
           << i << ".size()));\n"
           << "  auto i" << i << " = 0u;\n"
@@ -3682,9 +3727,22 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   // Additional special methods for specific derived classes go here
 
+  if (class_name == "CXXRecordDecl") {
+    class_os
+        << "  // List of base and derived classes.\n"
+        << "  gap::generator<CXXRecordDecl> derived_classes(void) const &;\n"
+        << "  gap::generator<CXXRecordDecl> base_classes(void) const &;\n";
+  }
+
+  if (class_name == "CXXMethodDecl") {
+    class_os
+        << "  // List of methods that can override this method.\n"
+        << "  gap::generator<CXXMethodDecl> overridden_by_methods(void) const &;\n"
+        << "  gap::generator<CXXMethodDecl> transitive_overridden_by_methods(void) const &;\n";
+  }
+
   // `FunctionDecl::callers`.
   if (class_name == "FunctionDecl") {
-    forward_decls.insert("CallExpr");
     class_os
         << "  // Callers of a `FunctionDecl` can be `CallExpr`, `CxxNewExpr`,\n"
         << "  // `CxxConstructExpr`, etc. Even `CastExpr` can sometimes be a call\n"

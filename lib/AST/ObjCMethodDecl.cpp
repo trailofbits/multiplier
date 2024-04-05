@@ -226,132 +226,132 @@ std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const TokenContext &t) {
 }
 
 bool ObjCMethodDecl::defined_in_ns_object(void) const {
-  return impl->reader.getVal75();
+  return impl->reader.getVal74();
 }
 
 ObjCPropertyDecl ObjCMethodDecl::find_property_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal56();
+  RawEntityId eid = impl->reader.getVal55();
   return ObjCPropertyDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ObjCInterfaceDecl ObjCMethodDecl::class_interface(void) const {
-  RawEntityId eid = impl->reader.getVal57();
+  RawEntityId eid = impl->reader.getVal56();
   return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ImplicitParamDecl ObjCMethodDecl::command_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal58();
+  RawEntityId eid = impl->reader.getVal57();
   return ImplicitParamDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token ObjCMethodDecl::declarator_end_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal65());
 }
 
 ObjCMethodDeclImplementationControl ObjCMethodDecl::implementation_control(void) const {
-  return static_cast<ObjCMethodDeclImplementationControl>(impl->reader.getVal81());
+  return static_cast<ObjCMethodDeclImplementationControl>(impl->reader.getVal80());
 }
 
 ObjCMethodFamily ObjCMethodDecl::method_family(void) const {
-  return static_cast<ObjCMethodFamily>(impl->reader.getVal86());
+  return static_cast<ObjCMethodFamily>(impl->reader.getVal84());
 }
 
 DeclObjCDeclQualifier ObjCMethodDecl::obj_c_decl_qualifier(void) const {
-  return static_cast<DeclObjCDeclQualifier>(impl->reader.getVal88());
+  return static_cast<DeclObjCDeclQualifier>(impl->reader.getVal86());
 }
 
 Type ObjCMethodDecl::return_type(void) const {
-  RawEntityId eid = impl->reader.getVal67();
+  RawEntityId eid = impl->reader.getVal66();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TokenRange ObjCMethodDecl::return_type_tokens(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal68(), impl->reader.getVal79());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal67(), impl->reader.getVal78());
 }
 
 Token ObjCMethodDecl::selector_start_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal80());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal79());
 }
 
 ImplicitParamDecl ObjCMethodDecl::self_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal82();
+  RawEntityId eid = impl->reader.getVal81();
   return ImplicitParamDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool ObjCMethodDecl::has_parameter_destroyed_in_callee(void) const {
-  return impl->reader.getVal76();
+  return impl->reader.getVal75();
 }
 
 bool ObjCMethodDecl::has_redeclaration(void) const {
-  return impl->reader.getVal77();
+  return impl->reader.getVal76();
 }
 
 bool ObjCMethodDecl::has_related_result_type(void) const {
-  return impl->reader.getVal78();
+  return impl->reader.getVal77();
 }
 
 bool ObjCMethodDecl::has_skipped_body(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal93();
 }
 
 bool ObjCMethodDecl::is_class_method(void) const {
-  return impl->reader.getVal96();
+  return impl->reader.getVal94();
 }
 
 bool ObjCMethodDecl::is_defined(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal95();
 }
 
 bool ObjCMethodDecl::is_designated_initializer_for_the_interface(void) const {
-  return impl->reader.getVal98();
+  return impl->reader.getVal96();
 }
 
 bool ObjCMethodDecl::is_direct_method(void) const {
-  return impl->reader.getVal99();
+  return impl->reader.getVal97();
 }
 
 bool ObjCMethodDecl::is_instance_method(void) const {
-  return impl->reader.getVal100();
+  return impl->reader.getVal98();
 }
 
 bool ObjCMethodDecl::is_optional(void) const {
-  return impl->reader.getVal101();
+  return impl->reader.getVal99();
 }
 
 bool ObjCMethodDecl::is_overriding(void) const {
-  return impl->reader.getVal102();
+  return impl->reader.getVal100();
 }
 
 bool ObjCMethodDecl::is_property_accessor(void) const {
-  return impl->reader.getVal103();
+  return impl->reader.getVal101();
 }
 
 bool ObjCMethodDecl::is_redeclaration(void) const {
-  return impl->reader.getVal104();
+  return impl->reader.getVal102();
 }
 
 bool ObjCMethodDecl::is_synthesized_accessor_stub(void) const {
-  return impl->reader.getVal105();
+  return impl->reader.getVal103();
 }
 
 bool ObjCMethodDecl::is_this_declaration_a_definition(void) const {
-  return impl->reader.getVal106();
+  return impl->reader.getVal104();
 }
 
 bool ObjCMethodDecl::is_this_declaration_a_designated_initializer(void) const {
-  return impl->reader.getVal107();
+  return impl->reader.getVal105();
 }
 
 bool ObjCMethodDecl::is_variadic(void) const {
-  return impl->reader.getVal108();
+  return impl->reader.getVal106();
 }
 
 unsigned ObjCMethodDecl::num_parameters(void) const {
-  return impl->reader.getVal51().size();
+  return impl->reader.getVal50().size();
 }
 
 std::optional<ParmVarDecl> ObjCMethodDecl::nth_parameter(unsigned n) const {
-  auto list = impl->reader.getVal51();
+  auto list = impl->reader.getVal50();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -365,12 +365,12 @@ std::optional<ParmVarDecl> ObjCMethodDecl::nth_parameter(unsigned n) const {
 }
 
 gap::generator<ParmVarDecl> ObjCMethodDecl::parameters(void) const & {
-  auto list = impl->reader.getVal51();
+  auto list = impl->reader.getVal50();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d51 = ep->DeclFor(ep, v)) {
-      if (auto e = ParmVarDecl::from_base(std::move(d51))) {
+    if (auto d50 = ep->DeclFor(ep, v)) {
+      if (auto e = ParmVarDecl::from_base(std::move(d50))) {
         co_yield std::move(*e);
       }
     }
@@ -379,11 +379,11 @@ gap::generator<ParmVarDecl> ObjCMethodDecl::parameters(void) const & {
 }
 
 unsigned ObjCMethodDecl::num_selector_tokens(void) const {
-  return impl->reader.getVal52().size();
+  return impl->reader.getVal51().size();
 }
 
 std::optional<Token> ObjCMethodDecl::nth_selector_token(unsigned n) const {
-  auto list = impl->reader.getVal52();
+  auto list = impl->reader.getVal51();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -397,7 +397,7 @@ std::optional<Token> ObjCMethodDecl::nth_selector_token(unsigned n) const {
 }
 
 gap::generator<Token> ObjCMethodDecl::selector_tokens(void) const & {
-  auto list = impl->reader.getVal52();
+  auto list = impl->reader.getVal51();
   EntityProviderPtr ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
   if (!fragment) {
@@ -407,8 +407,8 @@ gap::generator<Token> ObjCMethodDecl::selector_tokens(void) const & {
   auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
-    if (auto t52 = ep->TokenFor(ep, tok_reader, v)) {
-      co_yield t52;
+    if (auto t51 = ep->TokenFor(ep, tok_reader, v)) {
+      co_yield t51;
     }
   }
   co_return;
@@ -416,7 +416,7 @@ gap::generator<Token> ObjCMethodDecl::selector_tokens(void) const & {
 
 gap::generator<Decl> ObjCMethodDecl::declarations_in_context(void) const & {
   EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal62();
+  auto list = impl->reader.getVal61();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

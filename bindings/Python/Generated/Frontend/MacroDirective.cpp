@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[816]) || tp >= &(gTypes[835])) {
+  if (tp < &(gTypes[817]) || tp >= &(gTypes[836])) {
     return std::nullopt;
   }
 
@@ -90,67 +90,67 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::DefineMacroDirective::static_kind():
-      tp = &(gTypes[817]);
-      break;
-
-    case mx::PragmaMacroDirective::static_kind():
       tp = &(gTypes[818]);
       break;
 
-    case mx::UndefineMacroDirective::static_kind():
+    case mx::PragmaMacroDirective::static_kind():
       tp = &(gTypes[819]);
       break;
 
-    case mx::OtherMacroDirective::static_kind():
+    case mx::UndefineMacroDirective::static_kind():
       tp = &(gTypes[820]);
       break;
 
-    case mx::EndIfMacroDirective::static_kind():
-      tp = &(gTypes[822]);
+    case mx::OtherMacroDirective::static_kind():
+      tp = &(gTypes[821]);
       break;
 
-    case mx::ElseMacroDirective::static_kind():
+    case mx::EndIfMacroDirective::static_kind():
       tp = &(gTypes[823]);
       break;
 
-    case mx::ElseIfNotDefinedMacroDirective::static_kind():
+    case mx::ElseMacroDirective::static_kind():
       tp = &(gTypes[824]);
       break;
 
-    case mx::ElseIfDefinedMacroDirective::static_kind():
+    case mx::ElseIfNotDefinedMacroDirective::static_kind():
       tp = &(gTypes[825]);
       break;
 
-    case mx::ElseIfMacroDirective::static_kind():
+    case mx::ElseIfDefinedMacroDirective::static_kind():
       tp = &(gTypes[826]);
       break;
 
-    case mx::IfNotDefinedMacroDirective::static_kind():
+    case mx::ElseIfMacroDirective::static_kind():
       tp = &(gTypes[827]);
       break;
 
-    case mx::IfDefinedMacroDirective::static_kind():
+    case mx::IfNotDefinedMacroDirective::static_kind():
       tp = &(gTypes[828]);
       break;
 
-    case mx::IfMacroDirective::static_kind():
+    case mx::IfDefinedMacroDirective::static_kind():
       tp = &(gTypes[829]);
       break;
 
-    case mx::ImportMacroDirective::static_kind():
-      tp = &(gTypes[831]);
+    case mx::IfMacroDirective::static_kind():
+      tp = &(gTypes[830]);
       break;
 
-    case mx::IncludeMacrosMacroDirective::static_kind():
+    case mx::ImportMacroDirective::static_kind():
       tp = &(gTypes[832]);
       break;
 
-    case mx::IncludeNextMacroDirective::static_kind():
+    case mx::IncludeMacrosMacroDirective::static_kind():
       tp = &(gTypes[833]);
       break;
 
-    case mx::IncludeMacroDirective::static_kind():
+    case mx::IncludeNextMacroDirective::static_kind():
       tp = &(gTypes[834]);
+      break;
+
+    case mx::IncludeMacroDirective::static_kind():
+      tp = &(gTypes[835]);
       break;
 
   }
@@ -352,7 +352,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation, mx::ir::Operation>>(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::ir::Operation>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -382,7 +382,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[816]);
+  PyTypeObject * const tp = &(gTypes[817]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -397,12 +397,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[806].tp_hash;
-  tp->tp_richcompare = gTypes[806].tp_richcompare;
+  tp->tp_hash = gTypes[807].tp_hash;
+  tp->tp_richcompare = gTypes[807].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[806]);
+  tp->tp_base = &(gTypes[807]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

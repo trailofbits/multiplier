@@ -52,7 +52,7 @@ bool Attr::contains(const Token &tok) const {
 std::optional<Attr> Attr::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<AttrId>(vid)) {
-    index.attribute(eid.Pack());
+    return index.attribute(eid.Pack());
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }

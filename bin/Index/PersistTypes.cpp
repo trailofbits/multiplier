@@ -39,7 +39,7 @@ extern void SerializeType(const pasta::Type &entity,
 
 // Find the entity ID of the declaration that is most related to a particular
 // token.
-extern mx::RawEntityId RelatedEntityIdToToken(
+extern mx::RawEntityId RelatedEntityIdToPrintedToken(
     const EntityMapper &em, const pasta::PrintedToken &printed_tok,
     const std::optional<pasta::Token> &parsed_tok);
 
@@ -79,7 +79,7 @@ static void PersistPrintedTokens(
 
     to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
     tk.set(i, static_cast<uint16_t>(token_id.kind));
-    re.set(i, RelatedEntityIdToToken(em, tok, tok.DerivedLocation()));
+    re.set(i, RelatedEntityIdToPrintedToken(em, tok, tok.DerivedLocation()));
 
     AccumulateTokenData<pasta::PrintedToken>(utf8_fragment_data, tok);
     ++i;

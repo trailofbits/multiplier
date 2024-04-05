@@ -58,7 +58,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
                         "-DLLVM_ENABLE_PROJECTS=clang;mlir"
                         "-DLLVM_TARGETS_TO_BUILD=AArch64;X86;ARM"
-                        "-DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=ARM"
+                        "-DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=ARM;WebAssembly"
                         "-DLLVM_ENABLE_RUNTIMES=libcxx;libcxxabi"
                         -DBUILD_SHARED_LIBS:BOOL=OFF
                         -DLLVM_APPEND_VC_REV:BOOL=OFF

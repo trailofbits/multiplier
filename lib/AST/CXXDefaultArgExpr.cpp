@@ -192,24 +192,19 @@ std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::from(const TokenContext &t) 
   return std::nullopt;
 }
 
-Expr CXXDefaultArgExpr::adjusted_rewritten_expression(void) const {
+Expr CXXDefaultArgExpr::expression(void) const {
   RawEntityId eid = impl->reader.getVal37();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-Expr CXXDefaultArgExpr::expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
-}
-
 ParmVarDecl CXXDefaultArgExpr::parameter(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return ParmVarDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 std::optional<Expr> CXXDefaultArgExpr::rewritten_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal40();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -221,11 +216,11 @@ std::optional<Expr> CXXDefaultArgExpr::rewritten_expression(void) const {
 }
 
 Token CXXDefaultArgExpr::used_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 bool CXXDefaultArgExpr::has_rewritten_initializer(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

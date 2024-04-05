@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LLVM_PASTA_VER: 4a2f2bf
+  LLVM_PASTA_VER: 145b6ff
   LLVM_VER: 17
   PYTHON_VER: 3.11
 
@@ -84,12 +84,10 @@ jobs:
             -DCMAKE_SHARED_LINKER_FLAGS="--ld-path=$(which ld.lld-${LLVM_VER})" \
             -DCMAKE_C_COMPILER="$(which clang-${LLVM_VER})" \
             -DCMAKE_CXX_COMPILER="$(which clang++-${LLVM_VER})" \
-            -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE \
             -DClang_DIR=${LLVM_PREFIX_DIR}/lib/cmake/clang \
             -DLLVM_DIR=${LLVM_PREFIX_DIR}/lib/cmake/llvm \
             -DMLIR_DIR=${LLVM_PREFIX_DIR}/lib/cmake/mlir \
             -DMX_USE_VENDORED_CLANG=OFF \
-            -DMX_USE_VENDORED_PASTA=OFF \
             -DLLVM_ENABLE_LLD:BOOL=TRUE \
             -GNinja \
             ./

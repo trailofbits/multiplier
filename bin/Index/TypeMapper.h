@@ -12,6 +12,7 @@
 #include <multiplier/Types.h>
 
 #include "Entity.h"
+#include "PendingFragment.h"
 #include "Util.h"
 
 namespace clang {
@@ -56,18 +57,20 @@ class TypeMapper final {
 
   // Hash a type, producing a string.
   std::string HashType(
-      const EntityMapper &em, const pasta::Type &type,
+      PendingFragment &pf, const pasta::Type &type,
       const pasta::PrintedTokenRange &range);
 
  public:
   TypeIdMap type_ids;
 
+  pasta::AST &ast;
+
   IdStore &id_store;
 
   bool read_only{false};
 
-  inline explicit TypeMapper(IdStore &id_store_)
-      : id_store(id_store_) {
+  inline explicit TypeMapper(pasta::AST &ast_, IdStore &id_store_)
+      : ast(ast_), id_store(id_store_) {
     decls.reserve(64);
   }
 
@@ -83,7 +86,7 @@ class TypeMapper final {
   mx::RawEntityId EntityId(const pasta::Type &entity) const;
 
   // NOTE(pag): `*entity` may be updated.
-  bool AddEntityId(const EntityMapper &em, pasta::Type *entity);
+  bool AddEntityId(PendingFragment &pf, pasta::Type *entity);
 
   mx::PackedTypeId TypeId(const pasta::Type &entity) const;
 

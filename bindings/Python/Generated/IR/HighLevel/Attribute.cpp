@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[903]) || tp >= &(gTypes[924])) {
+  if (tp < &(gTypes[904]) || tp >= &(gTypes[925])) {
     return std::nullopt;
   }
 
@@ -90,83 +90,83 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::hl::AllocAlignAttr::static_kind():
-      tp = &(gTypes[904]);
-      break;
-
-    case mx::ir::hl::AllocSizeAttr::static_kind():
       tp = &(gTypes[905]);
       break;
 
-    case mx::ir::hl::AnnotationAttr::static_kind():
+    case mx::ir::hl::AllocSizeAttr::static_kind():
       tp = &(gTypes[906]);
       break;
 
-    case mx::ir::hl::AsmLabelAttr::static_kind():
+    case mx::ir::hl::AnnotationAttr::static_kind():
       tp = &(gTypes[907]);
       break;
 
-    case mx::ir::hl::BuiltinAttr::static_kind():
+    case mx::ir::hl::AsmLabelAttr::static_kind():
       tp = &(gTypes[908]);
       break;
 
-    case mx::ir::hl::CVQualifiersAttr::static_kind():
+    case mx::ir::hl::BuiltinAttr::static_kind():
       tp = &(gTypes[909]);
       break;
 
-    case mx::ir::hl::CVRQualifiersAttr::static_kind():
+    case mx::ir::hl::CVQualifiersAttr::static_kind():
       tp = &(gTypes[910]);
       break;
 
-    case mx::ir::hl::ConstAttr::static_kind():
+    case mx::ir::hl::CVRQualifiersAttr::static_kind():
       tp = &(gTypes[911]);
       break;
 
-    case mx::ir::hl::FormatAttr::static_kind():
+    case mx::ir::hl::ConstAttr::static_kind():
       tp = &(gTypes[912]);
       break;
 
-    case mx::ir::hl::LoaderUninitializedAttr::static_kind():
+    case mx::ir::hl::FormatAttr::static_kind():
       tp = &(gTypes[913]);
       break;
 
-    case mx::ir::hl::ModeAttr::static_kind():
+    case mx::ir::hl::LoaderUninitializedAttr::static_kind():
       tp = &(gTypes[914]);
       break;
 
-    case mx::ir::hl::NoInstrumentFunctionAttr::static_kind():
+    case mx::ir::hl::ModeAttr::static_kind():
       tp = &(gTypes[915]);
       break;
 
-    case mx::ir::hl::NoThrowAttr::static_kind():
+    case mx::ir::hl::NoInstrumentFunctionAttr::static_kind():
       tp = &(gTypes[916]);
       break;
 
-    case mx::ir::hl::NonNullAttr::static_kind():
+    case mx::ir::hl::NoThrowAttr::static_kind():
       tp = &(gTypes[917]);
       break;
 
-    case mx::ir::hl::PackedAttr::static_kind():
+    case mx::ir::hl::NonNullAttr::static_kind():
       tp = &(gTypes[918]);
       break;
 
-    case mx::ir::hl::PureAttr::static_kind():
+    case mx::ir::hl::PackedAttr::static_kind():
       tp = &(gTypes[919]);
       break;
 
-    case mx::ir::hl::RestrictAttr::static_kind():
+    case mx::ir::hl::PureAttr::static_kind():
       tp = &(gTypes[920]);
       break;
 
-    case mx::ir::hl::SectionAttr::static_kind():
+    case mx::ir::hl::RestrictAttr::static_kind():
       tp = &(gTypes[921]);
       break;
 
-    case mx::ir::hl::UCVQualifiersAttr::static_kind():
+    case mx::ir::hl::SectionAttr::static_kind():
       tp = &(gTypes[922]);
       break;
 
-    case mx::ir::hl::WarnUnusedResultAttr::static_kind():
+    case mx::ir::hl::UCVQualifiersAttr::static_kind():
       tp = &(gTypes[923]);
+      break;
+
+    case mx::ir::hl::WarnUnusedResultAttr::static_kind():
+      tp = &(gTypes[924]);
       break;
 
   }
@@ -234,7 +234,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[903]);
+  PyTypeObject * const tp = &(gTypes[904]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -249,12 +249,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[842].tp_hash;
-  tp->tp_richcompare = gTypes[842].tp_richcompare;
+  tp->tp_hash = gTypes[843].tp_hash;
+  tp->tp_richcompare = gTypes[843].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[842]);
+  tp->tp_base = &(gTypes[843]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

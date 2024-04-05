@@ -7,7 +7,6 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/MemberPointerType.h>
-#include <multiplier/AST/CXXRecordDecl.h>
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/Type.h>
 
@@ -108,13 +107,8 @@ Type MemberPointerType::class_(void) const {
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
-CXXRecordDecl MemberPointerType::most_recent_cxx_record_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal26();
-  return CXXRecordDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
-}
-
 Type MemberPointerType::pointee_type(void) const {
-  RawEntityId eid = impl->reader.getVal27();
+  RawEntityId eid = impl->reader.getVal26();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

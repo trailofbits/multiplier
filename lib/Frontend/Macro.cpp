@@ -68,7 +68,7 @@ gap::generator<Macro> Macro::containing(const Token &token) {
 std::optional<Macro> Macro::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<MacroId>(vid)) {
-    index.macro(eid.Pack());
+    return index.macro(eid.Pack());
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }

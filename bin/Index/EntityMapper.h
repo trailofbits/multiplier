@@ -6,8 +6,9 @@
 
 #pragma once
 
-#include "PendingFragment.h"
 #include "Entity.h"
+#include "PendingFragment.h"
+#include "Util.h"
 
 namespace pasta {
 class File;
@@ -21,6 +22,9 @@ class TypeMapper;
 // Provides entity IDs and offsets to the serialization code.
 class EntityMapper final {
  public:
+  // Set of all top-level declarations (from the perspective of fragments).
+  std::unordered_set<const void *> top_level_decls;
+
   // Globally (within a translation unit) entity ids. Generally, these are
   // things that can be referenced across fragments.
   EntityIdMap entity_ids;
@@ -29,6 +33,13 @@ class EntityMapper final {
   // they are actually copied/cloned from place-to-place. Ideally, we want to
   // only keep around the "original" or first version of an attribute.
   EntityIdMap attr_ids;
+  EntityIdMap attr_token_ids;
+
+  // Attributes location that we have seen in fragment. The Attributes in
+  // template specialization can be used in different context and don't
+  // want to de-duplicate them. The attribute location tells us if we are
+  // referring to the original attribute or inherited one.
+  EntityLocationMap attr_token_locs;
 
   // An instance of TypeMapper that will hold type_ids of the
   // new types encountered in a translation unit. It will be used
@@ -74,12 +85,17 @@ class EntityMapper final {
   mx::RawEntityId ParentStmtId(const pasta::Designator &entity) const;
   mx::RawEntityId ParentStmtId(const pasta::TemplateArgument &entity) const;
 
+  inline mx::RawEntityId EntityId(std::nullptr_t entity) const noexcept {
+    return mx::kInvalidEntityId;
+  }
+
   mx::RawEntityId EntityId(const void *entity) const;
   mx::RawEntityId PerFragmentEntityId(const void *entity) const;
   mx::RawEntityId EntityId(const pasta::File &file) const;
   mx::RawEntityId EntityId(const pasta::Decl &entity) const;
   mx::RawEntityId EntityId(const pasta::Stmt &entity) const;
   mx::RawEntityId EntityId(const pasta::Token &entity) const;
+  mx::RawEntityId EntityId(const pasta::DerivedToken &entity) const;
   mx::RawEntityId EntityId(const pasta::PrintedToken &entity) const;
   mx::RawEntityId EntityId(const pasta::FileToken &entity) const;
   mx::RawEntityId EntityId(const pasta::MacroToken &entity);
@@ -92,6 +108,19 @@ class EntityMapper final {
   mx::RawEntityId EntityId(const pasta::TemplateParameterList &pseudo) const;
   mx::RawEntityId EntityId(const pasta::CXXBaseSpecifier &pseudo) const;
   mx::RawEntityId EntityId(const pasta::Designator &pseudo) const;
+  mx::RawEntityId EntityId(const pasta::CXXCtorInitializer &pseudo) const;
+
+  std::pair<mx::RawEntityId, mx::RawEntityId> EntityIds(
+      const pasta::TokenRange &range) const;
+
+  template <typename T>
+  inline mx::RawEntityId EntityId(const std::optional<T> &val) const {
+    if (val) {
+      return EntityId(val.value());
+    }
+    return mx::kInvalidEntityId;
+  }
+
 
   inline mx::RawEntityId SelectiveEntityId(const void *entity) const {
     if (generate_source_ir) {
@@ -102,7 +131,6 @@ class EntityMapper final {
   }
 
   mx::RawEntityId EntityIdOfType(const void *type, uint32_t quals=0u) const;
-
 
   template <typename IdType>
   inline std::optional<IdType> SpecificEntityId(const void *raw_entity) const {
@@ -124,6 +152,14 @@ class EntityMapper final {
       const pasta::AST &ast, const pasta::Stmt &entity) const;
 
   void ResetForFragment(void);
+
+  inline void MarkAsTopLevel(const pasta::Decl &decl) {
+    top_level_decls.insert(RawEntity(decl));
+  }
+
+  inline bool IsTopLevel(const pasta::Decl &decl) {
+    return top_level_decls.count(RawEntity(decl)) != 0u;
+  }
 };
 
 }  // namespace indexer

@@ -395,9 +395,9 @@ class AlignOfTypeOp(multiplier.ir.highlevel.Operation):
     ...
 
 class AsmOp(multiplier.ir.highlevel.Operation):
-  asm_outputs: Generator[multiplier.ir.Operand]
-  asm_inputs: Generator[multiplier.ir.Operand]
-  labels: Generator[multiplier.ir.Operand]
+  asm_outputs: Iterable[multiplier.ir.Operand]
+  asm_inputs: Iterable[multiplier.ir.Operand]
+  labels: Iterable[multiplier.ir.Operand]
   is_volatile: bool
   has_goto: bool
 
@@ -718,8 +718,8 @@ class CStyleCastOp(multiplier.ir.highlevel.Operation):
     ...
 
 class CallOp(multiplier.ir.highlevel.Operation):
-  arg_operands: Generator[multiplier.ir.Operand]
-  results: Generator[multiplier.ir.Result]
+  arg_operands: Iterable[multiplier.ir.Operand]
+  results: Iterable[multiplier.ir.Result]
   callee: str
 
   @staticmethod
@@ -1434,8 +1434,8 @@ class ImplicitCastOp(multiplier.ir.highlevel.Operation):
 
 class IndirectCallOp(multiplier.ir.highlevel.Operation):
   callee: multiplier.ir.Value
-  arg_operands: Generator[multiplier.ir.Operand]
-  results: Generator[multiplier.ir.Result]
+  arg_operands: Iterable[multiplier.ir.Operand]
+  results: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1450,7 +1450,7 @@ class IndirectCallOp(multiplier.ir.highlevel.Operation):
     ...
 
 class InitListExprOp(multiplier.ir.highlevel.Operation):
-  elements: Generator[multiplier.ir.Operand]
+  elements: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1796,7 +1796,7 @@ class RemUOp(multiplier.ir.highlevel.Operation):
     ...
 
 class ReturnOp(multiplier.ir.highlevel.Operation):
-  result: Generator[multiplier.ir.Operand]
+  result: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

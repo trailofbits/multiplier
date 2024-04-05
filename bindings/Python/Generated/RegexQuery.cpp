@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1444]) || tp >= &(gTypes[1445])) {
+  if (tp < &(gTypes[1445]) || tp >= &(gTypes[1446])) {
     return std::nullopt;
   }
 
@@ -196,7 +196,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1444]);
+  PyTypeObject * const tp = &(gTypes[1445]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -239,13 +239,12 @@ PyTypeObject *InitType(void) noexcept {
     }
 
     while (num_args == 1) {
-      auto obj_0 = PySequence_GetItem(args, 0);
+      SharedPyPtr obj_0(PySequence_GetItem(args, 0));
       PyErr_Clear();
       if (!obj_0) {
         break;
       }
-      auto arg_0 = ::mx::from_python<std::string>(obj_0);
-      Py_DECREF(obj_0);
+      auto arg_0 = ::mx::from_python<std::string>(obj_0.Get());
       if (!arg_0.has_value()) {
         break;
       }

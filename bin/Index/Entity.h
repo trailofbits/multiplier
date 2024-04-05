@@ -15,13 +15,15 @@
     m(TemplateArgument, template_argument) \
     m(TemplateParameterList, template_parameter_list)\
     m(CXXBaseSpecifier, cxx_base_specifier) \
-    m(Designator, designator)
+    m(Designator, designator) \
+    m(CXXCtorInitializer, cxx_ctor_initializer)
 
 #define FOR_EACH_PSEUDO_ENTITY_TYPE(p) \
     p(TemplateArgument) \
     p(TemplateParameterList) \
     p(CXXBaseSpecifier) \
-    p(Designator)
+    p(Designator) \
+    p(CXXCtorInitializer)
 
 #define PSEUDO_ENTITY_TYPE_ENUMERATOR(n) k ## n ,
 

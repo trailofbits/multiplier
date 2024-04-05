@@ -130,6 +130,7 @@ MAKE_DISPATCHER(TemplateArgument)
 MAKE_DISPATCHER(TemplateParameterList)
 MAKE_DISPATCHER(CXXBaseSpecifier)
 MAKE_DISPATCHER(Designator)
+MAKE_DISPATCHER(CXXCtorInitializer)
 
 #undef MAKE_DISPATCHER
 
@@ -270,6 +271,8 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
       pf.attrs_to_serialize,
       CheckFragOffsetKind<mx::AttrId, mx::AttrKind>);
 
+  // NOTE(pag): Keep these up-to-date with `PendingFragment`.
+
   serialize_list(
       fb.initDesignators(NumEntities(pf.designators_to_serialize)),
       pf.designators_to_serialize,
@@ -277,7 +280,8 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
       0u);
 
   serialize_list(
-      fb.initCXXBaseSpecifiers(NumEntities(pf.cxx_base_specifiers_to_serialize)),
+      fb.initCXXBaseSpecifiers(
+          NumEntities(pf.cxx_base_specifiers_to_serialize)),
       pf.cxx_base_specifiers_to_serialize,
       CheckFragOffset<mx::CXXBaseSpecifierId>,
       0u);
@@ -293,7 +297,14 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
       fb.initTemplateParameterLists(
           NumEntities(pf.template_parameter_lists_to_serialize)),
       pf.template_parameter_lists_to_serialize,
-      CheckFragOffset<mx::TemplateArgumentId>,
+      CheckFragOffset<mx::TemplateParameterListId>,
+      0u);
+
+  serialize_list(
+      fb.initCXXCtorInitializers(
+          NumEntities(pf.cxx_ctor_initializers_to_serialize)),
+      pf.cxx_ctor_initializers_to_serialize,
+      CheckFragOffset<mx::CXXCtorInitializerId>,
       0u);
 
   // Issue #480: Index macros. Persist.cpp manages the serialization of the

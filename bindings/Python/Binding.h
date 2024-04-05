@@ -318,7 +318,7 @@ struct PythonBinding<std::vector<T>> {
       if (!elem_obj) {
         goto unwind;
       }
-      
+
       new_elements.emplace_back(elem_obj);
     }
 
@@ -388,14 +388,14 @@ struct MapPythonBinding {
         Py_DECREF(map);
         return nullptr;
       }
-      
+
       auto val = ::mx::to_python<V>(std::move(entry.second));
       if (!val) {
         Py_DECREF(key);
         Py_DECREF(map);
         return nullptr;
       }
-      
+
       auto ret = PyDict_SetItem(map, key, val);
       Py_DECREF(val);
       if (-1 == ret) {

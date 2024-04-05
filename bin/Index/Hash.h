@@ -42,7 +42,8 @@ std::string HashFragment(
     const std::vector<pasta::Decl> &decls,
     const std::vector<pasta::Macro> &macros,
     const pasta::TokenRange *frag_tok_range,
-    const pasta::PrintedTokenRange &decl_tok_range);
+    const pasta::PrintedTokenRange &decl_tok_range,
+    const pasta::PrintedTokenRange *printed_tok_range);
 
 // Hash the entire compilation.
 std::string HashCompilation(const pasta::AST &ast, const EntityMapper &em);

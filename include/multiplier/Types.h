@@ -47,8 +47,9 @@ enum class TypeKind : unsigned char;
     pseudo_(::mx::, TemplateParameterList, template_parameter_list, TEMPLATE_PARAMETER_LIST, 10) \
     pseudo_(::mx::, CXXBaseSpecifier, cxx_base_specifier, CXX_BASE_SPECIFIER, 11) \
     pseudo_(::mx::, Designator, designator, DESIGNATOR, 12) \
-    tu_(::mx::, Compilation, compilation, COMPILATION, 13) \
-    ir_(::mx::ir::, Operation, operation, OPERATION, 14)
+    pseudo_(::mx::, CXXCtorInitializer, cxx_ctor_initializer, CXX_CTOR_INITIALIZER, 13) \
+    tu_(::mx::, Compilation, compilation, COMPILATION, 14) \
+    ir_(::mx::ir::, Operation, operation, OPERATION, 15)
 
 #define MX_DECLARE_ENTITY_CLASS(ns_path, type, lower, enum_, val) \
     class type;\
@@ -100,6 +101,7 @@ struct TemplateArgumentId;
 struct TemplateParameterListId;
 struct CXXBaseSpecifierId;
 struct DesignatorId;
+struct CXXCtorInitializerId;
 struct CompilationId;
 
 using EntityOffset = uint32_t;
@@ -331,6 +333,19 @@ struct MX_EXPORT DesignatorId final {
   auto operator<=>(const DesignatorId &) const noexcept = default;
 };
 
+// A CXXCtorInitializer is used by a CXXConstructorDecl as initialization expr.
+struct MX_EXPORT CXXCtorInitializerId final {
+ public:
+  RawEntityId fragment_id;
+
+  EntityOffset offset;
+
+  static constexpr PseudoKind kind = PseudoKind::DESIGNATOR;
+
+  bool operator==(const CXXCtorInitializerId &) const noexcept = default;
+  auto operator<=>(const CXXCtorInitializerId &) const noexcept = default;
+};
+
 // Translation units represent a compilation. From a translation unit we can
 // get the compile command, the MLIR, etc.
 struct MX_EXPORT CompilationId {
@@ -396,6 +411,8 @@ struct MX_EXPORT FragmentId final {
       : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const DesignatorId &id_)
       : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const CXXCtorInitializerId &id_)
+      : fragment_id(id_.fragment_id) {}
 
   static std::optional<FragmentId> from(const EntityId &);
 };
@@ -460,6 +477,7 @@ class MX_EXPORT EntityId final {
   /* implicit */ EntityId(TemplateParameterListId id);
   /* implicit */ EntityId(CXXBaseSpecifierId id);
   /* implicit */ EntityId(DesignatorId id);
+  /* implicit */ EntityId(CXXCtorInitializerId id);
   /* implicit */ EntityId(CompilationId id);
   /* implicit */ EntityId(OperationId id);
 

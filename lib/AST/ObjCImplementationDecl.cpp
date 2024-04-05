@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/ObjCImplementationDecl.h>
+#include <multiplier/AST/CXXCtorInitializer.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/ObjCContainerDecl.h>
@@ -224,41 +225,71 @@ std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const TokenCo
 }
 
 Token ObjCImplementationDecl::instance_variable_l_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal67());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 Token ObjCImplementationDecl::instance_variable_r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal68());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal67());
 }
 
 std::string_view ObjCImplementationDecl::obj_c_runtime_name_as_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal74();
+  capnp::Text::Reader data = impl->reader.getVal73();
   return std::string_view(data.cStr(), data.size());
 }
 
 ObjCInterfaceDecl ObjCImplementationDecl::super_class(void) const {
-  RawEntityId eid = impl->reader.getVal79();
+  RawEntityId eid = impl->reader.getVal78();
   return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token ObjCImplementationDecl::super_class_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal80());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal79());
 }
 
 bool ObjCImplementationDecl::has_destructors(void) const {
-  return impl->reader.getVal75();
+  return impl->reader.getVal74();
 }
 
 bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
-  return impl->reader.getVal76();
+  return impl->reader.getVal75();
+}
+
+unsigned ObjCImplementationDecl::num_initializers(void) const {
+  return impl->reader.getVal337().size();
+}
+
+std::optional<CXXCtorInitializer> ObjCImplementationDecl::nth_initializer(unsigned n) const {
+  auto list = impl->reader.getVal337();
+  if (n >= list.size()) {
+    return std::nullopt;
+  }
+  const EntityProviderPtr &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->CXXCtorInitializerFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return CXXCtorInitializer(std::move(e));
+}
+
+gap::generator<CXXCtorInitializer> ObjCImplementationDecl::initializers(void) const & {
+  auto list = impl->reader.getVal337();
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d337 = ep->CXXCtorInitializerFor(ep, v)) {
+      co_yield CXXCtorInitializer(std::move(d337));
+    }
+  }
+  co_return;
 }
 
 unsigned ObjCImplementationDecl::num_instance_variables(void) const {
-  return impl->reader.getVal342().size();
+  return impl->reader.getVal348().size();
 }
 
 std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsigned n) const {
-  auto list = impl->reader.getVal342();
+  auto list = impl->reader.getVal348();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -272,12 +303,12 @@ std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsign
 }
 
 gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const & {
-  auto list = impl->reader.getVal342();
+  auto list = impl->reader.getVal348();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d342 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCIvarDecl::from_base(std::move(d342))) {
+    if (auto d348 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCIvarDecl::from_base(std::move(d348))) {
         co_yield std::move(*e);
       }
     }

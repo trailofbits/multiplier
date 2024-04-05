@@ -63,7 +63,6 @@ class MX_EXPORT ExternCContextDecl : public Decl {
   static std::optional<ExternCContextDecl> from(const VariantEntity &e);
   static std::optional<ExternCContextDecl> from(const TokenContext &t);
 
-  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(ExternCContextDecl) == sizeof(Decl));

@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[758]) || tp >= &(gTypes[761])) {
+  if (tp < &(gTypes[759]) || tp >= &(gTypes[762])) {
     return std::nullopt;
   }
 
@@ -90,15 +90,15 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::CXXRecordDecl::static_kind():
-      tp = &(gTypes[758]);
-      break;
-
-    case mx::ClassTemplateSpecializationDecl::static_kind():
       tp = &(gTypes[759]);
       break;
 
-    case mx::ClassTemplatePartialSpecializationDecl::static_kind():
+    case mx::ClassTemplateSpecializationDecl::static_kind():
       tp = &(gTypes[760]);
+      break;
+
+    case mx::ClassTemplatePartialSpecializationDecl::static_kind():
+      tp = &(gTypes[761]);
       break;
 
   }
@@ -183,13 +183,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "calculate_inheritance_model",
+    "inheritance_model",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->calculate_inheritance_model());
+          return ::mx::to_python(T_cast(self)->inheritance_model());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRecordDecl::calculate_inheritance_model"),
+    PyDoc_STR("Wrapper for mx::CXXRecordDecl::inheritance_model"),
     nullptr,
   },
   {
@@ -323,6 +323,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "lambda_static_invoker",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->lambda_static_invoker());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRecordDecl::lambda_static_invoker"),
+    nullptr,
+  },
+  {
     "ms_inheritance_model",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -340,16 +350,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::ms_vtor_disp_mode"),
-    nullptr,
-  },
-  {
-    "odr_hash",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->odr_hash());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRecordDecl::odr_hash"),
     nullptr,
   },
   {
@@ -1382,6 +1382,26 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::has_own_virtual_base_table_pointer"),
     nullptr,
   },
+  {
+    "derived_classes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->derived_classes());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRecordDecl::derived_classes"),
+    nullptr,
+  },
+  {
+    "base_classes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base_classes());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRecordDecl::base_classes"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace
@@ -1549,7 +1569,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation, mx::ir::Operation>>(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::ir::Operation>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -1639,7 +1659,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[758]);
+  PyTypeObject * const tp = &(gTypes[759]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -1654,12 +1674,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[757].tp_hash;
-  tp->tp_richcompare = gTypes[757].tp_richcompare;
+  tp->tp_hash = gTypes[758].tp_hash;
+  tp->tp_richcompare = gTypes[758].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[757]);
+  tp->tp_base = &(gTypes[758]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

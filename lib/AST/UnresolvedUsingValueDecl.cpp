@@ -221,19 +221,19 @@ std::optional<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::from(const Tok
 }
 
 Token UnresolvedUsingValueDecl::ellipsis_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
 }
 
 Token UnresolvedUsingValueDecl::using_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal65());
 }
 
 bool UnresolvedUsingValueDecl::is_access_declaration(void) const {
-  return impl->reader.getVal77();
+  return impl->reader.getVal76();
 }
 
 bool UnresolvedUsingValueDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal78();
+  return impl->reader.getVal77();
 }
 
 #pragma GCC diagnostic pop

@@ -622,7 +622,7 @@ class Attribute(object):
 class Value(object):
   kind: multiplier.ir.ValueKind
   type: multiplier.ir.Type
-  uses: Generator[multiplier.ir.Operand]
+  uses: Iterable[multiplier.ir.Operand]
 
 class Argument(multiplier.ir.Value):
   index: int
@@ -653,10 +653,10 @@ class Result(multiplier.ir.Value):
 
 class Block(object):
   num_arguments: int
-  arguments: Generator[multiplier.ir.Argument]
-  operations: Generator[multiplier.ir.Operation]
-  reverse_operations: Generator[multiplier.ir.Operation]
-  uses: Generator[multiplier.ir.Label]
+  arguments: Iterable[multiplier.ir.Argument]
+  operations: Iterable[multiplier.ir.Operation]
+  reverse_operations: Iterable[multiplier.ir.Operation]
+  uses: Iterable[multiplier.ir.Label]
   terminator: multiplier.ir.Operation
 
   @overload
@@ -681,14 +681,14 @@ class Operation(multiplier.Entity):
   kind_name: str
   kind: multiplier.ir.OperationKind
   num_operands: int
-  operands: Generator[multiplier.ir.Operand]
+  operands: Iterable[multiplier.ir.Operand]
   num_results: int
-  results: Generator[multiplier.ir.Result]
+  results: Iterable[multiplier.ir.Result]
   num_regions: int
-  regions: Generator[multiplier.ir.Region]
+  regions: Iterable[multiplier.ir.Region]
   only_region: Optional[multiplier.ir.Region]
-  only_region_blocks: Generator[multiplier.ir.Block]
-  uses: Generator[multiplier.ir.Operand]
+  only_region_blocks: Iterable[multiplier.ir.Block]
+  uses: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def classify(arg_0: str) -> multiplier.ir.OperationKind:
@@ -736,12 +736,12 @@ class Operation(multiplier.Entity):
 
   @overload
   @staticmethod
-  def all_from(that: multiplier.ast.Decl) -> Generator[multiplier.ir.Operation]:
+  def all_from(that: multiplier.ast.Decl) -> Iterable[multiplier.ir.Operation]:
     ...
 
   @overload
   @staticmethod
-  def all_from(that: multiplier.ast.Stmt) -> Generator[multiplier.ir.Operation]:
+  def all_from(that: multiplier.ast.Stmt) -> Iterable[multiplier.ir.Operation]:
     ...
 
   def nth_operand(self, arg_0: int) -> Optional[multiplier.ir.Operand]:
@@ -760,11 +760,11 @@ class Operand(object):
 
 class Region(object):
   num_blocks: int
-  blocks: Generator[multiplier.ir.Block]
-  reverse_blocks: Generator[multiplier.ir.Block]
+  blocks: Iterable[multiplier.ir.Block]
+  reverse_blocks: Iterable[multiplier.ir.Block]
   entry_block: multiplier.ir.Block
   num_entry_block_arguments: int
-  entry_block_arguments: Generator[multiplier.ir.Argument]
+  entry_block_arguments: Iterable[multiplier.ir.Argument]
 
   @overload
   @staticmethod

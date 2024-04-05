@@ -86,7 +86,7 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
 
   std::optional<bool> allow_const_default_initializer(void) const;
   std::optional<std::vector<CXXBaseSpecifier>> bases(void) const;
-  std::optional<MSInheritanceModel> calculate_inheritance_model(void) const;
+  std::optional<MSInheritanceModel> inheritance_model(void) const;
   std::optional<CXXConstructorDecl> nth_constructor(unsigned n) const;
   unsigned num_constructors(void) const;
   gap::generator<CXXConstructorDecl> constructors(void) const &;
@@ -101,9 +101,9 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   std::optional<Decl> lambda_context_declaration(void) const;
   std::optional<std::vector<NamedDecl>> lambda_explicit_template_parameters(void) const;
   std::optional<uint32_t> lambda_mangling_number(void) const;
+  std::optional<CXXMethodDecl> lambda_static_invoker(void) const;
   std::optional<MSInheritanceModel> ms_inheritance_model(void) const;
   MSVtorDispMode ms_vtor_disp_mode(void) const;
-  std::optional<uint32_t> odr_hash(void) const;
   std::optional<CXXRecordDecl> template_instantiation_pattern(void) const;
   TemplateSpecializationKind template_specialization_kind(void) const;
   std::optional<bool> has_any_dependent_bases(void) const;
@@ -207,6 +207,9 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   std::optional<bool> has_extendable_virtual_function_table_pointer(void) const;
   std::optional<bool> has_virtual_base_table_pointer(void) const;
   std::optional<bool> has_own_virtual_base_table_pointer(void) const;
+  // List of base and derived classes.
+  gap::generator<CXXRecordDecl> derived_classes(void) const &;
+  gap::generator<CXXRecordDecl> base_classes(void) const &;
 };
 
 static_assert(sizeof(CXXRecordDecl) == sizeof(RecordDecl));

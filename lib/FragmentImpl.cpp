@@ -19,6 +19,16 @@ namespace {
 // A zero-sized string view that nontheless has a valid `.data()` pointer.
 static const std::string_view kEmptyStringView("");
 
+// Return the immediate parent ID of this fragment. 
+static RawEntityId ParentFragmentId(auto id_list) {
+  if (!id_list.size()) {
+    return kInvalidEntityId;
+  }
+  auto frag_id = id_list[0];
+  assert(EntityId(frag_id).Extract<FragmentId>().has_value());
+  return frag_id;
+}
+
 }  // namespace
 
 FragmentImpl::FragmentImpl(EntityProviderPtr ep_,
@@ -26,6 +36,7 @@ FragmentImpl::FragmentImpl(EntityProviderPtr ep_,
                            RawEntityId id_)
     : EntityImpl<rpc::Fragment>(std::move(ep_), kj::mv(data_)),
       fragment_id(EntityId(id_).Extract<FragmentId>()->fragment_id),
+      parent_fragment_id(ParentFragmentId(reader.getParentIds())),
       parsed_token_reader(this),
       macro_token_reader(this),
       token_context_reader(this),
@@ -237,12 +248,12 @@ EntityId ReadMacroTokensFromFragment::NthFileTokenId(EntityOffset ti) const {
           return kInvalidEntityId;
         }
 
-      // NOTE(pag): We shouldn't actually find ourselves going into another
-      //            fragment.
+      // NOTE(pag): We might find ourselves crossing into a different fragment's
+      //            tokens when a directive is embedded some larger fragment.
       } else if (FragmentImplPtr frag =
           fragment->ep->FragmentFor(fragment->ep, fid)) {
-        assert(false);
         return frag->MacroTokenReader(frag)->NthFileTokenId(tid.offset);
+
       } else {
         assert(false);
         return kInvalidEntityId;

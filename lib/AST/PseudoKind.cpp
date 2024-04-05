@@ -18,6 +18,7 @@ const char *EnumeratorName(PseudoKind e) {
     case PseudoKind::TEMPLATE_PARAMETER_LIST: return "TEMPLATE_PARAMETER_LIST";
     case PseudoKind::CXX_BASE_SPECIFIER: return "CXX_BASE_SPECIFIER";
     case PseudoKind::DESIGNATOR: return "DESIGNATOR";
+    case PseudoKind::CXX_CTOR_INITIALIZER: return "CXX_CTOR_INITIALIZER";
     default: return "<invalid>";
   }
 }

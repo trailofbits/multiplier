@@ -227,16 +227,16 @@ std::optional<ObjCImplDecl> ObjCImplDecl::from(const TokenContext &t) {
 }
 
 ObjCInterfaceDecl ObjCImplDecl::class_interface(void) const {
-  RawEntityId eid = impl->reader.getVal66();
+  RawEntityId eid = impl->reader.getVal65();
   return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 unsigned ObjCImplDecl::num_property_implementations(void) const {
-  return impl->reader.getVal316().size();
+  return impl->reader.getVal311().size();
 }
 
 std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(unsigned n) const {
-  auto list = impl->reader.getVal316();
+  auto list = impl->reader.getVal311();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -250,12 +250,12 @@ std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(un
 }
 
 gap::generator<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void) const & {
-  auto list = impl->reader.getVal316();
+  auto list = impl->reader.getVal311();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d316 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCPropertyImplDecl::from_base(std::move(d316))) {
+    if (auto d311 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCPropertyImplDecl::from_base(std::move(d311))) {
         co_yield std::move(*e);
       }
     }

@@ -5,6 +5,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "TypeMapper.h"
+#include "PendingFragment.h"
 
 #include <sstream>
 
@@ -50,35 +51,46 @@ static bool IsSizedBuiltinType(const pasta::Type &type) {
 // `auto` or `decltype(...)` types to the true underlying type, or selecting
 // the adjusted version of an adjusted type. This also helps us persist fewer
 // overall types.
-static clang::Type *BasicTypeDeduplication(clang::Type *type,
-                                           uint32_t &up_quals);
+static clang::Type *BasicTypeDeduplication(
+    clang::ASTContext &ctx, clang::Type *type, uint32_t &up_quals,
+    EntityList<const clang::Stmt *> *list = nullptr);
 
-static clang::Type *BasicTypeDeduplication(clang::QualType type,
-                                           uint32_t &up_quals) {
+static clang::Type *BasicTypeDeduplication(
+    clang::ASTContext &ctx,clang::QualType type, uint32_t &up_quals,
+    EntityList<const clang::Stmt *> *list = nullptr) {
+
   clang::Type *tp = const_cast<clang::Type *>(type.getTypePtrOrNull());
   if (!tp) {
     return tp;
   }
 
   up_quals |= type.getQualifiers().getAsOpaqueValue();
-  return BasicTypeDeduplication(tp, up_quals);
+  return BasicTypeDeduplication(ctx, tp, up_quals, list);
 }
 
-clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals) {
+
+clang::Type *BasicTypeDeduplication(
+    clang::ASTContext &ctx, clang::Type *type, uint32_t &up_quals,
+    EntityList<const clang::Stmt *> *list) {
+
   if (!type) {
     return nullptr;
   }
 
-  if (type->isDependentType()) {
-    return type;
+  // Early exit: we're not interested in finding nested statements, so replace
+  // all dependent types with the 
+  auto is_dependent = type->isDependentType();
+  if (!list && is_dependent) {
+    return const_cast<clang::Type *>(ctx.UnresolvedTy.getTypePtr());
   }
 
+  uint32_t orig_qualifier = up_quals;
   clang::Type *new_type = type;
   switch (type->getTypeClass()) {
     case clang::Type::Auto: {
       clang::AutoType *at = clang::dyn_cast<clang::AutoType>(type);
-      if (at->isSugared()) {
-        new_type = BasicTypeDeduplication(at->desugar(), up_quals);
+      if (!is_dependent && at->isSugared()) {
+        new_type = BasicTypeDeduplication(ctx, at->desugar(), up_quals, list);
       }
       break;
     }
@@ -86,38 +98,53 @@ clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals) {
     case clang::Type::TypeOfExpr: {
       clang::TypeOfExprType *et = clang::dyn_cast<clang::TypeOfExprType>(type);
       if (et->isSugared()) {
-        new_type = BasicTypeDeduplication(et->desugar(), up_quals);
+        new_type = BasicTypeDeduplication(ctx, et->desugar(), up_quals, list);
+      }
+      if (auto underlying_expr = et->getUnderlyingExpr()) {
+        if (list) {
+          list->emplace_back(
+              reinterpret_cast<const clang::Stmt *>(underlying_expr));
+        }
       }
       break;
     }
 
     case clang::Type::TypeOf:
       new_type = BasicTypeDeduplication(
-          clang::dyn_cast<clang::TypeOfType>(type)->desugar(), up_quals);
+          ctx, clang::dyn_cast<clang::TypeOfType>(type)->desugar(),
+          up_quals, list);
       break;
 
     case clang::Type::Decltype: {
       clang::DecltypeType *dt = clang::dyn_cast<clang::DecltypeType>(type);
-      if (dt->getUnderlyingExpr()) {
+      if (auto underlying_expr = dt->getUnderlyingExpr()) {
         if (dt->isSugared()) {
-          new_type = BasicTypeDeduplication(dt->desugar(), up_quals);
+          new_type = BasicTypeDeduplication(ctx, dt->desugar(), up_quals, list);
+        }
+        if (list) {
+          list->emplace_back(
+              reinterpret_cast<const clang::Stmt *>(underlying_expr));
         }
       } else {
-        new_type = BasicTypeDeduplication(dt->getUnderlyingType(), up_quals);
+        new_type = BasicTypeDeduplication(
+            ctx, dt->getUnderlyingType(), up_quals, list);
       }
       break;
     }
 
+    // TODO(pag): If `list` is non-`nullptr`, should be visit the adjusted
+    //            version, but ignore the return type, so that we can see any
+    //            nested statements through there?
     case clang::Type::Adjusted:
-      new_type = BasicTypeDeduplication(
+      new_type = BasicTypeDeduplication(ctx,
           clang::dyn_cast<clang::AdjustedType>(type)->desugar(),
-          up_quals);
+          up_quals, list);
       break;
 
     case clang::Type::UnaryTransform: {
       auto ut = clang::dyn_cast<clang::UnaryTransformType>(type);
       if (ut->isSugared()) {
-        new_type = BasicTypeDeduplication(ut->desugar(), up_quals);
+        new_type = BasicTypeDeduplication(ctx, ut->desugar(), up_quals, list);
       }
       break;
     }
@@ -134,27 +161,51 @@ clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals) {
           break;
         }
       }
-      new_type = BasicTypeDeduplication(et->desugar(), up_quals);
+      new_type = BasicTypeDeduplication(ctx, et->desugar(), up_quals, list);
       break;
     }
+
     case clang::Type::DeducedTemplateSpecialization: {
       auto dt = clang::dyn_cast<clang::DeducedTemplateSpecializationType>(type);
       if (dt->isSugared()) {
-        new_type = BasicTypeDeduplication(dt->desugar(), up_quals);
+        new_type = BasicTypeDeduplication(ctx, dt->desugar(), up_quals, list);
       }
       break;
     }
 
     case clang::Type::Decayed:
       new_type = BasicTypeDeduplication(
-          clang::dyn_cast<clang::DecayedType>(type)->desugar(),
-          up_quals);
+          ctx, clang::dyn_cast<clang::DecayedType>(type)->desugar(),
+          up_quals, list);
       break;
+
+    case clang::Type::SubstTemplateTypeParm:
+      new_type = BasicTypeDeduplication(
+          ctx,
+          clang::dyn_cast<clang::SubstTemplateTypeParmType>(type)->desugar(),
+          up_quals, list);
+      break;
+
+    case clang::Type::TemplateSpecialization: {
+      auto tst = clang::dyn_cast<clang::TemplateSpecializationType>(type);
+      if (tst->isSugared()) {
+        new_type = BasicTypeDeduplication(ctx, tst->desugar(), up_quals, list);
+      }
+      break;
+    }
+
+    // TODO(pag): ObjCTypeParamType
 
     default:
       break;
   }
 
+  if (is_dependent) {
+    up_quals = orig_qualifier;
+    return const_cast<clang::Type *>(ctx.UnresolvedTy.getTypePtr());
+  }
+
+  // if new_type is nullptr use type as new_type
   if (!new_type) {
     new_type = type;
   }
@@ -185,7 +236,7 @@ bool TypePrintingPolicy::ShouldPrintOriginalTypeOfDecayedType(void) const {
 clang::QualType TypeMapper::Compress(clang::ASTContext &context,
                                      const clang::QualType &type) {
   uint32_t qualifiers = 0u;
-  clang::Type *type_ptr = BasicTypeDeduplication(type, qualifiers);
+  clang::Type *type_ptr = BasicTypeDeduplication(context, type, qualifiers);
   clang::QualType fast_qtype(type_ptr, qualifiers & clang::Qualifiers::FastMask);
   return context.getQualifiedType(
       fast_qtype, clang::Qualifiers::fromOpaqueValue(qualifiers));
@@ -198,7 +249,7 @@ clang::QualType TypeMapper::Compress(clang::ASTContext &context,
 
 // Hash a type.
 std::string TypeMapper::HashType(
-    const EntityMapper &em, const pasta::Type &type,
+    PendingFragment &pf, const pasta::Type &type,
     const pasta::PrintedTokenRange &range) {
 
   decls.clear();
@@ -226,21 +277,28 @@ std::string TypeMapper::HashType(
   for (pasta::PrintedToken tok : range) {
     ss << ' ' << tok.Data();
 
-    for (std::optional<pasta::TokenContext> c = tok.Context();
-         c; c = c->Parent()) {
-      if (c->Kind() == pasta::TokenContextKind::kDecl) {
-        if (const void *decl = c->Data(); decl != last_decl) {
-          last_decl = decl;
-          if (!ShouldHideFromIndexer(pasta::Decl::From(c.value()).value())) {            
-            decls.emplace_back(decl, i++);
-          }
-        }
-
-        // We only care about the shallowest decl in the context chain; anything
-        // deeper (i.e. closer to the root of the AST) will end up being present
-        // somewhere in `decls`.
-        break;
+    for (const pasta::TokenContext &c : TokenContexts(tok)) {
+      if (c.Kind() != pasta::TokenContextKind::kDecl) {
+        continue;
       }
+
+      const void *raw_decl = c.Data();
+      if (raw_decl == last_decl) {
+        continue;
+      }
+
+      last_decl = raw_decl;
+
+      auto decl = pasta::Decl::From(c).value();
+      if (!ShouldHideFromIndexer(decl) &&
+          !ShouldInternalizeDeclContextIntoFragment(decl)) {
+        decls.emplace_back(raw_decl, i++);
+      }
+
+      // We only care about the shallowest decl in the context chain; anything
+      // deeper (i.e. closer to the root of the AST) will end up being present
+      // somewhere in `decls`.
+      break;
     }
   }
 
@@ -266,11 +324,28 @@ std::string TypeMapper::HashType(
 
     ss << " d";
     for (OpaqueOrderedDecl od : decls) {
-      auto eid = em.EntityId(od.first);
+      auto eid = pf.em.EntityId(od.first);
 
       // NOTE(pag): Eventually this may trigger as a result of top-level
       //            decls that are ignored due to `ShouldHideFromIndexer`.
-      assert(eid != mx::kInvalidEntityId);
+
+      // NOTE(kumarak): The assert will eventually trigger if there are underlying
+      //                or replacable decls beneith types. These decls may not be
+      //                visited because we stop visiting after seeing types while
+      //                building fragments.
+      // e.g:
+      //  SubstTemplateTypeParmType 0x7ffc4ae9c470 'class mx::AcquiredAfterAttr' typename depth 0 index 0 _Up
+      //  |-ClassTemplateSpecialization 0x7ffc4ae9ad90 '_Storage'
+      //  `-RecordType 0x7ffc4ae69270 'class mx::AcquiredAfterAttr'
+      //  `-CXXRecord 0x7ffc4ae69708 'AcquiredAfterAttr'
+      //
+      //assert(eid != mx::kInvalidEntityId || ((clang::Decl*)od.first)->isImplicit());
+      if ((eid == mx::kInvalidEntityId) && ((clang::Decl*)od.first)->isImplicit()) {
+        pf.TryAdd(ast.Adopt(reinterpret_cast<const clang::Decl*>(od.first)));
+      } else if (eid == mx::kInvalidEntityId) {
+        pf.TryAdd(ast.Adopt(reinterpret_cast<const clang::Decl*>(od.first)));
+      }
+
       ss << ' ' << eid;
     }
   }
@@ -282,6 +357,7 @@ mx::RawEntityId TypeMapper::EntityId(const void *raw_type_,
                                      uint32_t raw_qualifiers) const {
 
   clang::Type *raw_type = BasicTypeDeduplication(
+      ast.UnderlyingAST(),
       reinterpret_cast<clang::Type *>(const_cast<void *>(raw_type_)),
       raw_qualifiers);
 
@@ -296,7 +372,8 @@ mx::RawEntityId TypeMapper::EntityId(const void *raw_type_,
 mx::RawEntityId TypeMapper::EntityId(const pasta::Type &entity) const {
   uint32_t raw_qualifiers = entity.RawQualifiers();
   clang::Type *raw_type = BasicTypeDeduplication(
-      const_cast<clang::Type *>(entity.RawType()), raw_qualifiers);
+      ast.UnderlyingAST(), const_cast<clang::Type *>(entity.RawType()),
+      raw_qualifiers);
 
   TypeKey type_key(raw_type, raw_qualifiers);
   if (auto it = type_ids.find(type_key); it != type_ids.end()) {
@@ -307,7 +384,7 @@ mx::RawEntityId TypeMapper::EntityId(const pasta::Type &entity) const {
 }
 
 // NOTE(pag): `entity` may be updated.
-bool TypeMapper::AddEntityId(const EntityMapper &em, pasta::Type *entity_) {
+bool TypeMapper::AddEntityId(PendingFragment &pf, pasta::Type *entity_) {
   assert(!read_only);
 
   pasta::Type &entity = *entity_;
@@ -320,8 +397,17 @@ bool TypeMapper::AddEntityId(const EntityMapper &em, pasta::Type *entity_) {
     return false;
   }
 
-  clang::Type *raw_type = BasicTypeDeduplication(
-      const_cast<clang::Type *>(entity.RawType()), raw_qualifiers);
+  EntityList<const clang::Stmt*> underlying_stmts;
+  clang::Type *raw_type = BasicTypeDeduplication(ast.UnderlyingAST(),
+      const_cast<clang::Type *>(entity.RawType()), raw_qualifiers,
+      &underlying_stmts);
+
+  // If there are underlying stmts in type, add them to pending fragment
+  // to serialize.
+  for (auto stmt : underlying_stmts) {
+    pf.TryAdd(ast.Adopt(stmt));
+  }
+
 
   TypeKey dedup_type_key(raw_type, raw_qualifiers);
   assert(dedup_type_key.first != nullptr);
@@ -340,13 +426,13 @@ bool TypeMapper::AddEntityId(const EntityMapper &em, pasta::Type *entity_) {
 
   TypePrintingPolicy pp;
 
-  entity = pasta::AST::From(entity).Adopt(raw_type, raw_qualifiers);
+  entity = ast.Adopt(raw_type, raw_qualifiers);
 
   auto token_range = pasta::PrintedTokenRange::Create(entity, pp);
   auto [type_id, is_new_type_id] = id_store.GetOrCreateTypeIdForHash(
       mx::FromPasta(entity.Kind()),
       raw_qualifiers,
-      HashType(em, entity, token_range),
+      HashType(pf, entity, token_range),
       token_range.size());
 
   auto tid = type_id.Unpack();

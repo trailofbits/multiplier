@@ -219,14 +219,42 @@ std::optional<NamespaceDecl> NamespaceDecl::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-gap::generator<Decl> NamespaceDecl::declarations_in_context(void) const & {
-  EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal51();
-  for (auto v : list) {
-    if (auto eptr = ep->DeclFor(ep, v)) {
-      co_yield std::move(eptr);
+std::optional<NamespaceDecl> NamespaceDecl::anonymous_namespace(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal55();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return NamespaceDecl::from_base(std::move(eptr));
     }
   }
+  return std::nullopt;
+}
+
+NamespaceDecl NamespaceDecl::original_namespace(void) const {
+  RawEntityId eid = impl->reader.getVal56();
+  return NamespaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
+}
+
+Token NamespaceDecl::r_brace_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
+}
+
+bool NamespaceDecl::is_anonymous_namespace(void) const {
+  return impl->reader.getVal74();
+}
+
+bool NamespaceDecl::is_inline(void) const {
+  return impl->reader.getVal75();
+}
+
+bool NamespaceDecl::is_nested(void) const {
+  return impl->reader.getVal76();
+}
+
+bool NamespaceDecl::is_original_namespace(void) const {
+  return impl->reader.getVal77();
 }
 
 #pragma GCC diagnostic pop

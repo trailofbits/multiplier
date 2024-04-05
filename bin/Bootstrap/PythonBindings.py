@@ -88,6 +88,7 @@ StmtId = int
 TypeId = int
 MacroId = int
 DesignatorId = int
+CXXCtorInitializer = int
 CXXBaseSpecifierId = int
 TemplateArgumentId = int
 TemplateParameterListId = int
@@ -732,13 +733,12 @@ INIT_SPEC_CHECK_ARGCOUNT_END = """    }
 
 
 INIT_SPEC_GET_ARG = """
-      auto obj_{arg_num} = PySequence_GetItem(args, {arg_num});
+      SharedPyPtr obj_{arg_num}(PySequence_GetItem(args, {arg_num}));
       PyErr_Clear();
       if (!obj_{arg_num}) {{
         break;
       }}
-      auto arg_{arg_num} = ::mx::from_python<{arg_type}>(obj_{arg_num});
-      Py_DECREF(obj_{arg_num});
+      auto arg_{arg_num} = ::mx::from_python<{arg_type}>(obj_{arg_num}.Get());
       if (!arg_{arg_num}.has_value()) {{
         break;
       }}
@@ -785,22 +785,20 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
     return std::nullopt;
   }
 
-  auto long_val = PyObject_GetAttrString(obj, "value");
+  SharedPyPtr long_val(PyObject_GetAttrString(obj, "value"));
   if (!long_val) {
     PyErr_Clear();
     return std::nullopt;
   }
 
-  if (!PyLong_Check(long_val)) {
-    Py_DECREF(long_val);
+  if (!PyLong_Check(long_val.Get())) {
     return std::nullopt;
   }
 
   int did_overflow = 0;
   const auto ret = static_cast<T>(
-      PyLong_AsLongLongAndOverflow(obj, &did_overflow));
+      PyLong_AsLongLongAndOverflow(long_val.Get(), &did_overflow));
   if (did_overflow) {
-    Py_DECREF(long_val);
     return std::nullopt;
   }
 
@@ -813,58 +811,46 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
   bool created = false;
 
   if (!gType) {
-    auto enum_module = PyImport_ImportModule("enum");
+    SharedPyPtr enum_module(PyImport_ImportModule("enum"));
     if (!enum_module) {
       return false;
     }
 
-    auto int_enum = PyObject_GetAttrString(enum_module, "IntEnum");
-    Py_DECREF(enum_module);
+    SharedPyPtr int_enum(PyObject_GetAttrString(enum_module.Get(), "IntEnum"));
     if (!int_enum) {
       return false;
     }
 
-    auto enum_meta = PyObject_Type(int_enum);
-    auto prepare = PyObject_GetAttrString(enum_meta, "__prepare__");
+    SharedPyPtr enum_meta(PyObject_Type(int_enum.Get()));
+    SharedPyPtr prepare(PyObject_GetAttrString(enum_meta.Get(), "__prepare__"));
     if (!prepare) {
-      Py_DECREF(enum_meta);
-      Py_DECREF(int_enum);
       return false;
     }
 
     // Get the `enum._EnumDict` for what we're making.
-    auto ns_dict = PyObject_CallFunction(prepare, "s(N)", enum_name, int_enum);
-    Py_DECREF(prepare);
+    SharedPyPtr ns_dict(PyObject_CallFunction(prepare.Get(), "s(O)", enum_name, int_enum.Get()));
     if (!ns_dict) {
-      Py_DECREF(enum_meta);
-      Py_DECREF(int_enum);
       return false;
     }
 
     // Assign each enumerator.
     for (T val : EnumerationRange<T>()) {
-      auto iname = PyUnicode_FromString(EnumeratorName(val));
       auto ival = PyLong_FromUnsignedLongLong(static_cast<uint64_t>(val));
       if (ival) {
+        auto iname = PyUnicode_FromString(EnumeratorName(val));
         if (!PyObject_SetItem(ns_dict, iname, ival)) {
           continue;
         }
+
+        Py_DECREF(iname);
         Py_DECREF(ival);
       }
-
-      Py_DECREF(ns_dict);
-      Py_DECREF(enum_meta);
-      Py_DECREF(int_enum);
       return false;
     }
 
     // Create the type.
     auto enum_class = PyObject_CallFunction(
-        enum_meta, "s(N)N", enum_name, int_enum, ns_dict);
-    Py_DECREF(ns_dict);
-    Py_DECREF(enum_meta);
-    Py_DECREF(int_enum);
-
+        enum_meta.Get(), "s(O)O", enum_name, int_enum.Get(), ns_dict.Get());
     if (!enum_class) {
       return false;
     }
@@ -1322,7 +1308,7 @@ def wrap_class(schema: ClassSchema,
   py_base_class = "object"
 
   is_entity_type = _has_id_method(schema)
-  
+
   if schema.bases:
     assert len(schema.bases) == 1
     base_schema = schema.bases[0]
@@ -1378,7 +1364,7 @@ def wrap_class(schema: ClassSchema,
   out.append(PYTHON_BINDING_FROM_PYTHON.format(
       type_offset=type_offsets[0],
       type_offset_upper_bound=type_offsets[1]))
-  
+
   # Figure out if this class can use kind-based dispatch.
   kind_method = _get_method(schema, "kind")
   if isinstance(kind_method, MethodSchema) and \
@@ -1404,7 +1390,7 @@ def wrap_class(schema: ClassSchema,
        not method.is_const or \
        0 < method.max_num_parameters:
        continue
-    
+
     # Output the properties. Skip `id` if this is an entity.    
     if not is_entity_type or method.name != "id":
       stubs_out.append(CLASS_PROPERTY_STUB.format(
@@ -1412,7 +1398,7 @@ def wrap_class(schema: ClassSchema,
           method.return_type.python_value_name))
 
     _wrap_property(schema, method, renamer, out)
-  
+
   out.append(PROPERTY_LIST_SUFFIX)
 
   # Add in the methods.
@@ -1740,13 +1726,13 @@ def wrap(schemas: Iterable[Schema], renamer: Renamer):
     if line not in seen_bindings:
       bindings_out.append(line)
       seen_bindings.add(line)
-  
+
   for schema in TO_EXPORTS:
     line = TEMPLATE_SPEC_TO_PYTHON.format(schema.cxx_value_name)
     if line not in seen_bindings:
       bindings_out.append(line)
       seen_bindings.add(line)
-  
+
   bindings_out.append(BINDING_CPP_FOOTER)
   _save_output_file(os.path.join(MX_BINDINGS_PYTHON_DIR, "Generated", "Bindings.cpp"), bindings_out)
 
@@ -1761,6 +1747,7 @@ ENTITY_KINDS: Tuple[str] = (
   "Attr",
   "Type",
   "Designator",
+  "CXXCtorInitializer",
   "CXXBaseSpecifier",
   "TemplateArgument",
   "TemplateParameterList",
@@ -1835,7 +1822,7 @@ if __name__ == "__main__":
   renamer = BasicRenamer()
   cmd = CompileCommand.create_from_arguments(argv, args.working_dir)
   maybe_jobs = cxx.create_jobs_for_command(cmd)
-  
+
   if isinstance(maybe_jobs, str):
     print(maybe_jobs)
     sys.exit(1)

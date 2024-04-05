@@ -219,20 +219,20 @@ std::optional<ExportDecl> ExportDecl::from(const TokenContext &t) {
 }
 
 Token ExportDecl::export_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
 }
 
 Token ExportDecl::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
 }
 
 bool ExportDecl::has_braces(void) const {
-  return impl->reader.getVal50();
+  return impl->reader.getVal49();
 }
 
 gap::generator<Decl> ExportDecl::declarations_in_context(void) const & {
   EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal51();
+  auto list = impl->reader.getVal50();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

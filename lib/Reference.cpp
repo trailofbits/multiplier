@@ -121,6 +121,9 @@ const char *EnumeratorName(BuiltinReferenceKind kind) {
     case BuiltinReferenceKind::TAKES_ADDRESS: return "TAKES_ADDRESS";
     case BuiltinReferenceKind::INCLUDES_FILE: return "INCLUDES_FILE";
     case BuiltinReferenceKind::EXPANSION_OF: return "EXPANSION_OF";
+    case BuiltinReferenceKind::EXTENDS: return "EXTENDS";
+    case BuiltinReferenceKind::OVERRIDES: return "OVERRIDES";
+    case BuiltinReferenceKind::SPECIALIZES: return "SPECIALIZES";
   }
 }
 

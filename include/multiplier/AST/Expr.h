@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <multiplier/AST/ExprDependence.h>
 #include <multiplier/AST/ExprObjectKind.h>
 #include <multiplier/AST/ExprValueKind.h>
 #include <multiplier/AST/ValueStmt.h>
@@ -79,7 +78,6 @@ class MX_EXPORT Expr : public ValueStmt {
   Expr ignore_unless_spelled_in_source(void) const;
   bool contains_errors(void) const;
   bool contains_unexpanded_parameter_pack(void) const;
-  ExprDependence dependence(void) const;
   Token expression_token(void) const;
   std::optional<ObjCPropertyRefExpr> obj_c_property(void) const;
   ExprObjectKind object_kind(void) const;
@@ -92,8 +90,6 @@ class MX_EXPORT Expr : public ValueStmt {
   bool is_gl_value(void) const;
   bool is_implicit_cxx_this(void) const;
   bool is_instantiation_dependent(void) const;
-  std::optional<bool> is_integer_constant_expression(void) const;
-  std::optional<bool> is_known_to_have_boolean_value(void) const;
   bool is_l_value(void) const;
   bool is_objcgc_candidate(void) const;
   bool is_obj_c_self_expression(void) const;

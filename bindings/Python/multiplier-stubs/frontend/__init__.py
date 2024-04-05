@@ -129,7 +129,7 @@ class TokenKind(IntEnum):
   COMMA = 65
   HASH = 66
   HASH_HASH = 67
-  HASHAT = 68
+  HASH_AT = 68
   PERIOD_STAR = 69
   ARROW_STAR = 70
   COLON_COLON = 71
@@ -493,57 +493,59 @@ class TokenKind(IntEnum):
   ANNOT_MODULE_END = 429
   ANNOT_HEADER_UNIT = 430
   ANNOT_REPL_INPUT_END = 431
-  PP_IF = 432
-  PP_IFDEF = 433
-  PP_IFNDEF = 434
-  PP_ELIF = 435
-  PP_ELIFDEF = 436
-  PP_ELIFNDEF = 437
-  PP_ELSE = 438
-  PP_ENDIF = 439
-  PP_DEFINED = 440
-  PP_INCLUDE = 441
-  PP___INCLUDE_MACROS = 442
-  PP_DEFINE = 443
-  PP_UNDEF = 444
-  PP_LINE = 445
-  PP_ERROR = 446
-  PP_PRAGMA = 447
-  PP_IMPORT = 448
-  PP_INCLUDE_NEXT = 449
-  PP_WARNING = 450
-  PP_IDENTIFIER = 451
-  PP_SCCS = 452
-  PP_ASSERT = 453
-  PP_UNASSERT = 454
-  PP___PUBLIC_MACRO = 455
-  PP___PRIVATE_MACRO = 456
-  OBJC_AT_CLASS = 457
-  OBJC_AT_COMPATIBILITY_ALIAS = 458
-  OBJC_AT_DEFINITIONS = 459
-  OBJC_AT_ENCODE = 460
-  OBJC_AT_OBJC_END = 461
-  OBJC_AT_IMPLEMENTATION = 462
-  OBJC_AT_INTERFACE = 463
-  OBJC_AT_PRIVATE = 464
-  OBJC_AT_PROTECTED = 465
-  OBJC_AT_PROTOCOL = 466
-  OBJC_AT_PUBLIC = 467
-  OBJC_AT_SELECTOR = 468
-  OBJC_AT_THROW = 469
-  OBJC_AT_TRY = 470
-  OBJC_AT_CATCH = 471
-  OBJC_AT_FINALLY = 472
-  OBJC_AT_SYNCHRONIZED = 473
-  OBJC_AT_AUTORELEASEPOOL = 474
-  OBJC_AT_PROPERTY = 475
-  OBJC_AT_PACKAGE = 476
-  OBJC_AT_REQUIRED = 477
-  OBJC_AT_OPTIONAL = 478
-  OBJC_AT_SYNTHESIZE = 479
-  OBJC_AT_DYNAMIC = 480
-  OBJC_AT_IMPORT = 481
-  OBJC_AT_AVAILABLE = 482
+  L_ANGLE = 432
+  R_ANGLE = 433
+  PP_IF = 434
+  PP_IFDEF = 435
+  PP_IFNDEF = 436
+  PP_ELIF = 437
+  PP_ELIFDEF = 438
+  PP_ELIFNDEF = 439
+  PP_ELSE = 440
+  PP_ENDIF = 441
+  PP_DEFINED = 442
+  PP_INCLUDE = 443
+  PP___INCLUDE_MACROS = 444
+  PP_DEFINE = 445
+  PP_UNDEF = 446
+  PP_LINE = 447
+  PP_ERROR = 448
+  PP_PRAGMA = 449
+  PP_IMPORT = 450
+  PP_INCLUDE_NEXT = 451
+  PP_WARNING = 452
+  PP_IDENTIFIER = 453
+  PP_SCCS = 454
+  PP_ASSERT = 455
+  PP_UNASSERT = 456
+  PP___PUBLIC_MACRO = 457
+  PP___PRIVATE_MACRO = 458
+  OBJC_AT_CLASS = 459
+  OBJC_AT_COMPATIBILITY_ALIAS = 460
+  OBJC_AT_DEFINITIONS = 461
+  OBJC_AT_ENCODE = 462
+  OBJC_AT_OBJC_END = 463
+  OBJC_AT_IMPLEMENTATION = 464
+  OBJC_AT_INTERFACE = 465
+  OBJC_AT_PRIVATE = 466
+  OBJC_AT_PROTECTED = 467
+  OBJC_AT_PROTOCOL = 468
+  OBJC_AT_PUBLIC = 469
+  OBJC_AT_SELECTOR = 470
+  OBJC_AT_THROW = 471
+  OBJC_AT_TRY = 472
+  OBJC_AT_CATCH = 473
+  OBJC_AT_FINALLY = 474
+  OBJC_AT_SYNCHRONIZED = 475
+  OBJC_AT_AUTORELEASEPOOL = 476
+  OBJC_AT_PROPERTY = 477
+  OBJC_AT_PACKAGE = 478
+  OBJC_AT_REQUIRED = 479
+  OBJC_AT_OPTIONAL = 480
+  OBJC_AT_SYNTHESIZE = 481
+  OBJC_AT_DYNAMIC = 482
+  OBJC_AT_IMPORT = 483
+  OBJC_AT_AVAILABLE = 484
 
 class PathKind(IntEnum):
   UNIX = 0
@@ -632,13 +634,14 @@ class TokenContext(object):
   as_template_parameter_list: Optional[multiplier.ast.TemplateParameterList]
   as_cxx_base_specifier: Optional[multiplier.ast.CXXBaseSpecifier]
   as_designator: Optional[multiplier.ast.Designator]
+  as_cxx_ctor_initializer: Optional[multiplier.ast.CXXCtorInitializer]
   aliasee: Optional[multiplier.frontend.TokenContext]
   parent: Optional[multiplier.frontend.TokenContext]
 
 class Compilation(multiplier.Entity):
   ir: Optional[multiplier.ir.builtin.ModuleOp]
-  fragments: Generator[multiplier.Fragment]
-  files: Generator[multiplier.frontend.File]
+  fragments: Iterable[multiplier.Fragment]
+  files: Iterable[multiplier.frontend.File]
   main_source_file: multiplier.frontend.File
   main_source_file_path: pathlib.PurePath
   compiler_executable_path: pathlib.PurePath
@@ -649,10 +652,10 @@ class Compilation(multiplier.Entity):
   resource_directory: pathlib.PurePath
   target_triple: str
   auxiliary_target_triple: Optional[str]
-  arguments: Generator[str]
-  system_include_directories: Generator[Tuple[multiplier.frontend.IncludePathLocation, pathlib.PurePath]]
-  user_include_directories: Generator[Tuple[multiplier.frontend.IncludePathLocation, pathlib.PurePath]]
-  framework_directories: Generator[Tuple[multiplier.frontend.IncludePathLocation, pathlib.PurePath]]
+  arguments: Iterable[str]
+  system_include_directories: Iterable[Tuple[multiplier.frontend.IncludePathLocation, pathlib.PurePath]]
+  user_include_directories: Iterable[Tuple[multiplier.frontend.IncludePathLocation, pathlib.PurePath]]
+  framework_directories: Iterable[Tuple[multiplier.frontend.IncludePathLocation, pathlib.PurePath]]
 
   @overload
   @staticmethod
@@ -696,6 +699,11 @@ class Compilation(multiplier.Entity):
 
   @overload
   @staticmethod
+  def containing(arg_0: multiplier.ast.CXXCtorInitializer) -> multiplier.frontend.Compilation:
+    ...
+
+  @overload
+  @staticmethod
   def containing(arg_0: multiplier.ast.Designator) -> multiplier.frontend.Compilation:
     ...
 
@@ -711,7 +719,11 @@ class Compilation(multiplier.Entity):
 
   @overload
   @staticmethod
-  def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.Compilation]:
+  def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.Compilation]:
+    ...
+
+  @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.Compilation]:
     ...
 
 class Token(multiplier.Entity):
@@ -728,7 +740,7 @@ class Token(multiplier.Entity):
   containing_macro: Optional[multiplier.frontend.Macro]
 
   @staticmethod
-  def FROM(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.Token]:
+  def FROM(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.Token]:
     ...
 
   @staticmethod
@@ -736,7 +748,7 @@ class Token(multiplier.Entity):
     ...
 
   @staticmethod
-  def categorize(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> multiplier.frontend.TokenCategory:
+  def categorize(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> multiplier.frontend.TokenCategory:
     ...
 
   def location(self, arg_0: multiplier.frontend.FileLocationCache) -> Optional[Tuple[int, int]]:
@@ -804,8 +816,8 @@ class RegexQueryMatch(multiplier.frontend.TokenRange):
     ...
 
 class File(multiplier.Entity):
-  fragments: Generator[multiplier.Fragment]
-  paths: Generator[pathlib.PurePath]
+  fragments: Iterable[multiplier.Fragment]
+  paths: Iterable[pathlib.PurePath]
   fragment_ids: FragmentIdList
   tokens: multiplier.frontend.TokenRange
   data: str
@@ -867,6 +879,11 @@ class File(multiplier.Entity):
 
   @overload
   @staticmethod
+  def containing(entity: multiplier.ast.CXXCtorInitializer) -> Optional[multiplier.frontend.File]:
+    ...
+
+  @overload
+  @staticmethod
   def containing(entity: multiplier.ir.Operation) -> Optional[multiplier.frontend.File]:
     ...
 
@@ -887,26 +904,30 @@ class File(multiplier.Entity):
 
   @overload
   @staticmethod
-  def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.File]:
+  def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.File]:
     ...
 
   @staticmethod
-  def FROM(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.File]:
+  def FROM(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.File]:
     ...
 
   @staticmethod
   def entity_category() -> multiplier.EntityCategory:
     ...
 
+  @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.File]:
+    ...
+
 class Macro(multiplier.Entity):
   root: multiplier.frontend.Macro
   use_tokens: multiplier.frontend.TokenRange
-  generate_use_tokens: Generator[multiplier.frontend.Token]
+  generate_use_tokens: Iterable[multiplier.frontend.Token]
   expansion_tokens: multiplier.frontend.TokenRange
-  generate_expansion_tokens: Generator[multiplier.frontend.Token]
+  generate_expansion_tokens: Iterable[multiplier.frontend.Token]
   kind: multiplier.frontend.MacroKind
   parent: Optional[multiplier.frontend.Macro]
-  children: Generator[multiplier.frontend.Macro | multiplier.frontend.Token]
+  children: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token]
 
   @staticmethod
   def static_category() -> multiplier.EntityCategory:
@@ -914,32 +935,32 @@ class Macro(multiplier.Entity):
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index, kinds: Sequence[multiplier.frontend.MacroKind]) -> Generator[multiplier.frontend.Macro]:
+  def IN(index: multiplier.Index, kinds: Sequence[multiplier.frontend.MacroKind]) -> Iterable[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment, kinds: Sequence[multiplier.frontend.MacroKind]) -> Generator[multiplier.frontend.Macro]:
+  def IN(frag: multiplier.Fragment, kinds: Sequence[multiplier.frontend.MacroKind]) -> Iterable[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File, kinds: Sequence[multiplier.frontend.MacroKind]) -> Generator[multiplier.frontend.Macro]:
+  def IN(file: multiplier.frontend.File, kinds: Sequence[multiplier.frontend.MacroKind]) -> Iterable[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.Macro]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.Macro]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.Macro]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.Macro]:
     ...
 
   @staticmethod
@@ -948,12 +969,12 @@ class Macro(multiplier.Entity):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.Macro]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.Macro]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.Macro]:
     ...
 
   @overload
@@ -973,7 +994,7 @@ class Macro(multiplier.Entity):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.Macro]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.Macro]:
     ...
 
   @overload
@@ -982,24 +1003,24 @@ class Macro(multiplier.Entity):
     ...
 
 class MacroSubstitution(multiplier.frontend.Macro):
-  replacement_children: Generator[multiplier.frontend.Macro | multiplier.frontend.Token]
+  replacement_children: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token]
   first_fully_substituted_token: multiplier.frontend.Token
   last_fully_substituted_token: multiplier.frontend.Token
   name_or_operator: multiplier.frontend.Token
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroSubstitution]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroSubstitution]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroSubstitution]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroSubstitution]:
     ...
 
   @staticmethod
@@ -1012,12 +1033,12 @@ class MacroSubstitution(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroSubstitution]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.MacroSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroSubstitution]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroSubstitution]:
     ...
 
   @staticmethod
@@ -1041,7 +1062,7 @@ class MacroSubstitution(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroSubstitution]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroSubstitution]:
     ...
 
   @overload
@@ -1054,17 +1075,17 @@ class MacroConcatenate(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroConcatenate]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroConcatenate]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroConcatenate]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroConcatenate]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroConcatenate]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroConcatenate]:
     ...
 
   @staticmethod
@@ -1077,12 +1098,12 @@ class MacroConcatenate(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroConcatenate]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.MacroConcatenate]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroConcatenate]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroConcatenate]:
     ...
 
   @staticmethod
@@ -1106,7 +1127,7 @@ class MacroConcatenate(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroConcatenate]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroConcatenate]:
     ...
 
   @overload
@@ -1119,17 +1140,17 @@ class MacroStringify(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroStringify]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroStringify]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroStringify]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroStringify]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroStringify]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroStringify]:
     ...
 
   @staticmethod
@@ -1142,12 +1163,12 @@ class MacroStringify(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroStringify]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.MacroStringify]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroStringify]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroStringify]:
     ...
 
   @staticmethod
@@ -1171,7 +1192,7 @@ class MacroStringify(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroStringify]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroStringify]:
     ...
 
   @overload
@@ -1180,24 +1201,24 @@ class MacroStringify(multiplier.frontend.MacroSubstitution):
     ...
 
 class MacroExpansion(multiplier.frontend.MacroSubstitution):
-  intermediate_children: Generator[multiplier.frontend.Macro | multiplier.frontend.Token]
+  intermediate_children: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token]
   definition: Optional[multiplier.frontend.DefineMacroDirective]
   num_arguments: int
-  arguments: Generator[multiplier.frontend.MacroArgument]
+  arguments: Iterable[multiplier.frontend.MacroArgument]
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroExpansion]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroExpansion]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroExpansion]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroExpansion]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroExpansion]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroExpansion]:
     ...
 
   @staticmethod
@@ -1210,12 +1231,12 @@ class MacroExpansion(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroExpansion]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.MacroExpansion]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroExpansion]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroExpansion]:
     ...
 
   @staticmethod
@@ -1239,7 +1260,7 @@ class MacroExpansion(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroExpansion]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroExpansion]:
     ...
 
   @overload
@@ -1256,17 +1277,17 @@ class MacroParameterSubstitution(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroParameterSubstitution]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroParameterSubstitution]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroParameterSubstitution]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @staticmethod
@@ -1279,12 +1300,12 @@ class MacroParameterSubstitution(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroParameterSubstitution]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroParameterSubstitution]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @staticmethod
@@ -1308,7 +1329,7 @@ class MacroParameterSubstitution(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroParameterSubstitution]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @overload
@@ -1321,17 +1342,17 @@ class MacroVAOpt(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroVAOpt]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroVAOpt]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroVAOpt]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroVAOpt]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroVAOpt]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroVAOpt]:
     ...
 
   @staticmethod
@@ -1344,12 +1365,12 @@ class MacroVAOpt(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroVAOpt]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.MacroVAOpt]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroVAOpt]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroVAOpt]:
     ...
 
   @staticmethod
@@ -1373,7 +1394,7 @@ class MacroVAOpt(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroVAOpt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroVAOpt]:
     ...
 
   @overload
@@ -1385,17 +1406,17 @@ class MacroVAOptArgument(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroVAOptArgument]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroVAOptArgument]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroVAOptArgument]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @staticmethod
@@ -1408,12 +1429,12 @@ class MacroVAOptArgument(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroVAOptArgument]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroVAOptArgument]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @staticmethod
@@ -1437,7 +1458,7 @@ class MacroVAOptArgument(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroVAOptArgument]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @overload
@@ -1451,17 +1472,17 @@ class MacroArgument(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroArgument]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroArgument]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroArgument]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroArgument]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroArgument]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroArgument]:
     ...
 
   @staticmethod
@@ -1474,12 +1495,12 @@ class MacroArgument(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroArgument]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.MacroArgument]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroArgument]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroArgument]:
     ...
 
   @staticmethod
@@ -1503,7 +1524,7 @@ class MacroArgument(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroArgument]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroArgument]:
     ...
 
   @overload
@@ -1518,17 +1539,17 @@ class MacroParameter(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroParameter]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroParameter]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroParameter]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroParameter]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroParameter]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroParameter]:
     ...
 
   @staticmethod
@@ -1541,12 +1562,12 @@ class MacroParameter(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroParameter]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.MacroParameter]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroParameter]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroParameter]:
     ...
 
   @staticmethod
@@ -1570,7 +1591,7 @@ class MacroParameter(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroParameter]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroParameter]:
     ...
 
   @overload
@@ -1584,17 +1605,17 @@ class MacroDirective(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.MacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.MacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.MacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroDirective]:
     ...
 
   @staticmethod
@@ -1603,12 +1624,12 @@ class MacroDirective(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.MacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.MacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroDirective]:
     ...
 
   @staticmethod
@@ -1632,7 +1653,7 @@ class MacroDirective(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
@@ -1642,24 +1663,24 @@ class MacroDirective(multiplier.frontend.Macro):
 
 class DefineMacroDirective(multiplier.frontend.MacroDirective):
   name: multiplier.frontend.Token
-  body: Generator[multiplier.frontend.Macro | multiplier.frontend.Token]
+  body: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token]
   is_variadic: bool
   is_function_like: bool
-  parameters: Generator[multiplier.frontend.Macro | multiplier.frontend.Token]
+  parameters: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token]
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.DefineMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.DefineMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.DefineMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @staticmethod
@@ -1672,12 +1693,12 @@ class DefineMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.DefineMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.DefineMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @staticmethod
@@ -1701,7 +1722,7 @@ class DefineMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.DefineMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @overload
@@ -1713,17 +1734,17 @@ class PragmaMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.PragmaMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.PragmaMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.PragmaMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @staticmethod
@@ -1736,12 +1757,12 @@ class PragmaMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.PragmaMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.PragmaMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @staticmethod
@@ -1765,7 +1786,7 @@ class PragmaMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.PragmaMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @overload
@@ -1777,17 +1798,17 @@ class UndefineMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.UndefineMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.UndefineMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.UndefineMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @staticmethod
@@ -1800,12 +1821,12 @@ class UndefineMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.UndefineMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.UndefineMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @staticmethod
@@ -1829,7 +1850,7 @@ class UndefineMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.UndefineMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @overload
@@ -1841,17 +1862,17 @@ class OtherMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.OtherMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.OtherMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.OtherMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @staticmethod
@@ -1864,12 +1885,12 @@ class OtherMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.OtherMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.OtherMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @staticmethod
@@ -1893,7 +1914,7 @@ class OtherMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.OtherMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @overload
@@ -1905,17 +1926,17 @@ class ConditionalMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.ConditionalMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.ConditionalMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.ConditionalMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @staticmethod
@@ -1924,12 +1945,12 @@ class ConditionalMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.ConditionalMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.ConditionalMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @staticmethod
@@ -1953,7 +1974,7 @@ class ConditionalMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.ConditionalMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
@@ -1965,17 +1986,17 @@ class EndIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.EndIfMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.EndIfMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.EndIfMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @staticmethod
@@ -1988,12 +2009,12 @@ class EndIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.EndIfMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.EndIfMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @staticmethod
@@ -2017,7 +2038,7 @@ class EndIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.EndIfMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @overload
@@ -2029,17 +2050,17 @@ class ElseMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.ElseMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.ElseMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.ElseMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @staticmethod
@@ -2052,12 +2073,12 @@ class ElseMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.ElseMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.ElseMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @staticmethod
@@ -2081,7 +2102,7 @@ class ElseMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.ElseMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @overload
@@ -2093,17 +2114,17 @@ class ElseIfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirecti
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2116,12 +2137,12 @@ class ElseIfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirecti
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2145,7 +2166,7 @@ class ElseIfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirecti
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @overload
@@ -2157,17 +2178,17 @@ class ElseIfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective)
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.ElseIfDefinedMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.ElseIfDefinedMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.ElseIfDefinedMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2180,12 +2201,12 @@ class ElseIfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective)
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.ElseIfDefinedMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.ElseIfDefinedMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2209,7 +2230,7 @@ class ElseIfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective)
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @overload
@@ -2221,17 +2242,17 @@ class ElseIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.ElseIfMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.ElseIfMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.ElseIfMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @staticmethod
@@ -2244,12 +2265,12 @@ class ElseIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.ElseIfMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.ElseIfMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @staticmethod
@@ -2273,7 +2294,7 @@ class ElseIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.ElseIfMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @overload
@@ -2285,17 +2306,17 @@ class IfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.IfNotDefinedMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.IfNotDefinedMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.IfNotDefinedMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2308,12 +2329,12 @@ class IfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.IfNotDefinedMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.IfNotDefinedMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2337,7 +2358,7 @@ class IfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @overload
@@ -2349,17 +2370,17 @@ class IfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.IfDefinedMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.IfDefinedMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.IfDefinedMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2372,12 +2393,12 @@ class IfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.IfDefinedMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.IfDefinedMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2401,7 +2422,7 @@ class IfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @overload
@@ -2413,17 +2434,17 @@ class IfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.IfMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.IfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.IfMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.IfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.IfMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IfMacroDirective]:
     ...
 
   @staticmethod
@@ -2436,12 +2457,12 @@ class IfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.IfMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.IfMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.IfMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.IfMacroDirective]:
     ...
 
   @staticmethod
@@ -2465,7 +2486,7 @@ class IfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.IfMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.IfMacroDirective]:
     ...
 
   @overload
@@ -2478,17 +2499,17 @@ class IncludeLikeMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.IncludeLikeMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.IncludeLikeMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.IncludeLikeMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @staticmethod
@@ -2497,12 +2518,12 @@ class IncludeLikeMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.IncludeLikeMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.IncludeLikeMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @staticmethod
@@ -2526,7 +2547,7 @@ class IncludeLikeMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
@@ -2538,17 +2559,17 @@ class ImportMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.ImportMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.ImportMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.ImportMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @staticmethod
@@ -2561,12 +2582,12 @@ class ImportMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.ImportMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.ImportMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @staticmethod
@@ -2590,7 +2611,7 @@ class ImportMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.ImportMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @overload
@@ -2602,17 +2623,17 @@ class IncludeMacrosMacroDirective(multiplier.frontend.IncludeLikeMacroDirective)
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.IncludeMacrosMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.IncludeMacrosMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.IncludeMacrosMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @staticmethod
@@ -2625,12 +2646,12 @@ class IncludeMacrosMacroDirective(multiplier.frontend.IncludeLikeMacroDirective)
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.IncludeMacrosMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.IncludeMacrosMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @staticmethod
@@ -2654,7 +2675,7 @@ class IncludeMacrosMacroDirective(multiplier.frontend.IncludeLikeMacroDirective)
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @overload
@@ -2666,17 +2687,17 @@ class IncludeNextMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.IncludeNextMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.IncludeNextMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.IncludeNextMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @staticmethod
@@ -2689,12 +2710,12 @@ class IncludeNextMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.IncludeNextMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.IncludeNextMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @staticmethod
@@ -2718,7 +2739,7 @@ class IncludeNextMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @overload
@@ -2730,17 +2751,17 @@ class IncludeMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Generator[multiplier.frontend.IncludeMacroDirective]:
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(file: multiplier.frontend.File) -> Generator[multiplier.frontend.IncludeMacroDirective]:
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Generator[multiplier.frontend.IncludeMacroDirective]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @staticmethod
@@ -2753,12 +2774,12 @@ class IncludeMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def containing(macro: multiplier.frontend.Macro) -> Generator[multiplier.frontend.IncludeMacroDirective]:
+  def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @overload
   @staticmethod
-  def containing(token: multiplier.frontend.Token) -> Generator[multiplier.frontend.IncludeMacroDirective]:
+  def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @staticmethod
@@ -2782,7 +2803,7 @@ class IncludeMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.IncludeMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.Operation]) -> Optional[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @overload
@@ -2844,7 +2865,7 @@ class TokenTokenTreeNode(multiplier.frontend.TokenTreeNode):
     ...
 
 class ChoiceTokenTreeNode(multiplier.frontend.TokenTreeNode):
-  children: Generator[Tuple[multiplier.Fragment, multiplier.frontend.TokenTreeNode]]
+  children: Iterable[Tuple[multiplier.Fragment, multiplier.frontend.TokenTreeNode]]
 
   @staticmethod
   def static_kind() -> multiplier.frontend.TokenTreeNodeKind:
@@ -2868,7 +2889,7 @@ class SubstitutionTokenTreeNode(multiplier.frontend.TokenTreeNode):
     ...
 
 class SequenceTokenTreeNode(multiplier.frontend.TokenTreeNode):
-  children: Generator[multiplier.frontend.TokenTreeNode]
+  children: Iterable[multiplier.frontend.TokenTreeNode]
 
   @staticmethod
   def static_kind() -> multiplier.frontend.TokenTreeNodeKind:

@@ -18,6 +18,7 @@ enum class PseudoKind : unsigned char {
   TEMPLATE_PARAMETER_LIST,
   CXX_BASE_SPECIFIER,
   DESIGNATOR,
+  CXX_CTOR_INITIALIZER,
 };
 
 inline static const char *EnumerationName(PseudoKind) {
@@ -25,7 +26,7 @@ inline static const char *EnumerationName(PseudoKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(PseudoKind) {
-  return 4;
+  return 5;
 }
 
 MX_EXPORT const char *EnumeratorName(PseudoKind);

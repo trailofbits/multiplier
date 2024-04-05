@@ -193,7 +193,7 @@ std::optional<ExprWithCleanups> ExprWithCleanups::from(const TokenContext &t) {
 }
 
 bool ExprWithCleanups::cleanups_have_side_effects(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

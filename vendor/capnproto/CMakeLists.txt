@@ -32,6 +32,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${build_dir}")
 # NOTE(pag): This causes some issues.
 # "-DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH}"
 
+# NOTE(pag): `WITH_FIBERS` needs to be on for asan builds.
 
 # (b) Nested CMake run. May need more -D... options than shown here.
 execute_process(COMMAND ${CMAKE_COMMAND}
@@ -52,7 +53,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DBUILD_TESTING:BOOL=OFF
                         -DWITH_ZLIB:STRING=AUTO
                         -DWITH_OPENSSL:STRING=AUTO
-                        -DWITH_FIBERS:STRING=OFF
+                        -DWITH_FIBERS:BOOL=ON
                         "${src_dir}"
                WORKING_DIRECTORY "${build_dir}")
 

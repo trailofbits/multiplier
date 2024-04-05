@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1443]) || tp >= &(gTypes[1444])) {
+  if (tp < &(gTypes[1444]) || tp >= &(gTypes[1445])) {
     return std::nullopt;
   }
 
@@ -280,7 +280,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation, mx::ir::Operation>>(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::ir::Operation>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -678,6 +678,36 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::Index::designator"),
   },
   {
+    "cxx_ctor_initializer",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          T *obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->cxx_ctor_initializer(std::move(arg_0.value())));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<PackedCXXCtorInitializerId>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->cxx_ctor_initializer(std::move(arg_0.value())));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'cxx_ctor_initializer'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::Index::cxx_ctor_initializer"),
+  },
+  {
     "compilation",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
@@ -788,7 +818,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1443]);
+  PyTypeObject * const tp = &(gTypes[1444]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

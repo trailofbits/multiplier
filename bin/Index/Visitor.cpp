@@ -8,9 +8,12 @@
 
 #include <cassert>
 
+#include "Util.h"
+
 namespace indexer {
 
 void EntityVisitor::VisitDeclContext(const pasta::DeclContext &dc) {
+  EnterDecl(dc);
   for (const pasta::Decl &decl : dc.AlreadyLoadedDeclarations()) {
     Accept(decl);
   }
@@ -24,41 +27,88 @@ void EntityVisitor::VisitTranslationUnitDecl(
 
 void EntityVisitor::VisitNamespaceDecl(
     const pasta::NamespaceDecl &decl) {
-  assert(false);
-  VisitDeclContext(decl);
+  // Handle NamespaceDecl as a simple declaration and don't
+  // visit the decl context to avoid serializing all.
+  (void) EnterDecl(decl);
 }
 
 void EntityVisitor::VisitExternCContextDecl(
     const pasta::ExternCContextDecl &decl) {
-  assert(false);
-  VisitDeclContext(decl);
+  // Handle ExternCContextDecl as a simple declaration and don't
+  // visit the decl context to avoid serializing all.
+  (void) EnterDecl(decl);
 }
 
 void EntityVisitor::VisitLinkageSpecDecl(
     const pasta::LinkageSpecDecl &decl) {
-  if (!decl.HasBraces()) {
-    VisitDeclContext(decl);
-  }
+  // Handle LinkageSpecDecl as a simple declaration and don't
+  // visit the decl context to avoid serializing all.
+  (void) EnterDecl(decl);
 }
 
 void EntityVisitor::VisitClassTemplatePartialSpecializationDecl(
-    const pasta::ClassTemplatePartialSpecializationDecl &) {}
+    const pasta::ClassTemplatePartialSpecializationDecl &decl) {
+  VisitClassTemplateSpecializationDecl(decl);
+}
 
 void EntityVisitor::VisitVarTemplatePartialSpecializationDecl(
-    const pasta::VarTemplatePartialSpecializationDecl &) {}
+    const pasta::VarTemplatePartialSpecializationDecl &decl) {
+  if (EnterVarDecl(decl)) {
+    // TODO(pag): Are these lexically enclosed in the fragment?
+    for (const pasta::TemplateArgument &arg : decl.TemplateArguments()) {
+      Accept(arg);
+    }
+
+    for (const pasta::TemplateArgument &arg :
+             decl.TemplateInstantiationArguments()) {
+      Accept(arg);
+    }
+  }
+}
+
+void EntityVisitor::VisitTemplateTypeParmDecl(
+    const pasta::TemplateTypeParmDecl &decl) {
+  EnterDecl(decl);
+}
+
+bool EntityVisitor::EnterTemplateDecl(const pasta::TemplateDecl &decl) {
+  if (EnterDecl(decl)) {
+    for (auto ls : decl.TemplateParameters().Parameters()) {
+      Accept(ls);
+    }
+    if(auto td = decl.TemplatedDeclaration()) {
+      Accept(td.value());
+    }
+  }
+  return true;
+}
 
 void EntityVisitor::VisitTemplateDecl(const pasta::TemplateDecl &) {}
 
 void EntityVisitor::VisitFriendTemplateDecl(
-    const pasta::FriendTemplateDecl &) {}
+    const pasta::FriendTemplateDecl &decl) {
+  if (EnterDecl(decl)) {
+    Accept(decl.FriendDeclaration());
+    for (pasta::TemplateParameterList ls : 
+          decl.TemplateParameterLists()) {
+      Accept(ls);
+    }
+  }
+}
 
 void EntityVisitor::VisitClassTemplateDecl(
-    const pasta::ClassTemplateDecl &) {}
+    const pasta::ClassTemplateDecl &decl) {
+  EnterTemplateDecl(decl);
+}
 
-void EntityVisitor::VisitVarTemplateDecl(const pasta::VarTemplateDecl &) {}
+void EntityVisitor::VisitVarTemplateDecl(const pasta::VarTemplateDecl &decl) {
+  EnterTemplateDecl(decl);
+}
 
 void EntityVisitor::VisitFunctionTemplateDecl(
-    const pasta::FunctionTemplateDecl &) {}
+    const pasta::FunctionTemplateDecl &decl) {
+  EnterTemplateDecl(decl);
+}
 
 bool EntityVisitor::EnterVarDecl(const pasta::VarDecl &decl) {
   if (EnterDeclaratorDecl(decl)) {
@@ -73,6 +123,13 @@ bool EntityVisitor::EnterVarDecl(const pasta::VarDecl &decl) {
 
 void EntityVisitor::VisitFriendDecl(const pasta::FriendDecl &decl) {
   if (EnterDecl(decl)) {
+    if (auto fd = decl.FriendDeclaration()) {
+      Accept(fd.value());
+    } else if (auto tsi = decl.FriendType()) {
+      if (auto tagdecl = tsi->AsTagDeclaration()) {
+        Accept(tagdecl->CanonicalDeclaration());
+      }
+    }
     for (pasta::TemplateParameterList ls :
              decl.FriendTypeTemplateParameterLists()) {
       Accept(ls);
@@ -81,7 +138,11 @@ void EntityVisitor::VisitFriendDecl(const pasta::FriendDecl &decl) {
 }
 
 void EntityVisitor::VisitVarDecl(const pasta::VarDecl &decl) {
-  EnterVarDecl(decl);
+  if (EnterVarDecl(decl)) {
+    for (const pasta::TemplateParameterList &ls : decl.TemplateParameterLists()) {
+      Accept(ls);
+    }
+  }
 }
 
 void EntityVisitor::VisitParmVarDecl(const pasta::ParmVarDecl &decl) {
@@ -91,6 +152,8 @@ void EntityVisitor::VisitParmVarDecl(const pasta::ParmVarDecl &decl) {
       if (auto init_expr = decl.DefaultArgument()) {
         Accept(init_expr.value());
       }
+    }
+    if (decl.HasUninstantiatedDefaultArgument()) {
       if (auto tpl_init_expr = decl.UninstantiatedDefaultArgument()) {
         Accept(tpl_init_expr.value());
       }
@@ -111,19 +174,28 @@ void EntityVisitor::VisitNonTypeTemplateParmDecl(
 }
 
 bool EntityVisitor::EnterFunctionDecl(const pasta::FunctionDecl &decl) {
-  if (EnterDeclaratorDecl(decl)) {
-    Accept(decl.Type());
-    VisitDeclContext(decl);
-    for (const pasta::ParmVarDecl &param : decl.Parameters()) {
-      Accept(param);
-    }
-    if (auto body = decl.Body()) {
-      Accept(body.value());
-    }
-    return true;
-  } else {
+  if (!EnterDeclaratorDecl(decl)) {
     return false;
   }
+
+  Accept(decl.Type());
+  VisitDeclContext(decl);
+  for (const pasta::ParmVarDecl &param : decl.Parameters()) {
+    Accept(param);
+  }
+
+  if (auto fty = decl.FunctionType()) {
+    if (auto proto = pasta::FunctionProtoType::From(fty.value())) {
+      if (auto except = proto->NoexceptExpression()) {
+        Accept(except.value());
+      }
+    }
+  }
+  if (auto body = decl.Body()) {
+    Accept(body.value());
+  }
+
+  return true;
 }
 
 void EntityVisitor::VisitFunctionDecl(const pasta::FunctionDecl &decl) {
@@ -186,6 +258,32 @@ void EntityVisitor::VisitFileScopeAsmDecl(const pasta::FileScopeAsmDecl &decl) {
   }
 }
 
+void EntityVisitor::VisitBuiltinTemplateDecl(
+    const pasta::BuiltinTemplateDecl &decl) {
+  EnterTemplateDecl(decl);
+}
+
+void EntityVisitor::VisitTypeAliasTemplateDecl(
+    const pasta::TypeAliasTemplateDecl &decl) {
+  EnterTemplateDecl(decl);
+}
+
+void EntityVisitor::VisitTemplateTemplateParmDecl(
+    const pasta::TemplateTemplateParmDecl &decl) {
+  EnterTemplateDecl(decl);
+}
+
+void EntityVisitor::VisitCXXDeductionGuideDecl(
+    const pasta::CXXDeductionGuideDecl &decl) {
+  EnterFunctionDecl(decl);
+}
+
+void EntityVisitor::VisitTypeAliasDecl(const pasta::TypeAliasDecl &decl) {
+  if (EnterDecl(decl)) {
+    Accept(decl.UnderlyingType());
+  }
+}
+
 void EntityVisitor::VisitDeclStmt(const pasta::DeclStmt &stmt) {
   if (EnterStmt(stmt)) {
     for (const pasta::Decl &child : stmt.Declarations()) {
@@ -243,6 +341,10 @@ void EntityVisitor::VisitCXXUuidofExpr(const pasta::CXXUuidofExpr &expr) {
   }
 }
 
+void EntityVisitor::VisitCXXBoolLiteralExpr(const pasta::CXXBoolLiteralExpr &expr) {
+  EnterStmt(expr);
+}
+
 void EntityVisitor::VisitVarTemplateSpecializationDecl(
     const pasta::VarTemplateSpecializationDecl &decl) {
   if (EnterVarDecl(decl)) {
@@ -254,6 +356,22 @@ void EntityVisitor::VisitVarTemplateSpecializationDecl(
     for (const pasta::TemplateArgument &arg :
              decl.TemplateInstantiationArguments()) {
       Accept(arg);
+    }
+  }
+}
+
+void EntityVisitor::VisitCXXMethodDecl(
+    const pasta::CXXMethodDecl &decl) {
+  (void) EnterFunctionDecl(decl);
+}
+
+void EntityVisitor::VisitCXXConstructorDecl(
+    const pasta::CXXConstructorDecl &decl) {
+
+  if (EnterFunctionDecl(decl)) {
+    auto init_list = decl.Initializers();
+    for (const pasta::CXXCtorInitializer &init : init_list) {
+      Accept(init);
     }
   }
 }
@@ -287,8 +405,15 @@ bool EntityVisitor::EnterTagDecl(const pasta::TagDecl &decl) {
 bool EntityVisitor::EnterRecordDecl(const pasta::RecordDecl &decl) {
   if (EnterTagDecl(decl)) {
     if (decl.IsThisDeclarationADefinition()) {
-      for (const pasta::FieldDecl &field : decl.Fields()) {
-        Accept(field);
+      pasta::DeclContext dc(decl);
+      for (const auto &nested_decl : dc.AlreadyLoadedDeclarations()) {
+        if (nested_decl == decl) {
+          continue;
+        }
+
+        if (!nested_decl.IsOutOfLine()) {
+          Accept(nested_decl);
+        }
       }
     }
     return true;
@@ -339,6 +464,19 @@ void EntityVisitor::VisitClassTemplateSpecializationDecl(
   }
 }
 
+void EntityVisitor::VisitConceptDecl(const pasta::ConceptDecl &decl) {
+  if (EnterTemplateDecl(decl)) {
+    Accept(decl.ConstraintExpression());
+  }
+}
+
+void EntityVisitor::VisitLifetimeExtendedTemporaryDecl(
+    const pasta::LifetimeExtendedTemporaryDecl &decl) {
+  if (EnterDecl(decl)) {
+    Accept(decl.TemporaryExpression());
+  }
+}
+
 bool EntityVisitor::EnterValueDecl(const pasta::ValueDecl &decl) {
   if (EnterDecl(decl)) {
     Accept(decl.Type());
@@ -372,6 +510,7 @@ void EntityVisitor::VisitLambdaExpr(const pasta::LambdaExpr &stmt) {
     if (auto ls = stmt.TemplateParameterList()) {
       Accept(ls.value());
     }
+    Accept(stmt.LambdaClass());
   }
 }
 
@@ -386,6 +525,12 @@ void EntityVisitor::VisitInitListExpr(const pasta::InitListExpr &stmt) {
     //            be visited, but they logically belong "beside" eachother.
     //            So instead, we let a fallback path figure this out, via
     //            `FindMissingParentageFromInitList`.
+  }
+}
+
+void EntityVisitor::VisitImplicitCastExpr(const pasta::ImplicitCastExpr &stmt) {
+  if (EnterStmt(stmt)) {
+    Accept(stmt.SubExpression());
   }
 }
 
@@ -417,6 +562,34 @@ void EntityVisitor::VisitDesignatedInitExpr(
       Accept(sub_expr);
     }
     Accept(stmt.Initializer());
+  }
+}
+
+void EntityVisitor::VisitMaterializeTemporaryExpr(
+    const pasta::MaterializeTemporaryExpr &expr) {
+
+  // NOTE(pag): Not doing `EnterStmt` so that we can get the nested
+  //            sub-expression inside of the temporary declaration.
+  if (Enter(expr)) {
+    if (auto decl = expr.LifetimeExtendedTemporaryDeclaration()) {
+      Accept(decl.value());
+
+    } else {
+      Accept(expr.SubExpression());
+    }
+  }
+}
+
+void EntityVisitor::VisitExprWithCleanups(const pasta::ExprWithCleanups &expr) {
+  if (EnterStmt(expr)) {
+    for (auto &object : expr.Objects()) {
+      if (std::holds_alternative<pasta::BlockDecl>(object)) {
+        Accept(std::get<pasta::BlockDecl>(object));
+
+      } else if (std::holds_alternative<pasta::CompoundLiteralExpr>(object)) {
+        Accept(std::get<pasta::CompoundLiteralExpr>(object));
+      }
+    }
   }
 }
 
@@ -500,9 +673,63 @@ void EntityVisitor::VisitFunctionProtoType(
     if (auto noexcept_expr = type.NoexceptExpression()) {
       Accept(noexcept_expr.value());
     }
-    
+
+    // Function return type
+    Accept(type.ReturnType());
+
     // NOTE(pag): `ExceptionSpecDeclaration` and `ExceptionSpecTemplate`
     //            are *not* visited because they are not children.
+  }
+}
+
+void EntityVisitor::VisitArrayTypeTraitExpr(
+    const pasta::ArrayTypeTraitExpr &expr) {
+  if (EnterStmt(expr)) {
+    Accept(expr.DimensionExpression());
+  }
+}
+
+void EntityVisitor::VisitCXXConstructExpr(
+    const pasta::CXXConstructExpr &expr) {
+  if (EnterStmt(expr)) {
+    for (auto &arg : expr.Arguments()) {
+      Accept(arg);
+    }
+  }
+}
+
+void EntityVisitor::VisitCXXTemporaryObjectExpr(
+    const pasta::CXXTemporaryObjectExpr &expr) {
+  if (EnterStmt(expr)) {
+    for (auto &arg : expr.Arguments()) {
+      Accept(arg);
+    }
+  }
+}
+
+void EntityVisitor::VisitCXXOperatorCallExpr(
+    const pasta::CXXOperatorCallExpr &expr) {
+  if (EnterStmt(expr)) {
+    for (auto &arg : expr.Arguments()) {
+      Accept(arg);
+    }
+    Accept(expr.Callee());
+  }
+}
+
+void EntityVisitor::VisitRequiresExprBodyDecl(
+    const pasta::RequiresExprBodyDecl &decl) {
+  if (EnterDecl(decl)) {
+    VisitDeclContext(decl);
+  }
+}
+
+void EntityVisitor::VisitRequiresExpr(const pasta::RequiresExpr &expr) {
+  if (EnterStmt(expr)) {
+    Accept(expr.Body());
+    for (const auto &param : expr.LocalParameters()) {
+      Accept(param);
+    }
   }
 }
 
@@ -597,6 +824,12 @@ void EntityVisitor::Accept(const pasta::Designator &) {
 void EntityVisitor::Accept(const pasta::CXXBaseSpecifier &) {
   // NOTE(pag): Don't need to enter the bases; they're likely top-level
   //            declarations.
+}
+
+void EntityVisitor::Accept(const pasta::CXXCtorInitializer &init) {
+  if (auto init_expr = init.Initializer()) {
+    Accept(init_expr.value());
+  }
 }
 
 EntityVisitor::~EntityVisitor(void) {}

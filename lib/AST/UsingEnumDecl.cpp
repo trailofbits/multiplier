@@ -223,21 +223,21 @@ std::optional<UsingEnumDecl> UsingEnumDecl::from(const TokenContext &t) {
 }
 
 EnumDecl UsingEnumDecl::enum_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal56();
+  RawEntityId eid = impl->reader.getVal55();
   return EnumDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token UsingEnumDecl::enum_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
 Type UsingEnumDecl::enum_type(void) const {
-  RawEntityId eid = impl->reader.getVal58();
+  RawEntityId eid = impl->reader.getVal57();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token UsingEnumDecl::using_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal65());
 }
 
 #pragma GCC diagnostic pop

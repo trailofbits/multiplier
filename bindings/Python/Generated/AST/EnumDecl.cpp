@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[761]) || tp >= &(gTypes[762])) {
+  if (tp < &(gTypes[762]) || tp >= &(gTypes[763])) {
     return std::nullopt;
   }
 
@@ -90,7 +90,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::EnumDecl::static_kind():
-      tp = &(gTypes[761]);
+      tp = &(gTypes[762]);
       break;
 
   }
@@ -175,16 +175,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "instantiated_from_member_enum",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instantiated_from_member_enum());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::instantiated_from_member_enum"),
-    nullptr,
-  },
-  {
     "integer_type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -202,16 +192,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::EnumDecl::integer_type_range"),
-    nullptr,
-  },
-  {
-    "odr_hash",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->odr_hash());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::odr_hash"),
     nullptr,
   },
   {
@@ -481,7 +461,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation, mx::ir::Operation>>(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::ir::Operation>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -571,7 +551,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[761]);
+  PyTypeObject * const tp = &(gTypes[762]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -586,12 +566,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[756].tp_hash;
-  tp->tp_richcompare = gTypes[756].tp_richcompare;
+  tp->tp_hash = gTypes[757].tp_hash;
+  tp->tp_richcompare = gTypes[757].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[756]);
+  tp->tp_base = &(gTypes[757]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

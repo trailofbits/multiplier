@@ -9,6 +9,7 @@
 #include <multiplier/AST/NamespaceAliasDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/NamedDecl.h>
+#include <multiplier/AST/NamespaceDecl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -220,16 +221,21 @@ std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const TokenContext &t
 }
 
 Token NamespaceAliasDecl::alias_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
 }
 
 NamedDecl NamespaceAliasDecl::aliased_namespace(void) const {
-  RawEntityId eid = impl->reader.getVal57();
+  RawEntityId eid = impl->reader.getVal56();
   return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
+NamespaceDecl NamespaceAliasDecl::namespace_(void) const {
+  RawEntityId eid = impl->reader.getVal57();
+  return NamespaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
+}
+
 Token NamespaceAliasDecl::namespace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal65());
 }
 
 Token NamespaceAliasDecl::target_name_token(void) const {

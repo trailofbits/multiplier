@@ -3,6 +3,8 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=eclipse,clion,vs,c++,python
 
 .DS_Store
+.idea
+*/.idea
 
 ### C++ ###
 # Prerequisites

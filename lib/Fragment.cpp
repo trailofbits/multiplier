@@ -96,6 +96,11 @@ Fragment Fragment::containing(const CXXBaseSpecifier &entity) noexcept {
       entity.impl->ep, entity.impl->fragment_id));
 }
 
+Fragment Fragment::containing(const CXXCtorInitializer &entity) noexcept {
+  return Fragment(entity.impl->ep->FragmentFor(
+      entity.impl->ep, entity.impl->fragment_id));
+}
+
 Fragment Fragment::containing(const Designator &entity) noexcept {
   return Fragment(entity.impl->ep->FragmentFor(
       entity.impl->ep, entity.impl->fragment_id));
@@ -153,6 +158,14 @@ std::optional<Fragment> Fragment::containing(const TokenTree &tree) noexcept {
     return Fragment(tree.impl->fragment);
   } else {
     return std::nullopt;
+  }
+}
+
+// Generate all fragments in the index.
+gap::generator<Fragment> Fragment::in(const Index &index) {
+  auto impl = index.impl;
+  for (auto eptr : impl->FragmentsFor(impl)) {
+    co_yield Fragment(std::move(eptr));
   }
 }
 
@@ -306,7 +319,7 @@ gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
       }
 
     } else {
-      assert(false);
+      //assert(false);
     }
   }
 }

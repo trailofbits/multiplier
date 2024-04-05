@@ -137,7 +137,7 @@ PyTypeObject *InitType(void) noexcept {
 
     auto obj = O_cast(self);
     obj->data = new (obj->backing_storage) T;
-    
+
     return 0;
   };
   tp->tp_alloc = PyType_GenericAlloc;
@@ -160,7 +160,7 @@ bool ProxyTokenTreeVisitor::should_expand(
 
   SharedPyPtr sub_obj(::mx::to_python<MacroSubstitution>(sub));
   SharedPyPtr ret(PyObject_CallMethod(
-      obj, "should_expand", "(N)", sub_obj.Get()));
+      obj, "should_expand", "(O)", sub_obj.Get()));
 
   if (ret == nullptr) {
     assert(false);
@@ -181,7 +181,7 @@ Fragment ProxyTokenTreeVisitor::choose(
 
   SharedPyPtr frags_list(::mx::to_python<std::vector<Fragment>>(fragments));
   SharedPyPtr ret(PyObject_CallMethod(
-      obj, "choose", "(N)", frags_list.Get()));
+      obj, "choose", "(O)", frags_list.Get()));
 
   if (!ret) {
     assert(false);

@@ -119,6 +119,10 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
   // TODO(pag): Rename to `fragment_index`.
   const RawEntityId fragment_id;
 
+  // Immediate parent fragment ID. This is `kInvalidEntityId` if this is a top-
+  // level or floating fragment. This is packed entity ID.
+  const RawEntityId parent_fragment_id;
+
  private:
   friend class ReadParsedTokensFromFragment;
   friend class ReadMacroTokensFromFragment;

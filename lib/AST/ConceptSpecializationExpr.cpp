@@ -228,10 +228,6 @@ gap::generator<TemplateArgument> ConceptSpecializationExpr::template_arguments(v
   co_return;
 }
 
-bool ConceptSpecializationExpr::is_satisfied(void) const {
-  return impl->reader.getVal89();
-}
-
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

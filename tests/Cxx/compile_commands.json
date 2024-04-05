@@ -1,0 +1,187 @@
+[ 
+{
+"file": "Templates.cpp",
+"command": "/usr/bin/c++ Templates.cpp",
+"directory": ""
+},
+{
+"file": "TemplateFunctionSpecialization.cpp",
+"command": "/usr/bin/c++ TemplateFunctionSpecialization.cpp",
+"directory": ""
+},
+{
+"file": "TemplatePartialSpecialization.cpp",
+"command": "/usr/bin/c++ TemplatePartialSpecialization.cpp",
+"directory": ""
+},
+{
+"file": "TemplateSpecialization.cpp",
+"command": "/usr/bin/c++ TemplateSpecialization.cpp",
+"directory": ""
+},
+{
+"file": "TemplateDeduction.cpp",
+"command": "/usr/bin/c++ TemplateDeduction.cpp",
+"directory": ""
+},
+{
+"file": "TemplateSpecializationQuals.cpp",
+"command": "/usr/bin/c++ TemplateSpecializationQuals.cpp",
+"directory": ""
+},
+{
+"file": "TemplateRecursive.cpp",
+"command": "/usr/bin/c++ TemplateRecursive.cpp",
+"directory": ""
+},
+{
+  "file": "TemplateExplicitSpecialization.cpp",
+  "command": "/usr/bin/c++ TemplateExplicitSpecialization.cpp",
+  "directory": ""
+},
+{
+"file": "PartialSpecInstantiation.cpp",
+"command": "/usr/bin/c++ PartialSpecInstantiation.cpp",
+"directory": ""
+},
+{
+"file": "NestedLinkageSpec.cpp",
+"command": "/usr/bin/c++ NestedLinkageSpec.cpp",
+"directory": ""
+},
+{
+"file": "BuiltinTemplates.cpp",
+"command": "/usr/bin/c++ BuiltinTemplates.cpp",
+"directory": ""
+},
+{
+    "file": "AlignAttribute.cpp",
+    "command": "/usr/bin/c++ AlignAttribute.cpp",
+    "directory": ""
+},
+{
+    "file": "RestrictAttribute.cpp",
+    "command": "/usr/bin/c++ RestrictAttribute.cpp",
+    "directory": ""
+},
+{
+    "file": "TemplateArgumentType.cpp",
+    "command": "/usr/bin/c++ TemplateArgumentType.cpp",
+    "directory": ""
+},
+{
+    "file": "FriendFunctionDecl.cpp",
+    "command": "/usr/bin/c++ FriendFunctionDecl.cpp",
+    "directory": ""
+},
+{
+    "file": "FriendFunctionDecl2.cpp",
+    "command": "/usr/bin/c++ FriendFunctionDecl2.cpp",
+    "directory": ""
+},
+{
+    "file": "NestedTemplate.cpp",
+    "command": "/usr/bin/c++ std=c++20 NestedTemplate.cpp",
+    "directory": ""
+},
+{
+    "file": "PartialOrdering.cpp",
+    "command": "/usr/bin/c++ PartialOrdering.cpp",
+    "directory": ""
+},
+{
+    "file": "SplitToken.cpp",
+    "command": "/usr/bin/c++ -std=c++20 SplitToken.cpp",
+    "directory": ""
+},
+{
+    "file": "ExternSpecializationOfSizeless.cpp",
+    "command": "/usr/bin/c++ -std=c++20 ExternSpecializationOfSizeless.cpp",
+    "directory": ""
+},
+{
+    "file": "NoExceptSplitTokenTest.cpp",
+    "command": "/usr/bin/c++ -std=c++20 NoExceptSplitTokenTest.cpp",
+    "directory": ""
+},
+{
+    "file": "VarBounds.cpp",
+    "command": "/usr/bin/c++ -std=c++20 VarBounds.cpp",
+    "directory": ""
+},
+{
+    "file": "MixingMethodBounds.cpp",
+    "command": "/usr/bin/c++ -std=c++20 MixingMethodBounds.cpp",
+    "directory": ""
+},
+{
+    "file": "EvilNamespaceNesting.cpp",
+    "command": "/usr/bin/c++ EvilNamespaceNesting.cpp",
+    "directory": ""
+},
+{
+    "file": "ExplicitFunctionTemplateSpecialization.cpp",
+    "command": "/usr/bin/c++ ExplicitFunctionTemplateSpecialization.cpp",
+    "directory": ""
+},
+{
+    "file": "AutoDeducedMemberExpr.cpp",
+    "command": "/usr/bin/c++ -std=c++20 AutoDeducedMemberExpr.cpp",
+    "directory": ""
+},
+{
+    "file": "TypedefFunction.cpp",
+    "command": "/usr/bin/c++ TypedefFunction.cpp",
+    "directory": ""
+},
+{
+    "file": "ByteOperand.cpp",
+    "command": "/usr/bin/c++ ByteOperand.cpp",
+    "directory": ""
+},
+{
+    "file": "VarBounds.cpp",
+    "command": "/usr/bin/c++ VarBounds.cpp",
+    "directory": ""
+},
+{ 
+    "file": "ParamVarBounds.cpp",
+    "command": "/usr/bin/c++ ParamVarBounds.cpp",
+    "directory": ""
+},
+{
+    "file": "BasicStream.cpp",
+    "command": "/usr/bin/c++ BasicStream.cpp",
+    "directory": ""
+},
+{
+    "file": "TypeAliasTemplate.cpp",
+    "command": "/usr/bin/c++ TypeAliasTemplate.cpp",
+    "directory": ""
+},
+{
+    "file": "VarTemplateSpecializationWithNoParent.cpp",
+    "command": "/usr/bin/c++ VarTemplateSpecializationWithNoParent.cpp",
+    "directory": ""
+},
+{
+    "file": "VarDeclWithNoParent.cpp",
+    "command": "/usr/bin/c++ VarDeclWithNoParent.cpp",
+    "directory": ""
+},
+{
+    "file": "StaticMethod.cpp",
+    "command": "/usr/bin/c++ StaticMethod.cpp",
+    "directory": ""
+},
+{
+    "file": "ExplicitInstantiationDefinition.cpp",
+    "command": "/usr/bin/c++ ExplicitInstantiationDefinition.cpp",
+    "directory": ""
+},
+{
+    "file": "ExplicitInstantiationDefinitionMethod.cpp",
+    "command": "/usr/bin/c++ ExplicitInstantiationDefinitionMethod.cpp",
+    "directory": ""
+}
+]

@@ -69,10 +69,14 @@ class MX_EXPORT Compilation {
   static Compilation containing(const TemplateArgument &);
   static Compilation containing(const TemplateParameterList &);
   static Compilation containing(const CXXBaseSpecifier &);
+  static Compilation containing(const CXXCtorInitializer &);
   static Compilation containing(const Designator &);
   static std::optional<Compilation> containing(const Token &);
   static Compilation containing(const Macro &);
   static std::optional<Compilation> containing(const VariantEntity &);
+
+  // Generate all compilations in the index.
+  static gap::generator<Compilation> in(const Index &index);
 
   // Return the unique ID of this compilation.
   PackedCompilationId id(void) const noexcept;

@@ -72,7 +72,6 @@ class MX_EXPORT RequiresExpr : public Expr {
   gap::generator<ParmVarDecl> local_parameters(void) const &;
   Token r_brace_token(void) const;
   Token requires_keyword_token(void) const;
-  bool is_satisfied(void) const;
 };
 
 static_assert(sizeof(RequiresExpr) == sizeof(Expr));

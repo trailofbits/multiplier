@@ -135,7 +135,7 @@ class BinLOrOp(multiplier.ir.core.Operation):
     ...
 
 class ImplicitReturnOp(multiplier.ir.core.Operation):
-  result: Generator[multiplier.ir.Operand]
+  result: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -184,7 +184,7 @@ class SelectOp(multiplier.ir.core.Operation):
   cond: multiplier.ir.Value
   then_region: multiplier.ir.Value
   else_region: multiplier.ir.Value
-  results: Generator[multiplier.ir.Result]
+  results: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

@@ -17,6 +17,7 @@ class Index;
 class Decl;
 class NamedDecl;
 class NamespaceAliasDecl;
+class NamespaceDecl;
 class Stmt;
 class Token;
 namespace ir {
@@ -67,6 +68,7 @@ class MX_EXPORT NamespaceAliasDecl : public NamedDecl {
 
   Token alias_token(void) const;
   NamedDecl aliased_namespace(void) const;
+  NamespaceDecl namespace_(void) const;
   Token namespace_token(void) const;
   Token target_name_token(void) const;
 };

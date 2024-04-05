@@ -14,7 +14,6 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
-class CXXRecordDecl;
 class MemberPointerType;
 class Token;
 class Type;
@@ -49,7 +48,6 @@ class MX_EXPORT MemberPointerType : public Type {
 
   Type desugar(void) const;
   Type class_(void) const;
-  CXXRecordDecl most_recent_cxx_record_declaration(void) const;
   Type pointee_type(void) const;
   bool is_member_data_pointer(void) const;
   bool is_member_function_pointer(void) const;

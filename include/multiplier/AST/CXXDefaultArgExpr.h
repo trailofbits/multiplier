@@ -65,7 +65,6 @@ class MX_EXPORT CXXDefaultArgExpr : public Expr {
   static std::optional<CXXDefaultArgExpr> from(const VariantEntity &e);
   static std::optional<CXXDefaultArgExpr> from(const TokenContext &t);
 
-  Expr adjusted_rewritten_expression(void) const;
   Expr expression(void) const;
   ParmVarDecl parameter(void) const;
   std::optional<Expr> rewritten_expression(void) const;

@@ -14,6 +14,7 @@
 #include <multiplier/IR/Operation.h>
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/CXXBaseSpecifier.h>
+#include <multiplier/AST/CXXCtorInitializer.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Designator.h>
 #include <multiplier/AST/Stmt.h>
@@ -112,7 +113,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_CONVERT_TO_PYTHON,
                             MX_CONVERT_TO_PYTHON,
                             MX_CONVERT_TO_PYTHON)
 #undef MX_CONVERT_TO_PYTHON
-  
+
   Py_RETURN_NONE;
 }
 

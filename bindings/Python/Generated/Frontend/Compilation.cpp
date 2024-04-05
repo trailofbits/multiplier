@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[798]) || tp >= &(gTypes[799])) {
+  if (tp < &(gTypes[799]) || tp >= &(gTypes[800])) {
     return std::nullopt;
   }
 
@@ -368,6 +368,14 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::CXXCtorInitializer>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::containing(arg_0.value()));
+          }
+          while (num_args == 1) {
             auto arg_0 = ::mx::from_python<mx::Designator>(args[0]);
             if (!arg_0.has_value()) {
               break;
@@ -392,7 +400,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::Compilation, mx::ir::Operation>>(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::ir::Operation>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -407,6 +415,27 @@ static PyMethodDef gMethods[] = {
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::Compilation::containing"),
   },
+  {
+    "IN",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Index>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::in(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'IN'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::Compilation::in"),
+  },
   {}  // Sentinel.
 };
 }  // namespace
@@ -414,7 +443,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[798]);
+  PyTypeObject * const tp = &(gTypes[799]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

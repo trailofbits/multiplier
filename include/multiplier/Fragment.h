@@ -103,6 +103,7 @@ class MX_EXPORT Fragment {
   static Fragment containing(const TemplateArgument &) noexcept;
   static Fragment containing(const TemplateParameterList &) noexcept;
   static Fragment containing(const CXXBaseSpecifier &) noexcept;
+  static Fragment containing(const CXXCtorInitializer &) noexcept;
   static Fragment containing(const Designator &) noexcept;
   static std::optional<Fragment> containing(const Token &) noexcept;
   static Fragment containing(const Macro &) noexcept;
@@ -111,6 +112,9 @@ class MX_EXPORT Fragment {
 
   // Try to convert a variant entity into a fragment.
   static std::optional<Fragment> from(const VariantEntity &) noexcept;
+
+  // Generate all fragments in the index.
+  static gap::generator<Fragment> in(const Index &index);
 
   inline static constexpr EntityCategory entity_category(void) noexcept {
     return EntityCategory::FRAGMENT;

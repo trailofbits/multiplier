@@ -60,6 +60,7 @@ class ParentTrackerVisitor : public EntityVisitor {
 
   const void *parent_decl{nullptr};
   const void *parent_stmt{nullptr};
+  const void *parent_dc{nullptr};
 
   std::unordered_set<const void *> not_yet_seen;
 
@@ -89,6 +90,14 @@ class ParentTrackerVisitor : public EntityVisitor {
     return !not_yet_seen.count(RawEntity(entity));
   }
 
+  void VisitDeclContext(const pasta::DeclContext &dc) final {
+    PrevValueTracker<const void *> dc_guard(parent_dc, RawEntity(dc));
+
+    if (dc_guard) {
+      this->EntityVisitor::VisitDeclContext(dc);
+    }
+  }
+
   void VisitOtherInitListExprImpl(const pasta::InitListExpr &stmt,
                                   std::optional<pasta::InitListExpr> other) {
     if (other.has_value() &&
@@ -101,55 +110,201 @@ class ParentTrackerVisitor : public EntityVisitor {
 
   // `InitListExpr`s can have a semantic/syntactic form, and they logically
   // belong to the same parent.
-  void VisitInitListExpr(const pasta::InitListExpr &stmt) {
+  void VisitInitListExpr(const pasta::InitListExpr &stmt) final {
     this->EntityVisitor::VisitInitListExpr(stmt);
     VisitOtherInitListExprImpl(stmt, stmt.SyntacticForm());
     VisitOtherInitListExprImpl(stmt, stmt.SemanticForm());
   }
 
-  void AddToMaps(const void *entity) {
+  // What we find through the `friend` isn't really our child. If we find
+  // something lexically nested here, then the `friend`ed decl still isn't
+  // logically our child, but that of its semantic decl context.
+  void VisitFriendDecl(const pasta::FriendDecl &decl) final {
+    if (!EnterDecl(decl)) {
+      return;
+    }
+
+    for (pasta::TemplateParameterList ls :
+             decl.FriendTypeTemplateParameterLists()) {
+      Accept(ls);
+    }
+
+    // Find the friended decl.
+    std::optional<pasta::Decl> friended_decl;
+    if (auto fd = decl.FriendDeclaration()) {
+      friended_decl = std::move(fd.value());
+    } else if (auto tsi = decl.FriendType()) {
+      if (auto tag_decl = tsi->AsTagDeclaration()) {
+        friended_decl = std::move(tag_decl.value());
+      }
+    }
+
+    // If the friended decl is in a different fragmnent, then ignore it.
+    auto eid = mx::EntityId(em.EntityId(friended_decl)).Extract<mx::DeclId>();
+    if (!eid || eid->fragment_id != fragment.fragment_index) {
+      return;
+    }
+
+    auto dc = friended_decl->DeclarationContext();
+    if (!dc) {
+      return;
+    }
+
+    // Find the declaration associated with the friend decl's semantic decl
+    // context. That is who the friend decl's parent is going to be.
+    auto dc_decl = pasta::Decl::From(dc.value());
+    eid = mx::EntityId(em.EntityId(dc_decl)).Extract<mx::DeclId>();
+    if (!eid) {
+      return;
+    }
+
+    SaveRestoreEntity save_parent_decl(
+        parent_decl_id, parent_decl, eid.value(), RawEntity(dc_decl.value()));
+
+    this->EntityVisitor::Accept(friended_decl.value());
+  }
+
+  bool AddToMaps(const void *entity) {
     if (parent_decl_id != mx::kInvalidEntityId && parent_decl) {
-      assert(entity != parent_decl);
-      assert(mx::EntityId(parent_decl_id).Extract<mx::DeclId>());
+      if (entity == parent_decl) {
+        return false;
+      }
+
+#ifndef NDEBUG
+      auto parent_eid = mx::EntityId(parent_decl_id).Extract<mx::DeclId>();
+      if (!parent_eid) {
+        assert(false);
+        return false;
+      }
+#endif
+
       em.parent_decl_ids.emplace(entity, parent_decl_id);
       em.parent_decls.emplace(entity, parent_decl);
     }
 
     if (parent_stmt_id != mx::kInvalidEntityId && parent_stmt) {
-      assert(entity != parent_stmt);
-      assert(mx::EntityId(parent_stmt_id).Extract<mx::StmtId>());
+      if (entity == parent_stmt) {
+        assert(false);
+        return false;
+      }
+
+#ifndef NDEBUG
+      auto parent_eid = mx::EntityId(parent_stmt_id).Extract<mx::StmtId>();
+      if (!parent_eid) {
+        assert(false);
+        return false;
+      }
+#endif
+
       em.parent_stmt_ids.emplace(entity, parent_stmt_id);
       em.parent_stmts.emplace(entity, parent_stmt);
     }
+
+    return true;
   }
 
-  void Accept(const pasta::Decl &entity) final {
-    auto eid = em.SpecificEntityId<mx::DeclId>(entity);
-    if (!eid) {
+  void LabelDeclContext(const void *child_entity,
+                        std::optional<pasta::DeclContext> dc) {
+
+    if (!dc) {
+      return;
+    }
+
+    auto dc_decl = pasta::Decl::From(dc.value());
+    if (!dc_decl || !IsSerializableDecl(dc_decl.value())) {
+      return;
+    }
+
+    auto raw_dc_decl = RawEntity(dc_decl.value());
+    auto dc_eid = em.EntityId(raw_dc_decl);
+    if (dc_eid == mx::kInvalidEntityId) {
       assert(false);
       return;
     }
 
-    // This entity doesn't belong in this code chunk. Not sure if/when this will
-    // happen.
-    //
-    // TODO(pag): Assert as a signal to find when it happens?
-    if (eid->fragment_id != fragment.fragment_index) {
+    em.parent_decl_ids.emplace(child_entity, dc_eid);
+    em.parent_decls.emplace(child_entity, raw_dc_decl);
+  }
+
+  void AcceptTopLevel(const pasta::Decl &entity, bool actually_top_level) {
+
+    // Clang will put records of classes inside themselves for `friend` lookups
+    // and such. Our Clang patches set those to have the equivalent of
+    // `Child->RemappedDecl = Parent`, and PASTA always follows `->RemappedDecl`
+    // thus introducing apparent cycles into the AST. Here we go and protect
+    // against re-visiting such things.
+    std::optional<PrevValueTracker<const void *>> dc_guard;
+    if (auto dc = pasta::DeclContext::From(entity)) {
+      dc_guard.emplace(parent_dc, RawEntity(dc.value()));
+      if (!dc_guard) {
+        return;
+      }
+    }
+
+    Accept(entity);
+
+    // Go build parents for the semantic decl contexts. In the case of things
+    // like out-of-line static/member variables/fields/methods, we want the
+    // parent to be the class itself. We also want to be able to follow the
+    // namespaces up.
+    if (actually_top_level) {
+      CHECK(!ShouldInternalizeDeclContextIntoFragment(entity));
+      LabelDeclContext(RawEntity(entity), entity.DeclarationContext());
+    }
+
+    parent_decl = nullptr;
+    parent_decl_id = mx::kInvalidEntityId;
+  }
+
+  void Accept(const pasta::Decl &entity) final {
+    if (ShouldHideFromIndexer(entity)) {
       return;
     }
 
     auto raw_entity = RawEntity(entity);
-    AddToMaps(raw_entity);
+
+    // These are declaration contexts. We do invent them and add them in, but
+    // we don't want to go visiting everything inside of them. Instead, we want
+    // to add their parentage.
+    if (ShouldInternalizeDeclContextIntoFragment(entity)) {
+      not_yet_seen.erase(raw_entity);
+      LabelDeclContext(raw_entity, entity.DeclarationContext());
+      return;
+    }
+
+    // Handle the serializable decl context differently
+    auto eid = em.SpecificEntityId<mx::DeclId>(entity);
+    if (!eid) {
+      return;
+    }
+
+    // This entity doesn't belong in this code chunk. This happens when crossing
+    // fragments due to template specializations.
+    if (eid->fragment_id != fragment.fragment_index) {
+      return;
+    }
+
+    if (!AddToMaps(raw_entity)) {
+      return;
+    }
 
     SaveRestoreEntity save_parent_decl(
         parent_decl_id, parent_decl, eid.value(), raw_entity);
+
     this->EntityVisitor::Accept(entity);
   }
 
   void Accept(const pasta::Stmt &entity) final {
     auto eid = em.SpecificEntityId<mx::StmtId>(entity);
     if (!eid) {
-      assert(false);
+      // TODO(kumarak): Log error instead of assert. See the assert
+      //                while visiting dependent types.
+      LOG(ERROR)
+          << "Fragment"
+          << PrefixedLocation(fragment.top_level_decls.front(), " at or near ")
+          << " has statement without an ID: "
+          << entity.Tokens().Data();
+      //assert(false);
       return;
     }
 
@@ -158,11 +313,15 @@ class ParentTrackerVisitor : public EntityVisitor {
     //
     // TODO(pag): Assert as a signal to find when it happens?
     if (eid->fragment_id != fragment.fragment_index) {
+      // assert(false);
       return;
     }
 
     auto raw_entity = RawEntity(entity);
-    AddToMaps(raw_entity);
+    if (!AddToMaps(raw_entity)) {
+      assert(false);
+      return;
+    }
 
     SaveRestoreEntity save_parent_stmt(
         parent_stmt_id, parent_stmt, eid.value(), raw_entity);
@@ -170,7 +329,9 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 
   void Accept(const pasta::Attr &entity) final {
-    AddToMaps(RawEntity(entity));
+    if (AddToMaps(RawEntity(entity))) {
+      this->EntityVisitor::Accept(entity);
+    }
   }
 
   bool Enter(const pasta::Decl &entity) final {
@@ -182,7 +343,7 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 
   bool Enter(const pasta::Type &) final {
-    return false;
+    return true;
   }
 
   bool Enter(const pasta::Attr &entity) final {
@@ -190,22 +351,40 @@ class ParentTrackerVisitor : public EntityVisitor {
     return false;
   }
 
-  void Accept(const pasta::Type &) final {}
+  void Accept(const pasta::Type &entity) final {
+    if (!entity.IsDependentType()) {
+      this->EntityVisitor::Accept(entity);
+    }
+  }
 
   void Accept(const pasta::TemplateParameterList &entity) final {
-    AddToMaps(RawEntity(entity));
+    if (AddToMaps(RawEntity(entity))) {
+      this->EntityVisitor::Accept(entity);
+    }
   }
 
   void Accept(const pasta::TemplateArgument &entity) final {
-    AddToMaps(RawEntity(entity));
+    if (AddToMaps(RawEntity(entity))) {
+      this->EntityVisitor::Accept(entity);
+    }
   }
 
   void Accept(const pasta::Designator &entity) final {
-    AddToMaps(RawEntity(entity));
+    if (AddToMaps(RawEntity(entity))) {
+      this->EntityVisitor::Accept(entity);
+    }
   }
 
   void Accept(const pasta::CXXBaseSpecifier &entity) final {
-    AddToMaps(RawEntity(entity));
+    if (AddToMaps(RawEntity(entity))) {
+      this->EntityVisitor::Accept(entity);
+    }
+  }
+
+  void Accept(const pasta::CXXCtorInitializer &entity) final {
+    if (AddToMaps(RawEntity(entity))) {
+      this->EntityVisitor::Accept(entity);
+    }
   }
 
   bool ResolveParentIds(void) {
@@ -283,19 +462,20 @@ static ScanResult ScanTokenContexts(pasta::PrintedToken tok) {
         if (res.seen_type) {
           res.parent_stmt = raw_ctx;
           return res;
-        } else {
-          res.child_stmt = raw_ctx;
-          break;
         }
+        res.child_stmt = raw_ctx;
+        break;
       case pasta::TokenContextKind::kDecl:
         if (res.seen_type) {
           res.parent_decl = raw_ctx;
           return res;
-        } else {
-          res.child_stmt = nullptr;
-          break;
+        } else if (!res.parent_decl && res.child_stmt) {
+          res.parent_decl = raw_ctx;
         }
+        break;
       case pasta::TokenContextKind::kType:
+      case pasta::TokenContextKind::kTemplateParameterList:
+      case pasta::TokenContextKind::kTemplateArgument:
         if (res.child_stmt || res.seen_type) {
           res.seen_type = true;
         } else {
@@ -356,7 +536,7 @@ static void FindMissingParentageFromAttributeTokens(
 
     auto context = tok.Context();
     if (context && context->Kind() == pasta::TokenContextKind::kAttr) {
-      tok_to_attr.emplace(parsed_tok->RawToken(), context->Data());
+      tok_to_attr.emplace(RawEntity(parsed_tok.value()), context->Data());
     }
   }
 
@@ -367,7 +547,7 @@ static void FindMissingParentageFromAttributeTokens(
 
     // Look at the tokens of the statement
     for (const pasta::Token &tok : stmt.Tokens()) {
-      auto attr_it = tok_to_attr.find(tok.RawToken());
+      auto attr_it = tok_to_attr.find(RawEntity(tok));
       if (attr_it == tok_to_attr.end()) {
         continue;
       }
@@ -393,7 +573,7 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
   // Visit the top-level decls first.
 
   for (pasta::Decl decl : Entities(pf.top_level_decls)) {
-    vis.Accept(decl);
+    vis.AcceptTopLevel(decl, true);
   }
 
 #ifndef NDEBUG
@@ -406,8 +586,8 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
       continue;
     }
 
-    vis.Accept(decl);
-    
+    vis.AcceptTopLevel(decl, false);
+
     // NOTE(pag): If this assertion is hit, then it suggests that the
     //            manually-written traversals in `Visitor.cpp` are missing
     //            something that the automatically generated visitors created
@@ -441,23 +621,48 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
   // Log the error.
 
   std::optional<pasta::Stmt> first_missing_stmt;
-  for (pasta::Stmt stmt : Entities(pf.stmts_to_serialize)) {
+  for (const pasta::Stmt &stmt : Entities(pf.stmts_to_serialize)) {
     if (!vis.HasBeenSeen(stmt)) {
       first_missing_stmt.emplace(stmt);
       break;
     }
   }
 
-  CHECK(first_missing_stmt.has_value());
-
   auto ast = pasta::AST::From(pf.top_level_decls.front());
-  LOG(ERROR)
+
+  if (first_missing_stmt.has_value()) {
+    LOG(ERROR)
+        << "Fragment"
+        << PrefixedLocation(pf.top_level_decls.front(), " at or near ")
+        << " main job file " << ast.MainFile().Path().generic_string()
+        << " has statement without parents: "
+        << first_missing_stmt->Tokens().Data();
+    return;
+  }
+
+  std::optional<pasta::Decl> first_missing_decl;
+  for (const pasta::Decl &decl : Entities(pf.decls_to_serialize)) {
+    if (!vis.HasBeenSeen(decl)) {
+      first_missing_decl.emplace(decl);
+      break;
+    }
+  }
+
+  if (first_missing_decl.has_value()) {
+    LOG(ERROR)
+        << "Fragment"
+        << PrefixedLocation(pf.top_level_decls.front(), " at or near ")
+        << " main job file " << ast.MainFile().Path().generic_string()
+        << " has declaration without parents: "
+        << first_missing_decl->Tokens().Data();
+    return;
+  }
+
+  LOG(FATAL)
       << "Fragment"
       << PrefixedLocation(pf.top_level_decls.front(), " at or near ")
       << " main job file " << ast.MainFile().Path().generic_string()
-      << " has statements without parents: "
-      << DiagnosePrintedTokens(
-             pasta::PrintedTokenRange::Create(first_missing_stmt.value()));
+      << " has something without parents.";
 }
 
 }  // namespace indexer

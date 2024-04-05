@@ -564,7 +564,7 @@ class BitcastOp(multiplier.ir.llvm.Operation):
     ...
 
 class BrOp(multiplier.ir.llvm.Operation):
-  dest_operands: Generator[multiplier.ir.Operand]
+  dest_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -581,7 +581,7 @@ class BrOp(multiplier.ir.llvm.Operation):
 class CallOp(multiplier.ir.llvm.Operation):
   result: multiplier.ir.Value
   callee: Optional[str]
-  arg_operands: Generator[multiplier.ir.Operand]
+  arg_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -627,8 +627,8 @@ class ComdatSelectorOp(multiplier.ir.llvm.Operation):
     ...
 
 class CondBrOp(multiplier.ir.llvm.Operation):
-  true_dest_operands: Generator[multiplier.ir.Operand]
-  false_dest_operands: Generator[multiplier.ir.Operand]
+  true_dest_operands: Iterable[multiplier.ir.Operand]
+  false_dest_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -904,7 +904,7 @@ class FreezeOp(multiplier.ir.llvm.Operation):
 
 class GetElementPtrOp(multiplier.ir.llvm.Operation):
   base: multiplier.ir.Value
-  dynamic_indices: Generator[multiplier.ir.Operand]
+  dynamic_indices: Iterable[multiplier.ir.Operand]
   res: multiplier.ir.Value
   inbounds: bool
 
@@ -987,7 +987,7 @@ class ICmpOp(multiplier.ir.llvm.Operation):
     ...
 
 class InlineAsmOp(multiplier.ir.llvm.Operation):
-  operands: Generator[multiplier.ir.Operand]
+  operands: Iterable[multiplier.ir.Operand]
   res: multiplier.ir.Value
   asm_string: str
   constraints: str
@@ -1057,11 +1057,11 @@ class IntToPtrOp(multiplier.ir.llvm.Operation):
     ...
 
 class InvokeOp(multiplier.ir.llvm.Operation):
-  callee_operands: Generator[multiplier.ir.Operand]
-  normal_dest_operands: Generator[multiplier.ir.Operand]
-  unwind_dest_operands: Generator[multiplier.ir.Operand]
+  callee_operands: Iterable[multiplier.ir.Operand]
+  normal_dest_operands: Iterable[multiplier.ir.Operand]
+  unwind_dest_operands: Iterable[multiplier.ir.Operand]
   callee: Optional[str]
-  arg_operands: Generator[multiplier.ir.Operand]
+  arg_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1426,7 +1426,7 @@ class SubOp(multiplier.ir.llvm.Operation):
     ...
 
 class SwitchOp(multiplier.ir.llvm.Operation):
-  default_operands: Generator[multiplier.ir.Operand]
+  default_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1646,8 +1646,8 @@ class ByteSwapOp(multiplier.ir.llvm.Operation):
     ...
 
 class CallIntrinsicOp(multiplier.ir.llvm.Operation):
-  args: Generator[multiplier.ir.Operand]
-  results: Generator[multiplier.ir.Result]
+  args: Iterable[multiplier.ir.Operand]
+  results: Iterable[multiplier.ir.Result]
   intrin: str
 
   @staticmethod
@@ -2352,7 +2352,7 @@ class RoundAndCastToNearestLongOp(multiplier.ir.llvm.Operation):
 
 class MaskedLoadOp(multiplier.ir.llvm.Operation):
   mask: multiplier.ir.Value
-  pass_thru: Generator[multiplier.ir.Operand]
+  pass_thru: Iterable[multiplier.ir.Operand]
   res: multiplier.ir.Value
   alignment: int
 
@@ -4105,7 +4105,7 @@ class MaskedExpandLoadOp(multiplier.ir.llvm.Operation):
 class MaskedGatherOp(multiplier.ir.llvm.Operation):
   ptrs: multiplier.ir.Value
   mask: multiplier.ir.Value
-  pass_thru: Generator[multiplier.ir.Operand]
+  pass_thru: Iterable[multiplier.ir.Operand]
   res: multiplier.ir.Value
   alignment: int
 

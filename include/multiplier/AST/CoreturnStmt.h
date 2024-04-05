@@ -62,7 +62,7 @@ class MX_EXPORT CoreturnStmt : public Stmt {
   static std::optional<CoreturnStmt> from(const TokenContext &t);
 
   Token keyword_token(void) const;
-  Expr operand(void) const;
+  std::optional<Expr> operand(void) const;
   Expr promise_call(void) const;
   bool is_implicit(void) const;
 };

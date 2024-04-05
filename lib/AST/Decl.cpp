@@ -131,7 +131,7 @@ bool Decl::contains(const Stmt &stmt) {
 std::optional<Decl> Decl::by_id(const Index &index, EntityId eid) {
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<DeclId>(vid)) {
-    index.declaration(eid.Pack());
+    return index.declaration(eid.Pack());
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid.Pack() == kInvalidEntityId);
   }
@@ -239,17 +239,13 @@ gap::generator<Attr> Decl::attributes(void) const & {
   co_return;
 }
 
-AccessSpecifier Decl::access(void) const {
-  return static_cast<AccessSpecifier>(impl->reader.getVal4());
-}
-
 AvailabilityResult Decl::availability(void) const {
-  return static_cast<AvailabilityResult>(impl->reader.getVal5());
+  return static_cast<AvailabilityResult>(impl->reader.getVal4());
 }
 
 std::optional<Attr> Decl::defining_attribute(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal6();
+    RawEntityId eid = impl->reader.getVal5();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -262,7 +258,7 @@ std::optional<Attr> Decl::defining_attribute(void) const {
 
 std::optional<TemplateDecl> Decl::described_template(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal7();
+    RawEntityId eid = impl->reader.getVal6();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -275,7 +271,7 @@ std::optional<TemplateDecl> Decl::described_template(void) const {
 
 std::optional<TemplateParameterList> Decl::described_template_parameters(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal8();
+    RawEntityId eid = impl->reader.getVal7();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -288,7 +284,7 @@ std::optional<TemplateParameterList> Decl::described_template_parameters(void) c
 
 std::optional<ExternalSourceSymbolAttr> Decl::external_source_symbol_attribute(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal9();
+    RawEntityId eid = impl->reader.getVal8();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -300,25 +296,25 @@ std::optional<ExternalSourceSymbolAttr> Decl::external_source_symbol_attribute(v
 }
 
 DeclFriendObjectKind Decl::friend_object_kind(void) const {
-  return static_cast<DeclFriendObjectKind>(impl->reader.getVal10());
+  return static_cast<DeclFriendObjectKind>(impl->reader.getVal9());
 }
 
 std::optional<uint32_t> Decl::max_alignment(void) const {
-  if (!impl->reader.getVal12()) {
+  if (!impl->reader.getVal11()) {
     return std::nullopt;
   } else {
-    return static_cast<uint32_t>(impl->reader.getVal11());
+    return static_cast<uint32_t>(impl->reader.getVal10());
   }
   return std::nullopt;
 }
 
 DeclModuleOwnershipKind Decl::module_ownership_kind(void) const {
-  return static_cast<DeclModuleOwnershipKind>(impl->reader.getVal13());
+  return static_cast<DeclModuleOwnershipKind>(impl->reader.getVal12());
 }
 
 std::optional<Decl> Decl::non_closure_context(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal14();
+    RawEntityId eid = impl->reader.getVal13();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -330,136 +326,136 @@ std::optional<Decl> Decl::non_closure_context(void) const {
 }
 
 bool Decl::has_attributes(void) const {
-  return impl->reader.getVal15();
+  return impl->reader.getVal14();
 }
 
 bool Decl::has_owning_module(void) const {
-  return impl->reader.getVal16();
+  return impl->reader.getVal15();
 }
 
 bool Decl::has_tag_identifier_namespace(void) const {
-  return impl->reader.getVal17();
+  return impl->reader.getVal16();
 }
 
 bool Decl::is_defined_outside_function_or_method(void) const {
-  return impl->reader.getVal18();
+  return impl->reader.getVal17();
 }
 
 bool Decl::is_deprecated(void) const {
-  return impl->reader.getVal19();
+  return impl->reader.getVal18();
 }
 
 bool Decl::is_discarded_in_global_module_fragment(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal19();
 }
 
 bool Decl::is_file_context_declaration(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal20();
 }
 
 bool Decl::is_function_or_function_template(void) const {
-  return impl->reader.getVal22();
+  return impl->reader.getVal21();
 }
 
 bool Decl::is_function_pointer_type(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal22();
 }
 
 bool Decl::is_implicit(void) const {
-  return impl->reader.getVal24();
+  return impl->reader.getVal23();
 }
 
 bool Decl::is_in_anonymous_namespace(void) const {
-  return impl->reader.getVal25();
+  return impl->reader.getVal24();
 }
 
 bool Decl::is_in_another_module_unit(void) const {
-  return impl->reader.getVal26();
+  return impl->reader.getVal25();
 }
 
 bool Decl::is_in_export_declaration_context(void) const {
-  return impl->reader.getVal27();
+  return impl->reader.getVal26();
 }
 
 std::optional<bool> Decl::is_in_local_scope_for_instantiation(void) const {
-  if (!impl->reader.getVal29()) {
+  if (!impl->reader.getVal28()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal28());
+    return static_cast<bool>(impl->reader.getVal27());
   }
   return std::nullopt;
 }
 
 bool Decl::is_in_std_namespace(void) const {
-  return impl->reader.getVal30();
+  return impl->reader.getVal29();
 }
 
 bool Decl::is_invisible_outside_the_owning_module(void) const {
-  return impl->reader.getVal31();
+  return impl->reader.getVal30();
 }
 
 bool Decl::is_local_extern_declaration(void) const {
-  return impl->reader.getVal32();
+  return impl->reader.getVal31();
 }
 
 bool Decl::is_module_private(void) const {
-  return impl->reader.getVal33();
+  return impl->reader.getVal32();
 }
 
 bool Decl::is_out_of_line(void) const {
-  return impl->reader.getVal34();
+  return impl->reader.getVal33();
 }
 
 bool Decl::is_parameter_pack(void) const {
-  return impl->reader.getVal35();
+  return impl->reader.getVal34();
 }
 
 bool Decl::is_template_declaration(void) const {
-  return impl->reader.getVal36();
+  return impl->reader.getVal35();
 }
 
 bool Decl::is_template_parameter(void) const {
-  return impl->reader.getVal37();
+  return impl->reader.getVal36();
 }
 
 bool Decl::is_template_parameter_pack(void) const {
-  return impl->reader.getVal38();
+  return impl->reader.getVal37();
 }
 
 bool Decl::is_templated(void) const {
-  return impl->reader.getVal39();
+  return impl->reader.getVal38();
 }
 
 bool Decl::is_top_level_declaration_in_obj_c_container(void) const {
-  return impl->reader.getVal40();
+  return impl->reader.getVal39();
 }
 
 bool Decl::is_unavailable(void) const {
-  return impl->reader.getVal41();
+  return impl->reader.getVal40();
 }
 
 bool Decl::is_unconditionally_visible(void) const {
-  return impl->reader.getVal42();
+  return impl->reader.getVal41();
 }
 
 bool Decl::is_weak_imported(void) const {
-  return impl->reader.getVal43();
+  return impl->reader.getVal42();
 }
 
 DeclKind Decl::kind(void) const {
-  return static_cast<DeclKind>(impl->reader.getVal44());
+  return static_cast<DeclKind>(impl->reader.getVal43());
 }
 
 DeclCategory Decl::category(void) const {
-  return static_cast<DeclCategory>(impl->reader.getVal45());
+  return static_cast<DeclCategory>(impl->reader.getVal44());
 }
 
 Token Decl::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 TokenRange Decl::tokens(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal47(), impl->reader.getVal48());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal46(), impl->reader.getVal47());
 }
 
 #pragma GCC diagnostic pop

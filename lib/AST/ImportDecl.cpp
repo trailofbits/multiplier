@@ -220,11 +220,11 @@ std::optional<ImportDecl> ImportDecl::from(const TokenContext &t) {
 }
 
 unsigned ImportDecl::num_identifier_tokens(void) const {
-  return impl->reader.getVal51().size();
+  return impl->reader.getVal50().size();
 }
 
 std::optional<Token> ImportDecl::nth_identifier_token(unsigned n) const {
-  auto list = impl->reader.getVal51();
+  auto list = impl->reader.getVal50();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -238,7 +238,7 @@ std::optional<Token> ImportDecl::nth_identifier_token(unsigned n) const {
 }
 
 gap::generator<Token> ImportDecl::identifier_tokens(void) const & {
-  auto list = impl->reader.getVal51();
+  auto list = impl->reader.getVal50();
   EntityProviderPtr ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
   if (!fragment) {
@@ -248,8 +248,8 @@ gap::generator<Token> ImportDecl::identifier_tokens(void) const & {
   auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
-    if (auto t51 = ep->TokenFor(ep, tok_reader, v)) {
-      co_yield t51;
+    if (auto t50 = ep->TokenFor(ep, tok_reader, v)) {
+      co_yield t50;
     }
   }
   co_return;

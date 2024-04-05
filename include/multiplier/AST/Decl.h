@@ -22,7 +22,6 @@
 #include "../Iterator.h"
 #include "../Frontend/TokenContext.h"
 
-#include <multiplier/AST/AccessSpecifier.h>
 #include <multiplier/AST/AvailabilityResult.h>
 #include <multiplier/AST/DeclCategory.h>
 #include <multiplier/AST/DeclFriendObjectKind.h>
@@ -96,7 +95,8 @@ class MX_EXPORT Decl {
   bool is_definition(void) const;
   Decl canonical_declaration(void) const;
   gap::generator<Decl> redeclarations(void) const &;
- public:
+  gap::generator<Decl> specializations(void) const &;
+
   static gap::generator<Decl> in(const Index &index, std::span<const DeclKind> kinds);
   static gap::generator<Decl> in(const Fragment &frag, std::span<const DeclKind> kinds);
   static gap::generator<Decl> in(const File &file, std::span<const DeclKind> kinds);
@@ -135,7 +135,6 @@ class MX_EXPORT Decl {
   std::optional<Attr> nth_attribute(unsigned n) const;
   unsigned num_attributes(void) const;
   gap::generator<Attr> attributes(void) const &;
-  AccessSpecifier access(void) const;
   AvailabilityResult availability(void) const;
   std::optional<Attr> defining_attribute(void) const;
   std::optional<TemplateDecl> described_template(void) const;

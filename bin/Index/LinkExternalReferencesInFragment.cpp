@@ -11,6 +11,7 @@
 #include <pasta/AST/Macro.h>
 #include <pasta/AST/Stmt.h>
 #include <pasta/Util/File.h>
+#include <span>
 #include <unordered_set>
 
 #include "EntityMapper.h"
@@ -73,6 +74,328 @@ static void AddDeclReferencesFrom(
   }
 }
 
+// Add C++ base specifier extension relationships to the database.
+static void AddBaseSpecifierReferenceFrom(
+    const EntityMapper &em, mx::DatabaseWriter &database,
+    const pasta::CXXBaseSpecifier &spec) {
+  
+  auto raw_spec_id = em.EntityId(spec);
+
+  auto raw_cls_id = em.ParentDeclId(spec);
+  auto cls_id = mx::EntityId(raw_cls_id).Extract<mx::DeclId>();
+  if (!cls_id) {
+    return;
+  }
+
+  auto base_cls = spec.BaseType().AsCXXRecordDeclaration();
+  if (!base_cls) {
+    return;
+  }
+
+  auto raw_base_cls_id = em.EntityId(base_cls.value());
+  auto base_cls_id = mx::EntityId(raw_base_cls_id).Extract<mx::DeclId>();
+  if (!base_cls_id) {
+    return;
+  }
+
+  // The referer context id will be same as `from_id` by default. The
+  // DeclReferenceKind function updates it based on the AST analysis
+  // of the context in which declaration is referred.
+  mx::ReferenceRecord record{raw_cls_id, raw_base_cls_id, raw_spec_id,
+                             mx::BuiltinReferenceKind::EXTENDS};
+  database.AddAsync(record);
+}
+
+// Add C++ method override relationships to the database.
+static void AddMethodOverrideReferences(
+    const EntityMapper &em, mx::DatabaseWriter &database,
+    const pasta::CXXMethodDecl &method) {
+
+  auto raw_derived_id = em.EntityId(method);
+  auto derived_id = mx::EntityId(raw_derived_id).Extract<mx::DeclId>();
+  if (!derived_id) {
+    return;
+  }
+
+  for (const auto &base_method : method.OverriddenMethods()) {
+    auto raw_base_id = em.EntityId(base_method);
+    auto base_id = mx::EntityId(raw_base_id).Extract<mx::DeclId>();
+    if (!base_id) {
+      return;
+    }
+
+    mx::ReferenceRecord record{raw_derived_id, raw_base_id, raw_derived_id,
+                               mx::BuiltinReferenceKind::OVERRIDES};
+    database.AddAsync(record);
+  }
+}
+
+// Get a type cases list of a specific thing.
+template <typename T>
+static std::span<const T> SpecificDeclList(
+    const PendingFragment &pf, mx::DeclKind kind) {
+  auto decls_it = pf.decls_to_serialize.find(kind);
+  if (decls_it == pf.decls_to_serialize.end() || decls_it->second.empty()) {
+    return {};
+  }
+
+  auto first = reinterpret_cast<const T *>(decls_it->second.data());
+  return std::span<const T>(first, decls_it->second.size());
+}
+
+static constexpr mx::DeclKind kMethodKinds[] = {
+  mx::DeclKind::CXX_CONVERSION,
+  mx::DeclKind::CXX_CONSTRUCTOR,
+  mx::DeclKind::CXX_DEDUCTION_GUIDE,
+  mx::DeclKind::CXX_DESTRUCTOR,
+  mx::DeclKind::CXX_METHOD,
+};
+
+// Add C++ method override relationships to the database.
+static void AddMethodOverrideReferences(
+    const EntityMapper &em, mx::DatabaseWriter &database,
+    const PendingFragment &pf) {
+
+  for (auto kind : kMethodKinds) {
+    for (const auto &decl : SpecificDeclList<pasta::CXXMethodDecl>(pf, kind)) {
+      AddMethodOverrideReferences(em, database, decl);
+    }
+  }
+}
+
+// Go find the partial specialization ID, if any, and return it for use in the
+// reference context. If we do find one, then also add a second specialization
+// record.
+template <typename Partial, typename Tpl, typename Spec>
+static mx::RawEntityId PartialSpecializationContext(
+  const EntityMapper &em, mx::DatabaseWriter &database,
+  const Tpl &tpl, const Spec &spec) {
+
+  auto pattern = spec.SpecializedTemplateOrPartial();
+  auto partial = std::get_if<Partial>(&pattern);
+  if (!partial) {
+    return em.EntityId(tpl);
+  }
+
+  auto raw_partial_id = em.EntityId(*partial);
+  auto partial_id = mx::EntityId(raw_partial_id).Extract<mx::DeclId>();
+  if (!partial_id) {
+    assert(false);
+    return em.EntityId(tpl);
+  }
+
+  mx::ReferenceRecord record{em.EntityId(spec), raw_partial_id, raw_partial_id,
+                             mx::BuiltinReferenceKind::SPECIALIZES};
+  database.AddAsync(record);
+
+  return raw_partial_id;
+}
+
+static mx::RawEntityId SpecializationContext(
+    const EntityMapper &em, mx::DatabaseWriter &database,
+    const pasta::ClassTemplateDecl &tpl,
+    const pasta::ClassTemplateSpecializationDecl &spec) {
+  return PartialSpecializationContext<pasta::ClassTemplatePartialSpecializationDecl>(
+      em, database, tpl, spec);
+}
+
+static mx::RawEntityId SpecializationContext(
+    const EntityMapper &em, mx::DatabaseWriter &database,
+    const pasta::VarTemplateDecl &tpl,
+    const pasta::VarTemplateSpecializationDecl &spec) {
+  return PartialSpecializationContext<pasta::VarTemplatePartialSpecializationDecl>(
+      em, database, tpl, spec);
+}
+
+static mx::RawEntityId SpecializationContext(
+  const EntityMapper &em, mx::DatabaseWriter &database,
+  const pasta::FunctionTemplateDecl &tpl, const pasta::FunctionDecl &) {
+  return em.EntityId(tpl);
+}
+
+template <typename T>
+static void AddTemplateSpecialization(
+    const EntityMapper &em, mx::DatabaseWriter &database,
+    const T &tpl) {
+
+  auto raw_tpl_id = em.EntityId(tpl);
+  auto tpl_id = mx::EntityId(raw_tpl_id).Extract<mx::DeclId>();
+  if (!tpl_id) {
+    return;
+  }
+
+  for (const auto &spec : tpl.Specializations()) {
+    auto raw_spec_id = em.EntityId(spec);
+    auto spec_id = mx::EntityId(raw_spec_id).Extract<mx::DeclId>();
+    if (!spec_id) {
+      return;
+    }
+
+    auto raw_context_id = SpecializationContext(em, database, tpl, spec);
+    mx::ReferenceRecord record{raw_spec_id, raw_tpl_id, raw_context_id,
+                               mx::BuiltinReferenceKind::SPECIALIZES};
+    database.AddAsync(record);
+  }
+}
+
+// Try to figure out how functions are specialized.
+static void AddFunctionSpecialization(
+    const EntityMapper &em, mx::DatabaseWriter &database,
+    const pasta::FunctionDecl &func) {
+
+  mx::RawEntityId raw_tpl_id = mx::kInvalidEntityId;
+
+  if (auto meth_pattern = func.InstantiatedFromMemberFunction()) {
+    if (auto tpl = meth_pattern->DescribedFunctionTemplate()) {
+      raw_tpl_id = em.EntityId(tpl.value());
+    } else {
+      raw_tpl_id = em.EntityId(meth_pattern.value());
+    }
+  
+  } else if (auto func_pattern = func.InstantiatedFromDeclaration()) {
+    if (auto tpl = func_pattern->DescribedFunctionTemplate()) {
+      raw_tpl_id = em.EntityId(tpl.value());
+    } else {
+      raw_tpl_id = em.EntityId(func_pattern.value());
+    }
+  
+  } else if (auto tpl_pattern = func.TemplateInstantiationPattern()) {
+    if (auto tpl = tpl_pattern->DescribedFunctionTemplate()) {
+      raw_tpl_id = em.EntityId(tpl.value());
+    } else {
+      raw_tpl_id = em.EntityId(tpl_pattern.value());
+    }
+  }
+
+  auto tpl_id = mx::EntityId(raw_tpl_id).Extract<mx::DeclId>();
+  if (!tpl_id) {
+    return;
+  }
+
+  auto raw_spec_id = em.EntityId(func);
+  auto spec_id = mx::EntityId(raw_spec_id).Extract<mx::DeclId>();
+  if (!spec_id) {
+    return;
+  }
+
+  mx::ReferenceRecord record{raw_spec_id, raw_tpl_id, raw_tpl_id,
+                             mx::BuiltinReferenceKind::SPECIALIZES};
+  database.AddAsync(record);
+}
+
+static void AddVarSpecialization(
+    const EntityMapper &em, mx::DatabaseWriter &database,
+    const pasta::VarDecl &var) {
+
+  mx::RawEntityId raw_tpl_id = mx::kInvalidEntityId;
+
+  if (auto field_pattern = var.InstantiatedFromStaticDataMember()) {
+    if (auto tpl = field_pattern->DescribedVariableTemplate()) {
+      raw_tpl_id = em.EntityId(tpl.value());
+    } else {
+      raw_tpl_id = em.EntityId(field_pattern.value());
+    }
+  
+  } else if (auto tpl_pattern = var.TemplateInstantiationPattern()) {
+    if (auto tpl = tpl_pattern->DescribedVariableTemplate()) {
+      raw_tpl_id = em.EntityId(tpl.value());
+    } else {
+      raw_tpl_id = em.EntityId(tpl_pattern.value());
+    }
+  }
+
+  auto tpl_id = mx::EntityId(raw_tpl_id).Extract<mx::DeclId>();
+  if (!tpl_id) {
+    return;
+  }
+
+  auto raw_spec_id = em.EntityId(var);
+  auto spec_id = mx::EntityId(raw_spec_id).Extract<mx::DeclId>();
+  if (!spec_id) {
+    return;
+  }
+
+  mx::ReferenceRecord record{raw_spec_id, raw_tpl_id, raw_tpl_id,
+                             mx::BuiltinReferenceKind::SPECIALIZES};
+  database.AddAsync(record);
+}
+
+static void AddEnumSpecialization(
+    const EntityMapper &em, mx::DatabaseWriter &database,
+    const pasta::EnumDecl &spec) {
+
+  mx::RawEntityId raw_tpl_id = mx::kInvalidEntityId;
+  if (auto enum_pattern = spec.TemplateInstantiationPattern()) {
+    raw_tpl_id = em.EntityId(enum_pattern.value());
+  } else if (auto inst_pattern = spec.InstantiatedFromMemberEnum()) {
+    raw_tpl_id = em.EntityId(inst_pattern.value());
+  }
+
+  auto tpl_id = mx::EntityId(raw_tpl_id).Extract<mx::DeclId>();
+  if (!tpl_id) {
+    return;
+  }
+
+  auto raw_spec_id = em.EntityId(spec);
+  auto spec_id = mx::EntityId(raw_spec_id).Extract<mx::DeclId>();
+  if (!spec_id) {
+    return;
+  }
+
+  mx::ReferenceRecord record{raw_spec_id, raw_tpl_id, raw_tpl_id,
+                             mx::BuiltinReferenceKind::SPECIALIZES};
+  database.AddAsync(record);
+}
+
+static constexpr mx::DeclKind kFunctionKinds[] = {
+  mx::DeclKind::CXX_CONVERSION,
+  mx::DeclKind::CXX_CONSTRUCTOR,
+  mx::DeclKind::CXX_DEDUCTION_GUIDE,
+  mx::DeclKind::CXX_DESTRUCTOR,
+  mx::DeclKind::CXX_METHOD,
+  mx::DeclKind::FUNCTION
+};
+
+// Add template specialization records.
+static void AddTemplateSpecializations(
+    const EntityMapper &em, mx::DatabaseWriter &database,
+    const PendingFragment &pf) {
+
+  for (const auto &tpl : SpecificDeclList<pasta::ClassTemplateDecl>(
+           pf, mx::DeclKind::CLASS_TEMPLATE)) {
+    AddTemplateSpecialization(em, database, tpl);
+  }
+
+  for (const auto &tpl : SpecificDeclList<pasta::VarTemplateDecl>(
+           pf, mx::DeclKind::VAR_TEMPLATE)) {
+    AddTemplateSpecialization(em, database, tpl);
+  }
+
+  for (const auto &tpl : SpecificDeclList<pasta::FunctionTemplateDecl>(
+           pf, mx::DeclKind::FUNCTION_TEMPLATE)) {
+    AddTemplateSpecialization(em, database, tpl);
+  }
+
+  for (auto kind : kFunctionKinds) {
+    for (const auto &func : SpecificDeclList<pasta::FunctionDecl>(pf, kind)) {
+      AddFunctionSpecialization(em, database, func);
+    }
+  }
+
+  // NOTE(pag): We don't look at `VAR_TEMPLATE_SPECIALIZATION`, because we
+  //            should have gotten those from the specialization loop on
+  //            `VAR_TEMPLATE`.
+  //
+  // TODO(pag): Do `ParmVarDecl`s and such have specialization info from Clang?
+  for (const auto &spec : SpecificDeclList<pasta::VarDecl>(pf, mx::DeclKind::VAR)) {
+    AddVarSpecialization(em, database, spec);
+  }
+
+  for (const auto &spec : SpecificDeclList<pasta::EnumDecl>(pf, mx::DeclKind::ENUM)) {
+    AddEnumSpecialization(em, database, spec);
+  }
+}
+
 }  // namespace
 
 // Identify all unique entity IDs referenced by this fragment,
@@ -93,14 +416,16 @@ void LinkExternalReferencesInFragment(
   AddDeclReferencesFrom<mx::StmtId>(ast, database, pf, pf.stmts_to_serialize,
                                     EnumerateStmtToDeclReferences);
 
-  // XREF(pag): Issue #192. Make sure we record references from designators
-  //            to fields.
   AddDeclReferencesFrom<mx::DesignatorId>(
       ast, database, pf, pf.designators_to_serialize,
       EnumerateDesignatorToDeclReferences);
 
-  // TODO(pag): Issue #464. Add support for `CXXBaseSpecifier`s to the
-  //            references.
+  for (const auto &spec : pf.cxx_base_specifiers_to_serialize) {
+    AddBaseSpecifierReferenceFrom(em, database, spec);
+  }
+
+  AddMethodOverrideReferences(em, database, pf);
+  AddTemplateSpecializations(em, database, pf);
 
   for (auto maybe_tt : Entities(pf.macros_to_serialize)) {
     if (!maybe_tt) {
