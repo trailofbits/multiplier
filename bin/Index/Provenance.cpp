@@ -250,6 +250,28 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
     return VisitStmt(me->Base(), raw_token, token_data, token_kind,
                      is_identifier);
 
+  // Something like `__c11_atomic_load(...)` of an `_Atomic`-qualified variable.
+  } else if (auto atomic = pasta::AtomicExpr::From(stmt)) {
+    if (is_identifier) {
+      if (token_data == atomic->BuiltinToken().Data()) {
+        return RawEntity(atomic.value());
+      }
+    } else if (token_kind == pasta::TokenKind::kRParenthesis ||
+               token_kind == pasta::TokenKind::kLParenthesis) {
+      auto r_paren = atomic->RParenToken();
+      if (r_paren.Kind() == pasta::TokenKind::kRParenthesis) {
+        if (check_token(r_paren)) {
+          return RawEntity(atomic.value());
+        }
+
+        if (auto l_paren = r_paren.BalancedLocation()) {
+          if (check_token(l_paren.value())) {
+            return RawEntity(atomic.value());
+          }
+        }
+      }
+    }
+
   // The label name in an `asm goto`.
   } else if (auto addr = pasta::AddrLabelExpr::From(stmt)) {
     if (check_token(addr->LabelToken())) {
