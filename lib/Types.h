@@ -27,7 +27,7 @@ static constexpr unsigned kBigFragmentIdNumBits = 16u;
 static constexpr RawEntityId kMaxBigFragmentId = 1ull << kBigFragmentIdNumBits;
 
 static constexpr uint64_t kNumTokensInBigFragment =
-    (1ull << kBigFragmentIdNumBits) / 3u  /* fudge factor */;
+    (1ull << kBigFragmentIdNumBits) / 6u  /* fudge factor */;
 
 static constexpr unsigned kFileIdNumBits = 20u;
 static constexpr RawEntityId kMaxFileId = 1ull << kFileIdNumBits;
