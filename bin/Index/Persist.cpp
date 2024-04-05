@@ -850,13 +850,11 @@ void GlobalIndexingState::PersistFragment(
   // substitutions because that will just replicate logic from the token
   // tree.
   } else {
-#if 0
-    // TODO(pag): Re-enable later.
     if (!pf.top_level_decls.empty()) {
       const pasta::Decl &leader_decl = pf.top_level_decls.front();
       LOG(ERROR)
           << tok_tree_err.str() << " for top-level declaration "
-          << pf.parsed_tokens.Data()
+          << DeclToString(leader_decl)
           << PrefixedLocation(leader_decl, " at or near ")
           << " on main job file " << MainSourceFile(ast);
     } else {
@@ -864,7 +862,7 @@ void GlobalIndexingState::PersistFragment(
           << tok_tree_err.str() << " for macros on main job file "
           << MainSourceFile(ast);
     }
-#endif
+
     PersistParsedTokens(pf, fb, provenance);
   }
 

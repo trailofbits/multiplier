@@ -433,7 +433,7 @@ void LinkExternalReferencesInFragment(
       // TODO(pag): Remove this assertion later; really it's a failure to
       //            construct a token tree, and we do have a backup path
       //            in `Persist.cpp`.
-      // assert(false);
+      assert(false);
       continue;
     }
 
