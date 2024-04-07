@@ -270,6 +270,8 @@ struct TokenTreeSerializationSchedule {
       id.kind = tt.Kind();
       id.offset = static_cast<mx::EntityOffset>(entity_list.size());
       raw_id = mx::EntityId(id).Pack();
+      CHECK_NE(raw_id, mx::kInvalidEntityId)
+          << "Likely MacroId offset overflow: " << id.offset;
 
       // Add it to our to-serialize list.
       entity_list.push_back(tt);
@@ -360,6 +362,9 @@ struct TokenTreeSerializationSchedule {
       }
 
       raw_id = mx::EntityId(id).Pack();
+      CHECK_NE(raw_id, mx::kInvalidEntityId)
+          << "Likely MacroTokenId offset overflow: " << id.offset;
+
       if (raw_pt) {
         em.token_tree_ids.emplace(raw_pt, raw_id);
       }
@@ -369,7 +374,6 @@ struct TokenTreeSerializationSchedule {
     }
 
     auto raw_tt = RawEntity(node);
-    CHECK_NE(raw_id, mx::kInvalidEntityId);
     CHECK(em.token_tree_ids.emplace(raw_tt, raw_id).second);
 
     // Make sure `#define` macro body tokens are globally visible to provenance,
