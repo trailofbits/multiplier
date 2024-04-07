@@ -1946,6 +1946,39 @@ static std::optional<FileLocationOfFragment> FindFileLocationOfFragment(
   return FileLocationOfFragment(fid, btid, etid);
 }
 
+// Estimate the number of tokens in the macro range.
+static unsigned MacroRangeSize(const std::vector<pasta::Macro> &macros) {
+  if (macros.empty()) {
+    return 0u;
+  }
+
+  auto max = 0u;
+  auto min = ~0u;
+  auto any = false;
+
+  for (const auto &macro : macros) {
+    if (auto bt = macro.BeginToken()) {
+      auto index = bt->Index();
+      min = std::min(min, index);
+      max = std::max(max, index);
+      any = true;
+    }
+
+    auto range = pasta::Macro::CompleteExpansionRange(macro);
+    for (auto size = range.Size(); size--; ) {
+      if (auto et = range[size].MacroLocation()) {
+        auto index = et->Index();
+        min = std::min(min, index);
+        max = std::max(max, index);
+        any = true;
+        break;
+      }
+    }
+  }
+
+  return any ? (max - min + 1u) : 0u;
+}
+
 static PendingFragmentPtr CreatePendingFragment(
     IdStore &id_store, EntityMapper &em,
     const pasta::TokenRange *original_tokens,
@@ -1969,7 +2002,9 @@ static PendingFragmentPtr CreatePendingFragment(
   if (original_tokens) {
     num_tokens = original_tokens->Size();
   }
-  num_tokens = std::max(num_tokens, parsed_tokens.Size());
+
+  num_tokens = std::max(num_tokens, parsed_tokens.Size()) +
+               MacroRangeSize(macros);
 
   // Compute the fragment ID, and in doing so, figure out if this is actually
   // a new fragment.
