@@ -723,9 +723,10 @@ static TokenCategory ClassifyStmt(StmtId id, TokenKind kind,
     case StmtKind::FIXED_POINT_LITERAL:
       return TokenCategory::LITERAL;
 
+    // E.g. `__c11_atomic_load(...)`.
     case StmtKind::ATOMIC_EXPR:
       if (kind == TokenKind::IDENTIFIER) {
-        return TokenCategory::FUNCTION;
+        return TokenCategory::KEYWORD;
       }
       break;
 
