@@ -142,8 +142,9 @@ bool IsSpecialization(const pasta::Decl &decl);
 
 // Is this decl a specialization of a template? If so, then we will want
 // to render the printed tokens of the specialization into the fragment, rather
-// than the parsed tokens.
-bool IsSpecializationOrTemplateInSpecialization(const pasta::Decl &decl);
+// than the parsed tokens. If this is something like a function inside of a
+// specialization, then we'll also want to do the same thing.
+bool IsSpecializationOrInSpecialization(const pasta::Decl &decl);
 
 // Check of the declaration is Out of Line
 bool IsOutOfLine(const pasta::Decl &decl);
@@ -152,11 +153,6 @@ bool IsOutOfLine(const pasta::Decl &decl);
 // should be internalized into the fragment, otherwise `false`. Returns `false`
 // if `decl` isn't a declaration context.
 bool ShouldInternalizeDeclContextIntoFragment(const pasta::Decl &decl);
-
-// Determines whether or not a TLD is likely to have to go into a child
-// fragment. This happens when the TLD is a forward declaration, e.g. of a
-// struct.
-bool ShouldGoInNestedFragment(const pasta::Decl &decl);
 
 // Determines whether or not a TLM is likely to have to go into a floating
 // fragment. This generally happens when a TLM is a directive.

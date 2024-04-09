@@ -47,7 +47,9 @@ struct OrderedDecl {
   inline OrderedDecl(pasta::Decl decl_, const void *parent_, unsigned order_)
       : decl(std::move(decl_)),
         parent(parent_),
-        order(order_) {}
+        order(order_) {
+    assert(RawEntity(decl) != parent);        
+  }
 };
 
 struct OrderedMacro {
@@ -590,8 +592,6 @@ class TLDFinder final : public pasta::DeclVisitor {
         return;
       }
     }
-
-    assert(!ShouldGoInNestedFragment(decl));
   }
 };
 
@@ -1090,6 +1090,16 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
       begin_tok_index -= 2u;
     } else {
       break;
+    }
+  }
+
+  // Expand to leading indentation.
+  if (begin_tok_index) {
+    auto prev_tok = range[begin_tok_index - 1u];
+    auto prev_tok_data = prev_tok.Data();
+    if (prev_tok.Kind() == pasta::TokenKind::kUnknown &&
+        (prev_tok_data.ends_with(' ') || prev_tok_data.ends_with('\t'))) {
+      begin_tok_index -= 1u;
     }
   }
 
@@ -2086,7 +2096,7 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
   // don't want to return the parsed tokens, as those will likely represent
   // things like 
   for (const auto &decl : decls_to_print) {
-    if (IsSpecializationOrTemplateInSpecialization(decl)) {
+    if (IsSpecializationOrInSpecialization(decl)) {
       parsed_tokens = pasta::PrintedTokenRange::AdoptWhitespace(
           printed_tokens, parsed_tokens);
       break;
@@ -2189,7 +2199,7 @@ static void CreateFreestandingDeclFragment(
   //            `printed_tokens`.
   if (parsed_tokens) {
     (void) pasta::PrintedTokenRange::Align(parsed_tokens, printed_tokens);
-    if (IsSpecializationOrTemplateInSpecialization(decl)) {
+    if (IsSpecializationOrInSpecialization(decl)) {
       parsed_tokens = pasta::PrintedTokenRange::AdoptWhitespace(
           printed_tokens, parsed_tokens);
     }
@@ -2381,8 +2391,7 @@ static void CreatePendingFragments(
             decl, pending_fragments, main_file_path);
 
       // These are generally template instantiations.
-      } else if (ShouldGoInNestedFragment(decl)) {
-        CHECK_NOTNULL(er.parent);
+      } else if (er.parent) {
         nested_decls.emplace_back(std::move(er));
 
       // E.g. `int a, b;` will produce two `VarDecl`s that we want to merge into

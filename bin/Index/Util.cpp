@@ -705,6 +705,8 @@ bool IsSpecialization(const pasta::Decl &decl) {
 
     case pasta::DeclKind::kVarTemplateSpecialization:
     case pasta::DeclKind::kClassTemplateSpecialization:
+    case pasta::DeclKind::kClassScopeFunctionSpecialization:
+    case pasta::DeclKind::kImplicitConceptSpecialization:
       return true;
 
     // NOTE(pag): Type alias templates cannot be explicitly specialized.
@@ -759,159 +761,28 @@ bool IsSpecialization(const pasta::Decl &decl) {
 // Is this decl a specialization of a template? If so, then we will want
 // to render the printed tokens of the specialization into the fragment, rather
 // than the parsed tokens.
-bool IsSpecializationOrTemplateInSpecialization(const pasta::Decl &decl) {
+bool IsSpecializationOrInSpecialization(const pasta::Decl &decl) {
   switch (decl.Kind()) {
-    // Treat templates kind of like specializations if they exist inside of
-    // another specialization. This is because they may actually use the outer
-    // template arguments/parameters.
     case pasta::DeclKind::kVarTemplate:
     case pasta::DeclKind::kClassTemplate:
     case pasta::DeclKind::kFunctionTemplate:
     case pasta::DeclKind::kFriendTemplate:
-    case pasta::DeclKind::kVarTemplatePartialSpecialization:
-    case pasta::DeclKind::kClassTemplatePartialSpecialization:
     case pasta::DeclKind::kTypeAliasTemplate:
-      if (auto dc = decl.DeclarationContext()) {
+    case pasta::DeclKind::kFunction:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod:
+      if (auto dc = decl.LexicalDeclarationContext()) {
         if (auto dc_decl = pasta::Decl::From(dc.value())) {
-          return IsSpecializationOrTemplateInSpecialization(dc_decl.value());
+          return IsSpecializationOrInSpecialization(dc_decl.value());
         }
       }
       return false;
 
     default:
       return IsSpecialization(decl);
-  }
-}
-
-// Determines whether or not a TLD is likely to have to go into a child
-// fragment. This happens when the TLD is a forward declaration, e.g. of a
-// struct.
-//
-// TODO(pag): Thing about forward declarations in template parameter lists.
-//
-// NOTE(pag): This logic is closely related to what is in `TLDFinder`.
-bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
-
-  auto lc = decl.LexicalDeclarationContext();
-
-  // Methods (static or member) inside of class template specializations are
-  // always nested fragments. This is because their bodies may not be fully
-  // instantiated, and so we don't want them screwing up the fragment
-  // deduplication.
-  if (lc) {
-    auto parent_spec = pasta::ClassTemplateSpecializationDecl::From(lc.value());
-    if (parent_spec) {
-      if (parent_spec->Kind() != pasta::DeclKind::kClassTemplatePartialSpecialization &&
-          pasta::FunctionDecl::From(decl)) {
-        return true;
-      }
-    }
-  }
-
-  switch (decl.Kind()) {
-    case pasta::DeclKind::kFriendTemplate:
-    // TODO(pag): FriendDecl for FriendTemplateDecl.
-      return true;
-
-    case pasta::DeclKind::kClassTemplate:
-    case pasta::DeclKind::kClassTemplatePartialSpecialization:
-    case pasta::DeclKind::kFunctionTemplate:
-    case pasta::DeclKind::kTypeAliasTemplate:
-    case pasta::DeclKind::kVarTemplate:
-    case pasta::DeclKind::kVarTemplatePartialSpecialization:
-      return lc && lc->IsRecord();
-
-    case pasta::DeclKind::kVarTemplateSpecialization: {
-      auto var = reinterpret_cast<const pasta::VarTemplateSpecializationDecl &>(decl);
-      if (lc && lc->IsRecord()) {
-        return true;
-      }
-
-      auto tsk = var.TemplateSpecializationKind();
-      if (IsExplicitSpecialization(tsk)) {
-        return false;
-      }
-
-      if (IsExplicitInstantiation(tsk) && var.ExternToken()) {
-        return false;
-      }
-
-      return true;
-    }
-
-    case pasta::DeclKind::kClassTemplateSpecialization: {
-      auto cls = reinterpret_cast<const pasta::ClassTemplateSpecializationDecl &>(decl);
-      if (lc && lc->IsRecord()) {
-        return true;
-      }
-
-      auto tsk = cls.TemplateSpecializationKind();
-      if (IsExplicitSpecialization(tsk)) {
-        return false;
-      }
-
-      if (IsExplicitInstantiation(tsk) && cls.ExternToken()) {
-        return false;
-      }
-
-      return true;
-    }
-
-    case pasta::DeclKind::kVar: {
-      auto var = reinterpret_cast<const pasta::VarDecl &>(decl);
-      if (var.TemplateSpecializationKind() ==
-          pasta::TemplateSpecializationKind::kUndeclared) {
-        return false;
-      }
-
-      // This is an instantiation of a non-template, out-of-line static data
-      // member in a class template.
-      if (var.IsOutOfLine()) {
-        if (auto from = var.InstantiatedFromStaticDataMember()) {
-          if (0u < from->NumTemplateParameterLists()) {
-            return true;
-          }
-        }
-      }
-
-      return false;
-      // return !IsExplicitSpecialization(decl);
-    }
-
-    // TODO(pag): This might not be the right type of check.
-    case pasta::DeclKind::kFunction:
-    case pasta::DeclKind::kCXXConversion:
-    case pasta::DeclKind::kCXXConstructor:
-    case pasta::DeclKind::kCXXDeductionGuide:
-    case pasta::DeclKind::kCXXDestructor:
-    case pasta::DeclKind::kCXXMethod: {
-      auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
-      auto tsk = func.TemplateSpecializationKind();
-      if (tsk == pasta::TemplateSpecializationKind::kUndeclared) {
-        return false;
-      }
-
-      if (lc && lc->IsRecord()) {
-        return IsSpecialization(decl);
-      }
-
-      // This is an instantiation of a non-template, out-of-line method in a
-      // class template.
-      if (func.IsTemplateInstantiation() && func.IsOutOfLine()) {
-        if (auto from = func.InstantiatedFromMemberFunction()) {
-          if (0u < from->NumTemplateParameterLists()) {
-            return true;
-          }
-        }
-      }
-
-      return !IsExplicitSpecialization(tsk);
-    }
-
-    // TODO(pag): Where do type alias template specializations go?
-
-    default:
-      return false;
   }
 }
 
