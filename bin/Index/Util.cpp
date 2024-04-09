@@ -894,10 +894,13 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
 // List the indexable declarations in this declcontext.
 std::vector<pasta::Decl> DeclarationsInDeclContext(
     const pasta::DeclContext &dc) {
+
+  auto dc_decl = pasta::Decl::From(dc);
   auto decls = dc.AlreadyLoadedDeclarations();
   auto it = std::remove_if(decls.begin(), decls.end(),
-                           [] (const pasta::Decl &d) {
-                             return ShouldHideFromIndexer(d);
+                           [&] (const pasta::Decl &d) {
+                             return ShouldHideFromIndexer(d) ||
+                                    d == dc_decl;
                            });
   decls.erase(it, decls.end());
   return decls;
