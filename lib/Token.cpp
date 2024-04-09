@@ -617,6 +617,7 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
     case DeclKind::USING_ENUM:
       return TokenCategory::ENUM;
 
+    case DeclKind::TYPE_ALIAS:
     case DeclKind::TYPEDEF:
     case DeclKind::USING:
     case DeclKind::UNRESOLVED_USING_TYPENAME:
@@ -659,9 +660,12 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
     case DeclKind::CONCEPT:
       baseline_category = TokenCategory::CONCEPT;
       break;
+
+    // E.g. `__make_integer_seq`.
     case DeclKind::BUILTIN_TEMPLATE:
       baseline_category = TokenCategory::BUILTIN_TYPE_NAME;
       break;
+    
     case DeclKind::CLASS_TEMPLATE:
       baseline_category = TokenCategory::CLASS;
       break;
