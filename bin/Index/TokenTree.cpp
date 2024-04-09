@@ -93,9 +93,6 @@ class Substitution {
 
   Substitution *parent{nullptr};
 
-  TokenInfo *first_parsed_token{nullptr};
-  TokenInfo *last_parsed_token{nullptr};
-
   bool HasExpansion(void) const noexcept;
 
   // Is this node dead?
@@ -136,20 +133,7 @@ class TokenTreeImpl {
   // Possible rebuild the tree knowing that the `printed_range` tokens are the
   // ones that we want to present. This happens when `printed_range` is derived
   // from a template specialization.
-  Substitution *RebuildTree(Substitution *original_root,
-                            const pasta::TokenRange &range,
-                            const pasta::PrintedTokenRange &printed_range,
-                            const pasta::Decl &top_level_decl,
-                            std::ostream &err);
-
-  Substitution *RebuildSubTree(
-      Substitution *sub, Substitution::NodeList *parent_node_list,
-      const pasta::TokenRange &range,
-      const pasta::PrintedTokenRange &printed_range,
-      const pasta::Decl &top_level_decl,
-      const std::unordered_map<Substitution *, std::vector<TokenInfo *>> &parsed_tokens,
-      TokenInfo *&prev_parsed_token, unsigned &next_printed_index,
-      std::ostream &err);
+  Substitution *RebuildTree(const pasta::PrintedTokenRange &printed_range);
 
   // Figure out if `node->after` looks like a macro argument pre-expansion of
   // `node`, and if so, return `node->after.before.front()`, i.e. the pre-
@@ -164,12 +148,11 @@ class TokenTreeImpl {
       const std::optional<pasta::TokenRange> &range,
       const pasta::PrintedTokenRange &printed_range,
       const std::vector<pasta::Decl> &top_level_decls,
-      std::ostream &err);
+      std::ostream &err, bool rebuild_from_printed);
 
   Substitution *BuildFromParsedTokenList(
       const pasta::TokenRange &range,
       const pasta::PrintedTokenRange &printed_range,
-      const std::vector<pasta::Decl> &top_level_decls,
       std::ostream &err);
 
   Substitution *BuildFromPrintedTokenList(
@@ -789,11 +772,31 @@ Substitution *TokenTreeImpl::BuildFromTokenList(
     const std::optional<pasta::TokenRange> &range,
     const pasta::PrintedTokenRange &printed_range,
     const std::vector<pasta::Decl> &top_level_decls,
-    std::ostream &err) {
+    std::ostream &err, bool rebuild_from_printed) {
 
   if (range.has_value()) {
-    return BuildFromParsedTokenList(
-        range.value(), printed_range, top_level_decls, err);
+    auto root_sub = BuildFromParsedTokenList(range.value(), printed_range, err);
+    if (!root_sub) {
+      return nullptr;
+    }
+
+    // It's not a specialization of any kind, so we don't need to check if tokens
+    // are contiguous or rebuild things.
+    if (!rebuild_from_printed) {
+      return root_sub;
+    }
+
+    std::cerr << "\n-- REBUILDING TREE ----------\n";
+    std::cerr << printed_range.Data() << "\n";
+
+    auto new_root_sub = RebuildTree(printed_range);
+    if (!new_root_sub) {
+      err << "Unable to rebuild tree for parsed tokens.";
+      return nullptr;
+    }
+
+    new_root_sub->PrintDOT(std::cerr);
+    return new_root_sub;
 
   } else if (printed_range) {
     return BuildFromPrintedTokenList(printed_range, err);
@@ -814,8 +817,8 @@ Substitution *TokenTreeImpl::BuildFromPrintedTokenList(
 
   for (pasta::PrintedToken tok : range) {
     TokenInfo &info = tokens_alloc.emplace_back();
-    info.printed_tok = tok;
     info.parsed_tok = tok.DerivedLocation();
+    info.printed_tok = std::move(tok);
     sub->before.emplace_back(&info);
   }
 
@@ -830,7 +833,6 @@ Substitution *TokenTreeImpl::BuildFromPrintedTokenList(
 Substitution *TokenTreeImpl::BuildFromParsedTokenList(
     const pasta::TokenRange &range,
     const pasta::PrintedTokenRange &printed_range,
-    const std::vector<pasta::Decl> &top_level_decls,
     std::ostream &err) {
 
   bool in_macro = false;
@@ -1068,356 +1070,364 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
   assert(subs.size() == 1u);
   assert(subs.back().first == root_sub);
 
-  // It's not a specialization of any kind, so we don't need to check if tokens
-  // are contiguous or rebuild things.
-  if (top_level_decls.size() != 1u ||
-      !IsSpecializationOrTemplateInSpecialization(top_level_decls.front())) {
-    return root_sub;
-  }
-
-  std::cerr << "\n-- REBUILDING TREE ----------\n";
-  std::cerr << printed_range.Data() << "\n";
-
-  return RebuildTree(root_sub, range, printed_range, top_level_decls.front(),
-                     err);
+  return root_sub;
 }
 
-// This code is pretty challenging. The situation we face is that we have
-// a token tree constructed from parsed tokens. However, in the situations in
-// which this function is called, the parsed tokens represent something like
-// a class template declaration. What we really want is a token tree for
-// `printed_range`, which isn't the usual printer-adopted parsed token range
-// with aligned token contexts, but actually the pretty-printed specialization
-// declaration. In the case of `printed_range`, there isn't a 1:1 mapping back
-// to `range` -- some tokens in `range` may appear multiple times in
-// `printed_range` (in terms of `.DerivedLocation()`), some tokens may be gone
-// entirely (e.g. some `sizeof...(...)` replaced with a number), and some may
-// be completely new and without any form of provenance (e.g. said number). This
-// function attempts to maintain, as much as possible, the original "shape" of
-// the macro expansion tree, but have all the final expansion leaves be based
-// on `printed_range`.
-Substitution *TokenTreeImpl::RebuildSubTree(
-    Substitution *sub, Substitution::NodeList *injection_site,
-    const pasta::TokenRange &range,
-    const pasta::PrintedTokenRange &printed_range,
-    const pasta::Decl &top_level_decl,
-    const std::unordered_map<Substitution *, std::vector<TokenInfo *>> &parsed_tokens,
-    TokenInfo *&prev_parsed_token,
-    unsigned &next_printed_index,
-    std::ostream &err) {
+namespace {
 
-  auto it = parsed_tokens.find(sub);
-  if (it == parsed_tokens.end()) {
-    return sub;
-  }
+struct Rebuilder {
+  std::map<unsigned, std::vector<TokenInfo *>> parsed_tokens;
 
-  auto &old_nodes = sub->after.empty() ? sub->before : sub->after;
-  Substitution::NodeList new_nodes;
+  std::vector<int> depth;
+  std::deque<Substitution> new_subs_alloc;
+  std::deque<TokenInfo> new_tokens_alloc;
 
-  if (!injection_site) {
-    injection_site = &new_nodes;
-  }
+  TokenInfo *LastInRange(TokenInfo *curr, unsigned lb, unsigned ub,
+                         int min_depth, bool &covers_pt);
 
-  // Inclusive indices on the min/max parsed indices that should have fit into
-  // this area.
-  auto min_parsed_index = it->second.front()->parsed_tok->Index();
-  auto max_parsed_index = it->second.back()->parsed_tok->Index();
-  assert(min_parsed_index <= max_parsed_index);
+  // void CollectOriginalLeftCorners(const std::deque<Substitution> &subs_alloc);
+  void AllocateTokens(const pasta::PrintedTokenRange &range);
+  void BuildBottomUp(std::deque<Substitution> &subs_alloc);
+  // void BuildTopDown(Substitution *node);
 
-  auto spec_tok = printed_range.At(next_printed_index);
-  
-  // If this substitution starts at a specific spot, and we're not there yet,
-  // then go and inject stuff to get us closer to there. This could inject
-  // these prefix token nodes into our parent, or into ourself if this is the
-  // root substitution node.
-  auto injected_prefix = false;
-  while (spec_tok) {
-    auto spec_dtok = spec_tok->DerivedLocation();
-    if (!spec_dtok) {
-      break;
-    }
-    
-    auto spec_dtok_index = spec_dtok->Index();
-    if (spec_dtok_index >= min_parsed_index) {
-      break;
+  void AddTokensToSub(Substitution *new_sub, Substitution::NodeList &nodes,
+                      TokenInfo *first, unsigned max_index);
+
+  void ReplicateSurfaceUsesInto(
+      Substitution &new_sub, const pasta::Macro &macro);
+};
+
+TokenInfo *Rebuilder::LastInRange(
+    TokenInfo *curr, unsigned lb, unsigned ub, int min_depth, bool &covers_pt) {
+
+  TokenInfo *prev = nullptr;
+  for (; curr; curr = curr->next) {
+    assert(curr->printed_tok.has_value());
+
+    Substitution *last_parent = nullptr;
+    for (auto parent = curr->parent; parent; parent = parent->parent) {
+      last_parent = parent;
+      covers_pt = true;
     }
 
-    auto new_tok = &(tokens_alloc.emplace_back());
-    new_tok->macro_tok = spec_dtok->MacroLocation();
-    new_tok->parsed_tok = std::move(spec_dtok);
-    new_tok->printed_tok = std::move(spec_tok);
-    injection_site->emplace_back(new_tok);
+    // If this token is already nested inside of something, then jump us to the
+    // other end of that thing.
+    if (last_parent) {
+      curr = RightCornerOfExp(last_parent);
+      if (!curr) {
+        return prev;
+      }
+    }
 
-    prev_parsed_token = new_tok;
+    // We use depth as a heuristic to figure out when we've probably gone too
+    // far. This heuristic is based on the idea that most macro uses are
+    // probably going to be sane, and as a result, properly nested inside or
+    // in-between things.
+    if (depth[curr->printed_tok->Index()] < min_depth) {
+      return prev;
+    }
 
-    spec_tok = printed_range.At(++next_printed_index);
-    injected_prefix = true;
-  }
-
-  if (injected_prefix) {
-    injection_site = &new_nodes;
-  }
-
-  // The last parsed token we injected comes immediately before this expansion.
-  // If we've matched up someting like `[` before a `[SIZE` where `SIZE` is a
-  // macro expansion, and all of the expanded tokens in `SIZE` are replaced in
-  // the template specialization, then we want to make sure the injection site
-  // is inside `sub`, rather than our parent.
-  if (injection_site != &new_nodes &&
-      prev_parsed_token &&
-      prev_parsed_token->parsed_tok->Index() <= min_parsed_index) {
-    auto offset = prev_parsed_token->parsed_tok->Index() -
-                  range.Front()->Index();
-  
-    while (auto next_tok = range.At(++offset)) {
-      auto nti = next_tok->Index();
-      if (nti >= min_parsed_index) {
-        injection_site = &new_nodes;
-        goto process_old_nodes;
+    if (curr->parsed_tok.has_value()) {
+      auto pti = curr->parsed_tok->Index();
+      if (pti < lb || pti > ub) {
+        return prev;
       }
 
-      switch (next_tok->Role()) {
-        case pasta::TokenRole::kFileToken:
-        case pasta::TokenRole::kFinalMacroExpansionToken:
-          goto process_old_nodes;
-        default:
+      // Tell a higher level that we've covered a parsed token. This is a
+      // heuristic to tell us whether or not to bother making a macro
+      // substitution.
+      covers_pt = true;
+    }
+
+    // Accept this token into our new substitution, but try not to include
+    // trailing whitespace or commas, unless they are contained inside of
+    // macro expansions.
+    switch (curr->printed_tok->Kind()) {
+      case pasta::TokenKind::kUnknown:
+      case pasta::TokenKind::kComment:
+        if (!curr->parsed_tok || !curr->parsed_tok->MacroLocation()) {
           continue;
-      }
-    }
-  }
+        }
 
-process_old_nodes:
-  for (auto node : old_nodes) {
-
-    if (std::holds_alternative<Substitution *>(node)) {
-      auto old_prev_parsed_token = prev_parsed_token;
-      auto old_next_printed_index = next_printed_index;
-      auto new_sub = RebuildSubTree(
-          std::get<Substitution *>(node), injection_site, range, printed_range,
-          top_level_decl, parsed_tokens, prev_parsed_token, next_printed_index,
-          err);
-      
-      if (!new_sub) {
-        return nullptr;
-      }
-
-      if (prev_parsed_token != old_prev_parsed_token ||
-          next_printed_index != old_next_printed_index) {
-        injection_site = &new_nodes;
-      }
-
-      spec_tok = printed_range.At(next_printed_index);
-      new_nodes.emplace_back(new_sub);
-      continue;
-    }
-
-    if (!std::holds_alternative<TokenInfo *>(node)) {
-      assert(false);
-      return nullptr;
-    }
-
-    TokenInfo *old_tok = std::get<TokenInfo *>(node);
-    if (!old_tok) {
-      assert(false);
-      return nullptr;
-    }
-
-    // We should only be seeing parsed tokens.
-    if (!old_tok->parsed_tok.has_value()) {
-      assert(false);
-      return nullptr;
-    }
-
-    // Try to pull in a prefix of printed tokens that have no known/associated
-    // parsed tokens.
-    std::optional<pasta::Token> spec_dtok;
-    while (spec_tok) {
-      spec_dtok = spec_tok->DerivedLocation();
-      if (spec_dtok) {
+        [[fallthrough]];
+      default:
+        prev = curr;
         break;
-      }
-
-      // No associated parsed location; inject it.
-      auto new_tok = &(tokens_alloc.emplace_back());
-      if (spec_dtok) {
-        prev_parsed_token = new_tok;
-      }
-      new_tok->printed_tok = std::move(spec_tok);
-      new_tok->parsed_tok = std::move(spec_dtok);
-      injection_site->emplace_back(new_tok);
-      spec_tok = printed_range.At(++next_printed_index);
     }
-
-    // If there are no more tokens from the pretty-printed specialization that
-    // we can import, and this token is associated with an original parsed token
-    // from the template, then we have to skip this token, because it has no
-    // place.
-    if (!spec_tok || !spec_dtok) {
-      continue;
-    }
-
-    auto old_tok_parsed_index = old_tok->parsed_tok->Index();
-    auto spec_dtok_parsed_index = spec_dtok->Index();
-
-    assert(min_parsed_index <= old_tok_parsed_index);
-    assert(old_tok_parsed_index <= max_parsed_index);
-
-    // The pretty-printed token from the specialization has a matching parsed
-    // token. It is possible that we have a one-to-many relation between
-    // parsed tokens and pretty printed tokens, for whatever reasons.
-
-    // Best-case situation, we have alignment!
-    if (old_tok_parsed_index == spec_dtok_parsed_index) {
-      injection_site = &new_nodes;
-
-      auto new_tok = &(tokens_alloc.emplace_back());
-      new_tok->printed_tok = std::move(spec_tok);
-      new_tok->parsed_tok = std::move(spec_dtok);
-      new_tok->macro_tok = old_tok->macro_tok;
-      injection_site->emplace_back(new_tok);
-
-      spec_tok = printed_range.At(++next_printed_index);
-      prev_parsed_token = new_tok;
-      continue;
-    }
-    
-    // Skip this token; it's now dead.
-    if (old_tok_parsed_index < spec_dtok_parsed_index) {
-      continue;
-    }
-    
-    // Whitespace or comment, bring it in.
-    auto stk = spec_tok->Kind();
-    if (stk == pasta::TokenKind::kUnknown ||
-        stk == pasta::TokenKind::kComment) {
-      auto new_tok = &(tokens_alloc.emplace_back());
-      if (spec_dtok) {
-        prev_parsed_token = new_tok;
-      }
-
-      new_tok->printed_tok = std::move(spec_tok);
-      new_tok->parsed_tok = std::move(spec_dtok);
-      injection_site->emplace_back(new_tok);
-
-      spec_tok = printed_range.At(++next_printed_index);
-      continue;
-    }
-
-    // TODO(pag): Often this is the result of a bug in PASTA's pretty printer,
-    //            or PASTA's token alignment procedure. In the case of the
-    //            pretty printer, it could be related to over-aggressively
-    //            assigning a derived source location to a printed token, and
-    //            then that may cause other interferences within the token
-    //            alignment algorithm. The way to diagnose this often involves
-    //            turing on the token aligner debug information logging, and
-    //            then printing out `spec_dtok->Index()`, and then looking at
-    //            what tokens in the alignment dump have the same parsed token
-    //            index. Then, look at nearby tokens, and compare the tokens
-    //            with `spec_dtok->Data()` and `spec_tok->Data()`.
-    //assert(false);
   }
 
-  // Bring in a suffix of printed tokens with no corresponding parsed tokens.
-  // In the case of something like `[SIZE]`, where the original parsed tokens
-  // of `SIZE` are replaced, we want to get all those tokens before the `]`.
-  //
-  // TODO(pag): Use token contexts as an additional heuristic?
-  while (injection_site == &new_nodes && spec_tok) {
-    auto spec_dtok = spec_tok->DerivedLocation();
-    if (spec_dtok || spec_dtok->Index() <= max_parsed_index) {
+  return prev;
+}
+
+// Make new token infos for the printed tokens.
+void Rebuilder::AllocateTokens(const pasta::PrintedTokenRange &range) {
+  TokenInfo *first = nullptr;
+  TokenInfo **prev = &first;
+
+  int d = 10;
+
+  for (pasta::PrintedToken tok : range) {
+    auto &info = new_tokens_alloc.emplace_back();
+    auto tk = tok.Kind();
+
+    info.parsed_tok = tok.DerivedLocation();
+    info.printed_tok = std::move(tok);
+
+    if (info.parsed_tok.has_value()) {
+      info.macro_tok = info.parsed_tok->MacroLocation();
+      parsed_tokens[info.parsed_tok->Index()].push_back(&info);
+    }
+
+    assert(info.parsed_tok.has_value() ||
+           info.printed_tok.has_value() ||
+           info.macro_tok.has_value());
+
+    *prev = &info;
+    prev = &(info.next);
+
+    // Encode token depth in a way that puts a kind of natural limit on how
+    // far we can go with macros even when we don't have parsed tokens. We
+    // make depths in the following way:
+    //
+    //      void      10
+    //      foo       10
+    //      (         11
+    //      int       13
+    //      x         13
+    //      ,         12
+    //      ...       13
+    //      )         11
+    //      noexcept  10
+    //      ;         9
+    //
+    // The idea with this scheme is that we expect macros to be generally well
+    // behaved and nested, and so if there's a macro inside the parameter list
+    // then this scheme will help us to prevent it from crossing parameters.
+    switch (tk) {
+      case pasta::TokenKind::kLBrace:
+      case pasta::TokenKind::kLSquare:
+      case pasta::TokenKind::kLParenthesis:
+      case pasta::TokenKind::kLAngle:
+        depth.push_back(++d);
+        d += 2;
+        break;
+      case pasta::TokenKind::kRBrace:
+      case pasta::TokenKind::kRSquare:
+      case pasta::TokenKind::kRParenthesis:
+      case pasta::TokenKind::kRAngle:
+        d -= 2;
+        depth.push_back(d--);
+        break;
+      case pasta::TokenKind::kComma:
+      case pasta::TokenKind::kSemi:
+      case pasta::TokenKind::kColon:
+        depth.push_back(d - 1);
+        break;
+      default:
+        depth.push_back(d);
+        break;
+    }
+  }
+}
+
+void Rebuilder::AddTokensToSub(
+    Substitution *new_sub, Substitution::NodeList &nodes, TokenInfo *first,
+    unsigned max_index) {
+
+  for (auto tok = first; tok; tok = tok->next) {
+    if (tok->printed_tok->Index() > max_index) {
       break;
     }
 
-    // No associated parsed location; inject it.
-    auto new_tok = &(tokens_alloc.emplace_back());
-    if (spec_dtok) {
-      new_tok->macro_tok = spec_dtok->MacroLocation();
-      prev_parsed_token = new_tok;
+    Substitution **parent_pointer = &(tok->parent);
+    Substitution *last_parent = nullptr;
+    while (*parent_pointer) {
+      last_parent = *parent_pointer;
+      parent_pointer = &(last_parent->parent);
     }
-    new_tok->printed_tok = std::move(spec_tok);
-    new_tok->parsed_tok = std::move(spec_dtok);
-    injection_site->emplace_back(new_tok);
-    spec_tok = printed_range.At(++next_printed_index);
+
+    // This token is in something that has already been added to `new_sub`.
+    if (last_parent == new_sub) {
+      continue;
+    }
+
+    *parent_pointer = new_sub;
+    assert(tok->parent != nullptr);
+
+    if (parent_pointer == &(tok->parent)) {
+      nodes.emplace_back(tok);
+
+    } else if (nodes.empty()) {
+      nodes.emplace_back(last_parent);
+
+    } else if (Substitution::Node(last_parent) != nodes.back()) {
+      nodes.emplace_back(last_parent);
+    }
+  }
+}
+
+void Rebuilder::ReplicateSurfaceUsesInto(
+    Substitution &new_sub, const pasta::Macro &macro) {
+
+  if (auto mt = pasta::MacroToken::From(macro)) {
+    auto &new_tok = new_tokens_alloc.emplace_back();
+    new_tok.macro_tok = std::move(mt);
+    new_tok.parent = &new_sub;
+    new_sub.before.emplace_back(&new_tok);
+
+  } else {
+    for (auto child : macro.Children()) {
+      ReplicateSurfaceUsesInto(new_sub, child);
+    }
+  }
+}
+
+void Rebuilder::BuildBottomUp(
+    std::deque<Substitution> &orig_subs_alloc) {
+
+  auto last_processed = ~0u;
+
+  for (auto it = orig_subs_alloc.rbegin(); it != orig_subs_alloc.rend(); ++it) {
+    Substitution &orig_sub = *it;
+    if (orig_sub.is_dead || orig_sub.before.has_error ||
+        orig_sub.after.has_error || !orig_sub.parent || !orig_sub.macro) {
+      continue;
+    }
+
+    if (pasta::MacroDirective::From(orig_sub.macro.value())) {
+      continue;
+    }
+
+    // TODO(pag): Investigate when `!orig_lc->parsed_tok.has_value()`.
+    const TokenInfo *orig_lc = LeftCornerOfExp(&orig_sub);
+    if (!orig_lc || !orig_lc->parsed_tok.has_value() ||
+        !orig_lc->printed_tok.has_value()) {
+      continue;
+    }
+
+    const TokenInfo *orig_rc = RightCornerOfExp(&orig_sub);
+    if (!orig_rc->parsed_tok.has_value()) {
+      continue;
+    }
+
+    auto orig_lc_index = orig_lc->parsed_tok->Index();
+    auto orig_rc_index = orig_rc->parsed_tok->Index();
+    CHECK_LE(orig_lc_index, orig_rc_index);
+
+    auto lb = parsed_tokens.lower_bound(orig_lc_index);
+    if (lb == parsed_tokens.end()) {
+      continue;
+    }
+
+    // The parsed token appears mutliple times in the printed range.
+    // Conservatively ignore it for now.
+    //
+    // TODO(pag): Eventually do something smarter.
+    if (1u < lb->second.size()) {
+      continue;
+    }
+
+    // This substitution definitely cannot not contain this node. The right
+    // corner of the parsed tokens is less than the next known parsed token
+    // that is or follows the left corner of the substitution.
+    if (orig_rc_index < lb->first) {
+      continue;
+    }
+
+    // The printed token appears out-of-order with respect to the original
+    // parsed tokens. We always need to be moving back-to-front in the printed
+    // token list.
+    TokenInfo *new_lc = lb->second.front();
+    auto new_lc_index = new_lc->printed_tok->Index();
+    if (new_lc_index > last_processed) {
+      continue;
+    }
+
+    bool covers_pt = false;
+    auto new_rc = LastInRange(
+        lb->second.front(), orig_lc_index, orig_rc_index,
+        depth[orig_lc->printed_tok->Index()], covers_pt);
+
+    if (!new_rc || !covers_pt) {
+      continue;
+    }
+
+    auto new_rc_index = new_rc->printed_tok->Index();
+    DCHECK_LE(new_lc_index, new_rc_index);
+
+    last_processed = new_lc_index;
+
+    Substitution &new_sub = new_subs_alloc.emplace_back(orig_sub.kind);
+    new_sub.macro = orig_sub.macro;
+
+    AddTokensToSub(&new_sub, new_sub.after, new_lc, new_rc_index);
+    assert(!new_sub.parent);
+
+    ReplicateSurfaceUsesInto(new_sub, orig_sub.macro.value());
   }
 
-  old_nodes = std::move(new_nodes);
+  Substitution &orig_sub = orig_subs_alloc.front();
+  Substitution &new_sub = new_subs_alloc.emplace_back(orig_sub.kind);
+  new_sub.macro = orig_sub.macro;
 
-  FixupNodeParents(sub);
+  AddTokensToSub(&new_sub, new_sub.before, &(new_tokens_alloc.front()), ~0u);
+  assert(!new_sub.parent);
 
-  return sub;
+  // Make sure no macro tokens leak into the top level.
+  for (auto &tok : new_tokens_alloc) {
+    if (tok.parent == &new_sub) {
+      tok.macro_tok.reset();
+    }
+
+    assert(tok.printed_tok.has_value());
+  }
 }
+
+// void Rebuilder::BuildTopDown(
+//     Substitution *node, Substitution::NodeList &old_nodes) {
+
+//   Substitution::NodeList new_nodes;
+
+//   for (auto old_node : old_nodes) {
+//     TokenInfo *tok_lc = nullptr;
+//     TokenInfo *tok_rc = nullptr;
+//     if (std::holds_alternative<Substitution *>(old_node)) {
+//       auto old_sub = std::get<Substitution *>(old_node);
+//       BuildTopDown(old_sub, old_sub->after);
+//       new_nodes.emplace_back(old_sub);
+
+//       tok_lc = LeftCornerOfExp(old_sub);
+//       tok_rc = RightCornerOfExp(old_sub);
+
+//     } else if (std::holds_alternative<TokenInfo *>(old_node)) {
+//       tok_lc = std::get<TokenInfo *>(old_node);
+//       tok_rc = tok_lc;
+
+//     } else {
+//       assert(false);
+//       continue;
+//     }
+//   }
+
+//   old_nodes.swap(new_nodes);
+// }
+
+}  // namespace
 
 // Possible rebuild the tree knowing that the `printed_range` tokens are the
 // ones that we want to present. This happens when `printed_range` is derived
 // from a template specialization.
 Substitution *TokenTreeImpl::RebuildTree(
-    Substitution *original_root, const pasta::TokenRange &range,
-    const pasta::PrintedTokenRange &printed_range,
-    const pasta::Decl &top_level_decl, std::ostream &err) {
+    const pasta::PrintedTokenRange &printed_range) {
 
-  // Collect a mapping of substitutions containing parsed tokens, along with
-  // those parsed tokens in the order that we see them.
-  std::unordered_map<Substitution *, std::vector<TokenInfo *>> sub_tokens;
-  FindParsedTokens(original_root, sub_tokens);
-  if (sub_tokens.empty()) {
-    return original_root;
-  }
+  Rebuilder rebuilder;
 
-  TokenInfo *prev_parsed_token = nullptr;
-  unsigned next_printed_index = 0u;
-  auto new_root = RebuildSubTree(
-      original_root, nullptr, range, printed_range,
-      top_level_decl, sub_tokens, prev_parsed_token,
-      next_printed_index, err);
+  rebuilder.AllocateTokens(printed_range);
+  rebuilder.BuildBottomUp(substitutions_alloc);
+  tokens_alloc.swap(rebuilder.new_tokens_alloc);
+  substitutions_alloc.swap(rebuilder.new_subs_alloc);
 
-  if (!new_root) {
-    return nullptr;
-  }
-
-  // Suffix of unmatched/uninjected tokens.
-  while (auto spec_tok = printed_range.At(next_printed_index++)) {
-    auto spec_dtok = spec_tok->DerivedLocation();
-    auto new_tok = &(tokens_alloc.emplace_back());
-    new_tok->printed_tok = spec_tok;
-    new_tok->parsed_tok = spec_dtok;
-
-    // NOTE(pag): Ignore macro locations; it might mislead provenance.
-    new_tok->parent = new_root;
-    new_root->before.emplace_back(new_tok);
-  }
-
-  return new_root;
-
-  // // - have to remove tokens
-  // // - have to add tokens
-  // // - find a node list in an expansion, and replace all of its children with
-  // //   stuff from the printed tokens
-
-  // size_t next_printed_tok = 1u;
-  // std::optional<pasta::PrintedToken> npt = printed_range.At(0);
-
-  // // Match up the parsed token with a printed token.
-  
-  // auto next_parsed_tok = first_tok;
-
-  // for (auto printed_tok : printed_range) {
-
-  // }
-
-  // while (!info->printed_tok.has_value() && npt.has_value()) {
-  //   if (auto npt_pt = npt->DerivedLocation()) {
-  //     auto npt_pti = npt_pt->Index();
-  //     if (npt_pti == pti) {
-  //       info->printed_tok = std::move(npt);
-  //       // Fall through to update `npt`.
-
-  //     } else if (npt_pti > pti) {
-  //       break;
-  //     }
-  //   }
-
-  //   npt = printed_range.At(next_printed_tok++);
-  // }
+  return &(substitutions_alloc.back());
 }
 
 bool TokenTreeImpl::BuildFromMacro(
@@ -2065,7 +2075,7 @@ std::optional<TokenTreeNodeRange> TokenTree::Create(
     const std::optional<pasta::TokenRange> &range,
     const pasta::PrintedTokenRange &printed_range,
     const std::vector<pasta::Decl> &top_level_decls,
-    std::ostream &err) {
+    std::ostream &err, bool rebuild_from_printed) {
 
   auto impl = std::make_shared<TokenTreeImpl>();
 
@@ -2073,7 +2083,7 @@ std::optional<TokenTreeNodeRange> TokenTree::Create(
 
     // Build and classify the initial list of tokens.
     auto sub = impl->BuildFromTokenList(
-        range, printed_range, top_level_decls, err);
+        range, printed_range, top_level_decls, err, rebuild_from_printed);
     if (!sub) {
       return std::nullopt;
     }

@@ -142,7 +142,7 @@ class TokenTree {
   Create(const std::optional<pasta::TokenRange> &range,
          const pasta::PrintedTokenRange &printed_range,
          const std::vector<pasta::Decl> &top_level_decls,
-         std::ostream &err);
+         std::ostream &err, bool rebuild_from_printed);
 
   // Dump.
   void Dump(std::ostream &os) const;

@@ -415,6 +415,13 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
   return nullptr;
 }
 
+// Try to see if a token matches a declaration. As above, sometimes we have
+// the raw parsed token and want an exact match, whereas other times we only
+// have token data, and will accept an in-name-only match.
+static bool TokenMatchesDecl(
+    pasta::TokenKind tk, const void *raw_token, const pasta::Decl &decl,
+    std::string_view token_data);
+
 // Try to match some token data, e.g. identifier data `foo`, against the name of
 // a type, e.g. `foo` in `struct foo`. We don't use raw token pointers here
 // because types are usually independent of fragments, and type deduplication
@@ -423,28 +430,64 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
 // ways, we use PASTA's pretty printer and logic in this and other functions
 // to emulate the kinds of information gleaned from `clang::TypeLoc`s. PASTA
 // doesn't wrap `clang::TypeLoc`s, though.
-static const void *VisitType(const pasta::Type &type,
-                             std::string_view tok_data,
-                             int context_depth) {
+static const mx::RawEntityId VisitType(
+    const EntityMapper &em, const pasta::Type &type, std::string_view tok_data,
+    int context_depth) {
 
   if (auto typedef_type = pasta::TypedefType::From(type)) {
     auto typedef_decl = typedef_type->Declaration();
     if (typedef_decl.Name() == tok_data) {
-      return RawEntity(typedef_decl);
+      return em.EntityId(typedef_decl);
     }
 
   } else if (auto tag_type = pasta::TagType::From(type)) {
     auto tag_decl = tag_type->Declaration();
-    if (tag_decl.Name() == tok_data) {
-      return RawEntity(tag_decl);
+    if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr,
+                         tag_decl, tok_data)) {
+      return em.EntityId(tag_decl);
+    }
+
+  } else if (auto spec = pasta::TemplateSpecializationType::From(type)) {
+    if (spec->IsSugared()) {
+      return VisitType(em, spec->Desugar(), tok_data, context_depth);
+    }
+
+  } else if (auto param = pasta::TemplateTypeParmType::From(type)) {
+
+    if (auto decl = param->Declaration()) {
+      if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr,
+                           decl.value(), tok_data)) {
+        return em.EntityId(decl.value());
+      }
+    }
+
+    if (tok_data.starts_with("type-parameter-")) {
+      return em.EntityId(type);
+    }
+
+  } else if (auto inj_type = pasta::InjectedClassNameType::From(type)) {
+    auto decl = inj_type->Declaration();
+    if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr,
+                         decl, tok_data)) {
+      return em.EntityId(decl);
+    }
+
+    auto tst = inj_type->InjectedSpecializationType();
+    if (tst != type) {
+      return VisitType(em, tst, tok_data, context_depth);
     }
 
   } else if (auto deduced_type = pasta::DeducedType::From(type)) {
     if (deduced_type->IsDeduced()) {
       auto resolved_type = deduced_type->ResolvedType();
       if (resolved_type) {
-        return VisitType(resolved_type.value(), tok_data, context_depth);
+        return VisitType(em, resolved_type.value(), tok_data, context_depth);
       }
+    }
+
+  } else if (auto builtin_type = pasta::BuiltinType::From(type)) {
+    if (tok_data.starts_with("__") && tok_data.ends_with("_t")) {
+      return em.EntityId(type);
     }
 
   // // Handle issue #344, where parameter names in function type prototypes
@@ -457,10 +500,10 @@ static const void *VisitType(const pasta::Type &type,
 
   } else if (auto unqual_type = type.UnqualifiedType();
              unqual_type != type) {
-    return VisitType(unqual_type, tok_data, context_depth);
+    return VisitType(em, unqual_type, tok_data, context_depth);
   }
 
-  return nullptr;
+  return mx::kInvalidEntityId;
 }
 
 static std::optional<pasta::IncludeLikeMacroDirective>
@@ -781,10 +824,8 @@ static std::string_view NameWithoutTilde(const std::string &name,
 // Try to see if a token matches a declaration. As above, sometimes we have
 // the raw parsed token and want an exact match, whereas other times we only
 // have token data, and will accept an in-name-only match.
-static bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
-                             const pasta::Decl &decl,
-                             std::string_view token_data) {
-
+bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
+                      const pasta::Decl &decl, std::string_view token_data) {
   auto is_cxx_destructor = decl.Kind() == pasta::DeclKind::kCXXDestructor;
 
   if (auto func = pasta::FunctionDecl::From(decl)) {
@@ -816,10 +857,16 @@ static bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
     if (token_data == NameWithoutTilde(nd_name, is_cxx_destructor)) {
       return true;
     }
+
+    // Template specialization.
+    return nd_name.ends_with('>') &&
+           token_data.size() < nd_name.size() &&
+           nd_name.starts_with(token_data) &&
+           nd_name[token_data.size()] == '<';
   }
 
-  if (raw_token) {
-    return RawEntity(decl.Token()) == raw_token;
+  if (raw_token && RawEntity(decl.Token()) == raw_token) {
+    return true;
   }
 
   return false;
@@ -959,9 +1006,12 @@ mx::RawEntityId RelatedEntityIdToPrintedToken(
         break;
 
       case pasta::TokenContextKind::kType:
-        if (!is_literal) {
-          related_entity = VisitType(
-              pasta::Type::From(context).value(), token_data, depth);
+        if (is_identifier) {
+          auto eid = VisitType(
+              em, pasta::Type::From(context).value(), token_data, depth);
+          if (eid != mx::kInvalidEntityId) {
+            return eid;
+          }
         }
         break;
 

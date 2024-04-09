@@ -228,6 +228,9 @@ struct TokenTreeSerializationSchedule {
   // Maps parsed tokens to the macro in which they are contained.
   std::vector<mx::RawEntityId> containing_macro;
 
+  // Should we try to locate original macros?
+  const bool use_macros_as_locators;
+
   mx::RawEntityId RecordEntityId(const TokenTree &tt,
                                  bool &is_part_of_define,
                                  bool &is_part_of_fragment) {
@@ -237,7 +240,12 @@ struct TokenTreeSerializationSchedule {
     std::optional<pasta::Macro> macro = tt.Macro();
     if (macro) {
       CHECK(tt.Kind() == mx::FromPasta(macro->Kind()));
-      raw_locator = macro->RawMacro();
+      if (use_macros_as_locators) {
+        raw_locator = macro->RawMacro();
+
+      } else {
+        CHECK(!pasta::MacroDirective::From(macro.value()));
+      }
     }
 
     auto &entity_list = pf.EntityListFor(tt);
@@ -334,7 +342,7 @@ struct TokenTreeSerializationSchedule {
         //            but the lifetime of `raw_tt` and `raw_gt` are limited
         //            to fragment serialization.
 
-        if (mt) {
+        if (mt && use_macros_as_locators) {
           raw_pt = RawEntity(mt.value());
         } else if (pt) {
           raw_pt = RawEntity(pt.value());
@@ -437,9 +445,11 @@ struct TokenTreeSerializationSchedule {
     }
   }
 
-  TokenTreeSerializationSchedule(PendingFragment &pf_)
+  TokenTreeSerializationSchedule(PendingFragment &pf_,
+                                 bool was_rebuilt_from_printed_tokens)
       : pf(pf_),
-        em(pf_.em) {}
+        em(pf_.em),
+        use_macros_as_locators(!was_rebuilt_from_printed_tokens) {}
 };
 
 // Persist just the parsed tokens in the absence of a token tree.
@@ -515,11 +525,12 @@ static std::string MainSourceFile(const PendingFragment &pf) {
 // before IDs, and the
 static void PersistTokenTree(
     PendingFragment &pf, mx::rpc::Fragment::Builder &fb,
-    TokenTreeNodeRange nodes, TokenProvenanceCalculator &provenance) {
+    TokenTreeNodeRange nodes, TokenProvenanceCalculator &provenance,
+    bool was_rebuilt_from_printed_tokens) {
 
   const EntityMapper &em = pf.em;
 
-  TokenTreeSerializationSchedule sched(pf);
+  TokenTreeSerializationSchedule sched(pf, was_rebuilt_from_printed_tokens);
   sched.Schedule(nodes);
 
   provenance.Run(pf.fragment_index, sched.tokens);
@@ -669,7 +680,10 @@ static void PersistTokenTree(
         static_cast<unsigned>(kind), NumEntities(entities));
 
     for (const std::optional<TokenTree> &tt : entities) {
-      CHECK(tt.has_value());
+      CHECK(tt.has_value())
+          << "Missing token tree for " << mx::EnumeratorName(kind)
+          << "; rebuild was " << (was_rebuilt_from_printed_tokens ? "" : "not ")
+          << "forced";
 
       const void *raw_tt = tt->RawNode();
       mx::RawEntityId eid = em.EntityId(raw_tt);
@@ -839,15 +853,26 @@ void GlobalIndexingState::PersistFragment(
     tlds.set(i, em.EntityId(pf.top_level_decls[i]));
   }
 
+  bool force_rebuild = false;
+  if (pf.original_tokens.has_value() && !pf.parsed_tokens.empty() &&
+      !pf.top_level_decls.empty() && pf.top_level_decls.size() == 1 &&
+      IsSpecializationOrInSpecialization(pf.top_level_decls.front())) {
+    
+    pf.macros_to_serialize.clear();
+    force_rebuild = true;
+  }
+
   // Derive the macro substitution tree. Failing to build the tree is an error
   // condition, but we can't let it stop us from actually serializing the
   // fragment or its data.
   std::stringstream tok_tree_err;
   std::optional<TokenTreeNodeRange> maybe_tt = TokenTree::Create(
-      pf.original_tokens, pf.parsed_tokens, pf.top_level_decls, tok_tree_err);
+      pf.original_tokens, pf.parsed_tokens, pf.top_level_decls, tok_tree_err,
+      force_rebuild);
 
   if (maybe_tt) {
-    PersistTokenTree(pf, fb, std::move(maybe_tt.value()), provenance);
+    PersistTokenTree(pf, fb, std::move(maybe_tt.value()), provenance,
+                     force_rebuild);
 
   // If we don't have the normal or the backup token tree, then do a best
   // effort saving of macro tokens. Don't bother organizing them into
