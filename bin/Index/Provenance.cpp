@@ -16,6 +16,10 @@
 #pragma clang diagnostic ignored "-Wshadow"
 #pragma clang diagnostic ignored "-Wcast-align"
 #include <clang/Basic/TokenKinds.h>
+#include <clang/AST/TemplateBase.h>
+#include <clang/AST/TemplateName.h>
+#include <clang/AST/Type.h>
+#include <llvm/Support/raw_ostream.h>
 #pragma clang diagnostic pop
 
 #include <algorithm>
@@ -24,6 +28,7 @@
 #include <iostream>
 #include <multiplier/AST/StmtKind.h>
 #include <multiplier/Frontend/TokenKind.h>
+#include <pasta/AST/AST.h>
 #include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Macro.h>
@@ -422,6 +427,23 @@ static bool TokenMatchesDecl(
     pasta::TokenKind tk, const void *raw_token, const pasta::Decl &decl,
     std::string_view token_data);
 
+// Try to match some token data against a `clang::TemplateName`.
+static mx::RawEntityId VisitTemplateName(
+    const EntityMapper &em, const pasta::AST &ast, clang::TemplateName tn,
+    std::string_view tok_data) {
+
+  if (auto raw_tpl = tn.getAsTemplateDecl()) {
+    auto decl = ast.Adopt(
+        reinterpret_cast<const clang::Decl *>(raw_tpl));
+    if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr,
+                         decl, tok_data)) {
+      return em.EntityId(decl);
+    }
+  }
+
+  return mx::kInvalidEntityId;
+}
+
 // Try to match some token data, e.g. identifier data `foo`, against the name of
 // a type, e.g. `foo` in `struct foo`. We don't use raw token pointers here
 // because types are usually independent of fragments, and type deduplication
@@ -430,7 +452,7 @@ static bool TokenMatchesDecl(
 // ways, we use PASTA's pretty printer and logic in this and other functions
 // to emulate the kinds of information gleaned from `clang::TypeLoc`s. PASTA
 // doesn't wrap `clang::TypeLoc`s, though.
-static const mx::RawEntityId VisitType(
+static mx::RawEntityId VisitType(
     const EntityMapper &em, const pasta::Type &type, std::string_view tok_data,
     int context_depth) {
 
@@ -449,8 +471,17 @@ static const mx::RawEntityId VisitType(
 
   } else if (auto spec = pasta::TemplateSpecializationType::From(type)) {
     if (spec->IsSugared()) {
-      return VisitType(em, spec->Desugar(), tok_data, context_depth);
+      auto eid = VisitType(em, spec->Desugar(), tok_data, context_depth);
+      if (eid != mx::kInvalidEntityId) {
+        return eid;
+      }
     }
+
+    // This might find a builtin template decl.
+    auto raw_type = clang::dyn_cast<clang::TemplateSpecializationType>(
+        spec->RawType());
+    return VisitTemplateName(em, pasta::AST::From(type),
+                             raw_type->getTemplateName(), tok_data);
 
   } else if (auto param = pasta::TemplateTypeParmType::From(type)) {
 
@@ -486,8 +517,12 @@ static const mx::RawEntityId VisitType(
     }
 
   } else if (auto builtin_type = pasta::BuiltinType::From(type)) {
-    if (tok_data.starts_with("__") && tok_data.ends_with("_t")) {
-      return em.EntityId(type);
+    if (tok_data.starts_with("__")) {
+      if (tok_data.ends_with("_t") ||
+          tok_data == "__make_integer_seq" ||
+          tok_data == "__type_pack_element") {
+        return em.EntityId(type);
+      }
     }
 
   // // Handle issue #344, where parameter names in function type prototypes
@@ -872,6 +907,49 @@ bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
   return false;
 }
 
+static mx::RawEntityId VisitTemplateArgument(
+    const EntityMapper &em, const pasta::TemplateArgument &arg,
+    std::string_view tok_data, int context_depth) {
+
+  switch (arg.Kind()) {
+    case pasta::TemplateArgumentKind::kType:
+      if (auto t = arg.AsType()) {
+        return VisitType(em, t.value(), tok_data, context_depth);
+      }
+      break;
+
+    case pasta::TemplateArgumentKind::kDeclaration:
+      if (auto d = arg.AsDeclaration()) {
+        if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr, d.value(),
+                             tok_data)) {
+          return em.EntityId(d.value());
+        }
+      }
+
+      if (auto t = arg.ParameterTypeForDeclaration()) {
+        return VisitType(em, t.value(), tok_data, context_depth);
+      }
+      break;
+
+    case pasta::TemplateArgumentKind::kTemplate:
+    case pasta::TemplateArgumentKind::kTemplateExpansion: {
+      auto raw_arg = reinterpret_cast<const clang::TemplateArgument *>(
+          arg.RawTemplateArgument());
+      return VisitTemplateName(em, pasta::AST::From(arg),
+                               raw_arg->getAsTemplateOrTemplatePattern(),
+                               tok_data);
+    }
+
+    case pasta::TemplateArgumentKind::kEmpty:
+    case pasta::TemplateArgumentKind::kNullPointer:
+    case pasta::TemplateArgumentKind::kIntegral:
+    case pasta::TemplateArgumentKind::kExpression:
+    case pasta::TemplateArgumentKind::kPack:
+      break;
+  }
+  return mx::kInvalidEntityId;
+}
+
 }  // namespace
 
 // Find the entity ID of the declaration that is most related to a particular
@@ -1046,14 +1124,25 @@ mx::RawEntityId RelatedEntityIdToPrintedToken(
           }
         }
         break;
+
       case pasta::TokenContextKind::kDesignator:
         if (!is_literal) {
           if (auto d = pasta::Designator::From(context)) {
             if (RawEntity(d->FieldToken()) == self) {
               if (auto field = d->Field()) {
                 related_entity = RawEntity(field.value());
-                break;
               }
+            }
+          }
+        }
+        break;
+
+      case pasta::TokenContextKind::kTemplateArgument:
+        if (is_identifier) {
+          if (auto a = pasta::TemplateArgument::From(context)) {
+            auto eid = VisitTemplateArgument(em, a.value(), token_data, depth);
+            if (eid != mx::kInvalidEntityId) {
+              return eid;
             }
           }
         }
