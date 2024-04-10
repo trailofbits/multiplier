@@ -140,8 +140,7 @@ class TokenTree {
   // Create a token tree from the tokens in the inclusive range
   // `[begin_index, end_index]` from `range`.
   static std::optional<TokenTreeNodeRange>
-  Create(const PendingFragment &pf, std::ostream &err,
-         bool rebuild_from_printed);
+  Create(const PendingFragment &pf, std::ostream &err);
 
   // Dump.
   void Dump(std::ostream &os) const;

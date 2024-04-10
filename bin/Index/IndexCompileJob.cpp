@@ -434,6 +434,11 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
+    auto pattern = decl.TemplatedDeclaration();
+    if (ShouldHideFromIndexer(pattern)) {
+      return;
+    }
+
     AddDeclAlways(decl);
 
     if (decl.CanonicalDeclaration() != decl) {
@@ -455,17 +460,19 @@ class TLDFinder final : public pasta::DeclVisitor {
         }
       }
 
+      // NOTE(pag): We might not have `spec_parent` if this is an explicit
+      //            declaration that turns into an implicit instantion of
+      //            a function template.
       if (spec_parent) {
         PrevValueTracker<const void *> save_restore(parent_decl, spec_parent);
-        Accept(spec);
+        seen.emplace(RawEntity(spec));
+        AddDeclAlways(spec);
       }
     }
   }
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
-    // TODO(kumarak): Not sure how to handle CXXDeductionGuide. Don't add them 
-    //                to top-level declarations.
-    if (decl.Kind() == pasta::DeclKind::kCXXDeductionGuide) {
+    if (ShouldHideFromIndexer(decl)) {
       return;
     }
 
@@ -2000,7 +2007,8 @@ static PendingFragmentPtr CreatePendingFragment(
     uint64_t end_index,
     std::vector<pasta::Decl> decls,
     std::vector<pasta::Macro> macros,
-    const void *parent_entity) {
+    const void *parent_entity,
+    bool parsed_are_printed) {
 
   // The number of tokens is used to estimate the "size" of this fragment.
   // Mostly, it's a proxy of the complexity of the macro expansions as well.
@@ -2032,7 +2040,8 @@ static PendingFragmentPtr CreatePendingFragment(
       em,
       original_tokens,
       std::move(parsed_tokens),
-      std::move(floc)  /* file_location */));
+      std::move(floc)  /* file_location */,
+      parsed_are_printed));
 
   pf->num_top_level_declarations = static_cast<unsigned>(decls.size());
   pf->num_top_level_macros = static_cast<unsigned>(macros.size());
@@ -2051,7 +2060,7 @@ static PendingFragmentPtr CreatePendingFragment(
 static pasta::PrintedTokenRange CreateParsedTokenRange(
     pasta::PrintedTokenRange parsed_tokens,
     const std::vector<pasta::Decl> &decls, const pasta::PrintingPolicy &pp,
-    std::string_view main_job_file) {
+    std::string_view main_job_file, bool &parsed_are_printed) {
 
   CHECK(!decls.empty());
 
@@ -2097,6 +2106,7 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
   // things like 
   for (const auto &decl : decls_to_print) {
     if (IsSpecializationOrInSpecialization(decl)) {
+      parsed_are_printed = true;
       parsed_tokens = pasta::PrintedTokenRange::AdoptWhitespace(
           printed_tokens, parsed_tokens);
       break;
@@ -2234,7 +2244,8 @@ static void CreateFreestandingDeclFragment(
       end_index,
       std::move(decls),
       {}  /* empty macros */,
-      nullptr  /* no parent entity */);
+      nullptr  /* no parent entity */,
+      true  /* Using printed tokens */);
 
   // We move `floc` into `CreatePendingFragment` so that it affects our
   // hashing/deduplicating, but beyond that, we don't want to associate this
@@ -2304,7 +2315,8 @@ static void CreateFloatingDirectiveFragment(
       end_index,
       {}  /* empty decls */,
       std::move(macros),
-      nullptr  /* parent entity */);
+      nullptr  /* parent entity */,
+      false  /* using parsed tokens */);
 
   InitializeEntityLabeller(*pf);
 
@@ -2430,17 +2442,19 @@ static void CreatePendingFragments(
         end_index,
         std::move(root_decls),
         top_level_macros  /* copied */,
-        nullptr  /* parent entity */);
+        nullptr  /* parent entity */,
+        false  /* not using printed tokens */);
 
     InitializeEntityLabeller(*pf);
     pending_fragments.emplace_back(std::move(pf));
-  
+
   // Top-level declarations, possibly with macro expansions.
   } else if (!root_decls.empty()) {
+    bool parsed_are_printed = false;
     pasta::PrintedTokenRange aligned_tokens =
         CreateParsedTokenRange(
             pasta::PrintedTokenRange::Adopt(frag_tok_range),
-            root_decls, pp, main_file_path);
+            root_decls, pp, main_file_path, parsed_are_printed);
 
     CHECK(!aligned_tokens.empty() || !top_level_macros.empty());
 
@@ -2456,7 +2470,8 @@ static void CreatePendingFragments(
         end_index,
         std::move(root_decls),
         top_level_macros  /* copied */,
-        nullptr  /* parent entity */);
+        nullptr  /* parent entity */,
+        parsed_are_printed);
 
     InitializeEntityLabeller(*pf);
     pending_fragments.emplace_back(std::move(pf));
@@ -2473,9 +2488,10 @@ static void CreatePendingFragments(
     std::vector<pasta::Decl> decls;
     decls.emplace_back(std::move(std::get<pasta::Decl>(er.entity)));
 
+    bool parsed_are_printed = false;
     pasta::PrintedTokenRange aligned_tokens = CreateParsedTokenRange(
         pasta::PrintedTokenRange::Adopt(sub_tok_range.value()),
-        decls, pp, main_file_path);
+        decls, pp, main_file_path, parsed_are_printed);
 
     CHECK(!aligned_tokens.empty());
 
@@ -2491,7 +2507,8 @@ static void CreatePendingFragments(
         er.end_index,
         std::move(decls),
         top_level_macros  /* copied */,
-        er.parent);
+        er.parent,
+        parsed_are_printed);
 
     InitializeEntityLabeller(*pf);
     pending_fragments.emplace_back(std::move(pf));
