@@ -28,6 +28,7 @@
 #include <iostream>
 
 #include "PASTA.h"
+#include "PendingFragment.h"
 #include "Util.h"
 
 // #define D(...) __VA_ARGS__
@@ -145,10 +146,7 @@ class TokenTreeImpl {
   // file tokens that were elided due to things like conditional macros, e.g.
   // `#if 0`.
   Substitution *BuildFromTokenList(
-      const std::optional<pasta::TokenRange> &range,
-      const pasta::PrintedTokenRange &printed_range,
-      const std::vector<pasta::Decl> &top_level_decls,
-      std::ostream &err, bool rebuild_from_printed);
+      const PendingFragment &pf, std::ostream &err, bool rebuild_from_printed);
 
   Substitution *BuildFromParsedTokenList(
       const pasta::TokenRange &range,
@@ -769,13 +767,11 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
 // file tokens that were elided due to things like conditional macros, e.g.
 // `#if 0`.
 Substitution *TokenTreeImpl::BuildFromTokenList(
-    const std::optional<pasta::TokenRange> &range,
-    const pasta::PrintedTokenRange &printed_range,
-    const std::vector<pasta::Decl> &top_level_decls,
-    std::ostream &err, bool rebuild_from_printed) {
+    const PendingFragment &pf, std::ostream &err, bool rebuild_from_printed) {
 
-  if (range.has_value()) {
-    auto root_sub = BuildFromParsedTokenList(range.value(), printed_range, err);
+  if (pf.original_tokens) {
+    auto root_sub = BuildFromParsedTokenList(
+        pf.original_tokens.value(), pf.parsed_tokens, err);
     if (!root_sub) {
       return nullptr;
     }
@@ -786,20 +782,20 @@ Substitution *TokenTreeImpl::BuildFromTokenList(
       return root_sub;
     }
 
-    std::cerr << "\n-- REBUILDING TREE ----------\n";
-    std::cerr << printed_range.Data() << "\n";
+    // std::cerr << "\n-- REBUILDING TREE ----------\n";
+    // std::cerr << pf.parsed_tokens.Data() << "\n";
 
-    auto new_root_sub = RebuildTree(printed_range);
+    auto new_root_sub = RebuildTree(pf.parsed_tokens);
     if (!new_root_sub) {
       err << "Unable to rebuild tree for parsed tokens.";
       return nullptr;
     }
 
-    new_root_sub->PrintDOT(std::cerr);
+    // new_root_sub->PrintDOT(std::cerr);
     return new_root_sub;
 
-  } else if (printed_range) {
-    return BuildFromPrintedTokenList(printed_range, err);
+  } else if (pf.parsed_tokens) {
+    return BuildFromPrintedTokenList(pf.parsed_tokens, err);
 
   } else {
     err << "Empty parsed and printed token ranges";
@@ -2072,18 +2068,14 @@ TokenTree::~TokenTree(void) {}
 // Create a token tree from the tokens in the inclusive range
 // `[begin_index, end_index]` from `range`.
 std::optional<TokenTreeNodeRange> TokenTree::Create(
-    const std::optional<pasta::TokenRange> &range,
-    const pasta::PrintedTokenRange &printed_range,
-    const std::vector<pasta::Decl> &top_level_decls,
-    std::ostream &err, bool rebuild_from_printed) {
+    const PendingFragment &pf, std::ostream &err, bool rebuild_from_printed) {
 
   auto impl = std::make_shared<TokenTreeImpl>();
 
   try {
 
     // Build and classify the initial list of tokens.
-    auto sub = impl->BuildFromTokenList(
-        range, printed_range, top_level_decls, err, rebuild_from_printed);
+    auto sub = impl->BuildFromTokenList(pf, err, rebuild_from_printed);
     if (!sub) {
       return std::nullopt;
     }

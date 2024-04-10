@@ -866,11 +866,7 @@ void GlobalIndexingState::PersistFragment(
   // condition, but we can't let it stop us from actually serializing the
   // fragment or its data.
   std::stringstream tok_tree_err;
-  std::optional<TokenTreeNodeRange> maybe_tt = TokenTree::Create(
-      pf.original_tokens, pf.parsed_tokens, pf.top_level_decls, tok_tree_err,
-      force_rebuild);
-
-  if (maybe_tt) {
+  if (auto maybe_tt = TokenTree::Create(pf, tok_tree_err, force_rebuild)) {
     PersistTokenTree(pf, fb, std::move(maybe_tt.value()), provenance,
                      force_rebuild);
 
