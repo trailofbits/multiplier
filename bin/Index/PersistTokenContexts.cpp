@@ -36,12 +36,23 @@ namespace {
 //            on the ID of the canonical decl.
 static mx::RawEntityId IdOfRedeclInFragment(
     const EntityMapper &em, mx::RawEntityId frag_index,
-    pasta::Decl canon_decl) {
+    const pasta::Decl &canon_decl) {
 
-  mx::RawEntityId ret_id = em.EntityId(canon_decl);
+  mx::RawEntityId eid = em.EntityId(canon_decl);
+  auto ret_id = eid;
+  auto decl_id = mx::EntityId(eid).Extract<mx::DeclId>();
+  if (!decl_id) {
+    return mx::kInvalidEntityId;
+  }
+
+  // Don't scan redeclarations if we don't have to.
+  if (decl_id->fragment_id == frag_index) {
+    return eid;
+  }
+
   for (pasta::Decl redecl : canon_decl.Redeclarations()) {
-    mx::RawEntityId eid = em.EntityId(redecl);
-    auto decl_id = mx::EntityId(eid).Extract<mx::DeclId>();
+    eid = em.EntityId(redecl);
+    decl_id = mx::EntityId(eid).Extract<mx::DeclId>();
 
     // Note: Redecls of the canonical decl can be in the different
     //       fragment. In such case move to next redecls. An example
@@ -125,7 +136,7 @@ unsigned TokenContextSaver::CollectContextsFromTokens(void) {
 
       // NOTE(pag): PASTA stored the canonical decl in the decl context, so
       //            it's not likely to be in the current fragment.
-      if (fragment_index) {
+      if (fragment_index && context.Kind() == pasta::TokenContextKind::kDecl) {
         if (auto decl = pasta::Decl::From(unaliased_context)) {
           const mx::RawEntityId eid =
               IdOfRedeclInFragment(em, fragment_index, *decl);
@@ -135,19 +146,18 @@ unsigned TokenContextSaver::CollectContextsFromTokens(void) {
         }
       }
 
-    if (false) {
 #define ADD_ENTITY_TO_CONTEXT(type_name, lower_name) \
-    } else if (auto lower_name ## _ = \
-                   pasta::type_name::From(unaliased_context)) { \
-      const mx::RawEntityId eid = em.EntityId(*lower_name ## _); \
-      if (eid != mx::kInvalidEntityId) { \
-        contexts[eid].insert(context); \
+      if (auto lower_name ## _ = pasta::type_name::From(unaliased_context)) { \
+        const mx::RawEntityId eid = em.EntityId(*lower_name ## _); \
+        if (eid != mx::kInvalidEntityId) { \
+          contexts[eid].insert(context); \
+        } \
+        continue; \
       }
 
       FOR_EACH_ENTITY_CATEGORY(ADD_ENTITY_TO_CONTEXT)
 #undef ADD_ENTITY_TO_CONTEXT
-
-      }
+  
     }
   }
   return num_tokens;

@@ -1,18 +1,22 @@
-template<typename X>
-class SplitToken {};
+namespace SplitToken {
 
-using Split1 = SplitToken<SplitToken<int>>;
-using Split2 = SplitToken<SplitToken<SplitToken<int>>>;
-using Split3 = SplitToken<SplitToken<SplitToken<SplitToken<int>>>>;
-using Split4 = SplitToken<SplitToken<SplitToken<SplitToken<SplitToken<int>>>>>;
-using Split5 = SplitToken<SplitToken<SplitToken<SplitToken<SplitToken<SplitToken<int>>>>>>;
+template<typename X>
+class ST {};
+
+using Split1 = ST<ST<int>>;
+using Split2 = ST<ST<ST<int>>>;
+using Split3 = ST<ST<ST<ST<int>>>>;
+using Split4 = ST<ST<ST<ST<ST<int>>>>>;
+using Split5 = ST<ST<ST<ST<ST<ST<int>>>>>>;
 
 template <>
-class SplitToken<SplitToken<int>> {};
+class ST<ST<int>> {};
 
 struct Operator {
   template <typename T>
   T operator<<(T x) { return x; };
 };
 
-int x = Operator{}.operator<<<int>(1);
+int SplitToken_x = Operator{}.operator<<<int>(1);
+
+}

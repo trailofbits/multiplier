@@ -299,6 +299,13 @@ static const std::unordered_set<std::string> gEntityClassNames{
 // to check the conditions that would be asserted, and if those conditions
 // aren't satisfied, then return `std::nullopt`.
 static std::set<std::pair<std::string, std::string>> kMethodBlackList{
+
+  // We have `::Tokens()`, so we don't need these redundancies.
+  {"Stmt", "BeginToken"},
+  {"Stmt", "EndToken"},
+  {"Decl", "BeginToken"},
+  {"Decl", "EndToken"},
+
   {"Expr", "ClassifyLValue"},  // Calls `clang::Expr::ClassifyImpl`.
   {"Expr", "IsBoundMemberFunction"},  // Calls `clang::Expr::ClassifyImpl`.
   {"Expr", "IsModifiableLvalue"},  // Calls `clang::Expr::ClassifyImpl`.

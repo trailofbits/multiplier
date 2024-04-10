@@ -175,15 +175,20 @@ static bool AcceptOOK(pasta::OverloadedOperatorKind ook, pasta::TokenKind tk) {
   }
 }
 
+static mx::RawEntityId VisitType(
+    const EntityMapper &em, const pasta::Type &type, std::string_view tok_data,
+    int context_depth);
+
 // Visit the `stmt` and try to make `raw_token` or the token data in it.
 // Depending on the quality of information we have, we might go for exact
 // matches (against `raw_token`), or in-name-only matches, e.g. the field is
 // called `foo` and the data of the token is also `foo`.
-static const void *VisitStmt(const pasta::Stmt &stmt,
-                             const void *raw_token,
-                             std::string_view token_data,
-                             pasta::TokenKind token_kind,
-                             bool is_identifier) {
+static mx::RawEntityId VisitStmt(const EntityMapper &em,
+                                 const pasta::Stmt &stmt,
+                                 const void *raw_token,
+                                 std::string_view token_data,
+                                 pasta::TokenKind token_kind,
+                                 bool is_identifier) {
 
   auto check_token = [=] (const pasta::Token &et) {
     if (raw_token) {
@@ -193,6 +198,8 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
     }
   };
 
+  const auto raw_stmt = em.EntityId(stmt);
+
   // Try to match the named declaration referenced by a `DeclRefExpr`.
   if (auto dre = pasta::DeclRefExpr::From(stmt)) {
     auto decl = dre->Declaration();
@@ -200,12 +207,12 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
 
       if (auto nd = pasta::NamedDecl::From(decl)) {
         if (nd->Name() == token_data) {
-          return RawEntity(nd.value());
+          return em.EntityId(nd.value());
         }
 
         // Common case for C code.
         if (check_token(dre->ExpressionToken())) {
-          return RawEntity(nd.value());
+          return em.EntityId(nd.value());
         }
 
         // Sometimes the expression token is waaaay off, e.g. in the
@@ -213,7 +220,7 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
         // token for `__and_<....>::value` is `__and_`. In this case, we use
         // the end token.
         if (check_token(dre->EndToken())) {
-          return RawEntity(nd.value());
+          return em.EntityId(nd.value());
         }
 
         // For C++ code, something like `B::name<...>` where `B` is the
@@ -221,7 +228,7 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
         // and `name` is the token previous to the `LAngleToken`.
         if (auto before_l_angle = dre->LAngleToken().PreviousLocation()) {
           if (check_token(before_l_angle.value())) {
-            return RawEntity(nd.value());
+            return em.EntityId(nd.value());
           }
         }
       }
@@ -229,7 +236,7 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
 
     if (auto meth = pasta::CXXMethodDecl::From(decl)) {
       if (AcceptOOK(meth->OverloadedOperator(), token_kind)) {
-        return RawEntity(meth.value());
+        return em.EntityId(meth.value());
       }
     }
 
@@ -243,35 +250,35 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
     if (auto func = pasta::FunctionDecl::From(md)) {
       auto ook = func->OverloadedOperator();
       if (AcceptOOK(ook, token_kind)) {
-        return RawEntity(md);
+        return em.EntityId(md);
       }
     }
 
     if (check_token(me->MemberToken())) {
-      return RawEntity(md);
+      return em.EntityId(md);
     }
 
     // Failing this, try to match on `base` in `base->member` or `base.member`.
-    return VisitStmt(me->Base(), raw_token, token_data, token_kind,
+    return VisitStmt(em, me->Base(), raw_token, token_data, token_kind,
                      is_identifier);
 
   // Something like `__c11_atomic_load(...)` of an `_Atomic`-qualified variable.
   } else if (auto atomic = pasta::AtomicExpr::From(stmt)) {
     if (is_identifier) {
       if (token_data == atomic->BuiltinToken().Data()) {
-        return RawEntity(atomic.value());
+        return raw_stmt;
       }
     } else if (token_kind == pasta::TokenKind::kRParenthesis ||
                token_kind == pasta::TokenKind::kLParenthesis) {
       auto r_paren = atomic->RParenToken();
       if (r_paren.Kind() == pasta::TokenKind::kRParenthesis) {
         if (check_token(r_paren)) {
-          return RawEntity(atomic.value());
+          return raw_stmt;
         }
 
         if (auto l_paren = r_paren.BalancedLocation()) {
           if (check_token(l_paren.value())) {
-            return RawEntity(atomic.value());
+            return raw_stmt;
           }
         }
       }
@@ -280,19 +287,19 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
   // The label name in an `asm goto`.
   } else if (auto addr = pasta::AddrLabelExpr::From(stmt)) {
     if (check_token(addr->LabelToken())) {
-      return RawEntity(addr->Label());
+      return em.EntityId(addr->Label());
     }
 
   } else if (auto ce = pasta::CXXConstructExpr::From(stmt)) {
     pasta::CXXConstructorDecl cd = ce->Constructor();
     if (check_token(ce->Token())) {
-      return RawEntity(cd);
+      return em.EntityId(cd);
     }
 
   // Try to match on `label` in `goto label;`.
   } else if (auto gt = pasta::GotoStmt::From(stmt)) {
     if (check_token(gt->LabelToken())) {
-      return RawEntity(gt->Label());
+      return em.EntityId(gt->Label());
     }
 
   // Try to match on `member` in `{ .member = ... }`.
@@ -300,59 +307,97 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
     for (pasta::Designator de : di->Designators()) {
       if (auto f = de.Field()) {
         if (check_token(de.FieldToken())) {
-          return RawEntity(f.value());
+          return em.EntityId(f.value());
         }
       }
     }
 
   } else if (auto ili = pasta::InitListExpr::From(stmt)) {
-    // TODO(pag): Issue #192.
-//    auto bi = ili->BeginToken().Index();
-//    auto ei = ili->EndToken().Index();
-//    auto ti = token.Index();
-//    if (bi <= ti && ti <= ei) {
-//      return RawEntity(ili);
-//    }
+    if (token_kind == pasta::TokenKind::kLBrace) {
+      if (check_token(ili->BeginToken())) {
+        return raw_stmt;
+      }
+    } else if (token_kind == pasta::TokenKind::kRBrace) {
+      if (check_token(ili->EndToken())) {
+        return raw_stmt;
+      }
+    }
 
   // Try to match on `label` in `label:`.
   } else if (auto ls = pasta::LabelStmt::From(stmt)) {
     if (check_token(ls->IdentifierToken())) {
-      return RawEntity(ls->Declaration());
+      return em.EntityId(ls->Declaration());
     }
 
   } else if (auto pde = pasta::PredefinedExpr::From(stmt)) {
     if (is_identifier && check_token(pde->ExpressionToken())) {
-      return RawEntity(pde.value());
+      return raw_stmt;
     }
 
   // Try to match on `func`, `(`, or `)` in `func()`.
   } else if (auto call = pasta::CallExpr::From(stmt)) {
-    auto ret = VisitStmt(call->Callee(), raw_token, token_data, token_kind,
-                         is_identifier);
-    if (ret || is_identifier) {
-      return ret;
+    if (token_kind != pasta::TokenKind::kLParenthesis &&
+        token_kind != pasta::TokenKind::kRParenthesis) {
+      return VisitStmt(em, call->Callee(), raw_token, token_data, token_kind,
+                       is_identifier);
     }
 
     // Try to match the `)` in `func()`.
     auto r_paren = call->RParenToken();
     if (r_paren.Kind() != pasta::TokenKind::kRParenthesis) {
-      return nullptr;
+      return mx::kInvalidEntityId;
     }
 
     if (token_kind == pasta::TokenKind::kRParenthesis) {
       if (check_token(r_paren)) {
-        return RawEntity(call.value());
+        return raw_stmt;
       }
 
     } else if (token_kind == pasta::TokenKind::kLParenthesis) {
       auto l_paren = r_paren.BalancedLocation();
       if (!l_paren || l_paren->Kind() != pasta::TokenKind::kLParenthesis) {
         assert(false);
-        return nullptr;
+        return mx::kInvalidEntityId;
       }
 
       if (check_token(l_paren.value())) {
-        return RawEntity(call.value());
+        return raw_stmt;
+      }
+    }
+
+  } else if (auto fce = pasta::CXXFunctionalCastExpr::From(stmt)) {
+
+    if (is_identifier) {
+      return VisitType(em, fce->TypeAsWritten(), token_data, 0u);
+
+    } else if (token_kind == pasta::TokenKind::kLParenthesis) {
+      if (check_token(fce->LParenToken())) {
+        return raw_stmt;
+      }
+    } else if (token_kind == pasta::TokenKind::kRParenthesis) {
+      if (check_token(fce->RParenToken())) {
+        return raw_stmt;
+      }
+    }
+
+  } else if (auto ece = pasta::ExplicitCastExpr::From(stmt)) {
+    if (token_kind != pasta::TokenKind::kLParenthesis &&
+        token_kind != pasta::TokenKind::kRParenthesis) {
+      return mx::kInvalidEntityId;
+    }
+
+    auto begin_tok = ece->BeginToken();
+    if (begin_tok.Kind() != pasta::TokenKind::kLParenthesis) {
+      return mx::kInvalidEntityId;
+    }
+
+    if (token_kind == pasta::TokenKind::kLParenthesis) {
+      if (check_token(begin_tok)) {
+        return raw_stmt;
+      }
+    } else if (auto balanced = begin_tok.BalancedLocation()) {
+      if (check_token(balanced.value())) {
+        return raw_stmt;
       }
     }
 
@@ -360,64 +405,41 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
   } else if (auto paren = pasta::ParenExpr::From(stmt)) {
     if (token_kind == pasta::TokenKind::kLParenthesis) {
       if (check_token(paren->BeginToken())) {
-        return RawEntity(paren.value());
+        return raw_stmt;
       }
     } else if (token_kind == pasta::TokenKind::kRParenthesis) {
       if (check_token(paren->EndToken())) {
-        return RawEntity(paren.value());
+        return raw_stmt;
       }
     }
 
   // Braces.
   } else if (auto comp = pasta::CompoundStmt::From(stmt)) {
     if (token_kind == pasta::TokenKind::kLBrace) {
-      auto l_brace = comp->LeftBraceToken();
-      if (raw_token) {
-        if (raw_token == RawEntity(l_brace)) {
-          return RawEntity(comp.value());
-        }
-      } else if (l_brace.Kind() == token_kind) {
-        return RawEntity(comp.value());
+      if (check_token(comp->LeftBraceToken())) {
+        return raw_stmt;
       }
+
     } else if (token_kind == pasta::TokenKind::kRBrace) {
-      auto r_brace = comp->RightBraceToken();
-      if (raw_token) {
-        if (raw_token == RawEntity(r_brace)) {
-          return RawEntity(comp.value());
-        }
-      } else if (r_brace.Kind() == pasta::TokenKind::kRBrace) {
-        return RawEntity(comp.value());
+      if (check_token(comp->RightBraceToken())) {
+        return raw_stmt;
       }
     }
   
   // Binary operator.
   } else if (auto binary = pasta::BinaryOperator::From(stmt)) {
-    auto ot = binary->OperatorToken();
-    if (token_kind == ot.Kind()) {
-      if (raw_token) {
-        if (raw_token == RawEntity(ot)) {
-          return RawEntity(stmt);
-        }
-      } else {
-        return RawEntity(stmt);
-      }
+    if (check_token(binary->OperatorToken())) {
+      return raw_stmt;
     }
   
   // Unary operator.
   } else if (auto unary = pasta::UnaryOperator::From(stmt)) {
-    auto ot = unary->OperatorToken();
-    if (token_kind == ot.Kind()) {
-      if (raw_token) {
-        if (raw_token == RawEntity(ot)) {
-          return RawEntity(stmt);
-        }
-      } else {
-        return RawEntity(stmt);
-      }
+    if (check_token(unary->OperatorToken())) {
+      return raw_stmt;
     }
   }
 
-  return nullptr;
+  return mx::kInvalidEntityId;
 }
 
 // Try to see if a token matches a declaration. As above, sometimes we have
@@ -452,7 +474,7 @@ static mx::RawEntityId VisitTemplateName(
 // ways, we use PASTA's pretty printer and logic in this and other functions
 // to emulate the kinds of information gleaned from `clang::TypeLoc`s. PASTA
 // doesn't wrap `clang::TypeLoc`s, though.
-static mx::RawEntityId VisitType(
+mx::RawEntityId VisitType(
     const EntityMapper &em, const pasta::Type &type, std::string_view tok_data,
     int context_depth) {
 
@@ -470,7 +492,7 @@ static mx::RawEntityId VisitType(
     }
 
   } else if (auto spec = pasta::TemplateSpecializationType::From(type)) {
-    if (spec->IsSugared()) {
+    if (!context_depth && spec->IsSugared()) {
       auto eid = VisitType(em, spec->Desugar(), tok_data, context_depth);
       if (eid != mx::kInvalidEntityId) {
         return eid;
@@ -492,6 +514,8 @@ static mx::RawEntityId VisitType(
       }
     }
 
+    // PASTA's pretty printer ensures that this won't get split up into
+    // a bunch of individual tokens.
     if (tok_data.starts_with("type-parameter-")) {
       return em.EntityId(type);
     }
@@ -503,16 +527,10 @@ static mx::RawEntityId VisitType(
       return em.EntityId(decl);
     }
 
-    auto tst = inj_type->InjectedSpecializationType();
-    if (tst != type) {
-      return VisitType(em, tst, tok_data, context_depth);
-    }
-
-  } else if (auto deduced_type = pasta::DeducedType::From(type)) {
-    if (deduced_type->IsDeduced()) {
-      auto resolved_type = deduced_type->ResolvedType();
-      if (resolved_type) {
-        return VisitType(em, resolved_type.value(), tok_data, context_depth);
+    if (!context_depth) {
+      auto tst = inj_type->InjectedSpecializationType();
+      if (tst != type) {
+        return VisitType(em, tst, tok_data, context_depth);
       }
     }
 
@@ -532,10 +550,22 @@ static mx::RawEntityId VisitType(
   // } else if (auto func_type = pasta::FunctionProtoType::From(type);
   //            func_type && !context_depth) {
   //   return type.RawType();
+  } else if (!context_depth) {
+    if (auto unqual_type = type.UnqualifiedType(); unqual_type != type) {
+      return VisitType(em, unqual_type, tok_data, context_depth);
+    
+    } else if (auto elaborated_type = pasta::ElaboratedType::From(type)) {
+      return VisitType(em, elaborated_type->NamedType(), tok_data,
+                       context_depth);
 
-  } else if (auto unqual_type = type.UnqualifiedType();
-             unqual_type != type) {
-    return VisitType(em, unqual_type, tok_data, context_depth);
+    } else if (auto deduced_type = pasta::DeducedType::From(type)) {
+      if (deduced_type->IsDeduced()) {
+        auto resolved_type = deduced_type->ResolvedType();
+        if (resolved_type) {
+          return VisitType(em, resolved_type.value(), tok_data, context_depth);
+        }
+      }
+    }
   }
 
   return mx::kInvalidEntityId;
@@ -909,12 +939,12 @@ bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
 
 static mx::RawEntityId VisitTemplateArgument(
     const EntityMapper &em, const pasta::TemplateArgument &arg,
-    std::string_view tok_data, int context_depth) {
+    std::string_view tok_data) {
 
   switch (arg.Kind()) {
     case pasta::TemplateArgumentKind::kType:
       if (auto t = arg.AsType()) {
-        return VisitType(em, t.value(), tok_data, context_depth);
+        return VisitType(em, t.value(), tok_data, 0u);
       }
       break;
 
@@ -927,7 +957,7 @@ static mx::RawEntityId VisitTemplateArgument(
       }
 
       if (auto t = arg.ParameterTypeForDeclaration()) {
-        return VisitType(em, t.value(), tok_data, context_depth);
+        return VisitType(em, t.value(), tok_data, 0u);
       }
       break;
 
@@ -1077,8 +1107,11 @@ mx::RawEntityId RelatedEntityIdToPrintedToken(
                 break;
             }
           } else {
-            related_entity = VisitStmt(stmt.value(), self, token_data, tk,
-                                       is_identifier);
+            auto eid = VisitStmt(em, stmt.value(), self, token_data, tk,
+                                 is_identifier);
+            if (eid != mx::kInvalidEntityId) {
+              return eid;
+            }
           }
         }
         break;
@@ -1140,7 +1173,7 @@ mx::RawEntityId RelatedEntityIdToPrintedToken(
       case pasta::TokenContextKind::kTemplateArgument:
         if (is_identifier) {
           if (auto a = pasta::TemplateArgument::From(context)) {
-            auto eid = VisitTemplateArgument(em, a.value(), token_data, depth);
+            auto eid = VisitTemplateArgument(em, a.value(), token_data);
             if (eid != mx::kInvalidEntityId) {
               return eid;
             }
