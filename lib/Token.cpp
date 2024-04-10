@@ -585,8 +585,14 @@ static TokenCategory ClassifyMacro(TokenKind kind, MacroId id,
 }
 
 static inline TokenCategory Rebase(DeclCategory category) {
-  return static_cast<TokenCategory>(
-      int(category) + int(TokenCategory::COMMENT));
+  if (category == DeclCategory::UNKNOWN) {
+    assert(false);
+    return TokenCategory::UNKNOWN;
+
+  } else {
+    return static_cast<TokenCategory>(
+        int(category) + int(TokenCategory::COMMENT));
+  }
 }
 
 static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
@@ -659,40 +665,43 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
     // but we'll try to be more precise by fetching the actual decl.
 
     case DeclKind::CONCEPT:
-      baseline_category = TokenCategory::CONCEPT;
-      break;
+      return TokenCategory::CONCEPT;
 
     // E.g. `__make_integer_seq`.
     case DeclKind::BUILTIN_TEMPLATE:
-      baseline_category = TokenCategory::BUILTIN_TYPE_NAME;
-      break;
+      return TokenCategory::BUILTIN_TYPE_NAME;
     
     case DeclKind::CLASS_TEMPLATE:
-      baseline_category = TokenCategory::CLASS;
-      break;
+      return TokenCategory::CLASS;
+
     case DeclKind::VAR_TEMPLATE:
-      baseline_category = TokenCategory::GLOBAL_VARIABLE;
-      break;
+      return TokenCategory::GLOBAL_VARIABLE;
+
     case DeclKind::FUNCTION_TEMPLATE:
       baseline_category = TokenCategory::FUNCTION;
       break;
+
     case DeclKind::TYPE_ALIAS_TEMPLATE:
       baseline_category = TokenCategory::TYPE_ALIAS;
       break;
+
     case DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
     case DeclKind::VAR_TEMPLATE_SPECIALIZATION:
-      baseline_category = TokenCategory::GLOBAL_VARIABLE;
-      break;
+      return TokenCategory::GLOBAL_VARIABLE;
+
     case DeclKind::RECORD:
       baseline_category = TokenCategory::STRUCT;
       break;
+
     case DeclKind::CXX_METHOD:
     case DeclKind::OBJ_C_METHOD:
       baseline_category = TokenCategory::INSTANCE_METHOD;
       break;
+
     case DeclKind::IMPLICIT_PARAM:
       baseline_category = TokenCategory::PARAMETER_VARIABLE;
       break;
+
     case DeclKind::VAR:
       baseline_category = TokenCategory::LOCAL_VARIABLE;
       break;
