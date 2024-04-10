@@ -762,6 +762,9 @@ bool IsSpecialization(const pasta::Decl &decl) {
 // to render the printed tokens of the specialization into the fragment, rather
 // than the parsed tokens.
 bool IsSpecializationOrInSpecialization(const pasta::Decl &decl) {
+  if (IsSpecialization(decl)) {
+    return true;
+  }
   switch (decl.Kind()) {
     case pasta::DeclKind::kVarTemplate:
     case pasta::DeclKind::kClassTemplate:
@@ -782,7 +785,7 @@ bool IsSpecializationOrInSpecialization(const pasta::Decl &decl) {
       return false;
 
     default:
-      return IsSpecialization(decl);
+      return false;
   }
 }
 

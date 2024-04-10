@@ -74,7 +74,8 @@ class PendingFragment {
                          EntityMapper &em_,
                          const pasta::TokenRange *original_tokens_,
                          pasta::PrintedTokenRange parsed_tokens_,
-                         std::optional<FileLocationOfFragment> file_location_)
+                         std::optional<FileLocationOfFragment> file_location_,
+                         bool parsed_tokens_are_printed_)
       : fragment_id(fragment_id_),
         fragment_index(fragment_id.Unpack().fragment_id),
         compilation_id(tu_id_),
@@ -83,7 +84,8 @@ class PendingFragment {
         file_location(std::move(file_location_)),
         first_parsed_token_index(first_parsed_token_index_),
         last_parsed_token_index(last_parsed_token_index_),
-        is_new(is_new_) {
+        is_new(is_new_),
+        parsed_tokens_are_printed(parsed_tokens_are_printed_) {
     if (original_tokens_) {
       original_tokens = *original_tokens_;
     }
@@ -163,6 +165,10 @@ class PendingFragment {
   // it being redundant), yet have other fragments in the TU point to type IDs
   // that logically belong to this type.
   const bool is_new;
+
+  // Are the parsed tokens actually printed tokens? This happens when we need
+  // to render out the specialized version of templates.
+  const bool parsed_tokens_are_printed;
 
   // Keep track on if we've labelled some top-level entities in the entity
   // mapper.

@@ -146,7 +146,7 @@ class TokenTreeImpl {
   // file tokens that were elided due to things like conditional macros, e.g.
   // `#if 0`.
   Substitution *BuildFromTokenList(
-      const PendingFragment &pf, std::ostream &err, bool rebuild_from_printed);
+      const PendingFragment &pf, std::ostream &err);
 
   Substitution *BuildFromParsedTokenList(
       const pasta::TokenRange &range,
@@ -767,7 +767,7 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
 // file tokens that were elided due to things like conditional macros, e.g.
 // `#if 0`.
 Substitution *TokenTreeImpl::BuildFromTokenList(
-    const PendingFragment &pf, std::ostream &err, bool rebuild_from_printed) {
+    const PendingFragment &pf, std::ostream &err) {
 
   if (pf.original_tokens) {
     auto root_sub = BuildFromParsedTokenList(
@@ -778,7 +778,7 @@ Substitution *TokenTreeImpl::BuildFromTokenList(
 
     // It's not a specialization of any kind, so we don't need to check if tokens
     // are contiguous or rebuild things.
-    if (!rebuild_from_printed) {
+    if (!pf.parsed_tokens_are_printed) {
       return root_sub;
     }
 
@@ -1373,9 +1373,8 @@ void Rebuilder::BuildBottomUp(
   for (auto &tok : new_tokens_alloc) {
     if (tok.parent == &new_sub) {
       tok.macro_tok.reset();
+      assert(tok.printed_tok.has_value());
     }
-
-    assert(tok.printed_tok.has_value());
   }
 }
 
@@ -2068,14 +2067,14 @@ TokenTree::~TokenTree(void) {}
 // Create a token tree from the tokens in the inclusive range
 // `[begin_index, end_index]` from `range`.
 std::optional<TokenTreeNodeRange> TokenTree::Create(
-    const PendingFragment &pf, std::ostream &err, bool rebuild_from_printed) {
+    const PendingFragment &pf, std::ostream &err) {
 
   auto impl = std::make_shared<TokenTreeImpl>();
 
   try {
 
     // Build and classify the initial list of tokens.
-    auto sub = impl->BuildFromTokenList(pf, err, rebuild_from_printed);
+    auto sub = impl->BuildFromTokenList(pf, err);
     if (!sub) {
       return std::nullopt;
     }

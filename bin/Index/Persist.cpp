@@ -228,8 +228,6 @@ struct TokenTreeSerializationSchedule {
   // Maps parsed tokens to the macro in which they are contained.
   std::vector<mx::RawEntityId> containing_macro;
 
-  // Should we try to locate original macros?
-  const bool use_macros_as_locators;
 
   mx::RawEntityId RecordEntityId(const TokenTree &tt,
                                  bool &is_part_of_define,
@@ -240,7 +238,7 @@ struct TokenTreeSerializationSchedule {
     std::optional<pasta::Macro> macro = tt.Macro();
     if (macro) {
       CHECK(tt.Kind() == mx::FromPasta(macro->Kind()));
-      if (use_macros_as_locators) {
+      if (!pf.parsed_tokens_are_printed) {
         raw_locator = macro->RawMacro();
 
       } else {
@@ -342,7 +340,7 @@ struct TokenTreeSerializationSchedule {
         //            but the lifetime of `raw_tt` and `raw_gt` are limited
         //            to fragment serialization.
 
-        if (mt && use_macros_as_locators) {
+        if (mt && !pf.parsed_tokens_are_printed) {
           raw_pt = RawEntity(mt.value());
         } else if (pt) {
           raw_pt = RawEntity(pt.value());
@@ -445,11 +443,9 @@ struct TokenTreeSerializationSchedule {
     }
   }
 
-  TokenTreeSerializationSchedule(PendingFragment &pf_,
-                                 bool was_rebuilt_from_printed_tokens)
+  TokenTreeSerializationSchedule(PendingFragment &pf_)
       : pf(pf_),
-        em(pf_.em),
-        use_macros_as_locators(!was_rebuilt_from_printed_tokens) {}
+        em(pf_.em) {}
 };
 
 // Persist just the parsed tokens in the absence of a token tree.
@@ -525,12 +521,11 @@ static std::string MainSourceFile(const PendingFragment &pf) {
 // before IDs, and the
 static void PersistTokenTree(
     PendingFragment &pf, mx::rpc::Fragment::Builder &fb,
-    TokenTreeNodeRange nodes, TokenProvenanceCalculator &provenance,
-    bool was_rebuilt_from_printed_tokens) {
+    TokenTreeNodeRange nodes, TokenProvenanceCalculator &provenance) {
 
   const EntityMapper &em = pf.em;
 
-  TokenTreeSerializationSchedule sched(pf, was_rebuilt_from_printed_tokens);
+  TokenTreeSerializationSchedule sched(pf);
   sched.Schedule(nodes);
 
   provenance.Run(pf.fragment_index, sched.tokens);
@@ -682,7 +677,7 @@ static void PersistTokenTree(
     for (const std::optional<TokenTree> &tt : entities) {
       CHECK(tt.has_value())
           << "Missing token tree for " << mx::EnumeratorName(kind)
-          << "; rebuild was " << (was_rebuilt_from_printed_tokens ? "" : "not ")
+          << "; rebuild was " << (pf.parsed_tokens_are_printed ? "" : "not ")
           << "forced";
 
       const void *raw_tt = tt->RawNode();
@@ -853,22 +848,16 @@ void GlobalIndexingState::PersistFragment(
     tlds.set(i, em.EntityId(pf.top_level_decls[i]));
   }
 
-  bool force_rebuild = false;
-  if (pf.original_tokens.has_value() && !pf.parsed_tokens.empty() &&
-      !pf.top_level_decls.empty() && pf.top_level_decls.size() == 1 &&
-      IsSpecializationOrInSpecialization(pf.top_level_decls.front())) {
-    
+  if (pf.parsed_tokens_are_printed) {
     pf.macros_to_serialize.clear();
-    force_rebuild = true;
   }
 
   // Derive the macro substitution tree. Failing to build the tree is an error
   // condition, but we can't let it stop us from actually serializing the
   // fragment or its data.
   std::stringstream tok_tree_err;
-  if (auto maybe_tt = TokenTree::Create(pf, tok_tree_err, force_rebuild)) {
-    PersistTokenTree(pf, fb, std::move(maybe_tt.value()), provenance,
-                     force_rebuild);
+  if (auto maybe_tt = TokenTree::Create(pf, tok_tree_err)) {
+    PersistTokenTree(pf, fb, std::move(maybe_tt.value()), provenance);
 
   // If we don't have the normal or the backup token tree, then do a best
   // effort saving of macro tokens. Don't bother organizing them into
