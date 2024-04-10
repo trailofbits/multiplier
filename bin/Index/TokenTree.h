@@ -30,6 +30,7 @@ enum class MacroKind : unsigned char;
 }  // namespace mx
 namespace indexer {
 
+class PendingFragment;
 class Substitution;
 class SubstitutionNodeList;
 class TokenTree;
@@ -139,10 +140,8 @@ class TokenTree {
   // Create a token tree from the tokens in the inclusive range
   // `[begin_index, end_index]` from `range`.
   static std::optional<TokenTreeNodeRange>
-  Create(const std::optional<pasta::TokenRange> &range,
-         const pasta::PrintedTokenRange &printed_range,
-         const std::vector<pasta::Decl> &top_level_decls,
-         std::ostream &err, bool rebuild_from_printed);
+  Create(const PendingFragment &pf, std::ostream &err,
+         bool rebuild_from_printed);
 
   // Dump.
   void Dump(std::ostream &os) const;
