@@ -1247,17 +1247,45 @@ unsigned TokenProvenanceCalculator::TokenInfo::Depth(
   return depth;
 }
 
+TokenProvenanceCalculator::TokenInfo *
+TokenProvenanceCalculator::TokenInfo::OnlyChild(
+    const TokenProvenanceCalculator &self) const noexcept {
+  if (!child) {
+    return nullptr;
+  } else if (child < self.infos.size()) {
+    return nullptr;
+  } else {
+    return reinterpret_cast<TokenInfo *>(child);
+  }
+}
+
 gap::generator<TokenProvenanceCalculator::TokenInfo *>
 TokenProvenanceCalculator::TokenInfo::Children(
-    TokenProvenanceCalculator &self) {
+    const TokenProvenanceCalculator &self) const & {
   if (!child) {
     co_return;
   } else if (child < self.infos.size()) {
-    for (TokenInfo *c : self.multiple_children[this]) {
-      co_yield c;
+    auto it = self.multiple_children.find(this);
+    auto end = self.multiple_children.end();
+    if (it != end) {
+      for (auto tok : it->second) {
+        co_yield tok;
+      }
     }
   } else {
     co_yield reinterpret_cast<TokenInfo *>(child);
+  }
+}
+
+gap::generator<TokenProvenanceCalculator::TokenInfo *>
+TokenProvenanceCalculator::TokenInfo::MultipleChildren(
+    const TokenProvenanceCalculator &self) const & {
+  auto it = self.multiple_children.find(this);
+  auto end = self.multiple_children.end();
+  if (it != end) {
+    for (auto tok : it->second) {
+      co_yield tok;
+    }
   }
 }
 
@@ -1265,6 +1293,11 @@ bool TokenProvenanceCalculator::TokenInfo::DeriveFrom(
     TokenProvenanceCalculator &self, TokenInfo *new_parent) {
 
   if (new_parent == &(self.empty.value())) {
+    return false;
+  }
+
+  if (new_parent == this) {
+    assert(false);
     return false;
   }
 
@@ -1314,7 +1347,12 @@ bool TokenProvenanceCalculator::TryConnect(TokenInfo *child_info,
   }
 
   TokenInfo *parent_info = dt_it->second;
-  return child_info->DeriveFrom(*this, parent_info);
+  if (!child_info->DeriveFrom(*this, parent_info)) {
+    return false;
+  }
+
+  child_info->derived_token_id = parent_info->entity_id;
+  return true;
 }
 
 static void FillExpansionTokens(const pasta::Macro &macro,
@@ -1337,45 +1375,37 @@ static void FillExpansionTokens(const pasta::Macro &macro,
 // `info->derived_token_id`. However, there are more subtle cases, such as a
 // number being derived from `__COUNTER__`, or an identifier being derived from
 // token concatenations.
-void TokenProvenanceCalculator::ConnectToDerived(
-    TokenInfo *info, std::optional<pasta::MacroToken> mtok) {
-  auto derived_it = info_map.find(info->derived_token_id);
-  if (derived_it != info_map.end() &&
-      info->DeriveFrom(*this, derived_it->second)) {
-    return;
-  }
+bool TokenProvenanceCalculator::BackupConnectToDerived(
+    TokenInfo *info, const pasta::MacroToken &mtok) {
 
-  if (!mtok) {
-    return;
-  }
-
-  std::optional<pasta::Macro> parent = mtok->Parent();
+  std::optional<pasta::Macro> parent = mtok.Parent();
   if (!parent) {
     assert(false);
-    return;
+    return false;
   }
 
   // If this token is derived from the body of a macro, and we failed to
   // connect it above, then that generally means the current fragment is
   // not the macro definition itself.
   auto parent_kind = parent->Kind();
-  if (parent_kind == pasta::MacroKind::kDefineDirective) {
-    return;
+  if (parent_kind == pasta::MacroKind::kDefineDirective ||
+      parent_kind == pasta::MacroKind::kParameterSubstitution) {
+    return false;
   }
 
   auto sub = pasta::MacroSubstitution::From(parent.value());
-  if (!sub || parent_kind == pasta::MacroKind::kParameterSubstitution) {
-    return;
+  if (!sub) {
+    return false;
   }
 
-  const void *self = RawEntity(mtok.value());
+  const void *self = RawEntity(mtok);
 
   // Don't connect us into intermediate body tokens.
   if (parent_kind == pasta::MacroKind::kExpansion) {
     auto &exp = reinterpret_cast<pasta::MacroExpansion &>(parent.value());
     for (pasta::Macro n : exp.IntermediateChildren()) {
       if (RawEntity(n) == self) {
-        return;
+        return false;
       }
     }
   }
@@ -1385,7 +1415,7 @@ void TokenProvenanceCalculator::ConnectToDerived(
   expansion_toks.clear();
   for (pasta::Macro n : parent->Children()) {
     if (RawEntity(n) == self) {
-      return;
+      return false;
     }
 
     FillExpansionTokens(n, expansion_toks);
@@ -1407,10 +1437,14 @@ void TokenProvenanceCalculator::ConnectToDerived(
       case pasta::TokenKind::kUnknown:
         continue;
       default:
-        TryConnect(info, n);
+        if (TryConnect(info, n)) {
+          return true;
+        }
         break;
     }
   }
+
+  return false;
 }
 
 // Order token `a` before token `b` if:
@@ -1520,16 +1554,29 @@ static int Score(mx::RawEntityId fragment_index, mx::EntityId eid) {
 bool TokenProvenanceCalculator::Pull(void) {
   bool changed = false;
   for (TokenInfo *tok : ordered_tokens) {
-    auto parent_related_entity_id = tok->related_entity_id;
-    auto parent_has_rel = parent_related_entity_id != mx::kInvalidEntityId;
-    auto parent_has_parsed = tok->parsed_token_id != mx::kInvalidEntityId;
-    if (parent_has_parsed) {
+    if (tok->parsed_token_id != mx::kInvalidEntityId) {
       continue;
     }
 
-    if (!tok->child) {
-      continue;  // No children.
+    if (tok->related_entity_id != mx::kInvalidEntityId) {
+      continue;
     }
+
+    // No children.
+    if (!tok->child) {
+      continue;
+    }
+
+    // One child.
+    if (auto only_child = tok->OnlyChild(*this)) {
+      changed = Update(&(tok->parsed_token_id),
+                       only_child->parsed_token_id, changed);
+      changed = Update(&(tok->related_entity_id),
+                       only_child->related_entity_id, changed);
+      continue;
+    }
+
+    // Multiple children; score them for the sake of propagation.
 
     TokenInfo *matching_parsed = nullptr;
     TokenInfo *matching_rel = nullptr;
@@ -1541,7 +1588,7 @@ bool TokenProvenanceCalculator::Pull(void) {
     int other_parsed_score = -1;
     int other_rel_score = -1;
 
-    for (TokenInfo *derived_tok : tok->Children(*this)) {
+    for (TokenInfo *derived_tok : tok->MultipleChildren(*this)) {
       auto score = Score(fragment_index, derived_tok->related_entity_id);
 
       if (tok->data_hash == derived_tok->data_hash) {
@@ -1550,7 +1597,9 @@ bool TokenProvenanceCalculator::Pull(void) {
             matching_parsed = derived_tok;
             matching_parsed_score = score;
           }
-        } else if (derived_tok->related_entity_id != mx::kInvalidEntityId) {
+        }
+
+        if (derived_tok->related_entity_id != mx::kInvalidEntityId) {
           if (score > matching_rel_score) {
             matching_rel = derived_tok;
             matching_rel_score = score;
@@ -1562,7 +1611,9 @@ bool TokenProvenanceCalculator::Pull(void) {
             other_parsed = derived_tok;
             other_parsed_score = score;
           }
-        } else if (derived_tok->related_entity_id != mx::kInvalidEntityId) {
+        }
+
+        if (derived_tok->related_entity_id != mx::kInvalidEntityId) {
           if (score > other_rel_score) {
             other_rel = derived_tok;
             other_rel_score = score;
@@ -1572,102 +1623,41 @@ bool TokenProvenanceCalculator::Pull(void) {
     }
 
     if (matching_parsed) {
-      if (!parent_has_rel ||
-          parent_related_entity_id == matching_parsed->related_entity_id) {
-        changed = Update(&(tok->parsed_token_id),
-                         matching_parsed->parsed_token_id, changed);
-        changed = Update(&(tok->related_entity_id),
-                         matching_parsed->related_entity_id, changed);
-        continue;
-      }
-    }
-
-    if (matching_rel) {
-      if (!parent_has_rel) {
-        changed = Update(&(tok->related_entity_id),
-                         matching_rel->related_entity_id, changed);
-        continue;
-      }
+      tok->parsed_token_id = matching_parsed->parsed_token_id;
+      tok->related_entity_id = matching_parsed->related_entity_id;
+      matching_parsed->derived_token_id = tok->entity_id;
+      changed = true;
+      continue;
     }
 
     if (other_parsed) {
-      if (!parent_has_rel ||
-          parent_related_entity_id == other_parsed->related_entity_id) {
-        changed = Update(&(tok->parsed_token_id),
-                         other_parsed->parsed_token_id, changed);
-        changed = Update(&(tok->related_entity_id),
-                         other_parsed->related_entity_id, changed);
-        continue;
-      }
+      tok->parsed_token_id = other_parsed->parsed_token_id;
+      tok->related_entity_id = other_parsed->related_entity_id;
+      other_parsed->derived_token_id = tok->entity_id;
+      changed = true;
+      continue;
+    }
+
+    if (matching_rel) {
+      assert(matching_rel->parsed_token_id == mx::kInvalidEntityId);
+      tok->related_entity_id = matching_rel->related_entity_id;
+      changed = true;
+      continue;
     }
 
     if (other_rel) {
-      if (!parent_has_rel) {
-        changed = Update(&(tok->related_entity_id),
-                         other_rel->related_entity_id, changed);
-        continue;
-      }
+      assert(other_rel->parsed_token_id == mx::kInvalidEntityId);
+      tok->related_entity_id = other_rel->related_entity_id;
+      changed = true;
+      continue;
     }
   }
 
   return changed;
 }
 
-bool TokenProvenanceCalculator::Pull(const std::vector<TokenTreeNode> &tokens) {
-  // Force in the derived token stuff, guaranteeing data likeness. This is its
-  // own pass because a token may have multiple parents.
-  for (TokenInfo *parent : ordered_tokens) {
-    if (!parent->child) {
-      continue;
-    }
-
-    for (TokenInfo *child : parent->Children(*this)) {
-      if (child->data_hash == parent->data_hash) {
-        assert(parent->entity_id != child->entity_id);
-        child->derived_token_id = parent->entity_id;
-        break;
-      }
-    }
-  }
-
-  // Force in the derived token stuff in the absence of info.
-  for (TokenInfo *parent : ordered_tokens) {
-    if (!parent->child) {
-      continue;
-    }
-
-    for (TokenInfo *child : parent->Children(*this)) {
-      if (child->derived_token_id == mx::kInvalidEntityId) {
-        assert(parent->entity_id != child->entity_id);
-        child->derived_token_id = parent->entity_id;
-      }
-    }
-  }
-
-  // // Finally, any token info that doesn't have a derived token id might be
-  // // related to a file token, or to a token in the definition of a macro body.
-  // for (const TokenTreeNode &node : tokens) {
-  //   TokenInfo *info = info_map[em.EntityId(node)];
-  //   if (info->derived_token_id != mx::kInvalidEntityId) {
-  //     continue;
-  //   }
-
-  //   if (auto pt = node.Token()) {
-  //     info->derived_token_id = em.EntityId(pt->DerivedLocation());
-  //   }
-
-  //   if (info->derived_token_id != mx::kInvalidEntityId) {
-  //     continue;
-  //   }
-
-  //   if (auto mt = node.MacroToken()) {
-  //     info->derived_token_id = em.EntityId(mt->DerivedLocation());
-  //   }
-  // }
-
-  // Do single-step connections between the tokens and the what they are
-  // derived from.
-  (void) Pull();
+void TokenProvenanceCalculator::FallbackInitMacroProvenance(
+    const std::vector<TokenTreeNode> &tokens) {
 
   // Try to force in some extra macro connections. If we do these too early
   // then we'll miss opportunities to connect things to their parsed tokens.
@@ -1692,8 +1682,6 @@ bool TokenProvenanceCalculator::Pull(const std::vector<TokenTreeNode> &tokens) {
           RelatedEntityIdToMacroToken(em, ml.value(), true  /* force */);
     }
   }
-
-  return true;
 }
 
 // Push information from originating tokens down to derived tokens.
@@ -1701,32 +1689,29 @@ bool TokenProvenanceCalculator::Push(void) {
   auto it = ordered_tokens.rbegin();
   auto it_end = ordered_tokens.rend();
   auto changed = false;
+
   for (; it != it_end; ++it) {
     TokenInfo *tok = *it;
 
-    if (!tok->child) {
-      continue;  // No children.
+    const auto parsed_id = tok->parsed_token_id;
+    if (parsed_id == mx::kInvalidEntityId || !tok->child) {
+      continue;
     }
 
-    const auto rel_id = tok->related_entity_id;
-    const auto parsed_id = tok->parsed_token_id;
+    auto rel_id = tok->related_entity_id;
 
     for (TokenInfo *derived_tok : tok->Children(*this)) {
-      auto derived_parsed_id = derived_tok->parsed_token_id;
-      auto derived_rel_id = derived_tok->related_entity_id;
-      if (derived_parsed_id == mx::kInvalidEntityId &&
-          derived_rel_id == mx::kInvalidEntityId &&
-          rel_id != mx::kInvalidEntityId) {
-        changed = Update(&(derived_tok->related_entity_id), rel_id, changed);
-        changed = Update(&(derived_tok->parsed_token_id), parsed_id, changed);
-
-      } else if (derived_parsed_id == mx::kInvalidEntityId &&
-                 derived_rel_id == rel_id &&
-                 parsed_id != mx::kInvalidEntityId) {
-        changed = Update(&(derived_tok->parsed_token_id), parsed_id, changed);
+      if (derived_tok->parsed_token_id != mx::kInvalidEntityId ||
+          derived_tok->related_entity_id != mx::kInvalidEntityId) {
+        continue;
       }
+
+      derived_tok->parsed_token_id = parsed_id;
+      derived_tok->related_entity_id = rel_id;
+      changed = true;
     }
   }
+
   return changed;
 }
 
@@ -1745,7 +1730,7 @@ void TokenProvenanceCalculator::Run(
     std::optional<pasta::PrintedToken> cl = node.PrintedToken();
     std::optional<pasta::MacroToken> ml = node.MacroToken();
 
-    mx::RawEntityId tok_id = em.EntityId(node);
+    const mx::RawEntityId tok_id = em.EntityId(node);
     assert(tok_id != mx::kInvalidEntityId);
 
     uint64_t data_hash = 0u;
@@ -1822,54 +1807,99 @@ void TokenProvenanceCalculator::Run(
     }
 
     ordered_tokens.push_back(&info);
-
-    if (pl) {
-      auto pl_dl_id = em.EntityId(pl->DerivedLocation());
-      if (pl_dl_id != info.entity_id) {
-        info.derived_token_id = pl_dl_id;
-      }
-    }
-
-    if (info.derived_token_id != mx::kInvalidEntityId) {
-      continue;
-    }
-
-    // NOTE(pag): With macro tokens, we might find that we are missing some
-    //            "in-between" tokens due to the token tree process eliminating
-    //            tokens belonging to argument pre-expansion phases. In these
-    //            situations, we need to make an extra hop.
-    if (ml) {
-      auto dl = ml->DerivedLocation();
-      info.derived_token_id = em.EntityId(dl);
-      assert(info.derived_token_id != info.entity_id);
-
-      if (info.derived_token_id != mx::kInvalidEntityId) {
-        continue;
-      }
-
-      // Hop.
-      assert(!std::holds_alternative<pasta::FileToken>(dl));
-      if (std::holds_alternative<pasta::MacroToken>(dl)) {
-        info.derived_token_id = em.EntityId(
-            std::get<pasta::MacroToken>(dl).DerivedLocation());
-        assert(info.derived_token_id != info.entity_id);
-      }
-    }
-
-    if (info.derived_token_id != mx::kInvalidEntityId) {
-      continue;
-    }
   }
 
   info_map.erase(mx::kInvalidEntityId);
-  info_map.emplace(mx::kInvalidEntityId, &(empty.value()));
 
   // Do single-step connections between the tokens and the what they are
   // derived from.
   for (const TokenTreeNode &node : tokens) {
-    TokenInfo *info = info_map[em.EntityId(node)];
-    ConnectToDerived(info, node.MacroToken());
+    TokenInfo *child = info_map[em.EntityId(node)];
+    assert(child != nullptr);
+
+    auto pl = node.Token();
+    auto cl = node.PrintedToken();
+    auto ml = node.MacroToken();
+
+    if (!pl && cl) {
+      pl = cl->DerivedLocation();
+    }
+
+    if (pl && !ml) {
+      ml = pl->MacroLocation();
+    }
+
+    pasta::DerivedToken dl;
+    if (pl) {
+      dl = pl->DerivedLocation();
+    } else if (ml) {
+      dl = ml->DerivedLocation();
+    }
+
+    assert(child->derived_token_id == mx::kInvalidEntityId);
+
+    while (!std::holds_alternative<std::monostate>(dl)) {
+      auto found_eid = em.EntityId(dl);
+
+      auto it = info_map.find(found_eid);
+      if (it != info_map.end()) {
+        if (child != it->second &&
+            child->DeriveFrom(*this, it->second)) {
+          child->derived_token_id = found_eid;
+          break;
+        }
+      }
+
+      // Synthesize a file token node.
+      if (std::holds_alternative<pasta::FileToken>(dl)) {
+        TokenInfo &finfo = infos.emplace_back(
+            found_eid, child->data_hash, child->related_entity_id,
+            child->parsed_token_id);
+
+#ifndef NDEBUG
+        finfo.data = child->data;
+#endif
+        info_map.emplace(found_eid, &finfo);
+        if (child->DeriveFrom(*this, &finfo)) {
+          child->derived_token_id = found_eid;
+          break;
+        }
+      }
+
+      if (!std::holds_alternative<pasta::MacroToken>(dl)) {
+        break;
+      }
+      
+      // NOTE(pag): With macro tokens, we might find that we are missing some
+      //            "in-between" tokens due to the token tree process eliminating
+      //            tokens belonging to argument pre-expansion phases. In these
+      //            situations, we need to make an extra hop.
+      dl = std::get<pasta::MacroToken>(dl).DerivedLocation();
+    }
+
+    if (child->derived_token_id != mx::kInvalidEntityId) {
+      continue;
+    }
+
+    while (ml) {
+      if (BackupConnectToDerived(child, ml.value())) {
+        break;
+      }
+
+      dl = ml->DerivedLocation();
+      if (!std::holds_alternative<pasta::MacroToken>(dl)) {
+        break;
+      }
+
+      ml = std::move(std::get<pasta::MacroToken>(dl));
+    }
+
+    if (child->derived_token_id == mx::kInvalidEntityId) {
+      child->DeriveFrom(*this, &(empty.value()));
+    }
   }
+
+  info_map.emplace(mx::kInvalidEntityId, &(empty.value()));
 
   // NOTE(pag): Depth values are actually very very large positive numbers.
   auto min_depth = ~0u;
@@ -1883,9 +1913,18 @@ void TokenProvenanceCalculator::Run(
   auto iter = 0u;
 
   // Iteratively improve connections.
-  for (auto changed = Pull(tokens); changed && iter <= max_depth; ++iter) {
+  for (auto changed = true; changed && iter <= max_depth; ++iter) {
     changed = Pull();
-    changed = Push() || changed;
+  }
+
+  FallbackInitMacroProvenance(tokens);
+
+  iter = 0u;
+  for (auto changed = true; changed && iter <= max_depth; ++iter) {
+    changed = false;
+    if (Push()) {
+      changed = Pull();
+    }
   }
 }
 
@@ -1898,7 +1937,6 @@ void TokenProvenanceCalculator::Run(
 
   for (pasta::PrintedToken tok : tokens) {
     std::optional<pasta::Token> pl = tok.DerivedLocation();
-    std::optional<pasta::MacroToken> ml;
 
     mx::RawEntityId tok_id = em.EntityId(tok);
     mx::RawEntityId rel_id = mx::kInvalidEntityId;
@@ -1906,7 +1944,6 @@ void TokenProvenanceCalculator::Run(
 
     if (pl) {
       const pasta::Token &parsed_tok = pl.value();
-      ml = parsed_tok.MacroLocation();
 
       if (tok_id == mx::kInvalidEntityId) {
         tok_id = em.EntityId(parsed_tok);
@@ -1914,10 +1951,6 @@ void TokenProvenanceCalculator::Run(
 
       parsed_id = em.EntityId(parsed_tok);
       rel_id = RelatedEntityIdToPrintedToken(em, tok, parsed_tok);
-
-      if (ml && rel_id == mx::kInvalidEntityId) {
-        rel_id = RelatedEntityIdToMacroToken(em, ml.value());
-      }
 
       if (rel_id == mx::kInvalidEntityId) {
         rel_id = RelatedEntityIdToPrintedToken(em, tok, std::nullopt);
@@ -1935,10 +1968,7 @@ void TokenProvenanceCalculator::Run(
 
     if (pl) {
       info_map.emplace(em.EntityId(pl.value()), &info);
-    }
-
-    if (ml) {
-      info_map.emplace(em.EntityId(ml.value()), &info);
+      info.derived_token_id = em.EntityId(pl->FileLocation());
     }
 
     ordered_tokens.push_back(&info);
@@ -1947,26 +1977,10 @@ void TokenProvenanceCalculator::Run(
   info_map.erase(mx::kInvalidEntityId);
   info_map.emplace(mx::kInvalidEntityId, &(empty.value()));
 
-  // Do single-step connections between the tokens.
-  for (pasta::PrintedToken tok : tokens) {
-
-    std::optional<pasta::MacroToken> mt;
-    if (auto pdt = tok.DerivedLocation()) {
-      auto dt = pdt->DerivedLocation();
-      if (std::holds_alternative<pasta::MacroToken>(dt)) {
-        mt = std::move(std::get<pasta::MacroToken>(dt));
-      }
-    }
-
-    TokenInfo *info = info_map[em.EntityId(tok)];
-    ConnectToDerived(info, mt);
-  }
-
   Sort();
 
   for (auto changed = true; changed; ) {
     changed = Pull();
-    changed = Push() || changed;
   }
 }
 
