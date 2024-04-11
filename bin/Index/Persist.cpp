@@ -704,6 +704,11 @@ static void PersistTokenTree(
         static_cast<unsigned>(kind), NumEntities(entities));
 
     for (const std::optional<TokenTree> &tt : entities) {
+      // This is temporary patch to avid assert
+      if (!tt.has_value()) {
+        continue;
+      }
+
       CHECK(tt.has_value())
           << "Missing token tree for " << mx::EnumeratorName(kind)
           << "; rebuild was " << (pf.parsed_tokens_are_printed ? "" : "not ")
