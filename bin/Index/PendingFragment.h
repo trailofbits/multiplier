@@ -69,8 +69,8 @@ class PendingFragment {
  public:
   inline PendingFragment(mx::PackedFragmentId fragment_id_, bool is_new_,
                          mx::PackedCompilationId tu_id_,
-                         uint64_t first_parsed_token_index_,
-                         uint64_t last_parsed_token_index_,
+                         mx::EntityOffset first_parsed_token_index_,
+                         mx::EntityOffset last_parsed_token_index_,
                          EntityMapper &em_,
                          const pasta::TokenRange *original_tokens_,
                          pasta::PrintedTokenRange parsed_tokens_,
@@ -128,8 +128,8 @@ class PendingFragment {
   // us to avoid oddities in Clang, e.g. where clang will associate struct
   // attributes on forward declarations with prior definitions if they already
   // exist.
-  const uint64_t first_parsed_token_index;
-  const uint64_t last_parsed_token_index;  // Inclusive.
+  const mx::EntityOffset first_parsed_token_index;
+  const mx::EntityOffset last_parsed_token_index;  // Inclusive.
 
   unsigned num_top_level_declarations{0u};
   unsigned num_top_level_macros{0u};

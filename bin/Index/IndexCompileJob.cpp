@@ -39,6 +39,9 @@
 namespace indexer {
 namespace {
 
+using EntityOffsetMap = std::map<mx::EntityOffset, mx::EntityOffset>;
+using EntityOffsetToDirectiveMap = std::map<mx::EntityOffset, pasta::MacroDirective>;
+
 struct OrderedDecl {
   pasta::Decl decl;
   const void *parent;
@@ -72,11 +75,11 @@ struct EntityRange {
   const void *parent;
 
   // Inclusive entity bounds.
-  uint64_t begin_index;
-  uint64_t end_index;
+  mx::EntityOffset begin_index;
+  mx::EntityOffset end_index;
 
   inline EntityRange(Entity entity_, const void *parent_,
-                     uint64_t begin_index_, uint64_t end_index_)
+                     mx::EntityOffset begin_index_, mx::EntityOffset end_index_)
       : entity(std::move(entity_)),
         parent(parent_),
         begin_index(begin_index_),
@@ -91,11 +94,11 @@ struct EntityGroupRange {
   EntityGroup group;
 
   // Inclusive bounds for all entities in the group.
-  uint64_t begin_index;
-  uint64_t end_index;
+  mx::EntityOffset begin_index;
+  mx::EntityOffset end_index;
 
-  inline EntityGroupRange(EntityGroup group_, uint64_t begin_index_,
-                          uint64_t end_index_)
+  inline EntityGroupRange(EntityGroup group_, mx::EntityOffset begin_index_,
+                          mx::EntityOffset end_index_)
       : group(std::move(group_)),
         begin_index(begin_index_),
         end_index(end_index_) {}
@@ -602,7 +605,7 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 };
 
-static uint64_t ParsedIndexOfMacroDirective(
+static mx::EntityOffset ParsedIndexOfMacroDirective(
     const pasta::MacroDirective &macro) {
   return macro.ParsedLocation().Index();
 }
@@ -725,11 +728,12 @@ FindDirectivesInMacro(pasta::Macro mn) {
 // can extend its bounds, possibly as far as the `#endif`.
 //
 // XREF(pag): https://github.com/trailofbits/multiplier/issues/457
-static std::map<uint64_t, pasta::MacroDirective> FindNextPrevConditionalMacros(
-    const pasta::AST &ast, std::string_view main_file_path) {
+static EntityOffsetToDirectiveMap
+FindNextPrevConditionalMacros(const pasta::AST &ast,
+                              std::string_view main_file_path) {
 
   std::vector<pasta::MacroDirective> prev;
-  std::map<uint64_t, pasta::MacroDirective> next;
+  EntityOffsetToDirectiveMap next;
 
   auto add_to_prev = [&] (const pasta::MacroDirective &macro, const char *what) {
     CHECK(!prev.empty())
@@ -831,7 +835,7 @@ static bool CanElideTokenFromTLD(const pasta::Token &tok) {
 }
 
 // Do some minor stuff to find begin/ending tokens.
-static std::pair<uint64_t, uint64_t> BaselineEntityRange(
+static std::pair<mx::EntityOffset, mx::EntityOffset> BaselineEntityRange(
     const pasta::Decl &decl, pasta::Token tok,
     std::string_view main_file_path) {
 
@@ -861,11 +865,11 @@ static std::pair<uint64_t, uint64_t> BaselineEntityRange(
   return {begin_tok_index, end_tok_index};
 }
 
-static uint64_t PreviousConditionalIndex(
-    const std::map<uint64_t, pasta::MacroDirective> &dir_index_to_next_dir,
+static mx::EntityOffset PreviousConditionalIndex(
+    const EntityOffsetToDirectiveMap &dir_index_to_next_dir,
     const pasta::MacroDirective &macro) {
 
-  uint64_t macro_index = ParsedIndexOfMacroDirective(macro);
+  auto macro_index = ParsedIndexOfMacroDirective(macro);
   auto it = dir_index_to_next_dir.find(~macro_index);
   if (it != dir_index_to_next_dir.end()) {
     return ParsedIndexOfMacroDirective(it->second);
@@ -875,11 +879,11 @@ static uint64_t PreviousConditionalIndex(
   }
 }
 
-static uint64_t EndOfConditionalSequence(
-    const std::map<uint64_t, pasta::MacroDirective> &dir_index_to_next_dir,
+static mx::EntityOffset EndOfConditionalSequence(
+    const EntityOffsetToDirectiveMap &dir_index_to_next_dir,
     const pasta::MacroDirective &macro) {
 
-  uint64_t macro_index = ParsedIndexOfMacroDirective(macro);
+  auto macro_index = ParsedIndexOfMacroDirective(macro);
   auto it = dir_index_to_next_dir.find(macro_index);
   if (it != dir_index_to_next_dir.end()) {
     return EndOfConditionalSequence(dir_index_to_next_dir, it->second);
@@ -906,9 +910,10 @@ static uint64_t EndOfConditionalSequence(
 // Here, we want all variants of the fragment to end at the `#endif`.
 //
 // NOTE(pag): `tests/Macros/FragmentWithMultipleBounds.c` covers this case.
-static uint64_t ExpandToEndOfNextDirective(
-    const std::map<uint64_t, pasta::MacroDirective> &dir_index_to_next_dir,
-    uint64_t begin_index, uint64_t end_index, uint64_t max_index) {
+static mx::EntityOffset ExpandToEndOfNextDirective(
+    const EntityOffsetToDirectiveMap &dir_index_to_next_dir,
+    mx::EntityOffset begin_index, mx::EntityOffset end_index,
+    mx::EntityOffset max_index) {
 
   for (auto bi = begin_index; bi <= end_index; ) {
     auto it = dir_index_to_next_dir.upper_bound(bi);
@@ -922,8 +927,8 @@ static uint64_t ExpandToEndOfNextDirective(
     }
 
     const pasta::MacroDirective &dir = it->second;
-    uint64_t dir_begin_index = 0u;
-    uint64_t dir_end_index = 0u;
+    mx::EntityOffset dir_begin_index = 0u;
+    mx::EntityOffset dir_end_index = 0u;
 
     if (IsClosingConditionalDirective(dir)) {
       dir_begin_index = PreviousConditionalIndex(dir_index_to_next_dir, dir);
@@ -949,9 +954,9 @@ static uint64_t ExpandToEndOfNextDirective(
 
 // Expand an inclusive `[begin, end]` range to be as wide as necessary to
 // include the full scope of macro expansion.
-static std::pair<uint64_t, uint64_t> ExpandRange(
+static std::pair<mx::EntityOffset, mx::EntityOffset> ExpandRange(
     const pasta::TokenRange &range,
-    uint64_t begin_tok_index, uint64_t end_tok_index) {
+    mx::EntityOffset begin_tok_index, mx::EntityOffset end_tok_index) {
 
   const auto max_tok_index = range.Size();
 
@@ -1149,9 +1154,9 @@ static std::pair<uint64_t, uint64_t> ExpandRange(
 // Find the range of tokens of this decl. The range is returned as an inclusive
 // [begin_index, end_index]` pair, and is expanded to cover leading/trailing
 // macro expansions, and contracted to try to elide leading/trailing whitespace.
-static std::pair<uint64_t, uint64_t> FindDeclRange(
+static std::pair<mx::EntityOffset, mx::EntityOffset> FindDeclRange(
     const pasta::TokenRange &range,
-    const std::map<uint64_t, pasta::MacroDirective> &dir_index_to_next_dir,
+    const EntityOffsetToDirectiveMap &dir_index_to_next_dir,
     pasta::Decl decl, pasta::Token tok, std::string_view main_file_path) {
 
   auto [begin_tok_index, end_tok_index] = BaselineEntityRange(
@@ -1325,9 +1330,9 @@ static bool LooksLikeFunctionTemplateOfLambda(const pasta::Token &tok,
 // `entity_ranges`.
 static void AddDeclRangeToEntityListFor(
     const pasta::TokenRange &tokens,
-    const std::map<uint64_t, uint64_t> &eof_to_include,
-    const std::map<uint64_t, uint64_t> &eof_indices,
-    const std::map<uint64_t, pasta::MacroDirective> &dir_index_to_next_dir,
+    const EntityOffsetMap &eof_to_include,
+    const EntityOffsetMap &eof_indices,
+    const EntityOffsetToDirectiveMap &dir_index_to_next_dir,
     std::string_view main_file_path, pasta::Decl decl, const void *parent,
     std::vector<EntityRange> &entity_ranges) {
 
@@ -1370,7 +1375,7 @@ static void AddDeclRangeToEntityListFor(
   //            where possible.
   //
   // XREF(pag): Issue 258#issuecomment-1401170794
-  for (uint64_t i = begin_index + 1u; i < end_index; ++i) {
+  for (mx::EntityOffset i = begin_index + 1u; i < end_index; ++i) {
     switch (tokens[i].Role()) {
 
       // If we find an enclosed begin-of-file marker, then expand to the
@@ -1438,12 +1443,11 @@ static void AddDeclRangeToEntityListFor(
 // uses of `#define` directives.
 static std::vector<OrderedMacro> FindTLMs(
     const pasta::AST &ast, const pasta::TokenRange &tokens,
-    const std::map<uint64_t, uint64_t> &bof_to_eof,
-    std::map<uint64_t, uint64_t> &eof_to_include) {
+    const EntityOffsetMap &bof_to_eof, EntityOffsetMap &eof_to_include) {
 
   std::vector<OrderedMacro> tlms;
   std::vector<pasta::DefineMacroDirective> defs;
-  const uint64_t num_tokens = tokens.Size();
+  const mx::EntityOffset num_tokens = tokens.Size();
 
   auto order = 0u;
   for (pasta::Token tok : tokens) {
@@ -1599,14 +1603,14 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
   std::vector<EntityRange> entity_ranges;
   entity_ranges.reserve(8192u);
 
-  std::map<uint64_t, uint64_t> eof_index_to_include;
-  std::map<uint64_t, uint64_t> bof_to_eof;
+  EntityOffsetMap eof_index_to_include;
+  EntityOffsetMap bof_to_eof;
 
   // Find end-of-file indices. Sometimes we need to expand declaration ranges
   // out to include an end of file if they include the beginning of the file.
   // This helps keep later `TokenTree` stuff balanced, and relates to Issue
   // #258.
-  std::vector<uint64_t> open_indexes;
+  std::vector<mx::EntityOffset> open_indexes;
   open_indexes.reserve(64u);
   for (const pasta::Token &tok : tokens) {
     switch (tok.Role()) {
@@ -1691,8 +1695,8 @@ static bool StatementsHaveErrors(const pasta::Decl &) {
 //
 // XREF: Issue 412 (https://github.com/trailofbits/multiplier/issues/412).
 static bool MergeLeadingMacroWithNextEntity(
-    const pasta::TokenRange &tokens, uint64_t begin_index,
-    uint64_t end_index, uint64_t next_begin_index) {
+    const pasta::TokenRange &tokens, mx::EntityOffset begin_index,
+    mx::EntityOffset end_index, mx::EntityOffset next_begin_index) {
 
   // Make sure there are no parsed tokens inside of the leading macro expansion.
   // If there were then we should have discovered them as leading keywords (e.g.
@@ -1774,16 +1778,16 @@ static std::vector<EntityGroupRange> PartitionEntities(
     EntityGroup entities_for_group;
     Entity prev_entity;
 
-    uint64_t begin_index = entity_ranges[i].begin_index;
-    uint64_t end_index = entity_ranges[i].end_index;
-    uint64_t prev_begin_index = begin_index;
-    uint64_t prev_end_index = end_index;
+    auto begin_index = entity_ranges[i].begin_index;
+    auto end_index = entity_ranges[i].end_index;
+    auto prev_begin_index = begin_index;
+    auto prev_end_index = end_index;
 
     for (; i < max_i; ++i) {
 
       Entity next_entity = entity_ranges[i].entity;
-      uint64_t next_begin = entity_ranges[i].begin_index;
-      uint64_t next_end = entity_ranges[i].end_index;
+      auto next_begin = entity_ranges[i].begin_index;
+      auto next_end = entity_ranges[i].end_index;
 
       // XREF: Issue 412 (https://github.com/trailofbits/multiplier/issues/412).
       //       We can have leading empty macros in cURL and the Linux kernel,
@@ -2003,8 +2007,8 @@ static PendingFragmentPtr CreatePendingFragment(
     const pasta::PrintedTokenRange *printed_tokens,
     std::optional<FileLocationOfFragment> floc,
     mx::PackedCompilationId tu_id,
-    uint64_t begin_index,
-    uint64_t end_index,
+    mx::EntityOffset begin_index,
+    mx::EntityOffset end_index,
     std::vector<pasta::Decl> decls,
     std::vector<pasta::Macro> macros,
     const void *parent_entity,
@@ -2016,7 +2020,7 @@ static PendingFragmentPtr CreatePendingFragment(
   // fragment ID encoding scheme (i.e. has lots of stuff, but we can't encode
   // as many of them), or the small one (i.e. doesn't have as much stuff, and
   // we can encode substantially more of them).
-  size_t num_tokens = 0u;
+  mx::EntityOffset num_tokens = 0u;
   if (original_tokens) {
     num_tokens = original_tokens->Size();
   }
@@ -2177,8 +2181,8 @@ static void CreateFreestandingDeclFragment(
     EntityMapper &em,
     std::optional<FileLocationOfFragment> floc,
     mx::PackedCompilationId tu_id,
-    uint64_t begin_index,
-    uint64_t end_index,
+    mx::EntityOffset begin_index,
+    mx::EntityOffset end_index,
     const pasta::Decl &decl,
     std::vector<PendingFragmentPtr> &pending_fragments,
     std::string_view main_file_path) {
@@ -2339,8 +2343,8 @@ static void CreatePendingFragments(
     return;
   }
 
-  uint64_t begin_index = group_range.begin_index;
-  uint64_t end_index = group_range.end_index;
+  auto begin_index = group_range.begin_index;
+  auto end_index = group_range.end_index;
 
   std::optional<pasta::TokenRange> sub_tok_range = pasta::TokenRange::From(
       tok_range[begin_index], tok_range[end_index]);
@@ -2579,6 +2583,13 @@ static void PersistParsedFragments(
 
   for (PendingFragmentPtr &pf : pending_fragments) {
     LabelDeclsInFragment(*pf);
+
+    if (pf->first_parsed_token_index) {
+      em.MarkFragmentBounds(pf->first_parsed_token_index,
+                            pf->last_parsed_token_index,
+                            pf->fragment_id);
+    }
+
     if (pf->is_new) {
       ++num_new;
     } else {

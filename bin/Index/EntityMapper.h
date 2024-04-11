@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <set>
+
 #include "Entity.h"
 #include "PendingFragment.h"
 #include "Util.h"
@@ -19,11 +21,25 @@ class TokenTree;
 class TokenTreeNode;
 class TypeMapper;
 
+// Inclusive bounds of a fragment.
+struct FragmentBounds final {
+  mx::EntityOffset begin;
+  mx::EntityOffset end;
+  mx::PackedFragmentId fragment_id;
+
+  friend auto operator<=>(const FragmentBounds &,
+                          const FragmentBounds &) = default;
+};
+
 // Provides entity IDs and offsets to the serialization code.
 class EntityMapper final {
  public:
   // Set of all top-level declarations (from the perspective of fragments).
   std::unordered_set<const void *> top_level_decls;
+
+  // Map of parsed token index lower bounds to the upper bounds on where the
+  // fragment end is.
+  std::set<FragmentBounds> fragment_bounds;
 
   // Globally (within a translation unit) entity ids. Generally, these are
   // things that can be referenced across fragments.
@@ -152,6 +168,12 @@ class EntityMapper final {
       const pasta::AST &ast, const pasta::Stmt &entity) const;
 
   void ResetForFragment(void);
+
+  // Mark the (inclusive) fragment bounds.
+  inline void MarkFragmentBounds(
+      mx::EntityOffset lb, mx::EntityOffset ub, mx::PackedFragmentId fid) {
+    fragment_bounds.emplace(FragmentBounds{lb, ub, fid});
+  }
 
   inline void MarkAsTopLevel(const pasta::Decl &decl) {
     top_level_decls.insert(RawEntity(decl));
