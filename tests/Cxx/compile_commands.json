@@ -178,5 +178,10 @@
     "file": "ExplicitInstantiationDefinitionMethod.cpp",
     "command": "/usr/bin/c++ ExplicitInstantiationDefinitionMethod.cpp",
     "directory": ""
+},
+{
+    "file": "MissingPatternDefinition.cpp",
+    "command": "/usr/bin/c++ MissingPatternDefinition.cpp",
+    "directory": ""
 }
 ]
