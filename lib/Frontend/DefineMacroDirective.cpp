@@ -151,7 +151,7 @@ Token DefineMacroDirective::name(void) const {
   return Token();
 }
 
-gap::generator<MacroOrToken> DefineMacroDirective::body(void) const & {
+gap::generator<PreprocessedEntity> DefineMacroDirective::body(void) const & {
   Index index(impl->ep);
   auto list = impl->reader.getVal4();
   for (auto v : list) {
@@ -174,7 +174,7 @@ bool DefineMacroDirective::is_function_like(void) const {
   return impl->reader.getVal13();
 }
 
-gap::generator<MacroOrToken> DefineMacroDirective::parameters(void) const & {
+gap::generator<PreprocessedEntity> DefineMacroDirective::parameters(void) const & {
   Index index(impl->ep);
   auto list = impl->reader.getVal9();
   for (auto v : list) {

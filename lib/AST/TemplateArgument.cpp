@@ -94,7 +94,7 @@ bool TemplateArgument::is_pack_expansion(void) const {
   return impl->reader.getVal7();
 }
 
-std::optional<ValueDecl> TemplateArgument::as_declaration(void) const {
+std::optional<ValueDecl> TemplateArgument::declaration(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal8();
     if (eid == kInvalidEntityId) {
@@ -107,7 +107,7 @@ std::optional<ValueDecl> TemplateArgument::as_declaration(void) const {
   return std::nullopt;
 }
 
-std::optional<Type> TemplateArgument::as_type(void) const {
+std::optional<Type> TemplateArgument::type(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal9();
     if (eid == kInvalidEntityId) {

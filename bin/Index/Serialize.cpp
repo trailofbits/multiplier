@@ -199,14 +199,14 @@ void SerializeTemplateArgument(const PendingFragment &pf, const EntityMapper &es
   b.setVal5(e.IsInstantiationDependent());
   b.setVal6(e.ContainsUnexpandedParameterPack());
   b.setVal7(e.IsPackExpansion());
-  auto v8 = e.AsDeclaration();
+  auto v8 = e.Declaration();
   if (v8) {
     auto id8 = es.EntityId(v8.value());
     b.setVal8(id8);
   } else {
     b.setVal8(mx::kInvalidEntityId);
   }
-  auto v9 = e.AsType();
+  auto v9 = e.Type();
   if (v9) {
     auto id9 = es.EntityId(v9.value());
     b.setVal9(id9);
@@ -6725,7 +6725,13 @@ void SerializeExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::S
   b.setVal19(es.EntityId(e.IgnoreParenthesisCasts()));
   b.setVal20(es.EntityId(e.IgnoreParenthesisImplicitCasts()));
   b.setVal21(es.EntityId(e.IgnoreParenthesisLValueCasts()));
-  b.setVal22(es.EntityId(e.IgnoreParenthesisNoopCasts()));
+  auto v22 = e.IgnoreParenthesisNoopCasts();
+  if (v22) {
+    auto id22 = es.EntityId(v22.value());
+    b.setVal22(id22);
+  } else {
+    b.setVal22(mx::kInvalidEntityId);
+  }
   b.setVal30(es.EntityId(e.IgnoreParentheses()));
   b.setVal31(es.EntityId(e.IgnoreUnlessSpelledInSource()));
   b.setVal16(e.ContainsErrors());
@@ -7172,7 +7178,13 @@ void SerializeCXXUuidofExpr(const PendingFragment &pf, const EntityMapper &es, m
     b.setVal37(mx::kInvalidEntityId);
   }
   b.setVal38(es.EntityId(e.GuidDeclaration()));
-  b.setVal39(es.EntityId(e.TypeOperand()));
+  auto v39 = e.TypeOperand();
+  if (v39) {
+    auto id39 = es.EntityId(v39.value());
+    b.setVal39(id39);
+  } else {
+    b.setVal39(mx::kInvalidEntityId);
+  }
   b.setVal40(es.EntityId(e.TypeOperandSourceInfo()));
   b.setVal84(e.IsTypeOperand());
 }
@@ -7207,8 +7219,20 @@ void SerializeCXXTypeidExpr(const PendingFragment &pf, const EntityMapper &es, m
   } else {
     b.setVal37(mx::kInvalidEntityId);
   }
-  b.setVal38(es.EntityId(e.TypeOperand()));
-  b.setVal39(es.EntityId(e.TypeOperandSourceInfo()));
+  auto v38 = e.TypeOperand();
+  if (v38) {
+    auto id38 = es.EntityId(v38.value());
+    b.setVal38(id38);
+  } else {
+    b.setVal38(mx::kInvalidEntityId);
+  }
+  auto v39 = e.TypeOperandSourceInfo();
+  if (v39) {
+    auto id39 = es.EntityId(v39.value());
+    b.setVal39(id39);
+  } else {
+    b.setVal39(mx::kInvalidEntityId);
+  }
   auto v84 = e.IsMostDerived();
   if (v84) {
     b.setVal84(static_cast<bool>(v84.value()));

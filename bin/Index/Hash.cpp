@@ -168,8 +168,7 @@ std::string HashFragment(
     const std::vector<pasta::Decl> &decls,
     const std::vector<pasta::Macro> &macros,
     const pasta::TokenRange *frag_tok_range,
-    const pasta::PrintedTokenRange &decl_tok_range,
-    const pasta::PrintedTokenRange *printed_tok_range) {
+    const pasta::PrintedTokenRange &decl_tok_range) {
 
   std::stringstream ss;
 
@@ -245,13 +244,6 @@ std::string HashFragment(
       }
 
       ss << " c" << Hash64(tc.str());
-    }
-  }
-
-  if (printed_tok_range && *printed_tok_range) {
-    for (pasta::PrintedToken token : *printed_tok_range) {
-      accumulate_token_into_hash(mx::FromPasta(token.Kind()),
-                                 pasta::TokenRole::kFileToken, token.Data());
     }
   }
 

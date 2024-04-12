@@ -612,9 +612,17 @@ Expr Expr::ignore_parenthesis_l_value_casts(void) const {
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-Expr Expr::ignore_parenthesis_noop_casts(void) const {
-  RawEntityId eid = impl->reader.getVal22();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+std::optional<Expr> Expr::ignore_parenthesis_noop_casts(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal22();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 Expr Expr::ignore_parentheses(void) const {

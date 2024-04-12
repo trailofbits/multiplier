@@ -73,7 +73,7 @@ class MX_EXPORT Expr : public ValueStmt {
   Expr ignore_parenthesis_casts(void) const;
   Expr ignore_parenthesis_implicit_casts(void) const;
   Expr ignore_parenthesis_l_value_casts(void) const;
-  Expr ignore_parenthesis_noop_casts(void) const;
+  std::optional<Expr> ignore_parenthesis_noop_casts(void) const;
   Expr ignore_parentheses(void) const;
   Expr ignore_unless_spelled_in_source(void) const;
   bool contains_errors(void) const;

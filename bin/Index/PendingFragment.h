@@ -58,6 +58,16 @@ class FileLocationOfFragment {
         last_file_token_id(end) {}
 };
 
+// Inclusive bounds of a fragment.
+struct FragmentBounds final {
+  mx::EntityOffset begin;
+  mx::EntityOffset end;
+  mx::PackedFragmentId fragment_id;
+
+  friend auto operator<=>(const FragmentBounds &,
+                          const FragmentBounds &) = default;
+};
+
 // Summary information about a group of top-level declarations that are
 // somehow lexically/syntactically "stuck together" and thus serialized
 // together. For example, `int optind, opterr, optopt;` is one example of
@@ -177,6 +187,10 @@ class PendingFragment {
 
   // Should we drop token provenance after we've labelled tokens? This helps
   bool drop_token_provenance{false};
+
+  inline FragmentBounds Bounds(void) const noexcept {
+    return {first_parsed_token_index, last_parsed_token_index, fragment_id};
+  }
 
   // Types have special serialization that is sort of fragment-specific. We
   // collect the types that are "new" and seen by virtue of this fragment, but

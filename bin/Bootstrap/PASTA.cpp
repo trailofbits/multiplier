@@ -1087,7 +1087,7 @@ static std::optional<std::string> GetFirstTemplateParameterType(
   if (record) {
     if (auto cspec = pasta::ClassTemplateSpecializationDecl::From(*record)) {
       for (pasta::TemplateArgument arg : cspec->TemplateArguments()) {
-        if (auto arg_type = arg.AsType()) {
+        if (auto arg_type = arg.Type()) {
           if (auto arg_record = arg_type->AsTagDeclaration()) {
             return arg_record->Name();
           } else if (auto itype = CxxIntType(*arg_type)) {
@@ -1105,7 +1105,7 @@ static std::optional<pasta::RecordDecl> GetTemplateParameterRecord(
   if (record) {
     if (auto cspec = pasta::ClassTemplateSpecializationDecl::From(*record)) {
       for (pasta::TemplateArgument arg : cspec->TemplateArguments()) {
-        if (auto arg_type = arg.AsType()) {
+        if (auto arg_type = arg.Type()) {
           return arg_type->AsRecordDeclaration();
         }
       }
@@ -2150,7 +2150,7 @@ MethodListPtr CodeGenerator::RunOnClass(
   } else if (is_macro) {
     if (class_name == "Macro") {
       needed_decls.insert("MacroKind");
-      class_os << "using MacroOrToken = std::variant<Macro, Token>;\n";
+      class_os << "using PreprocessedEntity = std::variant<Macro, Token, Fragment>;\n";
     }
 
     serialize_cpp_os
@@ -3356,7 +3356,7 @@ MethodListPtr CodeGenerator::RunOnClass(
       } else if (record_name == "MacroRange") {
         const auto i = storage.AddMethod("List(UInt64)");  // Reference list.
         auto [getter_name, setter_name, init_name] = NamesFor(i);
-        auto cxx_element_name = "MacroOrToken";
+        auto cxx_element_name = "PreprocessedEntity";
 
         serialize_inc_os
               << "  MX_VISIT_MACRO_RANGE(" << class_name << ", "

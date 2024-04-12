@@ -103,8 +103,8 @@ class MX_EXPORT TemplateArgument {
   bool is_instantiation_dependent(void) const;
   bool contains_unexpanded_parameter_pack(void) const;
   bool is_pack_expansion(void) const;
-  std::optional<ValueDecl> as_declaration(void) const;
-  std::optional<Type> as_type(void) const;
+  std::optional<ValueDecl> declaration(void) const;
+  std::optional<Type> type(void) const;
   std::optional<Type> parameter_type_for_declaration(void) const;
   std::optional<Type> null_pointer_type(void) const;
   std::optional<std::vector<TemplateArgument>> pack_elements(void) const;

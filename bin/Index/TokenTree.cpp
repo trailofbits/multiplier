@@ -27,9 +27,8 @@
 
 #include <iostream>
 
+#include "EntityMapper.h"
 #include "PASTA.h"
-#include "PendingFragment.h"
-#include "Util.h"
 
 // #define D(...) __VA_ARGS__
 #ifndef D
@@ -134,7 +133,7 @@ class TokenTreeImpl {
   // Possible rebuild the tree knowing that the `printed_range` tokens are the
   // ones that we want to present. This happens when `printed_range` is derived
   // from a template specialization.
-  Substitution *RebuildTree(const pasta::PrintedTokenRange &printed_range);
+  Substitution *RebuildTree(const PendingFragment &pf);
 
   // Figure out if `node->after` looks like a macro argument pre-expansion of
   // `node`, and if so, return `node->after.before.front()`, i.e. the pre-
@@ -769,38 +768,64 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
 Substitution *TokenTreeImpl::BuildFromTokenList(
     const PendingFragment &pf, std::ostream &err) {
 
+  Substitution *root_sub = nullptr;
+
   if (pf.original_tokens) {
-    auto root_sub = BuildFromParsedTokenList(
+    root_sub = BuildFromParsedTokenList(
         pf.original_tokens.value(), pf.parsed_tokens, err);
-    if (!root_sub) {
-      return nullptr;
-    }
-
-    // It's not a specialization of any kind, so we don't need to check if tokens
-    // are contiguous or rebuild things.
-    if (!pf.parsed_tokens_are_printed) {
-      return root_sub;
-    }
-
-    // std::cerr << "\n-- REBUILDING TREE ----------\n";
-    // std::cerr << pf.parsed_tokens.Data() << "\n";
-
-    auto new_root_sub = RebuildTree(pf.parsed_tokens);
-    if (!new_root_sub) {
-      err << "Unable to rebuild tree for parsed tokens.";
-      return nullptr;
-    }
-
-    // new_root_sub->PrintDOT(std::cerr);
-    return new_root_sub;
 
   } else if (pf.parsed_tokens) {
-    return BuildFromPrintedTokenList(pf.parsed_tokens, err);
+    root_sub = BuildFromPrintedTokenList(pf.parsed_tokens, err);
 
   } else {
     err << "Empty parsed and printed token ranges";
     return nullptr;
   }
+
+  // Figure out if we need to rebuild the token tree based on pure printed
+  // tokens (e.g. for a template specialization), or to excise nested fragments.
+  auto &em = pf.em;
+  auto rebuild = !pf.top_level_decls.empty() && pf.parsed_tokens_are_printed;
+  auto begin = em.template_fragment_bounds.end();
+  auto end = begin;
+
+  if (!rebuild &&
+      (pf.first_parsed_token_index + 2u) <= pf.last_parsed_token_index) {
+    FragmentBounds bounds = pf.Bounds();
+    bounds.begin = pf.first_parsed_token_index + 1u;
+    bounds.end = 0u;
+
+    begin = em.template_fragment_bounds.lower_bound(bounds);
+    
+    bounds.begin = pf.last_parsed_token_index - 1u;
+    end = em.template_fragment_bounds.upper_bound(bounds);
+    
+    // There are some nested fragments that cover the tokens in this token
+    // range.
+    if (begin != end) {
+      rebuild = true;
+
+
+    }
+  }
+
+  // It's not a specialization of any kind, so we don't need to check if tokens
+  // are contiguous or rebuild things.
+  if (!root_sub || !rebuild) {
+    return root_sub;
+  }
+
+  std::cerr << "\n-- REBUILDING TREE ----------\n";
+  std::cerr << pf.parsed_tokens.Data() << "\n";
+
+  auto new_root_sub = RebuildTree(pf);
+  if (!new_root_sub) {
+    err << "Unable to rebuild tree for parsed tokens.";
+    return nullptr;
+  }
+
+  new_root_sub->PrintDOT(std::cerr);
+  return new_root_sub;
 }
 
 // It's possible that we have no parsed tokens. E.g. a 100% synthesized
@@ -1412,12 +1437,11 @@ void Rebuilder::BuildBottomUp(
 // Possible rebuild the tree knowing that the `printed_range` tokens are the
 // ones that we want to present. This happens when `printed_range` is derived
 // from a template specialization.
-Substitution *TokenTreeImpl::RebuildTree(
-    const pasta::PrintedTokenRange &printed_range) {
+Substitution *TokenTreeImpl::RebuildTree(const PendingFragment &pf) {
 
   Rebuilder rebuilder;
 
-  rebuilder.AllocateTokens(printed_range);
+  rebuilder.AllocateTokens(pf.parsed_tokens);
   rebuilder.BuildBottomUp(substitutions_alloc);
   tokens_alloc.swap(rebuilder.new_tokens_alloc);
   substitutions_alloc.swap(rebuilder.new_subs_alloc);

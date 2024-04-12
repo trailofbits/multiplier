@@ -811,7 +811,7 @@ void EntityVisitor::Accept(const pasta::TemplateParameterList &entity) {
 }
 
 void EntityVisitor::Accept(const pasta::TemplateArgument &entity) {
-  if (auto arg_decl = entity.AsDeclaration()) {
+  if (auto arg_decl = entity.Declaration()) {
     Accept(arg_decl.value());
   }
 }

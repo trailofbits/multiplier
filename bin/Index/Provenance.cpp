@@ -234,6 +234,7 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
       }
     }
 
+    // TODO(pag): Use `std::ispunct` on `token_data[0]`?
     if (auto meth = pasta::CXXMethodDecl::From(decl)) {
       if (AcceptOOK(meth->OverloadedOperator(), token_kind)) {
         return em.EntityId(meth.value());
@@ -242,6 +243,18 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
 
   // Try to match on `member` in `base->member` or `base.member`.
   } else if (auto me = pasta::MemberExpr::From(stmt)) {
+    if (token_kind == pasta::TokenKind::kPeriod ||
+        token_kind == pasta::TokenKind::kArrow) {
+      if (check_token(me->OperatorToken())) {
+        return raw_stmt;
+      }
+      return mx::kInvalidEntityId;
+    }
+
+    if (!is_identifier) {
+      return mx::kInvalidEntityId;
+    }
+
     pasta::ValueDecl md = me->MemberDeclaration();
 
     // With a `CxxMemberCallExpr` to an overloaded operator, we might see the
@@ -413,6 +426,19 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
       }
     }
 
+  } else if (auto sexpr = pasta::StmtExpr::From(stmt)) {
+    if (token_kind == pasta::TokenKind::kLParenthesis) {
+      if (check_token(paren->LParenToken())) {
+        return raw_stmt;
+      }
+    } else if (token_kind == pasta::TokenKind::kRParenthesis) {
+      if (check_token(paren->RParenToken())) {
+        return raw_stmt;
+      }
+    }
+
+  // TODO(pag): CoroutineBodyStmt.
+
   // Braces.
   } else if (auto comp = pasta::CompoundStmt::From(stmt)) {
     if (token_kind == pasta::TokenKind::kLBrace) {
@@ -425,13 +451,16 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
         return raw_stmt;
       }
     }
-  
+
+  // // Declaration statement, which might have an assignment.
+  // } else if (auto dstmt = pasta::DeclStmt::From(stmt)) {
+
   // Binary operator.
   } else if (auto binary = pasta::BinaryOperator::From(stmt)) {
     if (check_token(binary->OperatorToken())) {
       return raw_stmt;
     }
-  
+
   // Unary operator.
   } else if (auto unary = pasta::UnaryOperator::From(stmt)) {
     if (check_token(unary->OperatorToken())) {
@@ -553,7 +582,7 @@ mx::RawEntityId VisitType(
   } else if (!context_depth) {
     if (auto unqual_type = type.UnqualifiedType(); unqual_type != type) {
       return VisitType(em, unqual_type, tok_data, context_depth);
-    
+
     } else if (auto elaborated_type = pasta::ElaboratedType::From(type)) {
       return VisitType(em, elaborated_type->NamedType(), tok_data,
                        context_depth);
@@ -894,7 +923,7 @@ bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
   auto is_cxx_destructor = decl.Kind() == pasta::DeclKind::kCXXDestructor;
 
   if (auto func = pasta::FunctionDecl::From(decl)) {
-    
+
     // Try to match the operator token itself, or the `operator` keyword.
     auto ook = func->OverloadedOperator();
     if (AcceptOOK(ook, tk)) {
@@ -943,13 +972,13 @@ static mx::RawEntityId VisitTemplateArgument(
 
   switch (arg.Kind()) {
     case pasta::TemplateArgumentKind::kType:
-      if (auto t = arg.AsType()) {
+      if (auto t = arg.Type()) {
         return VisitType(em, t.value(), tok_data, 0u);
       }
       break;
 
     case pasta::TemplateArgumentKind::kDeclaration:
-      if (auto d = arg.AsDeclaration()) {
+      if (auto d = arg.Declaration()) {
         if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr, d.value(),
                              tok_data)) {
           return em.EntityId(d.value());
@@ -1322,7 +1351,7 @@ bool TokenProvenanceCalculator::TokenInfo::DeriveFrom(
 TokenProvenanceCalculator::TokenProvenanceCalculator(const EntityMapper &em_)
     : em(em_) {
   empty.emplace(mx::kInvalidEntityId, 0u, mx::kInvalidEntityId,
-                mx::kInvalidEntityId);      
+                mx::kInvalidEntityId);
 }
 
 TokenProvenanceCalculator::~TokenProvenanceCalculator(void) {}
@@ -1869,7 +1898,7 @@ void TokenProvenanceCalculator::Run(
       if (!std::holds_alternative<pasta::MacroToken>(dl)) {
         break;
       }
-      
+
       // NOTE(pag): With macro tokens, we might find that we are missing some
       //            "in-between" tokens due to the token tree process eliminating
       //            tokens belonging to argument pre-expansion phases. In these
@@ -1908,7 +1937,7 @@ void TokenProvenanceCalculator::Run(
   }
 
   Sort();
-  
+
   auto max_depth = (~0u - min_depth) + 1u;
   auto iter = 0u;
 

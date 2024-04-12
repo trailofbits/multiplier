@@ -789,6 +789,46 @@ bool IsSpecializationOrInSpecialization(const pasta::Decl &decl) {
   }
 }
 
+// Is this decl a template or template pattern?
+bool IsTemplateOrPattern(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kBuiltinTemplate:
+    case pasta::DeclKind::kClassTemplate:
+    case pasta::DeclKind::kClassTemplatePartialSpecialization:
+    case pasta::DeclKind::kConcept:
+    case pasta::DeclKind::kFunctionTemplate:
+    case pasta::DeclKind::kFriendTemplate:
+    case pasta::DeclKind::kVarTemplate:
+    case pasta::DeclKind::kVarTemplatePartialSpecialization:
+    case pasta::DeclKind::kTypeAliasTemplate:
+      return true;
+
+    case pasta::DeclKind::kCXXRecord: {
+      auto cls = reinterpret_cast<const pasta::CXXRecordDecl &>(decl);
+      return cls.DescribedClassTemplate().has_value();
+    }
+
+    case pasta::DeclKind::kFunction:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod: {
+      auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
+      return func.DescribedFunctionTemplate().has_value();
+    }
+
+    case pasta::DeclKind::kVar: {
+      auto var = reinterpret_cast<const pasta::VarDecl &>(decl);
+      return var.DescribedVariableTemplate().has_value();
+    }
+
+    default:
+      assert(!pasta::TemplateDecl::From(decl));
+      return false;
+  }
+}
+
 // Determines whether or not a TLM is likely to have to go into a floating
 // fragment. This generally happens when a TLM is a directive. Some general
 // thoughts:

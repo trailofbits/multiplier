@@ -211,9 +211,17 @@ MSGuidDecl CXXUuidofExpr::guid_declaration(void) const {
   return MSGuidDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
-Type CXXUuidofExpr::type_operand(void) const {
-  RawEntityId eid = impl->reader.getVal39();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
+std::optional<Type> CXXUuidofExpr::type_operand(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal39();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 Type CXXUuidofExpr::type_operand_source_info(void) const {
