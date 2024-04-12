@@ -56,10 +56,10 @@ class MX_EXPORT DefineMacroDirective : public MacroDirective {
   static std::optional<DefineMacroDirective> from(const TokenContext &t);
 
   Token name(void) const;
-  gap::generator<MacroOrToken> body(void) const &;
+  gap::generator<PreprocessedEntity> body(void) const &;
   bool is_variadic(void) const;
   bool is_function_like(void) const;
-  gap::generator<MacroOrToken> parameters(void) const &;
+  gap::generator<PreprocessedEntity> parameters(void) const &;
 };
 
 static_assert(sizeof(DefineMacroDirective) == sizeof(MacroDirective));

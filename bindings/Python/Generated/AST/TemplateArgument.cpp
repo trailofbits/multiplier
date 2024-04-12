@@ -211,23 +211,23 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "as_declaration",
+    "declaration",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->as_declaration());
+          return ::mx::to_python(T_cast(self)->declaration());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateArgument::as_declaration"),
+    PyDoc_STR("Wrapper for mx::TemplateArgument::declaration"),
     nullptr,
   },
   {
-    "as_type",
+    "type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->as_type());
+          return ::mx::to_python(T_cast(self)->type());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateArgument::as_type"),
+    PyDoc_STR("Wrapper for mx::TemplateArgument::type"),
     nullptr,
   },
   {

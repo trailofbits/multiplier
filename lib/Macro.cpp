@@ -68,7 +68,7 @@ gap::generator<Macro> Macro::containing_internal(const Token &token) {
 namespace {
 
 static gap::generator<Token> GenerateUseTokens(Macro macro) {
-  for (MacroOrToken use : macro.children()) {
+  for (PreprocessedEntity use : macro.children()) {
     if (std::holds_alternative<mx::Token>(use)) {
       co_yield std::get<Token>(use);
     } else if (std::holds_alternative<Macro>(use)) {
@@ -82,7 +82,7 @@ static gap::generator<Token> GenerateUseTokens(Macro macro) {
 static gap::generator<Token> GenerateExpansionTokensFromMacro(Macro macro);
 
 static gap::generator<Token> GenerateExpansionTokensFromUse(
-    MacroOrToken use) {
+    PreprocessedEntity use) {
   if (std::holds_alternative<mx::Token>(use)) {
     co_yield std::get<Token>(use);
   } else if (std::holds_alternative<Macro>(use)) {
@@ -95,13 +95,13 @@ static gap::generator<Token> GenerateExpansionTokensFromUse(
 
 gap::generator<Token> GenerateExpansionTokensFromMacro(Macro macro) {
   if (auto sub = MacroSubstitution::from(macro)) {
-    for (MacroOrToken use : sub->replacement_children()) {
+    for (PreprocessedEntity use : sub->replacement_children()) {
       for (Token tok : GenerateExpansionTokensFromUse(std::move(use))) {
         co_yield tok;
       }
     }
   } else {
-    for (MacroOrToken use : macro.children()) {
+    for (PreprocessedEntity use : macro.children()) {
       for (Token tok : GenerateExpansionTokensFromUse(std::move(use))) {
         co_yield tok;
       }

@@ -11,6 +11,8 @@
 #include <optional>
 #include <vector>
 
+#include "../../include/multiplier/Types.h"
+
 namespace pasta {
 class Decl;
 class DefineMacroDirective;
@@ -54,6 +56,8 @@ class TokenTreeNode {
   std::optional<pasta::MacroToken> MacroToken(void) const noexcept;
   std::optional<pasta::Token> Token(void) const noexcept;
   std::optional<TokenTree> SubTree(void) const noexcept;
+  std::optional<mx::RawEntityId> SubFragmentHole(void) const noexcept;
+
   const void *RawNode(void) const noexcept;
 };
 

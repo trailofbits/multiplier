@@ -59,9 +59,9 @@ class SaveRestoreLastSequence final {
 };
 
 #define FILL_MACRO_CHILREN(generator, children_name, file_tokens_name) \
-  std::vector<MacroOrToken> children_name; \
+  std::vector<PreprocessedEntity> children_name; \
   std::vector<Token> file_tokens_name; \
-  for (MacroOrToken mt : generator) { \
+  for (PreprocessedEntity mt : generator) { \
     if (std::holds_alternative<Token>(mt)) { \
       file_tokens_name.emplace_back(std::get<Token>(mt).file_token()); \
     } else { \
@@ -99,7 +99,7 @@ static Token RightCornerOfUse(const Macro &exp) {
 // if the `__VA_ARGS__` expands to something, and `false` if it expands to
 // nothing. If it's not a paste of `__VA_ARGS__` then return `std::nullopt`.
 static std::optional<bool> EndsWithEmptyVAArgs(
-    const std::vector<MacroOrToken> &before) {
+    const std::vector<PreprocessedEntity> &before) {
   auto num_entries = before.size();
   if (3u > num_entries) {
     return std::nullopt;
@@ -155,7 +155,7 @@ static std::optional<bool> EndsWithEmptyVAArgs(
 static std::optional<MacroExpansion> TrailingExpansionInExpansion(
     const MacroExpansion &exp) {
   std::optional<MacroExpansion> ret;
-  for (MacroOrToken mt : exp.replacement_children()) {
+  for (PreprocessedEntity mt : exp.replacement_children()) {
     ret.reset();
     if (std::holds_alternative<Macro>(mt)) {
       ret = MacroExpansion::from(std::get<Macro>(mt));
@@ -171,8 +171,8 @@ static std::optional<MacroExpansion> TrailingExpansionInExpansion(
 // in a way that maximizes our chances of merging against a macro body or an
 // intermediate macro body.
 static void FlattenExpansionUses(
-    MacroOrToken mt, unsigned depth, std::vector<MacroOrToken> &out,
-    std::vector<std::optional<MacroOrToken>> &out_orig) {
+    PreprocessedEntity mt, unsigned depth, std::vector<PreprocessedEntity> &out,
+    std::vector<std::optional<PreprocessedEntity>> &out_orig) {
 
   if (std::holds_alternative<Token>(mt)) {
     if (!depth) {
@@ -196,12 +196,12 @@ static void FlattenExpansionUses(
         } else if (out_orig.size() == out.size()) {
           out_orig.emplace_back();
         }
-        for (MacroOrToken sub_mt : m.children()) {
+        for (PreprocessedEntity sub_mt : m.children()) {
           FlattenExpansionUses(std::move(sub_mt), depth + 1u, out, out_orig);
         }
         break;
       case MacroKind::ARGUMENT:
-        for (MacroOrToken sub_mt : m.children()) {
+        for (PreprocessedEntity sub_mt : m.children()) {
           FlattenExpansionUses(std::move(sub_mt), depth, out, out_orig);
         }
         break;
@@ -222,7 +222,7 @@ static void FlattenExpansionUses(
   assert(out_orig.size() == out.size());
 }
 
-static std::optional<MacroVAOpt> AsMacroVAOpt(const MacroOrToken &mt) {
+static std::optional<MacroVAOpt> AsMacroVAOpt(const PreprocessedEntity &mt) {
   if (!std::holds_alternative<Macro>(mt)) {
     return std::nullopt;
   }
@@ -236,14 +236,14 @@ static std::optional<MacroVAOpt> AsMacroVAOpt(const MacroOrToken &mt) {
 //            way of "drilling up" to the relevant thing in the logic that
 //            injects whitespace?
 static void GenerateVAOptChildrenInto(
-    MacroVAOpt va_opt, std::vector<MacroOrToken> &out,
-    std::vector<std::optional<MacroOrToken>> &out_orig) {
+    MacroVAOpt va_opt, std::vector<PreprocessedEntity> &out,
+    std::vector<std::optional<PreprocessedEntity>> &out_orig) {
 
   if (va_opt.contents_are_elided()) {
     return;
   }
 
-  for (MacroOrToken mt : va_opt.children()) {
+  for (PreprocessedEntity mt : va_opt.children()) {
     if (Macro *m = std::get_if<Macro>(&mt);
         m && m->kind() == MacroKind::VA_OPT_ARGUMENT) {
       out_orig.emplace_back(mt);
@@ -345,7 +345,7 @@ static std::optional<MacroExpansion> NonTreeTailExpansion(
 
 struct BodyTokenForChild {
   // The child from the replacement body of a macro substitution.
-  MacroOrToken mt;
+  PreprocessedEntity mt;
 
   // A token from a macro's definition body that we have matched against `mt`.
   // We use this to determine whitespace injection.
@@ -356,7 +356,7 @@ struct BodyTokenForChild {
 
   BodyTokenForChild(void) = delete;
 
-  inline BodyTokenForChild(MacroOrToken mt_, Token definition_token_,
+  inline BodyTokenForChild(PreprocessedEntity mt_, Token definition_token_,
                            std::optional<MacroParameterSubstitution> param_sub_)
       : mt(std::move(mt_)),
         definition_token(std::move(definition_token_)),
@@ -897,18 +897,18 @@ static bool ForceLeadingWhitespace(bool prev_is_first, TokenKind prev,
 struct TokenTreeImpl::MacroExpansionProcessor {
 
   // Adjusted children from a macro definition body.
-  std::vector<MacroOrToken> body_children;
+  std::vector<PreprocessedEntity> body_children;
 
   // Tokens or macros from the expansion of a macro, expanded out in a way that
   // can be compared against `body_children`.
-  std::vector<MacroOrToken> after_children;
+  std::vector<PreprocessedEntity> after_children;
 
   // Non-expanded versions of `before_children` and `after_children`, where we
   // need to keep track of the unexpanded forms in order for `merged_children`
   // to be able to represent a complete expansion tree, otherwise
   // `merged_children` will only represent a single level deep of an expansion.
-  std::vector<std::optional<MacroOrToken>> body_use;
-  std::vector<std::optional<MacroOrToken>> after_use;
+  std::vector<std::optional<PreprocessedEntity>> body_use;
+  std::vector<std::optional<PreprocessedEntity>> after_use;
 
   // The result of aligning `body_children` with `after_children`, and then
   // selecting values from `body_children` or `after_use` to form up a proper
@@ -941,11 +941,11 @@ void TokenTreeImpl::MacroExpansionProcessor::Init(
   merged_children.clear();
   body_has_trailing_comment = false;
 
-  for (MacroOrToken mt : me.replacement_children()) {
+  for (PreprocessedEntity mt : me.replacement_children()) {
     FlattenExpansionUses(std::move(mt), 0u, after_children, after_use);
   }
 
-  for (MacroOrToken mt : me.intermediate_children()) {
+  for (PreprocessedEntity mt : me.intermediate_children()) {
 
     // Expand or eliminate a `__VA_OPT__`.
     //
@@ -972,10 +972,10 @@ void TokenTreeImpl::MacroExpansionProcessor::Init(
 
       assert(3u <= body_use.size());
 
-      MacroOrToken va_args_sub = std::move(body_children.back());
+      PreprocessedEntity va_args_sub = std::move(body_children.back());
       body_children.pop_back();
       body_children.pop_back();  // `##`.
-      MacroOrToken comma = std::move(body_children.back());
+      PreprocessedEntity comma = std::move(body_children.back());
       body_children.pop_back();
 
       body_use.pop_back();
@@ -1000,7 +1000,7 @@ void TokenTreeImpl::MacroExpansionProcessor::Init(
   // substitution, etc. So, we'll just collect the raw tokens from the macro
   // body.
   if (body_children.empty()) {
-    for (MacroOrToken mt : def.body()) {
+    for (PreprocessedEntity mt : def.body()) {
       body_use.emplace_back(mt);
       body_children.emplace_back(std::move(mt));
     }
@@ -1032,8 +1032,8 @@ bool TokenTreeImpl::MacroExpansionProcessor::Run(bool is_non_tree) {
   D( std::cerr << "max_i = " << max_i << "; max_j = " << max_j << '\n'; )
 
   while (i < max_i && j < max_j) {
-    const MacroOrToken &bt = body_children[i];
-    const MacroOrToken &at = after_children[j];
+    const PreprocessedEntity &bt = body_children[i];
+    const PreprocessedEntity &at = after_children[j];
 
     const Token *bt_tok = std::get_if<Token>(&bt);
     const Token *at_tok = std::get_if<Token>(&at);
@@ -1100,7 +1100,7 @@ bool TokenTreeImpl::MacroExpansionProcessor::Run(bool is_non_tree) {
 
 #if D( 1 + ) 0
   for (auto missing_j = j; missing_j < max_j; ++missing_j) {
-    const MacroOrToken &at = after_children[missing_j];
+    const PreprocessedEntity &at = after_children[missing_j];
     const Token *at_tok = std::get_if<Token>(&at);
     if (!at_tok) {
       at_lc = LeftCornerOfExpansion(std::get<Macro>(at));
@@ -1132,7 +1132,7 @@ bool TokenTreeImpl::MacroExpansionProcessor::Run(bool is_non_tree) {
 
 #if D( 1 + ) 0
   for (auto missing_i = i; missing_i < max_i; ++missing_i) {
-    const MacroOrToken &bt = body_children[missing_i];
+    const PreprocessedEntity &bt = body_children[missing_i];
     const Token *bt_tok = std::get_if<Token>(&bt);
     if (!bt_tok) {
       bt_lc = LeftCornerOfExpansion(std::get<Macro>(bt));
@@ -1358,7 +1358,7 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
   Bounds ret = {};
   Token last_tok;
 
-  for (MacroOrToken mt : def.body()) {
+  for (PreprocessedEntity mt : def.body()) {
     if (std::holds_alternative<Token>(mt)) {
       if (Token file_tok = std::get<Token>(mt).file_token()) {
         if (!last_tok) {
@@ -1587,7 +1587,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::AddLeadingTokensBeforeParam(
 }
 
 TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithMacroChild(
-    SequenceNode *seq, const MacroOrToken &mt, const Bounds &bounds,
+    SequenceNode *seq, const PreprocessedEntity &mt, const Bounds &bounds,
     const TrailingTokens &trailing_tokens) {
 
   if (std::holds_alternative<Token>(mt)) {
@@ -1700,7 +1700,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
 // stuff like whitespace.
 TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
     TokenTreeImpl::SequenceNode *seq, const Bounds &bounds,
-    std::vector<MacroOrToken> mts, std::vector<Token> fts,
+    std::vector<PreprocessedEntity> mts, std::vector<Token> fts,
     const TrailingTokens &trailing_tokens) {
 
   size_t num_mts = mts.size();
@@ -1709,7 +1709,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
                << BOUNDS(bounds) << '\n'; )
 
   for (auto i = 0u; i < num_mts; ++i) {
-    const MacroOrToken &mt = mts[i];
+    const PreprocessedEntity &mt = mts[i];
     auto &tt = (i + 1u) == num_mts ? trailing_tokens : dummy_trailing_tokens;
 
     if (std::holds_alternative<Token>(mt)) {
@@ -1986,7 +1986,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
 
   SequenceNode *after = nullptr;
   last_sequence = &dummy_sequence;
-  for (MacroOrToken mt : macro.replacement_children()) {
+  for (PreprocessedEntity mt : macro.replacement_children()) {
     depth = include_dir ? 0u : next_depth;
     after = ExtendWithMacroChild(after, mt, bounds, dummy_trailing_tokens);
     depth = prev_depth;
@@ -2082,7 +2082,7 @@ namespace {
 //            `bin/Index/Util.*`
 static bool IsFloatingDirectiveFragment(const Fragment &frag) {
   auto num_directives = 0u;
-  for (MacroOrToken &mt : frag.preprocessed_code()) {
+  for (PreprocessedEntity &mt : frag.preprocessed_code()) {
     if (!std::holds_alternative<Macro>(mt)) {
       return false;
     }

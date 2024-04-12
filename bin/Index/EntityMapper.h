@@ -21,25 +21,14 @@ class TokenTree;
 class TokenTreeNode;
 class TypeMapper;
 
-// Inclusive bounds of a fragment.
-struct FragmentBounds final {
-  mx::EntityOffset begin;
-  mx::EntityOffset end;
-  mx::PackedFragmentId fragment_id;
-
-  friend auto operator<=>(const FragmentBounds &,
-                          const FragmentBounds &) = default;
-};
-
 // Provides entity IDs and offsets to the serialization code.
 class EntityMapper final {
  public:
   // Set of all top-level declarations (from the perspective of fragments).
   std::unordered_set<const void *> top_level_decls;
 
-  // Map of parsed token index lower bounds to the upper bounds on where the
-  // fragment end is.
-  std::set<FragmentBounds> fragment_bounds;
+  // Locations of all fragments that are templates.
+  std::set<FragmentBounds> template_fragment_bounds;
 
   // Globally (within a translation unit) entity ids. Generally, these are
   // things that can be referenced across fragments.
@@ -137,7 +126,6 @@ class EntityMapper final {
     return mx::kInvalidEntityId;
   }
 
-
   inline mx::RawEntityId SelectiveEntityId(const void *entity) const {
     if (generate_source_ir) {
       return EntityId(entity);
@@ -169,10 +157,10 @@ class EntityMapper final {
 
   void ResetForFragment(void);
 
-  // Mark the (inclusive) fragment bounds.
-  inline void MarkFragmentBounds(
-      mx::EntityOffset lb, mx::EntityOffset ub, mx::PackedFragmentId fid) {
-    fragment_bounds.emplace(FragmentBounds{lb, ub, fid});
+  // Mark the (inclusive) fragment bounds for templates that are nested inside
+  // of something else.
+  inline void MarkNestedTemplateBounds(FragmentBounds bounds) {
+    template_fragment_bounds.emplace(bounds);
   }
 
   inline void MarkAsTopLevel(const pasta::Decl &decl) {

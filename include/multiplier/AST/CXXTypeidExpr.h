@@ -66,8 +66,8 @@ class MX_EXPORT CXXTypeidExpr : public Expr {
   static std::optional<CXXTypeidExpr> from(const TokenContext &t);
 
   std::optional<Expr> expression_operand(void) const;
-  Type type_operand(void) const;
-  Type type_operand_source_info(void) const;
+  std::optional<Type> type_operand(void) const;
+  std::optional<Type> type_operand_source_info(void) const;
   std::optional<bool> is_most_derived(void) const;
   bool is_potentially_evaluated(void) const;
   bool is_type_operand(void) const;

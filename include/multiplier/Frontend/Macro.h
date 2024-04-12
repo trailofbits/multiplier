@@ -40,7 +40,7 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MacroOrToken = std::variant<Macro, Token>;
+using PreprocessedEntity = std::variant<Macro, Token, Fragment>;
 class MX_EXPORT Macro {
  public:
  protected:
@@ -120,7 +120,7 @@ class MX_EXPORT Macro {
 
   MacroKind kind(void) const;
   std::optional<Macro> parent(void) const;
-  gap::generator<MacroOrToken> children(void) const &;
+  gap::generator<PreprocessedEntity> children(void) const &;
 };
 
 #endif

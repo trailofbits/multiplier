@@ -2004,7 +2004,6 @@ static PendingFragmentPtr CreatePendingFragment(
     IdStore &id_store, EntityMapper &em,
     const pasta::TokenRange *original_tokens,
     pasta::PrintedTokenRange parsed_tokens,
-    const pasta::PrintedTokenRange *printed_tokens,
     std::optional<FileLocationOfFragment> floc,
     mx::PackedCompilationId tu_id,
     mx::EntityOffset begin_index,
@@ -2032,8 +2031,8 @@ static PendingFragmentPtr CreatePendingFragment(
   // a new fragment.
   auto [fid, is_new_fragment_id] = id_store.GetOrCreateFragmentIdForHash(
       (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
-      HashFragment(decls, macros, original_tokens, parsed_tokens,
-      printed_tokens), num_tokens  /* for fragment id packing format */);
+      HashFragment(decls, macros, original_tokens, parsed_tokens),
+      num_tokens  /* for fragment id packing format */);
 
   PendingFragmentPtr pf(new PendingFragment(
       fid,
@@ -2241,7 +2240,6 @@ static void CreateFreestandingDeclFragment(
       em,
       nullptr  /* original_tokens */,
       std::move(printed_tokens)  /* parsed_tokens */,
-      nullptr /* printed tokens */,
       std::move(floc),
       tu_id,
       begin_index,
@@ -2249,7 +2247,8 @@ static void CreateFreestandingDeclFragment(
       std::move(decls),
       {}  /* empty macros */,
       nullptr  /* no parent entity */,
-      true  /* Using printed tokens */);
+      false  /* Using printed tokens. A bit of a lie, but we don't want to
+              * trigger token tree rebuilding. */);
 
   // We move `floc` into `CreatePendingFragment` so that it affects our
   // hashing/deduplicating, but beyond that, we don't want to associate this
@@ -2312,7 +2311,6 @@ static void CreateFloatingDirectiveFragment(
       &(directive_range.value())  /* original_tokens */,
       pasta::PrintedTokenRange::CreateEmpty(
           pasta::AST::From(macro))  /* parsed_tokens */,
-      nullptr,
       std::move(floc),
       tu_id,
       begin_index,
@@ -2439,7 +2437,6 @@ static void CreatePendingFragments(
         em,
         &frag_tok_range  /* original_tokens */,
         pasta::PrintedTokenRange::Adopt(frag_tok_range)  /* parsed_tokens */,
-        nullptr /* printed tokens */,
         floc  /* copied */,
         tu_id,
         begin_index,
@@ -2467,7 +2464,6 @@ static void CreatePendingFragments(
         em,
         &frag_tok_range  /* original_tokens */,
         std::move(aligned_tokens)  /* parsed_tokens */,
-        nullptr /* printed tokens */,
         floc  /* copied */,
         tu_id,
         begin_index,
@@ -2504,7 +2500,6 @@ static void CreatePendingFragments(
         em,
         &(sub_tok_range.value())  /* original_tokens */,
         std::move(aligned_tokens)  /* parsed_tokens */,
-        nullptr /* printed tokens */,
         floc  /* copied */,
         tu_id,
         er.begin_index,
@@ -2584,10 +2579,13 @@ static void PersistParsedFragments(
   for (PendingFragmentPtr &pf : pending_fragments) {
     LabelDeclsInFragment(*pf);
 
-    if (pf->first_parsed_token_index) {
-      em.MarkFragmentBounds(pf->first_parsed_token_index,
-                            pf->last_parsed_token_index,
-                            pf->fragment_id);
+    // Mark the locations of nested templates/patterns. These will represent
+    // "fragment holes" in the token trees that we create.
+    if (pf->first_parsed_token_index &&
+        pf->raw_parent_entity &&
+        pf->top_level_decls.size() == 1u &&
+        IsTemplateOrPattern(pf->top_level_decls.front())) {
+      em.MarkNestedTemplateBounds(pf->Bounds());
     }
 
     if (pf->is_new) {
@@ -2611,8 +2609,7 @@ static void PersistParsedFragments(
 
     auto start_time = std::chrono::system_clock::now();
     try {
-      em.ResetForFragment();
-      context.PersistFragment(ast, mangler, em, provenance, *pf);
+      context.PersistFragment(ast, mangler, provenance, *pf);
       context.PersistTypes(ast, mangler, em, *pf);
       fragment_ids.push_back(pf->fragment_id);
 

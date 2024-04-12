@@ -68,7 +68,7 @@ class MX_EXPORT CXXUuidofExpr : public Expr {
 
   std::optional<Expr> expression_operand(void) const;
   MSGuidDecl guid_declaration(void) const;
-  Type type_operand(void) const;
+  std::optional<Type> type_operand(void) const;
   Type type_operand_source_info(void) const;
   bool is_type_operand(void) const;
 };

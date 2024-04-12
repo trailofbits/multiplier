@@ -5572,8 +5572,8 @@ class TemplateArgument(multiplier.Entity):
   is_instantiation_dependent: bool
   contains_unexpanded_parameter_pack: bool
   is_pack_expansion: bool
-  as_declaration: Optional[multiplier.ast.ValueDecl]
-  as_type: Optional[multiplier.ast.Type]
+  declaration: Optional[multiplier.ast.ValueDecl]
+  type: Optional[multiplier.ast.Type]
   parameter_type_for_declaration: Optional[multiplier.ast.Type]
   null_pointer_type: Optional[multiplier.ast.Type]
   pack_elements: Optional[Sequence[multiplier.ast.TemplateArgument]]

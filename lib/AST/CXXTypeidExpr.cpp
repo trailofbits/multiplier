@@ -205,14 +205,30 @@ std::optional<Expr> CXXTypeidExpr::expression_operand(void) const {
   return std::nullopt;
 }
 
-Type CXXTypeidExpr::type_operand(void) const {
-  RawEntityId eid = impl->reader.getVal38();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
+std::optional<Type> CXXTypeidExpr::type_operand(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal38();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
-Type CXXTypeidExpr::type_operand_source_info(void) const {
-  RawEntityId eid = impl->reader.getVal39();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
+std::optional<Type> CXXTypeidExpr::type_operand_source_info(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal39();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXTypeidExpr::is_most_derived(void) const {

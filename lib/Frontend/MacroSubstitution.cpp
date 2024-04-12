@@ -151,7 +151,7 @@ std::optional<MacroSubstitution> MacroSubstitution::from(const TokenContext &t) 
   return std::nullopt;
 }
 
-gap::generator<MacroOrToken> MacroSubstitution::replacement_children(void) const & {
+gap::generator<PreprocessedEntity> MacroSubstitution::replacement_children(void) const & {
   Index index(impl->ep);
   auto list = impl->reader.getVal4();
   for (auto v : list) {

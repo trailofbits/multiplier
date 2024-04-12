@@ -122,7 +122,7 @@ class GlobalIndexingState {
   // and partially so that we can do things like print out fragments, or chunks
   // thereof.
   void PersistFragment(const pasta::AST &ast, NameMangler &mangler,
-                       EntityMapper &em, TokenProvenanceCalculator &provenance,
+                       TokenProvenanceCalculator &provenance,
                        PendingFragment &fragment);
 
   // Persist a type fragment into the database. Type fragments are special

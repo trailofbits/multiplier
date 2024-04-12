@@ -56,7 +56,7 @@ class MX_EXPORT MacroExpansion : public MacroSubstitution {
   static std::optional<MacroExpansion> from(const VariantEntity &e);
   static std::optional<MacroExpansion> from(const TokenContext &t);
 
-  gap::generator<MacroOrToken> intermediate_children(void) const &;
+  gap::generator<PreprocessedEntity> intermediate_children(void) const &;
   std::optional<DefineMacroDirective> definition(void) const;
   std::optional<MacroArgument> nth_argument(unsigned n) const;
   unsigned num_arguments(void) const;

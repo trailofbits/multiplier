@@ -745,6 +745,43 @@ static void PersistTokenTree(
   }
 }
 
+// Record the parent fragment relationship.
+//
+// XREF(pag): `TokenTreeImpl::BuildFromTokenList` in `bin/Index/TokenTree.cpp`.
+static void RecordParentFragment(
+    mx::rpc::Fragment::Builder &fb, mx::DatabaseWriter &database,
+    PendingFragment &pf) {
+
+  if (!pf.raw_parent_entity) {
+    fb.setParentFragmentId(mx::kInvalidEntityId);
+    return;
+  }
+
+  const EntityMapper &em = pf.em;
+  mx::VariantId vid = mx::EntityId(em.EntityId(pf.raw_parent_entity)).Unpack();
+  mx::RawEntityId parent_frag_index = mx::kInvalidEntityId;
+
+  if (std::holds_alternative<mx::DeclId>(vid)) {
+    parent_frag_index = std::get<mx::DeclId>(vid).fragment_id;
+
+  } else if (std::holds_alternative<mx::MacroId>(vid)) {
+    parent_frag_index = std::get<mx::MacroId>(vid).fragment_id;
+
+  } else if (std::holds_alternative<mx::FragmentId>(vid)) {
+    parent_frag_index = std::get<mx::FragmentId>(vid).fragment_id;
+
+  } else {
+    assert(false);
+    fb.setParentFragmentId(mx::kInvalidEntityId);
+    return;
+  }
+
+  mx::PackedFragmentId parent_fid = mx::FragmentId(parent_frag_index);
+
+  fb.setParentFragmentId(parent_fid.Pack());
+  database.AddAsync(mx::NestedFragmentRecord{parent_fid, pf.fragment_id});
+}
+
 }  // namespace
 
 // Persist a fragment. A fragment is Multiplier's "unit of granularity" of
@@ -770,8 +807,11 @@ static void PersistTokenTree(
 // and partially so that we can do things like print out fragments, or chunks
 // thereof.
 void GlobalIndexingState::PersistFragment(
-    const pasta::AST &ast, NameMangler &mangler, EntityMapper &em,
+    const pasta::AST &ast, NameMangler &mangler,
     TokenProvenanceCalculator &provenance, PendingFragment &pf) {
+
+  EntityMapper &em = pf.em;
+  em.ResetForFragment();
 
   ProgressBarWork fragment_progress_tracker(fragment_progress);
 
@@ -798,30 +838,8 @@ void GlobalIndexingState::PersistFragment(
   // Serialize all discovered entities.
   SerializePendingFragment(fb, database, pf);
 
-  // List of fragments IDs, where index `0` is this fragment's immediate parent.
-  //
-  // TODO(pag): Support more than depth 1.
-  mx::EntityId parent_eid(em.EntityId(pf.raw_parent_entity));
-  if (auto parent_decl_id = parent_eid.Extract<mx::DeclId>()) {
-    mx::FragmentId fid(parent_decl_id->fragment_id);
-    database.AddAsync(mx::NestedFragmentRecord{fid, pf.fragment_id});
-
-    auto parent_ids = fb.initParentIds(1u);
-    parent_ids.set(0u, mx::EntityId(fid).Pack());
-    CHECK_NE(pf.fragment_id.Pack(), parent_ids[0]);
-
-  } else if (auto parent_macro_id = parent_eid.Extract<mx::MacroId>()) {
-    mx::FragmentId fid(parent_macro_id->fragment_id);
-    database.AddAsync(mx::NestedFragmentRecord{fid, pf.fragment_id});
-
-    auto parent_ids = fb.initParentIds(1u);
-    parent_ids.set(0u, mx::EntityId(fid).Pack());
-    CHECK_NE(pf.fragment_id.Pack(), parent_ids[0]);
-
-  } else {
-    CHECK(!pf.raw_parent_entity);
-    fb.initParentIds(0u);
-  }
+  // Serialize the parent fragment id(s), if any.
+  RecordParentFragment(fb, database, pf);
 
   // The compilation containing this fragment.
   fb.setCompilationId(pf.compilation_id.Pack());
@@ -877,6 +895,8 @@ void GlobalIndexingState::PersistFragment(
           << MainSourceFile(ast);
     }
 
+    pf.macros_to_serialize.clear();
+    pf.top_level_macros.clear();
     PersistParsedTokens(pf, fb, provenance);
   }
 

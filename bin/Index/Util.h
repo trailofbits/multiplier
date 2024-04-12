@@ -146,6 +146,9 @@ bool IsSpecialization(const pasta::Decl &decl);
 // specialization, then we'll also want to do the same thing.
 bool IsSpecializationOrInSpecialization(const pasta::Decl &decl);
 
+// Is this decl a template or template pattern?
+bool IsTemplateOrPattern(const pasta::Decl &decl);
+
 // Check of the declaration is Out of Line
 bool IsOutOfLine(const pasta::Decl &decl);
 

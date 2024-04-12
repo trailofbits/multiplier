@@ -163,7 +163,7 @@ std::optional<Macro> Macro::parent(void) const {
   return std::nullopt;
 }
 
-gap::generator<MacroOrToken> Macro::children(void) const & {
+gap::generator<PreprocessedEntity> Macro::children(void) const & {
   Index index(impl->ep);
   auto list = impl->reader.getVal2();
   for (auto v : list) {

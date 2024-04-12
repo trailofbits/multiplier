@@ -31,33 +31,36 @@ namespace ir {
 class SourceIRImpl;
 }  // namespace ir
 
-Fragment Fragment::containing(const Fragment &child) noexcept {
-  for (mx::RawEntityId parent_id : child.impl->reader.getParentIds()) {
-    return Fragment(child.impl->ep->FragmentFor(child.impl->ep, parent_id));
+std::optional<Fragment> Fragment::containing(const Fragment &child) noexcept {
+  auto parent_id = child.impl->parent_fragment_id;
+  auto parent_fid = EntityId(parent_id).Extract<FragmentId>();
+  if (!parent_fid) {
+    return std::nullopt;
   }
-  return child;
+
+  auto eptr = child.impl->ep->FragmentFor(child.impl->ep, parent_id);
+  if (!eptr) {
+    assert(false);
+    return std::nullopt;
+  }
+
+  return Fragment(std::move(eptr));
 }
 
 // A fragment can be nested inside of another fragment. This is very common
 // with C++ templates, but can also happen in C due to elaborated type uses,
 // such as `struct foo`, acting as forward declarations upon their first use.
 std::optional<Fragment> Fragment::parent(void) const noexcept {
-  for (mx::RawEntityId parent_id : impl->reader.getParentIds()) {
-    return Fragment(impl->ep->FragmentFor(impl->ep, parent_id));
-  }
-  return std::nullopt;
+  return Fragment::containing(*this);
 }
 
 std::optional<PackedFragmentId> Fragment::parent_id(void) const noexcept {
-  for (mx::RawEntityId parent_id : impl->reader.getParentIds()) {
-    VariantId vid = EntityId(parent_id).Unpack();
-    if (std::holds_alternative<FragmentId>(vid)) {
-      return std::get<FragmentId>(vid);
-    } else {
-      break;
-    }
+  auto parent_id = impl->parent_fragment_id;
+  if (auto parent_fid = EntityId(parent_id).Extract<FragmentId>()) {
+    return parent_fid.value();
+  } else {
+    return std::nullopt;
   }
-  return std::nullopt;
 }
 
 // Return the fragment containing a query match.
@@ -266,7 +269,7 @@ gap::generator<Fragment> Fragment::nested_fragments(void) const & {
 
 // Return the list of top-level macros in this fragment.
 // This will return a mix of `Macro` or `Token` values.
-gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
+gap::generator<PreprocessedEntity> Fragment::preprocessed_code(void) const & {
   EntityIdListReader macro_ids = impl->reader.getTopLevelMacros();
 
   const EntityProviderPtr ep = impl->ep;
