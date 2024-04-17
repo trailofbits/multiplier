@@ -405,7 +405,6 @@ bool PendingFragment::TryAdd(const pasta::Attr &entity) {
   }
 
   auto &entity_list = EntityListFor(entity);
-
   mx::AttrId id;
   id.fragment_id = fragment_index;
   id.offset = static_cast<mx::EntityOffset>(entity_list.size());

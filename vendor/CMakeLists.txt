@@ -23,6 +23,7 @@ add_subdirectory(rocksdb)  # Depends on zstd, gflags
 add_subdirectory(llvm-project)  # Depends on zstd
 add_subdirectory(pasta)  # Depends on llvm-project
 add_subdirectory(vast)  # Depends on gap, llvm-project
+add_subdirectory(intervaltree)
 
 if(MX_ENABLE_RE2)
   add_subdirectory(abseil)

@@ -60,7 +60,6 @@ class ParentTrackerVisitor : public EntityVisitor {
 
   const void *parent_decl{nullptr};
   const void *parent_stmt{nullptr};
-  const void *parent_dc{nullptr};
 
   std::unordered_set<const void *> not_yet_seen;
 
@@ -88,14 +87,6 @@ class ParentTrackerVisitor : public EntityVisitor {
   template <typename T>
   inline bool HasBeenSeen(const T &entity) const {
     return !not_yet_seen.count(RawEntity(entity));
-  }
-
-  void VisitDeclContext(const pasta::DeclContext &dc) final {
-    PrevValueTracker<const void *> dc_guard(parent_dc, RawEntity(dc));
-
-    if (dc_guard) {
-      this->EntityVisitor::VisitDeclContext(dc);
-    }
   }
 
   void VisitOtherInitListExprImpl(const pasta::InitListExpr &stmt,
@@ -227,20 +218,6 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 
   void AcceptTopLevel(const pasta::Decl &entity, bool actually_top_level) {
-
-    // Clang will put records of classes inside themselves for `friend` lookups
-    // and such. Our Clang patches set those to have the equivalent of
-    // `Child->RemappedDecl = Parent`, and PASTA always follows `->RemappedDecl`
-    // thus introducing apparent cycles into the AST. Here we go and protect
-    // against re-visiting such things.
-    std::optional<PrevValueTracker<const void *>> dc_guard;
-    if (auto dc = pasta::DeclContext::From(entity)) {
-      dc_guard.emplace(parent_dc, RawEntity(dc.value()));
-      if (!dc_guard) {
-        return;
-      }
-    }
-
     Accept(entity);
 
     // Go build parents for the semantic decl contexts. In the case of things

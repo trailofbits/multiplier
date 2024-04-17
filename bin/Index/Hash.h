@@ -25,6 +25,7 @@ namespace indexer {
 
 using Entity = std::variant<std::monostate, pasta::Decl, pasta::Macro>;
 class EntityMapper;
+class NameMangler;
 
 // Compute a SHA256 hash of some data from a file.
 std::string HashFile(std::string_view data);
@@ -39,6 +40,7 @@ std::string HashFile(std::string_view data);
 // fragment deduplication as part of a compound primary key in the
 // `fragment_hash` database table.
 std::string HashFragment(
+    const EntityMapper &em, const NameMangler &nm, const void *parent_entity,
     const std::vector<pasta::Decl> &decls,
     const std::vector<pasta::Macro> &macros,
     const pasta::TokenRange *frag_tok_range,

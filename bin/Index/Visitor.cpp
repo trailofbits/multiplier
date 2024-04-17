@@ -12,10 +12,16 @@
 
 namespace indexer {
 
-void EntityVisitor::VisitDeclContext(const pasta::DeclContext &dc) {
-  EnterDecl(dc);
-  for (const pasta::Decl &decl : dc.AlreadyLoadedDeclarations()) {
-    Accept(decl);
+void EntityVisitor::VisitDeclContext(const pasta::Decl &dc_decl) {
+  auto dc = pasta::DeclContext::From(dc_decl);
+  if (!dc) {
+    return;
+  }
+
+  for (const pasta::Decl &decl : dc->AlreadyLoadedDeclarations()) {
+    if (decl != dc_decl) {
+      Accept(decl);
+    }
   }
 }
 

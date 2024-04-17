@@ -81,6 +81,7 @@ target_link_libraries("${exe_name}"
     glog::glog
     gflags::gflags
     concurrentqueue
+    intervaltree
     reproc++
     xxHash::xxhash
     RocksDB::rocksdb
