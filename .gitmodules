@@ -51,3 +51,6 @@
 [submodule "vendor/vast/src"]
 	path = vendor/vast/src
 	url = https://github.com/trailofbits/vast.git
+[submodule "vendor/intervaltree/src"]
+	path = vendor/intervaltree/src
+	url = https://github.com/ekg/intervaltree.git
