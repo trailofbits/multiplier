@@ -75,13 +75,26 @@ struct FileInfo @0xfd1022cb187f18f8 {
   path @1 :Text;
 }
 
+struct NestedFragment @0xd023961e5f656717 {
+  # ID of this sub fragment.
+  id @0 :UInt64;
+  
+  # Number of parsed tokens in this sub fragment. This includes parsed tokens
+  # in transitively nested sub fragments.
+  numParsedTokens @1 : UInt32;
+
+  # Offset into the parsed tokens of the parent fragment where this nested
+  # fragment should go.
+  offsetInParsedTokenList @2 : UInt32;
+}
+
 struct Fragment @0xe5f27760091f9a3a {
   # ID of this fragment's parent, or an invalid ID.
   parentFragmentId @0 :UInt64;
 
   # List of C++ template fragments lexically nested inside of this fragment.
   # These are referenced by the preprocessed code.
-  subFragmentIds @1 :List(UInt64);
+  nestedFragments @1 :List(NestedFragment);
   
   # Inclusive range of file token IDs for the unparsed data of this fragment.
   firstFileTokenId @2 :UInt64;
@@ -93,30 +106,23 @@ struct Fragment @0xe5f27760091f9a3a {
   # List of top-level macros or tokens in this code.
   topLevelMacros @5 :List(UInt64);
   
-  # Parsed tokens go through an extra level of indirection to get into
-  # `tokenOffsets`, `tokenKinds`, and `derivedTokenIds`.
-  #
-  # Indexed by `ParsedTokenId::offset`.
-  parsedTokenOffsetToIndex @6 :List(UInt32);
-  
-  # Inverse of the above. This is to let us get from a "final" macro token
-  # back to a parsed token. There is one for every token. A value is valid
-  # iff parsedTokenOffsetToIndex[macroTokenIndexToParsedTokenOffset[i]] == i.
-  macroTokenIndexToParsedTokenOffset @7 :List(UInt32);
+  # This is to let us get from a "final" macro token back to a parsed token.
+  # There is one for every non-parsed token token.
+  macroTokenIndexToParsedTokenOffset @6 :List(UInt32);
   
   # Inverted map of macro tokens -> macro id of containing macro. The macro
   # containing the `i`th token is `macroTokenIndexToMacroId[i]`.
-  macroTokenIndexToMacroId @8 :List(UInt64);
+  macroTokenIndexToMacroId @7 :List(UInt64);
   
   # List of token contexts. There is one token context per parsed token.
   # Non-parsed tokens don't have token contexts. Whitespace doesn't have
   # context.
-  parsedTokenContexts @9 :List(TokenContext);
+  parsedTokenContexts @8 :List(TokenContext);
   
   # List of offsets of token contexts for each of the tokens.
   #
   # Indexed by `ParsedTokenId::offset`.
-  parsedTokenContextOffsets @10 :List(UInt32);
+  parsedTokenContextOffsets @9 :List(UInt32);
   
   # The actual parsed tokens, as a text buffer. Each token is separated by a
   # single space. There are no newlines, except those that might be inside of
@@ -133,14 +139,14 @@ struct Fragment @0xe5f27760091f9a3a {
   #                   A E C D B
   #
   # The parsed tokens correspond to stuff in `A E C D`, and `B` comes after.
-  tokenData @11 :Text;
+  tokenData @10 :Text;
   
   # Offsets of the beginning of tokens into `tokenData`. There is one extra
   # element in here than there are tokens, which represents the size of the data.
-  tokenOffsets @12 :List(UInt32);
+  tokenOffsets @11 :List(UInt32);
   
   # List of macro token kinds in this fragment.
-  tokenKinds @13 :List(UInt16);
+  tokenKinds @12 :List(UInt16);
   
   # Every macro token is associated with an ID. The id is one of:
   #
@@ -148,34 +154,34 @@ struct Fragment @0xe5f27760091f9a3a {
   #   - MacroTokenId:        This macro token is a copy of another macro token.
   #   - MacroId: This macro token is derived in some way from its
   #                          parent substitution. E.g. stringize, concat, etc.
-  derivedTokenIds @14 :List(UInt64);
+  derivedTokenIds @13 :List(UInt64);
   
   # The single best related entity ID to the corresponding token. This helps
   # with improving the speed of syntax highlighting.
-  relatedEntityId @15 :List(UInt64);
+  relatedEntityId @14 :List(UInt64);
   
   # The translation unit from which this fragment was derived. We can find
   # the compile command for a fragment there, if we need to reproduce the
   # TU, and we can find its MLIR representation there too.
-  compilationId @16 :UInt64;
+  compilationId @15 :UInt64;
 
   # The entities from this fragment. These are lists-of-lists. The top-level
   # lists are indexed by entity kind. The nested list is all entities in this
   # fragment of that kind.
-  decls @17 :List(List(AST.Decl));
-  stmts @18 :List(List(AST.Stmt));
-  attrs @19 :List(List(AST.Attr));
-  macros @20 :List(List(AST.Macro));
-  templateArguments @21 :List(AST.TemplateArgument);
-  templateParameterLists @22 :List(AST.TemplateParameterList);
-  cXXBaseSpecifiers @23 :List(AST.CXXBaseSpecifier);
-  designators @24 :List(AST.Designator);
-  cXXCtorInitializers @25 :List(AST.CXXCtorInitializer);
+  decls @16 :List(List(AST.Decl));
+  stmts @17 :List(List(AST.Stmt));
+  attrs @18 :List(List(AST.Attr));
+  macros @19 :List(List(AST.Macro));
+  templateArguments @20 :List(AST.TemplateArgument);
+  templateParameterLists @21 :List(AST.TemplateParameterList);
+  cXXBaseSpecifiers @22 :List(AST.CXXBaseSpecifier);
+  designators @23 :List(AST.Designator);
+  cXXCtorInitializers @24 :List(AST.CXXCtorInitializer);
 
   # These are lists. When things in the AST need a list of stuff, they store
   # them in here.
-  textLists @26 :List(Text);
-  uInt64Lists @27 :List(UInt64);
+  textLists @25 :List(Text);
+  uInt64Lists @26 :List(UInt64);
 }
 
 struct Compilation @0xc8b5fa5dd0739e82 {

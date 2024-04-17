@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <set>
-
 #include "Entity.h"
 #include "PendingFragment.h"
 #include "Util.h"
@@ -21,6 +19,9 @@ class TokenTree;
 class TokenTreeNode;
 class TypeMapper;
 
+using NestedFragmentIntervals = interval_tree::IntervalTree<
+    mx::EntityOffset, mx::PackedFragmentId>;
+
 // Provides entity IDs and offsets to the serialization code.
 class EntityMapper final {
  public:
@@ -28,7 +29,7 @@ class EntityMapper final {
   std::unordered_set<const void *> top_level_decls;
 
   // Locations of all fragments that are templates.
-  std::set<FragmentBounds> template_fragment_bounds;
+  NestedFragmentIntervals nested_fragment_bounds;
 
   // Globally (within a translation unit) entity ids. Generally, these are
   // things that can be referenced across fragments.
@@ -66,6 +67,12 @@ class EntityMapper final {
   // Entities map for tracking parent pointers
   EntityParentMap parent_decls;
   EntityParentMap parent_stmts;
+
+  // Tracks the index of the next parsed token. Logic surrounding this
+  // processing is replicated when serializing `TokenTree`s. The key is that
+  // we want to serialize the final parsed tokens, and not any marker tokens
+  // or intermediate macro expansion tokens.
+  unsigned next_parsed_token_index{0u};
 
   // If we're in a mode where we're generating source IR then we need the
   // entity IDs for all `Decl`s and `Stmt`s and such to be global.
@@ -157,12 +164,6 @@ class EntityMapper final {
 
   void ResetForFragment(void);
 
-  // Mark the (inclusive) fragment bounds for templates that are nested inside
-  // of something else.
-  inline void MarkNestedTemplateBounds(FragmentBounds bounds) {
-    template_fragment_bounds.emplace(bounds);
-  }
-
   inline void MarkAsTopLevel(const pasta::Decl &decl) {
     top_level_decls.insert(RawEntity(decl));
   }
@@ -170,6 +171,9 @@ class EntityMapper final {
   inline bool IsTopLevel(const pasta::Decl &decl) {
     return top_level_decls.count(RawEntity(decl)) != 0u;
   }
+
+  // ID of the parent fragment.
+  mx::RawEntityId ParentFragmentId(const void *parent_entity) const;
 };
 
 }  // namespace indexer

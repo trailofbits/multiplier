@@ -152,6 +152,10 @@ bool IsTemplateOrPattern(const pasta::Decl &decl);
 // Check of the declaration is Out of Line
 bool IsOutOfLine(const pasta::Decl &decl);
 
+// Returns `true` if this declaration is a method inside of a class template
+// specialization.
+bool IsMethodLexicallyInSpecialization(const pasta::Decl &decl);
+
 // If `decl` is a declaration context, then this will return `true` if `decl`
 // should be internalized into the fragment, otherwise `false`. Returns `false`
 // if `decl` isn't a declaration context.
@@ -362,5 +366,9 @@ class PrevValueTracker {
     dc_ref = prev_dc;
   }
 };
+
+// If this is a debug build, then invoke Clang's `clang::Decl::dumpColor()` on
+// `decl`.
+void Dump(const pasta::Decl &decl);
 
 }  // namespace indexer

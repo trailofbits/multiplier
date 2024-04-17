@@ -758,6 +758,42 @@ bool IsSpecialization(const pasta::Decl &decl) {
   }
 }
 
+// Returns `true` if this declaration is a method inside of a class template
+// specialization. We care about these because Clang doesn't always substitute
+// the method bodies inside of class template specializations, and instead
+// prefers to defer their substitution until they are first referenced. This
+// behavior is depended upon by a lot of C++ code.
+bool IsMethodLexicallyInSpecialization(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod:
+      break;
+    default:
+      return false;
+  }
+
+  // NOTE(pag): Checking `decl.IsOutOfLine()` is not sufficient, as the out-of-
+  //            line method definition may itself be defined within a class
+  //            template specialization.
+
+  auto func = reinterpret_cast<const pasta::CXXMethodDecl &>(decl);
+  auto lc = func.LexicalDeclarationContext();
+  if (!lc) {
+    assert(false);
+    return false;
+  }
+
+  auto parent_spec = pasta::ClassTemplateSpecializationDecl::From(lc.value());
+  if (!parent_spec) {
+    return false;
+  }
+  
+  return parent_spec->Kind() != pasta::DeclKind::kClassTemplatePartialSpecialization;
+}
+
 // Is this decl a specialization of a template? If so, then we will want
 // to render the printed tokens of the specialization into the fragment, rather
 // than the parsed tokens.
@@ -997,14 +1033,9 @@ std::string GetSerializedData(capnp::MessageBuilder &builder) {
 // process.
 void AccumulateUTF8Data(std::string &data, llvm::StringRef utf8_data) {
   data.reserve(data.size() + utf8_data.size());
-  if (!utf8_data.contains('\r')) {
-    data.insert(data.end(), utf8_data.begin(), utf8_data.end());
-
-  } else {
-    for (char ch : utf8_data) {
-      if (ch != '\r') {
-        data += ch;
-      }
+  for (char ch : utf8_data) {
+    if (ch != '\r') {
+      data.push_back(ch);
     }
   }
 }
@@ -1139,6 +1170,15 @@ uint64_t Hash64(std::string_view data) {
     return 0u;
   }
   return XXH64(data.data(), data.size(), 0x7265746570626F74ull);
+}
+
+// If this is a debug build, then invoke Clang's `clang::Decl::dumpColor()` on
+// `decl`.
+void Dump(const pasta::Decl &decl) {
+#ifndef NDEBUG
+  decl.RawDecl()->dumpColor();
+#endif
+  (void) decl;
 }
 
 }  // namespace indexer

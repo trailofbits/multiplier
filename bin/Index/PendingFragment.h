@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <IntervalTree.h>
 #include <memory>
 #include <multiplier/AST/AttrKind.h>
 #include <multiplier/AST/DeclKind.h>
@@ -34,7 +35,6 @@
 namespace indexer {
 
 class EntityMapper;
-class EntityLabeller;
 class TypeMapper;
 
 using Pseudo = std::variant<pasta::TemplateArgument,
@@ -58,15 +58,10 @@ class FileLocationOfFragment {
         last_file_token_id(end) {}
 };
 
-// Inclusive bounds of a fragment.
-struct FragmentBounds final {
-  mx::EntityOffset begin;
-  mx::EntityOffset end;
-  mx::PackedFragmentId fragment_id;
+using FragmentBounds = interval_tree::Interval<mx::EntityOffset,
+                                               mx::PackedFragmentId>;
 
-  friend auto operator<=>(const FragmentBounds &,
-                          const FragmentBounds &) = default;
-};
+using FragmentIdMap = std::unordered_map<const void *, mx::PackedFragmentId>;
 
 // Summary information about a group of top-level declarations that are
 // somehow lexically/syntactically "stuck together" and thus serialized
@@ -163,8 +158,9 @@ class PendingFragment {
   EntityList<pasta::Designator> designators_to_serialize;
   EntityList<pasta::CXXCtorInitializer> cxx_ctor_initializers_to_serialize;
 
-  // The entity labeller for this fragment.
-  std::unique_ptr<EntityLabeller> labeller;
+  // Mapping of tokens belonging to nested fragments to their nested fragment
+  // IDs.
+  FragmentIdMap token_to_nested_fragment;
 
   // Did we encounter an error during serialization?
   bool has_error{false};
@@ -182,7 +178,6 @@ class PendingFragment {
 
   // Keep track on if we've labelled some top-level entities in the entity
   // mapper.
-  bool has_labelled_decls{false};
   bool has_labelled_tokens{false};
 
   // Should we drop token provenance after we've labelled tokens? This helps

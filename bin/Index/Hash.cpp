@@ -32,6 +32,7 @@
 #pragma clang diagnostic pop
 
 #include "EntityMapper.h"
+#include "NameMangler.h"
 #include "PASTA.h"
 #include "Util.h"
 
@@ -40,18 +41,19 @@ namespace {
 
 class HashVisitor final : public pasta::DeclVisitor {
  public:
-  const void *parent_dc{nullptr};
-
   virtual ~HashVisitor(void) = default;
 
   explicit HashVisitor(std::stringstream &ss_)
       : ss(ss_) {}
 
-  void VisitDeclContext(const pasta::DeclContext &dc) {
-    PrevValueTracker<const void *> dc_guard(parent_dc, dc.RawDeclContext());
+  void VisitDeclContext(const pasta::Decl &dc_decl) {
+    auto dc = pasta::DeclContext::From(dc_decl);
+    if (!dc) {
+      return;
+    }
 
-    if (dc_guard) {
-      for (const pasta::Decl &decl : dc.AlreadyLoadedDeclarations()) {
+    for (const pasta::Decl &decl : dc->AlreadyLoadedDeclarations()) {
+      if (dc_decl != decl) {
         Accept(decl);
       }
     }
@@ -86,7 +88,14 @@ class HashVisitor final : public pasta::DeclVisitor {
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
     VisitODRHashable(decl);
-    VisitDeclContext(decl);
+  }
+
+  void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &decl) {
+    Accept(decl.TemplatedDeclaration());
+  }
+
+  void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) {
+    Accept(decl.TemplatedDeclaration());
   }
 
   void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final {
@@ -100,13 +109,199 @@ class HashVisitor final : public pasta::DeclVisitor {
     VisitODRHashable(decl);
   }
 
-  // VisitDecl will add kind name of all decl to the folding set
-  // node.
   void VisitDecl(const pasta::Decl &) final {}
+
+  void VisitClassTemplatePartialSpecializationDecl(
+      const pasta::ClassTemplatePartialSpecializationDecl &decl) {
+    VisitCXXRecordDecl(decl);
+  }
+
+  void VisitClassTemplateSpecializationDecl(
+      const pasta::ClassTemplateSpecializationDecl &) {}
 
  private:
   std::stringstream &ss;
 };
+
+static void AccumulateTokenData(std::stringstream &ss,
+                                mx::TokenKind kind, pasta::TokenRole role,
+                                std::string_view data) {
+  if (data.empty()) {
+    return;
+  }
+
+  // Mix in generic token/structure/context information.
+  switch (role) {
+    case pasta::TokenRole::kIntermediateMacroExpansionToken:
+      ss << " e" << int(kind);
+      break;
+    case pasta::TokenRole::kInitialMacroUseToken:
+      ss << " u" << int(kind);
+      break;
+
+    case pasta::TokenRole::kFileToken:
+      ss << " f" << int(kind);
+      break;
+    case pasta::TokenRole::kFinalMacroExpansionToken:
+      ss << " p" << int(kind);
+      break;
+
+    default:
+      return;
+  }
+
+  if (data.size() >= 8u) {
+    ss << Hash64(data);
+  } else if (data[0] != '_' && !isalpha(data[0])) {
+    ss << data;
+  } else if (isalpha(data[0])) {
+    ss << data;
+  }
+}
+
+static void AccumulateTokenData(
+    std::stringstream &ss, const pasta::PrintedTokenRange &tokens) {
+
+  for (pasta::PrintedToken token : tokens) {
+    AccumulateTokenData(ss, mx::FromPasta(token.Kind()),
+                        pasta::TokenRole::kFileToken, token.Data());
+
+    std::stringstream tc;
+    for (pasta::TokenContext context : TokenContexts(token)) {
+      switch (context.Kind()) {
+        case pasta::TokenContextKind::kDecl:
+          tc << " d" << int(pasta::Decl::From(context)->Kind());
+          break;
+        case pasta::TokenContextKind::kStmt:
+          tc << " s" << int(pasta::Stmt::From(context)->Kind());
+          break;
+        case pasta::TokenContextKind::kType:
+          tc << " t" << int(pasta::Type::From(context)->Kind());
+          break;
+        case pasta::TokenContextKind::kAttr:
+          tc << " a" << int(pasta::Attr::From(context)->Kind());
+          break;
+        default:
+          break;
+      }
+    }
+
+    ss << " c" << Hash64(tc.str());
+  }
+}
+
+static std::string HashTopLevelFragment(
+    const EntityMapper &em,
+    const std::vector<pasta::Decl> &decls,
+    const std::vector<pasta::Macro> &macros,
+    const pasta::TokenRange *frag_tok_range,
+    const pasta::PrintedTokenRange &decl_tok_range) {
+
+  std::stringstream ss;
+
+  uint64_t end_index = 0u;
+
+  // Original tokens visible to the parser.
+  if (frag_tok_range && *frag_tok_range) {
+    for (pasta::Token token : *frag_tok_range) {
+      end_index = token.Index();
+      AccumulateTokenData(ss, mx::FromPasta(token.Kind()), token.Role(),
+                          token.Data());
+    }
+  }
+
+  // Pretty-printed tokens. These include token contexts. These may or may
+  // not correspond to original tokens.
+  if (decl_tok_range) {
+    AccumulateTokenData(ss, decl_tok_range);
+  }
+
+  HashVisitor visitor(ss);
+
+  // Mix in ODR hashes, decl kinds, and offsets of the decls. We need to mix
+  // in decl kinds and offsets because not all decls have ODR hashes, and so
+  // these extra bits of data add variability to help distinguish between things
+  // that might only manifest as nested fragments.
+  for (const pasta::Decl &decl : decls) {
+    ss << " D" << int(decl.Kind());
+
+    pasta::Token decl_token = decl.Token();
+    if (frag_tok_range && frag_tok_range->Contains(decl_token)) {
+      ss << " o" << (end_index - decl_token.Index());
+    }
+
+    visitor.Accept(decl);
+  }
+
+  // Mix in macro info. Note that macro uses are not integrated from the token
+  // values themselves, as those aren't represented in PASTA's parsed token
+  // list, so we integrate the top-level macro IDs manually.
+  //
+  // TODO(pag): Should really have a `MacroVisitor` in pasta, then separately
+  //            visit and hash each top-level macro entity. The saving factor
+  //            for now is probably that the above token hashing operates on
+  //            the parsed and intermediate tokens, which is a good enough
+  //            proxy.
+  for (const pasta::Macro &macro : macros) {
+
+    ss << " M" << int(macro.Kind());
+    if (macro.Kind() == pasta::MacroKind::kExpansion) {
+      const auto &exp = reinterpret_cast<const pasta::MacroExpansion &>(macro);
+      if (auto def = exp.Definition()) {
+        auto def_id = em.EntityId(def.value());
+        if (def_id != mx::kInvalidEntityId) {
+          ss << " E" << def_id;
+          continue;
+        }
+      }
+    }
+
+    // NOTE(pag): We don't need to use the location of anything here because
+    //            `GetOrCreateFragmentIdForHash` integrates a file token ID
+    //            at a higher level.
+    //
+    // // Bound to the top-level macro use location in the file.
+    // if (auto bt = macro.BeginToken()) {
+    //   auto dl = bt->DerivedLocation();
+    //   assert(!std::holds_alternative<pasta::MacroToken>(dl));
+    //   if (std::holds_alternative<pasta::FileToken>(dl)) {
+    //     ss << " @" << em.EntityId(std::get<pasta::FileToken>(dl));
+    //   }
+    // }
+  }
+
+  return ss.str();
+}
+
+static std::string HashNestedFragment(
+    const EntityMapper &em, const NameMangler &,
+    mx::RawEntityId parent_fid, const pasta::Decl &decl) {
+
+  auto dk = decl.Kind();
+
+  std::stringstream ss;
+  ss << "F" << parent_fid << " d" << int(dk);
+
+  if (auto nd = pasta::NamedDecl::From(decl)) {
+    ss << " N" << nd->Name();
+  }
+
+  if (auto td = pasta::TypeDecl::From(decl)) {
+    if (auto ty = td->TypeForDeclaration()) {
+      AccumulateTokenData(ss, pasta::PrintedTokenRange::Create(ty.value()));
+    } else {
+      assert(false);
+    }
+
+  } else if (auto vd = pasta::ValueDecl::From(decl)) {
+    AccumulateTokenData(ss, pasta::PrintedTokenRange::Create(vd->Type()));
+
+  } else {
+    assert(false);
+  }
+
+  return ss.str();
+}
 
 }  // namespace
 
@@ -165,118 +360,19 @@ std::string HashCompilation(const pasta::AST &ast, const EntityMapper &em) {
 //
 // TODO(pag): Integrate template parameter lists for specializations?
 std::string HashFragment(
+    const EntityMapper &em, const NameMangler &nm, const void *parent_entity,
     const std::vector<pasta::Decl> &decls,
     const std::vector<pasta::Macro> &macros,
     const pasta::TokenRange *frag_tok_range,
     const pasta::PrintedTokenRange &decl_tok_range) {
 
-  std::stringstream ss;
-
-  uint64_t end_index = 0u;
-
-  auto accumulate_token_into_hash = [&ss] (mx::TokenKind kind,
-                                           pasta::TokenRole role,
-                                           std::string_view data) {
-    if (data.empty()) {
-      return;
-    }
-
-    // Mix in generic token/structure/context information.
-    switch (role) {
-      case pasta::TokenRole::kIntermediateMacroExpansionToken:
-        ss << " e" << int(kind);
-        break;
-      case pasta::TokenRole::kInitialMacroUseToken:
-        ss << " u" << int(kind);
-        break;
-
-      case pasta::TokenRole::kFileToken:
-        ss << " f" << int(kind);
-        break;
-      case pasta::TokenRole::kFinalMacroExpansionToken:
-        ss << " p" << int(kind);
-        break;
-
-      default:
-        return;
-    }
-
-    if (data.size() >= 8u) {
-      ss << Hash64(data);
-    } else if (data[0] != '_' && !isalpha(data[0])) {
-      ss << data;
-    } else if (isalpha(data[0])) {
-      ss << Hash64(data);
-    }
-  };
-
-  if (frag_tok_range && *frag_tok_range) {
-    for (pasta::Token token : *frag_tok_range) {
-      end_index = token.Index();
-      accumulate_token_into_hash(mx::FromPasta(token.Kind()), token.Role(),
-                                 token.Data());
-    }
+  auto parent_fid = em.ParentFragmentId(parent_entity);
+  if (parent_fid != mx::kInvalidEntityId && decls.size() == 1u &&
+      !pasta::TemplateDecl::From(decls.front())) {
+    return HashNestedFragment(em, nm, parent_fid, decls.front());
   }
 
-  if (decl_tok_range) {
-    for (pasta::PrintedToken token : decl_tok_range) {
-      accumulate_token_into_hash(mx::FromPasta(token.Kind()),
-                                 pasta::TokenRole::kFileToken, token.Data());
-
-      std::stringstream tc;
-      for (pasta::TokenContext context : TokenContexts(token)) {
-        switch (context.Kind()) {
-          case pasta::TokenContextKind::kDecl:
-            tc << " d" << int(pasta::Decl::From(context)->Kind());
-            break;
-          case pasta::TokenContextKind::kStmt:
-            tc << " s" << int(pasta::Stmt::From(context)->Kind());
-            break;
-          case pasta::TokenContextKind::kType:
-            tc << " t" << int(pasta::Type::From(context)->Kind());
-            break;
-          case pasta::TokenContextKind::kAttr:
-            tc << " a" << int(pasta::Attr::From(context)->Kind());
-            break;
-          default:
-            break;
-        }
-      }
-
-      ss << " c" << Hash64(tc.str());
-    }
-  }
-
-  HashVisitor visitor(ss);
-
-  // Mix in ODR hashes, decl kinds, and offsets of the decls. We need to mix
-  // in decl kinds and offsets because not all decls have ODR hashes, and so
-  // these extra bits of data add variability to help distinguish between things
-  // that might only manifest as nested fragments.
-  for (const pasta::Decl &decl : decls) {
-    ss << " D" << int(decl.Kind());
-
-    pasta::Token decl_token = decl.Token();
-    if (frag_tok_range && frag_tok_range->Contains(decl_token)) {
-      ss << " o" << (end_index - decl_token.Index());
-    }
-
-    visitor.Accept(decl);
-  }
-
-  // Mix in macro info. Note that any macro names and such are already
-  // integrated from the token values themselves.
-  //
-  // TODO(pag): Should really have a `MacroVisitor` in pasta, then separately
-  //            visit and hash each top-level macro entity. The saving factor
-  //            for now is probably that the above token hashing operates on
-  //            the parsed and intermediate tokens, which is a good enough
-  //            proxy.
-  for (const pasta::Macro &macro : macros) {
-    ss << " M" << int(macro.Kind()) << "/" << macro.Children().Size();
-  }
-
-  return ss.str();
+  return HashTopLevelFragment(em, decls, macros, frag_tok_range, decl_tok_range);
 }
 
 }  // namespace indexer

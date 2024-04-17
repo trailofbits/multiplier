@@ -400,6 +400,33 @@ std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
   return std::nullopt;
 }
 
+// ID of the parent fragment.
+mx::RawEntityId EntityMapper::ParentFragmentId(
+    const void *parent_entity) const {
+  if (!parent_entity) {
+    return mx::kInvalidEntityId;
+  }
+
+  mx::VariantId vid = mx::EntityId(this->EntityId(parent_entity)).Unpack();
+  mx::RawEntityId parent_frag_index = mx::kInvalidEntityId;
+
+  if (std::holds_alternative<mx::DeclId>(vid)) {
+    parent_frag_index = std::get<mx::DeclId>(vid).fragment_id;
+
+  } else if (std::holds_alternative<mx::MacroId>(vid)) {
+    parent_frag_index = std::get<mx::MacroId>(vid).fragment_id;
+
+  } else if (std::holds_alternative<mx::FragmentId>(vid)) {
+    parent_frag_index = std::get<mx::FragmentId>(vid).fragment_id;
+
+  } else {
+    assert(false);
+    return mx::kInvalidEntityId;
+  }
+
+  return mx::EntityId(mx::FragmentId(parent_frag_index)).Pack();
+}
+
 void EntityMapper::ResetForFragment(void) {
   // clear token tree ids, parent_decl_ids, and parent_stmt_ids before
   // processing new pending fragments. Not clearing them will cause issue
@@ -409,6 +436,8 @@ void EntityMapper::ResetForFragment(void) {
   parent_stmt_ids.clear();
   parent_decls.clear();
   parent_stmts.clear();
+
+  next_parsed_token_index = 0u;
 }
 
 }  // namespace indexer
