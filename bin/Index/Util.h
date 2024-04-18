@@ -176,6 +176,9 @@ bool IsInjectedForwardDeclaration(const pasta::Decl &decl);
 // Should a declaration be hidden from the indexer?
 bool ShouldHideFromIndexer(const pasta::Decl &decl);
 
+// Does `decl` look like a lambda?
+bool IsLambda(const pasta::Decl &decl);
+
 // List the indexable declarations in this declcontext.
 std::vector<pasta::Decl> DeclarationsInDeclContext(const pasta::DeclContext &dc);
 

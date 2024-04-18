@@ -945,8 +945,15 @@ static mx::EntityOffset ExpandToEndOfNextDirective(
 // expansion range, and instead focuses on trailing semicolons, leading
 // indentation, empty macros, and comments.
 static std::pair<mx::EntityOffset, mx::EntityOffset> ExpandDeclRange(
-    const pasta::TokenRange &range,
+    const pasta::TokenRange &range, const pasta::Decl &decl,
     mx::EntityOffset begin_tok_index, mx::EntityOffset end_tok_index) {
+
+  // If this looks like a lambda then don't do any additional expansion, as
+  // that might capture things like leading whitespace before the lambda use
+  // but inside some statement.
+  if (IsLambda(decl)) {
+    return {begin_tok_index, end_tok_index};
+  }
 
   const auto max_tok_index = range.Size();
 
@@ -1009,7 +1016,7 @@ static std::pair<mx::EntityOffset, mx::EntityOffset> ExpandDeclRange(
 // Expand an inclusive `[begin, end]` range to be as wide as necessary to
 // include the full scope of macro expansion.
 static std::pair<mx::EntityOffset, mx::EntityOffset> ExpandRange(
-    const pasta::TokenRange &range,
+    const pasta::TokenRange &range, const pasta::Decl &decl,
     mx::EntityOffset begin_tok_index, mx::EntityOffset end_tok_index) {
 
   const auto max_tok_index = range.Size();
@@ -1117,7 +1124,7 @@ static std::pair<mx::EntityOffset, mx::EntityOffset> ExpandRange(
   (void) in_macro;
 
   std::tie(begin_tok_index, end_tok_index) = ExpandDeclRange(
-      range, begin_tok_index, end_tok_index);
+      range, decl, begin_tok_index, end_tok_index);
 
 #ifndef NDEBUG
   // Try to detect these types of issues early, as they'd otherwise manifest
@@ -1172,7 +1179,7 @@ static std::pair<mx::EntityOffset, mx::EntityOffset> FindDeclRange(
   end_tok_index = ExpandToEndOfNextDirective(
       dir_index_to_next_dir, begin_tok_index, end_tok_index, range.Size());
 
-  return ExpandRange(range, begin_tok_index, end_tok_index);
+  return ExpandRange(range, decl, begin_tok_index, end_tok_index);
 }
 
 // Returns `true` if `decl` is probably a compiler-built-in declaration. It's
@@ -2505,7 +2512,8 @@ static void CreatePendingFragments(
     auto decl_range = decls.front().Tokens();
     if (decl_range) {
       std::tie(begin_index, end_index) = ExpandDeclRange(
-          tok_range, decl_range.Front()->Index(), decl_range.Back()->Index());
+          tok_range, decls.front(), decl_range.Front()->Index(),
+          decl_range.Back()->Index());
 
     } else {
       LOG(ERROR)

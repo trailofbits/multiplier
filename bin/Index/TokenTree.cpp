@@ -875,9 +875,7 @@ void Rebuilder::BuildBottomUp(std::deque<Substitution> &orig_subs_alloc) {
     ReplicateSurfaceUsesInto(new_sub, orig_sub.macro.value());
   }
 
-  Substitution &orig_sub = orig_subs_alloc.front();
-  Substitution &new_sub = new_subs_alloc.emplace_back(orig_sub.kind);
-  new_sub.macro = orig_sub.macro;
+  Substitution &new_sub = new_subs_alloc.emplace_back(mx::MacroKind::OTHER_DIRECTIVE);
 
   AddTokensToSub(&new_sub, new_sub.before, &(new_tokens_alloc.front()), ~0u);
   assert(!new_sub.parent);
