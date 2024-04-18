@@ -907,6 +907,32 @@ bool ShouldGoInFloatingFragment(const pasta::Macro &macro) {
   }
 }
 
+// Does this decl look like a lamabda?
+bool IsLambda(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kCXXRecord:
+      if (decl.IsImplicit()) {
+        return reinterpret_cast<const pasta::CXXRecordDecl &>(decl).IsLambda();
+      }
+      return false;
+    case pasta::DeclKind::kCXXMethod: {
+      const auto &method = reinterpret_cast<const pasta::CXXMethodDecl &>(decl);
+      if (method.IsLambdaStaticInvoker()) {
+        return true;
+      } else if (method.OverloadedOperator() == pasta::OverloadedOperatorKind::kCall) {
+        return method.Parent().IsLambda();
+      } else {
+        return false;
+      }
+    }
+    case pasta::DeclKind::kFunctionTemplate:
+      return IsLambda(
+          reinterpret_cast<const pasta::FunctionTemplateDecl &>(decl).TemplatedDeclaration());
+    default:
+      return false;
+  }
+}
+
 // Returns `true` if a macro is visible across fragments, and should have an
 // entity id stored in the global mapper.
 bool AreVisibleAcrossFragments(const pasta::Macro &macro) {
