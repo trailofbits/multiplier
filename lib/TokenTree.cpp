@@ -208,7 +208,7 @@ static void FlattenExpansionUses(
     switch (m.kind()) {
       case MacroKind::EXPANSION:
       case MacroKind::CONCATENATE:
-      case MacroKind::SUBSTITUTION:
+      case MacroKind::SUBSTITUTION: {
         if (!depth) {
           out_orig.emplace_back(m);
 
@@ -219,11 +219,13 @@ static void FlattenExpansionUses(
           FlattenExpansionUses(std::move(sub_mt), depth + 1u, out, out_orig);
         }
         break;
-      case MacroKind::ARGUMENT:
+      }
+      case MacroKind::ARGUMENT: {
         for (PreprocessedEntity sub_mt : m.children()) {
           FlattenExpansionUses(std::move(sub_mt), depth, out, out_orig);
         }
         break;
+      }
       default:
         if (!depth) {
           out_orig.emplace_back(m);
@@ -233,6 +235,11 @@ static void FlattenExpansionUses(
         }
         out.emplace_back(std::move(m));
         break;
+    }
+  } else if (std::holds_alternative<Fragment>(mt)) {
+    Fragment f = std::move(std::get<Fragment>(mt));
+    for (PreprocessedEntity sub_mt : f.preprocessed_code()) {
+      FlattenExpansionUses(std::move(sub_mt), depth + 1u, out, out_orig);
     }
   } else {
     assert(false);
@@ -2120,7 +2127,7 @@ namespace {
 //            `bin/Index/Util.*`
 static bool IsFloatingDirectiveFragment(const Fragment &frag) {
   auto num_directives = 0u;
-  for (PreprocessedEntity &mt : frag.preprocessed_code()) {
+  for (PreprocessedEntity mt : frag.preprocessed_code()) {
     if (!std::holds_alternative<Macro>(mt)) {
       return false;
     }
