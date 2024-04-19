@@ -295,16 +295,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::DerivedToken &entity) const 
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::PrintedToken &entity) const {
-  if (auto id = PerFragmentEntityId(RawEntity(entity));
-      id != mx::kInvalidEntityId) {
-    return id;
-  }
-
-  if (auto pt = entity.DerivedLocation()) {
-    return EntityId(pt.value());
-  }
-
-  return mx::kInvalidEntityId;
+  return PerFragmentEntityId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::MacroToken &entity) {
@@ -436,8 +427,6 @@ void EntityMapper::ResetForFragment(void) {
   parent_stmt_ids.clear();
   parent_decls.clear();
   parent_stmts.clear();
-
-  next_parsed_token_index = 0u;
 }
 
 }  // namespace indexer

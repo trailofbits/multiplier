@@ -14,11 +14,6 @@
 #include "Types.h"
 
 namespace mx {
-namespace {
-
-static thread_local RawEntityIdList tIgnoredRedecls;
-
-}  // namespace
 
 MacroImpl::MacroImpl(FragmentImplPtr frag_,
                      ast::Macro::Reader reader_,
@@ -67,50 +62,50 @@ gap::generator<Macro> Macro::containing_internal(const Token &token) {
 
 namespace {
 
-static gap::generator<Token> GenerateUseTokens(Macro macro) {
-  for (PreprocessedEntity use : macro.children()) {
+static gap::generator<Token> GenerateUseTokens(
+    const Macro *scope, gap::generator<PreprocessedEntity> *gen) {
+
+  for (PreprocessedEntity use : *gen) {
     if (std::holds_alternative<mx::Token>(use)) {
       co_yield std::get<Token>(use);
+
     } else if (std::holds_alternative<Macro>(use)) {
-      for (auto tok : GenerateUseTokens(std::move(std::get<Macro>(use)))) {
+      for (auto tok : std::get<Macro>(use).generate_use_tokens()) {
+        co_yield tok;
+      }
+
+    } else if (std::holds_alternative<Fragment>(use)) {
+      auto nested_gen = std::get<Fragment>(use).preprocessed_code();
+      for (auto tok : GenerateUseTokens(scope, &nested_gen)) {
         co_yield tok;
       }
     }
   }
+
+  asm volatile ("" ::"m"(scope):"memory");
 }
 
-static gap::generator<Token> GenerateExpansionTokensFromMacro(Macro macro);
+static gap::generator<Token> GenerateExpansionTokens(
+    const Macro *scope, gap::generator<PreprocessedEntity> *gen) {
+  for (PreprocessedEntity use : *gen) {
+    if (std::holds_alternative<mx::Token>(use)) {
+      co_yield std::get<Token>(use);
 
-static gap::generator<Token> GenerateExpansionTokensFromUse(
-    PreprocessedEntity use) {
-  if (std::holds_alternative<mx::Token>(use)) {
-    co_yield std::get<Token>(use);
-  } else if (std::holds_alternative<Macro>(use)) {
-    for (Token pt : GenerateExpansionTokensFromMacro(
-                        std::move(std::get<Macro>(use)))) {
-      co_yield pt;
-    }
-  }
-}
-
-gap::generator<Token> GenerateExpansionTokensFromMacro(Macro macro) {
-  if (auto sub = MacroSubstitution::from(macro)) {
-    for (PreprocessedEntity use : sub->replacement_children()) {
-      for (Token tok : GenerateExpansionTokensFromUse(std::move(use))) {
+    } else if (std::holds_alternative<Macro>(use)) {
+      for (auto tok : std::get<Macro>(use).generate_expansion_tokens()) {
         co_yield tok;
       }
-    }
-  } else {
-    for (PreprocessedEntity use : macro.children()) {
-      for (Token tok : GenerateExpansionTokensFromUse(std::move(use))) {
+    } else if (std::holds_alternative<Fragment>(use)) {
+      auto nested_gen = std::get<Fragment>(use).preprocessed_code();
+      for (auto tok : GenerateExpansionTokens(scope, &nested_gen)) {
         co_yield tok;
       }
     }
   }
+  asm volatile ("" ::"m"(scope):"memory");
 }
 
 }  // namespace
-
 
 Macro Macro::root(void) const & {
   if (std::optional<Macro> p = parent()) {
@@ -130,7 +125,8 @@ TokenRange Macro::use_tokens(void) const & {
   std::shared_ptr<CustomTokenReader> reader =
       std::make_shared<CustomTokenReader>(std::move(frag));
   EntityOffset num_toks = 0u;
-  for (Token tok : GenerateUseTokens(*this)) {
+  auto nested_gen = children();
+  for (Token tok : GenerateUseTokens(this, &nested_gen)) {
     reader->Append(std::move(tok.impl), tok.offset);
     ++num_toks;
   }
@@ -151,7 +147,7 @@ TokenRange Macro::expansion_tokens(void) const & {
 
   auto reader = std::make_shared<CustomTokenReader>(std::move(frag));
   EntityOffset num_toks = 0u;
-  for (Token tok : GenerateExpansionTokensFromMacro(*this)) {
+  for (Token tok : generate_expansion_tokens()) {
     reader->Append(std::move(tok.impl), tok.offset);
     ++num_toks;
   }
@@ -159,12 +155,25 @@ TokenRange Macro::expansion_tokens(void) const & {
 }
 
 gap::generator<Token> Macro::generate_use_tokens(void) const & {
-  return GenerateUseTokens(*this);
+  auto nested_gen = children();
+  for (auto tok : GenerateUseTokens(this, &nested_gen)) {
+    co_yield tok;
+  }
 }
 
 // Find the tokens the expansion tokens that are actually parsed.
 gap::generator<Token> Macro::generate_expansion_tokens(void) const & {
-  return GenerateExpansionTokensFromMacro(*this);
+  if (auto sub = MacroSubstitution::from(*this)) {
+    auto nested_gen = sub->replacement_children();
+    for (auto tok : GenerateExpansionTokens(this, &nested_gen)) {
+      co_yield tok;
+    }
+  } else {
+    auto nested_gen = children();
+    for (auto tok : GenerateExpansionTokens(this, &nested_gen)) {
+      co_yield tok;
+    }
+  }
 }
 
 }  // namespace mx

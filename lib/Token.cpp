@@ -11,6 +11,7 @@
 #include <multiplier/AST/CXXMethodDecl.h>
 #include <multiplier/AST/DeclCategory.h>
 #include <multiplier/AST/DeclKind.h>
+#include <multiplier/AST/FriendDecl.h>
 #include <multiplier/AST/ImplicitParamDecl.h>
 #include <multiplier/AST/ObjCMethodDecl.h>
 #include <multiplier/AST/TagDecl.h>
@@ -677,6 +678,7 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
     case DeclKind::VAR_TEMPLATE:
       return TokenCategory::GLOBAL_VARIABLE;
 
+    // Could be a method.
     case DeclKind::FUNCTION_TEMPLATE:
       baseline_category = TokenCategory::FUNCTION;
       break;
@@ -692,6 +694,12 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
     case DeclKind::RECORD:
       baseline_category = TokenCategory::STRUCT;
       break;
+
+    case DeclKind::ACCESS_SPEC:
+    case DeclKind::LINKAGE_SPEC:
+    case DeclKind::FRIEND:
+    case DeclKind::FRIEND_TEMPLATE:
+      return TokenCategory::KEYWORD;
 
     case DeclKind::CXX_METHOD:
     case DeclKind::OBJ_C_METHOD:
@@ -721,6 +729,7 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
   const Decl &decl = std::get<Decl>(ent);
   if (auto spec = ClassScopeFunctionSpecializationDecl::from(decl)) {
     return Rebase(spec->specialization().category());
+
   } else {
     return Rebase(decl.category());
   }

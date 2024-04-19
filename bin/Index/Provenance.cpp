@@ -428,11 +428,11 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
 
   } else if (auto sexpr = pasta::StmtExpr::From(stmt)) {
     if (token_kind == pasta::TokenKind::kLParenthesis) {
-      if (check_token(paren->LParenToken())) {
+      if (check_token(sexpr->LParenToken())) {
         return raw_stmt;
       }
     } else if (token_kind == pasta::TokenKind::kRParenthesis) {
-      if (check_token(paren->RParenToken())) {
+      if (check_token(sexpr->RParenToken())) {
         return raw_stmt;
       }
     }
@@ -1846,6 +1846,10 @@ void TokenProvenanceCalculator::Run(
     TokenInfo *child = info_map[em.EntityId(node)];
     assert(child != nullptr);
 
+    if (child->derived_token_id != mx::kInvalidEntityId) {
+      continue;
+    }
+
     auto pl = node.Token();
     auto cl = node.PrintedToken();
     auto ml = node.MacroToken();
@@ -1864,8 +1868,6 @@ void TokenProvenanceCalculator::Run(
     } else if (ml) {
       dl = ml->DerivedLocation();
     }
-
-    assert(child->derived_token_id == mx::kInvalidEntityId);
 
     while (!std::holds_alternative<std::monostate>(dl)) {
       auto found_eid = em.EntityId(dl);
