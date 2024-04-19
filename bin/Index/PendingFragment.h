@@ -139,6 +139,9 @@ class PendingFragment {
   unsigned num_top_level_declarations{0u};
   unsigned num_top_level_macros{0u};
 
+  // Number of labelled parsed tokens.
+  mx::EntityOffset num_parsed_tokens{0u};
+  
   // Macros, declarations, statements, types, and pseudo-entities to serialize,
   // in their order of appearance and serialization.
   //

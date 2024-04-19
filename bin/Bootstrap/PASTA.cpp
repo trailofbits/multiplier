@@ -3378,6 +3378,8 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "      co_yield std::move(std::get<Macro>(e));\n"
             << "    } else if (std::holds_alternative<Token>(e)) {\n"
             << "      co_yield std::move(std::get<Token>(e));\n"
+            << "    } else if (std::holds_alternative<Fragment>(e)) {\n"
+            << "      co_yield std::move(std::get<Fragment>(e));\n"
             << "    } else {\n"
             << "      assert(false);\n"
             << "    }\n"

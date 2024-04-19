@@ -172,6 +172,8 @@ gap::generator<PreprocessedEntity> Macro::children(void) const & {
       co_yield std::move(std::get<Macro>(e));
     } else if (std::holds_alternative<Token>(e)) {
       co_yield std::move(std::get<Token>(e));
+    } else if (std::holds_alternative<Fragment>(e)) {
+      co_yield std::move(std::get<Fragment>(e));
     } else {
       assert(false);
     }

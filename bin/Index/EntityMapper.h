@@ -68,12 +68,6 @@ class EntityMapper final {
   EntityParentMap parent_decls;
   EntityParentMap parent_stmts;
 
-  // Tracks the index of the next parsed token. Logic surrounding this
-  // processing is replicated when serializing `TokenTree`s. The key is that
-  // we want to serialize the final parsed tokens, and not any marker tokens
-  // or intermediate macro expansion tokens.
-  unsigned next_parsed_token_index{0u};
-
   // If we're in a mode where we're generating source IR then we need the
   // entity IDs for all `Decl`s and `Stmt`s and such to be global.
   const bool generate_source_ir;

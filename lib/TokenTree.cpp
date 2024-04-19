@@ -31,7 +31,6 @@
 #define BOUNDS(b) "[reader=" << reinterpret_cast<const void *>(b.reader) << ", " << b.begin_index << ", " << b.end_index << ']' 
 #define TOKEN_INDEX(ti) "[reader=" << reinterpret_cast<const void *>(ti.first) << ", index=" << ti.second << ", data=" << (ti.first->NthTokenData(ti.second)) << ']' 
 
-
 namespace mx {
 namespace {
 
@@ -64,8 +63,12 @@ class SaveRestoreLastSequence final {
   for (PreprocessedEntity mt : generator) { \
     if (std::holds_alternative<Token>(mt)) { \
       file_tokens_name.emplace_back(std::get<Token>(mt).file_token()); \
-    } else { \
+    } else if (std::holds_alternative<Macro>(mt)) { \
       file_tokens_name.emplace_back(LeftCornerOfUse(std::get<Macro>(mt)).file_token()); \
+    } else if (std::holds_alternative<Fragment>(mt)) { \
+      file_tokens_name.emplace_back(LeftCornerOfUse(std::get<Fragment>(mt)).file_token()); \
+    } else { \
+      assert(false); \
     } \
     children_name.emplace_back(std::move(mt)); \
   }
@@ -93,6 +96,22 @@ static Token RightCornerOfUse(const Macro &exp) {
     ret = std::move(tok);
   }
   return ret;
+}
+
+// Return the leftmost use tokens of a macro.
+static Token LeftCornerOfUse(const Fragment &frag) {
+  for (auto tle : frag.preprocessed_code()) {
+    if (std::holds_alternative<Token>(tle)) {
+      return std::get<Token>(tle);
+
+    } else if (std::holds_alternative<Macro>(tle)) {
+      return LeftCornerOfUse(std::get<Macro>(tle));
+
+    } else if (std::holds_alternative<Fragment>(tle)) {
+      return LeftCornerOfUse(std::get<Fragment>(tle));
+    }
+  }
+  return Token();
 }
 
 // If the `i`th thing of `before` is a `, ## __VA_ARGS__` then return `true`
@@ -1596,6 +1615,10 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithMacroChild(
   } else if (std::holds_alternative<Macro>(mt)) {
     return ExtendWithMacro(seq, std::get<Macro>(mt), bounds, trailing_tokens);
 
+  } else if (std::holds_alternative<Fragment>(mt)) {
+    return ExtendWithFragment(seq, std::get<Fragment>(mt), bounds,
+                              trailing_tokens);
+
   } else {
     assert(false);
     return seq;
@@ -1713,10 +1736,15 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
     auto &tt = (i + 1u) == num_mts ? trailing_tokens : dummy_trailing_tokens;
 
     if (std::holds_alternative<Token>(mt)) {
-      const Token &tok = std::get<Token>(mt);
       seq = AddLeadingTokensInBounds(seq, fts[i], bounds);
-      seq = AddTokenToSequence(seq, tok, tt);
+      seq = AddTokenToSequence(seq, std::get<Token>(mt), tt);
       continue;
+    }
+
+    if (std::holds_alternative<Fragment>(mt)) {
+      seq = AddLeadingTokensInBounds(seq, fts[i], bounds);
+      seq = ExtendWithFragment(seq, std::get<Fragment>(mt), bounds, tt);
+      continue; 
     }
 
     if (!std::holds_alternative<Macro>(mt)) {
@@ -2006,6 +2034,41 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
   return AddToSequence(seq, sub, dummy_trailing_tokens);
 }
 
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithFragment(
+    SequenceNode *seq, const Fragment &frag, const Bounds &bounds,
+    const TrailingTokens &trailing_tokens) {
+  
+  TokenTree frag_tree = TokenTree::create(frag);
+  TokenTreeImpl::Node frag_node = *NodeFromPublic(frag_tree.root());
+  nested_trees.emplace_back(ImplFromPublic(std::move(frag_tree)));
+
+  auto alt = &(choices.emplace_back());
+  alt->fragments.emplace_back(std::move(frag));
+  alt->children.emplace_back(std::move(frag_node));
+
+  Token first_file_tok = frag.file_tokens().front();
+  if (!first_file_tok) {
+    first_file_tok = LeftCornerOfUse(frag).file_token();
+  }
+
+  if (first_file_tok) {
+    D( auto fft_index = GetOrCreateIndex(first_file_tok);
+       std::cerr << INDENT << "ExtendWithMacro: bounds=" << BOUNDS(bounds)
+                 << " fft_index=" << TOKEN_INDEX(fft_index) << '\n'; )
+
+    // Mark us as being at the top level.
+    auto prev_depth = depth;
+    depth = 0;
+    seq = AddLeadingTokensInBounds(seq, first_file_tok, bounds);
+    depth = prev_depth;
+
+    D( std::cerr << INDENT << "\tDone prefixing fragment\n"; )
+    alt->first_file_token.emplace_back(first_file_tok.id().Pack());
+  }
+
+  return AddNodeToSequence(seq, alt, dummy_trailing_tokens);
+}
+
 TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithMacro(
     SequenceNode *seq, const Macro &macro, const Bounds &bounds,
     const TrailingTokens &trailing_tokens) {
@@ -2014,33 +2077,8 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithMacro(
   // `#endif`. Go and pull it in as a fragment token tree, rather than
   // integrating it manually.
   if (macro.id().Unpack().fragment_id != fragment->fragment_id) {
-    auto frag = Fragment::containing(macro);
-    if (auto file_toks = frag.file_tokens()) {
-
-      auto first_file_tok = file_toks.front();
-      D( auto fft_index = GetOrCreateIndex(first_file_tok);
-         std::cerr << INDENT << "ExtendWithMacro: bounds=" << BOUNDS(bounds)
-                   << " fft_index=" << TOKEN_INDEX(fft_index) << '\n'; )
-
-      // Mark us as being at the top level.
-      auto prev_depth = depth;
-      depth = 0;
-      seq = AddLeadingTokensInBounds(seq, first_file_tok, bounds);
-      depth = prev_depth;
-
-      D( std::cerr << INDENT << "\tDone prefixing fragment\n"; )
-
-      TokenTree frag_tree = TokenTree::create(frag);
-
-      TokenTreeImpl::Node frag_node = *NodeFromPublic(frag_tree.root());
-      nested_trees.emplace_back(ImplFromPublic(std::move(frag_tree)));
-
-      auto alt = &(choices.emplace_back());
-      alt->fragments.emplace_back(std::move(frag));
-      alt->children.emplace_back(std::move(frag_node));
-      alt->first_file_token.emplace_back(first_file_tok.id().Pack());
-      return AddNodeToSequence(seq, alt, dummy_trailing_tokens);
-    }
+    return ExtendWithFragment(seq, Fragment::containing(macro), bounds,
+                              trailing_tokens);
   }
 
   if (auto ms = MacroSubstitution::from(macro)) {

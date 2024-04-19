@@ -22,63 +22,6 @@
 namespace indexer {
 namespace {
 
-// Find the entity id of `canon_decl` that resides in the current fragment
-// on which the serializer is operating. Token contexts from PASTA store the
-// canonical (typically first) declaration, but we generally want the version
-// of the declaration that is inside of the fragment itself, so here we go from
-// canonical back to specific.
-//
-// TODO(pag): Eventually, we should change the serialized representation of
-//            token contexts to store full 64-bit entity IDs. Right now, they
-//            store offsets of things in the fragments, hence the actual need
-//            to go canonical->specific in the first place, and why a failure to
-//            do so results in `kInvalidEntityId` instead of just falling back
-//            on the ID of the canonical decl.
-static mx::RawEntityId IdOfRedeclInFragment(
-    const EntityMapper &em, mx::RawEntityId frag_index,
-    const pasta::Decl &canon_decl) {
-
-  mx::RawEntityId eid = em.EntityId(canon_decl);
-  auto ret_id = eid;
-  auto decl_id = mx::EntityId(eid).Extract<mx::DeclId>();
-  if (!decl_id) {
-    return mx::kInvalidEntityId;
-  }
-
-  // Don't scan redeclarations if we don't have to.
-  if (decl_id->fragment_id == frag_index) {
-    return eid;
-  }
-
-  for (pasta::Decl redecl : canon_decl.Redeclarations()) {
-    eid = em.EntityId(redecl);
-    decl_id = mx::EntityId(eid).Extract<mx::DeclId>();
-
-    // Note: Redecls of the canonical decl can be in the different
-    //       fragment. In such case move to next redecls. An example
-    //       could be a friend class:
-    //          class __attribute__((__visibility__("default"))) A;
-    //          class B {
-    //            friend class __attribute__((__visibility__("default"))) A;
-    //          };
-    if (!decl_id) {
-      continue;
-    }
-
-    // If we come across a definition, then reference it if we're not able
-    // to reference a redecl that's in the right fragment.
-    if (IsDefinition(redecl)) {
-      ret_id = eid;
-    }
-
-    if (decl_id->fragment_id == frag_index) {
-      return eid;
-    }
-  }
-
-  return ret_id;
-}
-
 struct PendingTokenContext {
   mx::RawEntityId entity_id{mx::kInvalidEntityId};
   bool is_alias{false};
@@ -109,6 +52,15 @@ class TokenContextSaver {
 
  public:
 
+  bool TokenIsInFragment(const pasta::PrintedToken &tok) const {
+    if (!fragment_index) {
+      return true;  // We're persisting type tokens.
+    }
+
+    auto pid = mx::EntityId(em.EntityId(tok)).Extract<mx::ParsedTokenId>();
+    return pid && pid->fragment_id == fragment_index;
+  }
+
   TokenContextSaver(const EntityMapper &em_,
                     const pasta::PrintedTokenRange &tokens_,
                     mx::RawEntityId fragment_index_)
@@ -129,23 +81,16 @@ class TokenContextSaver {
 unsigned TokenContextSaver::CollectContextsFromTokens(void) {
   auto num_tokens = 0u;
   for (pasta::PrintedToken tok : tokens) {
+
+    // Don't save token contexts for tokens that are part of a nested fragment.
+    if (!TokenIsInFragment(tok)) {
+      continue;
+    }
+
     ++num_tokens;
 
     for (pasta::TokenContext context : TokenContexts(tok)) {
       auto unaliased_context = UnaliasedContext(context);
-
-      // NOTE(pag): PASTA stored the canonical decl in the decl context, so
-      //            it's not likely to be in the current fragment.
-      if (fragment_index && context.Kind() == pasta::TokenContextKind::kDecl) {
-        if (auto decl = pasta::Decl::From(unaliased_context)) {
-          const mx::RawEntityId eid =
-              IdOfRedeclInFragment(em, fragment_index, *decl);
-          if (eid != mx::kInvalidEntityId) {
-            contexts[eid].insert(context);
-          }
-        }
-      }
-
 #define ADD_ENTITY_TO_CONTEXT(type_name, lower_name) \
       if (auto lower_name ## _ = pasta::type_name::From(unaliased_context)) { \
         const mx::RawEntityId eid = em.EntityId(*lower_name ## _); \
@@ -278,6 +223,10 @@ void TokenContextSaver::Persist(ContextListBuilder tcb_list,
   auto num_tokens = 0u;
   for (pasta::PrintedToken tok : tokens) {
 
+    if (!TokenIsInFragment(tok)) {
+      continue;
+    }
+
     // `0` is an invalid value. A low bit of `1` means "present".
     tco_list.set(num_tokens, 0u);
 
@@ -336,12 +285,20 @@ void TokenContextSaver::Persist(ContextListBuilder tcb_list,
 
 }  // namespace
 
-void PersistTokenContexts(
-    const EntityMapper &em, const pasta::PrintedTokenRange &parsed_tokens,
-    mx::RawEntityId frag_index, mx::rpc::Fragment::Builder &fb) {
+void PersistTokenContexts(const PendingFragment &pf,
+                          mx::rpc::Fragment::Builder &fb) {
 
-  TokenContextSaver tcs(em, parsed_tokens, frag_index);
+  TokenContextSaver tcs(pf.em, pf.parsed_tokens, pf.fragment_index);
+
+#ifndef NDEBUG
+  for (auto tok : pf.parsed_tokens) {
+    CHECK_EQ(tcs.TokenIsInFragment(tok),
+             !pf.token_to_nested_fragment.contains(RawEntity(tok)));
+  }
+#endif
+
   auto num_tokens = tcs.CollectContextsFromTokens();
+  CHECK_EQ(pf.num_parsed_tokens, num_tokens);
   auto num_contexts = tcs.ConvertContextsToPendingContexts();
   tcs.ResolveAliases();
   tcs.Persist(fb.initParsedTokenContexts(num_contexts),

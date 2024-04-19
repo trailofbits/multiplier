@@ -13,6 +13,7 @@
 #include <fstream>
 #include <glog/logging.h>
 #include <iostream>
+#include <iterator>
 #include <kj/io.h>
 #include <multiplier/AST.h>
 #include <multiplier/Frontend.h>
@@ -100,8 +101,7 @@ extern void LinkEntityNamesToFragment(
     mx::DatabaseWriter &db, const PendingFragment &pf);
 
 extern void PersistTokenContexts(
-    const EntityMapper &em, const pasta::PrintedTokenRange &parsed_tokens,
-    mx::RawEntityId frag_index, mx::rpc::Fragment::Builder &fb);
+    const PendingFragment &pf, mx::rpc::Fragment::Builder &fb);
 
 namespace {
 
@@ -209,32 +209,31 @@ namespace {
 // that was originall missing between those parsed tokens, so we want to see
 // those too.
 struct TokenTreeSerializationSchedule {
-  struct Todo {
-    const void *parent;
-    mx::RawEntityId parent_id;
-    bool is_part_of_define{false};
-    TokenTreeNodeRange nodes;
-  };
-
   PendingFragment &pf;
   EntityMapper &em;
 
-  std::vector<Todo> todo_list;
   std::vector<TokenTreeNode> tokens;
-
-  size_t num_parsed_tokens{0u};
+  std::vector<TokenTreeNode> macro_tokens;
 
   // Maps parsed tokens to the macro in which they are contained.
   std::vector<mx::RawEntityId> containing_macro;
 
-  mx::RawEntityId RecordEntityId(const TokenTree &tt,
+  mx::RawEntityId RecordEntityId(TokenTree tt,
                                  bool &is_part_of_define,
                                  bool &is_part_of_fragment) {
 
     const void *raw_tt = RawEntity(tt);
     const void *raw_locator = raw_tt;
 
-    if (auto macro = tt.Macro()) {
+    // Nested fragment.
+    if (auto frag_id = tt.NestedFragmentId()) {
+      is_part_of_fragment = false;  // Don't visit deeper in `Schedule`.
+      auto fid = frag_id->Pack();
+      em.token_tree_ids.emplace(raw_tt, fid);
+      return fid;
+    
+    // Macro.
+    } else if (auto macro = tt.Macro()) {
       CHECK(tt.Kind() == mx::FromPasta(macro->Kind()));
       if (!pf.parsed_tokens_are_printed) {
         raw_locator = RawEntity(macro.value());
@@ -242,13 +241,6 @@ struct TokenTreeSerializationSchedule {
       } else {
         CHECK(!pasta::MacroDirective::From(macro.value()));
       }
-    
-    // Nested fragment.
-    } else if (auto frag_id = tt.NestedFragmentId()) {
-      is_part_of_fragment = false;  // Don't visit deeper in `Schedule`.
-      auto fid = frag_id->Pack();
-      em.token_tree_ids.emplace(raw_tt, fid);
-      return fid;
     }
 
     auto &entity_list = pf.EntityListFor(tt);
@@ -272,7 +264,7 @@ struct TokenTreeSerializationSchedule {
       if (is_part_of_fragment) {
         CHECK_LT(id.offset, entity_list.size());
         CHECK(!entity_list[id.offset].has_value());
-        entity_list[id.offset] = tt;
+        entity_list[id.offset] = std::move(tt);
       }
 
     // We need to form a new macro id for something we discovered along the way.
@@ -285,7 +277,7 @@ struct TokenTreeSerializationSchedule {
           << "Likely MacroId offset overflow: " << id.offset;
 
       // Add it to our to-serialize list.
-      entity_list.push_back(tt);
+      entity_list.emplace_back(std::move(tt));
     }
 
     // Update `is_part_of_define` by reference so that macro tokens and nodes
@@ -312,15 +304,16 @@ struct TokenTreeSerializationSchedule {
     return raw_id;
   }
 
-  mx::RawEntityId RecordEntityId(const TokenTreeNode &node,
+  mx::RawEntityId RecordEntityId(TokenTreeNode node,
                                  mx::RawEntityId parent_id,
                                  bool &is_part_of_define,
                                  bool &is_part_of_fragment) {
     mx::RawEntityId raw_id = mx::kInvalidEntityId;
     const void *raw_pt = nullptr;
+    const void *raw_tt = RawEntity(node);
 
     if (std::optional<TokenTree> sub = node.SubTree()) {
-      raw_id = RecordEntityId(sub.value(), is_part_of_define,
+      raw_id = RecordEntityId(std::move(sub.value()), is_part_of_define,
                               is_part_of_fragment);
 
     // Fill in IDs for derived tokens.
@@ -328,16 +321,21 @@ struct TokenTreeSerializationSchedule {
       mx::MacroTokenId id;
       id.kind = mx::TokenKind::UNKNOWN;
       id.fragment_id = pf.fragment_index;
-      id.offset = static_cast<unsigned>(tokens.size());
 
       std::optional<pasta::PrintedToken> gt = node.PrintedToken();
       std::optional<pasta::MacroToken> mt = node.MacroToken();
       std::optional<pasta::Token> pt = node.Token();
 
+      mx::VariantId vid;
+
       if (gt) {
-        id.kind = TokenKindFromPasta(gt.value());
         auto raw_gt = RawEntity(gt.value());
-        CHECK(em.token_tree_ids.contains(raw_gt));
+        CHECK(!pf.token_to_nested_fragment.count(raw_gt));
+
+        id.kind = TokenKindFromPasta(gt.value());
+
+        vid = mx::EntityId(em.token_tree_ids[raw_gt]).Unpack();
+        CHECK(std::holds_alternative<mx::ParsedTokenId>(vid));
 
         // NOTE(pag): Can't set `raw_gt` or `raw_tt` to `raw_pt` because this
         //            goes into the `EntityMapper::entity_ids`, which is global,
@@ -371,6 +369,22 @@ struct TokenTreeSerializationSchedule {
         raw_pt = RawEntity(pt.value());
       }
 
+      // This is a parsed token, the offset for the macro token ID has to
+      // exactly overlap with the parsed token.
+      if (std::holds_alternative<mx::ParsedTokenId>(vid)) {
+        id.offset = std::get<mx::ParsedTokenId>(vid).offset;
+
+        CHECK_EQ(id.offset, tokens.size());
+        tokens.emplace_back(std::move(node));
+
+      // This is a macro use/intermediate token, it needs to come after all
+      // of the parsed tokens.
+      } else {
+        id.offset = pf.num_parsed_tokens +
+                    static_cast<mx::EntityOffset>(macro_tokens.size());
+        macro_tokens.emplace_back(std::move(node));
+      }
+
       raw_id = mx::EntityId(id).Pack();
       CHECK_NE(raw_id, mx::kInvalidEntityId)
           << "Likely MacroTokenId offset overflow: " << id.offset;
@@ -380,10 +394,8 @@ struct TokenTreeSerializationSchedule {
       }
 
       containing_macro.push_back(parent_id);
-      tokens.emplace_back(node);
     }
 
-    auto raw_tt = RawEntity(node);
     CHECK(em.token_tree_ids.emplace(raw_tt, raw_id).second);
 
     // Make sure `#define` macro body tokens are globally visible to provenance,
@@ -396,17 +408,18 @@ struct TokenTreeSerializationSchedule {
     return raw_id;
   }
 
-  // Schedule the expansions so that all "afters" are properly nested. We want
-  // this so that `fragment.parsed_tokens().data()` reflects the final result
-  // of macro expansion.
+  // Recursively visit the nodes in the token tree, and give them all IDs. The
+  // parsed tokens will all come first.
   void Schedule(const void * /* parent */, mx::RawEntityId parent_id,
-                bool is_part_of_define, const TokenTreeNodeRange &nodes) {
+                bool is_part_of_define, TokenTreeNodeRange nodes) {
 
     for (TokenTreeNode node : nodes) {
 
       bool is_part_of_fragment = true;
+
+      std::optional<TokenTree> sub = node.SubTree();
       mx::RawEntityId child_id = RecordEntityId(
-          node, parent_id, is_part_of_define, is_part_of_fragment);
+          std::move(node), parent_id, is_part_of_define, is_part_of_fragment);
 
       // If this is a macro directive that is nested inside of another fragment,
       // then assume that we've already extracted the directive from that other
@@ -415,37 +428,34 @@ struct TokenTreeSerializationSchedule {
         continue;
       }
 
-      if (std::optional<TokenTree> sub = node.SubTree()) {
-
-        const void *child = RawEntity(sub.value());
-
-        if (sub->HasExpansion()) {
-          Schedule(child, child_id, is_part_of_define,
-                   sub->ReplacementChildren());
-          if (sub->HasIntermediateChildren()) {
-            todo_list.emplace_back(Todo{
-                child, child_id, is_part_of_define,
-                sub->IntermediateChildren()});
-          }
-          todo_list.emplace_back(Todo{child, child_id, is_part_of_define,
-                                 sub->Children()});
-        } else {
-          Schedule(child, child_id, is_part_of_define, sub->Children());
-        }
+      if (!sub) {
+        continue;
       }
-    }
-  }
 
-  void Schedule(const Todo &todo) {
-    Schedule(todo.parent, todo.parent_id, todo.is_part_of_define, todo.nodes);
+      const void *child = RawEntity(sub.value());
+
+      Schedule(child, child_id, is_part_of_define, sub->Children());
+
+      if (!sub->HasExpansion()) {
+        continue;
+      }
+
+      if (sub->HasIntermediateChildren()) {
+        Schedule(
+            child, child_id, is_part_of_define,
+            sub->IntermediateChildren());
+      }
+
+      Schedule(child, child_id, is_part_of_define,
+               sub->ReplacementChildren());
+    }
   }
 
   void Schedule(TokenTreeNodeRange nodes) {
     Schedule(nullptr, mx::kInvalidEntityId, false, std::move(nodes));
-    num_parsed_tokens = tokens.size();
-    for (auto i = 0u; i < todo_list.size(); ++i) {
-      Schedule(todo_list[i]);
-    }
+    CHECK_EQ(tokens.size(), pf.num_parsed_tokens);
+    tokens.insert(tokens.end(), std::make_move_iterator(macro_tokens.begin()),
+                  std::make_move_iterator(macro_tokens.end()));
   }
 
   TokenTreeSerializationSchedule(PendingFragment &pf_)
@@ -465,7 +475,7 @@ static void PersistParsedTokens(
   provenance.Run(pf.fragment_index, pf.parsed_tokens);
 
   unsigned num_parsed_tokens = static_cast<unsigned>(pf.parsed_tokens.size());
-  CHECK_EQ(num_parsed_tokens, pf.em.next_parsed_token_index);
+  CHECK_EQ(num_parsed_tokens, pf.num_parsed_tokens);
 
   unsigned num_tokens = num_parsed_tokens;
   auto tk = fb.initTokenKinds(num_tokens);
@@ -553,14 +563,13 @@ static void PersistTokenTree(
 // #endif
 
   // TODO(pag): Fix `num_parsed_tokens`.
-  unsigned num_parsed_tokens = static_cast<unsigned>(sched.num_parsed_tokens);
+  unsigned num_parsed_tokens = static_cast<unsigned>(pf.num_parsed_tokens);
   unsigned num_tokens = static_cast<unsigned>(sched.tokens.size());
 
   // As a result of nested fragments, the number of tokens in `pf.parsed_tokens`
   // might over-estimate the number of tokens in the fragment itself. The
   // entity labeller and the `TokenTree` code need to agree on the calculation
   // of the number of such tokens.
-  CHECK_EQ(num_parsed_tokens, em.next_parsed_token_index);
   CHECK_LE(num_parsed_tokens, pf.parsed_tokens.size());
   CHECK_LE(num_parsed_tokens, num_tokens);
 
@@ -900,7 +909,7 @@ void GlobalIndexingState::PersistFragment(
     PersistParsedTokens(pf, fb, provenance);
   }
 
-  PersistTokenContexts(em, pf.parsed_tokens, pf.fragment_index, fb);
+  PersistTokenContexts(pf, fb);
   LinkEntitiesAcrossFragments(database, pf, mangler);
   LinkExternalReferencesInFragment(ast, database, pf);
   LinkEntityNamesToFragment(database, pf);

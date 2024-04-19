@@ -20,23 +20,12 @@
 namespace indexer {
 namespace {
 
-static bool IsAcceptableRepeatedToken(const pasta::Token &tok) {
-  switch (tok.Kind()) {
-    case pasta::TokenKind::kUnknown:
-    case pasta::TokenKind::kKeyword__Attribute:
-    case pasta::TokenKind::kKeyword__Declspec:
-    case pasta::TokenKind::kLParenthesis:
-    case pasta::TokenKind::kRParenthesis:
-      return true;
-    default:
-      return false;
-  }
-}
-
 // Figure out the fragment index of a given token.
-static bool IdentifyAsNestedFragmentToken(
+static std::optional<mx::PackedFragmentId> IdentifyAsNestedFragmentToken(
     PendingFragment &pf, const pasta::PrintedToken &tok,
     bool might_have_nested_fragments) {
+
+#define D(...)
 
   auto frag_index = pf.fragment_index;
 
@@ -45,14 +34,14 @@ static bool IdentifyAsNestedFragmentToken(
   // the token contexts.
   if (pf.parsed_tokens_are_printed) {
 
-    std::cerr << tok.Index() << ' ' << tok.Data() << '\n';
+    D( std::cerr << tok.Index() << ' ' << tok.Data() << '\n'; )
 
     mx::RawEntityId parent_frag_index = pf.fragment_index;
     if (pf.raw_parent_entity) {
       auto parent_eid = pf.em.EntityId(pf.raw_parent_entity);
       if (auto parent_did = mx::EntityId(parent_eid).Extract<mx::DeclId>()) {
         parent_frag_index = parent_did->fragment_id;
-        std::cerr << "\tparent frag index is " << parent_frag_index << '\n';
+        D( std::cerr << "\tparent frag index is " << parent_frag_index << '\n'; )
       }
     }
 
@@ -63,14 +52,14 @@ static bool IdentifyAsNestedFragmentToken(
       }
 
       if (pasta::TokenContextKind::kDecl != kind) {
-        std::cerr << "\tresetting on " << ctx.KindName() << '\n';
+        D( std::cerr << "\tresetting on " << ctx.KindName() << '\n'; )
         frag_index = pf.fragment_index;
         continue;
       }
 
       auto did = mx::EntityId(pf.em.EntityId(ctx.Data())).Extract<mx::DeclId>();
       if (!did) {
-        std::cerr << "\tno decl id\n";
+        D( std::cerr << "\tno decl id\n"; )
         continue;
       }
 
@@ -78,20 +67,21 @@ static bool IdentifyAsNestedFragmentToken(
 
       if (decl_frag_index == pf.fragment_index) {
         if (frag_index != pf.fragment_index) {
-          std::cerr << "\t\texiting on next same frag\n";
+          D( std::cerr << "\t\texiting on next same frag\n"; )
           break;
         }
-        std::cerr << "\t\tsame frag: " << pf.fragment_index << '\n';
+
+        D( std::cerr << "\t\tsame frag: " << pf.fragment_index << '\n'; )
         break;
       }
 
       if (decl_frag_index == parent_frag_index) {
-        std::cerr << "\t\texiting to parent frag\n";
+        D( std::cerr << "\t\texiting to parent frag\n"; )
         frag_index = pf.fragment_index;
         break;
       }
 
-      std::cerr << "\t\tfound: " << decl_frag_index << '\n';
+      D( std::cerr << "\t\tfound: " << decl_frag_index << '\n'; )
       frag_index = decl_frag_index;
     }
 
@@ -102,7 +92,7 @@ static bool IdentifyAsNestedFragmentToken(
     auto pt = tok.DerivedLocation();
     if (!pt) {
       assert(false);
-      return false;
+      return std::nullopt;
     }
 
     // Find the largest interval that is contained within `pf` that contains
@@ -125,18 +115,49 @@ static bool IdentifyAsNestedFragmentToken(
         });
 
   } else {
-    return false;
+      return std::nullopt;
   }
 
   if (frag_index == pf.fragment_index) {
-    return false;
+      return std::nullopt;
   }
 
-  pf.token_to_nested_fragment.emplace(
-      RawEntity(tok), mx::FragmentId(frag_index));
-  return true;
+  return mx::FragmentId(frag_index);
 }
 
+// Search for gaps between two tokens identified in the same nested fragment,
+// and then fill them.
+static void IdentifyNestedFragmentTokens(
+    PendingFragment &pf, bool might_have_nested_fragments) {
+
+  if (!pf.parsed_tokens_are_printed && !might_have_nested_fragments) {
+    return;
+  }
+
+  std::optional<std::pair<mx::EntityOffset, mx::PackedFragmentId>> prev;
+
+  for (auto tok : pf.parsed_tokens) {
+    auto fid = IdentifyAsNestedFragmentToken(
+        pf, tok, might_have_nested_fragments);
+
+    if (!fid) {
+      continue;
+    }
+
+    auto ti = tok.Index();
+    if (prev && (prev->first + 1u) < ti && prev->second == fid.value()) {
+      for (auto i = prev->first + 1u; i < ti; ++i) {
+        pf.token_to_nested_fragment.emplace(
+            RawEntity(pf.parsed_tokens[i]), fid.value());
+      }
+    }
+
+    pf.token_to_nested_fragment.emplace(RawEntity(tok), fid.value());
+
+    prev.reset();
+    prev.emplace(ti, fid.value());
+  }
+}
 
 // Labels entities (decls, stmts, types, tokens). The idea here is that in
 // `rpc::Fragment`, which is derived from a Cap'n Proto schema, we have a
@@ -222,8 +243,7 @@ class EntityLabeller final : public EntityVisitor {
   // NOTE(pag): This labeling process is tightly coupled with how tokens are
   //            serialized into fragments, and how token trees are serialized
   //            into fragments.
-  bool Label(const pasta::PrintedToken &entity,
-             bool might_have_nested_templates);
+  bool Label(const pasta::PrintedToken &entity);
 
   // Create initial macro IDs for all of the top-level macros in the range of
   // this fragment.
@@ -294,63 +314,35 @@ bool EntityLabeller::ShouldLabelDecl(const pasta::Decl &decl) {
 // NOTE(pag): This labeling process is tightly coupled with how tokens are
 //            serialized into fragments, and how token trees are serialized
 //            into fragments.
-bool EntityLabeller::Label(const pasta::PrintedToken &entity,
-                           bool might_have_nested_fragments) {
-  CHECK(fragment.parsed_tokens.Contains(entity));
+bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
+  auto raw_entity = RawEntity(entity);
 
   // Figure out if this token is in a sub-range of tokens belonging to a
   // nested fragment.
-  if (IdentifyAsNestedFragmentToken(
-          fragment, entity, might_have_nested_fragments)) {
+  if (fragment.token_to_nested_fragment.count(raw_entity)) {
     return false;
   }
 
   mx::ParsedTokenId id;    
-  id.offset = fragment.em.next_parsed_token_index++;
+  id.offset = fragment.num_parsed_tokens++;
   id.fragment_id = fragment.fragment_index;
   id.kind = TokenKindFromPasta(entity);
 
-  CHECK(em.token_tree_ids.emplace(RawEntity(entity), id).second);
+  CHECK(em.token_tree_ids.emplace(raw_entity, id).second);
 
-  if (std::optional<pasta::Token> pt = entity.DerivedLocation()) {
-
-    // NOTE(pag): This can happen where a printed attribute ends up referring
-    //            back to a macro directive marker, where the macro directive
-    //            is something like the following:
-    //
-    //    #pragma clang attribute push(__attribute__((...)), apply_to=...)
-    //
-    //            These kinds of attributes are annoying because they don't
-    //            communicate that they were implicitly applied.
-    if (!IsParsedToken(pt.value())) {
-      CHECK(pt->Role() == pasta::TokenRole::kMacroDirectiveMarker);
-      return true;
-    }
-
-    auto raw_pt = RawEntity(pt.value());
-
-    // NOTE(pag): We may see the same token come up multiple times, especially
-    //            if this is purely printed tokens, rather than parsed tokens
-    //            aligned with printed tokens. A good example is that the
-    //            pure pretty-printed code will separately print the syntax for
-    //            each attribute in its own `__attribute__` block, whereas in
-    //            the pasrsed source code, multiple attributes may belong to the
-    //            same syntactical block.
-    if (!em.token_tree_ids.emplace(raw_pt, id).second) {
-      LOG_IF(WARNING, !IsAcceptableRepeatedToken(pt.value()))
-            << "Token kind " << pt.value().KindName()
-            << " is repeated and exist in the token tree!";
-    }
+  std::optional<pasta::Token> pt = entity.DerivedLocation();
+  if (!pt) {
+    return true;
   }
 
-  // // If we didn't just add the token, then we should be in the nested fragment
-  // // case, and we want to overwrite the token id.
-  // if (!res.second) {
-  //   mx::EntityId prev_id(res.first->second);
-  //   CHECK_NE(prev_id.Extract<mx::ParsedTokenId>()->fragment_id,
-  //            fragment.fragment_index);
-  //   res.first->second = id;
-  // }
+  // NOTE(pag): We may see the same token come up multiple times, especially
+  //            if this is purely printed tokens, rather than parsed tokens
+  //            aligned with printed tokens. A good example is that the
+  //            pure pretty-printed code will separately print the syntax for
+  //            each attribute in its own `__attribute__` block, whereas in
+  //            the pasrsed source code, multiple attributes may belong to the
+  //            same syntactical block.
+  em.token_tree_ids.emplace(RawEntity(pt.value()), id);
 
   return true;
 }
@@ -462,10 +454,12 @@ void LabelTokensAndMacrosInFragment(PendingFragment &pf) {
       pf.file_location.has_value() &&
       (pf.first_parsed_token_index + 2u) <= pf.last_parsed_token_index;
 
+  IdentifyNestedFragmentTokens(pf, might_have_nested_fragments);
+
   // Visit all of the tokens; it's possible we came across something that was
   // missed by the above process.
   for (auto tok : pf.parsed_tokens) {
-    (void) labeller.Label(tok, might_have_nested_fragments);
+    (void) labeller.Label(tok);
   }
 
   CHECK(labeller.next_decls.empty());

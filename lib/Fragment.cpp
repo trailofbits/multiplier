@@ -281,45 +281,65 @@ gap::generator<PreprocessedEntity> Fragment::preprocessed_code(void) const & {
       // NOTE(pag): We don't check for fragments matching as we might have
       //            macros (e.g. `#define` in nested macros that we inject as
       //            top-level macros).
-      if (eptr) {
-        co_yield Macro(std::move(eptr));
-      } else {
+      if (!eptr) {
         assert(false);
+        continue;
       }
+      
+      co_yield Macro(std::move(eptr));
 
     } else if (std::holds_alternative<MacroTokenId>(vid)) {
       MacroTokenId tid = std::get<MacroTokenId>(vid);
-      if (tid.fragment_id == impl->fragment_id &&
-          tid.offset < impl->num_tokens) {
-        co_yield Token(impl->MacroTokenReader(impl), tid.offset);
-      } else {
+      if (tid.fragment_id != impl->fragment_id ||
+          tid.offset >= impl->num_tokens) {
         assert(false);
+        continue;
       }
+
+      co_yield Token(impl->MacroTokenReader(impl), tid.offset);
 
     } else if (std::holds_alternative<ParsedTokenId>(vid)) {
       ParsedTokenId tid = std::get<ParsedTokenId>(vid);
-      if (tid.fragment_id == impl->fragment_id &&
-          tid.offset < impl->num_parsed_tokens) {
-        co_yield Token(impl->ParsedTokenReader(impl), tid.offset);
-      } else {
+      if (tid.fragment_id != impl->fragment_id ||
+          tid.offset >= impl->num_parsed_tokens) {
         assert(false);
+        continue;
       }
+
+      co_yield Token(impl->ParsedTokenReader(impl), tid.offset);
 
     // File tokens can come up via whitespace injection.
     } else if (std::holds_alternative<FileTokenId>(vid)) {
       FileTokenId tid = std::get<FileTokenId>(vid);
       FileId fid(tid.file_id);
-      FileImplPtr file = ep->FileFor(ep, fid);
-      if (!file) {
+      FileImplPtr eptr = ep->FileFor(ep, fid);
+      if (!eptr) {
         assert(false);
         continue;
       }
 
-      if (tid.offset < file->num_tokens) {
-        co_yield Token(file->TokenReader(file), tid.offset);
-      } else {
+      if (tid.offset >= eptr->num_tokens) {
         assert(false);
+        continue;
       }
+
+      co_yield Token(eptr->TokenReader(eptr), tid.offset);
+
+    // Nested fragment.
+    } else if (std::holds_alternative<FragmentId>(vid)) {
+      FragmentId fid = std::get<FragmentId>(vid);
+      if (fid.fragment_id == impl->fragment_id) {
+        assert(false);
+        continue;
+      }
+
+      FragmentImplPtr eptr = ep->FragmentFor(ep, eid);
+      if (!eptr) {
+        assert(false);
+        continue;
+      }
+
+      co_yield Fragment(std::move(eptr));
 
     } else {
       //assert(false);
