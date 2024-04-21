@@ -128,7 +128,7 @@ static PyGetSetDef gProperties[] = {
     "intermediate_children",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->intermediate_children());
+          return ::mx::generator_to_python(*T_cast(self), &T::intermediate_children);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::MacroExpansion::intermediate_children"),
@@ -158,7 +158,7 @@ static PyGetSetDef gProperties[] = {
     "arguments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->arguments());
+          return ::mx::generator_to_python(*T_cast(self), &T::arguments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::MacroExpansion::arguments"),

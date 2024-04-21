@@ -128,7 +128,7 @@ static PyGetSetDef gProperties[] = {
     "offsets",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->offsets());
+          return ::mx::generator_to_python(*T_cast(self), &T::offsets);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::memref::SubViewOp::offsets"),
@@ -138,7 +138,7 @@ static PyGetSetDef gProperties[] = {
     "sizes",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sizes());
+          return ::mx::generator_to_python(*T_cast(self), &T::sizes);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::memref::SubViewOp::sizes"),
@@ -148,7 +148,7 @@ static PyGetSetDef gProperties[] = {
     "strides",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->strides());
+          return ::mx::generator_to_python(*T_cast(self), &T::strides);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::memref::SubViewOp::strides"),
@@ -168,7 +168,7 @@ static PyGetSetDef gProperties[] = {
     "dynamic_sizes",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->dynamic_sizes());
+          return ::mx::generator_to_python(*T_cast(self), &T::dynamic_sizes);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::memref::SubViewOp::dynamic_sizes"),

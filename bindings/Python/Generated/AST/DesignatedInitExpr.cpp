@@ -138,7 +138,7 @@ static PyGetSetDef gProperties[] = {
     "designators",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->designators());
+          return ::mx::generator_to_python(*T_cast(self), &T::designators);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::DesignatedInitExpr::designators"),
@@ -208,7 +208,7 @@ static PyGetSetDef gProperties[] = {
     "sub_expressions",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sub_expressions());
+          return ::mx::generator_to_python(*T_cast(self), &T::sub_expressions);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::DesignatedInitExpr::sub_expressions"),

@@ -192,6 +192,7 @@ inline static bool ShouldHideFromIndexer(const T &) {
 const void *RawEntity(const pasta::Token &entity);
 const void *RawEntity(const pasta::PrintedToken &entity);
 const void *RawEntity(const pasta::File &entity);
+const void *RawEntity(const pasta::FileToken &entity);
 const void *RawEntity(const pasta::Decl &entity);
 const void *RawEntity(const pasta::DeclContext &entity);
 const void *RawEntity(const pasta::Stmt &entity);
@@ -204,6 +205,7 @@ const void *RawEntity(const pasta::TemplateArgument &entity);
 const void *RawEntity(const pasta::TemplateParameterList &entity);
 const void *RawEntity(const TokenTree &entity);
 const void *RawEntity(const TokenTreeNode &entity);
+const void *RawEntity(const pasta::DerivedToken &entity);
 
 template <typename T>
 inline static const void *RawEntity(const std::optional<T> &entity) {

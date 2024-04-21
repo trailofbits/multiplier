@@ -128,7 +128,7 @@ static PyGetSetDef gProperties[] = {
     "arg_operands",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->arg_operands());
+          return ::mx::generator_to_python(*T_cast(self), &T::arg_operands);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::hl::CallOp::arg_operands"),
@@ -138,7 +138,7 @@ static PyGetSetDef gProperties[] = {
     "results",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->results());
+          return ::mx::generator_to_python(*T_cast(self), &T::results);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::hl::CallOp::results"),

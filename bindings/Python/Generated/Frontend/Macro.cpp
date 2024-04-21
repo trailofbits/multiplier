@@ -254,7 +254,7 @@ static PyGetSetDef gProperties[] = {
     "generate_use_tokens",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->generate_use_tokens());
+          return ::mx::generator_to_python(*T_cast(self), &T::generate_use_tokens);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Macro::generate_use_tokens"),
@@ -274,7 +274,7 @@ static PyGetSetDef gProperties[] = {
     "generate_expansion_tokens",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->generate_expansion_tokens());
+          return ::mx::generator_to_python(*T_cast(self), &T::generate_expansion_tokens);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Macro::generate_expansion_tokens"),
@@ -304,7 +304,7 @@ static PyGetSetDef gProperties[] = {
     "children",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->children());
+          return ::mx::generator_to_python(*T_cast(self), &T::children);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Macro::children"),

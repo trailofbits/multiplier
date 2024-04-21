@@ -174,7 +174,8 @@ static std::optional<bool> EndsWithEmptyVAArgs(
 static std::optional<MacroExpansion> TrailingExpansionInExpansion(
     const MacroExpansion &exp) {
   std::optional<MacroExpansion> ret;
-  for (PreprocessedEntity mt : exp.replacement_children()) {
+  auto replacement_children = exp.replacement_children();
+  for (PreprocessedEntity mt : replacement_children) {
     ret.reset();
     if (std::holds_alternative<Macro>(mt)) {
       ret = MacroExpansion::from(std::get<Macro>(mt));
@@ -215,13 +216,15 @@ static void FlattenExpansionUses(
         } else if (out_orig.size() == out.size()) {
           out_orig.emplace_back();
         }
-        for (PreprocessedEntity sub_mt : m.children()) {
+        auto children = m.children();
+        for (PreprocessedEntity sub_mt : children) {
           FlattenExpansionUses(std::move(sub_mt), depth + 1u, out, out_orig);
         }
         break;
       }
       case MacroKind::ARGUMENT: {
-        for (PreprocessedEntity sub_mt : m.children()) {
+        auto children = m.children();
+        for (PreprocessedEntity sub_mt : children) {
           FlattenExpansionUses(std::move(sub_mt), depth, out, out_orig);
         }
         break;
@@ -238,7 +241,8 @@ static void FlattenExpansionUses(
     }
   } else if (std::holds_alternative<Fragment>(mt)) {
     Fragment f = std::move(std::get<Fragment>(mt));
-    for (PreprocessedEntity sub_mt : f.preprocessed_code()) {
+    auto children = f.preprocessed_code();
+    for (PreprocessedEntity sub_mt : children) {
       FlattenExpansionUses(std::move(sub_mt), depth + 1u, out, out_orig);
     }
   } else {
@@ -269,7 +273,8 @@ static void GenerateVAOptChildrenInto(
     return;
   }
 
-  for (PreprocessedEntity mt : va_opt.children()) {
+  auto children = va_opt.children();
+  for (PreprocessedEntity mt : children) {
     if (Macro *m = std::get_if<Macro>(&mt);
         m && m->kind() == MacroKind::VA_OPT_ARGUMENT) {
       out_orig.emplace_back(mt);
@@ -967,11 +972,13 @@ void TokenTreeImpl::MacroExpansionProcessor::Init(
   merged_children.clear();
   body_has_trailing_comment = false;
 
-  for (PreprocessedEntity mt : me.replacement_children()) {
+  auto replacement_children = me.replacement_children();
+  for (PreprocessedEntity mt : replacement_children) {
     FlattenExpansionUses(std::move(mt), 0u, after_children, after_use);
   }
 
-  for (PreprocessedEntity mt : me.intermediate_children()) {
+  auto intermediate_children = me.intermediate_children();
+  for (PreprocessedEntity mt : intermediate_children) {
 
     // Expand or eliminate a `__VA_OPT__`.
     //
@@ -1026,7 +1033,8 @@ void TokenTreeImpl::MacroExpansionProcessor::Init(
   // substitution, etc. So, we'll just collect the raw tokens from the macro
   // body.
   if (body_children.empty()) {
-    for (PreprocessedEntity mt : def.body()) {
+    auto body = def.body();
+    for (PreprocessedEntity mt : body) {
       body_use.emplace_back(mt);
       body_children.emplace_back(std::move(mt));
     }
@@ -1274,7 +1282,8 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::TopLevelUseBounds(
     const Macro &exp) {
   Bounds ret = {};
   Token last_tok;
-  for (Token tok : exp.generate_use_tokens()) {
+  auto use_tokens = exp.generate_use_tokens();
+  for (Token tok : use_tokens) {
     if (Token file_tok = tok.file_token()) {
       if (!last_tok) {
         TokenIndex ti = GetOrCreateIndex(file_tok);
@@ -1384,7 +1393,8 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
   Bounds ret = {};
   Token last_tok;
 
-  for (PreprocessedEntity mt : def.body()) {
+  auto body = def.body();
+  for (PreprocessedEntity mt : body) {
     if (std::holds_alternative<Token>(mt)) {
       if (Token file_tok = std::get<Token>(mt).file_token()) {
         if (!last_tok) {
@@ -1675,7 +1685,8 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
 
   last_sequence = &dummy_sequence;
   SequenceNode *after = nullptr;
-  for (const BodyTokenForChild &node : mep.ReplacementChildren()) {
+  const auto &replacement_children = mep.ReplacementChildren();
+  for (const BodyTokenForChild &node : replacement_children) {
     depth = next_depth;
 
     const size_t old_size = after ? after->children.size() : 0u;
@@ -1895,7 +1906,8 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
   last_sequence = &dummy_sequence;
   Token prev_rc;
 
-  for (const BodyTokenForChild &node : mep.ReplacementChildren()) {
+  const auto &replacement_children = mep.ReplacementChildren();
+  for (const BodyTokenForChild &node : replacement_children) {
     depth = next_depth;
 
     const size_t old_size = after ? after->children.size() : 0u;
@@ -2021,7 +2033,8 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
 
   SequenceNode *after = nullptr;
   last_sequence = &dummy_sequence;
-  for (PreprocessedEntity mt : macro.replacement_children()) {
+  auto replacement_children = macro.replacement_children();
+  for (PreprocessedEntity mt : replacement_children) {
     depth = include_dir ? 0u : next_depth;
     after = ExtendWithMacroChild(after, mt, bounds, dummy_trailing_tokens);
     depth = prev_depth;
@@ -2127,7 +2140,8 @@ namespace {
 //            `bin/Index/Util.*`
 static bool IsFloatingDirectiveFragment(const Fragment &frag) {
   auto num_directives = 0u;
-  for (PreprocessedEntity mt : frag.preprocessed_code()) {
+  auto preprocessed_code = frag.preprocessed_code();
+  for (PreprocessedEntity &mt : preprocessed_code) {
     if (!std::holds_alternative<Macro>(mt)) {
       return false;
     }
@@ -2363,7 +2377,8 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
 
   // Collect all overlapping fragments into alternations.
   std::vector<Fragment> floating_frags;
-  for (Fragment frag : entity.fragments()) {
+  auto fragments = entity.fragments();
+  for (Fragment frag : fragments) {
     if (IsFloatingDirectiveFragment(frag)) {
       floating_frags.emplace_back(std::move(frag));
     } else {

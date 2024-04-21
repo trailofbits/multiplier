@@ -20,12 +20,16 @@ namespace {
 using TokensFromPreprocessedEntities = VariantReducer<PreprocessedEntity, Token>;
 
 static void EnterExpansionTokens(TokensFromPreprocessedEntities &reducer,
-                                 const Macro &macro) {
-  if (auto sub = MacroSubstitution::from(macro)) {
-    reducer.Enter(sub->replacement_children());
-  } else {
-    reducer.Enter(macro.children());
-  }
+                                 Macro macro) {
+  reducer.Enter(
+      std::move(macro),
+      +[] (const Macro &m) {
+        if (auto sub = MacroSubstitution::from(m)) {
+          return sub->replacement_children();
+        } else {
+          return m.children();
+        }
+      });
 }
 
 }  // namespace
@@ -123,17 +127,23 @@ TokenRange Macro::expansion_tokens(void) const & {
 }
 
 gap::generator<Token> Macro::generate_use_tokens(void) const & {
-  TokensFromPreprocessedEntities reducer(children());
+  TokensFromPreprocessedEntities reducer;
+  reducer.Enter(*this, +[] (const Macro &m) { return m.children(); });
 
   for (;;) {
     auto tok = reducer.Next(
         [] (TokensFromPreprocessedEntities &r, PreprocessedEntity ppe) {
           if (std::holds_alternative<Token>(ppe)) {
             r.Yield(std::move(std::get<Token>(ppe)));
+
           } else if (std::holds_alternative<Macro>(ppe)) {
-            r.Enter(std::get<Macro>(ppe).children());
+            r.Enter(std::move(std::get<Macro>(ppe)),
+                    +[] (const Macro &m) { return m.children(); });
+
           } else if (std::holds_alternative<Fragment>(ppe)) {
-            r.Enter(std::get<Fragment>(ppe).preprocessed_code());
+            r.Enter(std::move(std::get<Fragment>(ppe)),
+                    +[] (const Fragment &f) { return f.preprocessed_code(); });
+
           } else {
             assert(false);
           }
@@ -162,10 +172,14 @@ gap::generator<Token> Macro::generate_expansion_tokens(void) const & {
         [] (TokensFromPreprocessedEntities &r, PreprocessedEntity ppe) {
           if (std::holds_alternative<Token>(ppe)) {
             r.Yield(std::move(std::get<Token>(ppe)));
+
           } else if (std::holds_alternative<Macro>(ppe)) {
-            EnterExpansionTokens(r, std::get<Macro>(ppe));
+            EnterExpansionTokens(r, std::move(std::get<Macro>(ppe)));
+
           } else if (std::holds_alternative<Fragment>(ppe)) {
-            r.Enter(std::get<Fragment>(ppe).preprocessed_code());
+            r.Enter(std::move(std::get<Fragment>(ppe)),
+                    +[] (const Fragment &f) { return f.preprocessed_code(); });
+
           } else {
             assert(false);
           }

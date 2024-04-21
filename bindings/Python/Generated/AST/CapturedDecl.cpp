@@ -148,7 +148,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CapturedDecl::redeclarations"),
@@ -188,7 +188,7 @@ static PyGetSetDef gProperties[] = {
     "parameters",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameters());
+          return ::mx::generator_to_python(*T_cast(self), &T::parameters);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CapturedDecl::parameters"),
@@ -198,7 +198,7 @@ static PyGetSetDef gProperties[] = {
     "declarations_in_context",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->declarations_in_context());
+          return ::mx::generator_to_python(*T_cast(self), &T::declarations_in_context);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CapturedDecl::declarations_in_context"),

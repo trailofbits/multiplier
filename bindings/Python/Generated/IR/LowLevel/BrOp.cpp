@@ -128,7 +128,7 @@ static PyGetSetDef gProperties[] = {
     "operands",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operands());
+          return ::mx::generator_to_python(*T_cast(self), &T::operands);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::ll::BrOp::operands"),

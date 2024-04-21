@@ -162,7 +162,7 @@ static PyGetSetDef gProperties[] = {
     "inputs",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->inputs());
+          return ::mx::generator_to_python(*T_cast(self), &T::inputs);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::AsmStmt::inputs"),
@@ -202,7 +202,7 @@ static PyGetSetDef gProperties[] = {
     "outputs",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->outputs());
+          return ::mx::generator_to_python(*T_cast(self), &T::outputs);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::AsmStmt::outputs"),
@@ -212,7 +212,7 @@ static PyGetSetDef gProperties[] = {
     "output_constraints",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->output_constraints());
+          return ::mx::generator_to_python(*T_cast(self), &T::output_constraints);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::AsmStmt::output_constraints"),
@@ -232,7 +232,7 @@ static PyGetSetDef gProperties[] = {
     "output_expressions",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->output_expressions());
+          return ::mx::generator_to_python(*T_cast(self), &T::output_expressions);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::AsmStmt::output_expressions"),
@@ -242,7 +242,7 @@ static PyGetSetDef gProperties[] = {
     "input_constraints",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->input_constraints());
+          return ::mx::generator_to_python(*T_cast(self), &T::input_constraints);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::AsmStmt::input_constraints"),
@@ -262,7 +262,7 @@ static PyGetSetDef gProperties[] = {
     "input_expressions",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->input_expressions());
+          return ::mx::generator_to_python(*T_cast(self), &T::input_expressions);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::AsmStmt::input_expressions"),
@@ -272,7 +272,7 @@ static PyGetSetDef gProperties[] = {
     "clobbers",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->clobbers());
+          return ::mx::generator_to_python(*T_cast(self), &T::clobbers);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::AsmStmt::clobbers"),

@@ -148,7 +148,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::FriendDecl::redeclarations"),
@@ -208,7 +208,7 @@ static PyGetSetDef gProperties[] = {
     "friend_type_template_parameter_lists",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->friend_type_template_parameter_lists());
+          return ::mx::generator_to_python(*T_cast(self), &T::friend_type_template_parameter_lists);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::FriendDecl::friend_type_template_parameter_lists"),

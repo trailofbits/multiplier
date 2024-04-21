@@ -87,10 +87,10 @@ class MX_EXPORT Compilation {
   // The fragments owned by this compilation. This will be a subset of all
   // observable fragments by this compilation, because some of them may be
   // owned by a different compilation.
-  gap::generator<Fragment> fragments(void) const & noexcept;
+  gap::generator<Fragment> fragments(void) const &;
 
   // The files parsed by this compilation.
-  gap::generator<File> files(void) const & noexcept;
+  gap::generator<File> files(void) const &;
 
   // The main source file of this compilation.
   File main_source_file(void) const noexcept;
@@ -130,22 +130,22 @@ class MX_EXPORT Compilation {
   std::optional<std::string_view> auxiliary_target_triple(void) const noexcept;
 
   // Arguments to this compile command.
-  gap::generator<std::string_view> arguments(void) const noexcept;
+  gap::generator<std::string_view> arguments(void) const &;
 
   // List of system include directories that influenced parsing. These can be
   // built-in or specified with command-line options like `-isystem /path`.
   gap::generator<std::pair<IncludePathLocation, std::filesystem::path>>
-  system_include_directories(void) const & noexcept;
+  system_include_directories(void) const &;
 
   // List of system include directories that influenced parsing. These are
   // usually specified with command-line options like `-I /path`.
   gap::generator<std::pair<IncludePathLocation, std::filesystem::path>>
-  user_include_directories(void) const & noexcept;
+  user_include_directories(void) const &;
 
   // List of framework directories that influenced parsing. These are relevant
   // on macOS.
   gap::generator<std::pair<IncludePathLocation, std::filesystem::path>>
-  framework_directories(void) const & noexcept;
+  framework_directories(void) const &;
 };
 
 }  // namespace mx

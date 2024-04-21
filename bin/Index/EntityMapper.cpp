@@ -296,6 +296,17 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::DerivedToken &entity) const 
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::PrintedToken &entity) const {
   return PerFragmentEntityId(RawEntity(entity));
+
+  // if (auto id = PerFragmentEntityId(RawEntity(entity));
+  //     id != mx::kInvalidEntityId) {
+  //   return id;
+  // }
+
+  // if (auto pt = entity.DerivedLocation()) {
+  //   return EntityId(pt.value());
+  // }
+
+  // return mx::kInvalidEntityId;
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::MacroToken &entity) {

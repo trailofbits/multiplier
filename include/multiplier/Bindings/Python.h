@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <gap/core/generator.hpp>
 #include <optional>
 #include <span>
 #include <string>
@@ -45,6 +46,28 @@ struct FromPythonReturnType<std::string_view> {
 template <typename T>
 [[gnu::noinline]]
 MX_EXPORT SharedPyObject *to_python(T) noexcept;
+
+
+// Given an object of type `T`, call `T::generator_method()`, producing a
+// generator of type `gap::generator<V>`, and wrap this in a Python object.
+template <typename T, typename V>
+[[gnu::noinline]]
+MX_EXPORT SharedPyObject *generator_to_python(
+    T val, gap::generator<V> (T::*generator_method)(void) const) noexcept;
+
+// Given an object of type `T`, call `T::generator_method()`, producing a
+// generator of type `gap::generator<V>`, and wrap this in a Python object.
+template <typename T, typename V>
+[[gnu::noinline]]
+MX_EXPORT SharedPyObject *generator_to_python(
+    T val, gap::generator<V> (T::*generator_method)(void) const &) noexcept;
+
+// Given an object of type `T`, call `T::generator_method()`, producing a
+// generator of type `gap::generator<V>`, and wrap this in a Python object.
+template <typename T, typename V>
+[[gnu::noinline]]
+MX_EXPORT SharedPyObject *generator_to_python(
+    T val, gap::generator<V> (T::*generator_method)(void) const & noexcept) noexcept;
 
 // Convert a borrowed reference to a Python object, and try to convert it to
 // a value of type `T`.

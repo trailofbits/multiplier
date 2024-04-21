@@ -128,7 +128,7 @@ static PyGetSetDef gProperties[] = {
     "dynamic_sizes",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->dynamic_sizes());
+          return ::mx::generator_to_python(*T_cast(self), &T::dynamic_sizes);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::memref::AllocOp::dynamic_sizes"),
@@ -138,7 +138,7 @@ static PyGetSetDef gProperties[] = {
     "symbol_operands",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->symbol_operands());
+          return ::mx::generator_to_python(*T_cast(self), &T::symbol_operands);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::memref::AllocOp::symbol_operands"),

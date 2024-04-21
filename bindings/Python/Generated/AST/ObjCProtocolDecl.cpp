@@ -148,7 +148,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::redeclarations"),
@@ -208,7 +208,7 @@ static PyGetSetDef gProperties[] = {
     "protocol_tokens",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->protocol_tokens());
+          return ::mx::generator_to_python(*T_cast(self), &T::protocol_tokens);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::protocol_tokens"),
@@ -228,7 +228,7 @@ static PyGetSetDef gProperties[] = {
     "protocols",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->protocols());
+          return ::mx::generator_to_python(*T_cast(self), &T::protocols);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCProtocolDecl::protocols"),

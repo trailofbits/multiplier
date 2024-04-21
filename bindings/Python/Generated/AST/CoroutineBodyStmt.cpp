@@ -128,7 +128,7 @@ static PyGetSetDef gProperties[] = {
     "children_excl_body",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->children_excl_body());
+          return ::mx::generator_to_python(*T_cast(self), &T::children_excl_body);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::children_excl_body"),
@@ -218,7 +218,7 @@ static PyGetSetDef gProperties[] = {
     "parameter_moves",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameter_moves());
+          return ::mx::generator_to_python(*T_cast(self), &T::parameter_moves);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CoroutineBodyStmt::parameter_moves"),

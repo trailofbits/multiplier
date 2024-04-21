@@ -128,7 +128,7 @@ static PyGetSetDef gProperties[] = {
     "sizes",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sizes());
+          return ::mx::generator_to_python(*T_cast(self), &T::sizes);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::memref::ViewOp::sizes"),

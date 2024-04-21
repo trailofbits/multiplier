@@ -128,7 +128,7 @@ static PyGetSetDef gProperties[] = {
     "callee_operands",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->callee_operands());
+          return ::mx::generator_to_python(*T_cast(self), &T::callee_operands);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::llvm::InvokeOp::callee_operands"),
@@ -138,7 +138,7 @@ static PyGetSetDef gProperties[] = {
     "normal_dest_operands",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->normal_dest_operands());
+          return ::mx::generator_to_python(*T_cast(self), &T::normal_dest_operands);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::llvm::InvokeOp::normal_dest_operands"),
@@ -148,7 +148,7 @@ static PyGetSetDef gProperties[] = {
     "unwind_dest_operands",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->unwind_dest_operands());
+          return ::mx::generator_to_python(*T_cast(self), &T::unwind_dest_operands);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::llvm::InvokeOp::unwind_dest_operands"),
@@ -168,7 +168,7 @@ static PyGetSetDef gProperties[] = {
     "arg_operands",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->arg_operands());
+          return ::mx::generator_to_python(*T_cast(self), &T::arg_operands);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::llvm::InvokeOp::arg_operands"),

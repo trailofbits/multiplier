@@ -128,7 +128,7 @@ static PyGetSetDef gProperties[] = {
     "inputs",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->inputs());
+          return ::mx::generator_to_python(*T_cast(self), &T::inputs);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::builtin::UnrealizedConversionCastOp::inputs"),
@@ -138,7 +138,7 @@ static PyGetSetDef gProperties[] = {
     "outputs",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->outputs());
+          return ::mx::generator_to_python(*T_cast(self), &T::outputs);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::builtin::UnrealizedConversionCastOp::outputs"),

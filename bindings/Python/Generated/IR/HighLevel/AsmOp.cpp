@@ -128,7 +128,7 @@ static PyGetSetDef gProperties[] = {
     "asm_outputs",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->asm_outputs());
+          return ::mx::generator_to_python(*T_cast(self), &T::asm_outputs);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::hl::AsmOp::asm_outputs"),
@@ -138,7 +138,7 @@ static PyGetSetDef gProperties[] = {
     "asm_inputs",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->asm_inputs());
+          return ::mx::generator_to_python(*T_cast(self), &T::asm_inputs);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::hl::AsmOp::asm_inputs"),
@@ -148,7 +148,7 @@ static PyGetSetDef gProperties[] = {
     "labels",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->labels());
+          return ::mx::generator_to_python(*T_cast(self), &T::labels);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::hl::AsmOp::labels"),

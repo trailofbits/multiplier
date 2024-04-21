@@ -6,37 +6,37 @@
 
 #include <cassert>
 #include <gap/core/generator.hpp>
+#include <multiplier/Entity.h>
 #include <optional>
 #include <list>
 
 namespace mx {
 
-// Packaged GAP generator.
-template <typename T>
-struct Generator {
-  gap::generator<T> generator;
-  gap::generator<T>::iterator iterator;
-
-  inline Generator(gap::generator<T> generator_)
-      : generator(std::move(generator_)),
-        iterator(generator.begin()) {}
-};
-
 // Holds on to a stack of generators of type `V`, often a `std::variant`, and
 // generate out values of type `T`.
 template <typename V, typename T>
-struct VariantReducer {
-  std::list<Generator<V>> generators;
+class VariantReducer {
+ private:
+  // Packaged GAP generator.
+  struct Generator {
+    VariantEntity lifetime;
+    gap::generator<V> generator;
+    gap::generator<V>::iterator iterator;
+
+    template <typename E>
+    inline Generator(E lifetime_, gap::generator<V> (*get_generator)(const E &))
+        : lifetime(std::move(lifetime_)),
+          generator(get_generator(std::get<E>(lifetime))),
+          iterator(generator.begin()) {}
+  };
+
+  std::list<Generator> generators;
   std::optional<T> yield_val;
-
-  VariantReducer(void) = default;
-
-  inline explicit VariantReducer(gap::generator<V> generator_) {
-    generators.emplace_back(std::move(generator_));
-  }
-
-  void Enter(gap::generator<V> generator_) & {
-    generators.emplace_back(std::move(generator_));
+ 
+ public:
+  template <typename E>
+  void Enter(E lifetime_, gap::generator<V> (*get_generator)(const E &)) & {
+    generators.emplace_back(std::move(lifetime_), get_generator);
   }
 
   void Yield(T val) & {
@@ -58,7 +58,7 @@ struct VariantReducer {
         continue;
       }
 
-      V val = *(back.iterator);
+      V val = std::move(*(back.iterator));
       ++back.iterator;
       if (back.iterator == back.generator.end()) {
         generators.pop_back();

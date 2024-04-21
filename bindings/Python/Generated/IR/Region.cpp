@@ -126,7 +126,7 @@ static PyGetSetDef gProperties[] = {
     "blocks",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->blocks());
+          return ::mx::generator_to_python(*T_cast(self), &T::blocks);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Region::blocks"),
@@ -136,7 +136,7 @@ static PyGetSetDef gProperties[] = {
     "reverse_blocks",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->reverse_blocks());
+          return ::mx::generator_to_python(*T_cast(self), &T::reverse_blocks);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Region::reverse_blocks"),
@@ -166,7 +166,7 @@ static PyGetSetDef gProperties[] = {
     "entry_block_arguments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->entry_block_arguments());
+          return ::mx::generator_to_python(*T_cast(self), &T::entry_block_arguments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Region::entry_block_arguments"),

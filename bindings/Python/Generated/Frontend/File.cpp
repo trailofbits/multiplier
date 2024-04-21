@@ -126,7 +126,7 @@ static PyGetSetDef gProperties[] = {
     "fragments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->fragments());
+          return ::mx::generator_to_python(*T_cast(self), &T::fragments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::File::fragments"),
@@ -136,7 +136,7 @@ static PyGetSetDef gProperties[] = {
     "paths",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->paths());
+          return ::mx::generator_to_python(*T_cast(self), &T::paths);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::File::paths"),

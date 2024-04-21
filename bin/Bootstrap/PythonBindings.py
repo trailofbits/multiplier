@@ -428,6 +428,22 @@ PROPERTY_SPEC = """  {{
 """
 
 
+# With generators, we want to make sure that we keep the object from which the
+# generator is produced alive as long as the generator itself, because some
+# internal state may get accessed during generation.
+GENERATOR_SPEC = """  {{
+    "{py_method_name}",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {{
+          return ::mx::generator_to_python(*T_cast(self), &T::{cxx_method_name});
+        }}),
+    nullptr,
+    PyDoc_STR("Wrapper for {cxx_namespace}{cxx_class_name}::{cxx_method_name}"),
+    nullptr,
+  }},
+"""
+
+
 PROPERTY_LIST_SUFFIX = """  {}  // Sentinel.
 };
 }  // namespace
@@ -1197,7 +1213,8 @@ def _wrap_property(class_schema: ClassSchema, schema: NamedSchema,
   rel_ns = _relative_namespace(class_schema)
   cxx_namespace = rel_ns and f"mx::{rel_ns}::" or "mx::"
 
-  out.append(PROPERTY_SPEC.format(
+  spec = isinstance(schema.return_type, GapGeneratorSchema) and GENERATOR_SPEC or PROPERTY_SPEC
+  out.append(spec.format(
       py_method_name=renamer.rename_method(class_schema, schema),
       cxx_class_name=class_schema.name,
       cxx_method_name=schema.name,

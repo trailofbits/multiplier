@@ -176,7 +176,7 @@ static PyGetSetDef gProperties[] = {
     "nested_fragments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->nested_fragments());
+          return ::mx::generator_to_python(*T_cast(self), &T::nested_fragments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Fragment::nested_fragments"),
@@ -186,7 +186,7 @@ static PyGetSetDef gProperties[] = {
     "top_level_declarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->top_level_declarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::top_level_declarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Fragment::top_level_declarations"),
@@ -196,7 +196,7 @@ static PyGetSetDef gProperties[] = {
     "preprocessed_code",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->preprocessed_code());
+          return ::mx::generator_to_python(*T_cast(self), &T::preprocessed_code);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Fragment::preprocessed_code"),

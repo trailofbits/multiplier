@@ -168,7 +168,7 @@ static PyGetSetDef gProperties[] = {
     "labels",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->labels());
+          return ::mx::generator_to_python(*T_cast(self), &T::labels);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::labels"),
@@ -188,7 +188,7 @@ static PyGetSetDef gProperties[] = {
     "output_constraint_literals",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->output_constraint_literals());
+          return ::mx::generator_to_python(*T_cast(self), &T::output_constraint_literals);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::output_constraint_literals"),
@@ -198,7 +198,7 @@ static PyGetSetDef gProperties[] = {
     "output_names",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->output_names());
+          return ::mx::generator_to_python(*T_cast(self), &T::output_names);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::output_names"),
@@ -218,7 +218,7 @@ static PyGetSetDef gProperties[] = {
     "input_constraint_literals",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->input_constraint_literals());
+          return ::mx::generator_to_python(*T_cast(self), &T::input_constraint_literals);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::input_constraint_literals"),
@@ -228,7 +228,7 @@ static PyGetSetDef gProperties[] = {
     "input_names",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->input_names());
+          return ::mx::generator_to_python(*T_cast(self), &T::input_names);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::input_names"),
@@ -248,7 +248,7 @@ static PyGetSetDef gProperties[] = {
     "clobber_string_literals",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->clobber_string_literals());
+          return ::mx::generator_to_python(*T_cast(self), &T::clobber_string_literals);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::clobber_string_literals"),
@@ -268,7 +268,7 @@ static PyGetSetDef gProperties[] = {
     "label_expressions",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->label_expressions());
+          return ::mx::generator_to_python(*T_cast(self), &T::label_expressions);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::label_expressions"),
@@ -278,7 +278,7 @@ static PyGetSetDef gProperties[] = {
     "label_names",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->label_names());
+          return ::mx::generator_to_python(*T_cast(self), &T::label_names);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::GCCAsmStmt::label_names"),

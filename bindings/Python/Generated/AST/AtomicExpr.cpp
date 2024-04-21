@@ -278,7 +278,7 @@ static PyGetSetDef gProperties[] = {
     "sub_expressions",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sub_expressions());
+          return ::mx::generator_to_python(*T_cast(self), &T::sub_expressions);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::AtomicExpr::sub_expressions"),

@@ -136,7 +136,7 @@ static PyGetSetDef gProperties[] = {
     "fragments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->fragments());
+          return ::mx::generator_to_python(*T_cast(self), &T::fragments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Compilation::fragments"),
@@ -146,7 +146,7 @@ static PyGetSetDef gProperties[] = {
     "files",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->files());
+          return ::mx::generator_to_python(*T_cast(self), &T::files);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Compilation::files"),
@@ -256,7 +256,7 @@ static PyGetSetDef gProperties[] = {
     "arguments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->arguments());
+          return ::mx::generator_to_python(*T_cast(self), &T::arguments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Compilation::arguments"),
@@ -266,7 +266,7 @@ static PyGetSetDef gProperties[] = {
     "system_include_directories",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->system_include_directories());
+          return ::mx::generator_to_python(*T_cast(self), &T::system_include_directories);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Compilation::system_include_directories"),
@@ -276,7 +276,7 @@ static PyGetSetDef gProperties[] = {
     "user_include_directories",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->user_include_directories());
+          return ::mx::generator_to_python(*T_cast(self), &T::user_include_directories);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Compilation::user_include_directories"),
@@ -286,7 +286,7 @@ static PyGetSetDef gProperties[] = {
     "framework_directories",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->framework_directories());
+          return ::mx::generator_to_python(*T_cast(self), &T::framework_directories);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Compilation::framework_directories"),

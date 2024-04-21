@@ -138,7 +138,7 @@ static PyGetSetDef gProperties[] = {
     "body",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->body());
+          return ::mx::generator_to_python(*T_cast(self), &T::body);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::DefineMacroDirective::body"),
@@ -168,7 +168,7 @@ static PyGetSetDef gProperties[] = {
     "parameters",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameters());
+          return ::mx::generator_to_python(*T_cast(self), &T::parameters);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::DefineMacroDirective::parameters"),

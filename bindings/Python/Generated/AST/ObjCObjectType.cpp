@@ -182,7 +182,7 @@ static PyGetSetDef gProperties[] = {
     "type_arguments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_arguments());
+          return ::mx::generator_to_python(*T_cast(self), &T::type_arguments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCObjectType::type_arguments"),
@@ -192,7 +192,7 @@ static PyGetSetDef gProperties[] = {
     "type_arguments_as_written",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_arguments_as_written());
+          return ::mx::generator_to_python(*T_cast(self), &T::type_arguments_as_written);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCObjectType::type_arguments_as_written"),

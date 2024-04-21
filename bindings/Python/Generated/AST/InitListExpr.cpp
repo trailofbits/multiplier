@@ -228,7 +228,7 @@ static PyGetSetDef gProperties[] = {
     "initializers",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializers());
+          return ::mx::generator_to_python(*T_cast(self), &T::initializers);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::InitListExpr::initializers"),

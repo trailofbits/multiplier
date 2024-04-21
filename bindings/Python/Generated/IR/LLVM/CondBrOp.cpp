@@ -128,7 +128,7 @@ static PyGetSetDef gProperties[] = {
     "true_dest_operands",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->true_dest_operands());
+          return ::mx::generator_to_python(*T_cast(self), &T::true_dest_operands);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::llvm::CondBrOp::true_dest_operands"),
@@ -138,7 +138,7 @@ static PyGetSetDef gProperties[] = {
     "false_dest_operands",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->false_dest_operands());
+          return ::mx::generator_to_python(*T_cast(self), &T::false_dest_operands);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::llvm::CondBrOp::false_dest_operands"),
