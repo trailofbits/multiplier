@@ -134,6 +134,19 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::ll::CondScopeRetOp::cond"),
     nullptr,
   },
+<<<<<<< HEAD
+=======
+  {
+    "dest_operands",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::dest_operands);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::ll::CondScopeRetOp::dest_operands"),
+    nullptr,
+  },
+>>>>>>> 7ebaf5fc (Improve issues related to provenance. Attempt to fix some speculative generator lifetime issues in the python bindings.)
   {}  // Sentinel.
 };
 }  // namespace

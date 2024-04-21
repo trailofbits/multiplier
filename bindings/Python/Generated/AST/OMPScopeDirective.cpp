@@ -124,6 +124,59 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+<<<<<<< HEAD:bindings/Python/Generated/AST/OMPScopeDirective.cpp
+=======
+  {
+    "canonical_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->canonical_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassScopeFunctionSpecializationDecl::canonical_declaration"),
+    nullptr,
+  },
+  {
+    "definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassScopeFunctionSpecializationDecl::definition"),
+    nullptr,
+  },
+  {
+    "redeclarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassScopeFunctionSpecializationDecl::redeclarations"),
+    nullptr,
+  },
+  {
+    "specialization",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->specialization());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassScopeFunctionSpecializationDecl::specialization"),
+    nullptr,
+  },
+  {
+    "has_explicit_template_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_explicit_template_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ClassScopeFunctionSpecializationDecl::has_explicit_template_arguments"),
+    nullptr,
+  },
+>>>>>>> 7ebaf5fc (Improve issues related to provenance. Attempt to fix some speculative generator lifetime issues in the python bindings.):bindings/Python/Generated/AST/ClassScopeFunctionSpecializationDecl.cpp
   {}  // Sentinel.
 };
 }  // namespace

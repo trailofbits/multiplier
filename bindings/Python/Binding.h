@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <map>
 #include <new>
 #include <set>
@@ -603,16 +604,167 @@ bool RangePythonBinding<RangeType>::gSucceeded = false;
 template <typename RangeType>
 PyTypeObject RangePythonBinding<RangeType>::gRangeType = {};
 
-// Conversions for iterables, e.g. `gap::generator`, or other ones.
+// Conversions for `gap::generator`s that hold on the the value from which
+// the generator was created, so that we can ensure the lifetime of that value.
 //
 // NOTE(pag): Separated from `RangePythonBinding` because concepts don't seem to
 //            play well with out-of-line static member definitions.
 template <ForwardIteratorProtocol RangeType>
 struct PythonBinding<RangeType> : public RangePythonBinding<RangeType> {};
 
+template <typename EntityType, typename ValueType>
+struct GeneratorPythonBinding {
+  using RangeType = gap::generator<ValueType>;
+  using BeginType = std::decay_t<decltype(std::declval<RangeType>().begin())>;
+  using EndType = std::decay_t<decltype(std::declval<RangeType>().end())>;
+
+  using T = std::remove_cvref_t<
+      decltype(*std::declval<RangeType>().begin())>;
+
+  // Python object that can hold an iterator range.
+  struct IterRange final : public ::PyObject {
+    EntityType *entity{nullptr};
+    RangeType *range{nullptr};
+    BeginType *it{nullptr};
+    EndType *end{nullptr};
+    alignas(alignof(EntityType)) char entity_storage[sizeof(EntityType)];
+    alignas(alignof(RangeType)) char range_storage[sizeof(RangeType)];
+    alignas(alignof(BeginType)) char it_storage[sizeof(BeginType)];
+    alignas(alignof(EndType)) char end_storage[sizeof(EndType)];
+  };
+
+  static bool gInitialized;
+  static bool gSucceeded;
+  static PyTypeObject gGeneratorType;
+  static PyTypeObject gIterType;
+
+  static bool InitType(void) {
+    if (gInitialized) {
+      return gSucceeded;
+    }
+
+    gInitialized = true;
+    auto module = PyImport_AddModule("__main__");
+    if (!module) {
+      return false;
+    }
+
+    // Define the range type. It holds the range before Python has asked for
+    // iteration.
+    gGeneratorType.tp_name = typeid(RangeType).name();
+    gGeneratorType.tp_basicsize = sizeof(IterRange);
+    gGeneratorType.tp_itemsize = 0;
+    gGeneratorType.tp_init = nullptr;
+    gGeneratorType.tp_new = nullptr;
+    gGeneratorType.tp_flags = Py_TPFLAGS_DEFAULT |
+                          Py_TPFLAGS_DISALLOW_INSTANTIATION |
+                          Py_TPFLAGS_IMMUTABLETYPE;
+    gGeneratorType.tp_alloc = PyType_GenericAlloc;
+
+    gGeneratorType.tp_dealloc = [] (BorrowedPyObject *obj) {
+      if (auto *data = reinterpret_cast<IterRange *>(obj)) {
+        data->it->~BeginType();
+        data->end->~EndType();
+        data->range->~RangeType();
+        data->entity->~EntityType();
+      }
+      PyObject_Free(obj);
+    };
+
+    gGeneratorType.tp_iter = [] (BorrowedPyObject *obj) {
+      Py_INCREF(obj);
+      return obj;
+    };
+
+    gGeneratorType.tp_iternext = [] (BorrowedPyObject *obj) -> SharedPyObject * {
+      auto iter_obj = reinterpret_cast<IterRange *>(obj);
+      BeginType &it = *(iter_obj->it);
+      EndType &end = *(iter_obj->end);
+      if (it == end) {
+        PyErr_SetNone(PyExc_StopIteration);
+        return nullptr;
+      }
+
+      auto ret = ::mx::to_python<T>(*it);
+      ++it;
+      return ret;
+    };
+
+    if (0 != PyType_Ready(&gGeneratorType)) {
+      return false;
+    }
+
+    auto rt = reinterpret_cast<BorrowedPyObject *>(&gGeneratorType);
+    if (0 != PyModule_AddObjectRef(module, gGeneratorType.tp_name, rt)) {
+      return false;
+    }
+
+    gSucceeded = true;
+    return true;
+  }
+
+  static SharedPyObject *to_python(EntityType entity, auto generator_method) noexcept {
+
+    if (!InitType()) {
+      if (!PyErr_Occurred()) {
+        PyErrorStreamer(PyExc_TypeError)
+            << "Unable to wrap iterator range type '"
+            << typeid(RangeType).name() << "'";
+      }
+      return nullptr;
+    }
+
+    auto obj = gGeneratorType.tp_alloc(&gGeneratorType, 0);
+    if (auto range = reinterpret_cast<IterRange *>(obj)) {
+      range->entity = new (range->entity_storage) EntityType(std::move(entity));
+      range->range = new (range->range_storage) RangeType(
+          (range->entity->*generator_method)());
+      range->it = new (range->it_storage) BeginType(range->range->begin());
+      range->end = new (range->end_storage) EndType(range->range->end());
+    }
+
+    return obj;
+  }
+};
+
+template <typename EntityType, typename ValueType>
+bool GeneratorPythonBinding<EntityType, ValueType>::gInitialized = false;
+
+template <typename EntityType, typename ValueType>
+bool GeneratorPythonBinding<EntityType, ValueType>::gSucceeded = false;
+
+template <typename EntityType, typename ValueType>
+PyTypeObject GeneratorPythonBinding<EntityType, ValueType>::gGeneratorType = {};
+
 template <typename T>
 SharedPyObject *to_python(T val) noexcept {
   return PythonBinding<T>::to_python(std::move(val));
+}
+
+// Given an object of type `T`, call `T::generator_method()`, producing a
+// generator of type `gap::generator<V>`, and wrap this in a Python object.
+template <typename T, typename V>
+[[gnu::noinline]]
+MX_EXPORT SharedPyObject *generator_to_python(
+    T entity, gap::generator<V> (T::*generator_method)(void) const) noexcept {
+  return GeneratorPythonBinding<T, V>::to_python(std::move(entity),
+                                                 generator_method);
+}
+
+template <typename T, typename V>
+[[gnu::noinline]]
+MX_EXPORT SharedPyObject *generator_to_python(
+    T entity, gap::generator<V> (T::*generator_method)(void) const &) noexcept {
+  return GeneratorPythonBinding<T, V>::to_python(std::move(entity),
+                                                 generator_method);
+}
+
+template <typename T, typename V>
+[[gnu::noinline]]
+MX_EXPORT SharedPyObject *generator_to_python(
+    T entity, gap::generator<V> (T::*generator_method)(void) const & noexcept) noexcept {
+  return GeneratorPythonBinding<T, V>::to_python(std::move(entity),
+                                                 generator_method);
 }
 
 template <typename T>

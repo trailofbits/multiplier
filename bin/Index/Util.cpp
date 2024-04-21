@@ -1136,6 +1136,10 @@ const void *RawEntity(const pasta::File &entity) {
   return entity.RawFile();
 }
 
+const void *RawEntity(const pasta::FileToken &entity) {
+  return entity.RawFileToken();
+}
+
 const void *RawEntity(const pasta::Decl &entity) {
   return entity.RawDecl()->RemappedDecl;
 }
@@ -1182,6 +1186,17 @@ const void *RawEntity(const TokenTree &entity) {
 
 const void *RawEntity(const TokenTreeNode &entity) {
   return entity.RawNode();
+}
+
+const void *RawEntity(const pasta::DerivedToken &entity) {
+  if (std::holds_alternative<pasta::FileToken>(entity)) {
+    return RawEntity(std::get<pasta::FileToken>(entity));
+
+  } else if (std::holds_alternative<pasta::MacroToken>(entity)) {
+    return RawEntity(std::get<pasta::MacroToken>(entity));
+  } else {
+    return nullptr;
+  }
 }
 
 uint32_t Hash32(std::string_view data) {

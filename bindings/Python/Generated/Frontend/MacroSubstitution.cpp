@@ -144,7 +144,7 @@ static PyGetSetDef gProperties[] = {
     "replacement_children",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->replacement_children());
+          return ::mx::generator_to_python(*T_cast(self), &T::replacement_children);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::MacroSubstitution::replacement_children"),

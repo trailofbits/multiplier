@@ -138,7 +138,7 @@ static PyGetSetDef gProperties[] = {
     "association_expressions",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->association_expressions());
+          return ::mx::generator_to_python(*T_cast(self), &T::association_expressions);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::GenericSelectionExpr::association_expressions"),

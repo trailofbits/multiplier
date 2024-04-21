@@ -1892,7 +1892,7 @@ static PyGetSetDef gProperties[] = {
     "operands",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operands());
+          return ::mx::generator_to_python(*T_cast(self), &T::operands);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Operation::operands"),
@@ -1912,7 +1912,7 @@ static PyGetSetDef gProperties[] = {
     "results",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->results());
+          return ::mx::generator_to_python(*T_cast(self), &T::results);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Operation::results"),
@@ -1932,7 +1932,7 @@ static PyGetSetDef gProperties[] = {
     "regions",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->regions());
+          return ::mx::generator_to_python(*T_cast(self), &T::regions);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Operation::regions"),
@@ -1952,7 +1952,7 @@ static PyGetSetDef gProperties[] = {
     "only_region_blocks",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->only_region_blocks());
+          return ::mx::generator_to_python(*T_cast(self), &T::only_region_blocks);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Operation::only_region_blocks"),
@@ -1962,7 +1962,7 @@ static PyGetSetDef gProperties[] = {
     "uses",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->uses());
+          return ::mx::generator_to_python(*T_cast(self), &T::uses);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Operation::uses"),

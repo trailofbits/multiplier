@@ -126,7 +126,7 @@ static PyGetSetDef gProperties[] = {
     "compilations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->compilations());
+          return ::mx::generator_to_python(*T_cast(self), &T::compilations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Index::compilations"),
@@ -136,7 +136,7 @@ static PyGetSetDef gProperties[] = {
     "files",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->files());
+          return ::mx::generator_to_python(*T_cast(self), &T::files);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Index::files"),

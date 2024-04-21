@@ -288,7 +288,7 @@ static PyGetSetDef gProperties[] = {
     "placement_arguments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->placement_arguments());
+          return ::mx::generator_to_python(*T_cast(self), &T::placement_arguments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXNewExpr::placement_arguments"),

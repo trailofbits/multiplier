@@ -124,6 +124,29 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+<<<<<<< HEAD
+=======
+  {
+    "value",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::value);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::abi::DirectOp::value"),
+    nullptr,
+  },
+  {
+    "result",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::result);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::abi::DirectOp::result"),
+    nullptr,
+  },
+>>>>>>> 7ebaf5fc (Improve issues related to provenance. Attempt to fix some speculative generator lifetime issues in the python bindings.)
   {}  // Sentinel.
 };
 }  // namespace

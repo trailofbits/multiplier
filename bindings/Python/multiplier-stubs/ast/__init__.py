@@ -44503,7 +44503,7 @@ class Expr(multiplier.ast.ValueStmt):
   ignore_parenthesis_casts: multiplier.ast.Expr
   ignore_parenthesis_implicit_casts: multiplier.ast.Expr
   ignore_parenthesis_l_value_casts: multiplier.ast.Expr
-  ignore_parenthesis_noop_casts: multiplier.ast.Expr
+  ignore_parenthesis_noop_casts: Optional[multiplier.ast.Expr]
   ignore_parentheses: multiplier.ast.Expr
   ignore_unless_spelled_in_source: multiplier.ast.Expr
   contains_errors: bool
@@ -47493,7 +47493,7 @@ class UserDefinedLiteral(multiplier.ast.CallExpr):
 class CXXUuidofExpr(multiplier.ast.Expr):
   expression_operand: Optional[multiplier.ast.Expr]
   guid_declaration: multiplier.ast.MSGuidDecl
-  type_operand: multiplier.ast.Type
+  type_operand: Optional[multiplier.ast.Type]
   type_operand_source_info: multiplier.ast.Type
   is_type_operand: bool
 
@@ -47684,8 +47684,8 @@ class CXXUnresolvedConstructExpr(multiplier.ast.Expr):
 
 class CXXTypeidExpr(multiplier.ast.Expr):
   expression_operand: Optional[multiplier.ast.Expr]
-  type_operand: multiplier.ast.Type
-  type_operand_source_info: multiplier.ast.Type
+  type_operand: Optional[multiplier.ast.Type]
+  type_operand_source_info: Optional[multiplier.ast.Type]
   is_most_derived: Optional[bool]
   is_potentially_evaluated: bool
   is_type_operand: bool

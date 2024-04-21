@@ -158,7 +158,7 @@ static PyGetSetDef gProperties[] = {
     "semantics",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->semantics());
+          return ::mx::generator_to_python(*T_cast(self), &T::semantics);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::PseudoObjectExpr::semantics"),
@@ -178,7 +178,7 @@ static PyGetSetDef gProperties[] = {
     "semantic_expressions",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->semantic_expressions());
+          return ::mx::generator_to_python(*T_cast(self), &T::semantic_expressions);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::PseudoObjectExpr::semantic_expressions"),

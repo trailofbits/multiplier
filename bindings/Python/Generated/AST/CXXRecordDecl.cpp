@@ -156,7 +156,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::redeclarations"),
@@ -206,7 +206,7 @@ static PyGetSetDef gProperties[] = {
     "constructors",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->constructors());
+          return ::mx::generator_to_python(*T_cast(self), &T::constructors);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::constructors"),
@@ -1406,7 +1406,7 @@ static PyGetSetDef gProperties[] = {
     "derived_classes",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->derived_classes());
+          return ::mx::generator_to_python(*T_cast(self), &T::derived_classes);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::derived_classes"),
@@ -1416,7 +1416,7 @@ static PyGetSetDef gProperties[] = {
     "base_classes",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base_classes());
+          return ::mx::generator_to_python(*T_cast(self), &T::base_classes);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::base_classes"),

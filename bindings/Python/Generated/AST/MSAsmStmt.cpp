@@ -128,7 +128,7 @@ static PyGetSetDef gProperties[] = {
     "all_constraints",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->all_constraints());
+          return ::mx::generator_to_python(*T_cast(self), &T::all_constraints);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::MSAsmStmt::all_constraints"),
@@ -148,7 +148,7 @@ static PyGetSetDef gProperties[] = {
     "all_expressions",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->all_expressions());
+          return ::mx::generator_to_python(*T_cast(self), &T::all_expressions);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::MSAsmStmt::all_expressions"),

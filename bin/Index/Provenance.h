@@ -88,7 +88,7 @@ class TokenProvenanceCalculator {
 
   template <typename T>
   TokenInfo *InfoOrEmpty(const T &entity) {
-    auto info_it = info_map.find(em.EntityId(entity));
+    auto info_it = info_map.find(RawEntity(entity));
     if (info_it != info_map.end()) {
       return info_it->second;
     } else {
@@ -100,7 +100,7 @@ class TokenProvenanceCalculator {
   const EntityMapper &em;
   mx::RawEntityId fragment_index{mx::kInvalidEntityId};
   std::deque<TokenInfo> infos;
-  std::unordered_map<mx::RawEntityId, TokenInfo *> info_map;
+  std::unordered_map<const void *, TokenInfo *> info_map;
   std::unordered_map<const void *, pasta::Token> parsed_tokens;
   std::unordered_map<const TokenInfo *, std::vector<TokenInfo *>>
       multiple_children;
@@ -115,6 +115,8 @@ class TokenProvenanceCalculator {
 
   template <typename T>
   bool TryConnect(TokenInfo *, const T &tok);
+  void TryConnectToConcatenatedTokens(
+      TokenInfo *, const pasta::MacroToken &, const pasta::Macro &parent);
   bool BackupConnectToDerived(TokenInfo *, const pasta::MacroToken &);
   void Clear(void);
 

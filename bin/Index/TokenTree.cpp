@@ -1256,8 +1256,8 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
 Substitution *TokenTreeImpl::BuildFromTokenList(
     const PendingFragment &pf, std::ostream &err) {
 
-  // std::cerr << "\n-- BUILDING TREE " << pf.fragment_id.Unpack().fragment_id << " ----------\n";
-  // std::cerr << pf.parsed_tokens.Data() << "\n";
+  std::cerr << "\n-- BUILDING TREE " << pf.fragment_id.Unpack().fragment_id << " ----------\n";
+  std::cerr << pf.parsed_tokens.Data() << "\n";
 
   Substitution *root_sub = nullptr;
 
@@ -1284,7 +1284,7 @@ Substitution *TokenTreeImpl::BuildFromTokenList(
     // It's not a specialization of any kind, so we don't need to check if tokens
     // are contiguous or rebuild things.
     if (!rebuild && root_sub) {
-      // root_sub->PrintDOT(std::cerr);
+      root_sub->PrintDOT(std::cerr);
       return root_sub;
     }
   }

@@ -126,7 +126,7 @@ static PyGetSetDef gProperties[] = {
     "arguments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->arguments());
+          return ::mx::generator_to_python(*T_cast(self), &T::arguments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Block::arguments"),
@@ -136,7 +136,7 @@ static PyGetSetDef gProperties[] = {
     "operations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operations());
+          return ::mx::generator_to_python(*T_cast(self), &T::operations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Block::operations"),
@@ -146,7 +146,7 @@ static PyGetSetDef gProperties[] = {
     "reverse_operations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->reverse_operations());
+          return ::mx::generator_to_python(*T_cast(self), &T::reverse_operations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Block::reverse_operations"),
@@ -156,7 +156,7 @@ static PyGetSetDef gProperties[] = {
     "uses",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->uses());
+          return ::mx::generator_to_python(*T_cast(self), &T::uses);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Block::uses"),

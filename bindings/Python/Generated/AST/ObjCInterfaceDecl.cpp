@@ -148,7 +148,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCInterfaceDecl::redeclarations"),
@@ -168,7 +168,7 @@ static PyGetSetDef gProperties[] = {
     "all_referenced_protocols",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->all_referenced_protocols());
+          return ::mx::generator_to_python(*T_cast(self), &T::all_referenced_protocols);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCInterfaceDecl::all_referenced_protocols"),
@@ -328,7 +328,7 @@ static PyGetSetDef gProperties[] = {
     "instance_variables",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instance_variables());
+          return ::mx::generator_to_python(*T_cast(self), &T::instance_variables);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCInterfaceDecl::instance_variables"),
@@ -348,7 +348,7 @@ static PyGetSetDef gProperties[] = {
     "known_categories",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->known_categories());
+          return ::mx::generator_to_python(*T_cast(self), &T::known_categories);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCInterfaceDecl::known_categories"),
@@ -368,7 +368,7 @@ static PyGetSetDef gProperties[] = {
     "known_extensions",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->known_extensions());
+          return ::mx::generator_to_python(*T_cast(self), &T::known_extensions);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCInterfaceDecl::known_extensions"),
@@ -388,7 +388,7 @@ static PyGetSetDef gProperties[] = {
     "protocol_tokens",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->protocol_tokens());
+          return ::mx::generator_to_python(*T_cast(self), &T::protocol_tokens);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCInterfaceDecl::protocol_tokens"),
@@ -408,7 +408,7 @@ static PyGetSetDef gProperties[] = {
     "protocols",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->protocols());
+          return ::mx::generator_to_python(*T_cast(self), &T::protocols);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCInterfaceDecl::protocols"),
@@ -428,7 +428,7 @@ static PyGetSetDef gProperties[] = {
     "visible_categories",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->visible_categories());
+          return ::mx::generator_to_python(*T_cast(self), &T::visible_categories);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCInterfaceDecl::visible_categories"),
@@ -448,7 +448,7 @@ static PyGetSetDef gProperties[] = {
     "visible_extensions",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->visible_extensions());
+          return ::mx::generator_to_python(*T_cast(self), &T::visible_extensions);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCInterfaceDecl::visible_extensions"),

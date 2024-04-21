@@ -152,7 +152,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::redeclarations"),
@@ -212,7 +212,7 @@ static PyGetSetDef gProperties[] = {
     "template_arguments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_arguments());
+          return ::mx::generator_to_python(*T_cast(self), &T::template_arguments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::template_arguments"),
@@ -232,7 +232,7 @@ static PyGetSetDef gProperties[] = {
     "template_instantiation_arguments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_instantiation_arguments());
+          return ::mx::generator_to_python(*T_cast(self), &T::template_instantiation_arguments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ClassTemplateSpecializationDecl::template_instantiation_arguments"),

@@ -470,6 +470,9 @@ class TypeWrapper {
  public:
   virtual ~TypeWrapper(void) {}
   virtual void ReturnType(std::ostream &, const pasta::CXXMethodDecl &) = 0;
+  virtual std::string_view MethodRefKind(void) {
+    return {};
+  }
   virtual std::string_view CallMethod(std::ostream &, const pasta::CXXMethodDecl &,
                                       const std::string &) {
     return {};
@@ -643,6 +646,10 @@ class ValueGeneratorWrapper final : public TypeWrapper {
     os << "gap::generator<" << type_name << ">";
   }
 
+  virtual std::string_view MethodRefKind(void) final {
+    return " &";
+  }
+
   std::string_view CallMethod(std::ostream &os, const pasta::CXXMethodDecl &m,
                               const std::string &indent) {
     os << indent << "auto range = underlying_repr()." << m.Name() << "();\n";
@@ -652,7 +659,8 @@ class ValueGeneratorWrapper final : public TypeWrapper {
   void Implementation(std::ostream &os, const pasta::CXXMethodDecl &m,
                       const std::string &indent, std::string_view val) final {
     os << indent << "for (auto val : " << val << ") {\n"
-       << indent << "  co_yield " << type_name << "(module_, val.getAsOpaquePointer());\n"
+       << indent << "  co_yield " << type_name
+       << "(module_, val.getAsOpaquePointer());\n"
        << indent << "}\n";
   }
 };
@@ -779,10 +787,12 @@ static void DoMethod(const pasta::CXXMethodDecl &meth,
   if (ret_wrapper) {
     hpp << "  ";
     ret_wrapper->ReturnType(hpp, meth);
-    hpp << " " << api_name << "(void) const;\n";
+    hpp << " " << api_name << "(void) const" << ret_wrapper->MethodRefKind()
+        << ";\n";
 
     ret_wrapper->ReturnType(cpp, meth);
-    cpp << " " << ent_class_name << "::" << api_name << "(void) const {\n";
+    cpp << " " << ent_class_name << "::" << api_name << "(void) const"
+        << ret_wrapper->MethodRefKind() << " {\n";
     std::string_view val = ret_wrapper->CallMethod(cpp, meth, "  ");
     ret_wrapper->Implementation(cpp, meth, "  ", val);
     cpp << "}\n\n";

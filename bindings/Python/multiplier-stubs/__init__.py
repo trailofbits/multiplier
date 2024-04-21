@@ -149,11 +149,11 @@ class Fragment(multiplier.Entity):
   parsed_tokens: multiplier.frontend.TokenRange
   nested_fragments: Iterable[multiplier.Fragment]
   top_level_declarations: Iterable[multiplier.ast.Decl]
-  preprocessed_code: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token]
+  preprocessed_code: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token | multiplier.Fragment]
 
   @overload
   @staticmethod
-  def containing(arg_0: multiplier.Fragment) -> multiplier.Fragment:
+  def containing(arg_0: multiplier.Fragment) -> Optional[multiplier.Fragment]:
     ...
 
   @overload
