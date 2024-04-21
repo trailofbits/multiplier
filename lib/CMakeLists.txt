@@ -140,6 +140,7 @@ add_library("mx-api" OBJECT
   "FragmentEntity.h"
   "FragmentImpl.cpp"
   "Fragment.h"
+  "Generator.h"
   "Index.cpp"
   "InvalidEntityProvider.cpp"
   "InvalidEntityProvider.h"
