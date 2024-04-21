@@ -10,10 +10,25 @@
 #include <multiplier/Index.h>
 
 #include "Fragment.h"
+#include "Generator.h"
 #include "Reference.h"
 #include "Types.h"
 
 namespace mx {
+namespace {
+
+using TokensFromPreprocessedEntities = VariantReducer<PreprocessedEntity, Token>;
+
+static void EnterExpansionTokens(TokensFromPreprocessedEntities &reducer,
+                                 const Macro &macro) {
+  if (auto sub = MacroSubstitution::from(macro)) {
+    reducer.Enter(sub->replacement_children());
+  } else {
+    reducer.Enter(macro.children());
+  }
+}
+
+}  // namespace
 
 MacroImpl::MacroImpl(FragmentImplPtr frag_,
                      ast::Macro::Reader reader_,
@@ -60,53 +75,6 @@ gap::generator<Macro> Macro::containing_internal(const Token &token) {
   }
 }
 
-namespace {
-
-static gap::generator<Token> GenerateUseTokens(
-    const Macro *scope, gap::generator<PreprocessedEntity> *gen) {
-
-  for (PreprocessedEntity use : *gen) {
-    if (std::holds_alternative<mx::Token>(use)) {
-      co_yield std::get<Token>(use);
-
-    } else if (std::holds_alternative<Macro>(use)) {
-      for (auto tok : std::get<Macro>(use).generate_use_tokens()) {
-        co_yield tok;
-      }
-
-    } else if (std::holds_alternative<Fragment>(use)) {
-      auto nested_gen = std::get<Fragment>(use).preprocessed_code();
-      for (auto tok : GenerateUseTokens(scope, &nested_gen)) {
-        co_yield tok;
-      }
-    }
-  }
-
-  asm volatile ("" ::"m"(scope):"memory");
-}
-
-static gap::generator<Token> GenerateExpansionTokens(
-    const Macro *scope, gap::generator<PreprocessedEntity> *gen) {
-  for (PreprocessedEntity use : *gen) {
-    if (std::holds_alternative<mx::Token>(use)) {
-      co_yield std::get<Token>(use);
-
-    } else if (std::holds_alternative<Macro>(use)) {
-      for (auto tok : std::get<Macro>(use).generate_expansion_tokens()) {
-        co_yield tok;
-      }
-    } else if (std::holds_alternative<Fragment>(use)) {
-      auto nested_gen = std::get<Fragment>(use).preprocessed_code();
-      for (auto tok : GenerateExpansionTokens(scope, &nested_gen)) {
-        co_yield tok;
-      }
-    }
-  }
-  asm volatile ("" ::"m"(scope):"memory");
-}
-
-}  // namespace
-
 Macro Macro::root(void) const & {
   if (std::optional<Macro> p = parent()) {
     return p->root();
@@ -126,7 +94,7 @@ TokenRange Macro::use_tokens(void) const & {
       std::make_shared<CustomTokenReader>(std::move(frag));
   EntityOffset num_toks = 0u;
   auto nested_gen = children();
-  for (Token tok : GenerateUseTokens(this, &nested_gen)) {
+  for (Token tok : generate_use_tokens()) {
     reader->Append(std::move(tok.impl), tok.offset);
     ++num_toks;
   }
@@ -155,24 +123,64 @@ TokenRange Macro::expansion_tokens(void) const & {
 }
 
 gap::generator<Token> Macro::generate_use_tokens(void) const & {
-  auto nested_gen = children();
-  for (auto tok : GenerateUseTokens(this, &nested_gen)) {
-    co_yield tok;
+  TokensFromPreprocessedEntities reducer(children());
+
+  for (;;) {
+    auto tok = reducer.Next(
+        [] (TokensFromPreprocessedEntities &r, PreprocessedEntity ppe) {
+          if (std::holds_alternative<Token>(ppe)) {
+            r.Yield(std::move(std::get<Token>(ppe)));
+          } else if (std::holds_alternative<Macro>(ppe)) {
+            r.Enter(std::get<Macro>(ppe).children());
+          } else if (std::holds_alternative<Fragment>(ppe)) {
+            r.Enter(std::get<Fragment>(ppe).preprocessed_code());
+          } else {
+            assert(false);
+          }
+        });
+
+    if (!tok) {
+      co_return;
+    }
+
+    if (!tok.value()) {
+      assert(false);
+      continue;
+    }
+
+    co_yield std::move(tok.value());
   }
 }
 
 // Find the tokens the expansion tokens that are actually parsed.
 gap::generator<Token> Macro::generate_expansion_tokens(void) const & {
-  if (auto sub = MacroSubstitution::from(*this)) {
-    auto nested_gen = sub->replacement_children();
-    for (auto tok : GenerateExpansionTokens(this, &nested_gen)) {
-      co_yield tok;
+  TokensFromPreprocessedEntities reducer;
+  EnterExpansionTokens(reducer, *this);
+
+  for (;;) {
+    auto tok = reducer.Next(
+        [] (TokensFromPreprocessedEntities &r, PreprocessedEntity ppe) {
+          if (std::holds_alternative<Token>(ppe)) {
+            r.Yield(std::move(std::get<Token>(ppe)));
+          } else if (std::holds_alternative<Macro>(ppe)) {
+            EnterExpansionTokens(r, std::get<Macro>(ppe));
+          } else if (std::holds_alternative<Fragment>(ppe)) {
+            r.Enter(std::get<Fragment>(ppe).preprocessed_code());
+          } else {
+            assert(false);
+          }
+        });
+
+    if (!tok) {
+      co_return;
     }
-  } else {
-    auto nested_gen = children();
-    for (auto tok : GenerateExpansionTokens(this, &nested_gen)) {
-      co_yield tok;
+
+    if (!tok.value()) {
+      assert(false);
+      continue;
     }
+
+    co_yield std::move(tok.value());
   }
 }
 
