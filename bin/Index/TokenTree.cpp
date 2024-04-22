@@ -1284,7 +1284,7 @@ Substitution *TokenTreeImpl::BuildFromTokenList(
     // It's not a specialization of any kind, so we don't need to check if tokens
     // are contiguous or rebuild things.
     if (!rebuild && root_sub) {
-      root_sub->PrintDOT(std::cerr);
+      // root_sub->PrintDOT(std::cerr);
       return root_sub;
     }
   }

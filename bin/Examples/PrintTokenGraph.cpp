@@ -71,6 +71,7 @@ static void PrintToken(std::ostream &os, const mx::TokenRange &file_toks,
       case mx::MacroKind::EXPANSION:
       case mx::MacroKind::STRINGIFY:
       case mx::MacroKind::CONCATENATE:
+      case mx::MacroKind::PARAMETER_SUBSTITUTION:
         pred_prefix = "b";
         break;
       default:
