@@ -19,6 +19,7 @@
 
 #include "File.h"
 #include "Fragment.h"
+#include "Generator.h"
 
 // #define D(...) __VA_ARGS__
 #ifndef D
@@ -75,7 +76,8 @@ class SaveRestoreLastSequence final {
 
 // Return the leftmost use tokens of a macro.
 static Token LeftCornerOfExpansion(const Macro &exp) {
-  for (Token tok : exp.generate_expansion_tokens()) {
+  auto expansion_tokens = exp.generate_expansion_tokens();
+  for (Token tok : expansion_tokens) {
     return tok;
   }
   return Token();
@@ -83,7 +85,8 @@ static Token LeftCornerOfExpansion(const Macro &exp) {
 
 // Return the leftmost use tokens of a macro.
 static Token LeftCornerOfUse(const Macro &exp) {
-  for (Token tok : exp.generate_use_tokens()) {
+  auto use_tokens = exp.generate_use_tokens();
+  for (Token tok : use_tokens) {
     return tok;
   }
   return Token();
@@ -92,7 +95,8 @@ static Token LeftCornerOfUse(const Macro &exp) {
 // Return the rightmost use tokens of a macro.
 static Token RightCornerOfUse(const Macro &exp) {
   Token ret;
-  for (Token tok : exp.generate_use_tokens()) {
+  auto use_tokens = exp.generate_use_tokens();
+  for (Token tok : use_tokens) {
     ret = std::move(tok);
   }
   return ret;
@@ -100,7 +104,8 @@ static Token RightCornerOfUse(const Macro &exp) {
 
 // Return the leftmost use tokens of a macro.
 static Token LeftCornerOfUse(const Fragment &frag) {
-  for (auto tle : frag.preprocessed_code()) {
+  auto preprocessed_code = frag.preprocessed_code();
+  for (auto tle : preprocessed_code) {
     if (std::holds_alternative<Token>(tle)) {
       return std::get<Token>(tle);
 

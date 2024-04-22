@@ -21,15 +21,19 @@ using TokensFromPreprocessedEntities = VariantReducer<PreprocessedEntity, Token>
 
 static void EnterExpansionTokens(TokensFromPreprocessedEntities &reducer,
                                  Macro macro) {
-  reducer.Enter(
-      std::move(macro),
-      +[] (const Macro &m) {
-        if (auto sub = MacroSubstitution::from(m)) {
-          return sub->replacement_children();
-        } else {
-          return m.children();
-        }
-      });
+  switch (macro.kind()) {
+    case MacroKind::EXPANSION:
+    case MacroKind::SUBSTITUTION:
+    case MacroKind::PARAMETER_SUBSTITUTION:
+    case MacroKind::STRINGIFY:
+    case MacroKind::CONCATENATE:
+      reducer.Enter<MacroSubstitution, Macro>(
+          reinterpret_cast<const MacroSubstitution &>(macro),
+          &MacroSubstitution::replacement_children);
+      break;
+    default:
+      reducer.Enter<Macro>(std::move(macro), &Macro::children);
+  }
 }
 
 }  // namespace
@@ -97,8 +101,8 @@ TokenRange Macro::use_tokens(void) const & {
   std::shared_ptr<CustomTokenReader> reader =
       std::make_shared<CustomTokenReader>(std::move(frag));
   EntityOffset num_toks = 0u;
-  auto nested_gen = children();
-  for (Token tok : generate_use_tokens()) {
+  auto nested_gen = generate_use_tokens();
+  for (Token tok : nested_gen) {
     reader->Append(std::move(tok.impl), tok.offset);
     ++num_toks;
   }
@@ -119,7 +123,8 @@ TokenRange Macro::expansion_tokens(void) const & {
 
   auto reader = std::make_shared<CustomTokenReader>(std::move(frag));
   EntityOffset num_toks = 0u;
-  for (Token tok : generate_expansion_tokens()) {
+  auto nested_gen = generate_expansion_tokens();
+  for (Token tok : nested_gen) {
     reader->Append(std::move(tok.impl), tok.offset);
     ++num_toks;
   }
@@ -128,7 +133,7 @@ TokenRange Macro::expansion_tokens(void) const & {
 
 gap::generator<Token> Macro::generate_use_tokens(void) const & {
   TokensFromPreprocessedEntities reducer;
-  reducer.Enter(*this, +[] (const Macro &m) { return m.children(); });
+  reducer.Enter<Macro>(*this, &Macro::children);
 
   for (;;) {
     auto tok = reducer.Next(
@@ -137,12 +142,12 @@ gap::generator<Token> Macro::generate_use_tokens(void) const & {
             r.Yield(std::move(std::get<Token>(ppe)));
 
           } else if (std::holds_alternative<Macro>(ppe)) {
-            r.Enter(std::move(std::get<Macro>(ppe)),
-                    +[] (const Macro &m) { return m.children(); });
+            r.Enter<Macro>(std::move(std::get<Macro>(ppe)),
+                           &Macro::children);
 
           } else if (std::holds_alternative<Fragment>(ppe)) {
-            r.Enter(std::move(std::get<Fragment>(ppe)),
-                    +[] (const Fragment &f) { return f.preprocessed_code(); });
+            r.Enter<Fragment>(std::move(std::get<Fragment>(ppe)),
+                              &Fragment::preprocessed_code);
 
           } else {
             assert(false);
@@ -177,8 +182,8 @@ gap::generator<Token> Macro::generate_expansion_tokens(void) const & {
             EnterExpansionTokens(r, std::move(std::get<Macro>(ppe)));
 
           } else if (std::holds_alternative<Fragment>(ppe)) {
-            r.Enter(std::move(std::get<Fragment>(ppe)),
-                    +[] (const Fragment &f) { return f.preprocessed_code(); });
+            r.Enter<Fragment>(std::move(std::get<Fragment>(ppe)),
+                              &Fragment::preprocessed_code);
 
           } else {
             assert(false);
