@@ -558,9 +558,9 @@ static void PersistTokenTree(
   //            might not be colored. For macro use tokens, the dumped
   //            provenance DOT graph will show what actual connections were
   //            made.
-#ifndef NDEBUG
-  provenance.Dump(std::cerr);
-#endif
+// #ifndef NDEBUG
+//   provenance.Dump(std::cerr);
+// #endif
 
   // TODO(pag): Fix `num_parsed_tokens`.
   unsigned num_parsed_tokens = static_cast<unsigned>(pf.num_parsed_tokens);

@@ -112,6 +112,7 @@ class TokenProvenanceCalculator {
   void FallbackInitMacroProvenance(const std::vector<TokenTreeNode> &tokens);
   bool Pull(void);
   bool Push(void);
+  bool FinalPush(void);
 
   template <typename T>
   bool TryConnect(TokenInfo *, const T &tok);

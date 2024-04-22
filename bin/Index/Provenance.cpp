@@ -1752,6 +1752,39 @@ bool TokenProvenanceCalculator::Push(void) {
   return changed;
 }
 
+
+// Push information from originating tokens down to derived tokens.
+bool TokenProvenanceCalculator::FinalPush(void) {
+  auto it = ordered_tokens.rbegin();
+  auto it_end = ordered_tokens.rend();
+  auto changed = false;
+
+  for (; it != it_end; ++it) {
+    TokenInfo *tok = *it;
+
+    // We would have pushed this in `Push()`.
+    if (tok->parsed_token_id != mx::kInvalidEntityId) {
+      continue;
+    }
+
+    const auto rel_id = tok->related_entity_id;
+    if (rel_id == mx::kInvalidEntityId || !tok->child) {
+      continue;
+    }
+
+    for (TokenInfo *derived_tok : tok->Children(*this)) {
+      if (derived_tok->related_entity_id != mx::kInvalidEntityId) {
+        continue;
+      }
+
+      derived_tok->related_entity_id = rel_id;
+      changed = true;
+    }
+  }
+
+  return changed;
+}
+
 // Try to connect the macro token resulting from a token paste to the original
 // tokens that were pasted.
 void TokenProvenanceCalculator::TryConnectToConcatenatedTokens(
@@ -2031,6 +2064,8 @@ void TokenProvenanceCalculator::Run(
       ++iter;
     }
   }
+
+  FinalPush();
 }
 
 // This is the backup version when `tokens` only contains parsed tokens.
