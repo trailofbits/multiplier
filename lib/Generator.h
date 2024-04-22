@@ -6,9 +6,10 @@
 
 #include <cassert>
 #include <gap/core/generator.hpp>
+#include <list>
 #include <multiplier/Entity.h>
 #include <optional>
-#include <list>
+#include <type_traits>
 
 namespace mx {
 
@@ -17,16 +18,24 @@ namespace mx {
 template <typename V, typename T>
 class VariantReducer {
  private:
+
+  template <typename E>
+  using GeneratorGetter = gap::generator<V> (E::*)(void) const &;
+
+  template <typename X>
+  struct Tag {};
+
   // Packaged GAP generator.
   struct Generator {
-    VariantEntity lifetime;
+    const VariantEntity lifetime;
     gap::generator<V> generator;
     gap::generator<V>::iterator iterator;
 
-    template <typename E>
-    inline Generator(E lifetime_, gap::generator<V> (*get_generator)(const E &))
+    template <typename E, typename D>
+    inline Generator(Tag<E>, Tag<D>, D lifetime_,
+                     GeneratorGetter<D> get_generator)
         : lifetime(std::move(lifetime_)),
-          generator(get_generator(std::get<E>(lifetime))),
+          generator((reinterpret_cast<const D &>(std::get<E>(lifetime)).*get_generator)()),
           iterator(generator.begin()) {}
   };
 
@@ -34,9 +43,10 @@ class VariantReducer {
   std::optional<T> yield_val;
  
  public:
-  template <typename E>
-  void Enter(E lifetime_, gap::generator<V> (*get_generator)(const E &)) & {
-    generators.emplace_back(std::move(lifetime_), get_generator);
+  template <typename E, typename Base=E>
+  void Enter(E lifetime_, GeneratorGetter<E> get_generator) & {
+    generators.emplace_back(Tag<Base>{}, Tag<E>{},
+                            std::move(lifetime_), get_generator);
   }
 
   void Yield(T val) & {
