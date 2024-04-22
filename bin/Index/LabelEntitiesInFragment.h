@@ -26,10 +26,7 @@ class PendingFragment;
 // level entities.
 void InitializeEntityLabeller(PendingFragment &pf);
 
-// Label the parsed tokens and macros of this fragment. This focuses on finding the
-// entities that syntactically belong to this fragment, and assigning them
-// IDs. Labeling happens first for all fragments, then we run `Build` for
-// new fragments that we want to serialize.
-void LabelTokensAndMacrosInFragment(PendingFragment &pf);
+// Label the parsed tokens in this fragment.
+void LabelTokensInFragment(PendingFragment &pf);
 
 }  // namespace indexer

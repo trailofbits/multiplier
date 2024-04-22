@@ -183,7 +183,10 @@ class TLDFinder final : public pasta::DeclVisitor {
     }
 
     std::optional<PrevValueTracker<const void *>> save_restore;
-    if (track_parent) {
+    
+    // NOTE(pag): If this isn't a C++ class/struct, so we don't need/want to
+    //            maintain trigger fragment nesting.
+    if (track_parent && dc_decl.Kind() != pasta::DeclKind::kRecord) {
       save_restore.emplace(parent_decl, RawEntity(dc_decl));
     }
 
@@ -2292,6 +2295,8 @@ static void CreateFreestandingDeclFragment(
   //            `EntityMapper` for the fragment.
   pf->drop_token_provenance = true;
 
+  pf->is_floating = true;
+
   pending_fragments.emplace_back(std::move(pf));
 }
 
@@ -2343,11 +2348,7 @@ static void CreateFloatingDirectiveFragment(
       nullptr  /* parent entity */,
       false  /* using parsed tokens */);
 
-  // NOTE(pag): This will not persist token ids, because there are no tokens
-  //            in the empty range, but it will persist  some macros globally.
-  //            When the `EntityMapper` is reset for a fragment prior to
-  //            persisting, those macros ids will persist.
-  // LabelTokensAndMacrosInFragment(*pf);
+  pf->is_floating = true;
 
   pending_fragments.emplace_back(std::move(pf));
 }
@@ -2616,6 +2617,14 @@ static void PersistParsedFragments(
   std::vector<mx::PackedFragmentId> fragment_ids;
   std::vector<FragmentBounds> nested_fragment_bounds;
 
+  // Process floating fragments (macro directives) and freestanding fragments
+  // (declarator-embedded `struct` forward declarations) first.
+  std::stable_sort(
+      pending_fragments.begin(), pending_fragments.end(),
+      [] (const PendingFragmentPtr &a, const PendingFragmentPtr &b) {
+        return a->is_floating && !b->is_floating;
+      });
+
   auto num_new = 0u;
   for (PendingFragmentPtr &pf : pending_fragments) {
 
@@ -2773,8 +2782,7 @@ static std::optional<pasta::AST> CompileJobToAST(
 IndexCompileJobAction::~IndexCompileJobAction(void) {}
 
 IndexCompileJobAction::IndexCompileJobAction(
-    GlobalIndexingState &context_,
-    pasta::FileManager file_manager_,
+    GlobalIndexingState &context_, pasta::FileManager file_manager_,
     pasta::Compiler compiler_, pasta::CompileJob job_)
     : context(context_),
       file_manager(std::move(file_manager_)),

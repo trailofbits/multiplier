@@ -167,7 +167,7 @@ bool ShouldGoInFloatingFragment(const pasta::Macro &macro);
 
 // Returns `true` if a macro is visible across fragments, and should have an
 // entity id stored in the global mapper.
-bool AreVisibleAcrossFragments(const pasta::Macro &macro);
+bool IsVisibleAcrossFragments(const pasta::Macro &macro);
 
 // Tells us if a given decl is probably a use that also acts as a forward
 // declaration.
