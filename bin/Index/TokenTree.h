@@ -52,6 +52,7 @@ class TokenTreeNode {
       : impl(std::move(impl_)) {}
 
  public:
+  std::optional<TokenTree> Parent(void) const noexcept;
   std::optional<pasta::PrintedToken> PrintedToken(void) const noexcept;
   std::optional<pasta::MacroToken> MacroToken(void) const noexcept;
   std::optional<pasta::Token> Token(void) const noexcept;
