@@ -168,6 +168,9 @@ class PendingFragment {
   // Did we encounter an error during serialization?
   bool has_error{false};
 
+  // Is this a floating directive fragment, or a freestanding decl fragment?
+  bool is_floating{false};
+
   // Is this a new fragment? This affects whether or not we keep track of types.
   // We don't want `PendingFragment` for a pre-existing type to "take ownership"
   // of a type, only to have that pending fragment "thrown away" later (due to

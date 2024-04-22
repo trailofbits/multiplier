@@ -896,7 +896,7 @@ bool ShouldGoInFloatingFragment(const pasta::Macro &macro) {
     return false;
   }
 
-  switch (dir->Kind()) {
+  switch (macro.Kind()) {
     case pasta::MacroKind::kIncludeDirective:
     case pasta::MacroKind::kIncludeNextDirective:
     case pasta::MacroKind::kIncludeMacrosDirective:
@@ -935,9 +935,9 @@ bool IsLambda(const pasta::Decl &decl) {
 
 // Returns `true` if a macro is visible across fragments, and should have an
 // entity id stored in the global mapper.
-bool AreVisibleAcrossFragments(const pasta::Macro &macro) {
+bool IsVisibleAcrossFragments(const pasta::Macro &macro) {
   return ShouldGoInFloatingFragment(macro) ||
-         pasta::MacroParameter::From(macro);
+         macro.Kind() == pasta::MacroKind::kParameter;
 }
 
 // Tells us if a given decl is probably a use that also acts as a forward

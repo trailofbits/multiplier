@@ -1289,9 +1289,20 @@ Substitution *TokenTreeImpl::BuildFromTokenList(
     }
   }
 
-  // std::cerr << "\n-- REBUILDING TREE ----------\n";
-  // std::cerr << pf.top_level_decls.front().Tokens().Data() << '\n';
-  // Dump(pf.top_level_decls.front());
+  // {
+  //   std::unique_lock<std::mutex> locker(gPrintDOTLock);
+  //   std::cerr
+  //       << "\n-- REBUILDING TREE:"
+  //       << " parsed_tokens_are_printed=" << pf.parsed_tokens_are_printed
+  //       << " has_any_macros=" << has_any_macros
+  //       << " original_tokens=" << pf.original_tokens.has_value()
+  //       << " root_sub=" << (!!root_sub) << '\n';
+  //   if (root_sub) {
+  //     root_sub->PrintDOT(std::cerr);
+  //   }
+  //   std::cerr << pf.top_level_decls.front().Tokens().Data() << '\n';
+  //   Dump(pf.top_level_decls.front());
+  // }
 
   Rebuilder rebuilder(pf);
   rebuilder.AllocateTokens(pf.parsed_tokens);
@@ -2268,7 +2279,9 @@ bool TokenTreeImpl::BuildMacroSubstitution(
     const PendingFragment &pf, Substitution *sub, Substitution::NodeList &nodes,
     const pasta::MacroDirective &node, std::ostream &err) {
 
-  Substitution *dir = CreateDirectiveFragment(pf, node);
+  Substitution *dir = ShouldGoInFloatingFragment(node) ?
+                      CreateDirectiveFragment(pf, node) :
+                      nullptr;
   if (!dir) {
     dir = CreateSubstitution(mx::FromPasta(node.Kind()));
     dir->macro = node;

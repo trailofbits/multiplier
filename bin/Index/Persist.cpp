@@ -221,6 +221,7 @@ struct TokenTreeSerializationSchedule {
 
     const void *raw_tt = RawEntity(tt);
     const void *raw_locator = raw_tt;
+    const void *global_macro_locator = nullptr;
 
     // Nested fragment.
     if (auto frag_id = tt.NestedFragmentId()) {
@@ -237,6 +238,10 @@ struct TokenTreeSerializationSchedule {
 
       } else {
         CHECK(!pasta::MacroDirective::From(macro.value()));
+      }
+
+      if (IsVisibleAcrossFragments(macro.value())) {
+        global_macro_locator = RawEntity(macro.value());
       }
     }
 
@@ -296,6 +301,9 @@ struct TokenTreeSerializationSchedule {
     if (is_part_of_define && is_part_of_fragment && raw_locator &&
         raw_tt != raw_locator) {
       (void) em.entity_ids.emplace(raw_locator, raw_id);
+    
+    } else if (global_macro_locator) {
+      (void) em.entity_ids.emplace(global_macro_locator, raw_id);
     }
 
     return raw_id;
@@ -828,7 +836,7 @@ void GlobalIndexingState::PersistFragment(
   mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
 
   // Labels tokens and macros.
-  LabelTokensAndMacrosInFragment(pf);
+  LabelTokensInFragment(pf);
 
   // Drop the connections between `pasta::PrintedToken::DerivedLocation` and
   // `pasta::Token`.

@@ -350,6 +350,10 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
 // Create initial macro IDs for all of the top-level macros in the range of
 // this fragment.
 bool EntityLabeller::Label(const pasta::Macro &entity) {
+  if (!IsVisibleAcrossFragments(entity)) {
+    return false;
+  }
+
   auto &entity_list = fragment.EntityListFor(entity);
 
   mx::MacroId id;
@@ -360,11 +364,9 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
   // Macro directives and macro `#define` parameters can be referenced by other
   // fragments that contain expansions of those definitions, and substitutions
   // of those parameters for arguments.
-  if (AreVisibleAcrossFragments(entity)) {
-    CHECK(em.entity_ids.emplace(entity.RawMacro(), id).second);
-  }
+  CHECK(em.entity_ids.emplace(entity.RawMacro(), id).second);
 
-  CHECK(em.token_tree_ids.emplace(entity.RawMacro(), id).second);
+  // CHECK(em.token_tree_ids.emplace(entity.RawMacro(), id).second);
 
   // NOTE(pag): `TokenTreeSerializationSchedule::RecordEntityId` in Persist.cpp
   //            fills in the empty slots.
@@ -397,6 +399,16 @@ void InitializeEntityLabeller(PendingFragment &pf) {
 
   EntityLabeller labeller(pf);
 
+  // TODO(pag): Define macro directives and their parameters need to be
+  //            part of the global entity map, not the per-fragment ones.
+  //
+  //            Make sure to check and fix uses of `PerFragmentEntityId` in
+  //            entity mapper.
+
+  for (const auto &macro : pf.top_level_macros) {
+    (void) labeller.Label(macro);
+  }
+
   // Go top-down through the top-level declarations of this pending fragment
   // and build up an initial list of `decls_to_serialize` and
   // `stmts_to_serialize`. This list will be expanded to fixpoint by
@@ -424,11 +436,11 @@ void InitializeEntityLabeller(PendingFragment &pf) {
   labeller.Run();
 }
 
-// Label the parsed tokens and macros of this fragment. This focuses on finding the
+// Label the parsed tokens of this fragment. This focuses on finding the
 // entities that syntactically belong to this fragment, and assigning them
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
-void LabelTokensAndMacrosInFragment(PendingFragment &pf) {
+void LabelTokensInFragment(PendingFragment &pf) {
 
   if (pf.has_labelled_tokens) {
     return;  // Already done.
@@ -436,18 +448,6 @@ void LabelTokensAndMacrosInFragment(PendingFragment &pf) {
 
   EntityLabeller labeller(pf);
   pf.has_labelled_tokens = true;
-
-  // TODO(pag): Define macro directives and their parameters need to be
-  //            part of the global entity map, not the per-fragment ones.
-  //
-  //            Make sure to check and fix uses of `PerFragmentEntityId` in
-  //            entity mapper.
-
-  if (!pf.num_top_level_declarations) {
-    for (const auto &macro : pf.top_level_macros) {
-      (void) labeller.Label(macro);
-    }
-  }
 
   auto might_have_nested_fragments =
       pf.num_top_level_declarations == 1u &&
