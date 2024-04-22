@@ -215,9 +215,6 @@ struct TokenTreeSerializationSchedule {
   std::vector<TokenTreeNode> tokens;
   std::vector<TokenTreeNode> macro_tokens;
 
-  // Maps parsed tokens to the macro in which they are contained.
-  std::vector<mx::RawEntityId> containing_macro;
-
   mx::RawEntityId RecordEntityId(TokenTree tt,
                                  bool &is_part_of_define,
                                  bool &is_part_of_fragment) {
@@ -318,6 +315,8 @@ struct TokenTreeSerializationSchedule {
 
     // Fill in IDs for derived tokens.
     } else {
+      DCHECK_EQ(em.EntityId(node.Parent()), parent_id);
+
       mx::MacroTokenId id;
       id.kind = mx::TokenKind::UNKNOWN;
       id.fragment_id = pf.fragment_index;
@@ -392,8 +391,6 @@ struct TokenTreeSerializationSchedule {
       if (raw_pt) {
         em.token_tree_ids.emplace(raw_pt, raw_id);
       }
-
-      containing_macro.push_back(parent_id);
     }
 
     CHECK(em.token_tree_ids.emplace(raw_tt, raw_id).second);
@@ -421,6 +418,8 @@ struct TokenTreeSerializationSchedule {
       mx::RawEntityId child_id = RecordEntityId(
           std::move(node), parent_id, is_part_of_define, is_part_of_fragment);
 
+      CHECK_NE(child_id, mx::kInvalidEntityId);
+
       // If this is a macro directive that is nested inside of another fragment,
       // then assume that we've already extracted the directive from that other
       // fragment and persisted it.
@@ -432,6 +431,8 @@ struct TokenTreeSerializationSchedule {
         continue;
       }
 
+      DCHECK_EQ(child_id, em.EntityId(sub.value()));
+
       const void *child = RawEntity(sub.value());
 
       Schedule(child, child_id, is_part_of_define, sub->Children());
@@ -441,9 +442,8 @@ struct TokenTreeSerializationSchedule {
       }
 
       if (sub->HasIntermediateChildren()) {
-        Schedule(
-            child, child_id, is_part_of_define,
-            sub->IntermediateChildren());
+        Schedule(child, child_id, is_part_of_define,
+                 sub->IntermediateChildren());
       }
 
       Schedule(child, child_id, is_part_of_define,
@@ -668,7 +668,7 @@ static void PersistTokenTree(
     }
 
     // Map the token to its containing macro.
-    mx::EntityId macro_eid(sched.containing_macro[i]);
+    mx::EntityId macro_eid(em.EntityId(tok_node.Parent()));
     mx::VariantId macro_vid = macro_eid.Unpack();
     if (std::holds_alternative<mx::MacroId>(macro_vid)) {
       mx::MacroId mid = std::get<mx::MacroId>(macro_vid);

@@ -1256,8 +1256,8 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
 Substitution *TokenTreeImpl::BuildFromTokenList(
     const PendingFragment &pf, std::ostream &err) {
 
-  std::cerr << "\n-- BUILDING TREE " << pf.fragment_id.Unpack().fragment_id << " ----------\n";
-  std::cerr << pf.parsed_tokens.Data() << "\n";
+  // std::cerr << "\n-- BUILDING TREE " << pf.fragment_id.Unpack().fragment_id << " ----------\n";
+  // std::cerr << pf.parsed_tokens.Data() << "\n";
 
   Substitution *root_sub = nullptr;
 
@@ -1577,6 +1577,7 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
           pending_macro = FindPendingMacro(pf, info->macro_tok->Parent());
           if (!pending_macro) {
             subs.back().second->emplace_back(info);
+            info->parent = subs.back().first;
             break;
           }
 
@@ -1606,6 +1607,7 @@ Substitution *TokenTreeImpl::BuildFromParsedTokenList(
         assert(!tok.MacroLocation());
         info = &(tokens_alloc.emplace_back());
         info->parsed_tok = std::move(tok);
+        info->parent = subs.back().first;
         subs.back().second->emplace_back(info);
         break;
     }
@@ -2012,6 +2014,7 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
       case pasta::TokenKind::kEndOfDirective:
         continue;
       default:
+        info.parent = body;
         body->before.emplace_back(&info);
         break;
     }
@@ -2317,6 +2320,20 @@ std::optional<TokenTreeNodeRange> TokenTree::Create(
 
   } catch (const char *msg) {
     err << msg;
+    return std::nullopt;
+  }
+}
+
+std::optional<TokenTree> TokenTreeNode::Parent(void) const noexcept {
+  if (const auto &ent = (*impl)[offset];
+      std::holds_alternative<TokenInfo *>(ent)) {
+    auto parent = std::get<TokenInfo *>(ent)->parent;
+    if (!parent || !parent->parent) {
+      return std::nullopt;
+    }
+
+    return TokenTree(std::shared_ptr<const Substitution>(impl, parent));
+  } else {
     return std::nullopt;
   }
 }

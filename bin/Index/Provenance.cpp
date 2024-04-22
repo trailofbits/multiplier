@@ -1538,6 +1538,16 @@ static int Score(mx::RawEntityId fragment_index, mx::EntityId eid) {
     if (std::get<mx::MacroId>(vid).fragment_id != fragment_index) {
       score += 1;
     }
+    switch (std::get<mx::MacroId>(vid).kind) {
+      case mx::MacroKind::DEFINE_DIRECTIVE:
+        score += 3;
+        break;
+      case mx::MacroKind::EXPANSION:
+        score += 2;
+        break;
+      default:
+        break;
+    }
     score += 30;
 
   } else if (std::holds_alternative<mx::StmtId>(vid)) {
