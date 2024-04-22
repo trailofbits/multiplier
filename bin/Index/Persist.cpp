@@ -461,7 +461,10 @@ struct TokenTreeSerializationSchedule {
 
   void Schedule(TokenTreeNodeRange nodes) {
     Schedule(nullptr, mx::kInvalidEntityId, false, std::move(nodes));
-    CHECK_EQ(tokens.size(), pf.num_parsed_tokens);
+    auto tok_data = pf.original_tokens ? pf.original_tokens->Data() :
+                    pf.parsed_tokens.Data();
+    CHECK_EQ(tokens.size(), pf.num_parsed_tokens)
+        << "On token data: " << tok_data; 
     tokens.insert(tokens.end(), std::make_move_iterator(macro_tokens.begin()),
                   std::make_move_iterator(macro_tokens.end()));
   }
@@ -830,7 +833,12 @@ void GlobalIndexingState::PersistFragment(
   EntityMapper &em = pf.em;
   em.ResetForFragment();
 
-  ProgressBarWork fragment_progress_tracker(fragment_progress);
+  std::optional<ProgressBarWork> fragment_progress_tracker;
+  if (pf.raw_parent_entity) {
+    fragment_progress_tracker.emplace(nested_fragment_progress);
+  } else {
+    fragment_progress_tracker.emplace(fragment_progress);
+  }
 
   capnp::MallocMessageBuilder message;
   mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();

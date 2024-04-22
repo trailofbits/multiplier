@@ -58,6 +58,9 @@ class GlobalIndexingState {
   // Tracks progress in serializing fragments.
   std::unique_ptr<ProgressBar> fragment_progress;
 
+  // Tracks progress in serializing fragments.
+  std::unique_ptr<ProgressBar> nested_fragment_progress;
+
   // Tracks progress in serializing types.
   std::unique_ptr<ProgressBar> type_progress;
 
