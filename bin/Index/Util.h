@@ -19,6 +19,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <unordered_set>
 #include <variant>
 
 namespace pasta {
@@ -31,6 +32,7 @@ class DeclContext;
 class Designator;
 class File;
 class FileToken;
+class FunctionDecl;
 class Macro;
 class MacroToken;
 class PrintedToken;
@@ -179,8 +181,17 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl);
 // Does `decl` look like a lambda?
 bool IsLambda(const pasta::Decl &decl);
 
+// Lots of methods are auto-generated, e.g. constructors, conversion operators,
+// etc. These superficially look like builtins, but we don't want to treat them
+// as such.
+bool IsImplicitMethod(const pasta::Decl &decl);
+
 // List the indexable declarations in this declcontext.
 std::vector<pasta::Decl> DeclarationsInDeclContext(const pasta::DeclContext &dc);
+
+// Get the instantiation pattern.
+std::optional<pasta::FunctionDecl> TemplateInstantiationPattern(
+    const pasta::FunctionDecl &decl);
 
 template <typename T>
 inline static bool ShouldHideFromIndexer(const T &) {
@@ -375,5 +386,6 @@ class PrevValueTracker {
 // If this is a debug build, then invoke Clang's `clang::Decl::dumpColor()` on
 // `decl`.
 void Dump(const pasta::Decl &decl);
+void Print(const pasta::Decl &decl);
 
 }  // namespace indexer

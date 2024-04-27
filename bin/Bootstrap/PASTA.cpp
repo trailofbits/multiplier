@@ -3590,6 +3590,12 @@ MethodListPtr CodeGenerator::RunOnClass(
           abort();
         }
 
+        // Work around this method returning only the pattern info for definitions.
+        auto meth_or_func = "MX_APPLY_METHOD";
+        if (class_name == "FunctionDecl" && api_name == "TemplateInstantiationPattern") {
+          meth_or_func = "MX_APPLY_FUNC";
+        }
+
         serialize_inc_os
             << "  MX_VISIT_ENTITY(" << class_name << ", " << api_name
             << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "

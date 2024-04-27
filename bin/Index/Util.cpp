@@ -536,6 +536,13 @@ bool IsSerializableDecl(const pasta::Decl &decl) {
     case pasta::DeclKind::kTranslationUnit:
     case pasta::DeclKind::kCXXDeductionGuide:
       return false;
+
+    // Function templates can contain deduction guides.
+    case pasta::DeclKind::kFunctionTemplate: {
+      auto &ft = reinterpret_cast<const pasta::FunctionTemplateDecl &>(decl);
+      return IsSerializableDecl(ft.TemplatedDeclaration());
+    }
+
     default:
       return !decl.IsInvalidDeclaration();
   }
@@ -732,7 +739,7 @@ bool IsSpecialization(const pasta::Decl &decl) {
         return pattern->DescribedFunctionTemplate().has_value();
       }
 
-      return func.TemplateInstantiationPattern().has_value();
+      return TemplateInstantiationPattern(func).has_value();
     }
 
     case pasta::DeclKind::kFunction: {
@@ -750,7 +757,7 @@ bool IsSpecialization(const pasta::Decl &decl) {
         return pattern->DescribedFunctionTemplate().has_value();
       }
 
-      return func.TemplateInstantiationPattern().has_value();
+      return TemplateInstantiationPattern(func).has_value();
     }
 
     default:
@@ -902,6 +909,9 @@ bool ShouldGoInFloatingFragment(const pasta::Macro &macro) {
     case pasta::MacroKind::kIncludeMacrosDirective:
     case pasta::MacroKind::kImportDirective:
       return false;
+    case pasta::MacroKind::kExpansion:
+      assert(false);
+      return false;
     default:
       return true;
   }
@@ -928,6 +938,31 @@ bool IsLambda(const pasta::Decl &decl) {
     case pasta::DeclKind::kFunctionTemplate:
       return IsLambda(
           reinterpret_cast<const pasta::FunctionTemplateDecl &>(decl).TemplatedDeclaration());
+    default:
+      return false;
+  }
+}
+
+// Lots of methods are auto-generated, e.g. constructors, conversion operators,
+// etc. These superficially look like builtins, but we don't want to treat them
+// as such.
+bool IsImplicitMethod(const pasta::Decl &decl) {
+  if (!decl.IsImplicit()) {
+    return false;
+  }
+
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod:
+      return true;
+
+    case pasta::DeclKind::kFunctionTemplate:
+      return IsImplicitMethod(
+          reinterpret_cast<const pasta::FunctionTemplateDecl &>(decl).TemplatedDeclaration());
+  
     default:
       return false;
   }
@@ -972,19 +1007,17 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
   }
 
   switch (decl.Kind()) {
-    case pasta::DeclKind::kFunction: {
-      auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
-      if (auto pattern_decl = func.TemplateInstantiationPattern()) {
-        // Return true if
-        //        1) isReferenced() is false
-        //        2) pattern->doesThisDeclarationHaveABody() is true
-        //        3) decl->doesThisDeclarationHaveABody() is false
-        return pattern_decl->DoesThisDeclarationHaveABody() &&
-               !func.DoesThisDeclarationHaveABody() &&
-               !func.IsReferenced();
-      }
-      break;
-    }
+
+    // // Function templates whose bodies are not fully instantiated.
+    // case pasta::DeclKind::kFunction: {
+    //   auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
+    //   if (auto pattern_decl = TemplateInstantiationPattern(func)) {
+    //     return pattern_decl->DoesThisDeclarationHaveABody() &&
+    //            !func.DoesThisDeclarationHaveABody() &&
+    //            !func.IsReferenced();
+    //   }
+    //   break;
+    // }
 
     case pasta::DeclKind::kUsingDirective:
       return decl.IsImplicit();
@@ -1199,6 +1232,27 @@ const void *RawEntity(const pasta::DerivedToken &entity) {
   }
 }
 
+// Get the instantiation pattern.
+std::optional<pasta::FunctionDecl> TemplateInstantiationPattern(
+    const pasta::FunctionDecl &decl) {
+  auto is_def = decl.IsThisDeclarationADefinition();
+  if (is_def) {
+    if (auto ret = decl.TemplateInstantiationPattern()) {
+      return ret;
+    }
+  }
+
+  auto raw_decl = reinterpret_cast<const clang::FunctionDecl *>(decl.RawDecl());
+  auto pattern = raw_decl->getTemplateInstantiationPattern(false);
+  if (!pattern) {
+    assert(!is_def || !raw_decl->getTemplateInstantiationPattern());
+    return std::nullopt;
+  }
+
+  auto adopted = pasta::AST::From(decl).Adopt(pattern);
+  return reinterpret_cast<const pasta::FunctionDecl &>(adopted);
+}
+
 uint32_t Hash32(std::string_view data) {
   if (data.empty()) {
     return 0u;
@@ -1220,6 +1274,10 @@ void Dump(const pasta::Decl &decl) {
   decl.RawDecl()->dumpColor();
 #endif
   (void) decl;
+}
+
+void Print(const pasta::Decl &decl) {
+  std::cerr << decl.Tokens().Data() << '\n';
 }
 
 }  // namespace indexer

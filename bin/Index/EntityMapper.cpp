@@ -410,8 +410,27 @@ mx::RawEntityId EntityMapper::ParentFragmentId(
   } else if (std::holds_alternative<mx::FragmentId>(vid)) {
     parent_frag_index = std::get<mx::FragmentId>(vid).fragment_id;
 
+  // This generally indicates one of three problems:
+  //
+  //    - There is something that was discovered, e.g. via a template
+  //      specialization list, that isn't actually discoverable from a decl
+  //      context (i.e. it's not added to a `DeclContext` in Clang). This
+  //      generally requires a Clang patch. You can test this by checking:
+  //
+  //        decl->getDeclContext()->containsDecl(decl)
+  //        decl->getLexicalDeclContext()->containsDecl(decl)
+  //
+  //    - There is something wrong in Bounds.cpp in PASTA. This could be that
+  //      there is something that shows up with a token location logically
+  //      before that of `parent_entity`.
+  //
+  //    - The bounds of the entity and its parents match, but there is a
+  //      heuristic, e.g. `ExpandDeclRange` or a called function in
+  //      `IndexCompileJob.cpp`, that goes and expands the range (e.g. to
+  //      include leading whitespace), and that triggers a child to somehow
+  //      show up before its parent.
   } else {
-    assert(false);
+    CHECK(false);
     return mx::kInvalidEntityId;
   }
 

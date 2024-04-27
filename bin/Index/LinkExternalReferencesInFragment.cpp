@@ -259,7 +259,7 @@ static void AddFunctionSpecialization(
       raw_tpl_id = em.EntityId(func_pattern.value());
     }
   
-  } else if (auto tpl_pattern = func.TemplateInstantiationPattern()) {
+  } else if (auto tpl_pattern = TemplateInstantiationPattern(func)) {
     if (auto tpl = tpl_pattern->DescribedFunctionTemplate()) {
       raw_tpl_id = em.EntityId(tpl.value());
     } else {

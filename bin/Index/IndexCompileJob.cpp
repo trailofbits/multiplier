@@ -55,15 +55,6 @@ struct OrderedDecl {
   }
 };
 
-struct OrderedMacro {
-  pasta::Macro macro;
-  unsigned order;
-
-  inline OrderedMacro(pasta::Macro macro_, unsigned order_)
-      : macro(std::move(macro_)),
-        order(order_) {}
-};
-
 // A declaration, the index of the first token to be saved associated with
 // the decl, and the (inclusive) index of the last token associated with
 // this token.
@@ -78,12 +69,34 @@ struct EntityRange {
   mx::EntityOffset begin_index;
   mx::EntityOffset end_index;
 
+  unsigned order;
+
   inline EntityRange(Entity entity_, const void *parent_,
-                     mx::EntityOffset begin_index_, mx::EntityOffset end_index_)
+                     mx::EntityOffset begin_index_, mx::EntityOffset end_index_,
+                     unsigned order_)
       : entity(std::move(entity_)),
         parent(parent_),
         begin_index(begin_index_),
-        end_index(end_index_) {}
+        end_index(end_index_),
+        order(order_) {}
+
+  inline bool operator<(const EntityRange &b) const {
+    if (begin_index < b.begin_index) {
+      return true;
+    } else if (begin_index > b.begin_index) {
+      return false;
+    } else if (!parent && b.parent) {
+      return true;
+    } else if (parent && !b.parent) {
+      return false;
+    } else if (end_index > b.end_index) {
+      return true;  // Encloses.
+    } else if (end_index < b.end_index) {
+      return false;
+    } else {
+      return order < b.order;
+    }
+  }
 };
 
 // A group of declarations with overlapping `EntityRange`s, along with the
@@ -97,11 +110,16 @@ struct EntityGroupRange {
   mx::EntityOffset begin_index;
   mx::EntityOffset end_index;
 
+  // Original order. This is helpful when we want make sure that we visit
+  // declarations in the right order.
+  unsigned order;
+
   inline EntityGroupRange(EntityGroup group_, mx::EntityOffset begin_index_,
-                          mx::EntityOffset end_index_)
+                          mx::EntityOffset end_index_, unsigned order_)
       : group(std::move(group_)),
         begin_index(begin_index_),
-        end_index(end_index_) {}
+        end_index(end_index_),
+        order(order_) {}
 };
 
 static bool IsProbablyABuiltinDecl(const pasta::Decl &decl);
@@ -113,14 +131,23 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   EntityMapper &em;
 
+  // Parent declaration of the declaration that we'd like to add. The parent
+  // declaration isn't always a top-level declaration. Instead, it can be
+  // something within a top-level decl, e.g. the parent of a lambda might be
+  // a method, but the method is inside of a top-level declaration, which is
+  // a class.
   const void *parent_decl{nullptr};
 
   // Tracks declarations for which we've seen the specializations. This is
   // to prevent us from double-adding specializations.
   std::unordered_set<const void *> seen;
 
-  // Depth of a decl context.
-  std::unordered_map<const void *, unsigned> dc_depth;
+  std::unordered_set<const void *> deferred_seen;
+
+  std::vector<std::pair<const void *, pasta::Decl>> pending_child_decls;
+  std::vector<std::pair<const void *, pasta::Decl>> pending_lambdas;
+
+  std::unordered_map<const void *, const void *> actual_parent;
 
   // If it doesn't look like a builtin declaration, then shift the order
   // by a fudge factor. Clang can invent a lot of builtins, though definitely
@@ -131,6 +158,13 @@ class TLDFinder final : public pasta::DeclVisitor {
   unsigned depth{0u};
 
   void AddDeclAlways(const pasta::Decl &decl) {
+    DCHECK(seen.count(RawEntity(decl)));
+
+    if (parent_decl) {
+      CHECK_NE(parent_decl, RawEntity(decl));
+      // CHECK(em.IsTopLevel(parent_decl));
+    }
+
     em.MarkAsTopLevel(decl);
 
     if (IsProbablyABuiltinDecl(decl)) {
@@ -138,6 +172,19 @@ class TLDFinder final : public pasta::DeclVisitor {
     } else {
       tlds.emplace_back(decl, parent_decl, order++);
     }
+
+    // LOG(ERROR) << "top-level " << decl.KindName() << ' ' << RawEntity(decl)
+    //            << " with parent " << parent_decl  << ' ' << tlds.back().order;
+  }
+
+  const void *RealParent(const void *parent) const {
+    auto it = actual_parent.find(parent);
+    if (it == actual_parent.end()) {
+      return parent;
+    }
+
+    // LOG(ERROR) << "Real parent of " << parent << " is " << it->second;
+    return it->second;
   }
 
   // Clang will invent some builtins just-in-time, and "just-in-time" ends up
@@ -152,6 +199,30 @@ class TLDFinder final : public pasta::DeclVisitor {
     }
   }
 
+  template <typename T>
+  void ScheduleAccept(std::optional<T> parent, pasta::Decl child) {
+    if (parent) {
+      ScheduleAccept(parent.value(), std::move(child));
+    }
+  }
+
+  void ScheduleAccept(const pasta::Decl &parent, pasta::Decl child) {
+    auto raw_parent = RawEntity(parent);
+    auto raw_child = RawEntity(child);
+    CHECK_NE(raw_parent, raw_child);
+    CHECK(seen.emplace(raw_child).second);
+    CHECK(deferred_seen.emplace(raw_child).second);
+    // LOG(ERROR) << "Scheduling " << raw_child << " with parent " << RawEntity(parent);
+    pending_child_decls.emplace_back(raw_parent, std::move(child));
+  }
+
+  void ScheduleLambda(const pasta::Decl &parent, pasta::Decl child) {
+    auto raw_child = RawEntity(child);
+    CHECK(seen.emplace(raw_child).second);
+    CHECK(deferred_seen.emplace(raw_child).second);
+    pending_lambdas.emplace_back(RawEntity(parent), std::move(child));
+  }
+
  public:
   virtual ~TLDFinder(void) = default;
 
@@ -160,30 +231,18 @@ class TLDFinder final : public pasta::DeclVisitor {
         em(em_) {}
 
   void VisitDeeperDeclContext(const pasta::Decl &dc_decl,
-                              const pasta::DeclContext &dc) {
+                              const pasta::DeclContext &dc,
+                              bool track_parent = true) {
     ++depth;
-    VisitDeclContext(dc_decl, dc);    
+    VisitDeclContext(dc_decl, dc, track_parent);
     --depth;
   }
 
   void VisitDeclContext(const pasta::Decl &dc_decl,
                         const pasta::DeclContext &dc,
                         bool track_parent = true) {
-
-    // Prevent us from revisiting the same decl context twice. It can be the
-    // case that we see a decl context nested inside itself. This is due to
-    // injected class names in Clang (`C++ [class]p2`) where a class is injected
-    // into itself to help with things like `friend` and argument-dependent
-    // lookups. In those cases, we mark that injected class with
-    // `Decl::RemappedDecl` back to its parent, and then PASTA follows the
-    // `->RemappedDecl` links, thus hiding its uniqueness from us, and making
-    // the resulting visit circular.
-    if (!dc_depth.emplace(RawEntity(dc), depth).second) {
-      return;  // Already visited.
-    }
-
     std::optional<PrevValueTracker<const void *>> save_restore;
-    
+
     // NOTE(pag): If this isn't a C++ class/struct, so we don't need/want to
     //            maintain trigger fragment nesting.
     if (track_parent && dc_decl.Kind() != pasta::DeclKind::kRecord) {
@@ -191,25 +250,64 @@ class TLDFinder final : public pasta::DeclVisitor {
     }
 
     for (const pasta::Decl &decl : dc.AlreadyLoadedDeclarations()) {
-      if (!decl.IsInvalidDeclaration() && !ShouldHideFromIndexer(decl)) {
-        Accept(decl);
+      if (dc_decl == decl) {
+        continue;
+      }
+
+      DCHECK(!decl.IsInvalidDeclaration());
+
+      Accept(decl);
+      if (parent_decl && !em.IsTopLevel(decl)) {
+        actual_parent.emplace(RawEntity(decl), parent_decl);
       }
     }
   }
 
   void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final {
+    actual_parent.emplace(RawEntity(decl), nullptr);
+
     VisitDeclContext(decl, decl, false  /* don't track parentage */);
+
+    pending_child_decls.insert(
+        pending_child_decls.end(),
+        std::make_move_iterator(pending_lambdas.begin()),
+        std::make_move_iterator(pending_lambdas.end()));
+    pending_lambdas.clear();
+
+    // Flush pending children. This generally happens because of lambdas. Our
+    // patches place them at a translation unit context (lexically), but leave
+    // their semantic decl contexts alone. However, by the time we come across
+    // the TU-level `CXXRecordDecl` for the lambda, we may have already seen
+    // and processed its semantic parent.
+    while (!pending_child_decls.empty()) {
+      auto prev_pending_child_decls = std::move(pending_child_decls);
+      pending_child_decls.clear();
+      for (const auto &[raw_parent, child] : prev_pending_child_decls) {
+        PrevValueTracker<const void *> save_restore(
+            parent_decl, RealParent(raw_parent));
+        auto raw_child = RawEntity(child);
+        seen.erase(raw_child);
+        Accept(child);
+        CHECK(seen.count(raw_child));
+      }
+    }
+
+    CHECK(pending_lambdas.empty());
   }
 
   void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final {
+    actual_parent.emplace(RawEntity(decl), nullptr);
+    // LOG(ERROR) << "VisitNamespaceDecl " << RawEntity(decl);
     VisitDeclContext(decl, decl, false  /* don't track parentage */);
   }
 
   void VisitExternCContextDecl(const pasta::ExternCContextDecl &decl) final {
+    actual_parent.emplace(RawEntity(decl), nullptr);
     VisitDeclContext(decl, decl, false  /* don't track parentage */);
   }
 
   void VisitLinkageSpecDecl(const pasta::LinkageSpecDecl &decl) final {
+    actual_parent.emplace(RawEntity(decl), nullptr);
     VisitDeclContext(decl, decl, false  /* don't track parentage */);
   }
 
@@ -292,6 +390,9 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   template <typename T>
   std::optional<T> FindParentRedecl(T &tpl, pasta::Token loc) {
+    if (tpl.Token() == loc) {
+      return tpl;
+    }
     for (const auto &redecl_ : tpl.Redeclarations()) {
       auto redecl = reinterpret_cast<const T &>(redecl_);
       if (redecl.Token() == loc) {
@@ -322,34 +423,30 @@ class TLDFinder final : public pasta::DeclVisitor {
     auto pattern = decl.TemplatedDeclaration();
     seen.insert(RawEntity(pattern));
 
+    if (decl.CanonicalDeclaration() == decl) {
+      auto specs = ExpandSpecializations(decl.Specializations());
+      for (pasta::ClassTemplateSpecializationDecl &spec : specs) {
+
+        // Specializations of partial specializations are collected into the
+        // template itself, but lexically "belong" to the partial specialization
+        // itself.
+        auto pattern = spec.SpecializedTemplateOrPartial();
+
+        if (std::holds_alternative<pasta::ClassTemplatePartialSpecializationDecl>(pattern)) {
+          const auto &partial = std::get<pasta::ClassTemplatePartialSpecializationDecl>(pattern);
+          ScheduleAccept(FindParentRedecl(partial, spec.Token()),
+                         std::move(spec));
+        
+        } else if (std::holds_alternative<pasta::ClassTemplateDecl>(pattern)) {
+          const auto &tpl = std::get<pasta::ClassTemplateDecl>(pattern);
+          ScheduleAccept(FindParentRedecl(tpl, spec.Token()),
+                         std::move(spec));
+        }
+      }
+    }
+
     AddDeclAlways(decl);
-    VisitDeeperDeclContext(pattern, pattern);
-
-    if (decl.CanonicalDeclaration() != decl) {
-      return;
-    }
-
-    auto specs = ExpandSpecializations(decl.Specializations());
-    for (const pasta::ClassTemplateSpecializationDecl &spec : specs) {
-      const void *spec_parent = nullptr;
-
-      // Specializations of partial specializations are collected into the
-      // template itself, but lexically "belong" to the partial specialization
-      // itself.
-      auto pattern = spec.SpecializedTemplateOrPartial();
-      if (std::holds_alternative<pasta::ClassTemplatePartialSpecializationDecl>(pattern)) {
-        const auto &partial = std::get<pasta::ClassTemplatePartialSpecializationDecl>(pattern);
-        spec_parent = RawEntity(FindParentRedecl(partial, spec.Token()));
-      
-      } else {
-        spec_parent = RawEntity(FindParentRedecl(decl, spec.Token()));
-      }
-
-      if (spec_parent) {
-        PrevValueTracker<const void *> save_restore(parent_decl, spec_parent);
-        Accept(spec);
-      }
-    }
+    VisitDeeperDeclContext(decl, pattern);
   }
 
   void VisitVarTemplateDecl(const pasta::VarTemplateDecl &decl) final {
@@ -358,33 +455,27 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
+    if (decl.CanonicalDeclaration() == decl) {
+      auto specs = ExpandSpecializations(decl.Specializations());
+      for (pasta::VarTemplateSpecializationDecl &spec : specs) {
+
+        // Specializations of partial specializations are collected into the
+        // template itself, but lexically "belong" to the partial specialization
+        // itself.
+        auto pattern = spec.SpecializedTemplateOrPartial();
+        if (std::holds_alternative<pasta::VarTemplatePartialSpecializationDecl>(pattern)) {
+          const auto &partial = std::get<pasta::VarTemplatePartialSpecializationDecl>(pattern);
+          ScheduleAccept(FindParentRedecl(partial, spec.Token()),
+                         std::move(spec));
+        
+        } else if (std::holds_alternative<pasta::VarTemplateDecl>(pattern)) {
+          const auto &tpl = std::get<pasta::VarTemplateDecl>(pattern);
+          ScheduleAccept(FindParentRedecl(tpl, spec.Token()), std::move(spec));
+        }
+      }
+    }
+
     AddDeclAlways(decl);
-
-    if (decl.CanonicalDeclaration() != decl) {
-      return;
-    }
-  
-    auto specs = ExpandSpecializations(decl.Specializations());
-    for (const pasta::VarTemplateSpecializationDecl &spec : specs) {
-      const void *spec_parent = nullptr;
-
-      // Specializations of partial specializations are collected into the
-      // template itself, but lexically "belong" to the partial specialization
-      // itself.
-      auto pattern = spec.SpecializedTemplateOrPartial();
-      if (std::holds_alternative<pasta::VarTemplatePartialSpecializationDecl>(pattern)) {
-        const auto &partial = std::get<pasta::VarTemplatePartialSpecializationDecl>(pattern);
-        spec_parent = RawEntity(FindParentRedecl(partial, spec.Token()));
-      
-      } else {
-        spec_parent = RawEntity(FindParentRedecl(decl, spec.Token()));
-      }
-
-      if (spec_parent) {
-        PrevValueTracker<const void *> save_restore(parent_decl, spec_parent);
-        Accept(spec);
-      }
-    }
   }
 
   void VisitVarTemplatePartialSpecializationDecl(
@@ -438,48 +529,45 @@ class TLDFinder final : public pasta::DeclVisitor {
     }
 
     auto pattern = decl.TemplatedDeclaration();
-    if (ShouldHideFromIndexer(pattern)) {
-      return;
-    }
+    auto should_hide = ShouldHideFromIndexer(pattern);  // Deduction guides.
 
-    AddDeclAlways(decl);
+    if (decl.CanonicalDeclaration() == decl) {
+      auto specs = ExpandSpecializations(decl.Specializations());
 
-    if (decl.CanonicalDeclaration() != decl) {
-      return;
-    }
-
-    auto specs = ExpandSpecializations(decl.Specializations());
-    for (const pasta::FunctionDecl &spec : specs) {
-      const void *spec_parent = nullptr;
-
-      // Specializations of partial specializations are collected into the
-      // template itself, but lexically "belong" to the partial specialization
-      // itself.
-      if (auto pattern = spec.TemplateInstantiationPattern()) {
-        if (auto tpl = pattern->DescribedFunctionTemplate()) {
-          spec_parent = RawEntity(FindParentRedecl(tpl.value(), spec.Token()));
-        } else {
-          assert(false);
+      for (pasta::FunctionDecl &spec : specs) {
+        if (should_hide) {
+          seen.emplace(RawEntity(spec));
         }
-      }
 
-      // NOTE(pag): We might not have `spec_parent` if this is an explicit
-      //            declaration that turns into an implicit instantion of
-      //            a function template.
-      if (spec_parent) {
-        PrevValueTracker<const void *> save_restore(parent_decl, spec_parent);
-        seen.emplace(RawEntity(spec));
-        AddDeclAlways(spec);
+        auto tpl = spec.PrimaryTemplate();
+        if (!tpl) {
+          assert(false);
+          continue;
+        }
+
+        // Specializations of partial specializations are collected into the
+        // template itself, but lexically "belong" to the partial specialization
+        // itself.
+        ScheduleAccept(FindParentRedecl(tpl.value(), spec.Token()),
+                       std::move(spec));
       }
+    }
+
+    if (!should_hide) {
+      AddDeclAlways(decl);
     }
   }
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
-    if (ShouldHideFromIndexer(decl)) {
+    auto raw_decl = RawEntity(decl);
+    if (seen.count(raw_decl)) {
+      // LOG(ERROR) << "Seen " << raw_decl;
       return;
     }
 
-    if (seen.count(RawEntity(decl))) {
+    if (ShouldHideFromIndexer(decl)) {
+      actual_parent.emplace(raw_decl, parent_decl);
+      // LOG(ERROR) << "Hiding " << raw_decl;
       return;
     }
 
@@ -501,6 +589,28 @@ class TLDFinder final : public pasta::DeclVisitor {
 
     // This is a function template specialization.
     if (IsSpecialization(decl)) {
+
+      // Sometimes functions don't show up in the relevant specialization
+      // lists. Another possibility is that we're a specialization of B, but
+      // B has been remapped to A, and so we'll never see B or its list of
+      // specializations.
+      if (!deferred_seen.count(raw_decl)) {
+        if (auto pattern = TemplateInstantiationPattern(decl)) {
+          if (auto tpl = pattern->DescribedFunctionTemplate()) {
+            ScheduleAccept(FindParentRedecl(tpl.value(), decl.Token()), decl);
+          
+          // This is probably a friend declaration inside of a class template.
+          } else if (pattern->Token() == decl.Token()) {
+            ScheduleAccept(pattern, decl);
+          }
+          return;
+        } else if (auto tpl = decl.PrimaryTemplate()) {
+          ScheduleAccept(FindParentRedecl(tpl.value(), decl.Token()), decl);
+          return;
+        }
+      }
+
+      seen.emplace(raw_decl);
       AddDeclAlways(decl);
       return;
     }
@@ -508,22 +618,37 @@ class TLDFinder final : public pasta::DeclVisitor {
     // An out-of-line line method defined on a class template.
     if (decl.NumTemplateParameterLists()) {
 #ifndef NDEBUG
-    auto dc = decl.LexicalDeclarationContext();
-#endif
+      auto dc = decl.LexicalDeclarationContext();
       assert(dc && !dc->IsRecord() && decl.IsOutOfLine() &&
              pasta::CXXMethodDecl::From(decl).has_value());
+#endif
+
+      // LOG(ERROR) << "Visiting NumTemplateParameterLists " << raw_decl;
+      seen.emplace(raw_decl);
       AddDeclAlways(decl);
       return;
     }
 
-    // This is an specialization of a non-template method.
+    // This is a specialization of a non-template method.
     if (decl.IsTemplateInstantiation() && decl.IsOutOfLine()) {
-      if (auto from = decl.InstantiatedFromMemberFunction()) {
-        PrevValueTracker<const void *> save_restore(
-            parent_decl, RawEntity(from.value()));
-        AddDeclAlways(decl);
-        return;
+      auto from = decl.InstantiatedFromMemberFunction();
+      if (from && (from->DeclarationContext()->RawDeclContext() ==
+                   decl.DeclarationContext()->RawDeclContext())) {
+        assert(from.value() != decl);
+        from = from->InstantiatedFromMemberFunction();
       }
+      if (from) {
+        if (auto from_tpl = FindParentRedecl(from.value(), decl.Token())) {
+          PrevValueTracker<const void *> save_restore(
+            parent_decl, RawEntity(from_tpl.value()));
+
+          // LOG(ERROR) << "Visiting IsTemplateInstantiation " << raw_decl;
+          seen.emplace(raw_decl);
+          AddDeclAlways(decl);
+          return;
+        }
+      }
+      assert(false);
     }
 
     // Methods (static or member) inside of class template specializations are
@@ -531,29 +656,82 @@ class TLDFinder final : public pasta::DeclVisitor {
     // instantiated, and so we don't want them screwing up the fragment
     // deduplication.
     if (IsMethodLexicallyInSpecialization(decl)) {
+      // LOG(ERROR) << "IsMethodLexicallyInSpecialization " << raw_decl;
+      seen.emplace(RawEntity(decl));
       AddDeclAlways(decl);
       return;
     }
 
+
+    // LOG(ERROR) << "VisitDeclaratorDecl " << raw_decl;
     VisitDeclaratorDecl(decl);
   }
 
+  // void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final {
+  //   VisitRecordDecl(decl);
+  // }
+
   void VisitRecordDecl(const pasta::RecordDecl &decl) final {
-    if (seen.count(RawEntity(decl))) {
+    auto raw_decl = RawEntity(decl);
+
+    // if (IsLambda(decl)) {
+    //   LOG(ERROR) << "lambda " << raw_decl << ' ' << parent_decl << ' ' << deferred_seen.count(raw_decl);
+    // }
+
+    if (seen.count(raw_decl)) {
+      return;
+    }
+
+    // If this is the class for a lambda, then embed the lambda, regardless of
+    // if it is a template specialization, as a nested fragment of the caller.
+    // This is because the anonymous class of the lambda represents its own
+    // top-level thing.
+    if (IsLambda(decl)) {
+      if (!deferred_seen.count(raw_decl)) {
+        if (auto dc = decl.DeclarationContext()) {
+          auto dc_decl = pasta::Decl::From(dc.value());
+          if (auto func = pasta::FunctionDecl::From(dc_decl.value())) {
+            if (auto tpl = func->DescribedFunctionTemplate()) {
+              dc_decl = std::move(tpl.value());
+            }
+          }
+
+          ScheduleLambda(dc_decl.value(), decl);
+          return;
+        }
+
+      } else {
+        CHECK(seen.emplace(raw_decl).second);
+        AddDeclAlways(decl);
+        VisitDeeperDeclContext(decl, decl, true);
+        return;
+      }
+
+      CHECK(false);
       return;
     }
 
     VisitTagDecl(decl);
+  }
 
-    // Forward declarations embedded in declarators within a record may have
-    // a semantic decl context that is at the top level.
-    VisitDeeperDeclContext(decl, decl);
+  void VisitTagDecl(const pasta::TagDecl &decl) final {
+    VisitTypeDecl(decl);
+    VisitDeeperDeclContext(decl, decl, em.IsTopLevel(decl));
   }
 
   void VisitCXXMethodDecl(const pasta::CXXMethodDecl &decl) final {
     // If the CXXMethodDecl is implicit, don't need to visit the declaration;
     // return early. We'll internalize these into the parent class fragment.
     if (decl.IsImplicit()) {
+      return;
+    }
+
+    // We should have already found this method via the top-level
+    // `CXXRecordDecl`. If it's a generic lambda then this method is the
+    // specialization of the `operator()` so don't want to skip it.
+    if (IsLambda(decl) && !IsSpecialization(decl)) {
+      CHECK_NOTNULL(parent_decl);
+      CHECK_GT(depth, 0u);
       return;
     }
 
@@ -564,7 +742,9 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   void VisitTypeAliasTemplateDecl(
       const pasta::TypeAliasTemplateDecl &decl) final {
-    AddDecl(decl);
+    if (seen.emplace(RawEntity(decl)).second) {
+      AddDecl(decl);
+    }
   }
 
   void VisitFriendDecl(const pasta::FriendDecl &decl) final {
@@ -577,9 +757,23 @@ class TLDFinder final : public pasta::DeclVisitor {
     }
   }
 
-  // void VisitConceptDecl(const pasta::ConceptDecl &decl) {
-  //   VisitTemplateDecl(decl);
-  // }
+  void VisitConceptDecl(const pasta::ConceptDecl &decl) {
+    if (seen.emplace(RawEntity(decl)).second) {
+      AddDeclAlways(decl);
+    }
+  }
+
+  void VisitStaticAssertDecl(const pasta::StaticAssertDecl &decl) final {
+    if (seen.emplace(RawEntity(decl)).second) {
+      VisitDecl(decl);
+    }
+  }
+
+  void VisitEmptyDecl(const pasta::EmptyDecl &decl) final {
+    if (seen.emplace(RawEntity(decl)).second) {
+      VisitDecl(decl);
+    }
+  }
 
   void VisitDecl(const pasta::Decl &decl) final {
     if (!depth) {
@@ -587,12 +781,9 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
-    // Check if we found something that is semantically at the top level.
-    if (auto sema_dc = decl.DeclarationContext()) {
-      if (!dc_depth[RawEntity(sema_dc.value())]) {
-        AddDecl(decl);
-        return;
-      }
+    if (parent_decl) {
+      // LOG(ERROR) << "Not a tld: " << RawEntity(decl);
+      actual_parent.emplace(RawEntity(decl), parent_decl);
     }
   }
 };
@@ -759,11 +950,11 @@ FindNextPrevConditionalMacros(const pasta::AST &ast,
 // Find all top-level declarations.
 static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast,
                                          EntityMapper &em) {
-
   std::vector<OrderedDecl> tlds;
   TLDFinder tld_finder(tlds, em);
   tld_finder.VisitTranslationUnitDecl(ast.TranslationUnit());
 
+#ifndef NDEBUG
   auto decl_eq = +[] (const OrderedDecl &a, const OrderedDecl &b) {
     return RawEntity(a.decl) == RawEntity(b.decl);
   };
@@ -772,20 +963,30 @@ static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast,
     return RawEntity(a.decl) < RawEntity(b.decl);
   };
 
+  std::sort(tlds.begin(), tlds.end(), decl_less);
+  auto it = std::unique(tlds.begin(), tlds.end(), decl_eq);
+
+  // If we find duplicates then that suggests we've seen something twice, and
+  // that isn't good and might lead to contradictions (e.g. one having a
+  // parent, where another one doesn't, or having different parents).
+  CHECK(it == tlds.end());
+  tlds.erase(it, tlds.end());
+#endif
+
   auto order_less = +[] (const OrderedDecl &a, const OrderedDecl &b) {
     return a.order < b.order;
   };
 
-  std::sort(tlds.begin(), tlds.end(), decl_less);
-  auto it = std::unique(tlds.begin(), tlds.end(), decl_eq);
-  tlds.erase(it, tlds.end());
-
-  // NOTE(pag): It is extremely important to retain the original ordering. You
+  // NOTE(pag): It is generally important to retain the original ordering. You
   //            can't rely on `sort` (a quicksort) to behave like a stable sort,
   //            nor can you rely on ASTs of different translation units putting
   //            side-by-side declarations one-after-another in memory, thus
   //            getting the same sort order. This is why we keep the extra info
   //            in the `pair` of the original sort order.
+  //
+  // NOTE(pag): It used to be more important to retain the original ordering,
+  //            but over time, shuffling around and labelling/visiting stuff in
+  //            different stages as made this less important.
   std::sort(tlds.begin(), tlds.end(), order_less);
 
   return tlds;
@@ -839,12 +1040,16 @@ static std::pair<mx::EntityOffset, mx::EntityOffset> BaselineEntityRange(
   auto end_tok_index = tok_index;
 
   if (decl_range.Size()) {
-    begin_tok_index = decl_range.begin()->Index();
-    end_tok_index = (--decl_range.end())->Index();
+    begin_tok_index = decl_range.Front()->Index();
+    end_tok_index = decl_range.Back()->Index();
 
     // NOTE(pag): This is more of an indication that we probably need to fix
     //            something in PASTA.
-    if (!(begin_tok_index <= tok_index && tok_index <= end_tok_index)) {
+    //
+    // NOTE(pag): Lambdas use unnamed `operator()` and unnamed classes, and so
+    //            they `decl.Token()` ends up not pointing anywhere.
+    if (!(begin_tok_index <= tok_index && tok_index <= end_tok_index) &&
+        !IsLambda(decl)) {
       DLOG(ERROR)
           << "Location of " << decl.KindName()
           << " declaration: " << DeclToString(decl)
@@ -954,7 +1159,10 @@ static std::pair<mx::EntityOffset, mx::EntityOffset> ExpandDeclRange(
   // If this looks like a lambda then don't do any additional expansion, as
   // that might capture things like leading whitespace before the lambda use
   // but inside some statement.
-  if (IsLambda(decl)) {
+  //
+  // The `decl.IsImplicit()` case helps to cover implicit methods in lambdas
+  // that nonetheless are full of location info, e.g. conversion operators.
+  if (IsLambda(decl) || decl.IsImplicit()) {
     return {begin_tok_index, end_tok_index};
   }
 
@@ -1191,6 +1399,10 @@ static std::pair<mx::EntityOffset, mx::EntityOffset> FindDeclRange(
 // preamble.
 bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
 
+  if (IsLambda(decl) || IsImplicitMethod(decl)) {
+    return false;
+  }
+
   // The compiler knows how to recognize builtin functions.
   //
   // NOTE(pag): Clang will sometimes "upgrade" user-defined functions into
@@ -1207,6 +1419,24 @@ bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
 
   if (!decl.IsImplicit()) {
     return false;
+  }
+
+  // Lots of methods are auto-generated, e.g. constructors, conversion
+  // operators, etc.
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod:
+      return false;
+
+    case pasta::DeclKind::kFunctionTemplate:
+      return IsProbablyABuiltinDecl(
+          reinterpret_cast<const pasta::FunctionTemplateDecl &>(decl).TemplatedDeclaration());
+  
+    default:
+      break;
   }
 
   auto dc = decl.DeclarationContext();
@@ -1260,64 +1490,6 @@ bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
   return false;
 }
 
-// Should we even expect to find this declaration in the token contexts? There
-// are cases where we shouldn't, e.g. with template instantiations, because the
-// token contexts will just end up being associated with the templates
-// themselves.
-static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
-  auto tsk = pasta::TemplateSpecializationKind::kUndeclared;
-  bool has_partial_or_tpl_or_dg = true;
-
-  if (auto csd = pasta::ClassTemplateSpecializationDecl::From(decl)) {
-    tsk = csd->TemplateSpecializationKind();
-    has_partial_or_tpl_or_dg = !csd->SpecializedTemplateOrPartial().index();
-
-  } else if (auto vsd = pasta::VarTemplateSpecializationDecl::From(decl)) {
-    tsk = vsd->TemplateSpecializationKind();
-    has_partial_or_tpl_or_dg = !vsd->SpecializedTemplateOrPartial().index();
-
-  } else if (auto ftd = pasta::FunctionTemplateDecl::From(decl)) {
-    auto td = ftd->TemplatedDeclaration();
-    tsk = td.TemplateSpecializationKind();
-    has_partial_or_tpl_or_dg = !(td.Kind() == pasta::DeclKind::kCXXDeductionGuide);
-
-  } else if (auto fd = pasta::FunctionDecl::From(decl)) {
-    tsk = fd->TemplateSpecializationKind();
-
-  } else if (auto vd = pasta::VarDecl::From(decl)) {
-    tsk = vd->TemplateSpecializationKind();
-
-  } else if (auto ta = pasta::TypeAliasDecl::From(decl)) {
-    if (ta->DescribedAliasTemplate()) {
-      tsk = pasta::TemplateSpecializationKind::kImplicitInstantiation;  // Fake.
-    }
-  } else if (auto td = pasta::TagDecl::From(decl)) {
-    if (td->Name().empty()) {
-      return false;
-    }
-  }
-
-  switch (tsk) {
-    case pasta::TemplateSpecializationKind::kExplicitSpecialization:
-    case pasta::TemplateSpecializationKind::kExplicitInstantiationDeclaration:
-    case pasta::TemplateSpecializationKind::kExplicitInstantiationDefinition:
-      return true;
-
-    // NOTE(pag): Have observed situations where `ClassTemplateSpecialization`
-    //            will report `kUndeclared`.
-    //
-    // NOTE(pag): Clang patches for `Decl::RemappedDecl` should help with this?
-    //
-    // NOTE(pag): This will also trigger for basicall all non-template things,
-    //            e.g. all C code.
-    case pasta::TemplateSpecializationKind::kUndeclared:
-      return has_partial_or_tpl_or_dg;
-
-    default:
-      return false;
-  }
-}
-
 // Clang's ASTContext code adds builtins, but they don't behave like user-
 // written code, in that Clang doesn't always add the nested decls into
 // the `DeclContext`.
@@ -1331,19 +1503,14 @@ static void AddBuiltinDeclRangeToEntityListFor(
       << PrefixedLocation(decl, " at or near ")
       << " on main job file " << main_file_path;
 
-  entity_ranges.emplace_back(std::move(decl), nullptr  /* no parent */, 0u, 0u);
-}
-
-static bool LooksLikeFunctionTemplateOfLambda(const pasta::Token &tok,
-                                              const pasta::Decl &decl) {
-  return tok.Kind() == pasta::TokenKind::kLSquare &&
-         decl.IsImplicit() &&
-         decl.Kind() == pasta::DeclKind::kFunctionTemplate;
+  entity_ranges.emplace_back(
+      std::move(decl), nullptr  /* no parent */, 0u, 0u,
+      static_cast<unsigned>(entity_ranges.size()));
 }
 
 // Figure out the inclusive token index bounds of `decl` and add it to
 // `entity_ranges`.
-static void AddDeclRangeToEntityListFor(
+static void AddDeclToEntityRangeList(
     const pasta::TokenRange &tokens,
     const EntityOffsetMap &eof_to_include,
     const EntityOffsetMap &eof_indices,
@@ -1355,27 +1522,12 @@ static void AddDeclRangeToEntityListFor(
 
   // These are probably part of the preamble of compiler-provided builtin
   // declarations.
-  if (!tok) {
+  if (!tok && !IsLambda(decl)) {
+    CHECK(!parent);
     AddBuiltinDeclRangeToEntityListFor(main_file_path, std::move(decl),
                                        entity_ranges);
     return;
   }
-
-  // This suggests an error in PASTA, usually related to token alignment
-  // against printed tokens. That process tries to "align" pretty-printed
-  // decl tokens, which are full of contextual information, with parsed
-  // tokens, which have no contextual information. We do this so that we
-  // can get the contextual information from parsed tokens, which is often
-  // more useful.
-  LOG_IF(ERROR, ShouldFindDeclInTokenContexts(decl) &&
-                decl.Kind() != pasta::DeclKind::kBlock &&
-                !TokenIsInContextOfDecl(tok, decl) &&
-                !IsProbablyABuiltinDecl(decl) &&
-                !LooksLikeFunctionTemplateOfLambda(tok, decl))
-      << "Could not find location of " << decl.KindName()
-      << " declaration: " << DeclToString(decl)
-      << PrefixedLocation(decl, " at or near ")
-      << " on main job file " << main_file_path;
 
   auto [begin_index, end_index] = FindDeclRange(
       tokens, dir_index_to_next_dir, decl, tok, main_file_path);
@@ -1425,6 +1577,7 @@ static void AddDeclRangeToEntityListFor(
     // builtin functions. This also happens at the usage site of builtin
     // functions themselves.
     if (IsProbablyABuiltinDecl(decl)) {
+      CHECK(!parent);
       AddBuiltinDeclRangeToEntityListFor(main_file_path, std::move(decl),
                                          entity_ranges);
       return;
@@ -1440,31 +1593,37 @@ static void AddDeclRangeToEntityListFor(
     }
   }
 
-  entity_ranges.emplace_back(std::move(decl), parent, begin_index, end_index);
+  entity_ranges.emplace_back(
+      std::move(decl), parent, begin_index, end_index,
+      static_cast<unsigned>(entity_ranges.size()));
 }
 
-// Go find the top-level macros to be indexed. These are basically directives
-// and macro expansions. We find the top-level macro expansions by locating
-// the macro roots of the expansions associated with macro definitions. There
-// are a few ways of going about this. PASTA's `TokenRange` will include marker
-// tokens telling us when a macro expansion area begins and ends. If there's
-// an empty expansion then there will be nothing between these two marker
-// tokens. We can get at some kind of expansion node (likely but not guaranteed
-// to be the root node from the begin/end markers). Alternatively, we can get at
-// all directives via directive marker tokens. This is the most reliable
-// approach, as some directives can be embedded inside of the argument list of
-// some expansions, and so we'd like to treat those separately (as floating
-// fragments). Then we can get the root expansions from looking at just the
-// uses of `#define` directives.
-static std::vector<OrderedMacro> FindTLMs(
+// Go find the top-level macros to be indexed. These are basically directives.
+// We find the top-level macro expansions later during the `TokenTree` building
+// process, because we only really care about how the top-level expansions
+// affect declarations. PASTA's `TokenRange` will include marker tokens telling
+// us when a macro expansion area begins and ends. If there's an empty expansion
+// then there will be nothing between these two marker tokens. We can get at
+// some kind of expansion node (likely but not guaranteed to be the root node
+// from the begin/end markers). Alternatively, we can get at all directives
+// via directive marker tokens. This is the most reliable approach, as some
+// directives can be embedded inside of the argument list of some expansions,
+// and so we'd like to treat those separately (as floating fragments). Then we
+// can get the root expansions from looking at just the uses of `#define`
+// directives.
+static void FindTLMs(
     const pasta::AST &ast, const pasta::TokenRange &tokens,
-    const EntityOffsetMap &bof_to_eof, EntityOffsetMap &eof_to_include) {
+    const EntityOffsetMap &bof_to_eof, EntityOffsetMap &eof_to_include,
+    std::vector<EntityRange> &entity_ranges) {
 
-  std::vector<OrderedMacro> tlms;
-  std::vector<pasta::DefineMacroDirective> defs;
+  auto add_macro = [&entity_ranges] (pasta::MacroDirective node) {
+    auto tok_index = node.ParsedLocation().Index();  // Marker location.
+    entity_ranges.emplace_back(
+        std::move(node), nullptr, tok_index, tok_index,
+        static_cast<unsigned>(entity_ranges.size()));
+  };
+
   const mx::EntityOffset num_tokens = tokens.Size();
-
-  auto order = 0u;
   for (pasta::Token tok : tokens) {
 
     // All macro directives have a corresponding marker token.
@@ -1479,14 +1638,18 @@ static std::vector<OrderedMacro> FindTLMs(
     }
 
     auto md = std::move(dir.value());
-    tlms.emplace_back(md, order++);
 
-    // If this is a macro definition, then keep track of it for later so that
-    // we can find all expansions.
+    // If this is a macro definition, then only keep track of it if we see it
+    // used/expanded.
     if (auto dmd = pasta::DefineMacroDirective::From(md)) {
-      defs.push_back(std::move(dmd.value()));
+      for (pasta::Macro use : dmd->Uses()) {
+        add_macro(std::move(md));
+        break;
+      }
       continue;
     }
+
+    add_macro(std::move(md));
     
     // If it's an include-like directive, then we want to be able to associate
     // begin- and end-of-file markers with this directive. Here we'll find
@@ -1545,66 +1708,6 @@ static std::vector<OrderedMacro> FindTLMs(
     // use this to help expand decl/fragment ranges.
     eof_to_include.emplace(it->second, bom_index);
   }
-
-  // Go find all expansions
-  for (pasta::DefineMacroDirective def : defs) {
-    for (pasta::Macro use : def.Uses()) {
-      tlms.emplace_back(RootMacroFrom(std::move(use)), order++);
-    }
-  }
-
-  auto eq = +[] (const OrderedMacro &a, const OrderedMacro &b) {
-    return RawEntity(a.macro) == RawEntity(b.macro);
-  };
-
-  auto less = +[] (const OrderedMacro &a, const OrderedMacro &b) {
-    auto a_id = RawEntity(a.macro);
-    auto b_id = RawEntity(b.macro);
-    if (a_id < b_id) {
-      return true;
-    } else if (a_id > b_id) {
-      return false;
-    } else {
-      return a.order < b.order;
-    }
-  };
-
-  auto orig_less = +[] (const OrderedMacro &a, const OrderedMacro &b) {
-    return a.order < b.order;
-  };
-
-  std::stable_sort(tlms.begin(), tlms.end(), less);
-  auto it = std::unique(tlms.begin(), tlms.end(), eq);
-  tlms.erase(it, tlms.end());
-
-  // NOTE(pag): It is extremely important to retain the original ordering. You
-  //            can't rely on `sort` (a quicksort) to behave like a stable sort,
-  //            nor can you rely on ASTs of different translation units putting
-  //            side-by-side declarations one-after-another in memory, thus
-  //            getting the same sort order. This is why we keep the extra info
-  //            in the `pair` of the original sort order.
-  std::stable_sort(tlms.begin(), tlms.end(), orig_less);
-
-  return tlms;
-}
-
-// Add a macro to our entity range list. The first token in a macro is usually
-// the first usage token, and the last one is the last expansion token.
-static void AddMacroRangeToEntityListFor(
-    const pasta::TokenRange &tok_range,
-    std::string_view main_file_path, pasta::Macro node,
-    std::vector<EntityRange> &entity_ranges) {
-
-  if (pasta::TokenRange range = pasta::Macro::CompleteExpansionRange(node)) {
-    entity_ranges.emplace_back(
-        std::move(node), nullptr, range.Front()->Index(),
-        range.Back()->Index());
-
-  } else {
-    LOG(ERROR)
-        << "Empty parsed token range for macro "
-        << MacroLocation(node);
-  }
 }
 
 // Sort the top-level declarations so that syntactically overlapping
@@ -1650,20 +1753,16 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
     }
   }
 
-  for (OrderedMacro ordered_entry : FindTLMs(ast, tokens, bof_to_eof,
-                                             eof_index_to_include)) {
-    AddMacroRangeToEntityListFor(tokens, main_file_path,
-                                 std::move(ordered_entry.macro), entity_ranges);
-  }
+  FindTLMs(ast, tokens, bof_to_eof, eof_index_to_include, entity_ranges);
 
   auto dir_index_to_next_dir = FindNextPrevConditionalMacros(
       ast, main_file_path);
 
-  for (OrderedDecl ordered_entry : FindTLDs(ast, em)) {
-    AddDeclRangeToEntityListFor(tokens, eof_index_to_include, bof_to_eof,
-                                dir_index_to_next_dir, main_file_path, 
-                                std::move(ordered_entry.decl),
-                                ordered_entry.parent, entity_ranges);
+  for (OrderedDecl &ordered_entry : FindTLDs(ast, em)) {
+    AddDeclToEntityRangeList(tokens, eof_index_to_include, bof_to_eof,
+                             dir_index_to_next_dir, main_file_path, 
+                             std::move(ordered_entry.decl),
+                             ordered_entry.parent, entity_ranges);
   }
 
   // It's possible that we have two-or-more things that appear to be top-level
@@ -1675,99 +1774,94 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
   // as its own top-level declaration, despite it being logically nested inside
   // of another top-level declaration.
 
-  std::stable_sort(
-      entity_ranges.begin(), entity_ranges.end(),
-      [] (const EntityRange &a, const EntityRange &b) {
-        if (a.begin_index < b.begin_index) {
-          return true;
-        } else if (a.begin_index > b.begin_index) {
-          return false;
-        } else if (a.end_index < b.end_index) {
-          return true;
-        } else if (a.end_index > b.end_index) {
-          return false;
-        } else {
-          return int(!!a.parent) < int(!!b.parent);
-        }
-      });
+  std::sort(entity_ranges.begin(), entity_ranges.end());
+
+  // std::sort(
+  //     entity_ranges.begin(), entity_ranges.end(),
+  //     [] (const EntityRange &a, const EntityRange &b) {
+  //       return b.end_index > a.end_index;
+  //     });
+
+  // std::stable_sort(
+  //     entity_ranges.begin(), entity_ranges.end(),
+  //     [] (const EntityRange &a, const EntityRange &b) {
+  //       return a.begin_index < b.begin_index;
+  //     });
 
   return entity_ranges;
 }
 
-// TODO(pag,kumarak): Add support for detecting that some of the containing
-//                    statements have errors.
-//
-//                    Need to use `Stmt::ContainsErrors`.
-static bool StatementsHaveErrors(const pasta::Decl &) {
-  return false;
-}
+// // Should we merge a leading macro with the next entity? We have to deal with
+// // one corner case, observed in cURL:
+// //
+// //    CURL_EXTERN CURLcode curl_easy_pause(...);
+// //
+// // Here, depending on the configuration, the macro `CURL_EXTERN` either
+// // expands to a `__declspec` or attribute, and is thus part of the
+// // function declaration, or it expands to nothing, and so looks disjoint
+// // from the function declaration. We want to make it logically part of
+// // the declaration, fusing the two.
+// //
+// // XREF: Issue 412 (https://github.com/trailofbits/multiplier/issues/412).
+// static bool MergeLeadingMacroWithNextEntity(
+//     const pasta::TokenRange &tokens, mx::EntityOffset begin_index,
+//     mx::EntityOffset end_index, mx::EntityOffset next_begin_index) {
 
-// Should we merge a leading macro with the next entity? We have to deal with
-// one corner case, observed in cURL:
-//
-//    CURL_EXTERN CURLcode curl_easy_pause(...);
-//
-// Here, depending on the configuration, the macro `CURL_EXTERN` either
-// expands to a `__declspec` or attribute, and is thus part of the
-// function declaration, or it expands to nothing, and so looks disjoint
-// from the function declaration. We want to make it logically part of
-// the declaration, fusing the two.
-//
-// XREF: Issue 412 (https://github.com/trailofbits/multiplier/issues/412).
-static bool MergeLeadingMacroWithNextEntity(
-    const pasta::TokenRange &tokens, mx::EntityOffset begin_index,
-    mx::EntityOffset end_index, mx::EntityOffset next_begin_index) {
+//   // Make sure there are no parsed tokens inside of the leading macro expansion.
+//   // If there were then we should have discovered them as leading keywords (e.g.
+//   // storage specifiers) or attributes.
+//   for (auto i = begin_index; i <= end_index; ++i) {
+//     auto tok = tokens[i];
+//     switch (tok.Role()) {
+//       case pasta::TokenRole::kFinalMacroExpansionToken:
+//       case pasta::TokenRole::kMacroDirectiveMarker:
+//       case pasta::TokenRole::kBeginOfFileMarker:
+//       case pasta::TokenRole::kEndOfFileMarker:
+//         return false;
+//       case pasta::TokenRole::kFileToken:
+//         if (IsParsedTokenExcludingWhitespaceAndComments(tok)) {
+//           return false;
+//         }
+//         continue;
+//       case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+//       case pasta::TokenRole::kEndOfMacroExpansionMarker:
+//       case pasta::TokenRole::kInvalid:
+//         continue;
+//       case pasta::TokenRole::kInitialMacroUseToken:
+//       case pasta::TokenRole::kIntermediateMacroExpansionToken:
+//         assert(false);
+//         continue;
+//     }
+//   }
 
-  // Make sure there are no parsed tokens inside of the leading macro expansion.
-  // If there were then we should have discovered them as leading keywords (e.g.
-  // storage specifiers) or attributes.
-  for (auto i = begin_index; i <= end_index; ++i) {
-    auto tok = tokens[i];
-    switch (tok.Role()) {
-      case pasta::TokenRole::kFinalMacroExpansionToken:
-      case pasta::TokenRole::kMacroDirectiveMarker:
-      case pasta::TokenRole::kBeginOfFileMarker:
-      case pasta::TokenRole::kEndOfFileMarker:
-        return false;
-      case pasta::TokenRole::kFileToken:
-        if (IsParsedTokenExcludingWhitespaceAndComments(tok)) {
-          return false;
-        }
-        continue;
-      case pasta::TokenRole::kBeginOfMacroExpansionMarker:
-      case pasta::TokenRole::kEndOfMacroExpansionMarker:
-      case pasta::TokenRole::kInvalid:
-        continue;
-      case pasta::TokenRole::kInitialMacroUseToken:
-      case pasta::TokenRole::kIntermediateMacroExpansionToken:
-        assert(false);
-        continue;
-    }
-  }
+//   // Nothing between.
+//   if ((end_index + 1u) == next_begin_index) {
+//     return true;
+//   }
 
-  // Nothing between.
-  if ((end_index + 1u) == next_begin_index) {
-    return true;
-  }
+//   // One token in-between.
+//   if ((end_index + 2u) == next_begin_index) {
 
-  // More than one token between.
-  if ((end_index + 2u) != next_begin_index) {
-    return false;
-  }
+//     auto btk = tokens[end_index + 1u].Kind();
+//     return btk == pasta::TokenKind::kComment ||
+//            btk == pasta::TokenKind::kUnknown;
+  
+//   // Two tokens in-between.
+//   } else if ((end_index + 3u) == next_begin_index) {
+//     auto btk = tokens[end_index + 1u].Kind();
+//     if (btk != pasta::TokenKind::kComment &&
+//         btk != pasta::TokenKind::kUnknown) {
+//       return false;
+//     }
 
-  auto bt = tokens[end_index + 1u];
-  auto btk = bt.Kind();
-  if (btk == pasta::TokenKind::kComment) {
-    return true;
-  }
+//     btk = tokens[end_index + 2u].Kind();
+//     return btk == pasta::TokenKind::kComment ||
+//            btk == pasta::TokenKind::kUnknown;
 
-  if (btk != pasta::TokenKind::kUnknown) {
-    return false;
-  }
-
-  auto btd = bt.Data();
-  return std::count(btd.begin(), btd.end(), '\n') <= 1u;
-}
+//   } else {
+//     return false;
+//   }
+// }
 
 // Try to accumulate the nearby top-level declarations whose token ranges
 // overlap with `decl` into `decls_for_chunk`. For example, this process
@@ -1794,51 +1888,174 @@ static std::vector<EntityGroupRange> PartitionEntities(
   std::vector<EntityGroupRange> entity_group_ranges;
   entity_group_ranges.reserve(entity_ranges.size());
 
+  auto max_end_index = 0u;
+
+  auto try_add_floating_macro = [&] (size_t i) {
+    auto &ent = entity_ranges[i].entity;
+    if (!std::holds_alternative<pasta::Macro>(ent) ||
+        !ShouldGoInFloatingFragment(std::get<pasta::Macro>(ent))) {
+      return false;
+    }
+    
+    auto next_begin = entity_ranges[i].begin_index;
+    auto next_end = entity_ranges[i].end_index;
+    auto next_order = entity_ranges[i].order;
+
+    EntityGroup sub_group;
+    sub_group.emplace_back(std::move(entity_ranges[i]));
+    entity_group_ranges.emplace_back(
+        std::move(sub_group), next_begin, next_end, next_order);
+    return true;
+  };
+
+  // for (size_t i = 0u, max_i = entity_ranges.size(); i < max_i; ++i) {
+  //   LOG(ERROR) << i << ' ' << entity_ranges[i].begin_index
+  //              << ' ' << entity_ranges[i].end_index; 
+  // }
+
   for (size_t i = 0u, max_i = entity_ranges.size(); i < max_i; ) {
     EntityGroup entities_for_group;
-    Entity prev_entity;
+    // Entity prev_entity;
 
+    auto prev_i = i;
+    auto order = entity_ranges[i].order;
     auto begin_index = entity_ranges[i].begin_index;
     auto end_index = entity_ranges[i].end_index;
-    auto prev_begin_index = begin_index;
-    auto prev_end_index = end_index;
+    // auto prev_begin_index = begin_index;
+    // auto prev_end_index = end_index;
+    // auto num_decls = 0u;
+    // std::optional<const void *> decl_parent;
 
-    for (; i < max_i; ++i) {
+    CHECK_LE(begin_index, end_index);
+
+    if (try_add_floating_macro(i)) {
+      ++i;
+
+      // LOG(ERROR) << "Floating end_index=" << end_index << " max_end_index=" << max_end_index; 
+      // max_end_index = std::max(end_index, max_end_index);
+      continue;
+    }
+
+    if (begin_index) {
+      CHECK_LT(max_end_index, begin_index);
+    }
+
+    while (i < max_i) {
 
       Entity next_entity = entity_ranges[i].entity;
+      auto next_order = entity_ranges[i].order;
       auto next_begin = entity_ranges[i].begin_index;
       auto next_end = entity_ranges[i].end_index;
 
-      // XREF: Issue 412 (https://github.com/trailofbits/multiplier/issues/412).
-      //       We can have leading empty macros in cURL and the Linux kernel,
-      //       depending on the configuration, that logically should belong to
-      //       the entity. It's possible we have a sequence of such macros.
-      if (std::holds_alternative<pasta::Macro>(prev_entity) &&
-          MergeLeadingMacroWithNextEntity(tokens, prev_begin_index,
-                                          prev_end_index, next_begin)) {
+      // auto next_parent = entity_ranges[i].parent;
+
+      // LOG(ERROR) << next_begin << ' ' << next_end << ' ' << next_parent;
+
+      // if (prev_i < i && try_add_floating_macro(i)) {
+      //   ++i;
+      //   begin_index = std::min(begin_index, next_begin);
+      //   end_index = std::max(end_index, next_end);
+      //   max_end_index = std::max(end_index, max_end_index);
+      //   continue;
+      //   EntityGroup sub_group;
+      //   sub_group.emplace_back(std::move(entity_ranges[i]));
+      //   entity_group_ranges.emplace_back(
+      //       std::move(sub_group), next_begin, next_end, order);
+      //   ++i;
+      //   end_index = std::max(end_index, next_end);
+      //   continue;
+
+      // // XREF: Issue 412 (https://github.com/trailofbits/multiplier/issues/412).
+      // //       We can have leading empty macros in cURL and the Linux kernel,
+      // //       depending on the configuration, that logically should belong to
+      // //       the entity. It's possible we have a sequence of such macros.
+      // if (std::holds_alternative<pasta::Macro>(prev_entity) &&
+      //     !ShouldGoInFloatingFragment(std::get<pasta::Macro>(prev_entity)) &&
+      //     MergeLeadingMacroWithNextEntity(tokens, prev_begin_index,
+      //                                     prev_end_index, next_begin)) {
+      
+
+      // If we have a macro that is Nth in the list, and it will end up in a
+      // floating fragment anyway, then separate it out. This also ends up
+      // being a good way to avoid shoving all the macros defined in preambles
+      // into a single entity range, only to have them split up again.
+      if (prev_i < i && try_add_floating_macro(i)) {
+        ++i;
+        continue;
 
       // Doesn't close over.
       } else if (next_begin > end_index) {
+        // LOG(ERROR) << "Breaking at i=" << i << " next_begin=" << next_begin << " > end_index=" << end_index;
+        break;
+      
+      // This declaration has no specific location, nor does the last one, so
+      // don't put them into the same entity range. If we do put them together,
+      // then we will end up pretty-printing them all together at the same time
+      // and trying to do token alignment on that, and that will have terrible
+      // computational complexity.
+      } else if (prev_i < i && !next_begin) {
+        // LOG(ERROR) << "Breaking at prev_i=" << i << " < i=" << i << " and !next_begin";
         break;
       }
 
-      if (std::holds_alternative<pasta::Decl>(next_entity)) {
-        CHECK_EQ(StatementsHaveErrors(std::get<pasta::Decl>(next_entity)), 0u);
-      }
+      // // If two decls have the same parent then that is fine, but if they don't
+      // // then split them into different ranges.
+      // if (std::holds_alternative<pasta::Decl>(next_entity)) {
+      //   if (decl_parent.has_value()) {
+
+      //     // If this declaration has an unrelated parent to the last one then
+      //     // they can't be placed into the same entity range.
+      //     if (next_parent != decl_parent.value()) {
+      //       break;
+      //     }
+      //   } else {
+      //     decl_parent.emplace(entity_ranges[i].parent);
+      //   }
+
+      //   // LOG(ERROR)
+      //   //     << RawEntity(std::get<pasta::Decl>(next_entity))
+      //   //     << ' ' << entity_ranges[i].parent
+      //   //     << ' ' << next_begin << ' ' << next_end << ' '
+      //   //     << next_order;
+
+      //   ++num_decls;
+      // }
 
       // Make sure we definitely enclose over the next decl.
+      order = std::min(order, next_order);
       begin_index = std::min(begin_index, next_begin);
       end_index = std::max(end_index, next_end);
-      prev_entity = std::move(next_entity);
-      prev_begin_index = next_begin;
-      prev_end_index = next_end;
+      max_end_index = std::max(end_index, max_end_index);
+      // prev_entity = std::move(next_entity);
+
+      // LOG(ERROR) << "Normal end_index=" << end_index << " max_end_index=" << max_end_index; 
 
       entities_for_group.emplace_back(std::move(entity_ranges[i]));
+
+      // if (!try_add_floating_macro(i)) {
+      //   LOG(ERROR) << "Normal end_index=" << end_index << " max_end_index=" << max_end_index; 
+      //   entities_for_group.emplace_back(std::move(entity_ranges[i]));
+      // } else {
+      //   LOG(ERROR) << "Floating end_index=" << end_index << " max_end_index=" << max_end_index; 
+      // }
+
+      
+      // prev_begin_index = next_begin;
+      // prev_end_index = next_end;
+
+      ++i;
     }
+
+    // LOG_IF(WARNING, num_decls && entities_for_group.size() > 10)
+    //     << "Possible performance issue: entity group has "
+    //     << entities_for_group.size() << " entities, " << num_decls
+    //     << " of which are decls";
 
     CHECK(!entities_for_group.empty());
     entity_group_ranges.emplace_back(
-        std::move(entities_for_group), begin_index, end_index);
+        std::move(entities_for_group), begin_index, end_index, order);
+
+    CHECK_LT(prev_i, i);
   }
 
   return entity_group_ranges;
@@ -2078,6 +2295,14 @@ static PendingFragmentPtr CreatePendingFragment(
 
   InitializeEntityLabeller(*pf);
 
+  // Should either be an empty expansion, or a macro directive (e.g. an include,
+  // a pragma, a define, etc.). Failure on this check is a good indication that
+  // something is pretty wrong with the sorting of stuff that leads to merging
+  // of macros and declarations into entity ranges.
+  if (!pf->num_top_level_declarations && 1u == pf->num_top_level_macros) {
+    CHECK_LE((pf->last_parsed_token_index - pf->first_parsed_token_index), 10);
+  }
+
   return pf;
 }
 
@@ -2115,10 +2340,26 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
   // alignment algorithm.
   pasta::PrintedTokenRange printed_tokens =
       pasta::PrintedTokenRange::Create(decls_to_print.front());
+
+  LOG_IF(ERROR, decls_to_print.size() > 100u)
+      << "Likely performance problem on main job file "
+      << main_job_file << " with " << decls_to_print.front().KindName()
+      << PrefixedLocation(decls_to_print.front(), " at or near ")
+      << " where we're doing token alignment on "
+      << decls_to_print.size() << " printed declarations";
+
+  // if (decls_to_print.size() > 100u) {
+  //   Dump(decls_to_print[0]);
+  //   Dump(decls_to_print[1]);
+  //   CHECK(false);
+  // }
+
+  CHECK_LT(decls_to_print.size(), 1000u);  // Likely a serious problem.
+
   for (auto i = 1u; i < decls_to_print.size(); ++i) {
+    auto decl_tokens = pasta::PrintedTokenRange::Create(decls_to_print[i]);
     auto concat = pasta::PrintedTokenRange::Concatenate(
-        printed_tokens,
-        pasta::PrintedTokenRange::Create(decls_to_print[i]));
+        printed_tokens, decl_tokens);
     CHECK(concat.has_value());
     printed_tokens = std::move(concat.value());
   }
@@ -2198,7 +2439,7 @@ static bool DebugIndexOnlyThisFragment(const EntityGroup &entities) {
 // forward declarations to prevent Issue #396.
 //
 // XREF(pag): https://github.com/trailofbits/multiplier/issues/396
-static void CreateFreestandingDeclFragment(
+static void CreateFloatingDeclFragment(
     IdStore &id_store,
     EntityMapper &em,
     NameMangler &nm,
@@ -2325,7 +2566,7 @@ static void CreateFloatingDirectiveFragment(
   // TODO(pag): Eventually allow floating macro define directives from
   //            compilation commands.
   EntityGroup entities;
-  entities.emplace_back(macro, nullptr, begin_index, end_index);
+  entities.emplace_back(macro, nullptr, begin_index, end_index, 0u);
   auto floc = FindFileLocationOfFragment(
       em.entity_ids, entities, directive_range.value());
 
@@ -2377,22 +2618,6 @@ static void CreatePendingFragments(
     return;
   }
 
-  // Directives, especially `#define` directives, are treated as floating
-  // root fragments, as they are kind of "free standing" w.r.t. expansion, and
-  // define directives in particular can be referenced from other locations,
-  // and so we need special handling of their tokens/entities w.r.t. the
-  // entity mapper. We process these first, as they can end up being used
-  // lexically inside of other top-level entities.
-  for (const EntityRange &er : entities) {
-    if (std::holds_alternative<pasta::Macro>(er.entity)) {
-      const pasta::Macro &macro = std::get<pasta::Macro>(er.entity);
-      if (ShouldGoInFloatingFragment(macro)) {
-        CreateFloatingDirectiveFragment(
-            id_store, em, nm, tu_id, macro, pending_fragments);
-      }
-    }
-  }
-
   const pasta::TokenRange &frag_tok_range = sub_tok_range.value();
 
   // Locate where this fragment is in its file.
@@ -2410,21 +2635,20 @@ static void CreatePendingFragments(
     if (std::holds_alternative<pasta::Decl>(er.entity)) {
       auto &decl = std::get<pasta::Decl>(er.entity);
 
-      // Things like C++ templates (but not their full specializations) are
-      // hidden from the indexer. Nonetheless, we do want to inherit the bounds
-      // from the templates themselves, and use those bounds for overlap/nesting
-      // calculation, hence why we don't omit them earlier in the process.
+      // Things like namespaces.
       if (ShouldHideFromIndexer(decl)) {
+        // LOG(ERROR) << "hidden " << RawEntity(decl);
         continue;
 
       // E.g. if there's something like: `typedef struct page *pgtable_t;`,
       // and if there is no prior declaration of `struct page`, then the
       // `struct page` declaration will show up on the same level as the
       // `typedef`.
-      } else if (IsInjectedForwardDeclaration(decl) ||
-                 !floc || decl.IsImplicit()) {
-
-        CreateFreestandingDeclFragment(
+      } else if (!IsLambda(decl) && !IsImplicitMethod(decl) &&
+                 (IsInjectedForwardDeclaration(decl) ||
+                  !floc || decl.IsImplicit())) {
+        CHECK(!er.parent);
+        CreateFloatingDeclFragment(
             id_store, em, nm, floc, tu_id, begin_index, end_index,
             decl, pending_fragments, main_file_path);
 
@@ -2441,7 +2665,18 @@ static void CreatePendingFragments(
     // Find our top-level macro uses.
     } else if (std::holds_alternative<pasta::Macro>(er.entity)) {
       const pasta::Macro &macro = std::get<pasta::Macro>(er.entity);
-      if (!ShouldGoInFloatingFragment(macro)) {
+
+      // Directives, especially `#define` directives, are treated as floating
+      // root fragments, as they are kind of "free standing" w.r.t. expansion, and
+      // define directives in particular can be referenced from other locations,
+      // and so we need special handling of their tokens/entities w.r.t. the
+      // entity mapper. We process these first, as they can end up being used
+      // lexically inside of other top-level entities.
+      if (ShouldGoInFloatingFragment(macro)) {
+        CreateFloatingDirectiveFragment(
+            id_store, em, nm, tu_id, macro, pending_fragments);
+
+      } else {
         top_level_macros.emplace_back(macro);
       }
 
@@ -2577,9 +2812,23 @@ static std::vector<PendingFragmentPtr> CreatePendingFragments(
   std::string main_job_file = ast.MainFile().Path().generic_string();
   DLOG(INFO)
       << "Main source file " << main_job_file
-      << " has " << decl_group_ranges.size() << " possible fragments";
+      << " has at least " << decl_group_ranges.size() << " possible fragments";
 
   pasta::TokenRange tok_range = ast.Tokens();
+
+  // // Sort the the order of appearance in the parsed token list, then break
+  // // ties using the order that we visited things in in the TLD finder.
+  // std::sort(
+  //     decl_group_ranges.begin(), decl_group_ranges.end(),
+  //     [] (const EntityGroupRange &a, const EntityGroupRange &b) {
+  //       if (a.begin_index < b.begin_index) {
+  //         return true;
+  //       } else if (a.begin_index > b.begin_index) {
+  //         return false;
+  //       } else {
+  //         return a.order < b.order;
+  //       }
+  //     });
 
   // Visit decl range groups in their natural order, so that we're more likely
   // to associate tokens/expressions indirectly reachable through types with
@@ -2636,7 +2885,8 @@ static void PersistParsedFragments(
       
       const auto &tld = pf->top_level_decls.front();
       if (IsTemplateOrPattern(tld) ||
-          IsMethodLexicallyInSpecialization(tld)) {
+          IsMethodLexicallyInSpecialization(tld) ||
+          IsLambda(tld)) {
         nested_fragment_bounds.emplace_back(pf->Bounds());
       }
     }

@@ -21,7 +21,7 @@
 #include "Fragment.h"
 #include "Generator.h"
 
-// #define D(...) __VA_ARGS__
+#define D(...) __VA_ARGS__
 #ifndef D
 # define D(...)
 #else

@@ -1256,7 +1256,11 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
 Substitution *TokenTreeImpl::BuildFromTokenList(
     const PendingFragment &pf, std::ostream &err) {
 
-  // std::cerr << "\n-- BUILDING TREE " << pf.fragment_id.Unpack().fragment_id << " ----------\n";
+  // std::cerr << "\n-- BUILDING TREE fragment_index="
+  //           << pf.fragment_id.Unpack().fragment_id
+  //           << " parent_entity=" << (!!pf.raw_parent_entity)
+  //           << " parent_eid=" << pf.em.EntityId(pf.raw_parent_entity)
+  //           << "\n";
   // std::cerr << pf.parsed_tokens.Data() << "\n";
 
   Substitution *root_sub = nullptr;
@@ -1297,9 +1301,6 @@ Substitution *TokenTreeImpl::BuildFromTokenList(
   //       << " has_any_macros=" << has_any_macros
   //       << " original_tokens=" << pf.original_tokens.has_value()
   //       << " root_sub=" << (!!root_sub) << '\n';
-  //   if (root_sub) {
-  //     root_sub->PrintDOT(std::cerr);
-  //   }
   //   std::cerr << pf.top_level_decls.front().Tokens().Data() << '\n';
   //   Dump(pf.top_level_decls.front());
   // }

@@ -464,7 +464,7 @@ struct TokenTreeSerializationSchedule {
     auto tok_data = pf.original_tokens ? pf.original_tokens->Data() :
                     pf.parsed_tokens.Data();
     CHECK_EQ(tokens.size(), pf.num_parsed_tokens)
-        << "On token data: " << tok_data; 
+        << "on token data: " << tok_data;
     tokens.insert(tokens.end(), std::make_move_iterator(macro_tokens.begin()),
                   std::make_move_iterator(macro_tokens.end()));
   }

@@ -68,7 +68,6 @@ static clang::Type *BasicTypeDeduplication(
   return BasicTypeDeduplication(ctx, tp, up_quals, list);
 }
 
-
 clang::Type *BasicTypeDeduplication(
     clang::ASTContext &ctx, clang::Type *type, uint32_t &up_quals,
     EntityList<const clang::Stmt *> *list) {

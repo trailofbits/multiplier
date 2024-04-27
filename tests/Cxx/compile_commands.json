@@ -81,7 +81,7 @@
 },
 {
     "file": "NestedTemplate.cpp",
-    "command": "/usr/bin/c++ std=c++20 NestedTemplate.cpp",
+    "command": "/usr/bin/c++ -std=c++20 NestedTemplate.cpp",
     "directory": ""
 },
 {

@@ -162,8 +162,12 @@ class EntityMapper final {
     top_level_decls.insert(RawEntity(decl));
   }
 
-  inline bool IsTopLevel(const pasta::Decl &decl) {
-    return top_level_decls.count(RawEntity(decl)) != 0u;
+  inline bool IsTopLevel(const pasta::Decl &decl) const {
+    return IsTopLevel(RawEntity(decl));
+  }
+
+  inline bool IsTopLevel(const void *decl) const {
+    return top_level_decls.count(decl) != 0u;
   }
 
   // ID of the parent fragment.

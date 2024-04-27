@@ -276,7 +276,7 @@ class ParentTrackerVisitor : public EntityVisitor {
     if (!eid) {
       // TODO(kumarak): Log error instead of assert. See the assert
       //                while visiting dependent types.
-      LOG(ERROR)
+      DLOG(WARNING)
           << "Fragment"
           << PrefixedLocation(fragment.top_level_decls.front(), " at or near ")
           << " has statement without an ID: "
