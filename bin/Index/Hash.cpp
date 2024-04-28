@@ -366,7 +366,7 @@ std::string HashFragment(
     const pasta::TokenRange *frag_tok_range,
     const pasta::PrintedTokenRange &decl_tok_range) {
 
-  auto parent_fid = em.ParentFragmentId(parent_entity);
+  auto parent_fid = em.ParentFragmentId(parent_entity, decls);
   if (parent_fid != mx::kInvalidEntityId && decls.size() == 1u &&
       !pasta::TemplateDecl::From(decls.front())) {
     return HashNestedFragment(em, nm, parent_fid, decls.front());

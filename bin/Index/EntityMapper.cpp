@@ -393,7 +393,7 @@ std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
 
 // ID of the parent fragment.
 mx::RawEntityId EntityMapper::ParentFragmentId(
-    const void *parent_entity) const {
+    const void *parent_entity, const std::vector<pasta::Decl> &decls) const {
   if (!parent_entity) {
     return mx::kInvalidEntityId;
   }
@@ -410,7 +410,7 @@ mx::RawEntityId EntityMapper::ParentFragmentId(
   } else if (std::holds_alternative<mx::FragmentId>(vid)) {
     parent_frag_index = std::get<mx::FragmentId>(vid).fragment_id;
 
-  // This generally indicates one of three problems:
+  // This generally indicates one of a few problems:
   //
   //    - There is something that was discovered, e.g. via a template
   //      specialization list, that isn't actually discoverable from a decl
@@ -429,8 +429,20 @@ mx::RawEntityId EntityMapper::ParentFragmentId(
   //      `IndexCompileJob.cpp`, that goes and expands the range (e.g. to
   //      include leading whitespace), and that triggers a child to somehow
   //      show up before its parent.
+  //
+  //    - There is some really annoying nesting of lambdas and templates that
+  //      screws up the `TLDFinder`.
   } else {
-    CHECK(false);
+    CHECK(!decls.empty());
+    LOG(ERROR)
+        << "Couldn't find parent fragment ID of " << decls.front().KindName()
+        << " (it " << (IsLambda(decls.front()) ? "is" : "isn't")
+        << " a lambda; its parent " << (IsTopLevel(parent_entity) ? "is" : "isn't")
+        << " a top-level entity)"
+        << PrefixedLocation(decls.front(), " at or near ")
+        << " in main job file "
+        << pasta::AST::From(decls.front()).MainFile().Path().generic_string();
+
     return mx::kInvalidEntityId;
   }
 

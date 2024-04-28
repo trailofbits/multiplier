@@ -171,7 +171,8 @@ class EntityMapper final {
   }
 
   // ID of the parent fragment.
-  mx::RawEntityId ParentFragmentId(const void *parent_entity) const;
+  mx::RawEntityId ParentFragmentId(
+      const void *parent_entity, const std::vector<pasta::Decl> &decls) const;
 };
 
 }  // namespace indexer

@@ -124,6 +124,41 @@ struct EntityGroupRange {
 
 static bool IsProbablyABuiltinDecl(const pasta::Decl &decl);
 
+// Find a redeclaration of `tpl` that has the same location as `loc`.
+template <typename T>
+static std::optional<pasta::Decl> FindParentRedecl(T &tpl, pasta::Token loc) {
+  if (tpl.Token() == loc) {
+    return tpl;
+  }
+  for (const auto &redecl_ : tpl.Redeclarations()) {
+    auto redecl = reinterpret_cast<const T &>(redecl_);
+    if (redecl.Token() == loc) {
+      return redecl;
+    }
+  }
+  return std::nullopt;
+}
+
+// Find the logical parent of this function specialization.
+static std::optional<pasta::Decl> FindSpecializationParent(
+    const pasta::FunctionDecl &decl) {
+  if (auto pattern = TemplateInstantiationPattern(decl)) {
+    if (auto tpl = pattern->DescribedFunctionTemplate()) {
+      return FindParentRedecl(tpl.value(), decl.Token());
+    
+    // This is probably a friend declaration inside of a class template.
+    } else if (pattern->Token() == decl.Token()) {
+      return std::move(pattern.value());
+    }
+  }
+
+  if (auto tpl = decl.PrimaryTemplate()) {
+    return FindParentRedecl(tpl.value(), decl.Token());
+  }
+
+  return std::nullopt;
+}
+
 // Find all top-level declarations.
 class TLDFinder final : public pasta::DeclVisitor {
  private:
@@ -144,8 +179,8 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   std::unordered_set<const void *> deferred_seen;
 
-  std::vector<std::pair<const void *, pasta::Decl>> pending_child_decls;
-  std::vector<std::pair<const void *, pasta::Decl>> pending_lambdas;
+  std::vector<std::pair<pasta::Decl, pasta::Decl>> pending_child_decls;
+  std::vector<std::pair<pasta::Decl, pasta::Decl>> pending_lambdas;
 
   std::unordered_map<const void *, const void *> actual_parent;
 
@@ -177,6 +212,10 @@ class TLDFinder final : public pasta::DeclVisitor {
     //            << " with parent " << parent_decl  << ' ' << tlds.back().order;
   }
 
+  const void *RealParent(const pasta::Decl &parent) const {
+    return RealParent(RawEntity(parent));
+  }
+
   const void *RealParent(const void *parent) const {
     auto it = actual_parent.find(parent);
     if (it == actual_parent.end()) {
@@ -206,21 +245,26 @@ class TLDFinder final : public pasta::DeclVisitor {
     }
   }
 
+  // NOTE(pag): We won't necessarily have seen `parent` at the time that we
+  //            schedule `child`, because `parent` might be a redeclaration of
+  //            a template.
   void ScheduleAccept(const pasta::Decl &parent, pasta::Decl child) {
     auto raw_parent = RawEntity(parent);
     auto raw_child = RawEntity(child);
     CHECK_NE(raw_parent, raw_child);
+    // CHECK(seen.count(raw_parent));
+    // CHECK(em.IsTopLevel(raw_parent));
     CHECK(seen.emplace(raw_child).second);
     CHECK(deferred_seen.emplace(raw_child).second);
     // LOG(ERROR) << "Scheduling " << raw_child << " with parent " << RawEntity(parent);
-    pending_child_decls.emplace_back(raw_parent, std::move(child));
+    pending_child_decls.emplace_back(parent, std::move(child));
   }
 
   void ScheduleLambda(const pasta::Decl &parent, pasta::Decl child) {
     auto raw_child = RawEntity(child);
     CHECK(seen.emplace(raw_child).second);
     CHECK(deferred_seen.emplace(raw_child).second);
-    pending_lambdas.emplace_back(RawEntity(parent), std::move(child));
+    pending_lambdas.emplace_back(parent, std::move(child));
   }
 
  public:
@@ -249,16 +293,13 @@ class TLDFinder final : public pasta::DeclVisitor {
       save_restore.emplace(parent_decl, RawEntity(dc_decl));
     }
 
-    for (const pasta::Decl &decl : dc.AlreadyLoadedDeclarations()) {
-      if (dc_decl == decl) {
-        continue;
-      }
+    auto decls = OriginalDeclsInDeclContext(dc);
+    for (const auto &[orig, remapped] : decls) {
+      Accept(remapped);
 
-      DCHECK(!decl.IsInvalidDeclaration());
-
-      Accept(decl);
-      if (parent_decl && !em.IsTopLevel(decl)) {
-        actual_parent.emplace(RawEntity(decl), parent_decl);
+      if (parent_decl && !em.IsTopLevel(remapped)) {
+        actual_parent.emplace(RawEntity(orig), parent_decl);
+        actual_parent.emplace(RawEntity(remapped), parent_decl);
       }
     }
   }
@@ -268,6 +309,8 @@ class TLDFinder final : public pasta::DeclVisitor {
 
     VisitDeclContext(decl, decl, false  /* don't track parentage */);
 
+    // We should only see the pending lambdas once, because our PASTA patches
+    // add the `CXXRecordDecl`s for the lambdas to the `TranslationUnitDecl`.
     pending_child_decls.insert(
         pending_child_decls.end(),
         std::make_move_iterator(pending_lambdas.begin()),
@@ -280,19 +323,98 @@ class TLDFinder final : public pasta::DeclVisitor {
     // the TU-level `CXXRecordDecl` for the lambda, we may have already seen
     // and processed its semantic parent.
     while (!pending_child_decls.empty()) {
+      auto made_progress = false;
       auto prev_pending_child_decls = std::move(pending_child_decls);
       pending_child_decls.clear();
-      for (const auto &[raw_parent, child] : prev_pending_child_decls) {
+      for (const auto &[parent, child] : prev_pending_child_decls) {
+        
+        // Figure out the "real" parent. We might have calculated the parent
+        // of a lambda as a method, but the real parent of the method is
+        // (sometimes) its containing class.
+        auto real_raw_parent = RealParent(parent);
+
+        // If we have a parent, and we haven't yet seen it, then we want to
+        // have the property that the order that we visit children follows
+        // the order that we visit parents. This helps later with topological
+        // sorting of overlapping entities.
+        if (real_raw_parent && !em.IsTopLevel(real_raw_parent)) {
+          pending_child_decls.emplace_back(parent, child);
+          continue;
+        }
+
         PrevValueTracker<const void *> save_restore(
-            parent_decl, RealParent(raw_parent));
+            parent_decl, real_raw_parent);
         auto raw_child = RawEntity(child);
         seen.erase(raw_child);
         Accept(child);
         CHECK(seen.count(raw_child));
+        made_progress = true;
+      }
+
+      // Detect infinite loops of waiting for the real parent to show up. This
+      // can semi-often happen as a result of PASTA remapping things behind the
+      // scenes. It's a rather tricky situation where our parent is a method
+      // that has been specialized from something that has been remapped.
+      if (!made_progress) {
+        CHECK(FixupRemapped());
       }
     }
 
     CHECK(pending_lambdas.empty());
+  }
+
+  bool FixupRemapped(void) {
+    for (auto i = 0u; i < pending_child_decls.size(); ++i) {
+      auto &[parent, child] = pending_child_decls[i];
+      if (auto parent_func = pasta::FunctionDecl::From(parent)) {
+        if (IsSpecialization(parent_func.value())) {
+          if (auto real_parent = FindSpecializationParent(parent_func.value())) {
+            parent = real_parent.value();
+            continue;
+          }
+
+        // Lambda in a lambda; force to parent lambda to be a root.
+        } else if (IsLambda(parent_func.value()) && IsLambda(child)) {
+          auto raw_parent = RawEntity(parent);
+          auto added = seen.emplace(raw_parent).second;
+          AddDeclAlways(parent);
+          if (added) {
+            seen.erase(raw_parent);
+            auto meth = reinterpret_cast<const pasta::CXXMethodDecl &>(parent);
+            CHECK(!meth.DescribedFunctionTemplate());
+            ScheduleAccept(meth.Parent(), meth);
+          }
+          continue;
+        }
+
+      } else if (auto parent_class = pasta::CXXRecordDecl::From(parent)) {
+        if (auto real_parent = parent_class->DescribedClassTemplate()) {
+          parent = real_parent.value();
+          continue;
+
+        } else if (IsLambda(parent) && IsLambda(child)) {
+          if (seen.emplace(RawEntity(parent)).second) {
+            CHECK(!em.IsTopLevel(parent));
+            AddDeclAlways(parent);
+          } else {
+            em.MarkAsTopLevel(parent);
+          }
+          continue;
+        }
+      }
+
+      CHECK(false)
+          << "Could not recover and find proper parent from "
+          << parent.KindName() << " of " << child.KindName()
+          << PrefixedLocation(child, " at or near ")
+          << " on main job file "
+          << pasta::AST::From(child).MainFile().Path().generic_string()
+          << " and thread " << std::hex << std::this_thread::get_id()
+          << std::dec << ": " << DeclToString(child);
+
+      return false;
+    }
+    return true;
   }
 
   void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final {
@@ -388,20 +510,6 @@ class TLDFinder final : public pasta::DeclVisitor {
   //   // Do nothing.
   // }
 
-  template <typename T>
-  std::optional<T> FindParentRedecl(T &tpl, pasta::Token loc) {
-    if (tpl.Token() == loc) {
-      return tpl;
-    }
-    for (const auto &redecl_ : tpl.Redeclarations()) {
-      auto redecl = reinterpret_cast<const T &>(redecl_);
-      if (redecl.Token() == loc) {
-        return redecl;
-      }
-    }
-    return std::nullopt;
-  }
-
   void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &decl) final {
     auto raw_decl = RawEntity(decl);
 
@@ -422,6 +530,7 @@ class TLDFinder final : public pasta::DeclVisitor {
     // being observed as a top-levelable thing.
     auto pattern = decl.TemplatedDeclaration();
     seen.insert(RawEntity(pattern));
+    AddDeclAlways(decl);
 
     if (decl.CanonicalDeclaration() == decl) {
       auto specs = ExpandSpecializations(decl.Specializations());
@@ -445,7 +554,6 @@ class TLDFinder final : public pasta::DeclVisitor {
       }
     }
 
-    AddDeclAlways(decl);
     VisitDeeperDeclContext(decl, pattern);
   }
 
@@ -454,6 +562,8 @@ class TLDFinder final : public pasta::DeclVisitor {
     if (!seen.emplace(raw_decl).second) {
       return;
     }
+
+    AddDeclAlways(decl);
 
     if (decl.CanonicalDeclaration() == decl) {
       auto specs = ExpandSpecializations(decl.Specializations());
@@ -474,8 +584,6 @@ class TLDFinder final : public pasta::DeclVisitor {
         }
       }
     }
-
-    AddDeclAlways(decl);
   }
 
   void VisitVarTemplatePartialSpecializationDecl(
@@ -518,10 +626,6 @@ class TLDFinder final : public pasta::DeclVisitor {
     VisitDeclaratorDecl(decl);
   }
 
-  void VisitFriendTemplateDecl(const pasta::FriendTemplateDecl &decl) final {
-    AddDecl(decl);
-  }
-
   void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) final {
     auto raw_decl = RawEntity(decl);
     if (!seen.emplace(raw_decl).second) {
@@ -530,6 +634,9 @@ class TLDFinder final : public pasta::DeclVisitor {
 
     auto pattern = decl.TemplatedDeclaration();
     auto should_hide = ShouldHideFromIndexer(pattern);  // Deduction guides.
+    if (!should_hide) {
+      AddDeclAlways(decl);
+    }
 
     if (decl.CanonicalDeclaration() == decl) {
       auto specs = ExpandSpecializations(decl.Specializations());
@@ -537,6 +644,7 @@ class TLDFinder final : public pasta::DeclVisitor {
       for (pasta::FunctionDecl &spec : specs) {
         if (should_hide) {
           seen.emplace(RawEntity(spec));
+          continue;
         }
 
         auto tpl = spec.PrimaryTemplate();
@@ -548,20 +656,15 @@ class TLDFinder final : public pasta::DeclVisitor {
         // Specializations of partial specializations are collected into the
         // template itself, but lexically "belong" to the partial specialization
         // itself.
-        ScheduleAccept(FindParentRedecl(tpl.value(), spec.Token()),
-                       std::move(spec));
+        auto parent = FindParentRedecl(tpl.value(), spec.Token());
+        ScheduleAccept(parent, std::move(spec));
       }
-    }
-
-    if (!should_hide) {
-      AddDeclAlways(decl);
     }
   }
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
     auto raw_decl = RawEntity(decl);
     if (seen.count(raw_decl)) {
-      // LOG(ERROR) << "Seen " << raw_decl;
       return;
     }
 
@@ -595,17 +698,8 @@ class TLDFinder final : public pasta::DeclVisitor {
       // B has been remapped to A, and so we'll never see B or its list of
       // specializations.
       if (!deferred_seen.count(raw_decl)) {
-        if (auto pattern = TemplateInstantiationPattern(decl)) {
-          if (auto tpl = pattern->DescribedFunctionTemplate()) {
-            ScheduleAccept(FindParentRedecl(tpl.value(), decl.Token()), decl);
-          
-          // This is probably a friend declaration inside of a class template.
-          } else if (pattern->Token() == decl.Token()) {
-            ScheduleAccept(pattern, decl);
-          }
-          return;
-        } else if (auto tpl = decl.PrimaryTemplate()) {
-          ScheduleAccept(FindParentRedecl(tpl.value(), decl.Token()), decl);
+        if (auto parent = FindSpecializationParent(decl)) {
+          ScheduleAccept(parent, decl);
           return;
         }
       }
@@ -623,7 +717,6 @@ class TLDFinder final : public pasta::DeclVisitor {
              pasta::CXXMethodDecl::From(decl).has_value());
 #endif
 
-      // LOG(ERROR) << "Visiting NumTemplateParameterLists " << raw_decl;
       seen.emplace(raw_decl);
       AddDeclAlways(decl);
       return;
@@ -631,6 +724,13 @@ class TLDFinder final : public pasta::DeclVisitor {
 
     // This is a specialization of a non-template method.
     if (decl.IsTemplateInstantiation() && decl.IsOutOfLine()) {
+      if (deferred_seen.count(raw_decl)) {
+        CHECK_NOTNULL(parent_decl);
+        seen.emplace(raw_decl);
+        AddDeclAlways(decl);
+        return;
+      }
+
       auto from = decl.InstantiatedFromMemberFunction();
       if (from && (from->DeclarationContext()->RawDeclContext() ==
                    decl.DeclarationContext()->RawDeclContext())) {
@@ -638,11 +738,13 @@ class TLDFinder final : public pasta::DeclVisitor {
         from = from->InstantiatedFromMemberFunction();
       }
       if (from) {
-        if (auto from_tpl = FindParentRedecl(from.value(), decl.Token())) {
-          PrevValueTracker<const void *> save_restore(
-            parent_decl, RawEntity(from_tpl.value()));
-
-          // LOG(ERROR) << "Visiting IsTemplateInstantiation " << raw_decl;
+        if (auto parent = FindParentRedecl(from.value(), decl.Token())) {
+          auto raw_parent = RawEntity(parent.value());
+          if (!em.IsTopLevel(raw_parent) && seen.count(raw_parent)) {
+            CHECK(IsLambda(parent.value()));
+            em.MarkAsTopLevel(parent.value());
+          }
+          PrevValueTracker<const void *> save_restore(parent_decl, raw_parent);
           seen.emplace(raw_decl);
           AddDeclAlways(decl);
           return;
@@ -662,8 +764,6 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
-
-    // LOG(ERROR) << "VisitDeclaratorDecl " << raw_decl;
     VisitDeclaratorDecl(decl);
   }
 
@@ -673,11 +773,6 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   void VisitRecordDecl(const pasta::RecordDecl &decl) final {
     auto raw_decl = RawEntity(decl);
-
-    // if (IsLambda(decl)) {
-    //   LOG(ERROR) << "lambda " << raw_decl << ' ' << parent_decl << ' ' << deferred_seen.count(raw_decl);
-    // }
-
     if (seen.count(raw_decl)) {
       return;
     }
@@ -706,9 +801,6 @@ class TLDFinder final : public pasta::DeclVisitor {
         VisitDeeperDeclContext(decl, decl, true);
         return;
       }
-
-      CHECK(false);
-      return;
     }
 
     VisitTagDecl(decl);
@@ -726,14 +818,16 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
-    // We should have already found this method via the top-level
-    // `CXXRecordDecl`. If it's a generic lambda then this method is the
-    // specialization of the `operator()` so don't want to skip it.
-    if (IsLambda(decl) && !IsSpecialization(decl)) {
-      CHECK_NOTNULL(parent_decl);
-      CHECK_GT(depth, 0u);
-      return;
-    }
+    // // We should have already found this method via the top-level
+    // // `CXXRecordDecl`. If it's a generic lambda then this method is the
+    // // specialization of the `operator()` so don't want to skip it.
+    // if (IsLambda(decl) && !IsSpecialization(decl)) {
+    //   LOG(ERROR) << "method in lambda " << RawEntity(decl)
+    //              << " IsSpecialization(parent)=" << IsSpecialization(decl.Parent());
+    //   CHECK_NOTNULL(parent_decl);
+    //   CHECK_GT(depth, 0u);
+    //   return;
+    // }
 
     VisitFunctionDecl(decl);
   }
@@ -747,13 +841,24 @@ class TLDFinder final : public pasta::DeclVisitor {
     }
   }
 
+  void VisitFriendTemplateDecl(const pasta::FriendTemplateDecl &decl) final {
+    auto raw_decl = RawEntity(decl);
+    if (!seen.emplace(raw_decl).second) {
+      return;
+    }
+    AddDeclAlways(decl);
+
+    PrevValueTracker<const void *> save_restore(parent_decl, raw_decl);
+    Accept(decl.FriendDeclaration());
+  }
+
   void VisitFriendDecl(const pasta::FriendDecl &decl) final {
-    // If there is a FriendDecl; visit the inner declaration
-    // and add them to the top-level decl.
+    if (!seen.emplace(RawEntity(decl)).second) {
+      return;
+    }
+
     if (auto fdl = decl.FriendDeclaration()) {
-      if (auto td = pasta::TemplateDecl::From(fdl.value())) {
-        Accept(td.value());
-      }
+      Accept(fdl.value());
     }
   }
 
@@ -954,7 +1059,6 @@ static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast,
   TLDFinder tld_finder(tlds, em);
   tld_finder.VisitTranslationUnitDecl(ast.TranslationUnit());
 
-#ifndef NDEBUG
   auto decl_eq = +[] (const OrderedDecl &a, const OrderedDecl &b) {
     return RawEntity(a.decl) == RawEntity(b.decl);
   };
@@ -968,10 +1072,12 @@ static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast,
 
   // If we find duplicates then that suggests we've seen something twice, and
   // that isn't good and might lead to contradictions (e.g. one having a
-  // parent, where another one doesn't, or having different parents).
-  CHECK(it == tlds.end());
+  // parent, where another one doesn't, or having different parents). This can
+  // happen with lambdas in lambdas in methods in class templates. The
+  // specialization of the template can result in the lambdas classes
+  // themselves being subject to substitution, and it really screws up the
+  // `TLDFinder`. 
   tlds.erase(it, tlds.end());
-#endif
 
   auto order_less = +[] (const OrderedDecl &a, const OrderedDecl &b) {
     return a.order < b.order;
@@ -2348,11 +2454,11 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
       << " where we're doing token alignment on "
       << decls_to_print.size() << " printed declarations";
 
-  // if (decls_to_print.size() > 100u) {
-  //   Dump(decls_to_print[0]);
-  //   Dump(decls_to_print[1]);
-  //   CHECK(false);
-  // }
+  if (decls_to_print.size() > 100u) {
+    Dump(decls_to_print[0]);
+    Dump(decls_to_print[1]);
+    CHECK(false);
+  }
 
   CHECK_LT(decls_to_print.size(), 1000u);  // Likely a serious problem.
 
@@ -2594,6 +2700,148 @@ static void CreateFloatingDirectiveFragment(
   pending_fragments.emplace_back(std::move(pf));
 }
 
+static void SortByParentage(EntityGroup &entities) {
+  auto num_entities = entities.size();
+  if (num_entities <= 1u) {
+    return;
+  }
+
+  auto end = entities.end();
+  auto it = std::partition(
+      entities.begin(), end,
+      [] (const EntityRange &er) {
+        return std::holds_alternative<pasta::Macro>(er.entity);
+      });
+
+  std::sort(
+      it, end,
+      [] (const EntityRange &a, const EntityRange &b) {
+        const auto &a_decl = std::get<pasta::Decl>(a.entity);
+        const auto &b_decl = std::get<pasta::Decl>(b.entity);
+        auto num_a_tokens = a_decl.Tokens().size();
+        auto num_b_tokens = b_decl.Tokens().size();
+        return num_a_tokens > num_b_tokens;
+      });
+
+  std::stable_sort(
+      it, end,
+      [] (const EntityRange &a, const EntityRange &b) {
+        return a.order < b.order;
+      });
+
+  while (it != end) {
+    auto raw_parent = RawEntity(std::get<pasta::Decl>(it->entity));
+    ++it;
+    if (it == end) {
+      break;
+    }
+
+    it = std::stable_partition(
+        it, end,
+        [=] (const EntityRange &er) {
+          return er.parent == raw_parent;
+        });
+  }
+
+  // figure out topological sort
+  // maybe: sort by size of token ranges, then do an selection sort, by taking
+  // the biggest thing from the sorted list, then finding all children, and
+  // recursing that way.
+
+  // // fix sorting.. maybe do a size-based sort, followed by a parentage check?
+  // //
+  // // note: only really need to do parent checking when the locations match
+
+  // std::sort(
+  //     entities.begin(), entities.end(),
+  //     [] (const EntityRange &a, const EntityRange &b) {
+  //       if (&a == &b) {
+  //         return false;
+  //       } else if (!a.parent && b.parent) {
+  //         return true;
+  //       } else if (a.parent && !b.parent) {
+  //         return false;
+  //       } else if (a.parent == b.parent) {
+  //         return a.order < b.order;
+  //       }
+
+  //       if (a.begin_index < b.begin_index) {
+  //         return true;
+  //       } else if (a.begin_index > b.begin_index) {
+  //         return false;
+  //       }
+
+  //       const auto &a_decl = std::get<pasta::Decl>(a.entity);
+  //       const auto &b_decl = std::get<pasta::Decl>(b.entity);
+
+  //       // We can have a function template with a parent, and a function
+  //       // specializing that template (i.e. the function's parent is the
+  //       // template). These two will occupy the same space, and so this should
+  //       // be the only case where both have parents, have the same locations,
+  //       // and have the same token range sizes, and thus 
+
+  //       if (a.parent == RawEntity(b_decl)) {
+  //         return false;
+  //       } else if (b.parent == RawEntity(a_decl)) {
+  //         return true;
+  //       }
+
+  //       // Here we actually want to compare the tokens and not the indexes
+  //       // recorded in the `EntityRange`s, because those have already been
+  //       // adjusted by things like `ExpandRange`.
+
+  //       auto a_tokens = a_decl.Tokens();
+  //       auto b_tokens = b_decl.Tokens();
+
+  //       // Containment implies parentage.
+  //       auto a_size = a_tokens.size();
+  //       auto b_size = b_tokens.size();
+  //       if (a_size > b_size) {
+  //         return true;
+  //       } else if (a_size < b_size) {
+  //         return false;
+  //       }
+
+  //       auto a_front = a_tokens.Front();
+  //       auto b_front = b_tokens.Front();
+  //       if (!a_front || !b_front) {
+  //         return a.order < b.order;
+  //       }
+
+  //       auto a_loc = a_front->Index();
+  //       auto b_loc = b_front->Index();
+  //       if (a_loc < b_loc) {
+  //         return true;
+  //       } else if (a_loc > b_loc) {
+  //         return false;
+  //       }
+
+  //       return a.order < b.order;
+  //     });
+
+  // for (auto &er : entities) {
+  //   CHECK(!std::holds_alternative<pasta::Macro>(er.entity));
+
+  //   auto raw_decl = RawEntity(std::get<pasta::Decl>(er.entity));
+  // }
+
+  // if (num_entities == 1u) {
+  //   return;
+  // } else if (num_entities == 2u) {
+  //   std::sort(
+  //       entities.begin(), entities.end(),
+  //       [] (const EntityRange &a, const EntityRange &b) {
+  //         if (a.parent == b.parent) {
+  //           return a.begin_index < b.begin_index;
+  //         } else if (!a.parent && b.parent) {
+  //           return true;
+  //         } else if (a.parent && !b.parent) {
+  //           return false;
+  //         }
+  //       });
+  // }
+}
+
 static void CreatePendingFragments(
     IdStore &id_store, EntityMapper &em, NameMangler &nm,
     const pasta::TokenRange &tok_range, mx::PackedCompilationId tu_id,
@@ -2604,6 +2852,8 @@ static void CreatePendingFragments(
   if (!DebugIndexOnlyThisFragment(entities)) {
     return;
   }
+
+  SortByParentage(entities);
 
   auto begin_index = group_range.begin_index;
   auto end_index = group_range.end_index;

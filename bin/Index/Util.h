@@ -205,6 +205,7 @@ const void *RawEntity(const pasta::PrintedToken &entity);
 const void *RawEntity(const pasta::File &entity);
 const void *RawEntity(const pasta::FileToken &entity);
 const void *RawEntity(const pasta::Decl &entity);
+const void *RemappedRawEntity(const pasta::Decl &entity);
 const void *RawEntity(const pasta::DeclContext &entity);
 const void *RawEntity(const pasta::Stmt &entity);
 const void *RawEntity(const pasta::Attr &entity);
@@ -247,7 +248,12 @@ std::string DiagnosePrintedTokens(const pasta::PrintedTokenRange &);
 // Returns `c` if `c` isn't an alias, otherwise `c.Aliasee().value()`.
 pasta::TokenContext UnaliasedContext(const pasta::TokenContext &c);
 
+// Return the root macro containing `node`.
 pasta::Macro RootMacroFrom(const pasta::Macro &node);
+
+// Generate pairs of original and remapped decls in this decl context.
+gap::generator<std::pair<pasta::Decl, pasta::Decl>>
+OriginalDeclsInDeclContext(pasta::DeclContext dc);
 
 uint32_t Hash32(std::string_view data);
 uint64_t Hash64(std::string_view data);

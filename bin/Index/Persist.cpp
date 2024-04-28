@@ -790,7 +790,8 @@ static void RecordParentFragment(
     mx::rpc::Fragment::Builder &fb, mx::DatabaseWriter &database,
     PendingFragment &pf) {
 
-  auto parent_eid = pf.em.ParentFragmentId(pf.raw_parent_entity);
+  auto parent_eid = pf.em.ParentFragmentId(
+      pf.raw_parent_entity, pf.top_level_decls);
   fb.setParentFragmentId(parent_eid);
 
   if (parent_eid == mx::kInvalidEntityId) {

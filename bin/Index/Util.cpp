@@ -1044,6 +1044,7 @@ std::vector<pasta::Decl> DeclarationsInDeclContext(
   return decls;
 }
 
+// Return the root macro containing `node`.
 pasta::Macro RootMacroFrom(const pasta::Macro &node) {
   if (auto parent = node.Parent()) {
     return RootMacroFrom(parent.value());
@@ -1174,6 +1175,10 @@ const void *RawEntity(const pasta::FileToken &entity) {
 }
 
 const void *RawEntity(const pasta::Decl &entity) {
+  return entity.RawDecl();
+}
+
+const void *RemappedRawEntity(const pasta::Decl &entity) {
   return entity.RawDecl()->RemappedDecl;
 }
 
@@ -1278,6 +1283,26 @@ void Dump(const pasta::Decl &decl) {
 
 void Print(const pasta::Decl &decl) {
   std::cerr << decl.Tokens().Data() << '\n';
+}
+
+// Generate pairs of original and remapped decls in this decl context.
+gap::generator<std::pair<pasta::Decl, pasta::Decl>>
+OriginalDeclsInDeclContext(pasta::DeclContext dc) {
+  auto ast = pasta::AST::From(dc);
+  auto raw_dc = const_cast<clang::DeclContext *>(dc.RawDeclContext());
+  auto raw_dc_decl = clang::Decl::castFromDeclContext(raw_dc);
+
+  decltype(auto) val = raw_dc->noload_decls();
+  for (auto raw_decl : val) {
+    if (!raw_decl || raw_decl->isInvalidDecl() || raw_decl == raw_dc_decl ||
+        raw_decl->RemappedDecl == raw_dc_decl) {
+      continue;
+    }
+
+    co_yield std::make_pair<pasta::Decl, pasta::Decl>(
+        ast.AdoptWithoutRemap(raw_decl),
+        ast.Adopt(raw_decl));
+  }
 }
 
 }  // namespace indexer

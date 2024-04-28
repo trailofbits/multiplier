@@ -178,5 +178,10 @@
     "file": "ExplicitInstantiationDefinitionMethod.cpp",
     "command": "/usr/bin/c++ ExplicitInstantiationDefinitionMethod.cpp",
     "directory": ""
+},
+{
+    "file": "LambdaInRequiresClause.cpp",
+    "command": "/usr/bin/c++ -std=c++20 LambdaInRequiresClause.cpp",
+    "directory": ""
 }
 ]

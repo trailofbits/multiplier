@@ -1266,7 +1266,7 @@ Substitution *TokenTreeImpl::BuildFromTokenList(
   Substitution *root_sub = nullptr;
 
   auto has_any_macros = !pf.top_level_macros.empty();
-  if (!has_any_macros && pf.parsed_tokens_are_printed && pf.original_tokens) {
+  if (!has_any_macros && pf.original_tokens) {
     has_any_macros = HasAnyMacroTokens(pf.original_tokens.value());
   }
 
@@ -1279,6 +1279,12 @@ Substitution *TokenTreeImpl::BuildFromTokenList(
 
     if (pf.original_tokens) {
       root_sub = BuildFromParsedTokenList(pf, err);
+
+      // Some dangling tokens, probably from a parent expansion.
+      if (!pf.parsed_tokens_are_printed && pf.original_tokens &&
+          !final_toks.empty()) {
+        rebuild = true;
+      }
 
     } else if (!pf.parsed_tokens) {
       err << "Empty parsed and printed token ranges";

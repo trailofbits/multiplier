@@ -608,7 +608,7 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
   auto ast = pasta::AST::From(pf.top_level_decls.front());
 
   if (first_missing_stmt.has_value()) {
-    LOG(ERROR)
+    DLOG(WARNING)
         << "Fragment"
         << PrefixedLocation(pf.top_level_decls.front(), " at or near ")
         << " main job file " << ast.MainFile().Path().generic_string()
@@ -626,7 +626,7 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
   }
 
   if (first_missing_decl.has_value()) {
-    LOG(ERROR)
+    DLOG(WARNING)
         << "Fragment"
         << PrefixedLocation(pf.top_level_decls.front(), " at or near ")
         << " main job file " << ast.MainFile().Path().generic_string()
