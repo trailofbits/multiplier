@@ -502,6 +502,10 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Decl decl) {
     for (auto ref : DeclReferencesFrom(td_->UnderlyingType())) {
       co_yield ref;
     }
+  } else if (auto dd = pasta::DecompositionDecl::From(decl)) {
+    for (auto binding : dd->Bindings()) {
+      co_yield binding;
+    }
   }
 }
 

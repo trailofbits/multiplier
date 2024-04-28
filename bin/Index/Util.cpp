@@ -1008,16 +1008,18 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
 
   switch (decl.Kind()) {
 
-    // // Function templates whose bodies are not fully instantiated.
-    // case pasta::DeclKind::kFunction: {
-    //   auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
-    //   if (auto pattern_decl = TemplateInstantiationPattern(func)) {
-    //     return pattern_decl->DoesThisDeclarationHaveABody() &&
-    //            !func.DoesThisDeclarationHaveABody() &&
-    //            !func.IsReferenced();
-    //   }
-    //   break;
-    // }
+    // Function templates whose bodies are not fully instantiated.
+    case pasta::DeclKind::kFunction: {
+      if (IsSpecialization(decl)) {
+        auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
+        if (auto pattern_decl = TemplateInstantiationPattern(func)) {
+          return pattern_decl->DoesThisDeclarationHaveABody() &&
+                 !func.DoesThisDeclarationHaveABody() &&
+                 !func.IsReferenced();
+        }
+      }
+      break;
+    }
 
     case pasta::DeclKind::kUsingDirective:
       return decl.IsImplicit();

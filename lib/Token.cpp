@@ -698,7 +698,13 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
     case DeclKind::LINKAGE_SPEC:
     case DeclKind::FRIEND:
     case DeclKind::FRIEND_TEMPLATE:
+    case DeclKind::STATIC_ASSERT:
+    case DeclKind::FILE_SCOPE_ASM:
+    case DeclKind::EXTERN_C_CONTEXT:
       return TokenCategory::KEYWORD;
+
+    case DeclKind::EMPTY:
+      return TokenCategory::PUNCTUATION;
 
     case DeclKind::CXX_METHOD:
     case DeclKind::OBJ_C_METHOD:

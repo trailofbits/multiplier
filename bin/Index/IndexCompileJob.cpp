@@ -2647,6 +2647,36 @@ static void CreateFloatingDeclFragment(
   pending_fragments.emplace_back(std::move(pf));
 }
 
+// Check if the full range has any other tokens in them.
+static bool CanUseFullDirectiveRange(const pasta::TokenRange &full_range) {
+  for (auto tok : full_range) {
+    switch (tok.Role()) {
+      case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+      case pasta::TokenRole::kEndOfMacroExpansionMarker:
+      case pasta::TokenRole::kMacroDirectiveMarker:
+        continue;
+      case pasta::TokenRole::kBeginOfFileMarker:
+      case pasta::TokenRole::kEndOfFileMarker:
+        return false;
+      default:
+        break;
+    }
+
+    switch (tok.Kind()) {
+      case pasta::TokenKind::kComment:
+        continue;
+      case pasta::TokenKind::kUnknown:
+        if (IsWhitespaceOrEmpty(tok.Data())) {
+          continue;
+        }
+        return false;
+      default:
+        return false;
+    }
+  }
+  return true;
+}
+
 // Create a floating fragment for the top-level directives.
 static void CreateFloatingDirectiveFragment(
     IdStore &id_store,
@@ -2660,21 +2690,26 @@ static void CreateFloatingDirectiveFragment(
   CHECK(dir.has_value());
 
   auto root_macro = RootMacroFrom(macro);
-
   auto marker_tok = dir->ParsedLocation();
+  auto begin_index = marker_tok.Index();
+  auto end_index = marker_tok.Index();
 
-  auto directive_range = pasta::TokenRange::From(marker_tok, marker_tok);
-  CHECK(directive_range.has_value());
-  CHECK(!directive_range->empty());
-  auto begin_index = directive_range->Front()->Index();
-  auto end_index = directive_range->Back()->Index();
+  // Check if the full range has any other tokens in them. We want to be able
+  // to get top level macros that expand into pragma directives.
+  auto directive_range = pasta::Macro::CompleteExpansionRange(root_macro);
+  if (CanUseFullDirectiveRange(directive_range)) {
+    begin_index = directive_range.Front()->Index();
+    end_index = directive_range.Back()->Index();
+  } else {
+    directive_range = pasta::TokenRange::From(marker_tok, marker_tok).value();
+  }
 
   // TODO(pag): Eventually allow floating macro define directives from
   //            compilation commands.
   EntityGroup entities;
   entities.emplace_back(macro, nullptr, begin_index, end_index, 0u);
   auto floc = FindFileLocationOfFragment(
-      em.entity_ids, entities, directive_range.value());
+      em.entity_ids, entities, directive_range);
 
   std::vector<pasta::Macro> macros;
   macros.push_back(macro);
@@ -2683,7 +2718,7 @@ static void CreateFloatingDirectiveFragment(
       id_store,
       em,
       nm,
-      &(directive_range.value())  /* original_tokens */,
+      &directive_range  /* original_tokens */,
       pasta::PrintedTokenRange::CreateEmpty(
           pasta::AST::From(macro))  /* parsed_tokens */,
       std::move(floc),

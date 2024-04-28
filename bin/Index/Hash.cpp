@@ -7,6 +7,7 @@
 #include "Hash.h"
 
 #include <cctype>
+#include <multiplier/Frontend/TokenKind.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Macro.h>
@@ -130,30 +131,45 @@ static void AccumulateTokenData(std::stringstream &ss,
     return;
   }
 
+  switch (kind) {
+    case mx::TokenKind::UNKNOWN:
+    case mx::TokenKind::WHITESPACE:
+    case mx::TokenKind::COMMENT:
+      return;
+    default:
+      break;
+  }
+
   // Mix in generic token/structure/context information.
   switch (role) {
     case pasta::TokenRole::kIntermediateMacroExpansionToken:
-      ss << " e" << int(kind);
-      break;
+      assert(false);
+      return;
     case pasta::TokenRole::kInitialMacroUseToken:
-      ss << " u" << int(kind);
+      assert(false);
+      return;
+
+    case pasta::TokenRole::kFinalMacroExpansionToken:
+      ss << " p" << int(kind);
       break;
 
     case pasta::TokenRole::kFileToken:
       ss << " f" << int(kind);
-      break;
-    case pasta::TokenRole::kFinalMacroExpansionToken:
-      ss << " p" << int(kind);
       break;
 
     default:
       return;
   }
 
-  if (data.size() >= 8u) {
+  // Hashing could result in big numbers that could require many digits.
+  if (data.size() > 18u) {
     ss << Hash64(data);
+
+  // Don't include punctuation.
   } else if (data[0] != '_' && !isalpha(data[0])) {
     ss << data;
+
+  // Keep short identifiers as is.
   } else if (isalpha(data[0])) {
     ss << data;
   }
@@ -166,27 +182,29 @@ static void AccumulateTokenData(
     AccumulateTokenData(ss, mx::FromPasta(token.Kind()),
                         pasta::TokenRole::kFileToken, token.Data());
 
-    std::stringstream tc;
-    for (pasta::TokenContext context : TokenContexts(token)) {
-      switch (context.Kind()) {
-        case pasta::TokenContextKind::kDecl:
-          tc << " d" << int(pasta::Decl::From(context)->Kind());
-          break;
-        case pasta::TokenContextKind::kStmt:
-          tc << " s" << int(pasta::Stmt::From(context)->Kind());
-          break;
-        case pasta::TokenContextKind::kType:
-          tc << " t" << int(pasta::Type::From(context)->Kind());
-          break;
-        case pasta::TokenContextKind::kAttr:
-          tc << " a" << int(pasta::Attr::From(context)->Kind());
-          break;
-        default:
-          break;
-      }
+    auto tc = token.Context();
+    if (!tc) {
+      continue;
     }
 
-    ss << " c" << Hash64(tc.str());
+    // Only keep the most specialized token kind.
+    switch (auto tc_kind = tc->Kind()) {
+      case pasta::TokenContextKind::kDecl:
+        ss << " d" << int(pasta::Decl::From(tc.value())->Kind());
+        break;
+      case pasta::TokenContextKind::kStmt:
+        ss << " s" << int(pasta::Stmt::From(tc.value())->Kind());
+        break;
+      case pasta::TokenContextKind::kType:
+        ss << " t" << int(pasta::Type::From(tc.value())->Kind());
+        break;
+      case pasta::TokenContextKind::kAttr:
+        ss << " a" << int(pasta::Attr::From(tc.value())->Kind());
+        break;
+      default:
+        ss << " k" << int(tc_kind);
+        break;
+    }
   }
 }
 
