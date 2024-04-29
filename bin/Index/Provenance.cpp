@@ -349,6 +349,13 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
 
   // Try to match on `func`, `(`, or `)` in `func()`.
   } else if (auto call = pasta::CallExpr::From(stmt)) {
+    if (auto oc = pasta::CXXOperatorCallExpr::From(stmt)) {
+      // Try to match the operator token itself, or the `operator` keyword.
+      if (AcceptOOK(oc->Operator(), token_kind) || token_data == "operator") {
+        return em.EntityId(call->CalleeDeclaration());
+      }
+    }
+
     if (token_kind != pasta::TokenKind::kLParenthesis &&
         token_kind != pasta::TokenKind::kRParenthesis) {
       return VisitStmt(em, call->Callee(), raw_token, token_data, token_kind,

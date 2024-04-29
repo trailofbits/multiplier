@@ -467,7 +467,7 @@ IdStore::IdStore(std::filesystem::path path)
     : impl(IdStoreImpl::Open(path)) {}
 
 MaybeNewId<mx::PackedFragmentId> IdStore::GetOrCreateFragmentIdForHash(
-    mx::RawEntityId tok_id, std::string hash, size_t num_tokens) {
+    mx::RawEntityId context_id, std::string hash, size_t num_tokens) {
 
   auto is_big_frag = num_tokens >= mx::kNumTokensInBigFragment;
   auto &next_index = is_big_frag ? impl->next_big_fragment_index :
@@ -476,7 +476,7 @@ MaybeNewId<mx::PackedFragmentId> IdStore::GetOrCreateFragmentIdForHash(
 
   // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
   auto new_id = impl->GetOrCreateId<mx::FragmentId>(
-      next_index, tok_id, num_tokens, hash);
+      next_index, context_id, num_tokens, hash);
 
   CHECK_LT(new_id.first.Unpack().fragment_id, max_id_val);
 

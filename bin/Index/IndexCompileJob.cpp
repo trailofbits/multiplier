@@ -2370,10 +2370,20 @@ static PendingFragmentPtr CreatePendingFragment(
   num_tokens = std::max(num_tokens, parsed_tokens.Size()) +
                MacroRangeSize(macros);
 
+  mx::RawEntityId context_eid = mx::kInvalidEntityId;
+  if (parent_entity) {
+    CHECK_EQ(decls.size(), 1u);
+    context_eid = em.ParentFragmentId(parent_entity, decls);
+  }
+
+  if (context_eid == mx::kInvalidEntityId && floc) {
+    context_eid = floc->first_file_token_id.Pack();
+  }
+
   // Compute the fragment ID, and in doing so, figure out if this is actually
   // a new fragment.
   auto [fid, is_new_fragment_id] = id_store.GetOrCreateFragmentIdForHash(
-      (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
+      context_eid,
       HashFragment(em, nm, parent_entity, decls, macros, original_tokens,
                    parsed_tokens),
       num_tokens  /* for fragment id packing format */);
@@ -2417,7 +2427,8 @@ static PendingFragmentPtr CreatePendingFragment(
 static pasta::PrintedTokenRange CreateParsedTokenRange(
     pasta::PrintedTokenRange parsed_tokens,
     const std::vector<pasta::Decl> &decls, const pasta::PrintingPolicy &pp,
-    std::string_view main_job_file, bool &parsed_are_printed) {
+    std::string_view main_job_file, const void *parent_entity,
+    bool &parsed_are_printed) {
 
   CHECK(!decls.empty());
 
@@ -2476,9 +2487,15 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
 
   // If any of the decls to be printed are actually specializations, then we
   // don't want to return the parsed tokens, as those will likely represent
-  // things like 
+  // things that need to be substituted.
   for (const auto &decl : decls_to_print) {
     if (IsSpecializationOrInSpecialization(decl)) {
+
+      // A top-level explicit specialization doesn't need to be printed.
+      if (!parent_entity && IsExplicitSpecialization(decl)) {
+        continue;
+      }
+
       parsed_are_printed = true;
       parsed_tokens = pasta::PrintedTokenRange::AdoptWhitespace(
           printed_tokens, parsed_tokens);
@@ -3002,7 +3019,7 @@ static void CreatePendingFragments(
     pasta::PrintedTokenRange aligned_tokens =
         CreateParsedTokenRange(
             pasta::PrintedTokenRange::Adopt(frag_tok_range),
-            root_decls, pp, main_file_path, parsed_are_printed);
+            root_decls, pp, main_file_path, nullptr, parsed_are_printed);
 
     CHECK(!aligned_tokens.empty() || !top_level_macros.empty());
 
@@ -3052,7 +3069,7 @@ static void CreatePendingFragments(
     bool parsed_are_printed = false;
     pasta::PrintedTokenRange aligned_tokens = CreateParsedTokenRange(
         pasta::PrintedTokenRange::Adopt(sub_tok_range.value()),
-        decls, pp, main_file_path, parsed_are_printed);
+        decls, pp, main_file_path, er.parent, parsed_are_printed);
 
     CHECK(!aligned_tokens.empty());
 

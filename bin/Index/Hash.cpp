@@ -36,6 +36,7 @@
 #include "NameMangler.h"
 #include "PASTA.h"
 #include "Util.h"
+#include "TypeMapper.h"
 
 namespace indexer {
 namespace {
@@ -208,6 +209,45 @@ static void AccumulateTokenData(
   }
 }
 
+class TemplateArgumentVisitor final : public EntityVisitor {
+ public:
+  std::stringstream &ss;
+  unsigned i{0u};
+
+  inline TemplateArgumentVisitor(std::stringstream &ss_)
+      : ss(ss_) {}
+
+  virtual ~TemplateArgumentVisitor(void) = default;
+
+  void VisitDeclContext(const pasta::Decl &) final {}
+
+  // NOTE(pag): This prevents infinite recursion.
+  void VisitFriendDecl(const pasta::FriendDecl &) final {}
+
+  bool Enter(const pasta::Attr &entity) final {
+    return false;
+  }
+  bool Enter(const pasta::Decl &entity) final {
+    return true;
+  }
+  bool Enter(const pasta::Stmt &entity) final {
+    return false;
+  }
+  bool Enter(const pasta::Type &entity) final {
+    return false;
+  }
+
+  using EntityVisitor::Accept;
+
+  void Accept(const pasta::TemplateArgument &entity) final {
+    ss << " A" << (i++);
+    if (auto ty = entity.Type()) {
+      TypePrintingPolicy pp;
+      AccumulateTokenData(ss, pasta::PrintedTokenRange::Create(ty.value(), pp));
+    }
+  }
+};
+
 static std::string HashTopLevelFragment(
     const EntityMapper &em,
     const std::vector<pasta::Decl> &decls,
@@ -292,31 +332,49 @@ static std::string HashTopLevelFragment(
 }
 
 static std::string HashNestedFragment(
-    const EntityMapper &em, const NameMangler &,
-    mx::RawEntityId parent_fid, const pasta::Decl &decl) {
-
-  auto dk = decl.Kind();
+    const EntityMapper &em, const NameMangler &, const pasta::Decl &decl) {
 
   std::stringstream ss;
-  ss << "F" << parent_fid << " d" << int(dk);
+  ss << "K" << int(decl.Kind()) << " S" << decl.Tokens().size();
+
+  // Relative position w.r.t. parent declaration context.
+  if (auto first_tok = decl.Tokens().Front()) {
+    if (auto dc = decl.DeclarationContext()) {
+      auto dc_decl = pasta::Decl::From(dc.value());
+      if (auto dc_decl_loc = dc_decl->Tokens().Front()) {
+        auto first = dc_decl_loc->Index();
+        auto second = first_tok->Index();
+        if (first < second) {
+          ss << " O" << (second - first);
+        }
+      }
+    }
+  }
 
   if (auto nd = pasta::NamedDecl::From(decl)) {
     ss << " N" << nd->Name();
   }
 
-  if (auto td = pasta::TypeDecl::From(decl)) {
+  TypePrintingPolicy pp;
+
+  // Type, e.g. of a function/method. This allows us to ignore the body, which
+  // may not have been substituted.
+  if (auto vd = pasta::ValueDecl::From(decl)) {
+    AccumulateTokenData(ss, pasta::PrintedTokenRange::Create(vd->Type(), pp));
+
+  } else if (auto td = pasta::TypeDecl::From(decl)) {
     if (auto ty = td->TypeForDeclaration()) {
-      AccumulateTokenData(ss, pasta::PrintedTokenRange::Create(ty.value()));
-    } else {
-      assert(false);
+      AccumulateTokenData(ss, pasta::PrintedTokenRange::Create(ty.value(), pp));
     }
-
-  } else if (auto vd = pasta::ValueDecl::From(decl)) {
-    AccumulateTokenData(ss, pasta::PrintedTokenRange::Create(vd->Type()));
-
-  } else {
-    assert(false);
   }
+
+  // Visit the template arguments.
+  TemplateArgumentVisitor tav(ss);
+  tav.Accept(decl);
+
+  // std::cerr << "\n-----------------\n";
+  // std::cerr << ss.str() << '\n';
+  // Dump(decl);
 
   return ss.str();
 }
@@ -384,10 +442,8 @@ std::string HashFragment(
     const pasta::TokenRange *frag_tok_range,
     const pasta::PrintedTokenRange &decl_tok_range) {
 
-  auto parent_fid = em.ParentFragmentId(parent_entity, decls);
-  if (parent_fid != mx::kInvalidEntityId && decls.size() == 1u &&
-      !pasta::TemplateDecl::From(decls.front())) {
-    return HashNestedFragment(em, nm, parent_fid, decls.front());
+  if (parent_entity && decls.size() == 1u) {
+    return HashNestedFragment(em, nm, decls.front());
   }
 
   return HashTopLevelFragment(em, decls, macros, frag_tok_range, decl_tok_range);

@@ -36,8 +36,11 @@ class IdStore {
   explicit IdStore(std::filesystem::path workspace_dir);
 
   // Get, or create and return, a type ID for the specific fragment details.
+  //
+  // NOTE(pag): `context_id` is either a file token ID, identifying where this
+  //            fragment is located, or it is the parent fragment id.
   MaybeNewId<mx::PackedFragmentId> GetOrCreateFragmentIdForHash(
-      mx::RawEntityId tok_id, std::string hash, size_t num_tokens);
+      mx::RawEntityId context_id, std::string hash, size_t num_tokens);
 
   // Get, or create and return, a type ID for the specific type details.
   MaybeNewId<mx::PackedTypeId> GetOrCreateTypeIdForHash(

@@ -65,10 +65,10 @@ void EntityVisitor::VisitVarTemplatePartialSpecializationDecl(
       Accept(arg);
     }
 
-    for (const pasta::TemplateArgument &arg :
-             decl.TemplateInstantiationArguments()) {
-      Accept(arg);
-    }
+    // for (const pasta::TemplateArgument &arg :
+    //          decl.TemplateInstantiationArguments()) {
+    //   Accept(arg);
+    // }
   }
 }
 
@@ -359,10 +359,10 @@ void EntityVisitor::VisitVarTemplateSpecializationDecl(
       Accept(arg);
     }
 
-    for (const pasta::TemplateArgument &arg :
-             decl.TemplateInstantiationArguments()) {
-      Accept(arg);
-    }
+    // for (const pasta::TemplateArgument &arg :
+    //          decl.TemplateInstantiationArguments()) {
+    //   Accept(arg);
+    // }
   }
 }
 
@@ -463,10 +463,10 @@ void EntityVisitor::VisitClassTemplateSpecializationDecl(
       Accept(arg);
     }
 
-    for (const pasta::TemplateArgument &arg :
-             decl.TemplateInstantiationArguments()) {
-      Accept(arg);
-    }
+    // for (const pasta::TemplateArgument &arg :
+    //          decl.TemplateInstantiationArguments()) {
+    //   Accept(arg);
+    // }
   }
 }
 
