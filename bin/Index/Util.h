@@ -158,10 +158,19 @@ bool IsOutOfLine(const pasta::Decl &decl);
 // specialization.
 bool IsMethodLexicallyInSpecialization(const pasta::Decl &decl);
 
+// Return `true` if a method or function is lexically defined inside of a class.
+bool IsMethodLexicallyInClass(const pasta::Decl &decl);
+
+// Return `true` if this is a friend declaration.
+bool IsFriendDeclaration(const pasta::Decl &decl);
+
 // If `decl` is a declaration context, then this will return `true` if `decl`
 // should be internalized into the fragment, otherwise `false`. Returns `false`
 // if `decl` isn't a declaration context.
 bool ShouldInternalizeDeclContextIntoFragment(const pasta::Decl &decl);
+
+// Returns `true` if this is a `#pragma` directive expanded from a `_Pragma`.
+bool IsInlinePragmaDirective(const pasta::Macro &macro);
 
 // Determines whether or not a TLM is likely to have to go into a floating
 // fragment. This generally happens when a TLM is a directive.

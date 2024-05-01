@@ -801,6 +801,39 @@ bool IsMethodLexicallyInSpecialization(const pasta::Decl &decl) {
   return parent_spec->Kind() != pasta::DeclKind::kClassTemplatePartialSpecialization;
 }
 
+// Return `true` if a method or function is lexically defined inside of a class.
+bool IsMethodLexicallyInClass(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod:
+      break;
+    default:
+      return false;
+  }
+
+  auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
+  auto ldc = func.LexicalDeclarationContext();
+  if (!ldc) {
+    return false;
+  }
+
+  return ldc->IsRecord();
+}
+
+// Return `true` if this is a friend declaration.
+bool IsFriendDeclaration(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kFriendTemplate:
+    case pasta::DeclKind::kFriend:
+      return true;
+    default:
+      return false;
+  }
+}
+
 // Is this decl a specialization of a template? If so, then we will want
 // to render the printed tokens of the specialization into the fragment, rather
 // than the parsed tokens.
@@ -872,6 +905,26 @@ bool IsTemplateOrPattern(const pasta::Decl &decl) {
   }
 }
 
+// Returns `true` if this is a `#pragma` directive expanded from a `_Pragma`.
+bool IsInlinePragmaDirective(const pasta::Macro &macro) {
+  if (macro.Kind() != pasta::MacroKind::kPragmaDirective) {
+    return false;
+  }
+
+  auto &pma = reinterpret_cast<const pasta::PragmaMacroDirective &>(macro);
+  if (auto parent = pma.Parent()) {
+    if (auto exp = pasta::MacroExpansion::From(parent.value())) {
+      if (auto name = exp->NameOrOperator()) {
+        if (name->Data() == "_Pragma") {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
 // Determines whether or not a TLM is likely to have to go into a floating
 // fragment. This generally happens when a TLM is a directive. Some general
 // thoughts:
@@ -912,6 +965,12 @@ bool ShouldGoInFloatingFragment(const pasta::Macro &macro) {
     case pasta::MacroKind::kExpansion:
       assert(false);
       return false;
+
+    // NOTE(pag): A `#pragma` generated from a `_Pragma` should be placed in
+    //            the same fragment.
+    case pasta::MacroKind::kPragmaDirective:
+      return !IsInlinePragmaDirective(macro);
+
     default:
       return true;
   }

@@ -21,12 +21,14 @@
 #include "Fragment.h"
 #include "Generator.h"
 
-#define D(...) __VA_ARGS__
+// #define D(...) __VA_ARGS__
 #ifndef D
 # define D(...)
 #else
 # include <iostream>
 #endif
+
+# include <iostream>
 
 #define INDENT std::string(static_cast<size_t>(depth), ' ')
 #define BOUNDS(b) "[reader=" << reinterpret_cast<const void *>(b.reader) << ", " << b.begin_index << ", " << b.end_index << ']' 
@@ -2062,6 +2064,12 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
 TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithFragment(
     SequenceNode *seq, const Fragment &frag, const Bounds &bounds,
     const TrailingTokens &trailing_tokens) {
+
+  // std::cerr << frag.id().Pack() << '\n';
+  // if (auto file = File::containing(frag)) {
+  //   std::cerr << file->paths().begin()->generic_string() << '\n';
+  //   std::cerr << frag.file_tokens().data();
+  // }
   
   TokenTree frag_tree = TokenTree::create(frag);
   TokenTreeImpl::Node frag_node = *NodeFromPublic(frag_tree.root());

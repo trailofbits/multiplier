@@ -620,7 +620,9 @@ void BuildCommandAction::Run(void) {
     LOG(ERROR)
         << "Error invoking original compiler to find version information: "
         << std::get<std::string>(maybe_cc_info) << "; original command was: "
-        << command.vec.Join();
+        << command.vec.Join()
+        << ". Perhaps try --env /path/to/file to specify a file containing "
+           "environment variables, to help me find the compiler executable";
     return;
   }
 

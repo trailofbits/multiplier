@@ -690,14 +690,13 @@ class TLDFinder final : public pasta::DeclVisitor {
       }
     }
 
-    // This is a function template specialization.
+    // This is a function is a method
     if (IsSpecialization(decl)) {
-
       // Sometimes functions don't show up in the relevant specialization
       // lists. Another possibility is that we're a specialization of B, but
       // B has been remapped to A, and so we'll never see B or its list of
       // specializations.
-      if (!deferred_seen.count(raw_decl)) {
+      if (IsSpecialization(decl) && !deferred_seen.count(raw_decl)) {
         if (auto parent = FindSpecializationParent(decl)) {
           ScheduleAccept(parent, decl);
           return;
@@ -753,11 +752,15 @@ class TLDFinder final : public pasta::DeclVisitor {
       assert(false);
     }
 
+    // All methods end up being nested or top-level fragmnets. The above cases
+    // try to figure out if we need to sometimes force-nest things. If we make
+    // it here and we're still dealing with a method then add it as top-level.
+    //
     // Methods (static or member) inside of class template specializations are
     // always nested fragments. This is because their bodies may not be fully
     // instantiated, and so we don't want them screwing up the fragment
     // deduplication.
-    if (IsMethodLexicallyInSpecialization(decl)) {
+    if (IsMethodLexicallyInClass(decl)) {
       // LOG(ERROR) << "IsMethodLexicallyInSpecialization " << raw_decl;
       seen.emplace(RawEntity(decl));
       AddDeclAlways(decl);
@@ -853,9 +856,16 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 
   void VisitFriendDecl(const pasta::FriendDecl &decl) final {
-    if (!seen.emplace(RawEntity(decl)).second) {
+    auto raw_decl = RawEntity(decl);
+    if (!seen.emplace(raw_decl).second) {
       return;
     }
+
+    // All friend declarations are nested fragments. This helps to extract out
+    // friend functions inside of classes.
+    AddDeclAlways(decl);
+
+    PrevValueTracker<const void *> save_restore(parent_decl, raw_decl);
 
     if (auto fdl = decl.FriendDeclaration()) {
       Accept(fdl.value());
@@ -1745,6 +1755,16 @@ static void FindTLMs(
 
     auto md = std::move(dir.value());
 
+    // If there's a `#pragma` derived from a `_Pragma` expansion, then put the
+    // whole expansion as a top-level range.
+    if (IsInlinePragmaDirective(md)) {
+      auto range = pasta::Macro::CompleteExpansionRange(md);
+      entity_ranges.emplace_back(
+          std::move(md), nullptr, range.Front()->Index(),
+          range.Back()->Index(), static_cast<unsigned>(entity_ranges.size()));
+      continue;
+    }
+
     // If this is a macro definition, then only keep track of it if we see it
     // used/expanded.
     if (auto dmd = pasta::DefineMacroDirective::From(md)) {
@@ -2222,13 +2242,20 @@ static bool FindTokenFileBounds(const pasta::Token &ptok,
   switch (ptok.Role()) {
     default:
       break;
+
+    // NOTE(pag): We also need to ask for the file locations associated with
+    //            the begin/end of macro expansion markers, as the expansion
+    //            may be empty.
     case pasta::TokenRole::kFileToken:
+    case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+    case pasta::TokenRole::kEndOfMacroExpansionMarker:
       if (std::optional<pasta::FileToken> ftok = ptok.FileLocation()) {
         FindTokenFileBounds(*ftok, begin_tok, end_tok);
         return true;
       }
       break;
     case pasta::TokenRole::kFinalMacroExpansionToken:
+    case pasta::TokenRole::kMacroDirectiveMarker:
       if (std::optional<pasta::MacroToken> mtok = ptok.MacroLocation()) {
         FindMacroFileBounds(RootMacroFrom(*mtok), begin_tok, end_tok);
         return true;
@@ -2535,17 +2562,17 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
 //            when using this debugging technique.
 static bool DebugIndexOnlyThisFragment(const EntityGroup &entities) {
   // bool found = false;
-  // for (const Entity &entity : entities) {
-  //   if (!std::holds_alternative<pasta::Decl>(entity)) {
+  // for (const auto &er : entities) {
+  //   if (!std::holds_alternative<pasta::Decl>(er.entity)) {
   //     continue;
   //   }
 
-  //   auto nd = pasta::FunctionDecl::From(std::get<pasta::Decl>(entity));
+  //   auto nd = pasta::FunctionDecl::From(std::get<pasta::Decl>(er.entity));
   //   if (!nd) {
   //     continue;
   //   }
 
-  //   if (nd->Name() == "function name here") {
+  //   if (nd->Name() == "qt_metatype_id") {
   //     found = true;
   //     break;
   //   }
@@ -3187,8 +3214,9 @@ static void PersistParsedFragments(
       
       const auto &tld = pf->top_level_decls.front();
       if (IsTemplateOrPattern(tld) ||
-          IsMethodLexicallyInSpecialization(tld) ||
-          IsLambda(tld)) {
+          IsLambda(tld) ||
+          IsMethodLexicallyInClass(tld) ||
+          IsFriendDeclaration(tld)) {
         nested_fragment_bounds.emplace_back(pf->Bounds());
       }
     }

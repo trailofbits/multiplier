@@ -211,6 +211,7 @@ namespace {
 struct TokenTreeSerializationSchedule {
   PendingFragment &pf;
   EntityMapper &em;
+  std::string_view main_job_file;
 
   std::vector<TokenTreeNode> tokens;
   std::vector<TokenTreeNode> macro_tokens;
@@ -269,6 +270,11 @@ struct TokenTreeSerializationSchedule {
         entity_list[id.offset] = std::move(tt);
       }
 
+      LOG_IF(ERROR, !is_part_of_fragment)
+          << "is_part_of_define=" << is_part_of_define
+          << " is_part_of_fragment=" << is_part_of_fragment
+          << ' ' << raw_id << ' ' << raw_locator << ' ' << raw_tt;
+
     // We need to form a new macro id for something we discovered along the way.
     } else {
       id.fragment_id = pf.fragment_index;
@@ -285,7 +291,8 @@ struct TokenTreeSerializationSchedule {
     // Update `is_part_of_define` by reference so that macro tokens and nodes
     // inside of a `#define` end up getting globally recorded for the sake
     // of provenance.
-    if (id.kind == mx::MacroKind::DEFINE_DIRECTIVE) {
+    if (id.kind == mx::MacroKind::DEFINE_DIRECTIVE ||
+        id.kind == mx::MacroKind::PARAMETER) {
       is_part_of_define = true;
     }
 
@@ -301,7 +308,7 @@ struct TokenTreeSerializationSchedule {
     if (is_part_of_define && is_part_of_fragment && raw_locator &&
         raw_tt != raw_locator) {
       (void) em.entity_ids.emplace(raw_locator, raw_id);
-    
+
     } else if (global_macro_locator) {
       (void) em.entity_ids.emplace(global_macro_locator, raw_id);
     }
@@ -311,15 +318,35 @@ struct TokenTreeSerializationSchedule {
 
   mx::RawEntityId RecordEntityId(TokenTreeNode node,
                                  mx::RawEntityId parent_id,
-                                 bool &is_part_of_define,
-                                 bool &is_part_of_fragment) {
+                                 bool &is_part_of_define) {
     mx::RawEntityId raw_id = mx::kInvalidEntityId;
     const void *raw_pt = nullptr;
     const void *raw_tt = RawEntity(node);
+    bool is_part_of_fragment = true;
 
     if (std::optional<TokenTree> sub = node.SubTree()) {
-      raw_id = RecordEntityId(std::move(sub.value()), is_part_of_define,
+      bool maybe_part_of_define = false;
+      raw_id = RecordEntityId(std::move(sub.value()), maybe_part_of_define,
                               is_part_of_fragment);
+
+      if (is_part_of_define) {
+        auto mid = mx::EntityId(raw_id).Extract<mx::MacroId>();
+        CHECK(mid && mid->kind == mx::MacroKind::PARAMETER);
+      }
+
+      // If this is a macro directive that is nested inside of another fragment,
+      // then assume that we've already extracted the directive from that other
+      // fragment and persisted it.
+      if (is_part_of_fragment) {
+        Schedule(raw_id, maybe_part_of_define, sub->Children());
+
+        bool never_part_of_define = false;
+        Schedule(raw_id, never_part_of_define, sub->IntermediateChildren());
+        CHECK(!never_part_of_define);
+
+        Schedule(raw_id, never_part_of_define, sub->ReplacementChildren());
+        CHECK(!never_part_of_define);
+      }
 
     // Fill in IDs for derived tokens.
     } else {
@@ -381,7 +408,13 @@ struct TokenTreeSerializationSchedule {
       if (std::holds_alternative<mx::ParsedTokenId>(vid)) {
         id.offset = std::get<mx::ParsedTokenId>(vid).offset;
 
-        CHECK_EQ(id.offset, tokens.size());
+        CHECK_EQ(id.offset, tokens.size())
+            << "Mismatched parsed token ID offset"
+            << PrefixedLocation(pf.top_level_decls.front(), " at or near ")
+            << " on main job file " << main_job_file
+            << " (thread " << std::hex << std::this_thread::get_id()
+            << std::dec << ")";
+
         tokens.emplace_back(std::move(node));
 
       // This is a macro use/intermediate token, it needs to come after all
@@ -415,52 +448,19 @@ struct TokenTreeSerializationSchedule {
 
   // Recursively visit the nodes in the token tree, and give them all IDs. The
   // parsed tokens will all come first.
-  void Schedule(const void * /* parent */, mx::RawEntityId parent_id,
-                bool is_part_of_define, TokenTreeNodeRange nodes) {
+  void Schedule(mx::RawEntityId parent_id, bool is_part_of_define,
+                TokenTreeNodeRange nodes) {
 
     for (TokenTreeNode node : nodes) {
-
-      bool is_part_of_fragment = true;
-
-      std::optional<TokenTree> sub = node.SubTree();
       mx::RawEntityId child_id = RecordEntityId(
-          std::move(node), parent_id, is_part_of_define, is_part_of_fragment);
+          std::move(node), parent_id, is_part_of_define);
 
       CHECK_NE(child_id, mx::kInvalidEntityId);
-
-      // If this is a macro directive that is nested inside of another fragment,
-      // then assume that we've already extracted the directive from that other
-      // fragment and persisted it.
-      if (!is_part_of_fragment) {
-        continue;
-      }
-
-      if (!sub) {
-        continue;
-      }
-
-      DCHECK_EQ(child_id, em.EntityId(sub.value()));
-
-      const void *child = RawEntity(sub.value());
-
-      Schedule(child, child_id, is_part_of_define, sub->Children());
-
-      if (!sub->HasExpansion()) {
-        continue;
-      }
-
-      if (sub->HasIntermediateChildren()) {
-        Schedule(child, child_id, is_part_of_define,
-                 sub->IntermediateChildren());
-      }
-
-      Schedule(child, child_id, is_part_of_define,
-               sub->ReplacementChildren());
     }
   }
 
   void Schedule(TokenTreeNodeRange nodes) {
-    Schedule(nullptr, mx::kInvalidEntityId, false, std::move(nodes));
+    Schedule(mx::kInvalidEntityId, false, std::move(nodes));
     auto tok_data = pf.original_tokens ? pf.original_tokens->Data() :
                     pf.parsed_tokens.Data();
     CHECK_EQ(tokens.size(), pf.num_parsed_tokens)
@@ -469,9 +469,12 @@ struct TokenTreeSerializationSchedule {
                   std::make_move_iterator(macro_tokens.end()));
   }
 
-  TokenTreeSerializationSchedule(PendingFragment &pf_)
+  TokenTreeSerializationSchedule(
+      PendingFragment &pf_,
+      std::string_view main_job_file_)
       : pf(pf_),
-        em(pf_.em) {}
+        em(pf_.em),
+        main_job_file(main_job_file_) {}
 };
 
 // Persist just the parsed tokens in the absence of a token tree.
@@ -547,11 +550,12 @@ static std::string MainSourceFile(const PendingFragment &pf) {
 // before IDs, and the
 static void PersistTokenTree(
     PendingFragment &pf, mx::rpc::Fragment::Builder &fb,
-    TokenTreeNodeRange nodes, TokenProvenanceCalculator &provenance) {
+    TokenTreeNodeRange nodes, TokenProvenanceCalculator &provenance,
+    std::string_view main_job_file) {
 
   const EntityMapper &em = pf.em;
 
-  TokenTreeSerializationSchedule sched(pf);
+  TokenTreeSerializationSchedule sched(pf, main_job_file);
   sched.Schedule(nodes);
 
   provenance.Run(pf.fragment_index, sched.tokens);
@@ -683,6 +687,9 @@ static void PersistTokenTree(
     mx::VariantId macro_vid = macro_eid.Unpack();
     if (std::holds_alternative<mx::MacroId>(macro_vid)) {
       mx::MacroId mid = std::get<mx::MacroId>(macro_vid);
+      if (mid.fragment_id != pf.fragment_index) {
+        nodes.Dump(StdErr());
+      }
       CHECK_EQ(mid.fragment_id, pf.fragment_index);
       mti2mi.set(i, macro_eid.Pack());
     } else {
@@ -896,12 +903,15 @@ void GlobalIndexingState::PersistFragment(
     pf.macros_to_serialize.clear();
   }
 
+  auto main_job_file = MainSourceFile(ast);
+
   // Derive the macro substitution tree. Failing to build the tree is an error
   // condition, but we can't let it stop us from actually serializing the
   // fragment or its data.
   std::stringstream tok_tree_err;
   if (auto maybe_tt = TokenTree::Create(pf, tok_tree_err)) {
-    PersistTokenTree(pf, fb, std::move(maybe_tt.value()), provenance);
+    PersistTokenTree(pf, fb, std::move(maybe_tt.value()), provenance,
+                     main_job_file);
 
   // If we don't have the normal or the backup token tree, then do a best
   // effort saving of macro tokens. Don't bother organizing them into
@@ -914,11 +924,11 @@ void GlobalIndexingState::PersistFragment(
           << tok_tree_err.str() << " for top-level declaration "
           << DeclToString(leader_decl)
           << PrefixedLocation(leader_decl, " at or near ")
-          << " on main job file " << MainSourceFile(ast);
+          << " on main job file " << main_job_file;
     } else {
       LOG(ERROR)
           << tok_tree_err.str() << " for macros on main job file "
-          << MainSourceFile(ast);
+          << main_job_file;
     }
 
     pf.macros_to_serialize.clear();
