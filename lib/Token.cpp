@@ -629,6 +629,7 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
     case DeclKind::USING:
     case DeclKind::UNRESOLVED_USING_TYPENAME:
     case DeclKind::UNRESOLVED_USING_IF_EXISTS:
+    case DeclKind::UNRESOLVED_USING_VALUE:  // Might not be a type.
       return TokenCategory::TYPE_ALIAS;
 
     case DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
