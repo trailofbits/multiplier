@@ -77,6 +77,12 @@ std::optional<pasta::FileToken> AsTopLevelFileToken(const pasta::Token &tok);
 // NOTE(pag): This logic is similarly reflected in `EntityLabeller::Label`.
 bool IsParsedToken(const pasta::Token &tok);
 
+// Tell us if this was a token that was actually parsed, and thus should have
+// a fragment token ID.
+//
+// NOTE(pag): This logic is similarly reflected in `EntityLabeller::Label`.
+bool IsParsedToken(const pasta::PrintedToken &tok);
+
 // Like `IsParsedToken`, but returns `false` for whitespace and comments that
 // were made visible to Clang's preprocessor.
 bool IsParsedTokenExcludingWhitespaceAndComments(const pasta::Token &tok);

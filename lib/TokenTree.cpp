@@ -2064,12 +2064,6 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
 TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithFragment(
     SequenceNode *seq, const Fragment &frag, const Bounds &bounds,
     const TrailingTokens &trailing_tokens) {
-
-  // std::cerr << frag.id().Pack() << '\n';
-  // if (auto file = File::containing(frag)) {
-  //   std::cerr << file->paths().begin()->generic_string() << '\n';
-  //   std::cerr << frag.file_tokens().data();
-  // }
   
   TokenTree frag_tree = TokenTree::create(frag);
   TokenTreeImpl::Node frag_node = *NodeFromPublic(frag_tree.root());

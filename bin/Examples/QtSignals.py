@@ -491,7 +491,7 @@ def main():
     parser.add_argument("--db", type=str, required=True, help="Path to the database")
     parser.add_argument("--dot", type=str, help="Path to the output DOT file")
     parser.add_argument("--locations", type=str, help="Path to the output locations file")
-    parser.add_argument("--only_cycles", type=bool, help="Should acyclic signals be removed?")
+    parser.add_argument("--only_cycles", action="store_true", help="Should acyclic signals be removed?")
     parser.add_argument("--save_references", action="store_true", help="Should references be added back into the database?")
     args = parser.parse_args()
     index = mx.Index.in_memory_cache(mx.Index.from_database(args.db))

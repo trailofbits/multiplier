@@ -28,6 +28,19 @@ static std::optional<mx::PackedFragmentId> IdentifyAsNestedFragmentToken(
 #define D(...)
 
   auto frag_index = pf.fragment_index;
+  auto pt = tok.DerivedLocation();
+
+  // Try to find a printed token that is a macro directive marker, and then
+  // invent a nested fragment for it (if it is part of a different fragment).
+  if (pt && pt->Role() == pasta::TokenRole::kMacroDirectiveMarker) {
+    if (auto dir = pt->Directive()) {
+      mx::EntityId vid(pf.em.EntityId(dir.value()));
+      auto dir_id = vid.Extract<mx::MacroId>();
+      if (dir_id && dir_id->fragment_id != pf.fragment_index) {
+        return mx::FragmentId(dir_id->fragment_id);
+      }
+    }
+  }
 
   // If we're dealing with printed tokens, then we need to manually determine
   // which tokens needs to be excised. This is somewhat tedious as it involves
@@ -89,7 +102,6 @@ static std::optional<mx::PackedFragmentId> IdentifyAsNestedFragmentToken(
   // template code.
   } else if (might_have_nested_fragments) {
 
-    auto pt = tok.DerivedLocation();
     if (!pt) {
       assert(false);
       return std::nullopt;
@@ -115,11 +127,11 @@ static std::optional<mx::PackedFragmentId> IdentifyAsNestedFragmentToken(
         });
 
   } else {
-      return std::nullopt;
+    return std::nullopt;
   }
 
   if (frag_index == pf.fragment_index) {
-      return std::nullopt;
+    return std::nullopt;
   }
 
   return mx::FragmentId(frag_index);
@@ -315,6 +327,10 @@ bool EntityLabeller::ShouldLabelDecl(const pasta::Decl &decl) {
 //            serialized into fragments, and how token trees are serialized
 //            into fragments.
 bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
+  if (!IsParsedToken(entity)) {
+    return false;
+  }
+
   auto raw_entity = RawEntity(entity);
 
   // Figure out if this token is in a sub-range of tokens belonging to a

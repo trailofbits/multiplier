@@ -496,6 +496,7 @@ static bool HasAnyMacroTokens(const pasta::TokenRange &range) {
 }
 
 struct Rebuilder final {
+  const PendingFragment &pf;
   const FragmentIdMap &token_to_nested_fragment;
   const bool has_nested_fragments;
 
@@ -504,8 +505,9 @@ struct Rebuilder final {
   std::deque<Substitution> new_subs_alloc;
   std::deque<TokenInfo> new_tokens_alloc;
 
-  inline Rebuilder(const PendingFragment &pf)
-      : token_to_nested_fragment(pf.token_to_nested_fragment),
+  inline Rebuilder(const PendingFragment &pf_)
+      : pf(pf_),
+        token_to_nested_fragment(pf.token_to_nested_fragment),
         has_nested_fragments(!token_to_nested_fragment.empty()) {}
 
   Substitution *CreateFragmentNode(mx::PackedFragmentId fid) {
@@ -535,7 +537,7 @@ TokenInfo *Rebuilder::LastInRange(
   TokenInfo *prev = nullptr;
   for (; curr; curr = curr->next) {
 
-    // std::cerr << '.' << curr->printed_tok->Index() << " " << curr->printed_tok->Data() << '\n';
+    // std::cerr << '\t' << curr->printed_tok->Index() << " " << curr->printed_tok->Data() << '\n';
     assert(curr->printed_tok.has_value());
 
     Substitution *last_parent = nullptr;
@@ -549,11 +551,11 @@ TokenInfo *Rebuilder::LastInRange(
     if (last_parent) {
       curr = RightCornerOfExp(last_parent);
       if (!curr) {
-        // std::cerr << "a) no rc of last_parent, prev=" << (!!prev) << '\n';
+        // std::cerr << "\t\ti)no rc of last_parent, prev=" << (!!prev) << '\n';
         return prev;
       }
 
-      // std::cerr << ".." << curr->printed_tok->Index() << " " << curr->printed_tok->Data() << '\n';
+      // std::cerr << "\t\t" << curr->printed_tok->Index() << " " << curr->printed_tok->Data() << '\n';
     }
 
     // We use depth as a heuristic to figure out when we've probably gone too
@@ -561,14 +563,14 @@ TokenInfo *Rebuilder::LastInRange(
     // probably going to be sane, and as a result, properly nested inside or
     // in-between things.
     if (depth[curr->printed_tok->Index()] < min_depth) {
-      // std::cerr << "b) depth=" << depth[curr->printed_tok->Index()] << " min_depth=" << min_depth << '\n';
+      // std::cerr << "\t\tii)depth=" << depth[curr->printed_tok->Index()] << " min_depth=" << min_depth << '\n';
       return prev;
     }
 
     if (curr->parsed_tok.has_value()) {
       auto pti = curr->parsed_tok->Index();
       if (pti < lb || pti > ub) {
-        // std::cerr << "c) pti=" << pti << " lb=" << lb << " ub=" << ub << '\n';
+        // std::cerr << "\t\tiii) pti=" << pti << " lb=" << lb << " ub=" << ub << '\n';
         return prev;
       }
 
@@ -610,9 +612,11 @@ void Rebuilder::AllocateTokens(const pasta::PrintedTokenRange &range) {
 
   auto i = 0u;
   auto num_parsed_tokens = 0u;
+  auto token_to_nested_fragment_end = token_to_nested_fragment.end();
 
   pasta::TokenKind prev_tk = pasta::TokenKind::kUnknown;
   for (pasta::PrintedToken tok : range) {
+
     auto &info = new_tokens_alloc.emplace_back();
     auto tk = tok.Kind();
     info.parsed_tok = tok.DerivedLocation();
@@ -620,9 +624,19 @@ void Rebuilder::AllocateTokens(const pasta::PrintedTokenRange &range) {
 
     assert(info.printed_tok->Index() == i++);
 
+    auto raw_tok = RawEntity(tok);
+    auto frag_id_it = token_to_nested_fragment.find(raw_tok);
+
+    // Try to find a printed token that is a macro directive marker, and then
+    // invent a nested fragment for it (if it is part of a different fragment).
     if (info.parsed_tok.has_value()) {
       info.macro_tok = info.parsed_tok->MacroLocation();
       parsed_tokens[info.parsed_tok->Index()].push_back(&info);
+
+      if (frag_id_it == token_to_nested_fragment_end &&
+          info.parsed_tok->Role() == pasta::TokenRole::kMacroDirectiveMarker) {
+        continue;
+      }
     }
 
     assert(info.parsed_tok.has_value() ||
@@ -693,8 +707,7 @@ void Rebuilder::AllocateTokens(const pasta::PrintedTokenRange &range) {
     }
 
     // Figure out if the token should belong to a sub fragment.
-    auto frag_id_it = token_to_nested_fragment.find(RawEntity(tok));
-    if (frag_id_it == token_to_nested_fragment.end()) {
+    if (frag_id_it == token_to_nested_fragment_end) {
       continue;
     }
 
@@ -817,7 +830,13 @@ void Rebuilder::BuildBottomUp(std::deque<Substitution> &orig_subs_alloc) {
       continue;
     }
 
-    if (pasta::MacroDirective::From(orig_sub.macro.value())) {
+    // These never expand to parsed tokens; they only exist in the pre-
+    // processor.
+    auto &orig_macro = orig_sub.macro.value();
+    if (pasta::MacroDirective::From(orig_macro) ||
+        pasta::MacroParameterSubstitution::From(orig_macro) ||
+        pasta::MacroStringify::From(orig_macro) ||
+        pasta::MacroConcatenate::From(orig_macro)) {
       // std::cerr << "2) directive\n";
       continue;
     }
@@ -873,21 +892,24 @@ void Rebuilder::BuildBottomUp(std::deque<Substitution> &orig_subs_alloc) {
       continue;
     }
 
-    // std::cerr << "new_lc_index=" << new_lc_index << " orig_lc_index="
-    //           << orig_lc->printed_tok->Index() << '\n';
-
     bool covers_pt = false;
     auto new_rc = LastInRange(
         new_lc, orig_lc_index, orig_rc_index,
         depth[orig_lc->printed_tok->Index()], covers_pt);
 
     if (!new_rc || !covers_pt) {
-      // std::cerr << "9) new_rc=" << (!!new_rc) << " covers_pt=" << covers_pt << '\n';
+      // std::cerr << "9) new_lc_index=" << new_lc_index << " orig_lc_index="
+      //           << orig_lc->printed_tok->Index()<< " new_rc=" << (!!new_rc)
+      //           << " covers_pt=" << covers_pt << '\n';
       continue;
     }
 
     auto new_rc_index = new_rc->printed_tok->Index();
     DCHECK_LE(new_lc_index, new_rc_index);
+
+    // std::cerr << "new_lc_index=" << new_lc_index << " orig_lc_index="
+    //           << orig_lc->printed_tok->Index() << '\n'
+    //           << "new_rc_index=" << new_rc_index << "\n";
 
     last_processed = new_lc_index;
 
@@ -1294,13 +1316,15 @@ Substitution *TokenTreeImpl::BuildFromTokenList(
     // It's not a specialization of any kind, so we don't need to check if tokens
     // are contiguous or rebuild things.
     if (!rebuild && root_sub) {
-      // root_sub->PrintDOT(std::cerr);
       return root_sub;
     }
   }
 
   // {
   //   std::unique_lock<std::mutex> locker(gPrintDOTLock);
+  //   if (root_sub) {
+  //     root_sub->PrintDOT(std::cerr);
+  //   }
   //   std::cerr
   //       << "\n-- REBUILDING TREE:"
   //       << " parsed_tokens_are_printed=" << pf.parsed_tokens_are_printed

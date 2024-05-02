@@ -89,6 +89,18 @@ bool IsParsedToken(const pasta::Token &tok) {
   }
 }
 
+bool IsParsedToken(const pasta::PrintedToken &tok) {
+  if (tok.Data().empty()) {
+    return false;
+  }
+
+  if (auto pl = tok.DerivedLocation()) {
+    return IsParsedToken(pl.value());
+  }
+
+  return true;
+}
+
 // Like `IsParsedToken`, but returns `false` for whitespace and comments that
 // were made visible to Clang's preprocessor.
 bool IsParsedTokenExcludingWhitespaceAndComments(const pasta::Token &tok) {
