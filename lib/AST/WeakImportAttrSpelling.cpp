@@ -16,7 +16,7 @@ const char *EnumeratorName(WeakImportAttrSpelling e) {
   switch (e) {
     case WeakImportAttrSpelling::GNU_WEAK_IMPORT: return "GNU_WEAK_IMPORT";
     case WeakImportAttrSpelling::CXX11_CLANG_WEAK_IMPORT: return "CXX11_CLANG_WEAK_IMPORT";
-    case WeakImportAttrSpelling::C2X_CLANG_WEAK_IMPORT: return "C2X_CLANG_WEAK_IMPORT";
+    case WeakImportAttrSpelling::C23_CLANG_WEAK_IMPORT: return "C23_CLANG_WEAK_IMPORT";
     case WeakImportAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

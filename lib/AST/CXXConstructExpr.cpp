@@ -228,8 +228,8 @@ gap::generator<Expr> CXXConstructExpr::arguments(void) const & {
   co_return;
 }
 
-CXXConstructExprConstructionKind CXXConstructExpr::construction_kind(void) const {
-  return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal90());
+CXXConstructionKind CXXConstructExpr::construction_kind(void) const {
+  return static_cast<CXXConstructionKind>(impl->reader.getVal91());
 }
 
 CXXConstructorDecl CXXConstructExpr::constructor(void) const {

@@ -16,7 +16,7 @@ namespace mx {
 enum class NoSanitizeAttrSpelling : unsigned char {
   GNU_NO_SANITIZE,
   CXX11_CLANG_NO_SANITIZE,
-  C2X_CLANG_NO_SANITIZE,
+  C23_CLANG_NO_SANITIZE,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -141,7 +141,7 @@ std::optional<Expr> AlignedAttr::alignment_expression(void) const {
 
 std::optional<Type> AlignedAttr::alignment_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal16();
+    RawEntityId eid = impl->reader.getVal20();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -156,7 +156,7 @@ std::optional<uint32_t> AlignedAttr::cached_alignment_value(void) const {
   if (!impl->reader.getVal12()) {
     return std::nullopt;
   } else {
-    return static_cast<uint32_t>(impl->reader.getVal20());
+    return static_cast<uint32_t>(impl->reader.getVal24());
   }
   return std::nullopt;
 }
@@ -170,27 +170,27 @@ bool AlignedAttr::is_alignas(void) const {
 }
 
 bool AlignedAttr::is_alignment_dependent(void) const {
-  return impl->reader.getVal19();
+  return impl->reader.getVal14();
 }
 
 bool AlignedAttr::is_alignment_error_dependent(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal15();
 }
 
 bool AlignedAttr::is_alignment_expression(void) const {
-  return impl->reader.getVal22();
+  return impl->reader.getVal16();
 }
 
 bool AlignedAttr::is_c11(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal25();
 }
 
 bool AlignedAttr::is_declspec(void) const {
-  return impl->reader.getVal24();
+  return impl->reader.getVal26();
 }
 
 bool AlignedAttr::is_gnu(void) const {
-  return impl->reader.getVal25();
+  return impl->reader.getVal27();
 }
 
 #pragma GCC diagnostic pop

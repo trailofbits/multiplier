@@ -16,7 +16,7 @@ namespace mx {
 enum class FormatArgAttrSpelling : unsigned char {
   GNU_FORMAT_ARGUMENT,
   CXX11_GNU_FORMAT_ARGUMENT,
-  C2X_GNU_FORMAT_ARGUMENT,
+  C23_GNU_FORMAT_ARGUMENT,
   SPELLING_NOT_CALCULATED,
 };
 

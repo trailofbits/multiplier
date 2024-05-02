@@ -20,6 +20,7 @@ enum class DefaultCallingConvention : unsigned char {
   STD_CALL,
   VECTOR_CALL,
   REG_CALL,
+  RTD_CALL,
 };
 
 inline static const char *EnumerationName(DefaultCallingConvention) {
@@ -27,7 +28,7 @@ inline static const char *EnumerationName(DefaultCallingConvention) {
 }
 
 inline static constexpr unsigned NumEnumerators(DefaultCallingConvention) {
-  return 6;
+  return 7;
 }
 
 MX_EXPORT const char *EnumeratorName(DefaultCallingConvention);

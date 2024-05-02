@@ -16,9 +16,9 @@ const char *EnumeratorName(AlwaysInlineAttrSpelling e) {
   switch (e) {
     case AlwaysInlineAttrSpelling::GNU_ALWAYS_INLINE: return "GNU_ALWAYS_INLINE";
     case AlwaysInlineAttrSpelling::CXX11_GNU_ALWAYS_INLINE: return "CXX11_GNU_ALWAYS_INLINE";
-    case AlwaysInlineAttrSpelling::C2X_GNU_ALWAYS_INLINE: return "C2X_GNU_ALWAYS_INLINE";
+    case AlwaysInlineAttrSpelling::C23_GNU_ALWAYS_INLINE: return "C23_GNU_ALWAYS_INLINE";
     case AlwaysInlineAttrSpelling::CXX11_CLANG_ALWAYS_INLINE: return "CXX11_CLANG_ALWAYS_INLINE";
-    case AlwaysInlineAttrSpelling::C2X_CLANG_ALWAYS_INLINE: return "C2X_CLANG_ALWAYS_INLINE";
+    case AlwaysInlineAttrSpelling::C23_CLANG_ALWAYS_INLINE: return "C23_CLANG_ALWAYS_INLINE";
     case AlwaysInlineAttrSpelling::KEYWORD_FORCEINLINE: return "KEYWORD_FORCEINLINE";
     case AlwaysInlineAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

@@ -24,6 +24,7 @@ const char *EnumeratorName(MSVCMajorVersion e) {
     case MSVCMajorVersion::MSVC2019: return "MSVC2019";
     case MSVCMajorVersion::MSVC20195: return "MSVC20195";
     case MSVCMajorVersion::MSVC20198: return "MSVC20198";
+    case MSVCMajorVersion::MSVC20223: return "MSVC20223";
     default: return "<invalid>";
   }
 }

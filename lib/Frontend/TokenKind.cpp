@@ -115,6 +115,7 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::KEYWORD_SHORT: return "KEYWORD_SHORT";
     case TokenKind::KEYWORD_SIGNED: return "KEYWORD_SIGNED";
     case TokenKind::KEYWORD_SIZEOF: return "KEYWORD_SIZEOF";
+    case TokenKind::KEYWORD___DATASIZEOF: return "KEYWORD___DATASIZEOF";
     case TokenKind::KEYWORD_STATIC: return "KEYWORD_STATIC";
     case TokenKind::KEYWORD_STRUCT: return "KEYWORD_STRUCT";
     case TokenKind::KEYWORD_SWITCH: return "KEYWORD_SWITCH";
@@ -290,6 +291,7 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::KEYWORD___IS_REFERENCEABLE: return "KEYWORD___IS_REFERENCEABLE";
     case TokenKind::KEYWORD___CAN_PASS_IN_REGS: return "KEYWORD___CAN_PASS_IN_REGS";
     case TokenKind::KEYWORD___REFERENCE_BINDS_TO_TEMPORARY: return "KEYWORD___REFERENCE_BINDS_TO_TEMPORARY";
+    case TokenKind::KEYWORD___REFERENCE_CONSTRUCTS_FROM_TEMPORARY: return "KEYWORD___REFERENCE_CONSTRUCTS_FROM_TEMPORARY";
     case TokenKind::KEYWORD___IS_LVALUE_EXPRESSION: return "KEYWORD___IS_LVALUE_EXPRESSION";
     case TokenKind::KEYWORD___IS_RVALUE_EXPRESSION: return "KEYWORD___IS_RVALUE_EXPRESSION";
     case TokenKind::KEYWORD___IS_ARITHMETIC: return "KEYWORD___IS_ARITHMETIC";
@@ -364,6 +366,9 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::KEYWORD_CBUFFER: return "KEYWORD_CBUFFER";
     case TokenKind::KEYWORD_TBUFFER: return "KEYWORD_TBUFFER";
     case TokenKind::KEYWORD_GROUPSHARED: return "KEYWORD_GROUPSHARED";
+    case TokenKind::KEYWORD_IN: return "KEYWORD_IN";
+    case TokenKind::KEYWORD_INOUT: return "KEYWORD_INOUT";
+    case TokenKind::KEYWORD_OUT: return "KEYWORD_OUT";
     case TokenKind::KEYWORD___BUILTIN_OMP_REQUIRED_SIMD_ALIGN: return "KEYWORD___BUILTIN_OMP_REQUIRED_SIMD_ALIGN";
     case TokenKind::KEYWORD___PASCAL: return "KEYWORD___PASCAL";
     case TokenKind::KEYWORD___VECTOR: return "KEYWORD___VECTOR";
@@ -400,10 +405,18 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::KEYWORD___VIRTUAL_INHERITANCE: return "KEYWORD___VIRTUAL_INHERITANCE";
     case TokenKind::KEYWORD___INTERFACE: return "KEYWORD___INTERFACE";
     case TokenKind::KEYWORD___BUILTIN_CONVERTVECTOR: return "KEYWORD___BUILTIN_CONVERTVECTOR";
+    case TokenKind::KEYWORD___BUILTIN_VECTORELEMENTS: return "KEYWORD___BUILTIN_VECTORELEMENTS";
     case TokenKind::KEYWORD___BUILTIN_BIT_CAST: return "KEYWORD___BUILTIN_BIT_CAST";
     case TokenKind::KEYWORD___BUILTIN_AVAILABLE: return "KEYWORD___BUILTIN_AVAILABLE";
     case TokenKind::KEYWORD___BUILTIN_SYCL_UNIQUE_STABLE_NAME: return "KEYWORD___BUILTIN_SYCL_UNIQUE_STABLE_NAME";
+    case TokenKind::KEYWORD___ARM_IN: return "KEYWORD___ARM_IN";
+    case TokenKind::KEYWORD___ARM_INOUT: return "KEYWORD___ARM_INOUT";
+    case TokenKind::KEYWORD___ARM_LOCALLY_STREAMING: return "KEYWORD___ARM_LOCALLY_STREAMING";
+    case TokenKind::KEYWORD___ARM_NEW: return "KEYWORD___ARM_NEW";
+    case TokenKind::KEYWORD___ARM_OUT: return "KEYWORD___ARM_OUT";
+    case TokenKind::KEYWORD___ARM_PRESERVES: return "KEYWORD___ARM_PRESERVES";
     case TokenKind::KEYWORD___ARM_STREAMING: return "KEYWORD___ARM_STREAMING";
+    case TokenKind::KEYWORD___ARM_STREAMING_COMPATIBLE: return "KEYWORD___ARM_STREAMING_COMPATIBLE";
     case TokenKind::KEYWORD___UNKNOWN_ANYTYPE: return "KEYWORD___UNKNOWN_ANYTYPE";
     case TokenKind::ANNOT_CXXSCOPE: return "ANNOT_CXXSCOPE";
     case TokenKind::ANNOT_TYPENAME: return "ANNOT_TYPENAME";
@@ -429,6 +442,7 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::ANNOT_PRAGMA_FENV_ACCESS: return "ANNOT_PRAGMA_FENV_ACCESS";
     case TokenKind::ANNOT_PRAGMA_FENV_ACCESS_MS: return "ANNOT_PRAGMA_FENV_ACCESS_MS";
     case TokenKind::ANNOT_PRAGMA_FENV_ROUND: return "ANNOT_PRAGMA_FENV_ROUND";
+    case TokenKind::ANNOT_PRAGMA_CX_LIMITED_RANGE: return "ANNOT_PRAGMA_CX_LIMITED_RANGE";
     case TokenKind::ANNOT_PRAGMA_FLOAT_CONTROL: return "ANNOT_PRAGMA_FLOAT_CONTROL";
     case TokenKind::ANNOT_PRAGMA_MS_POINTERS_TO_MEMBERS: return "ANNOT_PRAGMA_MS_POINTERS_TO_MEMBERS";
     case TokenKind::ANNOT_PRAGMA_MS_VTORDISP: return "ANNOT_PRAGMA_MS_VTORDISP";
@@ -437,6 +451,8 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::ANNOT_ATTRIBUTE_OPENMP: return "ANNOT_ATTRIBUTE_OPENMP";
     case TokenKind::ANNOT_PRAGMA_OPENMP: return "ANNOT_PRAGMA_OPENMP";
     case TokenKind::ANNOT_PRAGMA_OPENMP_END: return "ANNOT_PRAGMA_OPENMP_END";
+    case TokenKind::ANNOT_PRAGMA_OPENACC: return "ANNOT_PRAGMA_OPENACC";
+    case TokenKind::ANNOT_PRAGMA_OPENACC_END: return "ANNOT_PRAGMA_OPENACC_END";
     case TokenKind::ANNOT_PRAGMA_LOOP_HINT: return "ANNOT_PRAGMA_LOOP_HINT";
     case TokenKind::ANNOT_PRAGMA_FP: return "ANNOT_PRAGMA_FP";
     case TokenKind::ANNOT_PRAGMA_ATTRIBUTE: return "ANNOT_PRAGMA_ATTRIBUTE";

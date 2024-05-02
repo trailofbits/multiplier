@@ -9,7 +9,7 @@
 #pragma once
 
 #include <multiplier/AST/Expr.h>
-#include <multiplier/AST/PredefinedExprIdentKind.h>
+#include <multiplier/AST/PredefinedIdentKind.h>
 
 namespace mx {
 class EntityProvider;
@@ -67,7 +67,7 @@ class MX_EXPORT PredefinedExpr : public Expr {
   static std::optional<PredefinedExpr> from(const TokenContext &t);
 
   std::optional<StringLiteral> function_name(void) const;
-  PredefinedExprIdentKind identifier_kind(void) const;
+  PredefinedIdentKind identifier_kind(void) const;
   std::string_view identifier_kind_name(void) const;
   Token token(void) const;
   bool is_transparent(void) const;

@@ -16,7 +16,7 @@ namespace mx {
 enum class ObjCNonLazyClassAttrSpelling : unsigned char {
   GNU_OBJC_NONLAZY_CLASS,
   CXX11_CLANG_OBJC_NONLAZY_CLASS,
-  C2X_CLANG_OBJC_NONLAZY_CLASS,
+  C23_CLANG_OBJC_NONLAZY_CLASS,
   SPELLING_NOT_CALCULATED,
 };
 

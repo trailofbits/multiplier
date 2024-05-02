@@ -27,6 +27,7 @@ enum class OperationKind : unsigned {
   LLVM_ATOMICRMW,  // llvm.atomicrmw
   LLVM_BITCAST,  // llvm.bitcast
   LLVM_BR,  // llvm.br
+  LLVM_CALL_INTRINSIC,  // llvm.call_intrinsic
   LLVM_CALL,  // llvm.call
   LLVM_COMDAT,  // llvm.comdat
   LLVM_COMDAT_SELECTOR,  // llvm.comdat_selector
@@ -60,10 +61,10 @@ enum class OperationKind : unsigned {
   LLVM_FUNC,  // llvm.func
   LLVM_LSHR,  // llvm.lshr
   LLVM_LANDINGPAD,  // llvm.landingpad
+  LLVM_LINKER_OPTIONS,  // llvm.linker_options
   LLVM_LOAD,  // llvm.load
-  LLVM_METADATA,  // llvm.metadata
   LLVM_MUL,  // llvm.mul
-  LLVM_MLIR_NULL,  // llvm.mlir.null
+  LLVM_MLIR_NONE,  // llvm.mlir.none
   LLVM_OR,  // llvm.or
   LLVM_MLIR_POISON,  // llvm.mlir.poison
   LLVM_PTRTOINT,  // llvm.ptrtoint
@@ -87,18 +88,19 @@ enum class OperationKind : unsigned {
   LLVM_UNREACHABLE,  // llvm.unreachable
   LLVM_XOR,  // llvm.xor
   LLVM_ZEXT,  // llvm.zext
+  LLVM_MLIR_ZERO,  // llvm.mlir.zero
   LLVM_INTR_ABS,  // llvm.intr.abs
   LLVM_INTR_ANNOTATION,  // llvm.intr.annotation
   LLVM_INTR_ASSUME,  // llvm.intr.assume
   LLVM_INTR_BITREVERSE,  // llvm.intr.bitreverse
   LLVM_INTR_BSWAP,  // llvm.intr.bswap
-  LLVM_CALL_INTRINSIC,  // llvm.call_intrinsic
   LLVM_INTR_COPYSIGN,  // llvm.intr.copysign
   LLVM_INTR_CORO_ALIGN,  // llvm.intr.coro.align
   LLVM_INTR_CORO_BEGIN,  // llvm.intr.coro.begin
   LLVM_INTR_CORO_END,  // llvm.intr.coro.end
   LLVM_INTR_CORO_FREE,  // llvm.intr.coro.free
   LLVM_INTR_CORO_ID,  // llvm.intr.coro.id
+  LLVM_INTR_CORO_PROMISE,  // llvm.intr.coro.promise
   LLVM_INTR_CORO_RESUME,  // llvm.intr.coro.resume
   LLVM_INTR_CORO_SAVE,  // llvm.intr.coro.save
   LLVM_INTR_CORO_SIZE,  // llvm.intr.coro.size
@@ -125,6 +127,8 @@ enum class OperationKind : unsigned {
   LLVM_INTR_FSHL,  // llvm.intr.fshl
   LLVM_INTR_FSHR,  // llvm.intr.fshr
   LLVM_INTR_GET_ACTIVE_LANE_MASK,  // llvm.intr.get.active.lane.mask
+  LLVM_INTR_INVARIANT_END,  // llvm.intr.invariant.end
+  LLVM_INTR_INVARIANT_START,  // llvm.intr.invariant.start
   LLVM_INTR_IS_CONSTANT,  // llvm.intr.is.constant
   LLVM_INTR_IS_FPCLASS,  // llvm.intr.is.fpclass
   LLVM_INTR_LIFETIME_END,  // llvm.intr.lifetime.end
@@ -292,7 +296,6 @@ enum class OperationKind : unsigned {
   MEMREF_TRANSPOSE,  // memref.transpose
   MEMREF_VIEW,  // memref.view
   MEMREF_SUBVIEW,  // memref.subview
-  MEMREF_TENSOR_STORE,  // memref.tensor_store
   ABI_CALL_ARGS,  // abi.call_args
   ABI_CALL_EXEC,  // abi.call_exec
   ABI_CALL,  // abi.call
@@ -300,11 +303,12 @@ enum class OperationKind : unsigned {
   ABI_DIRECT,  // abi.direct
   ABI_EPILOGUE,  // abi.epilogue
   ABI_FUNC,  // abi.func
+  ABI_INDIRECT,  // abi.indirect
   ABI_PROLOGUE,  // abi.prologue
   ABI_RET_DIRECT,  // abi.ret_direct
-  ABI_TODO,  // abi.todo
-  ABI_WRAP_FN,  // abi.wrap_fn
   ABI_YIELD,  // abi.yield
+  LL_ALLOCA,  // ll.alloca
+  LL_ARG_ALLOCA,  // ll.arg_alloca
   LL_BR,  // ll.br
   LL_CONCAT,  // ll.concat
   LL_COND_BR,  // ll.cond_br
@@ -312,12 +316,15 @@ enum class OperationKind : unsigned {
   LL_EXTRACT,  // ll.extract
   LL_INITIALIZE,  // ll.initialize
   LL_INLINE_SCOPE,  // ll.inline_scope
+  LL_LOAD,  // ll.load
   LL_FUNC,  // ll.func
   LL_GEP,  // ll.gep
   LL_RETURN,  // ll.return
   LL_SCOPE,  // ll.scope
   LL_SCOPE_RECURSE,  // ll.scope_recurse
   LL_SCOPE_RET,  // ll.scope_ret
+  LL_STORE,  // ll.store
+  LL_SUBSCRIPT,  // ll.subscript
   LL_UNINITIALIZED_VAR,  // ll.uninitialized_var
   HL_ACCESS,  // hl.access
   HL_ASSIGN_FADD,  // hl.assign.fadd
@@ -431,6 +438,7 @@ enum class OperationKind : unsigned {
   HL_TYPEOF_TYPE,  // hl.typeof.type
   HL_UNION,  // hl.union
   HL_UNREACHABLE,  // hl.unreachable
+  HL_VA_ARG_EXPR,  // hl.va_arg_expr
   CORE_BIN_LAND,  // core.bin.land
   CORE_BIN_LOR,  // core.bin.lor
   CORE_IMPLICIT_RETURN,  // core.implicit.return
@@ -448,7 +456,7 @@ inline static const char *EnumerationName(ir::OperationKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::OperationKind) {
-  return 425;
+  return 433;
 }
 
 MX_EXPORT const char *EnumeratorName(ir::OperationKind);

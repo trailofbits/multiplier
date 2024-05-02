@@ -7,9 +7,11 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/ConceptSpecializationExpr.h>
+#include <multiplier/AST/ConceptDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Expr.h>
 #include <multiplier/AST/ImplicitConceptSpecializationDecl.h>
+#include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/AST/TemplateArgument.h>
 #include <multiplier/Frontend/Token.h>
@@ -193,8 +195,22 @@ std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const T
   return std::nullopt;
 }
 
+Token ConceptSpecializationExpr::concept_name_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
+}
+
+NamedDecl ConceptSpecializationExpr::found_declaration(void) const {
+  RawEntityId eid = impl->reader.getVal38();
+  return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
+}
+
+ConceptDecl ConceptSpecializationExpr::named_concept(void) const {
+  RawEntityId eid = impl->reader.getVal39();
+  return ConceptDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
+}
+
 ImplicitConceptSpecializationDecl ConceptSpecializationExpr::specialization_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal40();
   return ImplicitConceptSpecializationDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
@@ -226,6 +242,14 @@ gap::generator<TemplateArgument> ConceptSpecializationExpr::template_arguments(v
     }
   }
   co_return;
+}
+
+Token ConceptSpecializationExpr::template_keyword_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+}
+
+bool ConceptSpecializationExpr::has_explicit_template_arguments(void) const {
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

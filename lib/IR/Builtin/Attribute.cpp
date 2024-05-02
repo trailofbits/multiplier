@@ -120,17 +120,6 @@ std::optional<DenseIntOrFPElementsAttr> DenseIntOrFPElementsAttr::from(const ::m
   return ::mlir::DenseIntOrFPElementsAttr(this->::mx::ir::Attribute::attr_);
 }
 
-std::optional<DenseResourceElementsAttr> DenseResourceElementsAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::BUILTIN_DENSE_RESOURCE_ELEMENTS) {
-    return reinterpret_cast<const DenseResourceElementsAttr &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::DenseResourceElementsAttr DenseResourceElementsAttr::underlying_repr(void) const noexcept {
-  return ::mlir::DenseResourceElementsAttr(this->::mx::ir::Attribute::attr_);
-}
-
 std::optional<DenseStringElementsAttr> DenseStringElementsAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::BUILTIN_DENSE_STRING_ELEMENTS) {
     return reinterpret_cast<const DenseStringElementsAttr &>(that);
@@ -140,6 +129,17 @@ std::optional<DenseStringElementsAttr> DenseStringElementsAttr::from(const ::mx:
 
 ::mlir::DenseStringElementsAttr DenseStringElementsAttr::underlying_repr(void) const noexcept {
   return ::mlir::DenseStringElementsAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<DenseResourceElementsAttr> DenseResourceElementsAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::BUILTIN_DENSE_RESOURCE_ELEMENTS) {
+    return reinterpret_cast<const DenseResourceElementsAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::DenseResourceElementsAttr DenseResourceElementsAttr::underlying_repr(void) const noexcept {
+  return ::mlir::DenseResourceElementsAttr(this->::mx::ir::Attribute::attr_);
 }
 
 std::optional<DictionaryAttr> DictionaryAttr::from(const ::mx::ir::Attribute &that) {
@@ -242,6 +242,22 @@ std::optional<SparseElementsAttr> SparseElementsAttr::from(const ::mx::ir::Attri
   return ::mlir::SparseElementsAttr(this->::mx::ir::Attribute::attr_);
 }
 
+std::optional<StridedLayoutAttr> StridedLayoutAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::BUILTIN_STRIDED_LAYOUT) {
+    return reinterpret_cast<const StridedLayoutAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::StridedLayoutAttr StridedLayoutAttr::underlying_repr(void) const noexcept {
+  return ::mlir::StridedLayoutAttr(this->::mx::ir::Attribute::attr_);
+}
+
+int64_t StridedLayoutAttr::offset(void) const {
+  auto val = underlying_repr().getOffset();
+  return val;
+}
+
 std::optional<StringAttr> StringAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::BUILTIN_STRING) {
     return reinterpret_cast<const StringAttr &>(that);
@@ -255,6 +271,11 @@ std::optional<StringAttr> StringAttr::from(const ::mx::ir::Attribute &that) {
 
 std::string StringAttr::str(void) const {
   auto val = underlying_repr().str();
+  return val;
+}
+
+bool StringAttr::empty(void) const {
+  auto val = underlying_repr().empty();
   return val;
 }
 
@@ -298,22 +319,6 @@ std::optional<UnitAttr> UnitAttr::from(const ::mx::ir::Attribute &that) {
 
 ::mlir::UnitAttr UnitAttr::underlying_repr(void) const noexcept {
   return ::mlir::UnitAttr(this->::mx::ir::Attribute::attr_);
-}
-
-std::optional<StridedLayoutAttr> StridedLayoutAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::BUILTIN_STRIDED_LAYOUT) {
-    return reinterpret_cast<const StridedLayoutAttr &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::StridedLayoutAttr StridedLayoutAttr::underlying_repr(void) const noexcept {
-  return ::mlir::StridedLayoutAttr(this->::mx::ir::Attribute::attr_);
-}
-
-int64_t StridedLayoutAttr::offset(void) const {
-  auto val = underlying_repr().getOffset();
-  return val;
 }
 
 std::optional<BoolAttr> BoolAttr::from(const ::mx::ir::Attribute &that) {

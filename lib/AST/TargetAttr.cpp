@@ -130,7 +130,7 @@ std::string_view TargetAttr::architecture(void) const {
 }
 
 std::string_view TargetAttr::features_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal17();
+  capnp::Text::Reader data = impl->reader.getVal21();
   return std::string_view(data.cStr(), data.size());
 }
 

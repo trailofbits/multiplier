@@ -133,7 +133,7 @@ MSInheritanceModel MSInheritanceAttr::inheritance_model(void) const {
 }
 
 MSInheritanceAttrSpelling MSInheritanceAttr::semantic_spelling(void) const {
-  return static_cast<MSInheritanceAttrSpelling>(impl->reader.getVal14());
+  return static_cast<MSInheritanceAttrSpelling>(impl->reader.getVal18());
 }
 
 #pragma GCC diagnostic pop

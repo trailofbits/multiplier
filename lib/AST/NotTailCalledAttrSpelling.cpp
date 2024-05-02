@@ -16,7 +16,7 @@ const char *EnumeratorName(NotTailCalledAttrSpelling e) {
   switch (e) {
     case NotTailCalledAttrSpelling::GNU_NOT_TAIL_CALLED: return "GNU_NOT_TAIL_CALLED";
     case NotTailCalledAttrSpelling::CXX11_CLANG_NOT_TAIL_CALLED: return "CXX11_CLANG_NOT_TAIL_CALLED";
-    case NotTailCalledAttrSpelling::C2X_CLANG_NOT_TAIL_CALLED: return "C2X_CLANG_NOT_TAIL_CALLED";
+    case NotTailCalledAttrSpelling::C23_CLANG_NOT_TAIL_CALLED: return "C23_CLANG_NOT_TAIL_CALLED";
     case NotTailCalledAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

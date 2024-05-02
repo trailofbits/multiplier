@@ -49,7 +49,6 @@ class AssumeAlignmentOp(multiplier.ir.memref.Operation):
 
 class AtomicRMWOp(multiplier.ir.memref.Operation):
   value: multiplier.ir.Value
-  indices: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
 
   @staticmethod
@@ -94,7 +93,6 @@ class CopyOp(multiplier.ir.memref.Operation):
     ...
 
 class GenericAtomicRMWOp(multiplier.ir.memref.Operation):
-  indices: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
   atomic_body: multiplier.ir.Region
 
@@ -111,7 +109,6 @@ class GenericAtomicRMWOp(multiplier.ir.memref.Operation):
     ...
 
 class LoadOp(multiplier.ir.memref.Operation):
-  indices: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
   nontemporal: bool
 
@@ -128,8 +125,6 @@ class LoadOp(multiplier.ir.memref.Operation):
     ...
 
 class AllocOp(multiplier.ir.memref.Operation):
-  dynamic_sizes: Iterable[multiplier.ir.Operand]
-  symbol_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -144,8 +139,6 @@ class AllocOp(multiplier.ir.memref.Operation):
     ...
 
 class AllocaOp(multiplier.ir.memref.Operation):
-  dynamic_sizes: Iterable[multiplier.ir.Operand]
-  symbol_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -160,7 +153,6 @@ class AllocaOp(multiplier.ir.memref.Operation):
     ...
 
 class AllocaScopeOp(multiplier.ir.memref.Operation):
-  results: Iterable[multiplier.ir.Result]
   body_region: multiplier.ir.Region
 
   @staticmethod
@@ -176,7 +168,6 @@ class AllocaScopeOp(multiplier.ir.memref.Operation):
     ...
 
 class AllocaScopeReturnOp(multiplier.ir.memref.Operation):
-  results: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -248,7 +239,6 @@ class DimOp(multiplier.ir.memref.Operation):
     ...
 
 class DMAStartOp(multiplier.ir.memref.Operation):
-  operands: Iterable[multiplier.ir.Operand]
   is_dest_memory_space_faster: bool
   is_src_memory_space_faster: bool
   is_strided: bool
@@ -266,7 +256,6 @@ class DMAStartOp(multiplier.ir.memref.Operation):
     ...
 
 class DMAWaitOp(multiplier.ir.memref.Operation):
-  tag_indices: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -310,8 +299,6 @@ class ExtractAlignedPointerAsIndexOp(multiplier.ir.memref.Operation):
 
 class ExtractStridedMetadataOp(multiplier.ir.memref.Operation):
   base_buffer: multiplier.ir.Value
-  sizes: Iterable[multiplier.ir.Result]
-  strides: Iterable[multiplier.ir.Result]
   view_source: multiplier.ir.Value
 
   @staticmethod
@@ -343,7 +330,6 @@ class GetGlobalOp(multiplier.ir.memref.Operation):
 
 class GlobalOp(multiplier.ir.memref.Operation):
   sym_name: str
-  sym_visibility: Optional[str]
   constant: bool
   is_external: bool
   is_uninitialized: bool
@@ -375,7 +361,6 @@ class MemorySpaceCastOp(multiplier.ir.memref.Operation):
     ...
 
 class PrefetchOp(multiplier.ir.memref.Operation):
-  indices: Iterable[multiplier.ir.Operand]
   is_write: bool
   locality_hint: int
   is_data_cache: bool
@@ -421,10 +406,6 @@ class ReallocOp(multiplier.ir.memref.Operation):
     ...
 
 class ReinterpretCastOp(multiplier.ir.memref.Operation):
-  offsets: Iterable[multiplier.ir.Operand]
-  sizes: Iterable[multiplier.ir.Operand]
-  strides: Iterable[multiplier.ir.Operand]
-  dynamic_sizes: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -454,7 +435,6 @@ class ReshapeOp(multiplier.ir.memref.Operation):
 
 class StoreOp(multiplier.ir.memref.Operation):
   value: multiplier.ir.Value
-  indices: Iterable[multiplier.ir.Operand]
   nontemporal: bool
 
   @staticmethod
@@ -484,7 +464,6 @@ class TransposeOp(multiplier.ir.memref.Operation):
     ...
 
 class ViewOp(multiplier.ir.memref.Operation):
-  sizes: Iterable[multiplier.ir.Operand]
   view_source: multiplier.ir.Value
 
   @staticmethod
@@ -500,11 +479,7 @@ class ViewOp(multiplier.ir.memref.Operation):
     ...
 
 class SubViewOp(multiplier.ir.memref.Operation):
-  offsets: Iterable[multiplier.ir.Operand]
-  sizes: Iterable[multiplier.ir.Operand]
-  strides: Iterable[multiplier.ir.Operand]
   view_source: multiplier.ir.Value
-  dynamic_sizes: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -516,18 +491,4 @@ class SubViewOp(multiplier.ir.memref.Operation):
 
   @staticmethod
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.memref.SubViewOp]:
-    ...
-
-class TensorStoreOp(multiplier.ir.memref.Operation):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.OperationKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.memref.TensorStoreOp]:
-    ...
-
-  @staticmethod
-  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.memref.TensorStoreOp]:
     ...

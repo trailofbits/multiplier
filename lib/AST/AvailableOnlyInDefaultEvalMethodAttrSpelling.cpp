@@ -16,7 +16,7 @@ const char *EnumeratorName(AvailableOnlyInDefaultEvalMethodAttrSpelling e) {
   switch (e) {
     case AvailableOnlyInDefaultEvalMethodAttrSpelling::GNU_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD: return "GNU_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD";
     case AvailableOnlyInDefaultEvalMethodAttrSpelling::CXX11_CLANG_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD: return "CXX11_CLANG_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD";
-    case AvailableOnlyInDefaultEvalMethodAttrSpelling::C2X_CLANG_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD: return "C2X_CLANG_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD";
+    case AvailableOnlyInDefaultEvalMethodAttrSpelling::C23_CLANG_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD: return "C23_CLANG_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD";
     case AvailableOnlyInDefaultEvalMethodAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

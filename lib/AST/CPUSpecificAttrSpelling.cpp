@@ -16,7 +16,7 @@ const char *EnumeratorName(CPUSpecificAttrSpelling e) {
   switch (e) {
     case CPUSpecificAttrSpelling::GNU_CPU_SPECIFIC: return "GNU_CPU_SPECIFIC";
     case CPUSpecificAttrSpelling::CXX11_CLANG_CPU_SPECIFIC: return "CXX11_CLANG_CPU_SPECIFIC";
-    case CPUSpecificAttrSpelling::C2X_CLANG_CPU_SPECIFIC: return "C2X_CLANG_CPU_SPECIFIC";
+    case CPUSpecificAttrSpelling::C23_CLANG_CPU_SPECIFIC: return "C23_CLANG_CPU_SPECIFIC";
     case CPUSpecificAttrSpelling::DECLSPEC_CPU_SPECIFIC: return "DECLSPEC_CPU_SPECIFIC";
     case CPUSpecificAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

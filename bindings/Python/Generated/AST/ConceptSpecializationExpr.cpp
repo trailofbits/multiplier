@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[571]) || tp >= &(gTypes[572])) {
+  if (tp < &(gTypes[596]) || tp >= &(gTypes[597])) {
     return std::nullopt;
   }
 
@@ -90,7 +90,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ConceptSpecializationExpr::static_kind():
-      tp = &(gTypes[571]);
+      tp = &(gTypes[596]);
       break;
 
   }
@@ -125,6 +125,36 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
+    "concept_name_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->concept_name_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::concept_name_token"),
+    nullptr,
+  },
+  {
+    "found_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->found_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::found_declaration"),
+    nullptr,
+  },
+  {
+    "named_concept",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->named_concept());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::named_concept"),
+    nullptr,
+  },
+  {
     "specialization_declaration",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -152,6 +182,26 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::template_arguments"),
+    nullptr,
+  },
+  {
+    "template_keyword_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_keyword_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::template_keyword_token"),
+    nullptr,
+  },
+  {
+    "has_explicit_template_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_explicit_template_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::has_explicit_template_arguments"),
     nullptr,
   },
   {}  // Sentinel.
@@ -411,7 +461,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[571]);
+  PyTypeObject * const tp = &(gTypes[596]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -426,12 +476,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[561].tp_hash;
-  tp->tp_richcompare = gTypes[561].tp_richcompare;
+  tp->tp_hash = gTypes[586].tp_hash;
+  tp->tp_richcompare = gTypes[586].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[561]);
+  tp->tp_base = &(gTypes[586]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

@@ -14,6 +14,11 @@ namespace mx {
 
 const char *EnumeratorName(SyncScope e) {
   switch (e) {
+    case SyncScope::SYSTEM_SCOPE: return "SYSTEM_SCOPE";
+    case SyncScope::DEVICE_SCOPE: return "DEVICE_SCOPE";
+    case SyncScope::WORKGROUP_SCOPE: return "WORKGROUP_SCOPE";
+    case SyncScope::WAVEFRONT_SCOPE: return "WAVEFRONT_SCOPE";
+    case SyncScope::SINGLE_SCOPE: return "SINGLE_SCOPE";
     case SyncScope::HIP_SINGLE_THREAD: return "HIP_SINGLE_THREAD";
     case SyncScope::HIP_WAVEFRONT: return "HIP_WAVEFRONT";
     case SyncScope::HIP_WORKGROUP: return "HIP_WORKGROUP";

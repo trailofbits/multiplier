@@ -49,32 +49,6 @@ std::optional<ModuleOp> ModuleOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Region(module_, val);
 }
 
-std::optional<std::string_view> ModuleOp::sym_name(void) const {
-  auto opt_val = underlying_repr().getSymName();
-  if (!opt_val) {
-    return std::nullopt;
-  }
-  auto &val = opt_val.value();
-  if (auto size = val.size()) {
-    return std::string_view(val.data(), size);
-  } else {
-    return {};
-  }
-}
-
-std::optional<std::string_view> ModuleOp::sym_visibility(void) const {
-  auto opt_val = underlying_repr().getSymVisibility();
-  if (!opt_val) {
-    return std::nullopt;
-  }
-  auto &val = opt_val.value();
-  if (auto size = val.size()) {
-    return std::string_view(val.data(), size);
-  } else {
-    return {};
-  }
-}
-
 std::optional<std::string_view> ModuleOp::name(void) const {
   auto opt_val = underlying_repr().getName();
   if (!opt_val) {
@@ -118,20 +92,6 @@ std::optional<UnrealizedConversionCastOp> UnrealizedConversionCastOp::producing(
 
 ::mlir::UnrealizedConversionCastOp UnrealizedConversionCastOp::underlying_repr(void) const noexcept {
   return ::mlir::UnrealizedConversionCastOp(this->::mx::ir::Operation::op_);
-}
-
-gap::generator<::mx::ir::Operand> UnrealizedConversionCastOp::inputs(void) const {
-  auto range = underlying_repr().getInputs();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
-  }
-}
-
-gap::generator<::mx::ir::Result> UnrealizedConversionCastOp::outputs(void) const {
-  auto range = underlying_repr().getOutputs();
-  for (auto val : range) {
-    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
-  }
 }
 
 }  // namespace mx::ir::builtin

@@ -247,7 +247,7 @@ bool MemberExpr::is_implicit_access(void) const {
 }
 
 NonOdrUseReason MemberExpr::is_non_odr_use(void) const {
-  return static_cast<NonOdrUseReason>(impl->reader.getVal90());
+  return static_cast<NonOdrUseReason>(impl->reader.getVal91());
 }
 
 #pragma GCC diagnostic pop

@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[720]) || tp >= &(gTypes[750])) {
+  if (tp < &(gTypes[744]) || tp >= &(gTypes[774])) {
     return std::nullopt;
   }
 
@@ -90,111 +90,111 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::UnresolvedUsingValueDecl::static_kind():
-      tp = &(gTypes[721]);
-      break;
-
-    case mx::UnnamedGlobalConstantDecl::static_kind():
-      tp = &(gTypes[722]);
-      break;
-
-    case mx::TemplateParamObjectDecl::static_kind():
-      tp = &(gTypes[723]);
-      break;
-
-    case mx::OMPDeclareReductionDecl::static_kind():
-      tp = &(gTypes[724]);
-      break;
-
-    case mx::MSGuidDecl::static_kind():
-      tp = &(gTypes[725]);
-      break;
-
-    case mx::IndirectFieldDecl::static_kind():
-      tp = &(gTypes[726]);
-      break;
-
-    case mx::EnumConstantDecl::static_kind():
-      tp = &(gTypes[727]);
-      break;
-
-    case mx::VarDecl::static_kind():
-      tp = &(gTypes[729]);
-      break;
-
-    case mx::ParmVarDecl::static_kind():
-      tp = &(gTypes[730]);
-      break;
-
-    case mx::OMPCapturedExprDecl::static_kind():
-      tp = &(gTypes[731]);
-      break;
-
-    case mx::ImplicitParamDecl::static_kind():
-      tp = &(gTypes[732]);
-      break;
-
-    case mx::DecompositionDecl::static_kind():
-      tp = &(gTypes[733]);
-      break;
-
-    case mx::VarTemplateSpecializationDecl::static_kind():
-      tp = &(gTypes[734]);
-      break;
-
-    case mx::VarTemplatePartialSpecializationDecl::static_kind():
-      tp = &(gTypes[735]);
-      break;
-
-    case mx::NonTypeTemplateParmDecl::static_kind():
-      tp = &(gTypes[736]);
-      break;
-
-    case mx::MSPropertyDecl::static_kind():
-      tp = &(gTypes[737]);
-      break;
-
-    case mx::FunctionDecl::static_kind():
-      tp = &(gTypes[738]);
-      break;
-
-    case mx::CXXMethodDecl::static_kind():
-      tp = &(gTypes[739]);
-      break;
-
-    case mx::CXXDestructorDecl::static_kind():
-      tp = &(gTypes[740]);
-      break;
-
-    case mx::CXXConversionDecl::static_kind():
-      tp = &(gTypes[741]);
-      break;
-
-    case mx::CXXConstructorDecl::static_kind():
-      tp = &(gTypes[742]);
-      break;
-
-    case mx::CXXDeductionGuideDecl::static_kind():
-      tp = &(gTypes[743]);
-      break;
-
-    case mx::FieldDecl::static_kind():
-      tp = &(gTypes[744]);
-      break;
-
-    case mx::ObjCIvarDecl::static_kind():
       tp = &(gTypes[745]);
       break;
 
-    case mx::ObjCAtDefsFieldDecl::static_kind():
+    case mx::UnnamedGlobalConstantDecl::static_kind():
       tp = &(gTypes[746]);
       break;
 
-    case mx::BindingDecl::static_kind():
+    case mx::TemplateParamObjectDecl::static_kind():
       tp = &(gTypes[747]);
       break;
 
-    case mx::OMPDeclareMapperDecl::static_kind():
+    case mx::OMPDeclareReductionDecl::static_kind():
+      tp = &(gTypes[748]);
+      break;
+
+    case mx::MSGuidDecl::static_kind():
       tp = &(gTypes[749]);
+      break;
+
+    case mx::IndirectFieldDecl::static_kind():
+      tp = &(gTypes[750]);
+      break;
+
+    case mx::EnumConstantDecl::static_kind():
+      tp = &(gTypes[751]);
+      break;
+
+    case mx::VarDecl::static_kind():
+      tp = &(gTypes[753]);
+      break;
+
+    case mx::ParmVarDecl::static_kind():
+      tp = &(gTypes[754]);
+      break;
+
+    case mx::OMPCapturedExprDecl::static_kind():
+      tp = &(gTypes[755]);
+      break;
+
+    case mx::ImplicitParamDecl::static_kind():
+      tp = &(gTypes[756]);
+      break;
+
+    case mx::DecompositionDecl::static_kind():
+      tp = &(gTypes[757]);
+      break;
+
+    case mx::VarTemplateSpecializationDecl::static_kind():
+      tp = &(gTypes[758]);
+      break;
+
+    case mx::VarTemplatePartialSpecializationDecl::static_kind():
+      tp = &(gTypes[759]);
+      break;
+
+    case mx::NonTypeTemplateParmDecl::static_kind():
+      tp = &(gTypes[760]);
+      break;
+
+    case mx::MSPropertyDecl::static_kind():
+      tp = &(gTypes[761]);
+      break;
+
+    case mx::FunctionDecl::static_kind():
+      tp = &(gTypes[762]);
+      break;
+
+    case mx::CXXMethodDecl::static_kind():
+      tp = &(gTypes[763]);
+      break;
+
+    case mx::CXXDestructorDecl::static_kind():
+      tp = &(gTypes[764]);
+      break;
+
+    case mx::CXXConversionDecl::static_kind():
+      tp = &(gTypes[765]);
+      break;
+
+    case mx::CXXConstructorDecl::static_kind():
+      tp = &(gTypes[766]);
+      break;
+
+    case mx::CXXDeductionGuideDecl::static_kind():
+      tp = &(gTypes[767]);
+      break;
+
+    case mx::FieldDecl::static_kind():
+      tp = &(gTypes[768]);
+      break;
+
+    case mx::ObjCIvarDecl::static_kind():
+      tp = &(gTypes[769]);
+      break;
+
+    case mx::ObjCAtDefsFieldDecl::static_kind():
+      tp = &(gTypes[770]);
+      break;
+
+    case mx::BindingDecl::static_kind():
+      tp = &(gTypes[771]);
+      break;
+
+    case mx::OMPDeclareMapperDecl::static_kind():
+      tp = &(gTypes[773]);
       break;
 
   }
@@ -516,7 +516,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[720]);
+  PyTypeObject * const tp = &(gTypes[744]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -531,12 +531,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[714].tp_hash;
-  tp->tp_richcompare = gTypes[714].tp_richcompare;
+  tp->tp_hash = gTypes[738].tp_hash;
+  tp->tp_richcompare = gTypes[738].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[714]);
+  tp->tp_base = &(gTypes[738]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

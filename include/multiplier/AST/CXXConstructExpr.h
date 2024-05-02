@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <multiplier/AST/CXXConstructExprConstructionKind.h>
+#include <multiplier/AST/CXXConstructionKind.h>
 #include <multiplier/AST/Expr.h>
 
 namespace mx {
@@ -70,7 +70,7 @@ class MX_EXPORT CXXConstructExpr : public Expr {
   std::optional<Expr> nth_argument(unsigned n) const;
   unsigned num_arguments(void) const;
   gap::generator<Expr> arguments(void) const &;
-  CXXConstructExprConstructionKind construction_kind(void) const;
+  CXXConstructionKind construction_kind(void) const;
   CXXConstructorDecl constructor(void) const;
   Token token(void) const;
   TokenRange parenthesis_or_brace_range(void) const;

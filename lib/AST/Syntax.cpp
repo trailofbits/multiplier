@@ -16,7 +16,7 @@ const char *EnumeratorName(Syntax e) {
   switch (e) {
     case Syntax::GNU: return "GNU";
     case Syntax::CXX11: return "CXX11";
-    case Syntax::C2X: return "C2X";
+    case Syntax::C23: return "C23";
     case Syntax::DECLSPEC: return "DECLSPEC";
     case Syntax::MICROSOFT: return "MICROSOFT";
     case Syntax::KEYWORD: return "KEYWORD";

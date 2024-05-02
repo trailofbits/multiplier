@@ -17,7 +17,6 @@ enum class IdentifierInfoFlag : unsigned char {
   ZERO_ARGUMENT,
   ONE_ARGUMENT,
   MULTI_ARGUMENT,
-  // Skipped repeat pasta::kArgumentFlags
 };
 
 inline static const char *EnumerationName(IdentifierInfoFlag) {

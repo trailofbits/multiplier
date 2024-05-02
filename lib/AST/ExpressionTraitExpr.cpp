@@ -197,7 +197,7 @@ Expr ExpressionTraitExpr::queried_expression(void) const {
 }
 
 ExpressionTrait ExpressionTraitExpr::trait(void) const {
-  return static_cast<ExpressionTrait>(impl->reader.getVal90());
+  return static_cast<ExpressionTrait>(impl->reader.getVal91());
 }
 
 bool ExpressionTraitExpr::value(void) const {

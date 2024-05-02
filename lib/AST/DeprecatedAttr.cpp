@@ -130,7 +130,7 @@ std::string_view DeprecatedAttr::message(void) const {
 }
 
 std::string_view DeprecatedAttr::replacement(void) const {
-  capnp::Text::Reader data = impl->reader.getVal17();
+  capnp::Text::Reader data = impl->reader.getVal21();
   return std::string_view(data.cStr(), data.size());
 }
 

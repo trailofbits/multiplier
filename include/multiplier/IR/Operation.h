@@ -7,7 +7,7 @@
 #pragma once
 
 #include <cstdint>
-#include <gap/core/generator.hpp>
+#include <gap/coro/generator.hpp>
 #include <optional>
 #include <memory>
 #include <string_view>

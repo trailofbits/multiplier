@@ -63,6 +63,7 @@ class MX_EXPORT CastExpr : public Expr {
   static std::optional<CastExpr> from(const VariantEntity &e);
   static std::optional<CastExpr> from(const TokenContext &t);
 
+  bool changes_volatile_qualification(void) const;
   CastKind cast_kind(void) const;
   std::string_view cast_kind_name(void) const;
   std::optional<NamedDecl> conversion_function(void) const;

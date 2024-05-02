@@ -16,7 +16,7 @@ namespace mx {
 enum class MustTailAttrSpelling : unsigned char {
   GNU_MUSTTAIL,
   CXX11_CLANG_MUSTTAIL,
-  C2X_CLANG_MUSTTAIL,
+  C23_CLANG_MUSTTAIL,
   SPELLING_NOT_CALCULATED,
 };
 

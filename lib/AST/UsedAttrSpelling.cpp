@@ -16,7 +16,7 @@ const char *EnumeratorName(UsedAttrSpelling e) {
   switch (e) {
     case UsedAttrSpelling::GNU_USED: return "GNU_USED";
     case UsedAttrSpelling::CXX11_GNU_USED: return "CXX11_GNU_USED";
-    case UsedAttrSpelling::C2X_GNU_USED: return "C2X_GNU_USED";
+    case UsedAttrSpelling::C23_GNU_USED: return "C23_GNU_USED";
     case UsedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

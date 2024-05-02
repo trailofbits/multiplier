@@ -16,7 +16,7 @@ namespace mx {
 enum class PureAttrSpelling : unsigned char {
   GNU_PURE,
   CXX11_GNU_PURE,
-  C2X_GNU_PURE,
+  C23_GNU_PURE,
   SPELLING_NOT_CALCULATED,
 };
 

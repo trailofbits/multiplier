@@ -42,7 +42,6 @@ class StoreOp;
 class TransposeOp;
 class ViewOp;
 class SubViewOp;
-class TensorStoreOp;
 }  // namespace mlir::memref
 namespace mx::ir::memref {
 
@@ -64,7 +63,7 @@ class MX_EXPORT AssumeAlignmentOp final : public Operation {
   ::mlir::memref::AssumeAlignmentOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
+  //::mlir::TypedValue<MemRefType> memref(void) const;
   uint32_t alignment(void) const;
 };
 static_assert(sizeof(AssumeAlignmentOp) == sizeof(Operation));
@@ -82,8 +81,8 @@ class MX_EXPORT AtomicRMWOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value value(void) const;
-  //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
-  gap::generator<::mx::ir::Operand> indices(void) const;
+  //::mlir::TypedValue<MemRefType> memref(void) const;
+  //::mlir::Operation::operand_range indices(void) const;
   ::mx::ir::Value result(void) const;
   //::mlir::arith::AtomicRMWKind kind(void) const;
   //MemRefType mem_ref_type(void) const;
@@ -118,8 +117,8 @@ class MX_EXPORT CopyOp final : public Operation {
   ::mlir::memref::CopyOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::BaseMemRefType> source(void) const;
-  //::mlir::TypedValue<::mlir::BaseMemRefType> target(void) const;
+  //::mlir::TypedValue<BaseMemRefType> source(void) const;
+  //::mlir::TypedValue<BaseMemRefType> target(void) const;
 };
 static_assert(sizeof(CopyOp) == sizeof(Operation));
 
@@ -135,8 +134,8 @@ class MX_EXPORT GenericAtomicRMWOp final : public Operation {
   ::mlir::memref::GenericAtomicRMWOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
-  gap::generator<::mx::ir::Operand> indices(void) const;
+  //::mlir::TypedValue<MemRefType> memref(void) const;
+  //::mlir::Operation::operand_range indices(void) const;
   ::mx::ir::Value result(void) const;
   ::mx::ir::Region atomic_body(void) const;
   //Region& body(void) const;
@@ -157,8 +156,8 @@ class MX_EXPORT LoadOp final : public Operation {
   ::mlir::memref::LoadOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
-  gap::generator<::mx::ir::Operand> indices(void) const;
+  //::mlir::TypedValue<MemRefType> memref(void) const;
+  //::mlir::Operation::operand_range indices(void) const;
   ::mx::ir::Value result(void) const;
   bool nontemporal(void) const;
   //Value mem_ref(void) const;
@@ -178,13 +177,13 @@ class MX_EXPORT AllocOp final : public Operation {
   ::mlir::memref::AllocOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> dynamic_sizes(void) const;
-  gap::generator<::mx::ir::Operand> symbol_operands(void) const;
-  //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
-  //::std::optional<uint64_t> alignment(void) const;
+  //::mlir::Operation::operand_range dynamic_sizes(void) const;
+  //::mlir::Operation::operand_range symbol_operands(void) const;
+  //::mlir::TypedValue<MemRefType> memref(void) const;
+  //::std::optional<unsignedlonglong> alignment(void) const;
   //StringRef alignment_attr_str_name(void) const;
   //MemRefType type(void) const;
-  //SmallVector<OpFoldResult> mixed_sizes(void) const;
+  //SmallVector<OpFoldResult,6> mixed_sizes(void) const;
 };
 static_assert(sizeof(AllocOp) == sizeof(Operation));
 
@@ -200,15 +199,15 @@ class MX_EXPORT AllocaOp final : public Operation {
   ::mlir::memref::AllocaOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> dynamic_sizes(void) const;
-  gap::generator<::mx::ir::Operand> symbol_operands(void) const;
-  //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
-  //::std::optional<uint64_t> alignment(void) const;
-  //::llvm::SmallVector<::mlir::MemorySlot> promotable_slots(void) const;
-  //::llvm::SmallVector<::mlir::DestructurableMemorySlot> destructurable_slots(void) const;
+  //::mlir::Operation::operand_range dynamic_sizes(void) const;
+  //::mlir::Operation::operand_range symbol_operands(void) const;
+  //::mlir::TypedValue<MemRefType> memref(void) const;
+  //::std::optional<unsignedlonglong> alignment(void) const;
+  //::llvm::SmallVector<MemorySlot,3> promotable_slots(void) const;
+  //::llvm::SmallVector<DestructurableMemorySlot,1> destructurable_slots(void) const;
   //StringRef alignment_attr_str_name(void) const;
   //MemRefType type(void) const;
-  //SmallVector<OpFoldResult> mixed_sizes(void) const;
+  //SmallVector<OpFoldResult,6> mixed_sizes(void) const;
 };
 static_assert(sizeof(AllocaOp) == sizeof(Operation));
 
@@ -224,7 +223,7 @@ class MX_EXPORT AllocaScopeOp final : public Operation {
   ::mlir::memref::AllocaScopeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Result> results(void) const;
+  //::mlir::Operation::result_range results(void) const;
   ::mx::ir::Region body_region(void) const;
 };
 static_assert(sizeof(AllocaScopeOp) == sizeof(Operation));
@@ -241,7 +240,7 @@ class MX_EXPORT AllocaScopeReturnOp final : public Operation {
   ::mlir::memref::AllocaScopeReturnOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> results(void) const;
+  //::mlir::Operation::operand_range results(void) const;
 };
 static_assert(sizeof(AllocaScopeReturnOp) == sizeof(Operation));
 
@@ -257,8 +256,8 @@ class MX_EXPORT CastOp final : public Operation {
   ::mlir::memref::CastOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::BaseMemRefType> source(void) const;
-  //::mlir::TypedValue<::mlir::BaseMemRefType> dest(void) const;
+  //::mlir::TypedValue<BaseMemRefType> source(void) const;
+  //::mlir::TypedValue<BaseMemRefType> dest(void) const;
   //Value view_source(void) const;
 };
 static_assert(sizeof(CastOp) == sizeof(Operation));
@@ -275,12 +274,12 @@ class MX_EXPORT CollapseShapeOp final : public Operation {
   ::mlir::memref::CollapseShapeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::MemRefType> src(void) const;
-  //::mlir::TypedValue<::mlir::MemRefType> result(void) const;
+  //::mlir::TypedValue<MemRefType> src(void) const;
+  //::mlir::TypedValue<MemRefType> result(void) const;
   //::mlir::ArrayAttr reassociation(void) const;
   //SmallVector<AffineMap,4> reassociation_maps(void) const;
-  //SmallVector<ReassociationExprs,4> reassociation_exprs(void) const;
-  //SmallVector<ReassociationIndices,4> reassociation_indices(void) const;
+  //SmallVector<SmallVector<AffineExpr,2>,4> reassociation_exprs(void) const;
+  //SmallVector<SmallVector<longlong,2>,4> reassociation_indices(void) const;
   //MemRefType src_type(void) const;
   //MemRefType result_type(void) const;
   //Value view_source(void) const;
@@ -299,7 +298,7 @@ class MX_EXPORT DeallocOp final : public Operation {
   ::mlir::memref::DeallocOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::BaseMemRefType> memref(void) const;
+  //::mlir::TypedValue<BaseMemRefType> memref(void) const;
 };
 static_assert(sizeof(DeallocOp) == sizeof(Operation));
 
@@ -316,9 +315,9 @@ class MX_EXPORT DimOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value source(void) const;
-  //::mlir::TypedValue<::mlir::IndexType> index(void) const;
-  //::mlir::TypedValue<::mlir::IndexType> result(void) const;
-  //std::optional<int64_t> constant_index(void) const;
+  //::mlir::TypedValue<IndexType> index(void) const;
+  //::mlir::TypedValue<IndexType> result(void) const;
+  //std::optional<longlong> constant_index(void) const;
   //Value shaped_value(void) const;
   //OpFoldResult dimension(void) const;
   //Speculation::Speculatability speculatability(void) const;
@@ -337,7 +336,7 @@ class MX_EXPORT DMAStartOp final : public Operation {
   ::mlir::memref::DmaStartOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> operands(void) const;
+  //::mlir::Operation::operand_range operands(void) const;
   //Value src_mem_ref(void) const;
   //unsignedint src_mem_ref_rank(void) const;
   //operand_range src_indices(void) const;
@@ -371,9 +370,9 @@ class MX_EXPORT DMAWaitOp final : public Operation {
   ::mlir::memref::DmaWaitOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::MemRefType> tag_mem_ref(void) const;
-  gap::generator<::mx::ir::Operand> tag_indices(void) const;
-  //::mlir::TypedValue<::mlir::IndexType> num_elements(void) const;
+  //::mlir::TypedValue<MemRefType> tag_mem_ref(void) const;
+  //::mlir::Operation::operand_range tag_indices(void) const;
+  //::mlir::TypedValue<IndexType> num_elements(void) const;
   //unsignedint tag_mem_ref_rank(void) const;
 };
 static_assert(sizeof(DMAWaitOp) == sizeof(Operation));
@@ -390,12 +389,12 @@ class MX_EXPORT ExpandShapeOp final : public Operation {
   ::mlir::memref::ExpandShapeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::MemRefType> src(void) const;
-  //::mlir::TypedValue<::mlir::MemRefType> result(void) const;
+  //::mlir::TypedValue<MemRefType> src(void) const;
+  //::mlir::TypedValue<MemRefType> result(void) const;
   //::mlir::ArrayAttr reassociation(void) const;
   //SmallVector<AffineMap,4> reassociation_maps(void) const;
-  //SmallVector<ReassociationExprs,4> reassociation_exprs(void) const;
-  //SmallVector<ReassociationIndices,4> reassociation_indices(void) const;
+  //SmallVector<SmallVector<AffineExpr,2>,4> reassociation_exprs(void) const;
+  //SmallVector<SmallVector<longlong,2>,4> reassociation_indices(void) const;
   //MemRefType src_type(void) const;
   //MemRefType result_type(void) const;
   //Value view_source(void) const;
@@ -414,8 +413,8 @@ class MX_EXPORT ExtractAlignedPointerAsIndexOp final : public Operation {
   ::mlir::memref::ExtractAlignedPointerAsIndexOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::MemRefType> source(void) const;
-  //::mlir::TypedValue<::mlir::IndexType> aligned_pointer(void) const;
+  //::mlir::TypedValue<MemRefType> source(void) const;
+  //::mlir::TypedValue<IndexType> aligned_pointer(void) const;
 };
 static_assert(sizeof(ExtractAlignedPointerAsIndexOp) == sizeof(Operation));
 
@@ -431,13 +430,13 @@ class MX_EXPORT ExtractStridedMetadataOp final : public Operation {
   ::mlir::memref::ExtractStridedMetadataOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::MemRefType> source(void) const;
+  //::mlir::TypedValue<MemRefType> source(void) const;
   ::mx::ir::Value base_buffer(void) const;
-  //::mlir::TypedValue<::mlir::IndexType> offset(void) const;
-  gap::generator<::mx::ir::Result> sizes(void) const;
-  gap::generator<::mx::ir::Result> strides(void) const;
-  //SmallVector<OpFoldResult> constified_mixed_sizes(void) const;
-  //SmallVector<OpFoldResult> constified_mixed_strides(void) const;
+  //::mlir::TypedValue<IndexType> offset(void) const;
+  //::mlir::Operation::result_range sizes(void) const;
+  //::mlir::Operation::result_range strides(void) const;
+  //SmallVector<OpFoldResult,6> constified_mixed_sizes(void) const;
+  //SmallVector<OpFoldResult,6> constified_mixed_strides(void) const;
   //OpFoldResult constified_mixed_offset(void) const;
   ::mx::ir::Value view_source(void) const;
 };
@@ -455,7 +454,7 @@ class MX_EXPORT GetGlobalOp final : public Operation {
   ::mlir::memref::GetGlobalOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::MemRefType> result(void) const;
+  //::mlir::TypedValue<MemRefType> result(void) const;
   std::string_view name(void) const;
 };
 static_assert(sizeof(GetGlobalOp) == sizeof(Operation));
@@ -473,11 +472,11 @@ class MX_EXPORT GlobalOp final : public Operation {
 
   // Imported methods:
   std::string_view sym_name(void) const;
-  std::optional<std::string_view> sym_visibility(void) const;
+  //::std::optional<StringRef> sym_visibility(void) const;
   //::mlir::MemRefType type(void) const;
-  //::std::optional<::mlir::Attribute> initial_value(void) const;
+  //::std::optional<Attribute> initial_value(void) const;
   bool constant(void) const;
-  //::std::optional<uint64_t> alignment(void) const;
+  //::std::optional<unsignedlonglong> alignment(void) const;
   bool is_external(void) const;
   bool is_uninitialized(void) const;
   //ElementsAttr constant_init_value(void) const;
@@ -496,8 +495,8 @@ class MX_EXPORT MemorySpaceCastOp final : public Operation {
   ::mlir::memref::MemorySpaceCastOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::BaseMemRefType> source(void) const;
-  //::mlir::TypedValue<::mlir::BaseMemRefType> dest(void) const;
+  //::mlir::TypedValue<BaseMemRefType> source(void) const;
+  //::mlir::TypedValue<BaseMemRefType> dest(void) const;
   //Value view_source(void) const;
 };
 static_assert(sizeof(MemorySpaceCastOp) == sizeof(Operation));
@@ -514,8 +513,8 @@ class MX_EXPORT PrefetchOp final : public Operation {
   ::mlir::memref::PrefetchOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
-  gap::generator<::mx::ir::Operand> indices(void) const;
+  //::mlir::TypedValue<MemRefType> memref(void) const;
+  //::mlir::Operation::operand_range indices(void) const;
   bool is_write(void) const;
   uint32_t locality_hint(void) const;
   bool is_data_cache(void) const;
@@ -538,7 +537,7 @@ class MX_EXPORT RankOp final : public Operation {
   ::mlir::memref::RankOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::BaseMemRefType> memref(void) const;
+  //::mlir::TypedValue<BaseMemRefType> memref(void) const;
 };
 static_assert(sizeof(RankOp) == sizeof(Operation));
 
@@ -554,9 +553,9 @@ class MX_EXPORT ReallocOp final : public Operation {
   ::mlir::memref::ReallocOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::MemRefType> source(void) const;
-  //::mlir::TypedValue<::mlir::IndexType> dynamic_result_size(void) const;
-  //::std::optional<uint64_t> alignment(void) const;
+  //::mlir::TypedValue<MemRefType> source(void) const;
+  //::mlir::TypedValue<IndexType> dynamic_result_size(void) const;
+  //::std::optional<unsignedlonglong> alignment(void) const;
   //MemRefType type(void) const;
 };
 static_assert(sizeof(ReallocOp) == sizeof(Operation));
@@ -573,22 +572,22 @@ class MX_EXPORT ReinterpretCastOp final : public Operation {
   ::mlir::memref::ReinterpretCastOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::BaseMemRefType> source(void) const;
-  gap::generator<::mx::ir::Operand> offsets(void) const;
-  gap::generator<::mx::ir::Operand> sizes(void) const;
-  gap::generator<::mx::ir::Operand> strides(void) const;
-  //::mlir::TypedValue<::mlir::MemRefType> result(void) const;
-  //::llvm::ArrayRef<int64_t> static_offsets(void) const;
-  //::llvm::ArrayRef<int64_t> static_sizes(void) const;
-  //::llvm::ArrayRef<int64_t> static_strides(void) const;
-  gap::generator<::mx::ir::Operand> dynamic_sizes(void) const;
+  //::mlir::TypedValue<BaseMemRefType> source(void) const;
+  //::mlir::Operation::operand_range offsets(void) const;
+  //::mlir::Operation::operand_range sizes(void) const;
+  //::mlir::Operation::operand_range strides(void) const;
+  //::mlir::TypedValue<MemRefType> result(void) const;
+  //::llvm::ArrayRef<longlong> static_offsets(void) const;
+  //::llvm::ArrayRef<longlong> static_sizes(void) const;
+  //::llvm::ArrayRef<longlong> static_strides(void) const;
+  //::mlir::Operation::operand_range dynamic_sizes(void) const;
   //MemRefType type(void) const;
   //Value view_source(void) const;
   //unsignedint result_rank(void) const;
   //std::array<unsignedint,3> array_attr_max_ranks(void) const;
   //unsignedint offset_size_and_stride_start_operand_index(void) const;
-  //SmallVector<OpFoldResult> constified_mixed_sizes(void) const;
-  //SmallVector<OpFoldResult> constified_mixed_strides(void) const;
+  //SmallVector<OpFoldResult,6> constified_mixed_sizes(void) const;
+  //SmallVector<OpFoldResult,6> constified_mixed_strides(void) const;
   //OpFoldResult constified_mixed_offset(void) const;
 };
 static_assert(sizeof(ReinterpretCastOp) == sizeof(Operation));
@@ -605,9 +604,9 @@ class MX_EXPORT ReshapeOp final : public Operation {
   ::mlir::memref::ReshapeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::BaseMemRefType> source(void) const;
-  //::mlir::TypedValue<::mlir::MemRefType> shape(void) const;
-  //::mlir::TypedValue<::mlir::BaseMemRefType> result(void) const;
+  //::mlir::TypedValue<BaseMemRefType> source(void) const;
+  //::mlir::TypedValue<MemRefType> shape(void) const;
+  //::mlir::TypedValue<BaseMemRefType> result(void) const;
   //MemRefType type(void) const;
   //Value view_source(void) const;
 };
@@ -626,8 +625,8 @@ class MX_EXPORT StoreOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value value(void) const;
-  //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
-  gap::generator<::mx::ir::Operand> indices(void) const;
+  //::mlir::TypedValue<MemRefType> memref(void) const;
+  //::mlir::Operation::operand_range indices(void) const;
   bool nontemporal(void) const;
   //Value value_to_store(void) const;
   //Value mem_ref(void) const;
@@ -647,7 +646,7 @@ class MX_EXPORT TransposeOp final : public Operation {
   ::mlir::memref::TransposeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::MemRefType> in(void) const;
+  //::mlir::TypedValue<MemRefType> in(void) const;
   //::mlir::AffineMap permutation(void) const;
   //StringRef permutation_attr_str_name(void) const;
 };
@@ -665,9 +664,9 @@ class MX_EXPORT ViewOp final : public Operation {
   ::mlir::memref::ViewOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::MemRefType> source(void) const;
-  //::mlir::TypedValue<::mlir::IndexType> byte_shift(void) const;
-  gap::generator<::mx::ir::Operand> sizes(void) const;
+  //::mlir::TypedValue<MemRefType> source(void) const;
+  //::mlir::TypedValue<IndexType> byte_shift(void) const;
+  //::mlir::Operation::operand_range sizes(void) const;
   ::mx::ir::Value view_source(void) const;
   //MemRefType type(void) const;
   //operand_range dynamic_sizes(void) const;
@@ -686,16 +685,16 @@ class MX_EXPORT SubViewOp final : public Operation {
   ::mlir::memref::SubViewOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::MemRefType> source(void) const;
-  gap::generator<::mx::ir::Operand> offsets(void) const;
-  gap::generator<::mx::ir::Operand> sizes(void) const;
-  gap::generator<::mx::ir::Operand> strides(void) const;
-  //::mlir::TypedValue<::mlir::MemRefType> result(void) const;
-  //::llvm::ArrayRef<int64_t> static_offsets(void) const;
-  //::llvm::ArrayRef<int64_t> static_sizes(void) const;
-  //::llvm::ArrayRef<int64_t> static_strides(void) const;
+  //::mlir::TypedValue<MemRefType> source(void) const;
+  //::mlir::Operation::operand_range offsets(void) const;
+  //::mlir::Operation::operand_range sizes(void) const;
+  //::mlir::Operation::operand_range strides(void) const;
+  //::mlir::TypedValue<MemRefType> result(void) const;
+  //::llvm::ArrayRef<longlong> static_offsets(void) const;
+  //::llvm::ArrayRef<longlong> static_sizes(void) const;
+  //::llvm::ArrayRef<longlong> static_strides(void) const;
   ::mx::ir::Value view_source(void) const;
-  gap::generator<::mx::ir::Operand> dynamic_sizes(void) const;
+  //::mlir::Operation::operand_range dynamic_sizes(void) const;
   //MemRefType source_type(void) const;
   //MemRefType type(void) const;
   //std::array<unsignedint,3> array_attr_max_ranks(void) const;
@@ -703,22 +702,5 @@ class MX_EXPORT SubViewOp final : public Operation {
   //llvm::SmallBitVector dropped_dims(void) const;
 };
 static_assert(sizeof(SubViewOp) == sizeof(Operation));
-
-class MX_EXPORT TensorStoreOp final : public Operation {
- public:
-  inline static constexpr OperationKind static_kind(void) {
-    return OperationKind::MEMREF_TENSOR_STORE;
-  }
-
-  static std::optional<TensorStoreOp> from(const ::mx::ir::Operation &that);
-  static std::optional<TensorStoreOp> producing(const ::mx::ir::Value &val);
-
-  ::mlir::memref::TensorStoreOp underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  //::mlir::TypedValue<::mlir::TensorType> tensor(void) const;
-  //::mlir::TypedValue<::mlir::BaseMemRefType> memref(void) const;
-};
-static_assert(sizeof(TensorStoreOp) == sizeof(Operation));
 
 }  // namespace mx::ir::memref

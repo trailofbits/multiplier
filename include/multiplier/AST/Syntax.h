@@ -16,7 +16,7 @@ namespace mx {
 enum class Syntax : unsigned char {
   GNU,
   CXX11,
-  C2X,
+  C23,
   DECLSPEC,
   MICROSOFT,
   KEYWORD,

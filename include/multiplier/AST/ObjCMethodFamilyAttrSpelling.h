@@ -16,7 +16,7 @@ namespace mx {
 enum class ObjCMethodFamilyAttrSpelling : unsigned char {
   GNU_OBJC_METHOD_FAMILY,
   CXX11_CLANG_OBJC_METHOD_FAMILY,
-  C2X_CLANG_OBJC_METHOD_FAMILY,
+  C23_CLANG_OBJC_METHOD_FAMILY,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -112,8 +112,8 @@ Type ArrayType::element_type(void) const {
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
-ArrayTypeArraySizeModifier ArrayType::size_modifier(void) const {
-  return static_cast<ArrayTypeArraySizeModifier>(impl->reader.getVal28());
+ArraySizeModifier ArrayType::size_modifier(void) const {
+  return static_cast<ArraySizeModifier>(impl->reader.getVal28());
 }
 
 #pragma GCC diagnostic pop

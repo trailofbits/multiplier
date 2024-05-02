@@ -14,6 +14,11 @@
 
 namespace mx {
 enum class SyncScope : unsigned char {
+  SYSTEM_SCOPE,
+  DEVICE_SCOPE,
+  WORKGROUP_SCOPE,
+  WAVEFRONT_SCOPE,
+  SINGLE_SCOPE,
   HIP_SINGLE_THREAD,
   HIP_WAVEFRONT,
   HIP_WORKGROUP,
@@ -30,7 +35,7 @@ inline static const char *EnumerationName(SyncScope) {
 }
 
 inline static constexpr unsigned NumEnumerators(SyncScope) {
-  return 9;
+  return 14;
 }
 
 MX_EXPORT const char *EnumeratorName(SyncScope);

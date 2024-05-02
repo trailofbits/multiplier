@@ -16,7 +16,7 @@ namespace mx {
 enum class ARMInterruptAttrSpelling : unsigned char {
   GNU_INTERRUPT,
   CXX11_GNU_INTERRUPT,
-  C2X_GNU_INTERRUPT,
+  C23_GNU_INTERRUPT,
   SPELLING_NOT_CALCULATED,
 };
 

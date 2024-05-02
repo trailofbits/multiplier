@@ -100,7 +100,7 @@ std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const TokenContext &t) 
 }
 
 ObjCInterfaceDecl ObjCInterfaceType::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal61();
+  RawEntityId eid = impl->reader.getVal62();
   return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 

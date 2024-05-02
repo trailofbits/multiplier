@@ -16,7 +16,7 @@ namespace mx {
 enum class AnnotateAttrSpelling : unsigned char {
   GNU_ANNOTATE,
   CXX11_CLANG_ANNOTATE,
-  C2X_CLANG_ANNOTATE,
+  C23_CLANG_ANNOTATE,
   SPELLING_NOT_CALCULATED,
 };
 

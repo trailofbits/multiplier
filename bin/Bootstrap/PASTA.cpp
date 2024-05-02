@@ -1985,7 +1985,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "#include <compare>\n"
         << "#include <cstdint>\n"
         << "#include <filesystem>\n"
-        << "#include <gap/core/generator.hpp>\n"
+        << "#include <gap/coro/generator.hpp>\n"
         << "#include <memory>\n"
         << "#include <optional>\n"
         << "#include <span>\n"
@@ -3201,10 +3201,10 @@ MethodListPtr CodeGenerator::RunOnClass(
     auto method_name = method.Name();
     llvm::StringRef method_name_ref(method_name);
     if (method_name == "KindName" ||
-        method_name_ref.endswith("Raw") ||
-        method_name_ref.endswith("Internal") ||
-        method_name_ref.startswith("operator") ||
-        method_name_ref.startswith("~")) {
+        method_name_ref.ends_with("Raw") ||
+        method_name_ref.ends_with("Internal") ||
+        method_name_ref.starts_with("operator") ||
+        method_name_ref.starts_with("~")) {
       continue;  // E.g. `Decl::KindName()`, `operator==`.
     }
 

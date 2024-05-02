@@ -25,6 +25,7 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::LLVM_ATOMICRMW: return "LLVM_ATOMICRMW";
     case ir::OperationKind::LLVM_BITCAST: return "LLVM_BITCAST";
     case ir::OperationKind::LLVM_BR: return "LLVM_BR";
+    case ir::OperationKind::LLVM_CALL_INTRINSIC: return "LLVM_CALL_INTRINSIC";
     case ir::OperationKind::LLVM_CALL: return "LLVM_CALL";
     case ir::OperationKind::LLVM_COMDAT: return "LLVM_COMDAT";
     case ir::OperationKind::LLVM_COMDAT_SELECTOR: return "LLVM_COMDAT_SELECTOR";
@@ -58,10 +59,10 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::LLVM_FUNC: return "LLVM_FUNC";
     case ir::OperationKind::LLVM_LSHR: return "LLVM_LSHR";
     case ir::OperationKind::LLVM_LANDINGPAD: return "LLVM_LANDINGPAD";
+    case ir::OperationKind::LLVM_LINKER_OPTIONS: return "LLVM_LINKER_OPTIONS";
     case ir::OperationKind::LLVM_LOAD: return "LLVM_LOAD";
-    case ir::OperationKind::LLVM_METADATA: return "LLVM_METADATA";
     case ir::OperationKind::LLVM_MUL: return "LLVM_MUL";
-    case ir::OperationKind::LLVM_MLIR_NULL: return "LLVM_MLIR_NULL";
+    case ir::OperationKind::LLVM_MLIR_NONE: return "LLVM_MLIR_NONE";
     case ir::OperationKind::LLVM_OR: return "LLVM_OR";
     case ir::OperationKind::LLVM_MLIR_POISON: return "LLVM_MLIR_POISON";
     case ir::OperationKind::LLVM_PTRTOINT: return "LLVM_PTRTOINT";
@@ -85,18 +86,19 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::LLVM_UNREACHABLE: return "LLVM_UNREACHABLE";
     case ir::OperationKind::LLVM_XOR: return "LLVM_XOR";
     case ir::OperationKind::LLVM_ZEXT: return "LLVM_ZEXT";
+    case ir::OperationKind::LLVM_MLIR_ZERO: return "LLVM_MLIR_ZERO";
     case ir::OperationKind::LLVM_INTR_ABS: return "LLVM_INTR_ABS";
     case ir::OperationKind::LLVM_INTR_ANNOTATION: return "LLVM_INTR_ANNOTATION";
     case ir::OperationKind::LLVM_INTR_ASSUME: return "LLVM_INTR_ASSUME";
     case ir::OperationKind::LLVM_INTR_BITREVERSE: return "LLVM_INTR_BITREVERSE";
     case ir::OperationKind::LLVM_INTR_BSWAP: return "LLVM_INTR_BSWAP";
-    case ir::OperationKind::LLVM_CALL_INTRINSIC: return "LLVM_CALL_INTRINSIC";
     case ir::OperationKind::LLVM_INTR_COPYSIGN: return "LLVM_INTR_COPYSIGN";
     case ir::OperationKind::LLVM_INTR_CORO_ALIGN: return "LLVM_INTR_CORO_ALIGN";
     case ir::OperationKind::LLVM_INTR_CORO_BEGIN: return "LLVM_INTR_CORO_BEGIN";
     case ir::OperationKind::LLVM_INTR_CORO_END: return "LLVM_INTR_CORO_END";
     case ir::OperationKind::LLVM_INTR_CORO_FREE: return "LLVM_INTR_CORO_FREE";
     case ir::OperationKind::LLVM_INTR_CORO_ID: return "LLVM_INTR_CORO_ID";
+    case ir::OperationKind::LLVM_INTR_CORO_PROMISE: return "LLVM_INTR_CORO_PROMISE";
     case ir::OperationKind::LLVM_INTR_CORO_RESUME: return "LLVM_INTR_CORO_RESUME";
     case ir::OperationKind::LLVM_INTR_CORO_SAVE: return "LLVM_INTR_CORO_SAVE";
     case ir::OperationKind::LLVM_INTR_CORO_SIZE: return "LLVM_INTR_CORO_SIZE";
@@ -123,6 +125,8 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::LLVM_INTR_FSHL: return "LLVM_INTR_FSHL";
     case ir::OperationKind::LLVM_INTR_FSHR: return "LLVM_INTR_FSHR";
     case ir::OperationKind::LLVM_INTR_GET_ACTIVE_LANE_MASK: return "LLVM_INTR_GET_ACTIVE_LANE_MASK";
+    case ir::OperationKind::LLVM_INTR_INVARIANT_END: return "LLVM_INTR_INVARIANT_END";
+    case ir::OperationKind::LLVM_INTR_INVARIANT_START: return "LLVM_INTR_INVARIANT_START";
     case ir::OperationKind::LLVM_INTR_IS_CONSTANT: return "LLVM_INTR_IS_CONSTANT";
     case ir::OperationKind::LLVM_INTR_IS_FPCLASS: return "LLVM_INTR_IS_FPCLASS";
     case ir::OperationKind::LLVM_INTR_LIFETIME_END: return "LLVM_INTR_LIFETIME_END";
@@ -290,7 +294,6 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::MEMREF_TRANSPOSE: return "MEMREF_TRANSPOSE";
     case ir::OperationKind::MEMREF_VIEW: return "MEMREF_VIEW";
     case ir::OperationKind::MEMREF_SUBVIEW: return "MEMREF_SUBVIEW";
-    case ir::OperationKind::MEMREF_TENSOR_STORE: return "MEMREF_TENSOR_STORE";
     case ir::OperationKind::ABI_CALL_ARGS: return "ABI_CALL_ARGS";
     case ir::OperationKind::ABI_CALL_EXEC: return "ABI_CALL_EXEC";
     case ir::OperationKind::ABI_CALL: return "ABI_CALL";
@@ -298,11 +301,12 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::ABI_DIRECT: return "ABI_DIRECT";
     case ir::OperationKind::ABI_EPILOGUE: return "ABI_EPILOGUE";
     case ir::OperationKind::ABI_FUNC: return "ABI_FUNC";
+    case ir::OperationKind::ABI_INDIRECT: return "ABI_INDIRECT";
     case ir::OperationKind::ABI_PROLOGUE: return "ABI_PROLOGUE";
     case ir::OperationKind::ABI_RET_DIRECT: return "ABI_RET_DIRECT";
-    case ir::OperationKind::ABI_TODO: return "ABI_TODO";
-    case ir::OperationKind::ABI_WRAP_FN: return "ABI_WRAP_FN";
     case ir::OperationKind::ABI_YIELD: return "ABI_YIELD";
+    case ir::OperationKind::LL_ALLOCA: return "LL_ALLOCA";
+    case ir::OperationKind::LL_ARG_ALLOCA: return "LL_ARG_ALLOCA";
     case ir::OperationKind::LL_BR: return "LL_BR";
     case ir::OperationKind::LL_CONCAT: return "LL_CONCAT";
     case ir::OperationKind::LL_COND_BR: return "LL_COND_BR";
@@ -310,12 +314,15 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::LL_EXTRACT: return "LL_EXTRACT";
     case ir::OperationKind::LL_INITIALIZE: return "LL_INITIALIZE";
     case ir::OperationKind::LL_INLINE_SCOPE: return "LL_INLINE_SCOPE";
+    case ir::OperationKind::LL_LOAD: return "LL_LOAD";
     case ir::OperationKind::LL_FUNC: return "LL_FUNC";
     case ir::OperationKind::LL_GEP: return "LL_GEP";
     case ir::OperationKind::LL_RETURN: return "LL_RETURN";
     case ir::OperationKind::LL_SCOPE: return "LL_SCOPE";
     case ir::OperationKind::LL_SCOPE_RECURSE: return "LL_SCOPE_RECURSE";
     case ir::OperationKind::LL_SCOPE_RET: return "LL_SCOPE_RET";
+    case ir::OperationKind::LL_STORE: return "LL_STORE";
+    case ir::OperationKind::LL_SUBSCRIPT: return "LL_SUBSCRIPT";
     case ir::OperationKind::LL_UNINITIALIZED_VAR: return "LL_UNINITIALIZED_VAR";
     case ir::OperationKind::HL_ACCESS: return "HL_ACCESS";
     case ir::OperationKind::HL_ASSIGN_FADD: return "HL_ASSIGN_FADD";
@@ -429,6 +436,7 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_TYPEOF_TYPE: return "HL_TYPEOF_TYPE";
     case ir::OperationKind::HL_UNION: return "HL_UNION";
     case ir::OperationKind::HL_UNREACHABLE: return "HL_UNREACHABLE";
+    case ir::OperationKind::HL_VA_ARG_EXPR: return "HL_VA_ARG_EXPR";
     case ir::OperationKind::CORE_BIN_LAND: return "CORE_BIN_LAND";
     case ir::OperationKind::CORE_BIN_LOR: return "CORE_BIN_LOR";
     case ir::OperationKind::CORE_IMPLICIT_RETURN: return "CORE_IMPLICIT_RETURN";
@@ -464,6 +472,7 @@ bool IsLLVMIROperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::LLVM_ATOMICRMW:
     case mx::ir::OperationKind::LLVM_BITCAST:
     case mx::ir::OperationKind::LLVM_BR:
+    case mx::ir::OperationKind::LLVM_CALL_INTRINSIC:
     case mx::ir::OperationKind::LLVM_CALL:
     case mx::ir::OperationKind::LLVM_COMDAT:
     case mx::ir::OperationKind::LLVM_COMDAT_SELECTOR:
@@ -497,10 +506,10 @@ bool IsLLVMIROperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::LLVM_FUNC:
     case mx::ir::OperationKind::LLVM_LSHR:
     case mx::ir::OperationKind::LLVM_LANDINGPAD:
+    case mx::ir::OperationKind::LLVM_LINKER_OPTIONS:
     case mx::ir::OperationKind::LLVM_LOAD:
-    case mx::ir::OperationKind::LLVM_METADATA:
     case mx::ir::OperationKind::LLVM_MUL:
-    case mx::ir::OperationKind::LLVM_MLIR_NULL:
+    case mx::ir::OperationKind::LLVM_MLIR_NONE:
     case mx::ir::OperationKind::LLVM_OR:
     case mx::ir::OperationKind::LLVM_MLIR_POISON:
     case mx::ir::OperationKind::LLVM_PTRTOINT:
@@ -524,18 +533,19 @@ bool IsLLVMIROperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::LLVM_UNREACHABLE:
     case mx::ir::OperationKind::LLVM_XOR:
     case mx::ir::OperationKind::LLVM_ZEXT:
+    case mx::ir::OperationKind::LLVM_MLIR_ZERO:
     case mx::ir::OperationKind::LLVM_INTR_ABS:
     case mx::ir::OperationKind::LLVM_INTR_ANNOTATION:
     case mx::ir::OperationKind::LLVM_INTR_ASSUME:
     case mx::ir::OperationKind::LLVM_INTR_BITREVERSE:
     case mx::ir::OperationKind::LLVM_INTR_BSWAP:
-    case mx::ir::OperationKind::LLVM_CALL_INTRINSIC:
     case mx::ir::OperationKind::LLVM_INTR_COPYSIGN:
     case mx::ir::OperationKind::LLVM_INTR_CORO_ALIGN:
     case mx::ir::OperationKind::LLVM_INTR_CORO_BEGIN:
     case mx::ir::OperationKind::LLVM_INTR_CORO_END:
     case mx::ir::OperationKind::LLVM_INTR_CORO_FREE:
     case mx::ir::OperationKind::LLVM_INTR_CORO_ID:
+    case mx::ir::OperationKind::LLVM_INTR_CORO_PROMISE:
     case mx::ir::OperationKind::LLVM_INTR_CORO_RESUME:
     case mx::ir::OperationKind::LLVM_INTR_CORO_SAVE:
     case mx::ir::OperationKind::LLVM_INTR_CORO_SIZE:
@@ -562,6 +572,8 @@ bool IsLLVMIROperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::LLVM_INTR_FSHL:
     case mx::ir::OperationKind::LLVM_INTR_FSHR:
     case mx::ir::OperationKind::LLVM_INTR_GET_ACTIVE_LANE_MASK:
+    case mx::ir::OperationKind::LLVM_INTR_INVARIANT_END:
+    case mx::ir::OperationKind::LLVM_INTR_INVARIANT_START:
     case mx::ir::OperationKind::LLVM_INTR_IS_CONSTANT:
     case mx::ir::OperationKind::LLVM_INTR_IS_FPCLASS:
     case mx::ir::OperationKind::LLVM_INTR_LIFETIME_END:
@@ -737,7 +749,6 @@ bool IsMemRefOperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::MEMREF_TRANSPOSE:
     case mx::ir::OperationKind::MEMREF_VIEW:
     case mx::ir::OperationKind::MEMREF_SUBVIEW:
-    case mx::ir::OperationKind::MEMREF_TENSOR_STORE:
       return true;
   }
 }
@@ -753,10 +764,9 @@ bool IsABIOperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::ABI_DIRECT:
     case mx::ir::OperationKind::ABI_EPILOGUE:
     case mx::ir::OperationKind::ABI_FUNC:
+    case mx::ir::OperationKind::ABI_INDIRECT:
     case mx::ir::OperationKind::ABI_PROLOGUE:
     case mx::ir::OperationKind::ABI_RET_DIRECT:
-    case mx::ir::OperationKind::ABI_TODO:
-    case mx::ir::OperationKind::ABI_WRAP_FN:
     case mx::ir::OperationKind::ABI_YIELD:
       return true;
   }
@@ -766,6 +776,8 @@ bool IsLowLevelOperationKind(ir::OperationKind kind) {
   switch (kind) {
     default:
       return false;
+    case mx::ir::OperationKind::LL_ALLOCA:
+    case mx::ir::OperationKind::LL_ARG_ALLOCA:
     case mx::ir::OperationKind::LL_BR:
     case mx::ir::OperationKind::LL_CONCAT:
     case mx::ir::OperationKind::LL_COND_BR:
@@ -773,12 +785,15 @@ bool IsLowLevelOperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::LL_EXTRACT:
     case mx::ir::OperationKind::LL_INITIALIZE:
     case mx::ir::OperationKind::LL_INLINE_SCOPE:
+    case mx::ir::OperationKind::LL_LOAD:
     case mx::ir::OperationKind::LL_FUNC:
     case mx::ir::OperationKind::LL_GEP:
     case mx::ir::OperationKind::LL_RETURN:
     case mx::ir::OperationKind::LL_SCOPE:
     case mx::ir::OperationKind::LL_SCOPE_RECURSE:
     case mx::ir::OperationKind::LL_SCOPE_RET:
+    case mx::ir::OperationKind::LL_STORE:
+    case mx::ir::OperationKind::LL_SUBSCRIPT:
     case mx::ir::OperationKind::LL_UNINITIALIZED_VAR:
       return true;
   }
@@ -900,6 +915,7 @@ bool IsHighLevelOperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::HL_TYPEOF_TYPE:
     case mx::ir::OperationKind::HL_UNION:
     case mx::ir::OperationKind::HL_UNREACHABLE:
+    case mx::ir::OperationKind::HL_VA_ARG_EXPR:
       return true;
   }
 }

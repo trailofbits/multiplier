@@ -224,7 +224,7 @@ std::optional<TypeAliasDecl> TypeAliasDecl::from(const TokenContext &t) {
 
 std::optional<TypeAliasTemplateDecl> TypeAliasDecl::described_alias_template(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal65();
+    RawEntityId eid = impl->reader.getVal66();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

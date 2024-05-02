@@ -129,7 +129,7 @@ OwnershipAttrOwnershipKind OwnershipAttr::own_kind(void) const {
 }
 
 OwnershipAttrSpelling OwnershipAttr::semantic_spelling(void) const {
-  return static_cast<OwnershipAttrSpelling>(impl->reader.getVal14());
+  return static_cast<OwnershipAttrSpelling>(impl->reader.getVal18());
 }
 
 bool OwnershipAttr::is_holds(void) const {
@@ -141,7 +141,7 @@ bool OwnershipAttr::is_returns(void) const {
 }
 
 bool OwnershipAttr::is_takes(void) const {
-  return impl->reader.getVal19();
+  return impl->reader.getVal14();
 }
 
 #pragma GCC diagnostic pop

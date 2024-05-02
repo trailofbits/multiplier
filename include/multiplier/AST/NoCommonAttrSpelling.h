@@ -16,7 +16,7 @@ namespace mx {
 enum class NoCommonAttrSpelling : unsigned char {
   GNU_NOCOMMON,
   CXX11_GNU_NOCOMMON,
-  C2X_GNU_NOCOMMON,
+  C23_GNU_NOCOMMON,
   SPELLING_NOT_CALCULATED,
 };
 

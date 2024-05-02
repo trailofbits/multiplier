@@ -103,7 +103,7 @@ Type BuiltinType::desugar(void) const {
 }
 
 BuiltinTypeKind BuiltinType::builtin_kind(void) const {
-  return static_cast<BuiltinTypeKind>(impl->reader.getVal68());
+  return static_cast<BuiltinTypeKind>(impl->reader.getVal69());
 }
 
 bool BuiltinType::is_floating_point(void) const {

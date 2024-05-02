@@ -16,7 +16,7 @@ const char *EnumeratorName(BTFDeclTagAttrSpelling e) {
   switch (e) {
     case BTFDeclTagAttrSpelling::GNU_BTF_DECLARATION_TAG: return "GNU_BTF_DECLARATION_TAG";
     case BTFDeclTagAttrSpelling::CXX11_CLANG_BTF_DECLARATION_TAG: return "CXX11_CLANG_BTF_DECLARATION_TAG";
-    case BTFDeclTagAttrSpelling::C2X_CLANG_BTF_DECLARATION_TAG: return "C2X_CLANG_BTF_DECLARATION_TAG";
+    case BTFDeclTagAttrSpelling::C23_CLANG_BTF_DECLARATION_TAG: return "C23_CLANG_BTF_DECLARATION_TAG";
     case BTFDeclTagAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

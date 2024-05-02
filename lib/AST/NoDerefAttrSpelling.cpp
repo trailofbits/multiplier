@@ -16,7 +16,7 @@ const char *EnumeratorName(NoDerefAttrSpelling e) {
   switch (e) {
     case NoDerefAttrSpelling::GNU_NODEREF: return "GNU_NODEREF";
     case NoDerefAttrSpelling::CXX11_CLANG_NODEREF: return "CXX11_CLANG_NODEREF";
-    case NoDerefAttrSpelling::C2X_CLANG_NODEREF: return "C2X_CLANG_NODEREF";
+    case NoDerefAttrSpelling::C23_CLANG_NODEREF: return "C23_CLANG_NODEREF";
     case NoDerefAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

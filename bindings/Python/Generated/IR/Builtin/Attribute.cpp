@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[844]) || tp >= &(gTypes[867])) {
+  if (tp < &(gTypes[868]) || tp >= &(gTypes[891])) {
     return std::nullopt;
   }
 
@@ -90,91 +90,91 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::builtin::TypedAttr::static_kind():
-      tp = &(gTypes[845]);
+      tp = &(gTypes[869]);
       break;
 
     case mx::ir::builtin::ElementsAttr::static_kind():
-      tp = &(gTypes[846]);
+      tp = &(gTypes[870]);
       break;
 
     case mx::ir::builtin::AffineMapAttr::static_kind():
-      tp = &(gTypes[847]);
+      tp = &(gTypes[871]);
       break;
 
     case mx::ir::builtin::ArrayAttr::static_kind():
-      tp = &(gTypes[848]);
+      tp = &(gTypes[872]);
       break;
 
     case mx::ir::builtin::DenseArrayAttr::static_kind():
-      tp = &(gTypes[849]);
+      tp = &(gTypes[873]);
       break;
 
     case mx::ir::builtin::DenseIntOrFPElementsAttr::static_kind():
-      tp = &(gTypes[850]);
-      break;
-
-    case mx::ir::builtin::DenseResourceElementsAttr::static_kind():
-      tp = &(gTypes[851]);
+      tp = &(gTypes[874]);
       break;
 
     case mx::ir::builtin::DenseStringElementsAttr::static_kind():
-      tp = &(gTypes[852]);
+      tp = &(gTypes[875]);
+      break;
+
+    case mx::ir::builtin::DenseResourceElementsAttr::static_kind():
+      tp = &(gTypes[876]);
       break;
 
     case mx::ir::builtin::DictionaryAttr::static_kind():
-      tp = &(gTypes[853]);
+      tp = &(gTypes[877]);
       break;
 
     case mx::ir::builtin::FloatAttr::static_kind():
-      tp = &(gTypes[854]);
+      tp = &(gTypes[878]);
       break;
 
     case mx::ir::builtin::IntegerAttr::static_kind():
-      tp = &(gTypes[855]);
+      tp = &(gTypes[879]);
       break;
 
     case mx::ir::builtin::IntegerSetAttr::static_kind():
-      tp = &(gTypes[856]);
+      tp = &(gTypes[880]);
       break;
 
     case mx::ir::builtin::OpaqueAttr::static_kind():
-      tp = &(gTypes[857]);
+      tp = &(gTypes[881]);
       break;
 
     case mx::ir::builtin::SparseElementsAttr::static_kind():
-      tp = &(gTypes[858]);
-      break;
-
-    case mx::ir::builtin::StringAttr::static_kind():
-      tp = &(gTypes[859]);
-      break;
-
-    case mx::ir::builtin::SymbolRefAttr::static_kind():
-      tp = &(gTypes[860]);
-      break;
-
-    case mx::ir::builtin::TypeAttr::static_kind():
-      tp = &(gTypes[861]);
-      break;
-
-    case mx::ir::builtin::UnitAttr::static_kind():
-      tp = &(gTypes[862]);
+      tp = &(gTypes[882]);
       break;
 
     case mx::ir::builtin::StridedLayoutAttr::static_kind():
-      tp = &(gTypes[863]);
+      tp = &(gTypes[883]);
+      break;
+
+    case mx::ir::builtin::StringAttr::static_kind():
+      tp = &(gTypes[884]);
+      break;
+
+    case mx::ir::builtin::SymbolRefAttr::static_kind():
+      tp = &(gTypes[885]);
+      break;
+
+    case mx::ir::builtin::TypeAttr::static_kind():
+      tp = &(gTypes[886]);
+      break;
+
+    case mx::ir::builtin::UnitAttr::static_kind():
+      tp = &(gTypes[887]);
       break;
 
     case mx::ir::builtin::BoolAttr::static_kind():
-      tp = &(gTypes[864]);
+      tp = &(gTypes[888]);
       break;
 
     case mx::ir::builtin::FlatSymbolRefAttr::static_kind():
-      tp = &(gTypes[865]);
+      tp = &(gTypes[889]);
       break;
 
     case mx::ir::builtin::DenseIntElementsAttr::static_kind():
-      tp = &(gTypes[866]);
+      tp = &(gTypes[890]);
       break;
 
   }
@@ -242,7 +242,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[844]);
+  PyTypeObject * const tp = &(gTypes[868]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -257,12 +257,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[843].tp_hash;
-  tp->tp_richcompare = gTypes[843].tp_richcompare;
+  tp->tp_hash = gTypes[867].tp_hash;
+  tp->tp_richcompare = gTypes[867].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[843]);
+  tp->tp_base = &(gTypes[867]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

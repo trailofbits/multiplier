@@ -19,6 +19,7 @@ const char *EnumeratorName(TemplateArgumentKind e) {
     case TemplateArgumentKind::DECLARATION: return "DECLARATION";
     case TemplateArgumentKind::NULL_POINTER: return "NULL_POINTER";
     case TemplateArgumentKind::INTEGRAL: return "INTEGRAL";
+    case TemplateArgumentKind::STRUCTURAL_VALUE: return "STRUCTURAL_VALUE";
     case TemplateArgumentKind::TEMPLATE: return "TEMPLATE";
     case TemplateArgumentKind::TEMPLATE_EXPANSION: return "TEMPLATE_EXPANSION";
     case TemplateArgumentKind::EXPRESSION: return "EXPRESSION";

@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[40]) || tp >= &(gTypes[47])) {
+  if (tp < &(gTypes[48]) || tp >= &(gTypes[55])) {
     return std::nullopt;
   }
 
@@ -90,27 +90,27 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::OpenCLUnrollHintAttr::static_kind():
-      tp = &(gTypes[41]);
+      tp = &(gTypes[49]);
       break;
 
     case mx::MustTailAttr::static_kind():
-      tp = &(gTypes[42]);
+      tp = &(gTypes[50]);
       break;
 
     case mx::LikelyAttr::static_kind():
-      tp = &(gTypes[43]);
+      tp = &(gTypes[51]);
       break;
 
     case mx::FallThroughAttr::static_kind():
-      tp = &(gTypes[44]);
+      tp = &(gTypes[52]);
+      break;
+
+    case mx::CodeAlignAttr::static_kind():
+      tp = &(gTypes[53]);
       break;
 
     case mx::UnlikelyAttr::static_kind():
-      tp = &(gTypes[45]);
-      break;
-
-    case mx::SuppressAttr::static_kind():
-      tp = &(gTypes[46]);
+      tp = &(gTypes[54]);
       break;
 
   }
@@ -336,7 +336,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[40]);
+  PyTypeObject * const tp = &(gTypes[48]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

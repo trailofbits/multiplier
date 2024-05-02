@@ -21,6 +21,7 @@ class AtomicCmpXchgOp;
 class AtomicRMWOp;
 class BitcastOp;
 class BrOp;
+class CallIntrinsicOp;
 class CallOp;
 class ComdatOp;
 class ComdatSelectorOp;
@@ -54,10 +55,10 @@ class InvokeOp;
 class LLVMFuncOp;
 class LShrOp;
 class LandingpadOp;
+class LinkerOptionsOp;
 class LoadOp;
-class MetadataOp;
 class MulOp;
-class NullOp;
+class NoneTokenOp;
 class OrOp;
 class PoisonOp;
 class PtrToIntOp;
@@ -81,18 +82,19 @@ class UndefOp;
 class UnreachableOp;
 class XOrOp;
 class ZExtOp;
+class ZeroOp;
 class AbsOp;
 class Annotation;
 class AssumeOp;
 class BitReverseOp;
 class ByteSwapOp;
-class CallIntrinsicOp;
 class CopySignOp;
 class CoroAlignOp;
 class CoroBeginOp;
 class CoroEndOp;
 class CoroFreeOp;
 class CoroIdOp;
+class CoroPromiseOp;
 class CoroResumeOp;
 class CoroSaveOp;
 class CoroSizeOp;
@@ -119,6 +121,8 @@ class FTruncOp;
 class FshlOp;
 class FshrOp;
 class GetActiveLaneMaskOp;
+class InvariantEndOp;
+class InvariantStartOp;
 class IsConstantOp;
 class IsFPClass;
 class LifetimeEndOp;
@@ -297,6 +301,7 @@ class MX_EXPORT AddOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value res(void) const;
+  //::mlir::LLVM::IntegerOverflowFlags overflow_flags(void) const;
 };
 static_assert(sizeof(AddOp) == sizeof(Operation));
 
@@ -329,7 +334,7 @@ class MX_EXPORT AddressOfOp final : public Operation {
   ::mlir::LLVM::AddressOfOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> res(void) const;
+  //::mlir::TypedValue<LLVMPointerType> res(void) const;
   std::string_view global_name(void) const;
 };
 static_assert(sizeof(AddressOfOp) == sizeof(Operation));
@@ -346,13 +351,13 @@ class MX_EXPORT AllocaOp final : public Operation {
   ::mlir::LLVM::AllocaOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> array_size(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> res(void) const;
-  //::std::optional<uint64_t> alignment(void) const;
-  //::std::optional<::mlir::Type> elem_type(void) const;
+  //::mlir::TypedValue<IntegerType> array_size(void) const;
+  //::mlir::TypedValue<LLVMPointerType> res(void) const;
+  //::std::optional<unsignedlonglong> alignment(void) const;
+  //::mlir::Type elem_type(void) const;
   bool inalloca(void) const;
-  //::llvm::SmallVector<::mlir::MemorySlot> promotable_slots(void) const;
-  //::llvm::SmallVector<::mlir::DestructurableMemorySlot> destructurable_slots(void) const;
+  //::llvm::SmallVector<MemorySlot,3> promotable_slots(void) const;
+  //::llvm::SmallVector<DestructurableMemorySlot,1> destructurable_slots(void) const;
   //Type result_ptr_element_type(void) const;
 };
 static_assert(sizeof(AllocaOp) == sizeof(Operation));
@@ -387,21 +392,21 @@ class MX_EXPORT AtomicCmpXchgOp final : public Operation {
   ::mlir::LLVM::AtomicCmpXchgOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> ptr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
   ::mx::ir::Value cmp(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value res(void) const;
   //::mlir::LLVM::AtomicOrdering success_ordering(void) const;
   //::mlir::LLVM::AtomicOrdering failure_ordering(void) const;
-  std::optional<std::string_view> syncscope(void) const;
-  //::std::optional<uint64_t> alignment(void) const;
+  //::std::optional<StringRef> syncscope(void) const;
+  //::std::optional<unsignedlonglong> alignment(void) const;
   bool weak(void) const;
   bool volatile__(void) const;
-  //::std::optional<::mlir::ArrayAttr> access_groups(void) const;
-  //::std::optional<::mlir::ArrayAttr> alias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> noalias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<::mlir::Value> accessed_operands(void) const;
+  //::std::optional<ArrayAttr> access_groups(void) const;
+  //::std::optional<ArrayAttr> alias_scopes(void) const;
+  //::std::optional<ArrayAttr> noalias_scopes(void) const;
+  //::std::optional<ArrayAttr> tbaa(void) const;
+  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
 };
 static_assert(sizeof(AtomicCmpXchgOp) == sizeof(Operation));
 
@@ -417,19 +422,19 @@ class MX_EXPORT AtomicRMWOp final : public Operation {
   ::mlir::LLVM::AtomicRMWOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> ptr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value res(void) const;
   //::mlir::LLVM::AtomicBinOp bin_op(void) const;
   //::mlir::LLVM::AtomicOrdering ordering(void) const;
-  std::optional<std::string_view> syncscope(void) const;
-  //::std::optional<uint64_t> alignment(void) const;
+  //::std::optional<StringRef> syncscope(void) const;
+  //::std::optional<unsignedlonglong> alignment(void) const;
   bool volatile__(void) const;
-  //::std::optional<::mlir::ArrayAttr> access_groups(void) const;
-  //::std::optional<::mlir::ArrayAttr> alias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> noalias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<::mlir::Value> accessed_operands(void) const;
+  //::std::optional<ArrayAttr> access_groups(void) const;
+  //::std::optional<ArrayAttr> alias_scopes(void) const;
+  //::std::optional<ArrayAttr> noalias_scopes(void) const;
+  //::std::optional<ArrayAttr> tbaa(void) const;
+  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
 };
 static_assert(sizeof(AtomicRMWOp) == sizeof(Operation));
 
@@ -462,11 +467,30 @@ class MX_EXPORT BrOp final : public Operation {
   ::mlir::LLVM::BrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> dest_operands(void) const;
+  //::mlir::Operation::operand_range dest_operands(void) const;
   //::mlir::Block* dest(void) const;
-  //::std::optional<::mlir::LLVM::LoopAnnotationAttr> loop_annotation(void) const;
+  //::std::optional<LoopAnnotationAttr> loop_annotation(void) const;
 };
 static_assert(sizeof(BrOp) == sizeof(Operation));
+
+class MX_EXPORT CallIntrinsicOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::LLVM_CALL_INTRINSIC;
+  }
+
+  static std::optional<CallIntrinsicOp> from(const ::mx::ir::Operation &that);
+  static std::optional<CallIntrinsicOp> producing(const ::mx::ir::Value &val);
+
+  ::mlir::LLVM::CallIntrinsicOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::mlir::Operation::operand_range args(void) const;
+  ::mx::ir::Value results(void) const;
+  std::string_view intrin(void) const;
+  //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
+};
+static_assert(sizeof(CallIntrinsicOp) == sizeof(Operation));
 
 class MX_EXPORT CallOp final : public Operation {
  public:
@@ -480,17 +504,21 @@ class MX_EXPORT CallOp final : public Operation {
   ::mlir::LLVM::CallOp underlying_repr(void) const noexcept;
 
   // Imported methods:
+  //::mlir::Operation::operand_range callee_operands(void) const;
   ::mx::ir::Value result(void) const;
-  std::optional<std::string_view> callee(void) const;
+  //::std::optional<LLVMFunctionType> callee_type(void) const;
+  //::std::optional<StringRef> callee(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
-  //::std::optional<::llvm::ArrayRef<int32_t>> branch_weights(void) const;
-  //::std::optional<::mlir::ArrayAttr> access_groups(void) const;
-  //::std::optional<::mlir::ArrayAttr> alias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> noalias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<::mlir::Value> accessed_operands(void) const;
+  //::std::optional<ArrayRef<int>> branch_weights(void) const;
+  //::mlir::LLVM::cconv::CConv c_conv(void) const;
+  //::std::optional<ArrayAttr> access_groups(void) const;
+  //::std::optional<ArrayAttr> alias_scopes(void) const;
+  //::std::optional<ArrayAttr> noalias_scopes(void) const;
+  //::std::optional<ArrayAttr> tbaa(void) const;
+  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
-  gap::generator<::mx::ir::Operand> arg_operands(void) const;
+  //::mlir::Operation::operand_range arg_operands(void) const;
+  //LLVMFunctionType callee_function_type(void) const;
 };
 static_assert(sizeof(CallOp) == sizeof(Operation));
 
@@ -540,13 +568,13 @@ class MX_EXPORT CondBrOp final : public Operation {
   ::mlir::LLVM::CondBrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> condition(void) const;
-  gap::generator<::mx::ir::Operand> true_dest_operands(void) const;
-  gap::generator<::mx::ir::Operand> false_dest_operands(void) const;
+  //::mlir::TypedValue<IntegerType> condition(void) const;
+  //::mlir::Operation::operand_range true_dest_operands(void) const;
+  //::mlir::Operation::operand_range false_dest_operands(void) const;
   //::mlir::Block* true_dest(void) const;
   //::mlir::Block* false_dest(void) const;
-  //::std::optional<::llvm::ArrayRef<int32_t>> branch_weights(void) const;
-  //::std::optional<::mlir::LLVM::LoopAnnotationAttr> loop_annotation(void) const;
+  //::std::optional<ArrayRef<int>> branch_weights(void) const;
+  //::std::optional<LoopAnnotationAttr> loop_annotation(void) const;
 };
 static_assert(sizeof(CondBrOp) == sizeof(Operation));
 
@@ -580,7 +608,7 @@ class MX_EXPORT ExtractElementOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value vector(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> position(void) const;
+  //::mlir::TypedValue<IntegerType> position(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(ExtractElementOp) == sizeof(Operation));
@@ -599,7 +627,7 @@ class MX_EXPORT ExtractValueOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value container(void) const;
   ::mx::ir::Value res(void) const;
-  //::llvm::ArrayRef<int64_t> position(void) const;
+  //::llvm::ArrayRef<longlong> position(void) const;
 };
 static_assert(sizeof(ExtractValueOp) == sizeof(Operation));
 
@@ -817,7 +845,7 @@ class MX_EXPORT FenceOp final : public Operation {
 
   // Imported methods:
   //::mlir::LLVM::AtomicOrdering ordering(void) const;
-  std::optional<std::string_view> syncscope(void) const;
+  //::std::optional<StringRef> syncscope(void) const;
 };
 static_assert(sizeof(FenceOp) == sizeof(Operation));
 
@@ -851,13 +879,12 @@ class MX_EXPORT GetElementPtrOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value base(void) const;
-  gap::generator<::mx::ir::Operand> dynamic_indices(void) const;
+  //::mlir::Operation::operand_range dynamic_indices(void) const;
   ::mx::ir::Value res(void) const;
-  //::llvm::ArrayRef<int32_t> raw_constant_indices(void) const;
-  //::std::optional<::mlir::Type> elem_type(void) const;
+  //::llvm::ArrayRef<int> raw_constant_indices(void) const;
+  //::mlir::Type elem_type(void) const;
   bool inbounds(void) const;
   //Type result_ptr_element_type(void) const;
-  //Type source_element_type(void) const;
   //GEPIndicesAdaptor<ValueRange> indices(void) const;
 };
 static_assert(sizeof(GetElementPtrOp) == sizeof(Operation));
@@ -915,12 +942,13 @@ class MX_EXPORT GlobalOp final : public Operation {
   //::mlir::LLVM::Linkage linkage(void) const;
   bool dso_local(void) const;
   bool thread_local__(void) const;
-  //::std::optional<::mlir::Attribute> value(void) const;
-  //::std::optional<uint64_t> alignment(void) const;
+  //::std::optional<Attribute> value(void) const;
+  //::std::optional<unsignedlonglong> alignment(void) const;
   uint32_t addr_space(void) const;
-  //::std::optional<::mlir::LLVM::UnnamedAddr> unnamed_addr(void) const;
-  std::optional<std::string_view> section(void) const;
-  //::std::optional<::mlir::SymbolRefAttr> comdat(void) const;
+  //::std::optional<UnnamedAddr> unnamed_addr(void) const;
+  //::std::optional<StringRef> section(void) const;
+  //::std::optional<SymbolRefAttr> comdat(void) const;
+  //::mlir::LLVM::DIGlobalVariableExpressionAttr dbg_expr(void) const;
   //::mlir::LLVM::Visibility visibility__(void) const;
   //Type type(void) const;
   //Attribute value_or_null(void) const;
@@ -960,14 +988,14 @@ class MX_EXPORT InlineAsmOp final : public Operation {
   ::mlir::LLVM::InlineAsmOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> operands(void) const;
+  //::mlir::Operation::operand_range operands(void) const;
   ::mx::ir::Value res(void) const;
   std::string_view asm_string(void) const;
   std::string_view constraints(void) const;
   bool has_side_effects(void) const;
   bool is_align_stack(void) const;
-  //::std::optional<::mlir::LLVM::AsmDialect> asm_dialect(void) const;
-  //::std::optional<::mlir::ArrayAttr> operand_attrs(void) const;
+  //::std::optional<AsmDialect> asm_dialect(void) const;
+  //::std::optional<ArrayAttr> operand_attrs(void) const;
 };
 static_assert(sizeof(InlineAsmOp) == sizeof(Operation));
 
@@ -985,7 +1013,7 @@ class MX_EXPORT InsertElementOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value vector(void) const;
   ::mx::ir::Value value(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> position(void) const;
+  //::mlir::TypedValue<IntegerType> position(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(InsertElementOp) == sizeof(Operation));
@@ -1005,7 +1033,7 @@ class MX_EXPORT InsertValueOp final : public Operation {
   ::mx::ir::Value container(void) const;
   ::mx::ir::Value value(void) const;
   ::mx::ir::Value res(void) const;
-  //::llvm::ArrayRef<int64_t> position(void) const;
+  //::llvm::ArrayRef<longlong> position(void) const;
 };
 static_assert(sizeof(InsertValueOp) == sizeof(Operation));
 
@@ -1038,15 +1066,18 @@ class MX_EXPORT InvokeOp final : public Operation {
   ::mlir::LLVM::InvokeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> callee_operands(void) const;
-  gap::generator<::mx::ir::Operand> normal_dest_operands(void) const;
-  gap::generator<::mx::ir::Operand> unwind_dest_operands(void) const;
+  //::mlir::Operation::operand_range callee_operands(void) const;
+  //::mlir::Operation::operand_range normal_dest_operands(void) const;
+  //::mlir::Operation::operand_range unwind_dest_operands(void) const;
   //::mlir::Block* normal_dest(void) const;
   //::mlir::Block* unwind_dest(void) const;
-  std::optional<std::string_view> callee(void) const;
-  //::std::optional<::llvm::ArrayRef<int32_t>> branch_weights(void) const;
+  //::std::optional<LLVMFunctionType> callee_type(void) const;
+  //::std::optional<StringRef> callee(void) const;
+  //::std::optional<ArrayRef<int>> branch_weights(void) const;
+  //::mlir::LLVM::cconv::CConv c_conv(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
-  gap::generator<::mx::ir::Operand> arg_operands(void) const;
+  //::mlir::Operation::operand_range arg_operands(void) const;
+  //LLVMFunctionType callee_function_type(void) const;
 };
 static_assert(sizeof(InvokeOp) == sizeof(Operation));
 
@@ -1064,32 +1095,38 @@ class MX_EXPORT FuncOp final : public Operation {
   // Imported methods:
   ::mx::ir::Region body(void) const;
   std::string_view sym_name(void) const;
+  //::std::optional<StringRef> sym_visibility(void) const;
   //::mlir::LLVM::LLVMFunctionType function_type(void) const;
   //::mlir::LLVM::Linkage linkage(void) const;
   bool dso_local(void) const;
   //::mlir::LLVM::cconv::CConv c_conv(void) const;
-  //::std::optional<::mlir::SymbolRefAttr> comdat(void) const;
-  std::optional<std::string_view> personality(void) const;
-  std::optional<std::string_view> garbage_collector(void) const;
-  //::std::optional<::mlir::ArrayAttr> passthrough(void) const;
-  //::std::optional<::mlir::ArrayAttr> arg_attrs(void) const;
-  //::std::optional<::mlir::ArrayAttr> res_attrs(void) const;
-  //::std::optional<uint64_t> function_entry_count(void) const;
-  //::std::optional<::mlir::LLVM::MemoryEffectsAttr> memory(void) const;
+  //::std::optional<SymbolRefAttr> comdat(void) const;
+  //::std::optional<StringRef> personality(void) const;
+  //::std::optional<StringRef> garbage_collector(void) const;
+  //::std::optional<ArrayAttr> passthrough(void) const;
+  //::std::optional<ArrayAttr> arg_attrs(void) const;
+  //::std::optional<ArrayAttr> res_attrs(void) const;
+  //::std::optional<unsignedlonglong> function_entry_count(void) const;
+  //::std::optional<MemoryEffectsAttr> memory(void) const;
   //::mlir::LLVM::Visibility visibility__(void) const;
   //::std::optional<bool> arm_streaming(void) const;
   //::std::optional<bool> arm_locally_streaming(void) const;
-  std::optional<std::string_view> section(void) const;
-  //::std::optional<::mlir::LLVM::UnnamedAddr> unnamed_addr(void) const;
-  //::std::optional<uint64_t> alignment(void) const;
+  //::std::optional<bool> arm_streaming_compatible(void) const;
+  //::std::optional<bool> arm_new_za(void) const;
+  //::std::optional<bool> arm_preserves_za(void) const;
+  //::std::optional<bool> arm_shared_za(void) const;
+  //::std::optional<StringRef> section(void) const;
+  //::std::optional<UnnamedAddr> unnamed_addr(void) const;
+  //::std::optional<unsignedlonglong> alignment(void) const;
+  //::std::optional<VScaleRangeAttr> vscale_range(void) const;
+  //::std::optional<FramePointerKindAttr> frame_pointer(void) const;
+  //::std::optional<StringRef> target_cpu(void) const;
+  //::std::optional<TargetFeaturesAttr> target_features(void) const;
   //Block* add_entry_block(void) const;
   bool is_var_arg(void) const;
   //ArrayRef<Type> argument_types(void) const;
   //ArrayRef<Type> result_types(void) const;
   //Region* callable_region(void) const;
-  //ArrayRef<Type> callable_results(void) const;
-  //::mlir::ArrayAttr callable_arg_attrs(void) const;
-  //::mlir::ArrayAttr callable_res_attrs(void) const;
 };
 static_assert(sizeof(FuncOp) == sizeof(Operation));
 
@@ -1128,6 +1165,22 @@ class MX_EXPORT LandingpadOp final : public Operation {
 };
 static_assert(sizeof(LandingpadOp) == sizeof(Operation));
 
+class MX_EXPORT LinkerOptionsOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::LLVM_LINKER_OPTIONS;
+  }
+
+  static std::optional<LinkerOptionsOp> from(const ::mx::ir::Operation &that);
+  static std::optional<LinkerOptionsOp> producing(const ::mx::ir::Value &val);
+
+  ::mlir::LLVM::LinkerOptionsOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::mlir::ArrayAttr options(void) const;
+};
+static_assert(sizeof(LinkerOptionsOp) == sizeof(Operation));
+
 class MX_EXPORT LoadOp final : public Operation {
  public:
   inline static constexpr OperationKind static_kind(void) {
@@ -1140,37 +1193,21 @@ class MX_EXPORT LoadOp final : public Operation {
   ::mlir::LLVM::LoadOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> addr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> addr(void) const;
   ::mx::ir::Value res(void) const;
-  //::std::optional<uint64_t> alignment(void) const;
+  //::std::optional<unsignedlonglong> alignment(void) const;
   bool volatile__(void) const;
   bool nontemporal(void) const;
+  bool invariant(void) const;
   //::mlir::LLVM::AtomicOrdering ordering(void) const;
-  std::optional<std::string_view> syncscope(void) const;
-  //::std::optional<::mlir::ArrayAttr> access_groups(void) const;
-  //::std::optional<::mlir::ArrayAttr> alias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> noalias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<::mlir::Value> accessed_operands(void) const;
+  //::std::optional<StringRef> syncscope(void) const;
+  //::std::optional<ArrayAttr> access_groups(void) const;
+  //::std::optional<ArrayAttr> alias_scopes(void) const;
+  //::std::optional<ArrayAttr> noalias_scopes(void) const;
+  //::std::optional<ArrayAttr> tbaa(void) const;
+  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
 };
 static_assert(sizeof(LoadOp) == sizeof(Operation));
-
-class MX_EXPORT MetadataOp final : public Operation {
- public:
-  inline static constexpr OperationKind static_kind(void) {
-    return OperationKind::LLVM_METADATA;
-  }
-
-  static std::optional<MetadataOp> from(const ::mx::ir::Operation &that);
-  static std::optional<MetadataOp> producing(const ::mx::ir::Value &val);
-
-  ::mlir::LLVM::MetadataOp underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  ::mx::ir::Region body(void) const;
-  std::string_view sym_name(void) const;
-};
-static_assert(sizeof(MetadataOp) == sizeof(Operation));
 
 class MX_EXPORT MulOp final : public Operation {
  public:
@@ -1187,24 +1224,25 @@ class MX_EXPORT MulOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value res(void) const;
+  //::mlir::LLVM::IntegerOverflowFlags overflow_flags(void) const;
 };
 static_assert(sizeof(MulOp) == sizeof(Operation));
 
-class MX_EXPORT NullOp final : public Operation {
+class MX_EXPORT NoneTokenOp final : public Operation {
  public:
   inline static constexpr OperationKind static_kind(void) {
-    return OperationKind::LLVM_MLIR_NULL;
+    return OperationKind::LLVM_MLIR_NONE;
   }
 
-  static std::optional<NullOp> from(const ::mx::ir::Operation &that);
-  static std::optional<NullOp> producing(const ::mx::ir::Value &val);
+  static std::optional<NoneTokenOp> from(const ::mx::ir::Operation &that);
+  static std::optional<NoneTokenOp> producing(const ::mx::ir::Value &val);
 
-  ::mlir::LLVM::NullOp underlying_repr(void) const noexcept;
+  ::mlir::LLVM::NoneTokenOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> res(void) const;
+  ::mx::ir::Value res(void) const;
 };
-static_assert(sizeof(NullOp) == sizeof(Operation));
+static_assert(sizeof(NoneTokenOp) == sizeof(Operation));
 
 class MX_EXPORT OrOp final : public Operation {
  public:
@@ -1394,6 +1432,7 @@ class MX_EXPORT ShlOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value res(void) const;
+  //::mlir::LLVM::IntegerOverflowFlags overflow_flags(void) const;
 };
 static_assert(sizeof(ShlOp) == sizeof(Operation));
 
@@ -1412,7 +1451,7 @@ class MX_EXPORT ShuffleVectorOp final : public Operation {
   ::mx::ir::Value v1(void) const;
   ::mx::ir::Value v2(void) const;
   ::mx::ir::Value res(void) const;
-  //::llvm::ArrayRef<int32_t> mask(void) const;
+  //::llvm::ArrayRef<int> mask(void) const;
 };
 static_assert(sizeof(ShuffleVectorOp) == sizeof(Operation));
 
@@ -1429,17 +1468,17 @@ class MX_EXPORT StoreOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value value(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> addr(void) const;
-  //::std::optional<uint64_t> alignment(void) const;
+  //::mlir::TypedValue<LLVMPointerType> addr(void) const;
+  //::std::optional<unsignedlonglong> alignment(void) const;
   bool volatile__(void) const;
   bool nontemporal(void) const;
   //::mlir::LLVM::AtomicOrdering ordering(void) const;
-  std::optional<std::string_view> syncscope(void) const;
-  //::std::optional<::mlir::ArrayAttr> access_groups(void) const;
-  //::std::optional<::mlir::ArrayAttr> alias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> noalias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<::mlir::Value> accessed_operands(void) const;
+  //::std::optional<StringRef> syncscope(void) const;
+  //::std::optional<ArrayAttr> access_groups(void) const;
+  //::std::optional<ArrayAttr> alias_scopes(void) const;
+  //::std::optional<ArrayAttr> noalias_scopes(void) const;
+  //::std::optional<ArrayAttr> tbaa(void) const;
+  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
 };
 static_assert(sizeof(StoreOp) == sizeof(Operation));
 
@@ -1458,6 +1497,7 @@ class MX_EXPORT SubOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value res(void) const;
+  //::mlir::LLVM::IntegerOverflowFlags overflow_flags(void) const;
 };
 static_assert(sizeof(SubOp) == sizeof(Operation));
 
@@ -1473,14 +1513,14 @@ class MX_EXPORT SwitchOp final : public Operation {
   ::mlir::LLVM::SwitchOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> value(void) const;
-  gap::generator<::mx::ir::Operand> default_operands(void) const;
+  //::mlir::TypedValue<IntegerType> value(void) const;
+  //::mlir::Operation::operand_range default_operands(void) const;
   //::mlir::OperandRangeRange case_operands(void) const;
   //::mlir::Block* default_destination(void) const;
   //::mlir::SuccessorRange case_destinations(void) const;
-  //::std::optional<::mlir::DenseIntElementsAttr> case_values(void) const;
-  //::llvm::ArrayRef<int32_t> case_operand_segments(void) const;
-  //::std::optional<::llvm::ArrayRef<int32_t>> branch_weights(void) const;
+  //::std::optional<DenseIntElementsAttr> case_values(void) const;
+  //::llvm::ArrayRef<int> case_operand_segments(void) const;
+  //::std::optional<ArrayRef<int>> branch_weights(void) const;
 };
 static_assert(sizeof(SwitchOp) == sizeof(Operation));
 
@@ -1620,6 +1660,22 @@ class MX_EXPORT ZExtOp final : public Operation {
 };
 static_assert(sizeof(ZExtOp) == sizeof(Operation));
 
+class MX_EXPORT ZeroOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::LLVM_MLIR_ZERO;
+  }
+
+  static std::optional<ZeroOp> from(const ::mx::ir::Operation &that);
+  static std::optional<ZeroOp> producing(const ::mx::ir::Value &val);
+
+  ::mlir::LLVM::ZeroOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Value res(void) const;
+};
+static_assert(sizeof(ZeroOp) == sizeof(Operation));
+
 class MX_EXPORT AbsOp final : public Operation {
  public:
   inline static constexpr OperationKind static_kind(void) {
@@ -1650,11 +1706,11 @@ class MX_EXPORT AnnotationOp final : public Operation {
   ::mlir::LLVM::Annotation underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> integer(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> annotation(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> file_name(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> line(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> res(void) const;
+  //::mlir::TypedValue<IntegerType> integer(void) const;
+  //::mlir::TypedValue<LLVMPointerType> annotation(void) const;
+  //::mlir::TypedValue<LLVMPointerType> file_name(void) const;
+  //::mlir::TypedValue<IntegerType> line(void) const;
+  //::mlir::TypedValue<IntegerType> res(void) const;
 };
 static_assert(sizeof(AnnotationOp) == sizeof(Operation));
 
@@ -1670,7 +1726,7 @@ class MX_EXPORT AssumeOp final : public Operation {
   ::mlir::LLVM::AssumeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> cond(void) const;
+  //::mlir::TypedValue<IntegerType> cond(void) const;
 };
 static_assert(sizeof(AssumeOp) == sizeof(Operation));
 
@@ -1707,25 +1763,6 @@ class MX_EXPORT ByteSwapOp final : public Operation {
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(ByteSwapOp) == sizeof(Operation));
-
-class MX_EXPORT CallIntrinsicOp final : public Operation {
- public:
-  inline static constexpr OperationKind static_kind(void) {
-    return OperationKind::LLVM_CALL_INTRINSIC;
-  }
-
-  static std::optional<CallIntrinsicOp> from(const ::mx::ir::Operation &that);
-  static std::optional<CallIntrinsicOp> producing(const ::mx::ir::Value &val);
-
-  ::mlir::LLVM::CallIntrinsicOp underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  gap::generator<::mx::ir::Operand> args(void) const;
-  gap::generator<::mx::ir::Result> results(void) const;
-  std::string_view intrin(void) const;
-  //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
-};
-static_assert(sizeof(CallIntrinsicOp) == sizeof(Operation));
 
 class MX_EXPORT CopySignOp final : public Operation {
  public:
@@ -1775,7 +1812,7 @@ class MX_EXPORT CoroBeginOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value token(void) const;
-  ::mx::ir::Value mem(void) const;
+  //::mlir::TypedValue<LLVMPointerType> mem(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(CoroBeginOp) == sizeof(Operation));
@@ -1792,8 +1829,9 @@ class MX_EXPORT CoroEndOp final : public Operation {
   ::mlir::LLVM::CoroEndOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value handle(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> unwind(void) const;
+  //::mlir::TypedValue<LLVMPointerType> handle(void) const;
+  //::mlir::TypedValue<IntegerType> unwind(void) const;
+  ::mx::ir::Value retvals(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(CoroEndOp) == sizeof(Operation));
@@ -1811,7 +1849,7 @@ class MX_EXPORT CoroFreeOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value id(void) const;
-  ::mx::ir::Value handle(void) const;
+  //::mlir::TypedValue<LLVMPointerType> handle(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(CoroFreeOp) == sizeof(Operation));
@@ -1828,13 +1866,32 @@ class MX_EXPORT CoroIdOp final : public Operation {
   ::mlir::LLVM::CoroIdOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> align(void) const;
-  ::mx::ir::Value promise(void) const;
-  ::mx::ir::Value coroaddr(void) const;
-  ::mx::ir::Value fnaddrs(void) const;
+  //::mlir::TypedValue<IntegerType> align(void) const;
+  //::mlir::TypedValue<LLVMPointerType> promise(void) const;
+  //::mlir::TypedValue<LLVMPointerType> coroaddr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> fnaddrs(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(CoroIdOp) == sizeof(Operation));
+
+class MX_EXPORT CoroPromiseOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::LLVM_INTR_CORO_PROMISE;
+  }
+
+  static std::optional<CoroPromiseOp> from(const ::mx::ir::Operation &that);
+  static std::optional<CoroPromiseOp> producing(const ::mx::ir::Value &val);
+
+  ::mlir::LLVM::CoroPromiseOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::mlir::TypedValue<LLVMPointerType> handle(void) const;
+  //::mlir::TypedValue<IntegerType> align(void) const;
+  //::mlir::TypedValue<IntegerType> from(void) const;
+  //::mlir::TypedValue<LLVMPointerType> res(void) const;
+};
+static_assert(sizeof(CoroPromiseOp) == sizeof(Operation));
 
 class MX_EXPORT CoroResumeOp final : public Operation {
  public:
@@ -1848,7 +1905,7 @@ class MX_EXPORT CoroResumeOp final : public Operation {
   ::mlir::LLVM::CoroResumeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value handle(void) const;
+  //::mlir::TypedValue<LLVMPointerType> handle(void) const;
 };
 static_assert(sizeof(CoroResumeOp) == sizeof(Operation));
 
@@ -1864,7 +1921,7 @@ class MX_EXPORT CoroSaveOp final : public Operation {
   ::mlir::LLVM::CoroSaveOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value handle(void) const;
+  //::mlir::TypedValue<LLVMPointerType> handle(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(CoroSaveOp) == sizeof(Operation));
@@ -1898,7 +1955,7 @@ class MX_EXPORT CoroSuspendOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value save(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> final(void) const;
+  //::mlir::TypedValue<IntegerType> final(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(CoroSuspendOp) == sizeof(Operation));
@@ -1986,8 +2043,9 @@ class MX_EXPORT DbgDeclareOp final : public Operation {
   ::mlir::LLVM::DbgDeclareOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> addr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> addr(void) const;
   //::mlir::LLVM::DILocalVariableAttr var_info(void) const;
+  //::mlir::LLVM::DIExpressionAttr location_expr(void) const;
 };
 static_assert(sizeof(DbgDeclareOp) == sizeof(Operation));
 
@@ -2021,6 +2079,7 @@ class MX_EXPORT DbgValueOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value value(void) const;
   //::mlir::LLVM::DILocalVariableAttr var_info(void) const;
+  //::mlir::LLVM::DIExpressionAttr location_expr(void) const;
 };
 static_assert(sizeof(DbgValueOp) == sizeof(Operation));
 
@@ -2051,7 +2110,7 @@ class MX_EXPORT EhTypeidForOp final : public Operation {
   ::mlir::LLVM::EhTypeidForOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value type_info(void) const;
+  //::mlir::TypedValue<LLVMPointerType> type_info(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(EhTypeidForOp) == sizeof(Operation));
@@ -2104,8 +2163,8 @@ class MX_EXPORT ExpectOp final : public Operation {
   ::mlir::LLVM::ExpectOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> val(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> expected(void) const;
+  //::mlir::TypedValue<IntegerType> val(void) const;
+  //::mlir::TypedValue<IntegerType> expected(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(ExpectOp) == sizeof(Operation));
@@ -2122,8 +2181,8 @@ class MX_EXPORT ExpectWithProbabilityOp final : public Operation {
   ::mlir::LLVM::ExpectWithProbabilityOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> val(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> expected(void) const;
+  //::mlir::TypedValue<IntegerType> val(void) const;
+  //::mlir::TypedValue<IntegerType> expected(void) const;
   ::mx::ir::Value res(void) const;
   //::llvm::APFloat prob(void) const;
 };
@@ -2291,11 +2350,47 @@ class MX_EXPORT GetActiveLaneMaskOp final : public Operation {
   ::mlir::LLVM::GetActiveLaneMaskOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> base(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> n(void) const;
+  //::mlir::TypedValue<IntegerType> base(void) const;
+  //::mlir::TypedValue<IntegerType> n(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(GetActiveLaneMaskOp) == sizeof(Operation));
+
+class MX_EXPORT InvariantEndOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::LLVM_INTR_INVARIANT_END;
+  }
+
+  static std::optional<InvariantEndOp> from(const ::mx::ir::Operation &that);
+  static std::optional<InvariantEndOp> producing(const ::mx::ir::Value &val);
+
+  ::mlir::LLVM::InvariantEndOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::mlir::TypedValue<LLVMPointerType> start(void) const;
+  //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
+  uint64_t size(void) const;
+};
+static_assert(sizeof(InvariantEndOp) == sizeof(Operation));
+
+class MX_EXPORT InvariantStartOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::LLVM_INTR_INVARIANT_START;
+  }
+
+  static std::optional<InvariantStartOp> from(const ::mx::ir::Operation &that);
+  static std::optional<InvariantStartOp> producing(const ::mx::ir::Value &val);
+
+  ::mlir::LLVM::InvariantStartOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> res(void) const;
+  uint64_t size(void) const;
+};
+static_assert(sizeof(InvariantStartOp) == sizeof(Operation));
 
 class MX_EXPORT IsConstantOp final : public Operation {
  public:
@@ -2310,7 +2405,7 @@ class MX_EXPORT IsConstantOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value val(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> res(void) const;
+  //::mlir::TypedValue<IntegerType> res(void) const;
 };
 static_assert(sizeof(IsConstantOp) == sizeof(Operation));
 
@@ -2344,7 +2439,7 @@ class MX_EXPORT LifetimeEndOp final : public Operation {
   ::mlir::LLVM::LifetimeEndOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> ptr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
   uint64_t size(void) const;
 };
 static_assert(sizeof(LifetimeEndOp) == sizeof(Operation));
@@ -2361,7 +2456,7 @@ class MX_EXPORT LifetimeStartOp final : public Operation {
   ::mlir::LLVM::LifetimeStartOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> ptr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
   uint64_t size(void) const;
 };
 static_assert(sizeof(LifetimeStartOp) == sizeof(Operation));
@@ -2500,9 +2595,9 @@ class MX_EXPORT MaskedLoadOp final : public Operation {
   ::mlir::LLVM::MaskedLoadOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> data(void) const;
+  //::mlir::TypedValue<LLVMPointerType> data(void) const;
   ::mx::ir::Value mask(void) const;
-  gap::generator<::mx::ir::Operand> pass_thru(void) const;
+  //::mlir::Operation::operand_range pass_thru(void) const;
   ::mx::ir::Value res(void) const;
   uint32_t alignment(void) const;
 };
@@ -2521,7 +2616,7 @@ class MX_EXPORT MaskedStoreOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value value(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> data(void) const;
+  //::mlir::TypedValue<LLVMPointerType> data(void) const;
   ::mx::ir::Value mask(void) const;
   uint32_t alignment(void) const;
 };
@@ -2539,8 +2634,8 @@ class MX_EXPORT MatrixColumnMajorLoadOp final : public Operation {
   ::mlir::LLVM::MatrixColumnMajorLoadOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> data(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> stride(void) const;
+  //::mlir::TypedValue<LLVMPointerType> data(void) const;
+  //::mlir::TypedValue<IntegerType> stride(void) const;
   ::mx::ir::Value res(void) const;
   bool is_volatile(void) const;
   uint32_t rows(void) const;
@@ -2561,8 +2656,8 @@ class MX_EXPORT MatrixColumnMajorStoreOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value matrix(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> data(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> stride(void) const;
+  //::mlir::TypedValue<LLVMPointerType> data(void) const;
+  //::mlir::TypedValue<IntegerType> stride(void) const;
   bool is_volatile(void) const;
   uint32_t rows(void) const;
   uint32_t columns(void) const;
@@ -2659,15 +2754,15 @@ class MX_EXPORT MemcpyInlineOp final : public Operation {
   ::mlir::LLVM::MemcpyInlineOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> dst(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> src(void) const;
+  //::mlir::TypedValue<LLVMPointerType> dst(void) const;
+  //::mlir::TypedValue<LLVMPointerType> src(void) const;
   //::mlir::APInt len(void) const;
   bool is_volatile(void) const;
-  //::std::optional<::mlir::ArrayAttr> access_groups(void) const;
-  //::std::optional<::mlir::ArrayAttr> alias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> noalias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<::mlir::Value> accessed_operands(void) const;
+  //::std::optional<ArrayAttr> access_groups(void) const;
+  //::std::optional<ArrayAttr> alias_scopes(void) const;
+  //::std::optional<ArrayAttr> noalias_scopes(void) const;
+  //::std::optional<ArrayAttr> tbaa(void) const;
+  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
 };
 static_assert(sizeof(MemcpyInlineOp) == sizeof(Operation));
 
@@ -2683,15 +2778,15 @@ class MX_EXPORT MemcpyOp final : public Operation {
   ::mlir::LLVM::MemcpyOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> dst(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> src(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> len(void) const;
+  //::mlir::TypedValue<LLVMPointerType> dst(void) const;
+  //::mlir::TypedValue<LLVMPointerType> src(void) const;
+  //::mlir::TypedValue<IntegerType> len(void) const;
   bool is_volatile(void) const;
-  //::std::optional<::mlir::ArrayAttr> access_groups(void) const;
-  //::std::optional<::mlir::ArrayAttr> alias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> noalias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<::mlir::Value> accessed_operands(void) const;
+  //::std::optional<ArrayAttr> access_groups(void) const;
+  //::std::optional<ArrayAttr> alias_scopes(void) const;
+  //::std::optional<ArrayAttr> noalias_scopes(void) const;
+  //::std::optional<ArrayAttr> tbaa(void) const;
+  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
 };
 static_assert(sizeof(MemcpyOp) == sizeof(Operation));
 
@@ -2707,15 +2802,15 @@ class MX_EXPORT MemmoveOp final : public Operation {
   ::mlir::LLVM::MemmoveOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> dst(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> src(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> len(void) const;
+  //::mlir::TypedValue<LLVMPointerType> dst(void) const;
+  //::mlir::TypedValue<LLVMPointerType> src(void) const;
+  //::mlir::TypedValue<IntegerType> len(void) const;
   bool is_volatile(void) const;
-  //::std::optional<::mlir::ArrayAttr> access_groups(void) const;
-  //::std::optional<::mlir::ArrayAttr> alias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> noalias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<::mlir::Value> accessed_operands(void) const;
+  //::std::optional<ArrayAttr> access_groups(void) const;
+  //::std::optional<ArrayAttr> alias_scopes(void) const;
+  //::std::optional<ArrayAttr> noalias_scopes(void) const;
+  //::std::optional<ArrayAttr> tbaa(void) const;
+  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
 };
 static_assert(sizeof(MemmoveOp) == sizeof(Operation));
 
@@ -2731,15 +2826,15 @@ class MX_EXPORT MemsetOp final : public Operation {
   ::mlir::LLVM::MemsetOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> dst(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> val(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> len(void) const;
+  //::mlir::TypedValue<LLVMPointerType> dst(void) const;
+  //::mlir::TypedValue<IntegerType> val(void) const;
+  //::mlir::TypedValue<IntegerType> len(void) const;
   bool is_volatile(void) const;
-  //::std::optional<::mlir::ArrayAttr> access_groups(void) const;
-  //::std::optional<::mlir::ArrayAttr> alias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> noalias_scopes(void) const;
-  //::std::optional<::mlir::ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<::mlir::Value> accessed_operands(void) const;
+  //::std::optional<ArrayAttr> access_groups(void) const;
+  //::std::optional<ArrayAttr> alias_scopes(void) const;
+  //::std::optional<ArrayAttr> noalias_scopes(void) const;
+  //::std::optional<ArrayAttr> tbaa(void) const;
+  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
 };
 static_assert(sizeof(MemsetOp) == sizeof(Operation));
 
@@ -2828,7 +2923,7 @@ class MX_EXPORT PowIOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value val(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> power(void) const;
+  //::mlir::TypedValue<IntegerType> power(void) const;
   ::mx::ir::Value res(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
@@ -2865,7 +2960,7 @@ class MX_EXPORT PrefetchOp final : public Operation {
   ::mlir::LLVM::Prefetch underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> addr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> addr(void) const;
   uint32_t rw(void) const;
   uint32_t hint(void) const;
   uint32_t cache(void) const;
@@ -2884,12 +2979,12 @@ class MX_EXPORT PtrAnnotationOp final : public Operation {
   ::mlir::LLVM::PtrAnnotation underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> ptr(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> annotation(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> file_name(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> line(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> attr(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> res(void) const;
+  //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> annotation(void) const;
+  //::mlir::TypedValue<LLVMPointerType> file_name(void) const;
+  //::mlir::TypedValue<IntegerType> line(void) const;
+  //::mlir::TypedValue<LLVMPointerType> attr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> res(void) const;
 };
 static_assert(sizeof(PtrAnnotationOp) == sizeof(Operation));
 
@@ -3150,7 +3245,7 @@ class MX_EXPORT StackRestoreOp final : public Operation {
   ::mlir::LLVM::StackRestoreOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value ptr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
 };
 static_assert(sizeof(StackRestoreOp) == sizeof(Operation));
 
@@ -3198,7 +3293,7 @@ class MX_EXPORT ThreadLocalAddressOp final : public Operation {
   ::mlir::LLVM::ThreadlocalAddressOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> global(void) const;
+  //::mlir::TypedValue<LLVMPointerType> global(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(ThreadLocalAddressOp) == sizeof(Operation));
@@ -3387,7 +3482,7 @@ class MX_EXPORT VPAShrOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPAShrOp) == sizeof(Operation));
@@ -3407,7 +3502,7 @@ class MX_EXPORT VPAddOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPAddOp) == sizeof(Operation));
@@ -3427,7 +3522,7 @@ class MX_EXPORT VPAndOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPAndOp) == sizeof(Operation));
@@ -3447,7 +3542,7 @@ class MX_EXPORT VPFAddOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPFAddOp) == sizeof(Operation));
@@ -3467,7 +3562,7 @@ class MX_EXPORT VPFDivOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPFDivOp) == sizeof(Operation));
@@ -3488,7 +3583,7 @@ class MX_EXPORT VPFMulAddOp final : public Operation {
   ::mx::ir::Value op2(void) const;
   ::mx::ir::Value op3(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPFMulAddOp) == sizeof(Operation));
@@ -3508,7 +3603,7 @@ class MX_EXPORT VPFMulOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPFMulOp) == sizeof(Operation));
@@ -3527,7 +3622,7 @@ class MX_EXPORT VPFNegOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value op(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPFNegOp) == sizeof(Operation));
@@ -3546,7 +3641,7 @@ class MX_EXPORT VPFPExtOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value src(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPFPExtOp) == sizeof(Operation));
@@ -3565,7 +3660,7 @@ class MX_EXPORT VPFPToSIOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value src(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPFPToSIOp) == sizeof(Operation));
@@ -3584,7 +3679,7 @@ class MX_EXPORT VPFPToUIOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value src(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPFPToUIOp) == sizeof(Operation));
@@ -3603,7 +3698,7 @@ class MX_EXPORT VPFPTruncOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value src(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPFPTruncOp) == sizeof(Operation));
@@ -3623,7 +3718,7 @@ class MX_EXPORT VPFRemOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPFRemOp) == sizeof(Operation));
@@ -3643,7 +3738,7 @@ class MX_EXPORT VPFSubOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPFSubOp) == sizeof(Operation));
@@ -3664,7 +3759,7 @@ class MX_EXPORT VPFmaOp final : public Operation {
   ::mx::ir::Value op2(void) const;
   ::mx::ir::Value op3(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPFmaOp) == sizeof(Operation));
@@ -3683,7 +3778,7 @@ class MX_EXPORT VPIntToPtrOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value src(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPIntToPtrOp) == sizeof(Operation));
@@ -3703,7 +3798,7 @@ class MX_EXPORT VPLShrOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPLShrOp) == sizeof(Operation));
@@ -3720,9 +3815,9 @@ class MX_EXPORT VPLoadOp final : public Operation {
   ::mlir::LLVM::VPLoadOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> ptr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPLoadOp) == sizeof(Operation));
@@ -3742,7 +3837,7 @@ class MX_EXPORT VPMergeMinOp final : public Operation {
   ::mx::ir::Value cond(void) const;
   ::mx::ir::Value true_val(void) const;
   ::mx::ir::Value false_val(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPMergeMinOp) == sizeof(Operation));
@@ -3762,7 +3857,7 @@ class MX_EXPORT VPMulOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPMulOp) == sizeof(Operation));
@@ -3782,7 +3877,7 @@ class MX_EXPORT VPOrOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPOrOp) == sizeof(Operation));
@@ -3801,7 +3896,7 @@ class MX_EXPORT VPPtrToIntOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value src(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPPtrToIntOp) == sizeof(Operation));
@@ -3818,10 +3913,10 @@ class MX_EXPORT VPReduceAddOp final : public Operation {
   ::mlir::LLVM::VPReduceAddOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> satrt_value(void) const;
+  //::mlir::TypedValue<IntegerType> satrt_value(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPReduceAddOp) == sizeof(Operation));
@@ -3838,10 +3933,10 @@ class MX_EXPORT VPReduceAndOp final : public Operation {
   ::mlir::LLVM::VPReduceAndOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> satrt_value(void) const;
+  //::mlir::TypedValue<IntegerType> satrt_value(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPReduceAndOp) == sizeof(Operation));
@@ -3858,10 +3953,10 @@ class MX_EXPORT VPReduceFAddOp final : public Operation {
   ::mlir::LLVM::VPReduceFAddOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::FloatType> satrt_value(void) const;
+  //::mlir::TypedValue<FloatType> satrt_value(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPReduceFAddOp) == sizeof(Operation));
@@ -3878,10 +3973,10 @@ class MX_EXPORT VPReduceFMaxOp final : public Operation {
   ::mlir::LLVM::VPReduceFMaxOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::FloatType> satrt_value(void) const;
+  //::mlir::TypedValue<FloatType> satrt_value(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPReduceFMaxOp) == sizeof(Operation));
@@ -3898,10 +3993,10 @@ class MX_EXPORT VPReduceFMinOp final : public Operation {
   ::mlir::LLVM::VPReduceFMinOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::FloatType> satrt_value(void) const;
+  //::mlir::TypedValue<FloatType> satrt_value(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPReduceFMinOp) == sizeof(Operation));
@@ -3918,10 +4013,10 @@ class MX_EXPORT VPReduceFMulOp final : public Operation {
   ::mlir::LLVM::VPReduceFMulOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::FloatType> satrt_value(void) const;
+  //::mlir::TypedValue<FloatType> satrt_value(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPReduceFMulOp) == sizeof(Operation));
@@ -3938,10 +4033,10 @@ class MX_EXPORT VPReduceMulOp final : public Operation {
   ::mlir::LLVM::VPReduceMulOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> satrt_value(void) const;
+  //::mlir::TypedValue<IntegerType> satrt_value(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPReduceMulOp) == sizeof(Operation));
@@ -3958,10 +4053,10 @@ class MX_EXPORT VPReduceOrOp final : public Operation {
   ::mlir::LLVM::VPReduceOrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> satrt_value(void) const;
+  //::mlir::TypedValue<IntegerType> satrt_value(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPReduceOrOp) == sizeof(Operation));
@@ -3978,10 +4073,10 @@ class MX_EXPORT VPReduceSMaxOp final : public Operation {
   ::mlir::LLVM::VPReduceSMaxOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> satrt_value(void) const;
+  //::mlir::TypedValue<IntegerType> satrt_value(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPReduceSMaxOp) == sizeof(Operation));
@@ -3998,10 +4093,10 @@ class MX_EXPORT VPReduceSMinOp final : public Operation {
   ::mlir::LLVM::VPReduceSMinOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> satrt_value(void) const;
+  //::mlir::TypedValue<IntegerType> satrt_value(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPReduceSMinOp) == sizeof(Operation));
@@ -4018,10 +4113,10 @@ class MX_EXPORT VPReduceUMaxOp final : public Operation {
   ::mlir::LLVM::VPReduceUMaxOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> satrt_value(void) const;
+  //::mlir::TypedValue<IntegerType> satrt_value(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPReduceUMaxOp) == sizeof(Operation));
@@ -4038,10 +4133,10 @@ class MX_EXPORT VPReduceUMinOp final : public Operation {
   ::mlir::LLVM::VPReduceUMinOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> satrt_value(void) const;
+  //::mlir::TypedValue<IntegerType> satrt_value(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPReduceUMinOp) == sizeof(Operation));
@@ -4058,10 +4153,10 @@ class MX_EXPORT VPReduceXorOp final : public Operation {
   ::mlir::LLVM::VPReduceXorOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::IntegerType> satrt_value(void) const;
+  //::mlir::TypedValue<IntegerType> satrt_value(void) const;
   ::mx::ir::Value val(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPReduceXorOp) == sizeof(Operation));
@@ -4081,7 +4176,7 @@ class MX_EXPORT VPSDivOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPSDivOp) == sizeof(Operation));
@@ -4100,7 +4195,7 @@ class MX_EXPORT VPSExtOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value src(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPSExtOp) == sizeof(Operation));
@@ -4119,7 +4214,7 @@ class MX_EXPORT VPSIToFPOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value src(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPSIToFPOp) == sizeof(Operation));
@@ -4139,7 +4234,7 @@ class MX_EXPORT VPSRemOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPSRemOp) == sizeof(Operation));
@@ -4159,7 +4254,7 @@ class MX_EXPORT VPSelectMinOp final : public Operation {
   ::mx::ir::Value cond(void) const;
   ::mx::ir::Value true_val(void) const;
   ::mx::ir::Value false_val(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPSelectMinOp) == sizeof(Operation));
@@ -4179,7 +4274,7 @@ class MX_EXPORT VPShlOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPShlOp) == sizeof(Operation));
@@ -4197,9 +4292,9 @@ class MX_EXPORT VPStoreOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value val(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> ptr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
 };
 static_assert(sizeof(VPStoreOp) == sizeof(Operation));
 
@@ -4215,10 +4310,10 @@ class MX_EXPORT VPStridedLoadOp final : public Operation {
   ::mlir::LLVM::VPStridedLoadOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> ptr(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> stride(void) const;
+  //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
+  //::mlir::TypedValue<IntegerType> stride(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPStridedLoadOp) == sizeof(Operation));
@@ -4236,10 +4331,10 @@ class MX_EXPORT VPStridedStoreOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value val(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> ptr(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> stride(void) const;
+  //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
+  //::mlir::TypedValue<IntegerType> stride(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
 };
 static_assert(sizeof(VPStridedStoreOp) == sizeof(Operation));
 
@@ -4258,7 +4353,7 @@ class MX_EXPORT VPSubOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPSubOp) == sizeof(Operation));
@@ -4277,7 +4372,7 @@ class MX_EXPORT VPTruncOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value src(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPTruncOp) == sizeof(Operation));
@@ -4297,7 +4392,7 @@ class MX_EXPORT VPUDivOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPUDivOp) == sizeof(Operation));
@@ -4316,7 +4411,7 @@ class MX_EXPORT VPUIToFPOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value src(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPUIToFPOp) == sizeof(Operation));
@@ -4336,7 +4431,7 @@ class MX_EXPORT VPURemOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPURemOp) == sizeof(Operation));
@@ -4356,7 +4451,7 @@ class MX_EXPORT VPXorOp final : public Operation {
   ::mx::ir::Value lhs(void) const;
   ::mx::ir::Value rhs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPXorOp) == sizeof(Operation));
@@ -4375,7 +4470,7 @@ class MX_EXPORT VPZExtOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value src(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> evl(void) const;
+  //::mlir::TypedValue<IntegerType> evl(void) const;
   ::mx::ir::Value res(void) const;
 };
 static_assert(sizeof(VPZExtOp) == sizeof(Operation));
@@ -4392,8 +4487,8 @@ class MX_EXPORT VaCopyOp final : public Operation {
   ::mlir::LLVM::VaCopyOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value dest_list(void) const;
-  ::mx::ir::Value src_list(void) const;
+  //::mlir::TypedValue<LLVMPointerType> dest_list(void) const;
+  //::mlir::TypedValue<LLVMPointerType> src_list(void) const;
 };
 static_assert(sizeof(VaCopyOp) == sizeof(Operation));
 
@@ -4409,7 +4504,7 @@ class MX_EXPORT VaEndOp final : public Operation {
   ::mlir::LLVM::VaEndOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg_list(void) const;
+  //::mlir::TypedValue<LLVMPointerType> arg_list(void) const;
 };
 static_assert(sizeof(VaEndOp) == sizeof(Operation));
 
@@ -4425,7 +4520,7 @@ class MX_EXPORT VaStartOp final : public Operation {
   ::mlir::LLVM::VaStartOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg_list(void) const;
+  //::mlir::TypedValue<LLVMPointerType> arg_list(void) const;
 };
 static_assert(sizeof(VaStartOp) == sizeof(Operation));
 
@@ -4441,11 +4536,11 @@ class MX_EXPORT VarAnnotationOp final : public Operation {
   ::mlir::LLVM::VarAnnotation underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> val(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> annotation(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> file_name(void) const;
-  //::mlir::TypedValue<::mlir::IntegerType> line(void) const;
-  //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> attr(void) const;
+  //::mlir::TypedValue<LLVMPointerType> val(void) const;
+  //::mlir::TypedValue<LLVMPointerType> annotation(void) const;
+  //::mlir::TypedValue<LLVMPointerType> file_name(void) const;
+  //::mlir::TypedValue<IntegerType> line(void) const;
+  //::mlir::TypedValue<LLVMPointerType> attr(void) const;
 };
 static_assert(sizeof(VarAnnotationOp) == sizeof(Operation));
 
@@ -4494,7 +4589,7 @@ class MX_EXPORT MaskedGatherOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value ptrs(void) const;
   ::mx::ir::Value mask(void) const;
-  gap::generator<::mx::ir::Operand> pass_thru(void) const;
+  //::mlir::Operation::operand_range pass_thru(void) const;
   ::mx::ir::Value res(void) const;
   uint32_t alignment(void) const;
 };
@@ -4551,8 +4646,8 @@ class MX_EXPORT VectorInsertOp final : public Operation {
   ::mlir::LLVM::vector_insert underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value srcvec(void) const;
   ::mx::ir::Value dstvec(void) const;
+  ::mx::ir::Value srcvec(void) const;
   ::mx::ir::Value res(void) const;
   uint64_t pos(void) const;
   uint64_t src_vector_bit_width(void) const;
@@ -4606,10 +4701,10 @@ class MX_EXPORT VectorReduceFAddOp final : public Operation {
   ::mlir::LLVM::vector_reduce_fadd underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::FloatType> start_value(void) const;
+  //::mlir::TypedValue<FloatType> start_value(void) const;
   ::mx::ir::Value input(void) const;
   ::mx::ir::Value res(void) const;
-  bool reassoc(void) const;
+  //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(VectorReduceFAddOp) == sizeof(Operation));
 
@@ -4697,10 +4792,10 @@ class MX_EXPORT VectorReduceFMulOp final : public Operation {
   ::mlir::LLVM::vector_reduce_fmul underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::mlir::FloatType> start_value(void) const;
+  //::mlir::TypedValue<FloatType> start_value(void) const;
   ::mx::ir::Value input(void) const;
   ::mx::ir::Value res(void) const;
-  bool reassoc(void) const;
+  //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(VectorReduceFMulOp) == sizeof(Operation));
 

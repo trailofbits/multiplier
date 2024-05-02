@@ -309,14 +309,14 @@ bool InitListExpr::is_string_literal_initializer(void) const {
 }
 
 bool InitListExpr::is_syntactic_form(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal90();
 }
 
 std::optional<bool> InitListExpr::is_transparent(void) const {
   if (!impl->reader.getVal94()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal93());
+    return static_cast<bool>(impl->reader.getVal92());
   }
   return std::nullopt;
 }

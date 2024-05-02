@@ -16,7 +16,7 @@ namespace mx {
 enum class SentinelAttrSpelling : unsigned char {
   GNU_SENTINEL,
   CXX11_GNU_SENTINEL,
-  C2X_GNU_SENTINEL,
+  C23_GNU_SENTINEL,
   SPELLING_NOT_CALCULATED,
 };
 

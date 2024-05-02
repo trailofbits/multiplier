@@ -139,7 +139,7 @@ Expr OMPDeclareTargetDeclAttr::indirect_expression(void) const {
 }
 
 OMPDeclareTargetDeclAttrMapTypeTy OMPDeclareTargetDeclAttr::map_type(void) const {
-  return static_cast<OMPDeclareTargetDeclAttrMapTypeTy>(impl->reader.getVal14());
+  return static_cast<OMPDeclareTargetDeclAttrMapTypeTy>(impl->reader.getVal18());
 }
 
 #pragma GCC diagnostic pop

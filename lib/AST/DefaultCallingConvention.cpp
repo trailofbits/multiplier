@@ -20,6 +20,7 @@ const char *EnumeratorName(DefaultCallingConvention e) {
     case DefaultCallingConvention::STD_CALL: return "STD_CALL";
     case DefaultCallingConvention::VECTOR_CALL: return "VECTOR_CALL";
     case DefaultCallingConvention::REG_CALL: return "REG_CALL";
+    case DefaultCallingConvention::RTD_CALL: return "RTD_CALL";
     default: return "<invalid>";
   }
 }

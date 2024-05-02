@@ -145,7 +145,7 @@ std::string_view DiagnoseIfAttr::message(void) const {
 }
 
 NamedDecl DiagnoseIfAttr::parent(void) const {
-  RawEntityId eid = impl->reader.getVal16();
+  RawEntityId eid = impl->reader.getVal20();
   return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
@@ -154,7 +154,7 @@ bool DiagnoseIfAttr::is_error(void) const {
 }
 
 bool DiagnoseIfAttr::is_warning(void) const {
-  return impl->reader.getVal19();
+  return impl->reader.getVal14();
 }
 
 #pragma GCC diagnostic pop

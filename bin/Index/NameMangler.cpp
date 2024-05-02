@@ -217,23 +217,23 @@ const std::string &NameManglerImpl::GetMangledNameRec(
   auto func_decl = clang::dyn_cast<clang::FunctionDecl>(parent_decl);
   if (!GetMangledNameRec(func_decl).empty()) {
     switch (decl->getParameterKind()) {
-      case clang::ImplicitParamDecl::ObjCSelf:
+      case clang::ImplicitParamKind::ObjCSelf:
         mangled_name_os << " implicit:self";
         break;
-      case clang::ImplicitParamDecl::ObjCCmd:
+      case clang::ImplicitParamKind::ObjCCmd:
         mangled_name_os << " implicit:_cmd";
         break;
-      case clang::ImplicitParamDecl::CXXThis:
+      case clang::ImplicitParamKind::CXXThis:
         mangled_name_os << " implicit:this";
         break;
-      case clang::ImplicitParamDecl::CXXVTT:
+      case clang::ImplicitParamKind::CXXVTT:
         mangled_name_os << " implicit:vtt";
         break;
-      case clang::ImplicitParamDecl::ThreadPrivateVar:
+      case clang::ImplicitParamKind::ThreadPrivateVar:
         mangled_name_os << " implicit:tpv";
         break;
-      case clang::ImplicitParamDecl::CapturedContext:
-      case clang::ImplicitParamDecl::Other:
+      case clang::ImplicitParamKind::CapturedContext:
+      case clang::ImplicitParamKind::Other:
         mangled_name_os << " implicit:other";
         break;
     }
@@ -343,7 +343,7 @@ const std::string &NameManglerImpl::GetMangledNameImpl(
     if (auto type_decl = clang::dyn_cast<clang::TypeDecl>(decl)) {
       if (auto type = type_decl->getTypeForDecl()) {
         clang::QualType qual_type(type, 0);
-        mangle_context->mangleTypeName(qual_type, mangled_name_os);
+        mangle_context->mangleCanonicalTypeName(qual_type, mangled_name_os);
 
       } else if (is_cxx_name) {
         clang::GlobalDecl gd(decl);

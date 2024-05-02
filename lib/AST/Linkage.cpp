@@ -14,12 +14,13 @@ namespace mx {
 
 const char *EnumeratorName(Linkage e) {
   switch (e) {
-    case Linkage::NO_LINKAGE: return "NO_LINKAGE";
-    case Linkage::INTERNAL_LINKAGE: return "INTERNAL_LINKAGE";
-    case Linkage::UNIQUE_EXTERNAL_LINKAGE: return "UNIQUE_EXTERNAL_LINKAGE";
-    case Linkage::VISIBLE_NO_LINKAGE: return "VISIBLE_NO_LINKAGE";
-    case Linkage::MODULE_LINKAGE: return "MODULE_LINKAGE";
-    case Linkage::EXTERNAL_LINKAGE: return "EXTERNAL_LINKAGE";
+    case Linkage::INVALID: return "INVALID";
+    case Linkage::NONE: return "NONE";
+    case Linkage::INTERNAL: return "INTERNAL";
+    case Linkage::UNIQUE_EXTERNAL: return "UNIQUE_EXTERNAL";
+    case Linkage::VISIBLE_NONE: return "VISIBLE_NONE";
+    case Linkage::MODULE: return "MODULE";
+    case Linkage::EXTERNAL: return "EXTERNAL";
     default: return "<invalid>";
   }
 }

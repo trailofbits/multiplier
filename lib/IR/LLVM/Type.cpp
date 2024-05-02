@@ -31,17 +31,6 @@ std::optional<ArrayType> ArrayType::from(const ::mx::ir::Type &that) {
   return ::mlir::LLVM::LLVMArrayType(this->::mx::ir::Type::type_);
 }
 
-std::optional<FixedVectorType> FixedVectorType::from(const ::mx::ir::Type &that) {
-  if (that.kind() == TypeKind::LLVM_FIXED_VECTOR) {
-    return reinterpret_cast<const FixedVectorType &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::LLVM::LLVMFixedVectorType FixedVectorType::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::LLVMFixedVectorType(this->::mx::ir::Type::type_);
-}
-
 std::optional<FunctionType> FunctionType::from(const ::mx::ir::Type &that) {
   if (that.kind() == TypeKind::LLVM_FUNCTION) {
     return reinterpret_cast<const FunctionType &>(that);
@@ -74,9 +63,15 @@ std::optional<PointerType> PointerType::from(const ::mx::ir::Type &that) {
   return ::mlir::LLVM::LLVMPointerType(this->::mx::ir::Type::type_);
 }
 
-bool PointerType::is_opaque(void) const {
-  auto val = underlying_repr().isOpaque();
-  return val;
+std::optional<FixedVectorType> FixedVectorType::from(const ::mx::ir::Type &that) {
+  if (that.kind() == TypeKind::LLVM_FIXED_VECTOR) {
+    return reinterpret_cast<const FixedVectorType &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::LLVMFixedVectorType FixedVectorType::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::LLVMFixedVectorType(this->::mx::ir::Type::type_);
 }
 
 std::optional<ScalableVectorType> ScalableVectorType::from(const ::mx::ir::Type &that) {

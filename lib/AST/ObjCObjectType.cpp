@@ -160,12 +160,12 @@ gap::generator<Type> ObjCObjectType::type_arguments(void) const & {
 }
 
 gap::generator<Type> ObjCObjectType::type_arguments_as_written(void) const & {
-  auto list = impl->reader.getVal59();
+  auto list = impl->reader.getVal60();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d59 = ep->TypeFor(ep, v)) {
-      co_yield Type(std::move(d59));
+    if (auto d60 = ep->TypeFor(ep, v)) {
+      co_yield Type(std::move(d60));
     }
   }
   co_return;
@@ -228,7 +228,7 @@ bool ObjCObjectType::is_unspecialized_as_written(void) const {
 }
 
 Type ObjCObjectType::strip_obj_c_kind_of_type_and_qualifiers(void) const {
-  RawEntityId eid = impl->reader.getVal60();
+  RawEntityId eid = impl->reader.getVal61();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

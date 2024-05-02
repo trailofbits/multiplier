@@ -16,7 +16,7 @@ namespace mx {
 enum class NoMergeAttrSpelling : unsigned char {
   GNU_NOMERGE,
   CXX11_CLANG_NOMERGE,
-  C2X_CLANG_NOMERGE,
+  C23_CLANG_NOMERGE,
   SPELLING_NOT_CALCULATED,
 };
 

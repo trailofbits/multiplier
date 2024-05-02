@@ -16,7 +16,7 @@ namespace mx {
 enum class PreserveMostAttrSpelling : unsigned char {
   GNU_PRESERVE_MOST,
   CXX11_CLANG_PRESERVE_MOST,
-  C2X_CLANG_PRESERVE_MOST,
+  C23_CLANG_PRESERVE_MOST,
   SPELLING_NOT_CALCULATED,
 };
 

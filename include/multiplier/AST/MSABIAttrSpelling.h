@@ -16,7 +16,7 @@ namespace mx {
 enum class MSABIAttrSpelling : unsigned char {
   GNU_MS_ABI,
   CXX11_GNU_MS_ABI,
-  C2X_GNU_MS_ABI,
+  C23_GNU_MS_ABI,
   SPELLING_NOT_CALCULATED,
 };
 

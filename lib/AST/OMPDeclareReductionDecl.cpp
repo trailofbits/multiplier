@@ -222,42 +222,42 @@ std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const Token
 }
 
 Expr OMPDeclareReductionDecl::combiner(void) const {
-  RawEntityId eid = impl->reader.getVal57();
+  RawEntityId eid = impl->reader.getVal58();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr OMPDeclareReductionDecl::combiner_in(void) const {
-  RawEntityId eid = impl->reader.getVal65();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
-}
-
-Expr OMPDeclareReductionDecl::combiner_out(void) const {
   RawEntityId eid = impl->reader.getVal66();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-Expr OMPDeclareReductionDecl::initializer_original(void) const {
+Expr OMPDeclareReductionDecl::combiner_out(void) const {
   RawEntityId eid = impl->reader.getVal67();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-Expr OMPDeclareReductionDecl::initializer_private(void) const {
-  RawEntityId eid = impl->reader.getVal78();
+Expr OMPDeclareReductionDecl::initializer_original(void) const {
+  RawEntityId eid = impl->reader.getVal68();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-Expr OMPDeclareReductionDecl::initializer(void) const {
+Expr OMPDeclareReductionDecl::initializer_private(void) const {
   RawEntityId eid = impl->reader.getVal79();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-OMPDeclareReductionDeclInitKind OMPDeclareReductionDecl::initializer_kind(void) const {
-  return static_cast<OMPDeclareReductionDeclInitKind>(impl->reader.getVal80());
+Expr OMPDeclareReductionDecl::initializer(void) const {
+  RawEntityId eid = impl->reader.getVal80();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+}
+
+OMPDeclareReductionInitKind OMPDeclareReductionDecl::initializer_kind(void) const {
+  return static_cast<OMPDeclareReductionInitKind>(impl->reader.getVal81());
 }
 
 gap::generator<Decl> OMPDeclareReductionDecl::declarations_in_context(void) const & {
   EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal50();
+  auto list = impl->reader.getVal51();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

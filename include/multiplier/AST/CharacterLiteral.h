@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <multiplier/AST/CharacterLiteralCharacterKind.h>
+#include <multiplier/AST/CharacterLiteralKind.h>
 #include <multiplier/AST/Expr.h>
 
 namespace mx {
@@ -65,7 +65,7 @@ class MX_EXPORT CharacterLiteral : public Expr {
   static std::optional<CharacterLiteral> from(const VariantEntity &e);
   static std::optional<CharacterLiteral> from(const TokenContext &t);
 
-  CharacterLiteralCharacterKind literal_kind(void) const;
+  CharacterLiteralKind literal_kind(void) const;
   Token token(void) const;
 };
 

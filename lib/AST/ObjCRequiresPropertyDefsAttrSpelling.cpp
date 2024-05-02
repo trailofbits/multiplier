@@ -16,7 +16,7 @@ const char *EnumeratorName(ObjCRequiresPropertyDefsAttrSpelling e) {
   switch (e) {
     case ObjCRequiresPropertyDefsAttrSpelling::GNU_OBJC_REQUIRES_PROPERTY_DEFINITIONS: return "GNU_OBJC_REQUIRES_PROPERTY_DEFINITIONS";
     case ObjCRequiresPropertyDefsAttrSpelling::CXX11_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS: return "CXX11_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS";
-    case ObjCRequiresPropertyDefsAttrSpelling::C2X_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS: return "C2X_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS";
+    case ObjCRequiresPropertyDefsAttrSpelling::C23_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS: return "C23_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS";
     case ObjCRequiresPropertyDefsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -16,7 +16,7 @@ namespace mx {
 enum class OSConsumesThisAttrSpelling : unsigned char {
   GNU_OS_CONSUMES_THIS,
   CXX11_CLANG_OS_CONSUMES_THIS,
-  C2X_CLANG_OS_CONSUMES_THIS,
+  C23_CLANG_OS_CONSUMES_THIS,
   SPELLING_NOT_CALCULATED,
 };
 

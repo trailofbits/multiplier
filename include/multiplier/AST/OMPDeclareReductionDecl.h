@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <multiplier/AST/OMPDeclareReductionDeclInitKind.h>
+#include <multiplier/AST/OMPDeclareReductionInitKind.h>
 #include <multiplier/AST/ValueDecl.h>
 
 namespace mx {
@@ -75,7 +75,7 @@ class MX_EXPORT OMPDeclareReductionDecl : public ValueDecl {
   Expr initializer_original(void) const;
   Expr initializer_private(void) const;
   Expr initializer(void) const;
-  OMPDeclareReductionDeclInitKind initializer_kind(void) const;
+  OMPDeclareReductionInitKind initializer_kind(void) const;
   gap::generator<Decl> declarations_in_context(void) const &;
 };
 

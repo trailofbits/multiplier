@@ -13,6 +13,7 @@
 #include <multiplier/AST/AlwaysInlineAttr.h>
 #include <multiplier/AST/NoInlineAttr.h>
 #include <multiplier/AST/NoMergeAttr.h>
+#include <multiplier/AST/SuppressAttr.h>
 
 #include "../EntityProvider.h"
 #include "../Attr.h"
@@ -26,6 +27,7 @@ namespace {
 static const AttrKind kDeclOrStmtAttrDerivedKinds[] = {
     NoInlineAttr::static_kind(),
     NoMergeAttr::static_kind(),
+    SuppressAttr::static_kind(),
     AlwaysInlineAttr::static_kind(),
 };
 }  // namespace
@@ -69,6 +71,7 @@ std::optional<DeclOrStmtAttr> DeclOrStmtAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
     case NoInlineAttr::static_kind():
     case NoMergeAttr::static_kind():
+    case SuppressAttr::static_kind():
     case AlwaysInlineAttr::static_kind():
       return reinterpret_cast<const DeclOrStmtAttr &>(parent);
     default:

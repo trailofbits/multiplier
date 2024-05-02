@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[397]) || tp >= &(gTypes[398])) {
+  if (tp < &(gTypes[421]) || tp >= &(gTypes[422])) {
     return std::nullopt;
   }
 
@@ -90,7 +90,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::QualifiedType::static_kind():
-      tp = &(gTypes[397]);
+      tp = &(gTypes[421]);
       break;
 
   }
@@ -395,6 +395,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "is_trivially_copy_constructible_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_trivially_copy_constructible_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::QualifiedType::is_trivially_copy_constructible_type"),
+    nullptr,
+  },
+  {
     "is_trivially_copyable_type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -667,7 +677,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[397]);
+  PyTypeObject * const tp = &(gTypes[421]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -682,12 +692,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[386].tp_hash;
-  tp->tp_richcompare = gTypes[386].tp_richcompare;
+  tp->tp_hash = gTypes[410].tp_hash;
+  tp->tp_richcompare = gTypes[410].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[386]);
+  tp->tp_base = &(gTypes[410]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

@@ -16,7 +16,7 @@ namespace mx {
 enum class SYCLKernelAttrSpelling : unsigned char {
   GNU_SYCL_KERNEL,
   CXX11_CLANG_SYCL_KERNEL,
-  C2X_CLANG_SYCL_KERNEL,
+  C23_CLANG_SYCL_KERNEL,
   SPELLING_NOT_CALCULATED,
 };
 

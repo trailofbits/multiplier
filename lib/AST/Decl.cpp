@@ -442,20 +442,24 @@ bool Decl::is_weak_imported(void) const {
   return impl->reader.getVal42();
 }
 
+bool Decl::should_skip_checking_odr(void) const {
+  return impl->reader.getVal43();
+}
+
 DeclKind Decl::kind(void) const {
-  return static_cast<DeclKind>(impl->reader.getVal43());
+  return static_cast<DeclKind>(impl->reader.getVal44());
 }
 
 DeclCategory Decl::category(void) const {
-  return static_cast<DeclCategory>(impl->reader.getVal44());
+  return static_cast<DeclCategory>(impl->reader.getVal45());
 }
 
 Token Decl::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
 }
 
 TokenRange Decl::tokens(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal46(), impl->reader.getVal47());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal47(), impl->reader.getVal48());
 }
 
 #pragma GCC diagnostic pop

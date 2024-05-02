@@ -15,6 +15,7 @@ namespace mx {
 const char *EnumeratorName(UnaryExprOrTypeTrait e) {
   switch (e) {
     case UnaryExprOrTypeTrait::SIZE_OF: return "SIZE_OF";
+    case UnaryExprOrTypeTrait::DATA_SIZE_OF: return "DATA_SIZE_OF";
     case UnaryExprOrTypeTrait::ALIGN_OF: return "ALIGN_OF";
     case UnaryExprOrTypeTrait::PREFERRED_ALIGN_OF: return "PREFERRED_ALIGN_OF";
     case UnaryExprOrTypeTrait::POINTER_AUTH_TYPE_DISCRIMINATOR: return "POINTER_AUTH_TYPE_DISCRIMINATOR";
@@ -23,6 +24,7 @@ const char *EnumeratorName(UnaryExprOrTypeTrait e) {
     case UnaryExprOrTypeTrait::TMO_TYPE_GET_METADATA: return "TMO_TYPE_GET_METADATA";
     case UnaryExprOrTypeTrait::VEC_STEP: return "VEC_STEP";
     case UnaryExprOrTypeTrait::OPEN_MP_REQUIRED_SIMD_ALIGN: return "OPEN_MP_REQUIRED_SIMD_ALIGN";
+    case UnaryExprOrTypeTrait::VECTOR_ELEMENTS: return "VECTOR_ELEMENTS";
     default: return "<invalid>";
   }
 }

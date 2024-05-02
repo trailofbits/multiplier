@@ -16,7 +16,7 @@ namespace mx {
 enum class AllocAlignAttrSpelling : unsigned char {
   GNU_ALLOC_ALIGN,
   CXX11_GNU_ALLOC_ALIGN,
-  C2X_GNU_ALLOC_ALIGN,
+  C23_GNU_ALLOC_ALIGN,
   SPELLING_NOT_CALCULATED,
 };
 

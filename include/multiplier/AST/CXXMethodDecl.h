@@ -73,12 +73,15 @@ class MX_EXPORT CXXMethodDecl : public FunctionDecl {
   static std::optional<CXXMethodDecl> from(const VariantEntity &e);
   static std::optional<CXXMethodDecl> from(const TokenContext &t);
 
+  Type function_object_parameter_reference_type(void) const;
+  Type function_object_parameter_type(void) const;
   RefQualifierKind reference_qualifier(void) const;
-  std::optional<Type> this_object_type(void) const;
   std::optional<Type> this_type(void) const;
   bool has_inline_body(void) const;
   bool is_const(void) const;
   bool is_copy_assignment_operator(void) const;
+  bool is_explicit_object_member_function(void) const;
+  bool is_implicit_object_member_function(void) const;
   bool is_instance(void) const;
   bool is_lambda_static_invoker(void) const;
   bool is_move_assignment_operator(void) const;

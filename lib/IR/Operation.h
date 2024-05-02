@@ -19,6 +19,7 @@
    _llvm("llvm.atomicrmw", OperationKind::LLVM_ATOMICRMW, mlir::LLVM::AtomicRMWOp) \
    _llvm("llvm.bitcast", OperationKind::LLVM_BITCAST, mlir::LLVM::BitcastOp) \
    _llvm("llvm.br", OperationKind::LLVM_BR, mlir::LLVM::BrOp) \
+   _llvm("llvm.call_intrinsic", OperationKind::LLVM_CALL_INTRINSIC, mlir::LLVM::CallIntrinsicOp) \
    _llvm("llvm.call", OperationKind::LLVM_CALL, mlir::LLVM::CallOp) \
    _llvm("llvm.comdat", OperationKind::LLVM_COMDAT, mlir::LLVM::ComdatOp) \
    _llvm("llvm.comdat_selector", OperationKind::LLVM_COMDAT_SELECTOR, mlir::LLVM::ComdatSelectorOp) \
@@ -52,10 +53,10 @@
    _llvm("llvm.func", OperationKind::LLVM_FUNC, mlir::LLVM::LLVMFuncOp) \
    _llvm("llvm.lshr", OperationKind::LLVM_LSHR, mlir::LLVM::LShrOp) \
    _llvm("llvm.landingpad", OperationKind::LLVM_LANDINGPAD, mlir::LLVM::LandingpadOp) \
+   _llvm("llvm.linker_options", OperationKind::LLVM_LINKER_OPTIONS, mlir::LLVM::LinkerOptionsOp) \
    _llvm("llvm.load", OperationKind::LLVM_LOAD, mlir::LLVM::LoadOp) \
-   _llvm("llvm.metadata", OperationKind::LLVM_METADATA, mlir::LLVM::MetadataOp) \
    _llvm("llvm.mul", OperationKind::LLVM_MUL, mlir::LLVM::MulOp) \
-   _llvm("llvm.mlir.null", OperationKind::LLVM_MLIR_NULL, mlir::LLVM::NullOp) \
+   _llvm("llvm.mlir.none", OperationKind::LLVM_MLIR_NONE, mlir::LLVM::NoneTokenOp) \
    _llvm("llvm.or", OperationKind::LLVM_OR, mlir::LLVM::OrOp) \
    _llvm("llvm.mlir.poison", OperationKind::LLVM_MLIR_POISON, mlir::LLVM::PoisonOp) \
    _llvm("llvm.ptrtoint", OperationKind::LLVM_PTRTOINT, mlir::LLVM::PtrToIntOp) \
@@ -79,18 +80,19 @@
    _llvm("llvm.unreachable", OperationKind::LLVM_UNREACHABLE, mlir::LLVM::UnreachableOp) \
    _llvm("llvm.xor", OperationKind::LLVM_XOR, mlir::LLVM::XOrOp) \
    _llvm("llvm.zext", OperationKind::LLVM_ZEXT, mlir::LLVM::ZExtOp) \
+   _llvm("llvm.mlir.zero", OperationKind::LLVM_MLIR_ZERO, mlir::LLVM::ZeroOp) \
    _llvm("llvm.intr.abs", OperationKind::LLVM_INTR_ABS, mlir::LLVM::AbsOp) \
    _llvm("llvm.intr.annotation", OperationKind::LLVM_INTR_ANNOTATION, mlir::LLVM::Annotation) \
    _llvm("llvm.intr.assume", OperationKind::LLVM_INTR_ASSUME, mlir::LLVM::AssumeOp) \
    _llvm("llvm.intr.bitreverse", OperationKind::LLVM_INTR_BITREVERSE, mlir::LLVM::BitReverseOp) \
    _llvm("llvm.intr.bswap", OperationKind::LLVM_INTR_BSWAP, mlir::LLVM::ByteSwapOp) \
-   _llvm("llvm.call_intrinsic", OperationKind::LLVM_CALL_INTRINSIC, mlir::LLVM::CallIntrinsicOp) \
    _llvm("llvm.intr.copysign", OperationKind::LLVM_INTR_COPYSIGN, mlir::LLVM::CopySignOp) \
    _llvm("llvm.intr.coro.align", OperationKind::LLVM_INTR_CORO_ALIGN, mlir::LLVM::CoroAlignOp) \
    _llvm("llvm.intr.coro.begin", OperationKind::LLVM_INTR_CORO_BEGIN, mlir::LLVM::CoroBeginOp) \
    _llvm("llvm.intr.coro.end", OperationKind::LLVM_INTR_CORO_END, mlir::LLVM::CoroEndOp) \
    _llvm("llvm.intr.coro.free", OperationKind::LLVM_INTR_CORO_FREE, mlir::LLVM::CoroFreeOp) \
    _llvm("llvm.intr.coro.id", OperationKind::LLVM_INTR_CORO_ID, mlir::LLVM::CoroIdOp) \
+   _llvm("llvm.intr.coro.promise", OperationKind::LLVM_INTR_CORO_PROMISE, mlir::LLVM::CoroPromiseOp) \
    _llvm("llvm.intr.coro.resume", OperationKind::LLVM_INTR_CORO_RESUME, mlir::LLVM::CoroResumeOp) \
    _llvm("llvm.intr.coro.save", OperationKind::LLVM_INTR_CORO_SAVE, mlir::LLVM::CoroSaveOp) \
    _llvm("llvm.intr.coro.size", OperationKind::LLVM_INTR_CORO_SIZE, mlir::LLVM::CoroSizeOp) \
@@ -117,6 +119,8 @@
    _llvm("llvm.intr.fshl", OperationKind::LLVM_INTR_FSHL, mlir::LLVM::FshlOp) \
    _llvm("llvm.intr.fshr", OperationKind::LLVM_INTR_FSHR, mlir::LLVM::FshrOp) \
    _llvm("llvm.intr.get.active.lane.mask", OperationKind::LLVM_INTR_GET_ACTIVE_LANE_MASK, mlir::LLVM::GetActiveLaneMaskOp) \
+   _llvm("llvm.intr.invariant.end", OperationKind::LLVM_INTR_INVARIANT_END, mlir::LLVM::InvariantEndOp) \
+   _llvm("llvm.intr.invariant.start", OperationKind::LLVM_INTR_INVARIANT_START, mlir::LLVM::InvariantStartOp) \
    _llvm("llvm.intr.is.constant", OperationKind::LLVM_INTR_IS_CONSTANT, mlir::LLVM::IsConstantOp) \
    _llvm("llvm.intr.is.fpclass", OperationKind::LLVM_INTR_IS_FPCLASS, mlir::LLVM::IsFPClass) \
    _llvm("llvm.intr.lifetime.end", OperationKind::LLVM_INTR_LIFETIME_END, mlir::LLVM::LifetimeEndOp) \
@@ -284,7 +288,6 @@
    _memref("memref.transpose", OperationKind::MEMREF_TRANSPOSE, mlir::memref::TransposeOp) \
    _memref("memref.view", OperationKind::MEMREF_VIEW, mlir::memref::ViewOp) \
    _memref("memref.subview", OperationKind::MEMREF_SUBVIEW, mlir::memref::SubViewOp) \
-   _memref("memref.tensor_store", OperationKind::MEMREF_TENSOR_STORE, mlir::memref::TensorStoreOp) \
    _abi("abi.call_args", OperationKind::ABI_CALL_ARGS, vast::abi::CallArgsOp) \
    _abi("abi.call_exec", OperationKind::ABI_CALL_EXEC, vast::abi::CallExecutionOp) \
    _abi("abi.call", OperationKind::ABI_CALL, vast::abi::CallOp) \
@@ -292,11 +295,12 @@
    _abi("abi.direct", OperationKind::ABI_DIRECT, vast::abi::DirectOp) \
    _abi("abi.epilogue", OperationKind::ABI_EPILOGUE, vast::abi::EpilogueOp) \
    _abi("abi.func", OperationKind::ABI_FUNC, vast::abi::FuncOp) \
+   _abi("abi.indirect", OperationKind::ABI_INDIRECT, vast::abi::IndirectOp) \
    _abi("abi.prologue", OperationKind::ABI_PROLOGUE, vast::abi::PrologueOp) \
    _abi("abi.ret_direct", OperationKind::ABI_RET_DIRECT, vast::abi::RetDirectOp) \
-   _abi("abi.todo", OperationKind::ABI_TODO, vast::abi::TodoOp) \
-   _abi("abi.wrap_fn", OperationKind::ABI_WRAP_FN, vast::abi::WrapFuncOp) \
    _abi("abi.yield", OperationKind::ABI_YIELD, vast::abi::YieldOp) \
+   _ll("ll.alloca", OperationKind::LL_ALLOCA, vast::ll::Alloca) \
+   _ll("ll.arg_alloca", OperationKind::LL_ARG_ALLOCA, vast::ll::ArgAlloca) \
    _ll("ll.br", OperationKind::LL_BR, vast::ll::Br) \
    _ll("ll.concat", OperationKind::LL_CONCAT, vast::ll::Concat) \
    _ll("ll.cond_br", OperationKind::LL_COND_BR, vast::ll::CondBr) \
@@ -304,12 +308,15 @@
    _ll("ll.extract", OperationKind::LL_EXTRACT, vast::ll::Extract) \
    _ll("ll.initialize", OperationKind::LL_INITIALIZE, vast::ll::InitializeVar) \
    _ll("ll.inline_scope", OperationKind::LL_INLINE_SCOPE, vast::ll::InlineScope) \
+   _ll("ll.load", OperationKind::LL_LOAD, vast::ll::Load) \
    _ll("ll.func", OperationKind::LL_FUNC, vast::ll::FuncOp) \
    _ll("ll.gep", OperationKind::LL_GEP, vast::ll::StructGEPOp) \
    _ll("ll.return", OperationKind::LL_RETURN, vast::ll::ReturnOp) \
    _ll("ll.scope", OperationKind::LL_SCOPE, vast::ll::Scope) \
    _ll("ll.scope_recurse", OperationKind::LL_SCOPE_RECURSE, vast::ll::ScopeRecurse) \
    _ll("ll.scope_ret", OperationKind::LL_SCOPE_RET, vast::ll::ScopeRet) \
+   _ll("ll.store", OperationKind::LL_STORE, vast::ll::Store) \
+   _ll("ll.subscript", OperationKind::LL_SUBSCRIPT, vast::ll::Subscript) \
    _ll("ll.uninitialized_var", OperationKind::LL_UNINITIALIZED_VAR, vast::ll::UninitializedVar) \
    _hl("hl.access", OperationKind::HL_ACCESS, vast::hl::AccessSpecifierOp) \
    _hl("hl.assign.fadd", OperationKind::HL_ASSIGN_FADD, vast::hl::AddFAssignOp) \
@@ -423,6 +430,7 @@
    _hl("hl.typeof.type", OperationKind::HL_TYPEOF_TYPE, vast::hl::TypeOfTypeOp) \
    _hl("hl.union", OperationKind::HL_UNION, vast::hl::UnionDeclOp) \
    _hl("hl.unreachable", OperationKind::HL_UNREACHABLE, vast::hl::UnreachableOp) \
+   _hl("hl.va_arg_expr", OperationKind::HL_VA_ARG_EXPR, vast::hl::VAArgExpr) \
    _core("core.bin.land", OperationKind::CORE_BIN_LAND, vast::core::BinLAndOp) \
    _core("core.bin.lor", OperationKind::CORE_BIN_LOR, vast::core::BinLOrOp) \
    _core("core.implicit.return", OperationKind::CORE_IMPLICIT_RETURN, vast::core::ImplicitReturnOp) \
@@ -432,5 +440,5 @@
    _unsup("unsup.decl", OperationKind::UNSUP_DECL, vast::unsup::UnsupportedDecl) \
    _unsup("unsup.stmt", OperationKind::UNSUP_STMT, vast::unsup::UnsupportedStmt)
 
-#define MX_IR_NUM_MLIR_OPS 424
+#define MX_IR_NUM_MLIR_OPS 432
 

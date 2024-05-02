@@ -16,7 +16,7 @@ const char *EnumeratorName(MustTailAttrSpelling e) {
   switch (e) {
     case MustTailAttrSpelling::GNU_MUSTTAIL: return "GNU_MUSTTAIL";
     case MustTailAttrSpelling::CXX11_CLANG_MUSTTAIL: return "CXX11_CLANG_MUSTTAIL";
-    case MustTailAttrSpelling::C2X_CLANG_MUSTTAIL: return "C2X_CLANG_MUSTTAIL";
+    case MustTailAttrSpelling::C23_CLANG_MUSTTAIL: return "C23_CLANG_MUSTTAIL";
     case MustTailAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

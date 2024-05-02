@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[904]) || tp >= &(gTypes[925])) {
+  if (tp < &(gTypes[937]) || tp >= &(gTypes[959])) {
     return std::nullopt;
   }
 
@@ -89,84 +89,88 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       tp = gType;
       break;
 
-    case mx::ir::hl::AllocAlignAttr::static_kind():
-      tp = &(gTypes[905]);
-      break;
-
-    case mx::ir::hl::AllocSizeAttr::static_kind():
-      tp = &(gTypes[906]);
-      break;
-
     case mx::ir::hl::AnnotationAttr::static_kind():
-      tp = &(gTypes[907]);
-      break;
-
-    case mx::ir::hl::AsmLabelAttr::static_kind():
-      tp = &(gTypes[908]);
-      break;
-
-    case mx::ir::hl::BuiltinAttr::static_kind():
-      tp = &(gTypes[909]);
-      break;
-
-    case mx::ir::hl::CVQualifiersAttr::static_kind():
-      tp = &(gTypes[910]);
-      break;
-
-    case mx::ir::hl::CVRQualifiersAttr::static_kind():
-      tp = &(gTypes[911]);
-      break;
-
-    case mx::ir::hl::ConstAttr::static_kind():
-      tp = &(gTypes[912]);
+      tp = &(gTypes[938]);
       break;
 
     case mx::ir::hl::FormatAttr::static_kind():
-      tp = &(gTypes[913]);
-      break;
-
-    case mx::ir::hl::LoaderUninitializedAttr::static_kind():
-      tp = &(gTypes[914]);
-      break;
-
-    case mx::ir::hl::ModeAttr::static_kind():
-      tp = &(gTypes[915]);
-      break;
-
-    case mx::ir::hl::NoInstrumentFunctionAttr::static_kind():
-      tp = &(gTypes[916]);
-      break;
-
-    case mx::ir::hl::NoThrowAttr::static_kind():
-      tp = &(gTypes[917]);
-      break;
-
-    case mx::ir::hl::NonNullAttr::static_kind():
-      tp = &(gTypes[918]);
-      break;
-
-    case mx::ir::hl::PackedAttr::static_kind():
-      tp = &(gTypes[919]);
-      break;
-
-    case mx::ir::hl::PureAttr::static_kind():
-      tp = &(gTypes[920]);
-      break;
-
-    case mx::ir::hl::RestrictAttr::static_kind():
-      tp = &(gTypes[921]);
+      tp = &(gTypes[939]);
       break;
 
     case mx::ir::hl::SectionAttr::static_kind():
-      tp = &(gTypes[922]);
+      tp = &(gTypes[940]);
       break;
 
-    case mx::ir::hl::UCVQualifiersAttr::static_kind():
-      tp = &(gTypes[923]);
+    case mx::ir::hl::AlwaysInlineAttr::static_kind():
+      tp = &(gTypes[941]);
+      break;
+
+    case mx::ir::hl::ConstAttr::static_kind():
+      tp = &(gTypes[942]);
+      break;
+
+    case mx::ir::hl::LoaderUninitializedAttr::static_kind():
+      tp = &(gTypes[943]);
+      break;
+
+    case mx::ir::hl::NoInstrumentFunctionAttr::static_kind():
+      tp = &(gTypes[944]);
+      break;
+
+    case mx::ir::hl::PackedAttr::static_kind():
+      tp = &(gTypes[945]);
+      break;
+
+    case mx::ir::hl::PureAttr::static_kind():
+      tp = &(gTypes[946]);
       break;
 
     case mx::ir::hl::WarnUnusedResultAttr::static_kind():
-      tp = &(gTypes[924]);
+      tp = &(gTypes[947]);
+      break;
+
+    case mx::ir::hl::RestrictAttr::static_kind():
+      tp = &(gTypes[948]);
+      break;
+
+    case mx::ir::hl::NoThrowAttr::static_kind():
+      tp = &(gTypes[949]);
+      break;
+
+    case mx::ir::hl::NonNullAttr::static_kind():
+      tp = &(gTypes[950]);
+      break;
+
+    case mx::ir::hl::AsmLabelAttr::static_kind():
+      tp = &(gTypes[951]);
+      break;
+
+    case mx::ir::hl::ModeAttr::static_kind():
+      tp = &(gTypes[952]);
+      break;
+
+    case mx::ir::hl::BuiltinAttr::static_kind():
+      tp = &(gTypes[953]);
+      break;
+
+    case mx::ir::hl::AllocAlignAttr::static_kind():
+      tp = &(gTypes[954]);
+      break;
+
+    case mx::ir::hl::AllocSizeAttr::static_kind():
+      tp = &(gTypes[955]);
+      break;
+
+    case mx::ir::hl::CVQualifiersAttr::static_kind():
+      tp = &(gTypes[956]);
+      break;
+
+    case mx::ir::hl::UCVQualifiersAttr::static_kind():
+      tp = &(gTypes[957]);
+      break;
+
+    case mx::ir::hl::CVRQualifiersAttr::static_kind():
+      tp = &(gTypes[958]);
       break;
 
   }
@@ -234,7 +238,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[904]);
+  PyTypeObject * const tp = &(gTypes[937]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -249,12 +253,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[843].tp_hash;
-  tp->tp_richcompare = gTypes[843].tp_richcompare;
+  tp->tp_hash = gTypes[867].tp_hash;
+  tp->tp_richcompare = gTypes[867].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[843]);
+  tp->tp_base = &(gTypes[867]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

@@ -77,6 +77,7 @@ class MX_EXPORT DeclRefExpr : public Expr {
   bool has_qualifier(void) const;
   bool has_template_keyword_and_arguments_info(void) const;
   bool has_template_keyword(void) const;
+  bool is_captured_by_copy_in_lambda_with_explicit_object_parameter(void) const;
   bool is_immediate_escalating(void) const;
   NonOdrUseReason is_non_odr_use(void) const;
   bool refers_to_enclosing_variable_or_capture(void) const;

@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LLVM_PASTA_VER: 145b6ff
-  LLVM_VER: 17
+  LLVM_PASTA_VER: f36f80d
+  LLVM_VER: 18
   PYTHON_VER: 3.11
 
 jobs:

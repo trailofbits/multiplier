@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <multiplier/AST/HLSLResourceAttrResourceClass.h>
-#include <multiplier/AST/HLSLResourceAttrResourceKind.h>
 #include <multiplier/AST/InheritableAttr.h>
 
 namespace mx {
@@ -52,8 +50,7 @@ class MX_EXPORT HLSLResourceAttr : public InheritableAttr {
   static std::optional<HLSLResourceAttr> from(const VariantEntity &e);
   static std::optional<HLSLResourceAttr> from(const TokenContext &t);
 
-  HLSLResourceAttrResourceKind resource_shape(void) const;
-  HLSLResourceAttrResourceClass resource_type(void) const;
+  bool is_rov(void) const;
 };
 
 static_assert(sizeof(HLSLResourceAttr) == sizeof(InheritableAttr));

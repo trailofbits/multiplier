@@ -235,16 +235,20 @@ bool DeclRefExpr::has_template_keyword(void) const {
   return impl->reader.getVal88();
 }
 
-bool DeclRefExpr::is_immediate_escalating(void) const {
+bool DeclRefExpr::is_captured_by_copy_in_lambda_with_explicit_object_parameter(void) const {
   return impl->reader.getVal89();
 }
 
+bool DeclRefExpr::is_immediate_escalating(void) const {
+  return impl->reader.getVal90();
+}
+
 NonOdrUseReason DeclRefExpr::is_non_odr_use(void) const {
-  return static_cast<NonOdrUseReason>(impl->reader.getVal90());
+  return static_cast<NonOdrUseReason>(impl->reader.getVal91());
 }
 
 bool DeclRefExpr::refers_to_enclosing_variable_or_capture(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal92();
 }
 
 #pragma GCC diagnostic pop

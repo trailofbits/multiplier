@@ -16,7 +16,7 @@ namespace mx {
 enum class PackedAttrSpelling : unsigned char {
   GNU_PACKED,
   CXX11_GNU_PACKED,
-  C2X_GNU_PACKED,
+  C23_GNU_PACKED,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -16,7 +16,7 @@ const char *EnumeratorName(CDeclAttrSpelling e) {
   switch (e) {
     case CDeclAttrSpelling::GNU_CDECL: return "GNU_CDECL";
     case CDeclAttrSpelling::CXX11_GNU_CDECL: return "CXX11_GNU_CDECL";
-    case CDeclAttrSpelling::C2X_GNU_CDECL: return "C2X_GNU_CDECL";
+    case CDeclAttrSpelling::C23_GNU_CDECL: return "C23_GNU_CDECL";
     case CDeclAttrSpelling::KEYWORD_CDECL: return "KEYWORD_CDECL";
     case CDeclAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

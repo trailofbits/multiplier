@@ -9,11 +9,11 @@
 #include <multiplier/AST/StmtAttr.h>
 #include <multiplier/AST/Attr.h>
 #include <multiplier/Frontend/Token.h>
+#include <multiplier/AST/CodeAlignAttr.h>
 #include <multiplier/AST/FallThroughAttr.h>
 #include <multiplier/AST/LikelyAttr.h>
 #include <multiplier/AST/MustTailAttr.h>
 #include <multiplier/AST/OpenCLUnrollHintAttr.h>
-#include <multiplier/AST/SuppressAttr.h>
 #include <multiplier/AST/UnlikelyAttr.h>
 
 #include "../EntityProvider.h"
@@ -26,8 +26,8 @@ namespace mx {
 
 namespace {
 static const AttrKind kStmtAttrDerivedKinds[] = {
-    SuppressAttr::static_kind(),
     UnlikelyAttr::static_kind(),
+    CodeAlignAttr::static_kind(),
     FallThroughAttr::static_kind(),
     LikelyAttr::static_kind(),
     MustTailAttr::static_kind(),
@@ -72,8 +72,8 @@ std::optional<StmtAttr> StmtAttr::from(const std::optional<Attr> &parent) {
 
 std::optional<StmtAttr> StmtAttr::from_base(const Attr &parent) {
   switch (parent.kind()) {
-    case SuppressAttr::static_kind():
     case UnlikelyAttr::static_kind():
+    case CodeAlignAttr::static_kind():
     case FallThroughAttr::static_kind():
     case LikelyAttr::static_kind():
     case MustTailAttr::static_kind():

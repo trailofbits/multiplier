@@ -16,7 +16,7 @@ const char *EnumeratorName(EnumExtensibilityAttrSpelling e) {
   switch (e) {
     case EnumExtensibilityAttrSpelling::GNU_ENUM_EXTENSIBILITY: return "GNU_ENUM_EXTENSIBILITY";
     case EnumExtensibilityAttrSpelling::CXX11_CLANG_ENUM_EXTENSIBILITY: return "CXX11_CLANG_ENUM_EXTENSIBILITY";
-    case EnumExtensibilityAttrSpelling::C2X_CLANG_ENUM_EXTENSIBILITY: return "C2X_CLANG_ENUM_EXTENSIBILITY";
+    case EnumExtensibilityAttrSpelling::C23_CLANG_ENUM_EXTENSIBILITY: return "C23_CLANG_ENUM_EXTENSIBILITY";
     case EnumExtensibilityAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

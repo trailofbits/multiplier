@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <multiplier/AST/ArrayTypeArraySizeModifier.h>
+#include <multiplier/AST/ArraySizeModifier.h>
 #include <multiplier/AST/Type.h>
 
 namespace mx {
@@ -44,7 +44,7 @@ class MX_EXPORT ArrayType : public Type {
   static std::optional<ArrayType> from(const TokenContext &t);
 
   Type element_type(void) const;
-  ArrayTypeArraySizeModifier size_modifier(void) const;
+  ArraySizeModifier size_modifier(void) const;
 };
 
 static_assert(sizeof(ArrayType) == sizeof(Type));

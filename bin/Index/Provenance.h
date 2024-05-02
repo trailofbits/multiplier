@@ -8,7 +8,7 @@
 
 #include <cassert>
 #include <deque>
-#include <gap/core/generator.hpp>
+#include <gap/coro/generator.hpp>
 #include <iosfwd>
 #include <multiplier/Types.h>
 #include <pasta/AST/Token.h>

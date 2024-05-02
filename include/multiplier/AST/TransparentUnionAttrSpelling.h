@@ -16,7 +16,7 @@ namespace mx {
 enum class TransparentUnionAttrSpelling : unsigned char {
   GNU_TRANSPARENT_UNION,
   CXX11_GNU_TRANSPARENT_UNION,
-  C2X_GNU_TRANSPARENT_UNION,
+  C23_GNU_TRANSPARENT_UNION,
   SPELLING_NOT_CALCULATED,
 };
 

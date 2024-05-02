@@ -16,7 +16,7 @@ const char *EnumeratorName(FlagEnumAttrSpelling e) {
   switch (e) {
     case FlagEnumAttrSpelling::GNU_FLAG_ENUM: return "GNU_FLAG_ENUM";
     case FlagEnumAttrSpelling::CXX11_CLANG_FLAG_ENUM: return "CXX11_CLANG_FLAG_ENUM";
-    case FlagEnumAttrSpelling::C2X_CLANG_FLAG_ENUM: return "C2X_CLANG_FLAG_ENUM";
+    case FlagEnumAttrSpelling::C23_CLANG_FLAG_ENUM: return "C23_CLANG_FLAG_ENUM";
     case FlagEnumAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

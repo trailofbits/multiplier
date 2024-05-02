@@ -28,7 +28,7 @@
 #pragma clang diagnostic ignored "-Wshadow"
 #pragma clang diagnostic ignored "-Wcast-align"
 #include <llvm/IR/LLVMContext.h>
-#include <llvm/Support/Host.h>
+//#include <llvm/Support/Host.h>
 #include <llvm/Support/InitLLVM.h>
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/MemoryBuffer.h>

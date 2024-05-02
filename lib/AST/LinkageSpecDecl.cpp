@@ -219,19 +219,19 @@ std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const TokenContext &t) {
 }
 
 Token LinkageSpecDecl::extern_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
 }
 
-LinkageSpecDeclLanguageIDs LinkageSpecDecl::language(void) const {
-  return static_cast<LinkageSpecDeclLanguageIDs>(impl->reader.getVal64());
+LinkageSpecLanguageIDs LinkageSpecDecl::language(void) const {
+  return static_cast<LinkageSpecLanguageIDs>(impl->reader.getVal65());
 }
 
 Token LinkageSpecDecl::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
 bool LinkageSpecDecl::has_braces(void) const {
-  return impl->reader.getVal49();
+  return impl->reader.getVal50();
 }
 
 #pragma GCC diagnostic pop

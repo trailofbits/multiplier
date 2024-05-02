@@ -16,7 +16,7 @@ namespace mx {
 enum class EnforceTCBAttrSpelling : unsigned char {
   GNU_ENFORCE_TCB,
   CXX11_CLANG_ENFORCE_TCB,
-  C2X_CLANG_ENFORCE_TCB,
+  C23_CLANG_ENFORCE_TCB,
   SPELLING_NOT_CALCULATED,
 };
 

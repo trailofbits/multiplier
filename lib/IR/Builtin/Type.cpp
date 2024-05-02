@@ -67,17 +67,6 @@ std::optional<FloatType> FloatType::from(const ::mx::ir::Type &that) {
   return ::mlir::FloatType(this->::mx::ir::Type::type_);
 }
 
-std::optional<BFloat16Type> BFloat16Type::from(const ::mx::ir::Type &that) {
-  if (that.kind() == TypeKind::BUILTIN_B_FLOAT16) {
-    return reinterpret_cast<const BFloat16Type &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::BFloat16Type BFloat16Type::underlying_repr(void) const noexcept {
-  return ::mlir::BFloat16Type(this->::mx::ir::Type::type_);
-}
-
 std::optional<ComplexType> ComplexType::from(const ::mx::ir::Type &that) {
   if (that.kind() == TypeKind::BUILTIN_COMPLEX) {
     return reinterpret_cast<const ComplexType &>(that);
@@ -87,39 +76,6 @@ std::optional<ComplexType> ComplexType::from(const ::mx::ir::Type &that) {
 
 ::mlir::ComplexType ComplexType::underlying_repr(void) const noexcept {
   return ::mlir::ComplexType(this->::mx::ir::Type::type_);
-}
-
-std::optional<Float8E4M3B11FNUZType> Float8E4M3B11FNUZType::from(const ::mx::ir::Type &that) {
-  if (that.kind() == TypeKind::BUILTIN_FLOAT8_E4_M3_B11_FNUZ) {
-    return reinterpret_cast<const Float8E4M3B11FNUZType &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::Float8E4M3B11FNUZType Float8E4M3B11FNUZType::underlying_repr(void) const noexcept {
-  return ::mlir::Float8E4M3B11FNUZType(this->::mx::ir::Type::type_);
-}
-
-std::optional<Float8E4M3FNType> Float8E4M3FNType::from(const ::mx::ir::Type &that) {
-  if (that.kind() == TypeKind::BUILTIN_FLOAT8_E4_M3_FN) {
-    return reinterpret_cast<const Float8E4M3FNType &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::Float8E4M3FNType Float8E4M3FNType::underlying_repr(void) const noexcept {
-  return ::mlir::Float8E4M3FNType(this->::mx::ir::Type::type_);
-}
-
-std::optional<Float8E4M3FNUZType> Float8E4M3FNUZType::from(const ::mx::ir::Type &that) {
-  if (that.kind() == TypeKind::BUILTIN_FLOAT8_E4_M3_FNUZ) {
-    return reinterpret_cast<const Float8E4M3FNUZType &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::Float8E4M3FNUZType Float8E4M3FNUZType::underlying_repr(void) const noexcept {
-  return ::mlir::Float8E4M3FNUZType(this->::mx::ir::Type::type_);
 }
 
 std::optional<Float8E5M2Type> Float8E5M2Type::from(const ::mx::ir::Type &that) {
@@ -133,6 +89,17 @@ std::optional<Float8E5M2Type> Float8E5M2Type::from(const ::mx::ir::Type &that) {
   return ::mlir::Float8E5M2Type(this->::mx::ir::Type::type_);
 }
 
+std::optional<Float8E4M3FNType> Float8E4M3FNType::from(const ::mx::ir::Type &that) {
+  if (that.kind() == TypeKind::BUILTIN_FLOAT8_E4_M3_FN) {
+    return reinterpret_cast<const Float8E4M3FNType &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::Float8E4M3FNType Float8E4M3FNType::underlying_repr(void) const noexcept {
+  return ::mlir::Float8E4M3FNType(this->::mx::ir::Type::type_);
+}
+
 std::optional<Float8E5M2FNUZType> Float8E5M2FNUZType::from(const ::mx::ir::Type &that) {
   if (that.kind() == TypeKind::BUILTIN_FLOAT8_E5_M2_FNUZ) {
     return reinterpret_cast<const Float8E5M2FNUZType &>(that);
@@ -144,6 +111,39 @@ std::optional<Float8E5M2FNUZType> Float8E5M2FNUZType::from(const ::mx::ir::Type 
   return ::mlir::Float8E5M2FNUZType(this->::mx::ir::Type::type_);
 }
 
+std::optional<Float8E4M3FNUZType> Float8E4M3FNUZType::from(const ::mx::ir::Type &that) {
+  if (that.kind() == TypeKind::BUILTIN_FLOAT8_E4_M3_FNUZ) {
+    return reinterpret_cast<const Float8E4M3FNUZType &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::Float8E4M3FNUZType Float8E4M3FNUZType::underlying_repr(void) const noexcept {
+  return ::mlir::Float8E4M3FNUZType(this->::mx::ir::Type::type_);
+}
+
+std::optional<Float8E4M3B11FNUZType> Float8E4M3B11FNUZType::from(const ::mx::ir::Type &that) {
+  if (that.kind() == TypeKind::BUILTIN_FLOAT8_E4_M3_B11_FNUZ) {
+    return reinterpret_cast<const Float8E4M3B11FNUZType &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::Float8E4M3B11FNUZType Float8E4M3B11FNUZType::underlying_repr(void) const noexcept {
+  return ::mlir::Float8E4M3B11FNUZType(this->::mx::ir::Type::type_);
+}
+
+std::optional<BFloat16Type> BFloat16Type::from(const ::mx::ir::Type &that) {
+  if (that.kind() == TypeKind::BUILTIN_B_FLOAT16) {
+    return reinterpret_cast<const BFloat16Type &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::BFloat16Type BFloat16Type::underlying_repr(void) const noexcept {
+  return ::mlir::BFloat16Type(this->::mx::ir::Type::type_);
+}
+
 std::optional<Float16Type> Float16Type::from(const ::mx::ir::Type &that) {
   if (that.kind() == TypeKind::BUILTIN_FLOAT16) {
     return reinterpret_cast<const Float16Type &>(that);
@@ -153,6 +153,17 @@ std::optional<Float16Type> Float16Type::from(const ::mx::ir::Type &that) {
 
 ::mlir::Float16Type Float16Type::underlying_repr(void) const noexcept {
   return ::mlir::Float16Type(this->::mx::ir::Type::type_);
+}
+
+std::optional<FloatTF32Type> FloatTF32Type::from(const ::mx::ir::Type &that) {
+  if (that.kind() == TypeKind::BUILTIN_FLOAT_TF32) {
+    return reinterpret_cast<const FloatTF32Type &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::FloatTF32Type FloatTF32Type::underlying_repr(void) const noexcept {
+  return ::mlir::FloatTF32Type(this->::mx::ir::Type::type_);
 }
 
 std::optional<Float32Type> Float32Type::from(const ::mx::ir::Type &that) {
@@ -197,17 +208,6 @@ std::optional<Float128Type> Float128Type::from(const ::mx::ir::Type &that) {
 
 ::mlir::Float128Type Float128Type::underlying_repr(void) const noexcept {
   return ::mlir::Float128Type(this->::mx::ir::Type::type_);
-}
-
-std::optional<FloatTF32Type> FloatTF32Type::from(const ::mx::ir::Type &that) {
-  if (that.kind() == TypeKind::BUILTIN_FLOAT_TF32) {
-    return reinterpret_cast<const FloatTF32Type &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::FloatTF32Type FloatTF32Type::underlying_repr(void) const noexcept {
-  return ::mlir::FloatTF32Type(this->::mx::ir::Type::type_);
 }
 
 std::optional<FunctionType> FunctionType::from(const ::mx::ir::Type &that) {

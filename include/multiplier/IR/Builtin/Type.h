@@ -13,19 +13,19 @@
 namespace mlir {
 class ShapedType;
 class FloatType;
-class BFloat16Type;
 class ComplexType;
-class Float8E4M3B11FNUZType;
-class Float8E4M3FNType;
-class Float8E4M3FNUZType;
 class Float8E5M2Type;
+class Float8E4M3FNType;
 class Float8E5M2FNUZType;
+class Float8E4M3FNUZType;
+class Float8E4M3B11FNUZType;
+class BFloat16Type;
 class Float16Type;
+class FloatTF32Type;
 class Float32Type;
 class Float64Type;
 class Float80Type;
 class Float128Type;
-class FloatTF32Type;
 class FunctionType;
 class IndexType;
 class IntegerType;
@@ -58,7 +58,7 @@ class MX_EXPORT ShapedType final : public Type {
   // Imported methods:
   //::mlir::Type element_type(void) const;
   bool has_rank(void) const;
-  //::llvm::ArrayRef<int64_t> shape(void) const;
+  //::llvm::ArrayRef<longlong> shape(void) const;
   //unsignedint element_type_bit_width(void) const;
   int64_t rank(void) const;
   int64_t num_elements(void) const;
@@ -83,19 +83,6 @@ class MX_EXPORT FloatType final : public Type {
 };
 static_assert(sizeof(FloatType) == sizeof(Type));
 
-class MX_EXPORT BFloat16Type final : public Type {
- public:
-  inline static constexpr TypeKind static_kind(void) {
-    return TypeKind::BUILTIN_B_FLOAT16;
-  }
-
-  static std::optional<BFloat16Type> from(const ::mx::ir::Type &that);
-  ::mlir::BFloat16Type underlying_repr(void) const noexcept;
-
-  // Imported methods:
-};
-static_assert(sizeof(BFloat16Type) == sizeof(Type));
-
 class MX_EXPORT ComplexType final : public Type {
  public:
   inline static constexpr TypeKind static_kind(void) {
@@ -110,18 +97,18 @@ class MX_EXPORT ComplexType final : public Type {
 };
 static_assert(sizeof(ComplexType) == sizeof(Type));
 
-class MX_EXPORT Float8E4M3B11FNUZType final : public Type {
+class MX_EXPORT Float8E5M2Type final : public Type {
  public:
   inline static constexpr TypeKind static_kind(void) {
-    return TypeKind::BUILTIN_FLOAT8_E4_M3_B11_FNUZ;
+    return TypeKind::BUILTIN_FLOAT8_E5_M2;
   }
 
-  static std::optional<Float8E4M3B11FNUZType> from(const ::mx::ir::Type &that);
-  ::mlir::Float8E4M3B11FNUZType underlying_repr(void) const noexcept;
+  static std::optional<Float8E5M2Type> from(const ::mx::ir::Type &that);
+  ::mlir::Float8E5M2Type underlying_repr(void) const noexcept;
 
   // Imported methods:
 };
-static_assert(sizeof(Float8E4M3B11FNUZType) == sizeof(Type));
+static_assert(sizeof(Float8E5M2Type) == sizeof(Type));
 
 class MX_EXPORT Float8E4M3FNType final : public Type {
  public:
@@ -136,32 +123,6 @@ class MX_EXPORT Float8E4M3FNType final : public Type {
 };
 static_assert(sizeof(Float8E4M3FNType) == sizeof(Type));
 
-class MX_EXPORT Float8E4M3FNUZType final : public Type {
- public:
-  inline static constexpr TypeKind static_kind(void) {
-    return TypeKind::BUILTIN_FLOAT8_E4_M3_FNUZ;
-  }
-
-  static std::optional<Float8E4M3FNUZType> from(const ::mx::ir::Type &that);
-  ::mlir::Float8E4M3FNUZType underlying_repr(void) const noexcept;
-
-  // Imported methods:
-};
-static_assert(sizeof(Float8E4M3FNUZType) == sizeof(Type));
-
-class MX_EXPORT Float8E5M2Type final : public Type {
- public:
-  inline static constexpr TypeKind static_kind(void) {
-    return TypeKind::BUILTIN_FLOAT8_E5_M2;
-  }
-
-  static std::optional<Float8E5M2Type> from(const ::mx::ir::Type &that);
-  ::mlir::Float8E5M2Type underlying_repr(void) const noexcept;
-
-  // Imported methods:
-};
-static_assert(sizeof(Float8E5M2Type) == sizeof(Type));
-
 class MX_EXPORT Float8E5M2FNUZType final : public Type {
  public:
   inline static constexpr TypeKind static_kind(void) {
@@ -175,6 +136,45 @@ class MX_EXPORT Float8E5M2FNUZType final : public Type {
 };
 static_assert(sizeof(Float8E5M2FNUZType) == sizeof(Type));
 
+class MX_EXPORT Float8E4M3FNUZType final : public Type {
+ public:
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::BUILTIN_FLOAT8_E4_M3_FNUZ;
+  }
+
+  static std::optional<Float8E4M3FNUZType> from(const ::mx::ir::Type &that);
+  ::mlir::Float8E4M3FNUZType underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(Float8E4M3FNUZType) == sizeof(Type));
+
+class MX_EXPORT Float8E4M3B11FNUZType final : public Type {
+ public:
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::BUILTIN_FLOAT8_E4_M3_B11_FNUZ;
+  }
+
+  static std::optional<Float8E4M3B11FNUZType> from(const ::mx::ir::Type &that);
+  ::mlir::Float8E4M3B11FNUZType underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(Float8E4M3B11FNUZType) == sizeof(Type));
+
+class MX_EXPORT BFloat16Type final : public Type {
+ public:
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::BUILTIN_B_FLOAT16;
+  }
+
+  static std::optional<BFloat16Type> from(const ::mx::ir::Type &that);
+  ::mlir::BFloat16Type underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(BFloat16Type) == sizeof(Type));
+
 class MX_EXPORT Float16Type final : public Type {
  public:
   inline static constexpr TypeKind static_kind(void) {
@@ -187,6 +187,19 @@ class MX_EXPORT Float16Type final : public Type {
   // Imported methods:
 };
 static_assert(sizeof(Float16Type) == sizeof(Type));
+
+class MX_EXPORT FloatTF32Type final : public Type {
+ public:
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::BUILTIN_FLOAT_TF32;
+  }
+
+  static std::optional<FloatTF32Type> from(const ::mx::ir::Type &that);
+  ::mlir::FloatTF32Type underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(FloatTF32Type) == sizeof(Type));
 
 class MX_EXPORT Float32Type final : public Type {
  public:
@@ -239,19 +252,6 @@ class MX_EXPORT Float128Type final : public Type {
   // Imported methods:
 };
 static_assert(sizeof(Float128Type) == sizeof(Type));
-
-class MX_EXPORT FloatTF32Type final : public Type {
- public:
-  inline static constexpr TypeKind static_kind(void) {
-    return TypeKind::BUILTIN_FLOAT_TF32;
-  }
-
-  static std::optional<FloatTF32Type> from(const ::mx::ir::Type &that);
-  ::mlir::FloatTF32Type underlying_repr(void) const noexcept;
-
-  // Imported methods:
-};
-static_assert(sizeof(FloatTF32Type) == sizeof(Type));
 
 class MX_EXPORT FunctionType final : public Type {
  public:
@@ -312,7 +312,7 @@ class MX_EXPORT MemRefType final : public Type {
 
   // Imported methods:
   //unsignedint memory_space_as_int(void) const;
-  //::llvm::ArrayRef<int64_t> shape(void) const;
+  //::llvm::ArrayRef<longlong> shape(void) const;
   //Type element_type(void) const;
   //MemRefLayoutAttrInterface layout(void) const;
   //Attribute memory_space(void) const;
@@ -357,7 +357,7 @@ class MX_EXPORT RankedTensorType final : public Type {
   ::mlir::RankedTensorType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::llvm::ArrayRef<int64_t> shape(void) const;
+  //::llvm::ArrayRef<longlong> shape(void) const;
   //Type element_type(void) const;
   //Attribute encoding(void) const;
 };
@@ -390,7 +390,7 @@ class MX_EXPORT UnrankedMemRefType final : public Type {
   ::mlir::UnrankedMemRefType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //ArrayRef<int64_t> shape(void) const;
+  //ArrayRef<longlong> shape(void) const;
   //unsignedint memory_space_as_int(void) const;
   //Type element_type(void) const;
   //Attribute memory_space(void) const;
@@ -407,7 +407,7 @@ class MX_EXPORT UnrankedTensorType final : public Type {
   ::mlir::UnrankedTensorType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //ArrayRef<int64_t> shape(void) const;
+  //ArrayRef<longlong> shape(void) const;
   //Type element_type(void) const;
 };
 static_assert(sizeof(UnrankedTensorType) == sizeof(Type));
@@ -425,7 +425,7 @@ class MX_EXPORT VectorType final : public Type {
   bool is_scalable(void) const;
   bool all_dims_scalable(void) const;
   bool has_rank(void) const;
-  //::llvm::ArrayRef<int64_t> shape(void) const;
+  //::llvm::ArrayRef<longlong> shape(void) const;
   //Type element_type(void) const;
   //::llvm::ArrayRef<bool> scalable_dims(void) const;
 };

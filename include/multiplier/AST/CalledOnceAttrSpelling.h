@@ -16,7 +16,7 @@ namespace mx {
 enum class CalledOnceAttrSpelling : unsigned char {
   GNU_CALLED_ONCE,
   CXX11_CLANG_CALLED_ONCE,
-  C2X_CLANG_CALLED_ONCE,
+  C23_CLANG_CALLED_ONCE,
   SPELLING_NOT_CALCULATED,
 };
 

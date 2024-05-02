@@ -193,7 +193,7 @@ std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const TokenContext 
 }
 
 OverloadedOperatorKind CXXOperatorCallExpr::operator_(void) const {
-  return static_cast<OverloadedOperatorKind>(impl->reader.getVal92());
+  return static_cast<OverloadedOperatorKind>(impl->reader.getVal93());
 }
 
 Token CXXOperatorCallExpr::operator_token(void) const {
@@ -201,11 +201,11 @@ Token CXXOperatorCallExpr::operator_token(void) const {
 }
 
 bool CXXOperatorCallExpr::is_assignment_operation(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool CXXOperatorCallExpr::is_comparison_operation(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool CXXOperatorCallExpr::is_infix_binary_operation(void) const {

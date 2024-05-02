@@ -16,7 +16,7 @@ const char *EnumeratorName(CleanupAttrSpelling e) {
   switch (e) {
     case CleanupAttrSpelling::GNU_CLEANUP: return "GNU_CLEANUP";
     case CleanupAttrSpelling::CXX11_GNU_CLEANUP: return "CXX11_GNU_CLEANUP";
-    case CleanupAttrSpelling::C2X_GNU_CLEANUP: return "C2X_GNU_CLEANUP";
+    case CleanupAttrSpelling::C23_GNU_CLEANUP: return "C23_GNU_CLEANUP";
     case CleanupAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

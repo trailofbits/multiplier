@@ -7,7 +7,7 @@
 #pragma once
 
 #include <filesystem>
-#include <gap/core/generator.hpp>
+#include <gap/coro/generator.hpp>
 #include <memory>
 #include <string_view>
 

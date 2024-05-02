@@ -16,7 +16,7 @@ namespace mx {
 enum class WeakAttrSpelling : unsigned char {
   GNU_WEAK,
   CXX11_GNU_WEAK,
-  C2X_GNU_WEAK,
+  C23_GNU_WEAK,
   SPELLING_NOT_CALCULATED,
 };
 

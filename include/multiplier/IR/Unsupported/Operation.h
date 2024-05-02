@@ -52,7 +52,7 @@ class MX_EXPORT UnsupportedStmtOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value result(void) const;
-  //::mlir::MutableArrayRef<::mlir::Region> children(void) const;
+  //::mlir::MutableArrayRef<Region> children(void) const;
   std::string_view name(void) const;
 };
 static_assert(sizeof(UnsupportedStmtOp) == sizeof(Operation));

@@ -11,6 +11,8 @@
 #include "../Operation.h"
 
 namespace vast::ll {
+class Alloca;
+class ArgAlloca;
 class Br;
 class Concat;
 class CondBr;
@@ -18,12 +20,15 @@ class CondScopeRet;
 class Extract;
 class InitializeVar;
 class InlineScope;
+class Load;
 class FuncOp;
 class StructGEPOp;
 class ReturnOp;
 class Scope;
 class ScopeRecurse;
 class ScopeRet;
+class Store;
+class Subscript;
 class UninitializedVar;
 }  // namespace vast::ll
 namespace mx::ir::ll {
@@ -33,6 +38,39 @@ class MX_EXPORT Operation : public ::mx::ir::Operation {
   static std::optional<Operation> from(const ::mx::ir::Operation &);
 };
 static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));
+
+class MX_EXPORT AllocaOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::LL_ALLOCA;
+  }
+
+  static std::optional<AllocaOp> from(const ::mx::ir::Operation &that);
+  static std::optional<AllocaOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::ll::Alloca underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Value result(void) const;
+};
+static_assert(sizeof(AllocaOp) == sizeof(Operation));
+
+class MX_EXPORT ArgAllocaOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::LL_ARG_ALLOCA;
+  }
+
+  static std::optional<ArgAllocaOp> from(const ::mx::ir::Operation &that);
+  static std::optional<ArgAllocaOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::ll::ArgAlloca underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Value fn_arg(void) const;
+  ::mx::ir::Value result(void) const;
+};
+static_assert(sizeof(ArgAllocaOp) == sizeof(Operation));
 
 class MX_EXPORT BrOp final : public Operation {
  public:
@@ -46,7 +84,7 @@ class MX_EXPORT BrOp final : public Operation {
   ::vast::ll::Br underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> operands(void) const;
+  //::mlir::Operation::operand_range operands(void) const;
   //::mlir::Block* dest(void) const;
 };
 static_assert(sizeof(BrOp) == sizeof(Operation));
@@ -63,7 +101,7 @@ class MX_EXPORT ConcatOp final : public Operation {
   ::vast::ll::Concat underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> args(void) const;
+  //::mlir::Operation::operand_range args(void) const;
   ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(ConcatOp) == sizeof(Operation));
@@ -81,8 +119,8 @@ class MX_EXPORT CondBrOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value cond(void) const;
-  gap::generator<::mx::ir::Operand> true_operands(void) const;
-  gap::generator<::mx::ir::Operand> false_operands(void) const;
+  //::mlir::Operation::operand_range true_operands(void) const;
+  //::mlir::Operation::operand_range false_operands(void) const;
   //::mlir::Block* true_dest(void) const;
   //::mlir::Block* false_dest(void) const;
 };
@@ -101,7 +139,7 @@ class MX_EXPORT CondScopeRetOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value cond(void) const;
-  gap::generator<::mx::ir::Operand> dest_operands(void) const;
+  //::mlir::Operation::operand_range dest_operands(void) const;
   //::mlir::Block* dest(void) const;
 };
 static_assert(sizeof(CondScopeRetOp) == sizeof(Operation));
@@ -139,7 +177,7 @@ class MX_EXPORT InitializeVarOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value var(void) const;
-  gap::generator<::mx::ir::Operand> elements(void) const;
+  //::mlir::Operation::operand_range elements(void) const;
   ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(InitializeVarOp) == sizeof(Operation));
@@ -160,6 +198,23 @@ class MX_EXPORT InlineScopeOp final : public Operation {
 };
 static_assert(sizeof(InlineScopeOp) == sizeof(Operation));
 
+class MX_EXPORT LoadOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::LL_LOAD;
+  }
+
+  static std::optional<LoadOp> from(const ::mx::ir::Operation &that);
+  static std::optional<LoadOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::ll::Load underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::mlir::TypedValue<ElementTypeInterface> ptr(void) const;
+  ::mx::ir::Value result(void) const;
+};
+static_assert(sizeof(LoadOp) == sizeof(Operation));
+
 class MX_EXPORT FuncOp final : public Operation {
  public:
   inline static constexpr OperationKind static_kind(void) {
@@ -176,9 +231,9 @@ class MX_EXPORT FuncOp final : public Operation {
   std::string_view sym_name(void) const;
   //::vast::core::FunctionType function_type(void) const;
   //::vast::core::GlobalLinkageKind linkage(void) const;
-  std::optional<std::string_view> sym_visibility(void) const;
-  //::std::optional<::mlir::ArrayAttr> arg_attrs(void) const;
-  //::std::optional<::mlir::ArrayAttr> res_attrs(void) const;
+  //::std::optional<StringRef> sym_visibility(void) const;
+  //::std::optional<ArrayAttr> arg_attrs(void) const;
+  //::std::optional<ArrayAttr> res_attrs(void) const;
   bool is_var_arg(void) const;
   //::mlir::Region* callable_region(void) const;
   //llvm::ArrayRef<Type> callable_results(void) const;
@@ -221,7 +276,7 @@ class MX_EXPORT ReturnOp final : public Operation {
   ::vast::ll::ReturnOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> result(void) const;
+  //::mlir::Operation::operand_range result(void) const;
 };
 static_assert(sizeof(ReturnOp) == sizeof(Operation));
 
@@ -271,6 +326,41 @@ class MX_EXPORT ScopeRetOp final : public Operation {
   // Imported methods:
 };
 static_assert(sizeof(ScopeRetOp) == sizeof(Operation));
+
+class MX_EXPORT StoreOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::LL_STORE;
+  }
+
+  static std::optional<StoreOp> from(const ::mx::ir::Operation &that);
+  static std::optional<StoreOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::ll::Store underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Value val(void) const;
+  //::mlir::TypedValue<ElementTypeInterface> ptr(void) const;
+};
+static_assert(sizeof(StoreOp) == sizeof(Operation));
+
+class MX_EXPORT SubscriptOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::LL_SUBSCRIPT;
+  }
+
+  static std::optional<SubscriptOp> from(const ::mx::ir::Operation &that);
+  static std::optional<SubscriptOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::ll::Subscript underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Value array(void) const;
+  ::mx::ir::Value index(void) const;
+  ::mx::ir::Value result(void) const;
+};
+static_assert(sizeof(SubscriptOp) == sizeof(Operation));
 
 class MX_EXPORT UninitializedVarOp final : public Operation {
  public:

@@ -16,7 +16,7 @@ namespace mx {
 enum class LeafAttrSpelling : unsigned char {
   GNU_LEAF,
   CXX11_GNU_LEAF,
-  C2X_GNU_LEAF,
+  C23_GNU_LEAF,
   SPELLING_NOT_CALCULATED,
 };
 

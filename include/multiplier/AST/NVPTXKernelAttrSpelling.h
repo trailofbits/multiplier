@@ -16,7 +16,7 @@ namespace mx {
 enum class NVPTXKernelAttrSpelling : unsigned char {
   GNU_NVPTX_KERNEL,
   CXX11_CLANG_NVPTX_KERNEL,
-  C2X_CLANG_NVPTX_KERNEL,
+  C23_CLANG_NVPTX_KERNEL,
   SPELLING_NOT_CALCULATED,
 };
 

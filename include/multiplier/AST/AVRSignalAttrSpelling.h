@@ -16,7 +16,7 @@ namespace mx {
 enum class AVRSignalAttrSpelling : unsigned char {
   GNU_SIGNAL,
   CXX11_GNU_SIGNAL,
-  C2X_GNU_SIGNAL,
+  C23_GNU_SIGNAL,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -129,11 +129,11 @@ LoopHintAttrOptionType LoopHintAttr::option(void) const {
 }
 
 LoopHintAttrSpelling LoopHintAttr::semantic_spelling(void) const {
-  return static_cast<LoopHintAttrSpelling>(impl->reader.getVal14());
+  return static_cast<LoopHintAttrSpelling>(impl->reader.getVal18());
 }
 
 LoopHintAttrLoopHintState LoopHintAttr::state(void) const {
-  return static_cast<LoopHintAttrLoopHintState>(impl->reader.getVal15());
+  return static_cast<LoopHintAttrLoopHintState>(impl->reader.getVal19());
 }
 
 std::optional<Expr> LoopHintAttr::value(void) const {

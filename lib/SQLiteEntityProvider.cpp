@@ -7,7 +7,7 @@
 #include "SQLiteEntityProvider.h"
 
 #include <array>
-#include <gap/core/generator.hpp>
+#include <gap/coro/generator.hpp>
 #include <type_traits>
 #include <zdict.h>
 #include <zstd.h>

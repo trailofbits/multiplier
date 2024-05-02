@@ -124,12 +124,8 @@ std::optional<HLSLResourceAttr> HLSLResourceAttr::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-HLSLResourceAttrResourceKind HLSLResourceAttr::resource_shape(void) const {
-  return static_cast<HLSLResourceAttrResourceKind>(impl->reader.getVal10());
-}
-
-HLSLResourceAttrResourceClass HLSLResourceAttr::resource_type(void) const {
-  return static_cast<HLSLResourceAttrResourceClass>(impl->reader.getVal14());
+bool HLSLResourceAttr::is_rov(void) const {
+  return impl->reader.getVal12();
 }
 
 #pragma GCC diagnostic pop

@@ -8,7 +8,8 @@
 
 #include <multiplier/AST/SuppressAttr.h>
 #include <multiplier/AST/Attr.h>
-#include <multiplier/AST/StmtAttr.h>
+#include <multiplier/AST/DeclOrStmtAttr.h>
+#include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
 
 #include "../EntityProvider.h"
@@ -122,6 +123,10 @@ std::optional<SuppressAttr> SuppressAttr::from(const TokenContext &t) {
     return from_base(base.value());
   }
   return std::nullopt;
+}
+
+bool SuppressAttr::is_gsl(void) const {
+  return impl->reader.getVal12();
 }
 
 #pragma GCC diagnostic pop

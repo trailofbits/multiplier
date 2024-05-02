@@ -15,7 +15,7 @@
 namespace mx {
 enum class UnlikelyAttrSpelling : unsigned char {
   CXX11_UNLIKELY,
-  C2X_CLANG_UNLIKELY,
+  C23_CLANG_UNLIKELY,
   SPELLING_NOT_CALCULATED,
 };
 

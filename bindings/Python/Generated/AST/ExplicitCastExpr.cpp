@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[577]) || tp >= &(gTypes[588])) {
+  if (tp < &(gTypes[602]) || tp >= &(gTypes[613])) {
     return std::nullopt;
   }
 
@@ -90,39 +90,39 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::CXXDynamicCastExpr::static_kind():
-      tp = &(gTypes[579]);
+      tp = &(gTypes[604]);
       break;
 
     case mx::CXXConstCastExpr::static_kind():
-      tp = &(gTypes[580]);
+      tp = &(gTypes[605]);
       break;
 
     case mx::CXXAddrspaceCastExpr::static_kind():
-      tp = &(gTypes[581]);
+      tp = &(gTypes[606]);
       break;
 
     case mx::CXXStaticCastExpr::static_kind():
-      tp = &(gTypes[582]);
+      tp = &(gTypes[607]);
       break;
 
     case mx::CXXReinterpretCastExpr::static_kind():
-      tp = &(gTypes[583]);
+      tp = &(gTypes[608]);
       break;
 
     case mx::CXXFunctionalCastExpr::static_kind():
-      tp = &(gTypes[584]);
+      tp = &(gTypes[609]);
       break;
 
     case mx::CStyleCastExpr::static_kind():
-      tp = &(gTypes[585]);
+      tp = &(gTypes[610]);
       break;
 
     case mx::BuiltinBitCastExpr::static_kind():
-      tp = &(gTypes[586]);
+      tp = &(gTypes[611]);
       break;
 
     case mx::ObjCBridgedCastExpr::static_kind():
-      tp = &(gTypes[587]);
+      tp = &(gTypes[612]);
       break;
 
   }
@@ -384,7 +384,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[577]);
+  PyTypeObject * const tp = &(gTypes[602]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -399,12 +399,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[575].tp_hash;
-  tp->tp_richcompare = gTypes[575].tp_richcompare;
+  tp->tp_hash = gTypes[600].tp_hash;
+  tp->tp_richcompare = gTypes[600].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[575]);
+  tp->tp_base = &(gTypes[600]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

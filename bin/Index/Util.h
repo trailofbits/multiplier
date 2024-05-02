@@ -9,7 +9,7 @@
 #include <capnp/c++.capnp.h>
 #include <capnp/message.h>
 #include <cstdint>
-#include <gap/core/generator.hpp>
+#include <gap/coro/generator.hpp>
 #include <iosfwd>
 #include <map>
 #include <multiplier/Iterator.h>

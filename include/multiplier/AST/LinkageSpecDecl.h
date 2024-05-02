@@ -9,7 +9,7 @@
 #pragma once
 
 #include <multiplier/AST/Decl.h>
-#include <multiplier/AST/LinkageSpecDeclLanguageIDs.h>
+#include <multiplier/AST/LinkageSpecLanguageIDs.h>
 
 namespace mx {
 class EntityProvider;
@@ -65,7 +65,7 @@ class MX_EXPORT LinkageSpecDecl : public Decl {
   static std::optional<LinkageSpecDecl> from(const TokenContext &t);
 
   Token extern_token(void) const;
-  LinkageSpecDeclLanguageIDs language(void) const;
+  LinkageSpecLanguageIDs language(void) const;
   Token r_brace_token(void) const;
   bool has_braces(void) const;
 };

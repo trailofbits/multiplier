@@ -134,12 +134,12 @@ bool ExternalSourceSymbolAttr::generated_declaration(void) const {
 }
 
 std::string_view ExternalSourceSymbolAttr::language(void) const {
-  capnp::Text::Reader data = impl->reader.getVal17();
+  capnp::Text::Reader data = impl->reader.getVal21();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::string_view ExternalSourceSymbolAttr::usr(void) const {
-  capnp::Text::Reader data = impl->reader.getVal18();
+  capnp::Text::Reader data = impl->reader.getVal22();
   return std::string_view(data.cStr(), data.size());
 }
 

@@ -168,6 +168,7 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   std::optional<bool> is_any_destructor_no_return(void) const;
   std::optional<bool> is_c_like(void) const;
   std::optional<bool> is_cxx11_standard_layout(void) const;
+  bool is_captureless_lambda(void) const;
   bool is_dependent_lambda(void) const;
   std::optional<bool> is_dynamic_class(void) const;
   std::optional<bool> is_effectively_final(void) const;
@@ -182,6 +183,7 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   std::optional<bool> is_standard_layout(void) const;
   std::optional<bool> is_structural(void) const;
   std::optional<bool> is_trivial(void) const;
+  bool is_trivially_copy_constructible(void) const;
   std::optional<bool> is_trivially_copyable(void) const;
   std::optional<bool> lambda_is_default_constructible_and_assignable(void) const;
   std::optional<bool> may_be_abstract(void) const;

@@ -140,7 +140,7 @@ std::optional<Type> OwnerAttr::dereferenced_type(void) const {
 
 std::optional<Type> OwnerAttr::dereferenced_type_token(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal16();
+    RawEntityId eid = impl->reader.getVal20();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

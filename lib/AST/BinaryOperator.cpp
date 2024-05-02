@@ -200,7 +200,7 @@ Expr BinaryOperator::lhs(void) const {
 }
 
 BinaryOperatorKind BinaryOperator::opcode(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal90());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal91());
 }
 
 std::string_view BinaryOperator::opcode_string(void) const {
@@ -242,11 +242,11 @@ bool BinaryOperator::is_comparison_operation(void) const {
 }
 
 bool BinaryOperator::is_compound_assignment_operation(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool BinaryOperator::is_equality_operation(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool BinaryOperator::is_logical_operation(void) const {

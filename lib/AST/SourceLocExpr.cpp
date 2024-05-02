@@ -196,8 +196,8 @@ std::string_view SourceLocExpr::builtin_string(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-SourceLocExprIdentKind SourceLocExpr::identifier_kind(void) const {
-  return static_cast<SourceLocExprIdentKind>(impl->reader.getVal90());
+SourceLocIdentKind SourceLocExpr::identifier_kind(void) const {
+  return static_cast<SourceLocIdentKind>(impl->reader.getVal91());
 }
 
 Token SourceLocExpr::token(void) const {

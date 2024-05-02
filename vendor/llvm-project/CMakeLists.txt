@@ -60,6 +60,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DLLVM_TARGETS_TO_BUILD=AArch64;X86;ARM"
                         "-DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=ARM;WebAssembly"
                         "-DLLVM_ENABLE_RUNTIMES=libcxx;libcxxabi"
+                        -DLIBCXXABI_USE_LLVM_UNWINDER:BOOL=OFF
                         -DBUILD_SHARED_LIBS:BOOL=OFF
                         -DLLVM_APPEND_VC_REV:BOOL=OFF
                         -DLLVM_BUILD_DOCS:BOOL=OFF

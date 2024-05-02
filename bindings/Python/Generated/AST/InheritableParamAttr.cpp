@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[368]) || tp >= &(gTypes[383])) {
+  if (tp < &(gTypes[392]) || tp >= &(gTypes[407])) {
     return std::nullopt;
   }
 
@@ -90,55 +90,55 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::CarriesDependencyAttr::static_kind():
-      tp = &(gTypes[369]);
+      tp = &(gTypes[393]);
       break;
 
     case mx::CFConsumedAttr::static_kind():
-      tp = &(gTypes[370]);
+      tp = &(gTypes[394]);
       break;
 
     case mx::AnnotateAttr::static_kind():
-      tp = &(gTypes[371]);
+      tp = &(gTypes[395]);
       break;
 
     case mx::UseHandleAttr::static_kind():
-      tp = &(gTypes[372]);
+      tp = &(gTypes[396]);
       break;
 
     case mx::ReleaseHandleAttr::static_kind():
-      tp = &(gTypes[373]);
+      tp = &(gTypes[397]);
       break;
 
     case mx::PassObjectSizeAttr::static_kind():
-      tp = &(gTypes[374]);
+      tp = &(gTypes[398]);
       break;
 
     case mx::SwiftIndirectResultAttr::static_kind():
-      tp = &(gTypes[376]);
+      tp = &(gTypes[400]);
       break;
 
     case mx::SwiftErrorResultAttr::static_kind():
-      tp = &(gTypes[377]);
+      tp = &(gTypes[401]);
       break;
 
     case mx::SwiftContextAttr::static_kind():
-      tp = &(gTypes[378]);
+      tp = &(gTypes[402]);
       break;
 
     case mx::SwiftAsyncContextAttr::static_kind():
-      tp = &(gTypes[379]);
+      tp = &(gTypes[403]);
       break;
 
     case mx::OSConsumedAttr::static_kind():
-      tp = &(gTypes[380]);
+      tp = &(gTypes[404]);
       break;
 
     case mx::NonNullAttr::static_kind():
-      tp = &(gTypes[381]);
+      tp = &(gTypes[405]);
       break;
 
     case mx::NSConsumedAttr::static_kind():
-      tp = &(gTypes[382]);
+      tp = &(gTypes[406]);
       break;
 
   }
@@ -364,7 +364,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[368]);
+  PyTypeObject * const tp = &(gTypes[392]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -379,12 +379,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[68].tp_hash;
-  tp->tp_richcompare = gTypes[68].tp_richcompare;
+  tp->tp_hash = gTypes[76].tp_hash;
+  tp->tp_richcompare = gTypes[76].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[68]);
+  tp->tp_base = &(gTypes[76]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

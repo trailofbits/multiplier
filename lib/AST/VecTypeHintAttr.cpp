@@ -131,7 +131,7 @@ Type VecTypeHintAttr::type_hint(void) const {
 }
 
 Type VecTypeHintAttr::type_hint_token(void) const {
-  RawEntityId eid = impl->reader.getVal16();
+  RawEntityId eid = impl->reader.getVal20();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

@@ -12,11 +12,11 @@
 
 namespace vast::core {
 class BooleanAttr;
-class FloatAttr;
 class IntegerAttr;
-class SourceLanguageAttr;
-class StringLiteralAttr;
+class FloatAttr;
 class VoidAttr;
+class SourceLanguageAttr;
+class GlobalLinkageKindAttr;
 }  // namespace vast::core
 namespace mx::ir::core {
 
@@ -42,22 +42,6 @@ class MX_EXPORT BooleanAttr final : public Attribute {
 };
 static_assert(sizeof(BooleanAttr) == sizeof(Attribute));
 
-class MX_EXPORT FloatAttr final : public Attribute {
- public:
-  inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::CORE_FLOAT;
-  }
-
-  static std::optional<FloatAttr> from(const ::mx::ir::Attribute &that);
-
-  ::vast::core::FloatAttr underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  //::mlir::Type type(void) const;
-  //::llvm::APFloat value(void) const;
-};
-static_assert(sizeof(FloatAttr) == sizeof(Attribute));
-
 class MX_EXPORT IntegerAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
@@ -74,36 +58,21 @@ class MX_EXPORT IntegerAttr final : public Attribute {
 };
 static_assert(sizeof(IntegerAttr) == sizeof(Attribute));
 
-class MX_EXPORT SourceLanguageAttr final : public Attribute {
+class MX_EXPORT FloatAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::CORE_SOURCE_LANGUAGE;
+    return AttributeKind::CORE_FLOAT;
   }
 
-  static std::optional<SourceLanguageAttr> from(const ::mx::ir::Attribute &that);
+  static std::optional<FloatAttr> from(const ::mx::ir::Attribute &that);
 
-  ::vast::core::SourceLanguageAttr underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  //::vast::core::SourceLanguage value(void) const;
-};
-static_assert(sizeof(SourceLanguageAttr) == sizeof(Attribute));
-
-class MX_EXPORT StringLiteralAttr final : public Attribute {
- public:
-  inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::CORE_STRING_LITERAL;
-  }
-
-  static std::optional<StringLiteralAttr> from(const ::mx::ir::Attribute &that);
-
-  ::vast::core::StringLiteralAttr underlying_repr(void) const noexcept;
+  ::vast::core::FloatAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  std::string_view value(void) const;
   //::mlir::Type type(void) const;
+  //::llvm::APFloat value(void) const;
 };
-static_assert(sizeof(StringLiteralAttr) == sizeof(Attribute));
+static_assert(sizeof(FloatAttr) == sizeof(Attribute));
 
 class MX_EXPORT VoidAttr final : public Attribute {
  public:
@@ -119,5 +88,35 @@ class MX_EXPORT VoidAttr final : public Attribute {
   //::mlir::Type type(void) const;
 };
 static_assert(sizeof(VoidAttr) == sizeof(Attribute));
+
+class MX_EXPORT SourceLanguageAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::CORE_SOURCE_LANGUAGE;
+  }
+
+  static std::optional<SourceLanguageAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::core::SourceLanguageAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::vast::core::SourceLanguage value(void) const;
+};
+static_assert(sizeof(SourceLanguageAttr) == sizeof(Attribute));
+
+class MX_EXPORT GlobalLinkageKindAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::CORE_GLOBAL_LINKAGE_KIND;
+  }
+
+  static std::optional<GlobalLinkageKindAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::core::GlobalLinkageKindAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::vast::core::GlobalLinkageKind value(void) const;
+};
+static_assert(sizeof(GlobalLinkageKindAttr) == sizeof(Attribute));
 
 }  // namespace mx::ir::core

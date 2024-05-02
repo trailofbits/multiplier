@@ -46,13 +46,6 @@ std::optional<CallArgsOp> CallArgsOp::producing(const ::mx::ir::Value &that) {
   return ::vast::abi::CallArgsOp(this->::mx::ir::Operation::op_);
 }
 
-gap::generator<::mx::ir::Result> CallArgsOp::results(void) const {
-  auto range = underlying_repr().getResults();
-  for (auto val : range) {
-    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
-  }
-}
-
 ::mx::ir::Region CallArgsOp::body(void) const {
   auto &val = underlying_repr().getBody();
   return ::mx::ir::Region(module_, val);
@@ -76,13 +69,6 @@ std::optional<CallExecutionOp> CallExecutionOp::producing(const ::mx::ir::Value 
   return ::vast::abi::CallExecutionOp(this->::mx::ir::Operation::op_);
 }
 
-gap::generator<::mx::ir::Operand> CallExecutionOp::args(void) const {
-  auto range = underlying_repr().getArgs();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
-  }
-}
-
 ::mx::ir::Value CallExecutionOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
@@ -99,13 +85,6 @@ std::string_view CallExecutionOp::callee(void) const {
     return std::string_view(val.data(), size);
   } else {
     return {};
-  }
-}
-
-gap::generator<::mx::ir::Operand> CallExecutionOp::arg_operands(void) const {
-  auto range = underlying_repr().getArgOperands();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
   }
 }
 
@@ -127,33 +106,12 @@ std::optional<CallOp> CallOp::producing(const ::mx::ir::Value &that) {
   return ::vast::abi::CallOp(this->::mx::ir::Operation::op_);
 }
 
-gap::generator<::mx::ir::Operand> CallOp::args(void) const {
-  auto range = underlying_repr().getArgs();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
-  }
-}
-
-gap::generator<::mx::ir::Result> CallOp::results(void) const {
-  auto range = underlying_repr().getResults();
-  for (auto val : range) {
-    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
-  }
-}
-
 std::string_view CallOp::callee(void) const {
   auto val = underlying_repr().getCallee();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {
     return {};
-  }
-}
-
-gap::generator<::mx::ir::Operand> CallOp::arg_operands(void) const {
-  auto range = underlying_repr().getArgOperands();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
   }
 }
 
@@ -173,13 +131,6 @@ std::optional<CallRetsOp> CallRetsOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::abi::CallRetsOp CallRetsOp::underlying_repr(void) const noexcept {
   return ::vast::abi::CallRetsOp(this->::mx::ir::Operation::op_);
-}
-
-gap::generator<::mx::ir::Result> CallRetsOp::results(void) const {
-  auto range = underlying_repr().getResults();
-  for (auto val : range) {
-    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
-  }
 }
 
 ::mx::ir::Region CallRetsOp::body(void) const {
@@ -205,20 +156,6 @@ std::optional<DirectOp> DirectOp::producing(const ::mx::ir::Value &that) {
   return ::vast::abi::DirectOp(this->::mx::ir::Operation::op_);
 }
 
-gap::generator<::mx::ir::Operand> DirectOp::value(void) const {
-  auto range = underlying_repr().getValue();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
-  }
-}
-
-gap::generator<::mx::ir::Result> DirectOp::result(void) const {
-  auto range = underlying_repr().getResult();
-  for (auto val : range) {
-    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
-  }
-}
-
 std::optional<EpilogueOp> EpilogueOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::ABI_EPILOGUE) {
     return reinterpret_cast<const EpilogueOp &>(that);
@@ -235,13 +172,6 @@ std::optional<EpilogueOp> EpilogueOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::abi::EpilogueOp EpilogueOp::underlying_repr(void) const noexcept {
   return ::vast::abi::EpilogueOp(this->::mx::ir::Operation::op_);
-}
-
-gap::generator<::mx::ir::Result> EpilogueOp::results(void) const {
-  auto range = underlying_repr().getResults();
-  for (auto val : range) {
-    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
-  }
 }
 
 ::mx::ir::Region EpilogueOp::body(void) const {
@@ -281,19 +211,6 @@ std::string_view FuncOp::sym_name(void) const {
   }
 }
 
-std::optional<std::string_view> FuncOp::sym_visibility(void) const {
-  auto opt_val = underlying_repr().getSymVisibility();
-  if (!opt_val) {
-    return std::nullopt;
-  }
-  auto &val = opt_val.value();
-  if (auto size = val.size()) {
-    return std::string_view(val.data(), size);
-  } else {
-    return {};
-  }
-}
-
 bool FuncOp::is_var_arg(void) const {
   auto val = underlying_repr().isVarArg();
   return val;
@@ -302,6 +219,34 @@ bool FuncOp::is_var_arg(void) const {
 bool FuncOp::is_declaration(void) const {
   auto val = underlying_repr().isDeclaration();
   return val;
+}
+
+std::optional<IndirectOp> IndirectOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::ABI_INDIRECT) {
+    return reinterpret_cast<const IndirectOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<IndirectOp> IndirectOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::abi::IndirectOp IndirectOp::underlying_repr(void) const noexcept {
+  return ::vast::abi::IndirectOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value IndirectOp::value(void) const {
+  auto val = underlying_repr().getValue();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value IndirectOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 std::optional<PrologueOp> PrologueOp::from(const ::mx::ir::Operation &that) {
@@ -320,13 +265,6 @@ std::optional<PrologueOp> PrologueOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::abi::PrologueOp PrologueOp::underlying_repr(void) const noexcept {
   return ::vast::abi::PrologueOp(this->::mx::ir::Operation::op_);
-}
-
-gap::generator<::mx::ir::Result> PrologueOp::results(void) const {
-  auto range = underlying_repr().getResults();
-  for (auto val : range) {
-    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
-  }
 }
 
 ::mx::ir::Region PrologueOp::body(void) const {
@@ -357,98 +295,6 @@ std::optional<RetDirectOp> RetDirectOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-gap::generator<::mx::ir::Result> RetDirectOp::result(void) const {
-  auto range = underlying_repr().getResult();
-  for (auto val : range) {
-    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
-  }
-}
-
-std::optional<TodoOp> TodoOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::ABI_TODO) {
-    return reinterpret_cast<const TodoOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<TodoOp> TodoOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::abi::TodoOp TodoOp::underlying_repr(void) const noexcept {
-  return ::vast::abi::TodoOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Value TodoOp::value(void) const {
-  auto val = underlying_repr().getValue();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-gap::generator<::mx::ir::Result> TodoOp::result(void) const {
-  auto range = underlying_repr().getResult();
-  for (auto val : range) {
-    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
-  }
-}
-
-std::optional<WrapFuncOp> WrapFuncOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::ABI_WRAP_FN) {
-    return reinterpret_cast<const WrapFuncOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<WrapFuncOp> WrapFuncOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::abi::WrapFuncOp WrapFuncOp::underlying_repr(void) const noexcept {
-  return ::vast::abi::WrapFuncOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region WrapFuncOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
-}
-
-std::string_view WrapFuncOp::sym_name(void) const {
-  auto val = underlying_repr().getSymName();
-  if (auto size = val.size()) {
-    return std::string_view(val.data(), size);
-  } else {
-    return {};
-  }
-}
-
-std::optional<std::string_view> WrapFuncOp::sym_visibility(void) const {
-  auto opt_val = underlying_repr().getSymVisibility();
-  if (!opt_val) {
-    return std::nullopt;
-  }
-  auto &val = opt_val.value();
-  if (auto size = val.size()) {
-    return std::string_view(val.data(), size);
-  } else {
-    return {};
-  }
-}
-
-bool WrapFuncOp::is_var_arg(void) const {
-  auto val = underlying_repr().isVarArg();
-  return val;
-}
-
-bool WrapFuncOp::is_declaration(void) const {
-  auto val = underlying_repr().isDeclaration();
-  return val;
-}
-
 std::optional<YieldOp> YieldOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::ABI_YIELD) {
     return reinterpret_cast<const YieldOp &>(that);
@@ -465,20 +311,6 @@ std::optional<YieldOp> YieldOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::abi::YieldOp YieldOp::underlying_repr(void) const noexcept {
   return ::vast::abi::YieldOp(this->::mx::ir::Operation::op_);
-}
-
-gap::generator<::mx::ir::Operand> YieldOp::values(void) const {
-  auto range = underlying_repr().getValues();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
-  }
-}
-
-gap::generator<::mx::ir::Result> YieldOp::result(void) const {
-  auto range = underlying_repr().getResult();
-  for (auto val : range) {
-    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
-  }
 }
 
 }  // namespace mx::ir::abi

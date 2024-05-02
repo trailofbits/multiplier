@@ -16,7 +16,7 @@ namespace mx {
 enum class MaybeUndefAttrSpelling : unsigned char {
   GNU_MAYBE_UNDEF,
   CXX11_CLANG_MAYBE_UNDEF,
-  C2X_CLANG_MAYBE_UNDEF,
+  C23_CLANG_MAYBE_UNDEF,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -16,7 +16,7 @@ namespace mx {
 enum class TargetClonesAttrSpelling : unsigned char {
   GNU_TARGET_CLONES,
   CXX11_GNU_TARGET_CLONES,
-  C2X_GNU_TARGET_CLONES,
+  C23_GNU_TARGET_CLONES,
   SPELLING_NOT_CALCULATED,
 };
 

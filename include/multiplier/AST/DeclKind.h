@@ -25,7 +25,6 @@ enum class DeclKind : unsigned char {
   CXX_METHOD,
   CXX_RECORD,
   CAPTURED,
-  CLASS_SCOPE_FUNCTION_SPECIALIZATION,
   CLASS_TEMPLATE,
   CLASS_TEMPLATE_PARTIAL_SPECIALIZATION,
   CLASS_TEMPLATE_SPECIALIZATION,
@@ -108,7 +107,7 @@ inline static const char *EnumerationName(DeclKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(DeclKind) {
-  return 87;
+  return 86;
 }
 
 MX_EXPORT const char *EnumeratorName(DeclKind);

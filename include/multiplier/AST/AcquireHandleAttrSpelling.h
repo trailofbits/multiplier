@@ -16,7 +16,7 @@ namespace mx {
 enum class AcquireHandleAttrSpelling : unsigned char {
   GNU_ACQUIRE_HANDLE,
   CXX11_CLANG_ACQUIRE_HANDLE,
-  C2X_CLANG_ACQUIRE_HANDLE,
+  C23_CLANG_ACQUIRE_HANDLE,
   SPELLING_NOT_CALCULATED,
 };
 

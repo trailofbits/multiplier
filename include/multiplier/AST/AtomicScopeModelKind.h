@@ -17,6 +17,7 @@ enum class AtomicScopeModelKind : unsigned char {
   NONE,
   OPEN_CL,
   HIP,
+  GENERIC,
 };
 
 inline static const char *EnumerationName(AtomicScopeModelKind) {
@@ -24,7 +25,7 @@ inline static const char *EnumerationName(AtomicScopeModelKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(AtomicScopeModelKind) {
-  return 3;
+  return 4;
 }
 
 MX_EXPORT const char *EnumeratorName(AtomicScopeModelKind);

@@ -35,6 +35,7 @@ enum class CallingConv : unsigned char {
   A_ARCH64_VECTOR_CALL,
   A_ARCH64_SVEPCS,
   AMDGPU_KERNEL_CALL,
+  M68K_RTD,
 };
 
 inline static const char *EnumerationName(CallingConv) {
@@ -42,7 +43,7 @@ inline static const char *EnumerationName(CallingConv) {
 }
 
 inline static constexpr unsigned NumEnumerators(CallingConv) {
-  return 21;
+  return 22;
 }
 
 MX_EXPORT const char *EnumeratorName(CallingConv);

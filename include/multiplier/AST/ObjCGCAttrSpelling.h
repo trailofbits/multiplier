@@ -16,7 +16,7 @@ namespace mx {
 enum class ObjCGCAttrSpelling : unsigned char {
   GNU_OBJC_GC,
   CXX11_CLANG_OBJC_GC,
-  C2X_CLANG_OBJC_GC,
+  C23_CLANG_OBJC_GC,
   SPELLING_NOT_CALCULATED,
 };
 
