@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[768]) || tp >= &(gTypes[777])) {
+  if (tp < &(gTypes[792]) || tp >= &(gTypes[801])) {
     return std::nullopt;
   }
 
@@ -90,31 +90,31 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::FunctionTemplateDecl::static_kind():
-      tp = &(gTypes[770]);
+      tp = &(gTypes[794]);
       break;
 
     case mx::ClassTemplateDecl::static_kind():
-      tp = &(gTypes[771]);
+      tp = &(gTypes[795]);
       break;
 
     case mx::VarTemplateDecl::static_kind():
-      tp = &(gTypes[772]);
+      tp = &(gTypes[796]);
       break;
 
     case mx::TypeAliasTemplateDecl::static_kind():
-      tp = &(gTypes[773]);
+      tp = &(gTypes[797]);
       break;
 
     case mx::ConceptDecl::static_kind():
-      tp = &(gTypes[774]);
+      tp = &(gTypes[798]);
       break;
 
     case mx::BuiltinTemplateDecl::static_kind():
-      tp = &(gTypes[775]);
+      tp = &(gTypes[799]);
       break;
 
     case mx::TemplateTemplateParmDecl::static_kind():
-      tp = &(gTypes[776]);
+      tp = &(gTypes[800]);
       break;
 
   }
@@ -436,7 +436,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[768]);
+  PyTypeObject * const tp = &(gTypes[792]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -451,12 +451,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[714].tp_hash;
-  tp->tp_richcompare = gTypes[714].tp_richcompare;
+  tp->tp_hash = gTypes[738].tp_hash;
+  tp->tp_richcompare = gTypes[738].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[714]);
+  tp->tp_base = &(gTypes[738]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

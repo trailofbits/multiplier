@@ -16,7 +16,7 @@ const char *EnumeratorName(PascalAttrSpelling e) {
   switch (e) {
     case PascalAttrSpelling::GNU_PASCAL: return "GNU_PASCAL";
     case PascalAttrSpelling::CXX11_CLANG_PASCAL: return "CXX11_CLANG_PASCAL";
-    case PascalAttrSpelling::C2X_CLANG_PASCAL: return "C2X_CLANG_PASCAL";
+    case PascalAttrSpelling::C23_CLANG_PASCAL: return "C23_CLANG_PASCAL";
     case PascalAttrSpelling::KEYWORD_PASCAL: return "KEYWORD_PASCAL";
     case PascalAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

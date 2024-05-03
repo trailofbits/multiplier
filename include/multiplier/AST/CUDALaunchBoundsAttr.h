@@ -51,6 +51,7 @@ class MX_EXPORT CUDALaunchBoundsAttr : public InheritableAttr {
   static std::optional<CUDALaunchBoundsAttr> from(const VariantEntity &e);
   static std::optional<CUDALaunchBoundsAttr> from(const TokenContext &t);
 
+  Expr max_blocks(void) const;
   Expr max_threads(void) const;
   Expr min_blocks(void) const;
 };

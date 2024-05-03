@@ -10,7 +10,6 @@
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
-#include <multiplier/AST/VarDecl.h>
 
 #include "../EntityProvider.h"
 #include "../Attr.h"
@@ -123,11 +122,6 @@ std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from(const TokenContext &t) 
     return from_base(base.value());
   }
   return std::nullopt;
-}
-
-VarDecl NSErrorDomainAttr::error_domain(void) const {
-  RawEntityId eid = impl->reader.getVal8();
-  return VarDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 #pragma GCC diagnostic pop

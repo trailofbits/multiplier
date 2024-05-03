@@ -16,7 +16,7 @@ namespace mx {
 enum class AvailabilityAttrSpelling : unsigned char {
   GNU_AVAILABILITY,
   CXX11_CLANG_AVAILABILITY,
-  C2X_CLANG_AVAILABILITY,
+  C23_CLANG_AVAILABILITY,
   SPELLING_NOT_CALCULATED,
 };
 

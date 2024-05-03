@@ -16,7 +16,7 @@ const char *EnumeratorName(EnforceTCBLeafAttrSpelling e) {
   switch (e) {
     case EnforceTCBLeafAttrSpelling::GNU_ENFORCE_TCB_LEAF: return "GNU_ENFORCE_TCB_LEAF";
     case EnforceTCBLeafAttrSpelling::CXX11_CLANG_ENFORCE_TCB_LEAF: return "CXX11_CLANG_ENFORCE_TCB_LEAF";
-    case EnforceTCBLeafAttrSpelling::C2X_CLANG_ENFORCE_TCB_LEAF: return "C2X_CLANG_ENFORCE_TCB_LEAF";
+    case EnforceTCBLeafAttrSpelling::C23_CLANG_ENFORCE_TCB_LEAF: return "C23_CLANG_ENFORCE_TCB_LEAF";
     case EnforceTCBLeafAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

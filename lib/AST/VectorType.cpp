@@ -110,8 +110,8 @@ Type VectorType::element_type(void) const {
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
-VectorTypeVectorKind VectorType::vector_kind(void) const {
-  return static_cast<VectorTypeVectorKind>(impl->reader.getVal28());
+VectorKind VectorType::vector_kind(void) const {
+  return static_cast<VectorKind>(impl->reader.getVal28());
 }
 
 bool VectorType::is_sugared(void) const {

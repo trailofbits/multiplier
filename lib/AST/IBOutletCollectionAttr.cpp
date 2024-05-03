@@ -131,7 +131,7 @@ Type IBOutletCollectionAttr::interface(void) const {
 }
 
 Type IBOutletCollectionAttr::interface_token(void) const {
-  RawEntityId eid = impl->reader.getVal16();
+  RawEntityId eid = impl->reader.getVal20();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

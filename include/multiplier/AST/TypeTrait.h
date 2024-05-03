@@ -81,6 +81,7 @@ enum class TypeTrait : unsigned char {
   IS_CONVERTIBLE_TO,
   IS_TRIVIALLY_ASSIGNABLE,
   REFERENCE_BINDS_TO_TEMPORARY,
+  REFERENCE_CONSTRUCTS_FROM_TEMPORARY,
   IS_SAME,
   IS_CONVERTIBLE,
   XNU_TYPE_COMPATIBLE,
@@ -94,7 +95,7 @@ inline static const char *EnumerationName(TypeTrait) {
 }
 
 inline static constexpr unsigned NumEnumerators(TypeTrait) {
-  return 73;
+  return 74;
 }
 
 MX_EXPORT const char *EnumeratorName(TypeTrait);

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <multiplier/AST/CXXConstructExprConstructionKind.h>
+#include <multiplier/AST/CXXConstructionKind.h>
 #include <multiplier/AST/Expr.h>
 
 namespace mx {
@@ -67,7 +67,7 @@ class MX_EXPORT CXXInheritedCtorInitExpr : public Expr {
   static std::optional<CXXInheritedCtorInitExpr> from(const TokenContext &t);
 
   bool constructs_virtual_base(void) const;
-  CXXConstructExprConstructionKind construction_kind(void) const;
+  CXXConstructionKind construction_kind(void) const;
   CXXConstructorDecl constructor(void) const;
   Token token(void) const;
   bool inherited_from_virtual_base(void) const;

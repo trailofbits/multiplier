@@ -43,6 +43,16 @@ class BooleanAttr(multiplier.ir.core.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.BooleanAttr]:
     ...
 
+class IntegerAttr(multiplier.ir.core.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.IntegerAttr]:
+    ...
+
 class FloatAttr(multiplier.ir.core.Attribute):
 
   @staticmethod
@@ -53,14 +63,14 @@ class FloatAttr(multiplier.ir.core.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.FloatAttr]:
     ...
 
-class IntegerAttr(multiplier.ir.core.Attribute):
+class VoidAttr(multiplier.ir.core.Attribute):
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.IntegerAttr]:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.VoidAttr]:
     ...
 
 class SourceLanguageAttr(multiplier.ir.core.Attribute):
@@ -73,25 +83,14 @@ class SourceLanguageAttr(multiplier.ir.core.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.SourceLanguageAttr]:
     ...
 
-class StringLiteralAttr(multiplier.ir.core.Attribute):
-  value: str
+class GlobalLinkageKindAttr(multiplier.ir.core.Attribute):
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.StringLiteralAttr]:
-    ...
-
-class VoidAttr(multiplier.ir.core.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.VoidAttr]:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.core.GlobalLinkageKindAttr]:
     ...
 
 class Operation(multiplier.ir.Operation):
@@ -135,7 +134,6 @@ class BinLOrOp(multiplier.ir.core.Operation):
     ...
 
 class ImplicitReturnOp(multiplier.ir.core.Operation):
-  result: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -184,7 +182,6 @@ class SelectOp(multiplier.ir.core.Operation):
   cond: multiplier.ir.Value
   then_region: multiplier.ir.Value
   else_region: multiplier.ir.Value
-  results: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

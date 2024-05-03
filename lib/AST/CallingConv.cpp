@@ -35,6 +35,7 @@ const char *EnumeratorName(CallingConv e) {
     case CallingConv::A_ARCH64_VECTOR_CALL: return "A_ARCH64_VECTOR_CALL";
     case CallingConv::A_ARCH64_SVEPCS: return "A_ARCH64_SVEPCS";
     case CallingConv::AMDGPU_KERNEL_CALL: return "AMDGPU_KERNEL_CALL";
+    case CallingConv::M68K_RTD: return "M68K_RTD";
     default: return "<invalid>";
   }
 }

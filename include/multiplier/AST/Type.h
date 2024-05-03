@@ -11,7 +11,7 @@
 #include <compare>
 #include <cstdint>
 #include <filesystem>
-#include <gap/core/generator.hpp>
+#include <gap/coro/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
@@ -118,8 +118,8 @@ class MX_EXPORT Type {
   TypeKind kind(void) const;
   Type unqualified_desugared_type(void) const;
   Visibility visibility(void) const;
+  bool is_sizeless_vector_type(void) const;
   bool is_unresolved_type(void) const;
-  bool is_vlst_builtin_type(void) const;
 };
 
 #endif

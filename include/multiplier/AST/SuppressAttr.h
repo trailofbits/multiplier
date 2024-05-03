@@ -8,14 +8,15 @@
 
 #pragma once
 
-#include <multiplier/AST/StmtAttr.h>
+#include <multiplier/AST/DeclOrStmtAttr.h>
 
 namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
-class StmtAttr;
+class DeclOrStmtAttr;
+class InheritableAttr;
 class SuppressAttr;
 class Token;
 namespace ir {
@@ -24,10 +25,11 @@ class Value;
 }  // namespace ir
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class MX_EXPORT SuppressAttr : public StmtAttr {
+class MX_EXPORT SuppressAttr : public DeclOrStmtAttr {
  private:
   friend class FragmentImpl;
-  friend class StmtAttr;
+  friend class DeclOrStmtAttr;
+  friend class InheritableAttr;
   friend class Attr;
  public:
   static gap::generator<SuppressAttr> in(const Index &index);
@@ -50,9 +52,10 @@ class MX_EXPORT SuppressAttr : public StmtAttr {
   static std::optional<SuppressAttr> from(const VariantEntity &e);
   static std::optional<SuppressAttr> from(const TokenContext &t);
 
+  bool is_gsl(void) const;
 };
 
-static_assert(sizeof(SuppressAttr) == sizeof(StmtAttr));
+static_assert(sizeof(SuppressAttr) == sizeof(DeclOrStmtAttr));
 
 #endif
 } // namespace mx

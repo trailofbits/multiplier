@@ -15,7 +15,7 @@
 namespace mx {
 enum class LikelyAttrSpelling : unsigned char {
   CXX11_LIKELY,
-  C2X_CLANG_LIKELY,
+  C23_CLANG_LIKELY,
   SPELLING_NOT_CALCULATED,
 };
 

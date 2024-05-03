@@ -16,7 +16,7 @@ const char *EnumeratorName(TargetClonesAttrSpelling e) {
   switch (e) {
     case TargetClonesAttrSpelling::GNU_TARGET_CLONES: return "GNU_TARGET_CLONES";
     case TargetClonesAttrSpelling::CXX11_GNU_TARGET_CLONES: return "CXX11_GNU_TARGET_CLONES";
-    case TargetClonesAttrSpelling::C2X_GNU_TARGET_CLONES: return "C2X_GNU_TARGET_CLONES";
+    case TargetClonesAttrSpelling::C23_GNU_TARGET_CLONES: return "C23_GNU_TARGET_CLONES";
     case TargetClonesAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

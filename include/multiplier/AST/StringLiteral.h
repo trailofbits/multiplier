@@ -9,7 +9,7 @@
 #pragma once
 
 #include <multiplier/AST/Expr.h>
-#include <multiplier/AST/StringLiteralStringKind.h>
+#include <multiplier/AST/StringLiteralKind.h>
 
 namespace mx {
 class EntityProvider;
@@ -68,7 +68,7 @@ class MX_EXPORT StringLiteral : public Expr {
   std::optional<bool> contains_non_ascii(void) const;
   std::optional<bool> contains_non_ascii_or_null(void) const;
   std::string_view bytes(void) const;
-  StringLiteralStringKind literal_kind(void) const;
+  StringLiteralKind literal_kind(void) const;
   std::optional<std::string_view> string(void) const;
   bool is_ordinary(void) const;
   bool is_pascal(void) const;

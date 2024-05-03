@@ -16,7 +16,7 @@ namespace mx {
 enum class MinVectorWidthAttrSpelling : unsigned char {
   GNU_MIN_VECTOR_WIDTH,
   CXX11_CLANG_MIN_VECTOR_WIDTH,
-  C2X_CLANG_MIN_VECTOR_WIDTH,
+  C23_CLANG_MIN_VECTOR_WIDTH,
   SPELLING_NOT_CALCULATED,
 };
 

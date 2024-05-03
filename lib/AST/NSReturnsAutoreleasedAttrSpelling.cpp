@@ -16,7 +16,7 @@ const char *EnumeratorName(NSReturnsAutoreleasedAttrSpelling e) {
   switch (e) {
     case NSReturnsAutoreleasedAttrSpelling::GNU_NS_RETURNS_AUTORELEASED: return "GNU_NS_RETURNS_AUTORELEASED";
     case NSReturnsAutoreleasedAttrSpelling::CXX11_CLANG_NS_RETURNS_AUTORELEASED: return "CXX11_CLANG_NS_RETURNS_AUTORELEASED";
-    case NSReturnsAutoreleasedAttrSpelling::C2X_CLANG_NS_RETURNS_AUTORELEASED: return "C2X_CLANG_NS_RETURNS_AUTORELEASED";
+    case NSReturnsAutoreleasedAttrSpelling::C23_CLANG_NS_RETURNS_AUTORELEASED: return "C23_CLANG_NS_RETURNS_AUTORELEASED";
     case NSReturnsAutoreleasedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

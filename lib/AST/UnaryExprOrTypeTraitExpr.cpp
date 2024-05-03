@@ -219,7 +219,7 @@ std::optional<Type> UnaryExprOrTypeTraitExpr::argument_type(void) const {
 }
 
 UnaryExprOrTypeTrait UnaryExprOrTypeTraitExpr::keyword_kind(void) const {
-  return static_cast<UnaryExprOrTypeTrait>(impl->reader.getVal90());
+  return static_cast<UnaryExprOrTypeTrait>(impl->reader.getVal91());
 }
 
 Token UnaryExprOrTypeTraitExpr::operator_token(void) const {

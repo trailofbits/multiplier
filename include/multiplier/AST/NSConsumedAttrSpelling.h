@@ -16,7 +16,7 @@ namespace mx {
 enum class NSConsumedAttrSpelling : unsigned char {
   GNU_NS_CONSUMED,
   CXX11_CLANG_NS_CONSUMED,
-  C2X_CLANG_NS_CONSUMED,
+  C23_CLANG_NS_CONSUMED,
   SPELLING_NOT_CALCULATED,
 };
 

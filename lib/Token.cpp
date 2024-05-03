@@ -7,7 +7,6 @@
 #include "Token.h"
 
 #include <cassert>
-#include <multiplier/AST/ClassScopeFunctionSpecializationDecl.h>
 #include <multiplier/AST/CXXMethodDecl.h>
 #include <multiplier/AST/DeclCategory.h>
 #include <multiplier/AST/DeclKind.h>
@@ -706,11 +705,7 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
   }
 
   const Decl &decl = std::get<Decl>(ent);
-  if (auto spec = ClassScopeFunctionSpecializationDecl::from(decl)) {
-    return Rebase(spec->specialization().category());
-  } else {
-    return Rebase(decl.category());
-  }
+  return Rebase(decl.category());
 }
 
 static TokenCategory ClassifyStmt(StmtId id, TokenKind kind,

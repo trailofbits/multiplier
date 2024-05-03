@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1234]) || tp >= &(gTypes[1249])) {
+  if (tp < &(gTypes[1270]) || tp >= &(gTypes[1290])) {
     return std::nullopt;
   }
 
@@ -89,60 +89,80 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       tp = gType;
       break;
 
+    case mx::ir::ll::AllocaOp::static_kind():
+      tp = &(gTypes[1271]);
+      break;
+
+    case mx::ir::ll::ArgAllocaOp::static_kind():
+      tp = &(gTypes[1272]);
+      break;
+
     case mx::ir::ll::BrOp::static_kind():
-      tp = &(gTypes[1235]);
+      tp = &(gTypes[1273]);
       break;
 
     case mx::ir::ll::ConcatOp::static_kind():
-      tp = &(gTypes[1236]);
+      tp = &(gTypes[1274]);
       break;
 
     case mx::ir::ll::CondBrOp::static_kind():
-      tp = &(gTypes[1237]);
+      tp = &(gTypes[1275]);
       break;
 
     case mx::ir::ll::CondScopeRetOp::static_kind():
-      tp = &(gTypes[1238]);
+      tp = &(gTypes[1276]);
       break;
 
     case mx::ir::ll::ExtractOp::static_kind():
-      tp = &(gTypes[1239]);
+      tp = &(gTypes[1277]);
       break;
 
     case mx::ir::ll::InitializeVarOp::static_kind():
-      tp = &(gTypes[1240]);
+      tp = &(gTypes[1278]);
       break;
 
     case mx::ir::ll::InlineScopeOp::static_kind():
-      tp = &(gTypes[1241]);
+      tp = &(gTypes[1279]);
+      break;
+
+    case mx::ir::ll::LoadOp::static_kind():
+      tp = &(gTypes[1280]);
       break;
 
     case mx::ir::ll::FuncOp::static_kind():
-      tp = &(gTypes[1242]);
+      tp = &(gTypes[1281]);
       break;
 
     case mx::ir::ll::StructGEPOp::static_kind():
-      tp = &(gTypes[1243]);
+      tp = &(gTypes[1282]);
       break;
 
     case mx::ir::ll::ReturnOp::static_kind():
-      tp = &(gTypes[1244]);
+      tp = &(gTypes[1283]);
       break;
 
     case mx::ir::ll::ScopeOp::static_kind():
-      tp = &(gTypes[1245]);
+      tp = &(gTypes[1284]);
       break;
 
     case mx::ir::ll::ScopeRecurseOp::static_kind():
-      tp = &(gTypes[1246]);
+      tp = &(gTypes[1285]);
       break;
 
     case mx::ir::ll::ScopeRetOp::static_kind():
-      tp = &(gTypes[1247]);
+      tp = &(gTypes[1286]);
+      break;
+
+    case mx::ir::ll::StoreOp::static_kind():
+      tp = &(gTypes[1287]);
+      break;
+
+    case mx::ir::ll::SubscriptOp::static_kind():
+      tp = &(gTypes[1288]);
       break;
 
     case mx::ir::ll::UninitializedVarOp::static_kind():
-      tp = &(gTypes[1248]);
+      tp = &(gTypes[1289]);
       break;
 
   }
@@ -210,7 +230,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1234]);
+  PyTypeObject * const tp = &(gTypes[1270]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -225,12 +245,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[939].tp_hash;
-  tp->tp_richcompare = gTypes[939].tp_richcompare;
+  tp->tp_hash = gTypes[973].tp_hash;
+  tp->tp_richcompare = gTypes[973].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[939]);
+  tp->tp_base = &(gTypes[973]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

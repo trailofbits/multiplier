@@ -17,6 +17,7 @@ const char *EnumeratorName(AtomicScopeModelKind e) {
     case AtomicScopeModelKind::NONE: return "NONE";
     case AtomicScopeModelKind::OPEN_CL: return "OPEN_CL";
     case AtomicScopeModelKind::HIP: return "HIP";
+    case AtomicScopeModelKind::GENERIC: return "GENERIC";
     default: return "<invalid>";
   }
 }

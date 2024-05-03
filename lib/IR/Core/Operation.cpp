@@ -111,13 +111,6 @@ std::optional<ImplicitReturnOp> ImplicitReturnOp::producing(const ::mx::ir::Valu
   return ::vast::core::ImplicitReturnOp(this->::mx::ir::Operation::op_);
 }
 
-gap::generator<::mx::ir::Operand> ImplicitReturnOp::result(void) const {
-  auto range = underlying_repr().getResult();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
-  }
-}
-
 std::optional<LazyOp> LazyOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::CORE_LAZY_OP) {
     return reinterpret_cast<const LazyOp &>(that);
@@ -200,13 +193,6 @@ std::optional<SelectOp> SelectOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value SelectOp::else_region(void) const {
   auto val = underlying_repr().getElseRegion();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-gap::generator<::mx::ir::Result> SelectOp::results(void) const {
-  auto range = underlying_repr().getResults();
-  for (auto val : range) {
-    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
-  }
 }
 
 }  // namespace mx::ir::core

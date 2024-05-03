@@ -19,6 +19,7 @@ enum class TemplateArgumentKind : unsigned char {
   DECLARATION,
   NULL_POINTER,
   INTEGRAL,
+  STRUCTURAL_VALUE,
   TEMPLATE,
   TEMPLATE_EXPANSION,
   EXPRESSION,
@@ -30,7 +31,7 @@ inline static const char *EnumerationName(TemplateArgumentKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(TemplateArgumentKind) {
-  return 9;
+  return 10;
 }
 
 MX_EXPORT const char *EnumeratorName(TemplateArgumentKind);

@@ -16,7 +16,7 @@ namespace mx {
 enum class AssumptionAttrSpelling : unsigned char {
   GNU_ASSUME,
   CXX11_CLANG_ASSUME,
-  C2X_CLANG_ASSUME,
+  C23_CLANG_ASSUME,
   SPELLING_NOT_CALCULATED,
 };
 

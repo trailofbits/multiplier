@@ -16,7 +16,7 @@ namespace mx {
 enum class ModeAttrSpelling : unsigned char {
   GNU_MODE,
   CXX11_GNU_MODE,
-  C2X_GNU_MODE,
+  C23_GNU_MODE,
   SPELLING_NOT_CALCULATED,
 };
 

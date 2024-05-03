@@ -234,8 +234,8 @@ TokenRange CXXNewExpr::direct_initializer_range(void) const {
   return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal40(), impl->reader.getVal41());
 }
 
-CXXNewExprInitializationStyle CXXNewExpr::initialization_style(void) const {
-  return static_cast<CXXNewExprInitializationStyle>(impl->reader.getVal90());
+CXXNewInitializationStyle CXXNewExpr::initialization_style(void) const {
+  return static_cast<CXXNewInitializationStyle>(impl->reader.getVal91());
 }
 
 std::optional<Expr> CXXNewExpr::initializer(void) const {

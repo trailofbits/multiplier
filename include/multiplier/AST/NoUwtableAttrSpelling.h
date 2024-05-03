@@ -16,7 +16,7 @@ namespace mx {
 enum class NoUwtableAttrSpelling : unsigned char {
   GNU_NOUWTABLE,
   CXX11_CLANG_NOUWTABLE,
-  C2X_CLANG_NOUWTABLE,
+  C23_CLANG_NOUWTABLE,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -131,7 +131,7 @@ Expr AMDGPUWavesPerEUAttr::max(void) const {
 }
 
 Expr AMDGPUWavesPerEUAttr::min(void) const {
-  RawEntityId eid = impl->reader.getVal16();
+  RawEntityId eid = impl->reader.getVal20();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

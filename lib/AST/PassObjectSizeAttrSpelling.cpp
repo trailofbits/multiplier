@@ -16,10 +16,10 @@ const char *EnumeratorName(PassObjectSizeAttrSpelling e) {
   switch (e) {
     case PassObjectSizeAttrSpelling::GNU_PASS_OBJECT_SIZE: return "GNU_PASS_OBJECT_SIZE";
     case PassObjectSizeAttrSpelling::CXX11_CLANG_PASS_OBJECT_SIZE: return "CXX11_CLANG_PASS_OBJECT_SIZE";
-    case PassObjectSizeAttrSpelling::C2X_CLANG_PASS_OBJECT_SIZE: return "C2X_CLANG_PASS_OBJECT_SIZE";
+    case PassObjectSizeAttrSpelling::C23_CLANG_PASS_OBJECT_SIZE: return "C23_CLANG_PASS_OBJECT_SIZE";
     case PassObjectSizeAttrSpelling::GNU_PASS_DYNAMIC_OBJECT_SIZE: return "GNU_PASS_DYNAMIC_OBJECT_SIZE";
     case PassObjectSizeAttrSpelling::CXX11_CLANG_PASS_DYNAMIC_OBJECT_SIZE: return "CXX11_CLANG_PASS_DYNAMIC_OBJECT_SIZE";
-    case PassObjectSizeAttrSpelling::C2X_CLANG_PASS_DYNAMIC_OBJECT_SIZE: return "C2X_CLANG_PASS_DYNAMIC_OBJECT_SIZE";
+    case PassObjectSizeAttrSpelling::C23_CLANG_PASS_DYNAMIC_OBJECT_SIZE: return "C23_CLANG_PASS_DYNAMIC_OBJECT_SIZE";
     case PassObjectSizeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

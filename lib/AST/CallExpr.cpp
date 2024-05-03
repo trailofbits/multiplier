@@ -239,7 +239,7 @@ gap::generator<Expr> CallExpr::arguments(void) const & {
 }
 
 CallExprADLCallKind CallExpr::adl_call_kind(void) const {
-  return static_cast<CallExprADLCallKind>(impl->reader.getVal90());
+  return static_cast<CallExprADLCallKind>(impl->reader.getVal91());
 }
 
 Type CallExpr::call_return_type(void) const {

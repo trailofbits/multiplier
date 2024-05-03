@@ -16,7 +16,7 @@ const char *EnumeratorName(ObjCExternallyRetainedAttrSpelling e) {
   switch (e) {
     case ObjCExternallyRetainedAttrSpelling::GNU_OBJC_EXTERNALLY_RETAINED: return "GNU_OBJC_EXTERNALLY_RETAINED";
     case ObjCExternallyRetainedAttrSpelling::CXX11_CLANG_OBJC_EXTERNALLY_RETAINED: return "CXX11_CLANG_OBJC_EXTERNALLY_RETAINED";
-    case ObjCExternallyRetainedAttrSpelling::C2X_CLANG_OBJC_EXTERNALLY_RETAINED: return "C2X_CLANG_OBJC_EXTERNALLY_RETAINED";
+    case ObjCExternallyRetainedAttrSpelling::C23_CLANG_OBJC_EXTERNALLY_RETAINED: return "C23_CLANG_OBJC_EXTERNALLY_RETAINED";
     case ObjCExternallyRetainedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

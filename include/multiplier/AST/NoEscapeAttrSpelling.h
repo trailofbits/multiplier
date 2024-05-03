@@ -16,7 +16,7 @@ namespace mx {
 enum class NoEscapeAttrSpelling : unsigned char {
   GNU_NOESCAPE,
   CXX11_CLANG_NOESCAPE,
-  C2X_CLANG_NOESCAPE,
+  C23_CLANG_NOESCAPE,
   SPELLING_NOT_CALCULATED,
 };
 

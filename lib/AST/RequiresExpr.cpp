@@ -198,6 +198,10 @@ RequiresExprBodyDecl RequiresExpr::body(void) const {
   return RequiresExprBodyDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
+Token RequiresExpr::l_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+}
+
 unsigned RequiresExpr::num_local_parameters(void) const {
   return impl->reader.getVal15().size();
 }
@@ -231,11 +235,15 @@ gap::generator<ParmVarDecl> RequiresExpr::local_parameters(void) const & {
 }
 
 Token RequiresExpr::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+}
+
+Token RequiresExpr::r_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token RequiresExpr::requires_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 #pragma GCC diagnostic pop

@@ -11,7 +11,7 @@
 #include <compare>
 #include <cstdint>
 #include <filesystem>
-#include <gap/core/generator.hpp>
+#include <gap/coro/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
@@ -172,6 +172,7 @@ class MX_EXPORT Decl {
   bool is_unavailable(void) const;
   bool is_unconditionally_visible(void) const;
   bool is_weak_imported(void) const;
+  bool should_skip_checking_odr(void) const;
   DeclKind kind(void) const;
   DeclCategory category(void) const;
   Token token(void) const;

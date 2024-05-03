@@ -11,7 +11,7 @@
 #include <string_view>
 #include <string>
 
-#include <gap/core/generator.hpp>
+#include <gap/coro/generator.hpp>
 
 #include "Compiler.h"
 

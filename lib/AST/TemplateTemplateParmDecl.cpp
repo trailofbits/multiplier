@@ -221,23 +221,23 @@ std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::from(const Tok
 }
 
 bool TemplateTemplateParmDecl::default_argument_was_inherited(void) const {
-  return impl->reader.getVal76();
-}
-
-Token TemplateTemplateParmDecl::default_argument_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
-}
-
-bool TemplateTemplateParmDecl::has_default_argument(void) const {
   return impl->reader.getVal77();
 }
 
+Token TemplateTemplateParmDecl::default_argument_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
+}
+
+bool TemplateTemplateParmDecl::has_default_argument(void) const {
+  return impl->reader.getVal78();
+}
+
 bool TemplateTemplateParmDecl::is_expanded_parameter_pack(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal94();
 }
 
 bool TemplateTemplateParmDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal95();
 }
 
 #pragma GCC diagnostic pop

@@ -16,7 +16,7 @@ const char *EnumeratorName(ObjCDesignatedInitializerAttrSpelling e) {
   switch (e) {
     case ObjCDesignatedInitializerAttrSpelling::GNU_OBJC_DESIGNATED_INITIALIZER: return "GNU_OBJC_DESIGNATED_INITIALIZER";
     case ObjCDesignatedInitializerAttrSpelling::CXX11_CLANG_OBJC_DESIGNATED_INITIALIZER: return "CXX11_CLANG_OBJC_DESIGNATED_INITIALIZER";
-    case ObjCDesignatedInitializerAttrSpelling::C2X_CLANG_OBJC_DESIGNATED_INITIALIZER: return "C2X_CLANG_OBJC_DESIGNATED_INITIALIZER";
+    case ObjCDesignatedInitializerAttrSpelling::C23_CLANG_OBJC_DESIGNATED_INITIALIZER: return "C23_CLANG_OBJC_DESIGNATED_INITIALIZER";
     case ObjCDesignatedInitializerAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

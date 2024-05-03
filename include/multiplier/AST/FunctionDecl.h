@@ -106,6 +106,7 @@ class MX_EXPORT FunctionDecl : public DeclaratorDecl {
   TemplateSpecializationKind template_specialization_kind(void) const;
   TemplateSpecializationKind template_specialization_kind_for_instantiation(void) const;
   FunctionDeclTemplatedKind templated_kind(void) const;
+  bool has_cxx_explicit_function_object_parameter(void) const;
   bool has_implicit_return_zero(void) const;
   bool has_inherited_prototype(void) const;
   bool has_one_parameter_or_default_arguments(void) const;
@@ -145,7 +146,7 @@ class MX_EXPORT FunctionDecl : public DeclaratorDecl {
   bool is_multi_version(void) const;
   bool is_no_return(void) const;
   bool is_overloaded_operator(void) const;
-  bool is_pure(void) const;
+  bool is_pure_virtual(void) const;
   bool is_replaceable_global_allocation_function(void) const;
   std::optional<bool> is_reserved_global_placement_operator(void) const;
   bool is_static(void) const;

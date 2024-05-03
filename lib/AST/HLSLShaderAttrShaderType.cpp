@@ -20,7 +20,6 @@ const char *EnumeratorName(HLSLShaderAttrShaderType e) {
     case HLSLShaderAttrShaderType::HULL: return "HULL";
     case HLSLShaderAttrShaderType::DOMAIN_: return "DOMAIN_";
     case HLSLShaderAttrShaderType::COMPUTE: return "COMPUTE";
-    case HLSLShaderAttrShaderType::LIBRARY: return "LIBRARY";
     case HLSLShaderAttrShaderType::RAY_GENERATION: return "RAY_GENERATION";
     case HLSLShaderAttrShaderType::INTERSECTION: return "INTERSECTION";
     case HLSLShaderAttrShaderType::ANY_HIT: return "ANY_HIT";

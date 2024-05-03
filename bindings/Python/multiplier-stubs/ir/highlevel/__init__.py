@@ -32,6 +32,167 @@ class Attribute(multiplier.ir.Attribute):
   def FROM(arg_0: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.Attribute]:
     ...
 
+class AnnotationAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.AnnotationAttr]:
+    ...
+
+class FormatAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.FormatAttr]:
+    ...
+
+class SectionAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.SectionAttr]:
+    ...
+
+class AlwaysInlineAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.AlwaysInlineAttr]:
+    ...
+
+class ConstAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.ConstAttr]:
+    ...
+
+class LoaderUninitializedAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.LoaderUninitializedAttr]:
+    ...
+
+class NoInstrumentFunctionAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.NoInstrumentFunctionAttr]:
+    ...
+
+class PackedAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.PackedAttr]:
+    ...
+
+class PureAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.PureAttr]:
+    ...
+
+class WarnUnusedResultAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.WarnUnusedResultAttr]:
+    ...
+
+class RestrictAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.RestrictAttr]:
+    ...
+
+class NoThrowAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.NoThrowAttr]:
+    ...
+
+class NonNullAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.NonNullAttr]:
+    ...
+
+class AsmLabelAttr(multiplier.ir.highlevel.Attribute):
+  is_literal: bool
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.AsmLabelAttr]:
+    ...
+
+class ModeAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.ModeAttr]:
+    ...
+
+class BuiltinAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.BuiltinAttr]:
+    ...
+
 class AllocAlignAttr(multiplier.ir.highlevel.Attribute):
   alignment: int
 
@@ -55,37 +216,6 @@ class AllocSizeAttr(multiplier.ir.highlevel.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.AllocSizeAttr]:
     ...
 
-class AnnotationAttr(multiplier.ir.highlevel.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.AnnotationAttr]:
-    ...
-
-class AsmLabelAttr(multiplier.ir.highlevel.Attribute):
-  is_literal: bool
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.AsmLabelAttr]:
-    ...
-
-class BuiltinAttr(multiplier.ir.highlevel.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.BuiltinAttr]:
-    ...
-
 class CVQualifiersAttr(multiplier.ir.highlevel.Attribute):
   is_const: bool
   is_volatile: bool
@@ -96,129 +226,6 @@ class CVQualifiersAttr(multiplier.ir.highlevel.Attribute):
 
   @staticmethod
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.CVQualifiersAttr]:
-    ...
-
-class CVRQualifiersAttr(multiplier.ir.highlevel.Attribute):
-  is_const: bool
-  is_volatile: bool
-  is_restrict: bool
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.CVRQualifiersAttr]:
-    ...
-
-class ConstAttr(multiplier.ir.highlevel.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.ConstAttr]:
-    ...
-
-class FormatAttr(multiplier.ir.highlevel.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.FormatAttr]:
-    ...
-
-class LoaderUninitializedAttr(multiplier.ir.highlevel.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.LoaderUninitializedAttr]:
-    ...
-
-class ModeAttr(multiplier.ir.highlevel.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.ModeAttr]:
-    ...
-
-class NoInstrumentFunctionAttr(multiplier.ir.highlevel.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.NoInstrumentFunctionAttr]:
-    ...
-
-class NoThrowAttr(multiplier.ir.highlevel.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.NoThrowAttr]:
-    ...
-
-class NonNullAttr(multiplier.ir.highlevel.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.NonNullAttr]:
-    ...
-
-class PackedAttr(multiplier.ir.highlevel.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.PackedAttr]:
-    ...
-
-class PureAttr(multiplier.ir.highlevel.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.PureAttr]:
-    ...
-
-class RestrictAttr(multiplier.ir.highlevel.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.RestrictAttr]:
-    ...
-
-class SectionAttr(multiplier.ir.highlevel.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.SectionAttr]:
     ...
 
 class UCVQualifiersAttr(multiplier.ir.highlevel.Attribute):
@@ -234,14 +241,17 @@ class UCVQualifiersAttr(multiplier.ir.highlevel.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.UCVQualifiersAttr]:
     ...
 
-class WarnUnusedResultAttr(multiplier.ir.highlevel.Attribute):
+class CVRQualifiersAttr(multiplier.ir.highlevel.Attribute):
+  is_const: bool
+  is_volatile: bool
+  is_restrict: bool
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.WarnUnusedResultAttr]:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.CVRQualifiersAttr]:
     ...
 
 class Operation(multiplier.ir.Operation):
@@ -395,9 +405,7 @@ class AlignOfTypeOp(multiplier.ir.highlevel.Operation):
     ...
 
 class AsmOp(multiplier.ir.highlevel.Operation):
-  asm_outputs: Iterable[multiplier.ir.Operand]
-  asm_inputs: Iterable[multiplier.ir.Operand]
-  labels: Iterable[multiplier.ir.Operand]
+  asm_template: str
   is_volatile: bool
   has_goto: bool
 
@@ -718,8 +726,6 @@ class CStyleCastOp(multiplier.ir.highlevel.Operation):
     ...
 
 class CallOp(multiplier.ir.highlevel.Operation):
-  arg_operands: Iterable[multiplier.ir.Operand]
-  results: Iterable[multiplier.ir.Result]
   callee: str
 
   @staticmethod
@@ -1235,7 +1241,6 @@ class ForOp(multiplier.ir.highlevel.Operation):
 class FuncOp(multiplier.ir.highlevel.Operation):
   body: multiplier.ir.Region
   sym_name: str
-  sym_visibility: Optional[str]
   is_var_arg: bool
   is_declaration: bool
 
@@ -1434,8 +1439,6 @@ class ImplicitCastOp(multiplier.ir.highlevel.Operation):
 
 class IndirectCallOp(multiplier.ir.highlevel.Operation):
   callee: multiplier.ir.Value
-  arg_operands: Iterable[multiplier.ir.Operand]
-  results: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1450,7 +1453,6 @@ class IndirectCallOp(multiplier.ir.highlevel.Operation):
     ...
 
 class InitListExprOp(multiplier.ir.highlevel.Operation):
-  elements: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1796,7 +1798,6 @@ class RemUOp(multiplier.ir.highlevel.Operation):
     ...
 
 class ReturnOp(multiplier.ir.highlevel.Operation):
-  result: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2078,50 +2079,119 @@ class UnreachableOp(multiplier.ir.highlevel.Operation):
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.highlevel.UnreachableOp]:
     ...
 
+class VAArgExprOp(multiplier.ir.highlevel.Operation):
+  arg_list: multiplier.ir.Value
+  result: multiplier.ir.Value
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.highlevel.VAArgExprOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.highlevel.VAArgExprOp]:
+    ...
+
 class Type(multiplier.ir.Type):
 
   @staticmethod
   def FROM(arg_0: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.Type]:
     ...
 
-class AdjustedType(multiplier.ir.highlevel.Type):
+class RecordType(multiplier.ir.highlevel.Type):
+  name: str
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.AdjustedType]:
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.RecordType]:
     ...
 
-class ArrayType(multiplier.ir.highlevel.Type):
+class EnumType(multiplier.ir.highlevel.Type):
+  name: str
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.ArrayType]:
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.EnumType]:
     ...
 
-class AttributedType(multiplier.ir.highlevel.Type):
+class TypedefType(multiplier.ir.highlevel.Type):
+  name: str
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.AttributedType]:
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.TypedefType]:
     ...
 
-class BFloat16Type(multiplier.ir.highlevel.Type):
+class ElaboratedType(multiplier.ir.highlevel.Type):
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.BFloat16Type]:
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.ElaboratedType]:
+    ...
+
+class LabelType(multiplier.ir.highlevel.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.LabelType]:
+    ...
+
+class ParenType(multiplier.ir.highlevel.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.ParenType]:
+    ...
+
+class LValueType(multiplier.ir.highlevel.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.LValueType]:
+    ...
+
+class RValueType(multiplier.ir.highlevel.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.RValueType]:
+    ...
+
+class VoidType(multiplier.ir.highlevel.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.VoidType]:
     ...
 
 class BoolType(multiplier.ir.highlevel.Type):
@@ -2144,85 +2214,14 @@ class CharType(multiplier.ir.highlevel.Type):
   def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.CharType]:
     ...
 
-class DecayedType(multiplier.ir.highlevel.Type):
+class ShortType(multiplier.ir.highlevel.Type):
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.DecayedType]:
-    ...
-
-class DoubleType(multiplier.ir.highlevel.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.DoubleType]:
-    ...
-
-class ElaboratedType(multiplier.ir.highlevel.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.ElaboratedType]:
-    ...
-
-class EnumType(multiplier.ir.highlevel.Type):
-  name: str
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.EnumType]:
-    ...
-
-class Float128Type(multiplier.ir.highlevel.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.Float128Type]:
-    ...
-
-class FloatType(multiplier.ir.highlevel.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.FloatType]:
-    ...
-
-class HalfType(multiplier.ir.highlevel.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.HalfType]:
-    ...
-
-class Int128Type(multiplier.ir.highlevel.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.Int128Type]:
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.ShortType]:
     ...
 
 class IntType(multiplier.ir.highlevel.Type):
@@ -2235,34 +2234,14 @@ class IntType(multiplier.ir.highlevel.Type):
   def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.IntType]:
     ...
 
-class LValueType(multiplier.ir.highlevel.Type):
+class LongType(multiplier.ir.highlevel.Type):
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.LValueType]:
-    ...
-
-class LabelType(multiplier.ir.highlevel.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.LabelType]:
-    ...
-
-class LongDoubleType(multiplier.ir.highlevel.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.LongDoubleType]:
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.LongType]:
     ...
 
 class LongLongType(multiplier.ir.highlevel.Type):
@@ -2275,24 +2254,74 @@ class LongLongType(multiplier.ir.highlevel.Type):
   def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.LongLongType]:
     ...
 
-class LongType(multiplier.ir.highlevel.Type):
+class Int128Type(multiplier.ir.highlevel.Type):
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.LongType]:
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.Int128Type]:
     ...
 
-class ParenType(multiplier.ir.highlevel.Type):
+class HalfType(multiplier.ir.highlevel.Type):
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.ParenType]:
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.HalfType]:
+    ...
+
+class BFloat16Type(multiplier.ir.highlevel.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.BFloat16Type]:
+    ...
+
+class FloatType(multiplier.ir.highlevel.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.FloatType]:
+    ...
+
+class DoubleType(multiplier.ir.highlevel.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.DoubleType]:
+    ...
+
+class LongDoubleType(multiplier.ir.highlevel.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.LongDoubleType]:
+    ...
+
+class Float128Type(multiplier.ir.highlevel.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.Float128Type]:
     ...
 
 class PointerType(multiplier.ir.highlevel.Type):
@@ -2305,25 +2334,44 @@ class PointerType(multiplier.ir.highlevel.Type):
   def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.PointerType]:
     ...
 
-class RValueType(multiplier.ir.highlevel.Type):
+class ArrayType(multiplier.ir.highlevel.Type):
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.RValueType]:
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.ArrayType]:
     ...
 
-class RecordType(multiplier.ir.highlevel.Type):
-  name: str
+class DecayedType(multiplier.ir.highlevel.Type):
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.RecordType]:
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.DecayedType]:
+    ...
+
+class AttributedType(multiplier.ir.highlevel.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.AttributedType]:
+    ...
+
+class AdjustedType(multiplier.ir.highlevel.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.AdjustedType]:
     ...
 
 class ReferenceType(multiplier.ir.highlevel.Type):
@@ -2334,16 +2382,6 @@ class ReferenceType(multiplier.ir.highlevel.Type):
 
   @staticmethod
   def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.ReferenceType]:
-    ...
-
-class ShortType(multiplier.ir.highlevel.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.ShortType]:
     ...
 
 class TypeOfExprType(multiplier.ir.highlevel.Type):
@@ -2365,25 +2403,4 @@ class TypeOfTypeType(multiplier.ir.highlevel.Type):
 
   @staticmethod
   def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.TypeOfTypeType]:
-    ...
-
-class TypedefType(multiplier.ir.highlevel.Type):
-  name: str
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.TypedefType]:
-    ...
-
-class VoidType(multiplier.ir.highlevel.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.highlevel.VoidType]:
     ...

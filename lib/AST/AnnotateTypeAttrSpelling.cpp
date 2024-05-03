@@ -15,7 +15,7 @@ namespace mx {
 const char *EnumeratorName(AnnotateTypeAttrSpelling e) {
   switch (e) {
     case AnnotateTypeAttrSpelling::CXX11_CLANG_ANNOTATE_TYPE: return "CXX11_CLANG_ANNOTATE_TYPE";
-    case AnnotateTypeAttrSpelling::C2X_CLANG_ANNOTATE_TYPE: return "C2X_CLANG_ANNOTATE_TYPE";
+    case AnnotateTypeAttrSpelling::C23_CLANG_ANNOTATE_TYPE: return "C23_CLANG_ANNOTATE_TYPE";
     case AnnotateTypeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

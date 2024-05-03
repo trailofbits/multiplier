@@ -32,8 +32,38 @@ class Operation(multiplier.ir.Operation):
   def FROM(arg_0: multiplier.ir.Operation) -> Optional[multiplier.ir.lowlevel.Operation]:
     ...
 
+class AllocaOp(multiplier.ir.lowlevel.Operation):
+  result: multiplier.ir.Value
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.lowlevel.AllocaOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.lowlevel.AllocaOp]:
+    ...
+
+class ArgAllocaOp(multiplier.ir.lowlevel.Operation):
+  fn_arg: multiplier.ir.Value
+  result: multiplier.ir.Value
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.lowlevel.ArgAllocaOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.lowlevel.ArgAllocaOp]:
+    ...
+
 class BrOp(multiplier.ir.lowlevel.Operation):
-  operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -48,7 +78,6 @@ class BrOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class ConcatOp(multiplier.ir.lowlevel.Operation):
-  args: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
 
   @staticmethod
@@ -65,8 +94,6 @@ class ConcatOp(multiplier.ir.lowlevel.Operation):
 
 class CondBrOp(multiplier.ir.lowlevel.Operation):
   cond: multiplier.ir.Value
-  true_operands: Iterable[multiplier.ir.Operand]
-  false_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -82,7 +109,6 @@ class CondBrOp(multiplier.ir.lowlevel.Operation):
 
 class CondScopeRetOp(multiplier.ir.lowlevel.Operation):
   cond: multiplier.ir.Value
-  dest_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -114,7 +140,6 @@ class ExtractOp(multiplier.ir.lowlevel.Operation):
 
 class InitializeVarOp(multiplier.ir.lowlevel.Operation):
   var: multiplier.ir.Value
-  elements: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
 
   @staticmethod
@@ -144,10 +169,24 @@ class InlineScopeOp(multiplier.ir.lowlevel.Operation):
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.lowlevel.InlineScopeOp]:
     ...
 
+class LoadOp(multiplier.ir.lowlevel.Operation):
+  result: multiplier.ir.Value
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.lowlevel.LoadOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.lowlevel.LoadOp]:
+    ...
+
 class FuncOp(multiplier.ir.lowlevel.Operation):
   body: multiplier.ir.Region
   sym_name: str
-  sym_visibility: Optional[str]
   is_var_arg: bool
   is_declaration: bool
 
@@ -182,7 +221,6 @@ class StructGEPOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class ReturnOp(multiplier.ir.lowlevel.Operation):
-  result: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -237,6 +275,38 @@ class ScopeRetOp(multiplier.ir.lowlevel.Operation):
 
   @staticmethod
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.lowlevel.ScopeRetOp]:
+    ...
+
+class StoreOp(multiplier.ir.lowlevel.Operation):
+  val: multiplier.ir.Value
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.lowlevel.StoreOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.lowlevel.StoreOp]:
+    ...
+
+class SubscriptOp(multiplier.ir.lowlevel.Operation):
+  array: multiplier.ir.Value
+  index: multiplier.ir.Value
+  result: multiplier.ir.Value
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.lowlevel.SubscriptOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.lowlevel.SubscriptOp]:
     ...
 
 class UninitializedVarOp(multiplier.ir.lowlevel.Operation):

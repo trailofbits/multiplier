@@ -9,7 +9,7 @@
 #pragma once
 
 #include <multiplier/AST/Type.h>
-#include <multiplier/AST/VectorTypeVectorKind.h>
+#include <multiplier/AST/VectorKind.h>
 
 namespace mx {
 class EntityProvider;
@@ -49,7 +49,7 @@ class MX_EXPORT VectorType : public Type {
 
   Type desugar(void) const;
   Type element_type(void) const;
-  VectorTypeVectorKind vector_kind(void) const;
+  VectorKind vector_kind(void) const;
   bool is_sugared(void) const;
 };
 

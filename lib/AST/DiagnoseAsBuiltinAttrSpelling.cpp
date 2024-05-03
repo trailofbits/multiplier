@@ -16,7 +16,7 @@ const char *EnumeratorName(DiagnoseAsBuiltinAttrSpelling e) {
   switch (e) {
     case DiagnoseAsBuiltinAttrSpelling::GNU_DIAGNOSE_AS_BUILTIN: return "GNU_DIAGNOSE_AS_BUILTIN";
     case DiagnoseAsBuiltinAttrSpelling::CXX11_CLANG_DIAGNOSE_AS_BUILTIN: return "CXX11_CLANG_DIAGNOSE_AS_BUILTIN";
-    case DiagnoseAsBuiltinAttrSpelling::C2X_CLANG_DIAGNOSE_AS_BUILTIN: return "C2X_CLANG_DIAGNOSE_AS_BUILTIN";
+    case DiagnoseAsBuiltinAttrSpelling::C23_CLANG_DIAGNOSE_AS_BUILTIN: return "C23_CLANG_DIAGNOSE_AS_BUILTIN";
     case DiagnoseAsBuiltinAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

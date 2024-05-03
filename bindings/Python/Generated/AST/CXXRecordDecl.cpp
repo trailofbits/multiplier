@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[759]) || tp >= &(gTypes[762])) {
+  if (tp < &(gTypes[783]) || tp >= &(gTypes[786])) {
     return std::nullopt;
   }
 
@@ -90,15 +90,15 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::CXXRecordDecl::static_kind():
-      tp = &(gTypes[759]);
+      tp = &(gTypes[783]);
       break;
 
     case mx::ClassTemplateSpecializationDecl::static_kind():
-      tp = &(gTypes[760]);
+      tp = &(gTypes[784]);
       break;
 
     case mx::ClassTemplatePartialSpecializationDecl::static_kind():
-      tp = &(gTypes[761]);
+      tp = &(gTypes[785]);
       break;
 
   }
@@ -993,6 +993,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "is_captureless_lambda",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_captureless_lambda());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRecordDecl::is_captureless_lambda"),
+    nullptr,
+  },
+  {
     "is_dependent_lambda",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -1130,6 +1140,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::is_trivial"),
+    nullptr,
+  },
+  {
+    "is_trivially_copy_constructible",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_trivially_copy_constructible());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRecordDecl::is_trivially_copy_constructible"),
     nullptr,
   },
   {
@@ -1659,7 +1679,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[759]);
+  PyTypeObject * const tp = &(gTypes[783]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -1674,12 +1694,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[758].tp_hash;
-  tp->tp_richcompare = gTypes[758].tp_richcompare;
+  tp->tp_hash = gTypes[782].tp_hash;
+  tp->tp_richcompare = gTypes[782].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[758]);
+  tp->tp_base = &(gTypes[782]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

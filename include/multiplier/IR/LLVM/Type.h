@@ -12,9 +12,9 @@
 
 namespace mlir::LLVM {
 class LLVMArrayType;
-class LLVMFixedVectorType;
 class LLVMFunctionType;
 class LLVMPointerType;
+class LLVMFixedVectorType;
 class LLVMScalableVectorType;
 class LLVMTargetExtType;
 }  // namespace mlir::LLVM
@@ -38,24 +38,9 @@ class MX_EXPORT ArrayType final : public Type {
   // Imported methods:
   //Type element_type(void) const;
   //unsignedint num_elements(void) const;
-  //::std::optional<::llvm::DenseMap<::mlir::Attribute,::mlir::Type>> subelement_index_map(void) const;
+  //::std::optional<DenseMap<Attribute,Type,DenseMapInfo<Attribute,void>,DenseMapPair<Attribute,Type>>> subelement_index_map(void) const;
 };
 static_assert(sizeof(ArrayType) == sizeof(Type));
-
-class MX_EXPORT FixedVectorType final : public Type {
- public:
-  inline static constexpr TypeKind static_kind(void) {
-    return TypeKind::LLVM_FIXED_VECTOR;
-  }
-
-  static std::optional<FixedVectorType> from(const ::mx::ir::Type &that);
-  ::mlir::LLVM::LLVMFixedVectorType underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  //Type element_type(void) const;
-  //unsignedint num_elements(void) const;
-};
-static_assert(sizeof(FixedVectorType) == sizeof(Type));
 
 class MX_EXPORT FunctionType final : public Type {
  public:
@@ -86,11 +71,24 @@ class MX_EXPORT PointerType final : public Type {
   ::mlir::LLVM::LLVMPointerType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  bool is_opaque(void) const;
-  //Type element_type(void) const;
   //unsignedint address_space(void) const;
 };
 static_assert(sizeof(PointerType) == sizeof(Type));
+
+class MX_EXPORT FixedVectorType final : public Type {
+ public:
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::LLVM_FIXED_VECTOR;
+  }
+
+  static std::optional<FixedVectorType> from(const ::mx::ir::Type &that);
+  ::mlir::LLVM::LLVMFixedVectorType underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //Type element_type(void) const;
+  //unsignedint num_elements(void) const;
+};
+static_assert(sizeof(FixedVectorType) == sizeof(Type));
 
 class MX_EXPORT ScalableVectorType final : public Type {
  public:

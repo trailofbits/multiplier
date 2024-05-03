@@ -9,7 +9,7 @@
 #pragma once
 
 #include <multiplier/AST/Expr.h>
-#include <multiplier/AST/SourceLocExprIdentKind.h>
+#include <multiplier/AST/SourceLocIdentKind.h>
 
 namespace mx {
 class EntityProvider;
@@ -66,7 +66,7 @@ class MX_EXPORT SourceLocExpr : public Expr {
   static std::optional<SourceLocExpr> from(const TokenContext &t);
 
   std::string_view builtin_string(void) const;
-  SourceLocExprIdentKind identifier_kind(void) const;
+  SourceLocIdentKind identifier_kind(void) const;
   Token token(void) const;
   bool is_int_type(void) const;
 };

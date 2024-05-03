@@ -16,7 +16,7 @@ const char *EnumeratorName(RandomizeLayoutAttrSpelling e) {
   switch (e) {
     case RandomizeLayoutAttrSpelling::GNU_RANDOMIZE_LAYOUT: return "GNU_RANDOMIZE_LAYOUT";
     case RandomizeLayoutAttrSpelling::CXX11_GNU_RANDOMIZE_LAYOUT: return "CXX11_GNU_RANDOMIZE_LAYOUT";
-    case RandomizeLayoutAttrSpelling::C2X_GNU_RANDOMIZE_LAYOUT: return "C2X_GNU_RANDOMIZE_LAYOUT";
+    case RandomizeLayoutAttrSpelling::C23_GNU_RANDOMIZE_LAYOUT: return "C23_GNU_RANDOMIZE_LAYOUT";
     case RandomizeLayoutAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

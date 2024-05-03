@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1409]) || tp >= &(gTypes[1440])) {
+  if (tp < &(gTypes[1451]) || tp >= &(gTypes[1482])) {
     return std::nullopt;
   }
 
@@ -89,124 +89,124 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       tp = gType;
       break;
 
-    case mx::ir::hl::AdjustedType::static_kind():
-      tp = &(gTypes[1410]);
-      break;
-
-    case mx::ir::hl::ArrayType::static_kind():
-      tp = &(gTypes[1411]);
-      break;
-
-    case mx::ir::hl::AttributedType::static_kind():
-      tp = &(gTypes[1412]);
-      break;
-
-    case mx::ir::hl::BFloat16Type::static_kind():
-      tp = &(gTypes[1413]);
-      break;
-
-    case mx::ir::hl::BoolType::static_kind():
-      tp = &(gTypes[1414]);
-      break;
-
-    case mx::ir::hl::CharType::static_kind():
-      tp = &(gTypes[1415]);
-      break;
-
-    case mx::ir::hl::DecayedType::static_kind():
-      tp = &(gTypes[1416]);
-      break;
-
-    case mx::ir::hl::DoubleType::static_kind():
-      tp = &(gTypes[1417]);
-      break;
-
-    case mx::ir::hl::ElaboratedType::static_kind():
-      tp = &(gTypes[1418]);
+    case mx::ir::hl::RecordType::static_kind():
+      tp = &(gTypes[1452]);
       break;
 
     case mx::ir::hl::EnumType::static_kind():
-      tp = &(gTypes[1419]);
-      break;
-
-    case mx::ir::hl::Float128Type::static_kind():
-      tp = &(gTypes[1420]);
-      break;
-
-    case mx::ir::hl::FloatType::static_kind():
-      tp = &(gTypes[1421]);
-      break;
-
-    case mx::ir::hl::HalfType::static_kind():
-      tp = &(gTypes[1422]);
-      break;
-
-    case mx::ir::hl::Int128Type::static_kind():
-      tp = &(gTypes[1423]);
-      break;
-
-    case mx::ir::hl::IntType::static_kind():
-      tp = &(gTypes[1424]);
-      break;
-
-    case mx::ir::hl::LValueType::static_kind():
-      tp = &(gTypes[1425]);
-      break;
-
-    case mx::ir::hl::LabelType::static_kind():
-      tp = &(gTypes[1426]);
-      break;
-
-    case mx::ir::hl::LongDoubleType::static_kind():
-      tp = &(gTypes[1427]);
-      break;
-
-    case mx::ir::hl::LongLongType::static_kind():
-      tp = &(gTypes[1428]);
-      break;
-
-    case mx::ir::hl::LongType::static_kind():
-      tp = &(gTypes[1429]);
-      break;
-
-    case mx::ir::hl::ParenType::static_kind():
-      tp = &(gTypes[1430]);
-      break;
-
-    case mx::ir::hl::PointerType::static_kind():
-      tp = &(gTypes[1431]);
-      break;
-
-    case mx::ir::hl::RValueType::static_kind():
-      tp = &(gTypes[1432]);
-      break;
-
-    case mx::ir::hl::RecordType::static_kind():
-      tp = &(gTypes[1433]);
-      break;
-
-    case mx::ir::hl::ReferenceType::static_kind():
-      tp = &(gTypes[1434]);
-      break;
-
-    case mx::ir::hl::ShortType::static_kind():
-      tp = &(gTypes[1435]);
-      break;
-
-    case mx::ir::hl::TypeOfExprType::static_kind():
-      tp = &(gTypes[1436]);
-      break;
-
-    case mx::ir::hl::TypeOfTypeType::static_kind():
-      tp = &(gTypes[1437]);
+      tp = &(gTypes[1453]);
       break;
 
     case mx::ir::hl::TypedefType::static_kind():
-      tp = &(gTypes[1438]);
+      tp = &(gTypes[1454]);
+      break;
+
+    case mx::ir::hl::ElaboratedType::static_kind():
+      tp = &(gTypes[1455]);
+      break;
+
+    case mx::ir::hl::LabelType::static_kind():
+      tp = &(gTypes[1456]);
+      break;
+
+    case mx::ir::hl::ParenType::static_kind():
+      tp = &(gTypes[1457]);
+      break;
+
+    case mx::ir::hl::LValueType::static_kind():
+      tp = &(gTypes[1458]);
+      break;
+
+    case mx::ir::hl::RValueType::static_kind():
+      tp = &(gTypes[1459]);
       break;
 
     case mx::ir::hl::VoidType::static_kind():
-      tp = &(gTypes[1439]);
+      tp = &(gTypes[1460]);
+      break;
+
+    case mx::ir::hl::BoolType::static_kind():
+      tp = &(gTypes[1461]);
+      break;
+
+    case mx::ir::hl::CharType::static_kind():
+      tp = &(gTypes[1462]);
+      break;
+
+    case mx::ir::hl::ShortType::static_kind():
+      tp = &(gTypes[1463]);
+      break;
+
+    case mx::ir::hl::IntType::static_kind():
+      tp = &(gTypes[1464]);
+      break;
+
+    case mx::ir::hl::LongType::static_kind():
+      tp = &(gTypes[1465]);
+      break;
+
+    case mx::ir::hl::LongLongType::static_kind():
+      tp = &(gTypes[1466]);
+      break;
+
+    case mx::ir::hl::Int128Type::static_kind():
+      tp = &(gTypes[1467]);
+      break;
+
+    case mx::ir::hl::HalfType::static_kind():
+      tp = &(gTypes[1468]);
+      break;
+
+    case mx::ir::hl::BFloat16Type::static_kind():
+      tp = &(gTypes[1469]);
+      break;
+
+    case mx::ir::hl::FloatType::static_kind():
+      tp = &(gTypes[1470]);
+      break;
+
+    case mx::ir::hl::DoubleType::static_kind():
+      tp = &(gTypes[1471]);
+      break;
+
+    case mx::ir::hl::LongDoubleType::static_kind():
+      tp = &(gTypes[1472]);
+      break;
+
+    case mx::ir::hl::Float128Type::static_kind():
+      tp = &(gTypes[1473]);
+      break;
+
+    case mx::ir::hl::PointerType::static_kind():
+      tp = &(gTypes[1474]);
+      break;
+
+    case mx::ir::hl::ArrayType::static_kind():
+      tp = &(gTypes[1475]);
+      break;
+
+    case mx::ir::hl::DecayedType::static_kind():
+      tp = &(gTypes[1476]);
+      break;
+
+    case mx::ir::hl::AttributedType::static_kind():
+      tp = &(gTypes[1477]);
+      break;
+
+    case mx::ir::hl::AdjustedType::static_kind():
+      tp = &(gTypes[1478]);
+      break;
+
+    case mx::ir::hl::ReferenceType::static_kind():
+      tp = &(gTypes[1479]);
+      break;
+
+    case mx::ir::hl::TypeOfExprType::static_kind():
+      tp = &(gTypes[1480]);
+      break;
+
+    case mx::ir::hl::TypeOfTypeType::static_kind():
+      tp = &(gTypes[1481]);
       break;
 
   }
@@ -274,7 +274,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1409]);
+  PyTypeObject * const tp = &(gTypes[1451]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -289,12 +289,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[1374].tp_hash;
-  tp->tp_richcompare = gTypes[1374].tp_richcompare;
+  tp->tp_hash = gTypes[1416].tp_hash;
+  tp->tp_richcompare = gTypes[1416].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[1374]);
+  tp->tp_base = &(gTypes[1416]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

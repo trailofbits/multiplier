@@ -16,7 +16,7 @@ namespace mx {
 enum class OptimizeNoneAttrSpelling : unsigned char {
   GNU_OPTNONE,
   CXX11_CLANG_OPTNONE,
-  C2X_CLANG_OPTNONE,
+  C23_CLANG_OPTNONE,
   SPELLING_NOT_CALCULATED,
 };
 

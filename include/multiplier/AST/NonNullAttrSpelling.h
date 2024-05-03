@@ -16,7 +16,7 @@ namespace mx {
 enum class NonNullAttrSpelling : unsigned char {
   GNU_NONNULL,
   CXX11_GNU_NONNULL,
-  C2X_GNU_NONNULL,
+  C23_GNU_NONNULL,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -13,40 +13,49 @@
 namespace mlir::LLVM {
 class CConvAttr;
 class ComdatAttr;
-class AccessGroupAttr;
-class AliasScopeAttr;
-class AliasScopeDomainAttr;
+class LinkageAttr;
+class FramePointerKindAttr;
+class LoopVectorizeAttr;
+class LoopInterleaveAttr;
+class LoopUnrollAttr;
+class LoopUnrollAndJamAttr;
+class LoopLICMAttr;
+class LoopDistributeAttr;
+class LoopPipelineAttr;
+class LoopPeeledAttr;
+class LoopUnswitchAttr;
+class LoopAnnotationAttr;
+class DIExpressionElemAttr;
+class DIExpressionAttr;
+class DINullTypeAttr;
 class DIBasicTypeAttr;
 class DICompileUnitAttr;
 class DICompositeTypeAttr;
 class DIDerivedTypeAttr;
 class DIFileAttr;
-class DILabelAttr;
+class DIGlobalVariableExpressionAttr;
+class DIGlobalVariableAttr;
 class DILexicalBlockAttr;
 class DILexicalBlockFileAttr;
 class DILocalVariableAttr;
-class DINamespaceAttr;
-class DINullTypeAttr;
 class DISubprogramAttr;
+class DIModuleAttr;
+class DINamespaceAttr;
 class DISubrangeAttr;
 class DISubroutineTypeAttr;
-class FastmathFlagsAttr;
+class DILabelAttr;
 class MemoryEffectsAttr;
-class TBAAMemberAttr;
+class AliasScopeDomainAttr;
+class AliasScopeAttr;
+class AccessGroupAttr;
 class TBAARootAttr;
-class TBAATagAttr;
+class TBAAMemberAttr;
 class TBAATypeDescriptorAttr;
-class LinkageAttr;
-class LoopAnnotationAttr;
-class LoopDistributeAttr;
-class LoopInterleaveAttr;
-class LoopLICMAttr;
-class LoopPeeledAttr;
-class LoopPipelineAttr;
-class LoopUnrollAndJamAttr;
-class LoopUnrollAttr;
-class LoopUnswitchAttr;
-class LoopVectorizeAttr;
+class TBAATagAttr;
+class VScaleRangeAttr;
+class TargetFeaturesAttr;
+class IntegerOverflowFlagsAttr;
+class FastmathFlagsAttr;
 }  // namespace mlir::LLVM
 namespace mx::ir::llvm {
 
@@ -86,53 +95,268 @@ class MX_EXPORT ComdatAttr final : public Attribute {
 };
 static_assert(sizeof(ComdatAttr) == sizeof(Attribute));
 
-class MX_EXPORT AccessGroupAttr final : public Attribute {
+class MX_EXPORT LinkageAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_ACCESS_GROUP;
+    return AttributeKind::LLVM_LINKAGE;
   }
 
-  static std::optional<AccessGroupAttr> from(const ::mx::ir::Attribute &that);
+  static std::optional<LinkageAttr> from(const ::mx::ir::Attribute &that);
 
-  ::mlir::LLVM::AccessGroupAttr underlying_repr(void) const noexcept;
+  ::mlir::LLVM::LinkageAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //DistinctAttr id(void) const;
+  //linkage::Linkage linkage(void) const;
 };
-static_assert(sizeof(AccessGroupAttr) == sizeof(Attribute));
+static_assert(sizeof(LinkageAttr) == sizeof(Attribute));
 
-class MX_EXPORT AliasScopeAttr final : public Attribute {
+class MX_EXPORT FramePointerKindAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_ALIAS_SCOPE;
+    return AttributeKind::LLVM_FRAME_POINTER_KIND;
   }
 
-  static std::optional<AliasScopeAttr> from(const ::mx::ir::Attribute &that);
+  static std::optional<FramePointerKindAttr> from(const ::mx::ir::Attribute &that);
 
-  ::mlir::LLVM::AliasScopeAttr underlying_repr(void) const noexcept;
+  ::mlir::LLVM::FramePointerKindAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //DistinctAttr id(void) const;
-  //AliasScopeDomainAttr domain(void) const;
-  //StringAttr description(void) const;
+  //framePointerKind::FramePointerKind frame_pointer_kind(void) const;
 };
-static_assert(sizeof(AliasScopeAttr) == sizeof(Attribute));
+static_assert(sizeof(FramePointerKindAttr) == sizeof(Attribute));
 
-class MX_EXPORT AliasScopeDomainAttr final : public Attribute {
+class MX_EXPORT LoopVectorizeAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_ALIAS_SCOPE_DOMAIN;
+    return AttributeKind::LLVM_LOOP_VECTORIZE;
   }
 
-  static std::optional<AliasScopeDomainAttr> from(const ::mx::ir::Attribute &that);
+  static std::optional<LoopVectorizeAttr> from(const ::mx::ir::Attribute &that);
 
-  ::mlir::LLVM::AliasScopeDomainAttr underlying_repr(void) const noexcept;
+  ::mlir::LLVM::LoopVectorizeAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //DistinctAttr id(void) const;
-  //StringAttr description(void) const;
+  //BoolAttr disable(void) const;
+  //BoolAttr predicate_enable(void) const;
+  //BoolAttr scalable_enable(void) const;
+  //IntegerAttr width(void) const;
+  //LoopAnnotationAttr followup_vectorized(void) const;
+  //LoopAnnotationAttr followup_epilogue(void) const;
+  //LoopAnnotationAttr followup_all(void) const;
 };
-static_assert(sizeof(AliasScopeDomainAttr) == sizeof(Attribute));
+static_assert(sizeof(LoopVectorizeAttr) == sizeof(Attribute));
+
+class MX_EXPORT LoopInterleaveAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_LOOP_INTERLEAVE;
+  }
+
+  static std::optional<LoopInterleaveAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::LoopInterleaveAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //IntegerAttr count(void) const;
+};
+static_assert(sizeof(LoopInterleaveAttr) == sizeof(Attribute));
+
+class MX_EXPORT LoopUnrollAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_LOOP_UNROLL;
+  }
+
+  static std::optional<LoopUnrollAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::LoopUnrollAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //BoolAttr disable(void) const;
+  //IntegerAttr count(void) const;
+  //BoolAttr runtime_disable(void) const;
+  //BoolAttr full(void) const;
+  //LoopAnnotationAttr followup_unrolled(void) const;
+  //LoopAnnotationAttr followup_remainder(void) const;
+  //LoopAnnotationAttr followup_all(void) const;
+};
+static_assert(sizeof(LoopUnrollAttr) == sizeof(Attribute));
+
+class MX_EXPORT LoopUnrollAndJamAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_LOOP_UNROLL_AND_JAM;
+  }
+
+  static std::optional<LoopUnrollAndJamAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::LoopUnrollAndJamAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //BoolAttr disable(void) const;
+  //IntegerAttr count(void) const;
+  //LoopAnnotationAttr followup_outer(void) const;
+  //LoopAnnotationAttr followup_inner(void) const;
+  //LoopAnnotationAttr followup_remainder_outer(void) const;
+  //LoopAnnotationAttr followup_remainder_inner(void) const;
+  //LoopAnnotationAttr followup_all(void) const;
+};
+static_assert(sizeof(LoopUnrollAndJamAttr) == sizeof(Attribute));
+
+class MX_EXPORT LoopLICMAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_LOOP_LICM;
+  }
+
+  static std::optional<LoopLICMAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::LoopLICMAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //BoolAttr disable(void) const;
+  //BoolAttr versioning_disable(void) const;
+};
+static_assert(sizeof(LoopLICMAttr) == sizeof(Attribute));
+
+class MX_EXPORT LoopDistributeAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_LOOP_DISTRIBUTE;
+  }
+
+  static std::optional<LoopDistributeAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::LoopDistributeAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //BoolAttr disable(void) const;
+  //LoopAnnotationAttr followup_coincident(void) const;
+  //LoopAnnotationAttr followup_sequential(void) const;
+  //LoopAnnotationAttr followup_fallback(void) const;
+  //LoopAnnotationAttr followup_all(void) const;
+};
+static_assert(sizeof(LoopDistributeAttr) == sizeof(Attribute));
+
+class MX_EXPORT LoopPipelineAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_LOOP_PIPELINE;
+  }
+
+  static std::optional<LoopPipelineAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::LoopPipelineAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //BoolAttr disable(void) const;
+  //IntegerAttr initiationinterval(void) const;
+};
+static_assert(sizeof(LoopPipelineAttr) == sizeof(Attribute));
+
+class MX_EXPORT LoopPeeledAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_LOOP_PEELED;
+  }
+
+  static std::optional<LoopPeeledAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::LoopPeeledAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //IntegerAttr count(void) const;
+};
+static_assert(sizeof(LoopPeeledAttr) == sizeof(Attribute));
+
+class MX_EXPORT LoopUnswitchAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_LOOP_UNSWITCH;
+  }
+
+  static std::optional<LoopUnswitchAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::LoopUnswitchAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //BoolAttr partial_disable(void) const;
+};
+static_assert(sizeof(LoopUnswitchAttr) == sizeof(Attribute));
+
+class MX_EXPORT LoopAnnotationAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_LOOP_ANNOTATION;
+  }
+
+  static std::optional<LoopAnnotationAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::LoopAnnotationAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //BoolAttr disable_nonforced(void) const;
+  //LoopVectorizeAttr vectorize(void) const;
+  //LoopInterleaveAttr interleave(void) const;
+  //LoopUnrollAttr unroll(void) const;
+  //LoopUnrollAndJamAttr unroll_and_jam(void) const;
+  //LoopLICMAttr licm(void) const;
+  //LoopDistributeAttr distribute(void) const;
+  //LoopPipelineAttr pipeline(void) const;
+  //LoopPeeledAttr peeled(void) const;
+  //LoopUnswitchAttr unswitch(void) const;
+  //BoolAttr must_progress(void) const;
+  //BoolAttr is_vectorized(void) const;
+  //FusedLoc start_loc(void) const;
+  //FusedLoc end_loc(void) const;
+  //::llvm::ArrayRef<AccessGroupAttr> parallel_accesses(void) const;
+};
+static_assert(sizeof(LoopAnnotationAttr) == sizeof(Attribute));
+
+class MX_EXPORT DIExpressionElemAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_DI_EXPRESSION_ELEM;
+  }
+
+  static std::optional<DIExpressionElemAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::DIExpressionElemAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //unsignedint opcode(void) const;
+  //::llvm::ArrayRef<unsignedlonglong> arguments(void) const;
+};
+static_assert(sizeof(DIExpressionElemAttr) == sizeof(Attribute));
+
+class MX_EXPORT DIExpressionAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_DI_EXPRESSION;
+  }
+
+  static std::optional<DIExpressionAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::DIExpressionAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::llvm::ArrayRef<DIExpressionElemAttr> operations(void) const;
+};
+static_assert(sizeof(DIExpressionAttr) == sizeof(Attribute));
+
+class MX_EXPORT DINullTypeAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_DI_NULL_TYPE;
+  }
+
+  static std::optional<DINullTypeAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::DINullTypeAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(DINullTypeAttr) == sizeof(Attribute));
 
 class MX_EXPORT DIBasicTypeAttr final : public Attribute {
  public:
@@ -163,6 +387,7 @@ class MX_EXPORT DICompileUnitAttr final : public Attribute {
   ::mlir::LLVM::DICompileUnitAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
+  //DistinctAttr id(void) const;
   //unsignedint source_language(void) const;
   //DIFileAttr file(void) const;
   //StringAttr producer(void) const;
@@ -231,23 +456,44 @@ class MX_EXPORT DIFileAttr final : public Attribute {
 };
 static_assert(sizeof(DIFileAttr) == sizeof(Attribute));
 
-class MX_EXPORT DILabelAttr final : public Attribute {
+class MX_EXPORT DIGlobalVariableExpressionAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_DI_LABEL;
+    return AttributeKind::LLVM_DI_GLOBAL_VARIABLE_EXPRESSION;
   }
 
-  static std::optional<DILabelAttr> from(const ::mx::ir::Attribute &that);
+  static std::optional<DIGlobalVariableExpressionAttr> from(const ::mx::ir::Attribute &that);
 
-  ::mlir::LLVM::DILabelAttr underlying_repr(void) const noexcept;
+  ::mlir::LLVM::DIGlobalVariableExpressionAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //DIGlobalVariableAttr var(void) const;
+  //DIExpressionAttr expr(void) const;
+};
+static_assert(sizeof(DIGlobalVariableExpressionAttr) == sizeof(Attribute));
+
+class MX_EXPORT DIGlobalVariableAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_DI_GLOBAL_VARIABLE;
+  }
+
+  static std::optional<DIGlobalVariableAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::DIGlobalVariableAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
   //DIScopeAttr scope(void) const;
   //StringAttr name(void) const;
+  //StringAttr linkage_name(void) const;
   //DIFileAttr file(void) const;
   //unsignedint line(void) const;
+  //DITypeAttr type(void) const;
+  bool is_local_to_unit(void) const;
+  bool is_defined(void) const;
+  //unsignedint align_in_bits(void) const;
 };
-static_assert(sizeof(DILabelAttr) == sizeof(Attribute));
+static_assert(sizeof(DIGlobalVariableAttr) == sizeof(Attribute));
 
 class MX_EXPORT DILexicalBlockAttr final : public Attribute {
  public:
@@ -305,6 +551,52 @@ class MX_EXPORT DILocalVariableAttr final : public Attribute {
 };
 static_assert(sizeof(DILocalVariableAttr) == sizeof(Attribute));
 
+class MX_EXPORT DISubprogramAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_DI_SUBPROGRAM;
+  }
+
+  static std::optional<DISubprogramAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::DISubprogramAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //DistinctAttr id(void) const;
+  //DICompileUnitAttr compile_unit(void) const;
+  //DIScopeAttr scope(void) const;
+  //StringAttr name(void) const;
+  //StringAttr linkage_name(void) const;
+  //DIFileAttr file(void) const;
+  //unsignedint line(void) const;
+  //unsignedint scope_line(void) const;
+  //DISubprogramFlags subprogram_flags(void) const;
+  //DISubroutineTypeAttr type(void) const;
+};
+static_assert(sizeof(DISubprogramAttr) == sizeof(Attribute));
+
+class MX_EXPORT DIModuleAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_DI_MODULE;
+  }
+
+  static std::optional<DIModuleAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::DIModuleAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //DIFileAttr file(void) const;
+  //DIScopeAttr scope(void) const;
+  //StringAttr name(void) const;
+  //StringAttr config_macros(void) const;
+  //StringAttr include_path(void) const;
+  //StringAttr apinotes(void) const;
+  //unsignedint line(void) const;
+  bool is_decl(void) const;
+};
+static_assert(sizeof(DIModuleAttr) == sizeof(Attribute));
+
 class MX_EXPORT DINamespaceAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
@@ -321,43 +613,6 @@ class MX_EXPORT DINamespaceAttr final : public Attribute {
   bool export_symbols(void) const;
 };
 static_assert(sizeof(DINamespaceAttr) == sizeof(Attribute));
-
-class MX_EXPORT DINullTypeAttr final : public Attribute {
- public:
-  inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_DI_NULL_TYPE;
-  }
-
-  static std::optional<DINullTypeAttr> from(const ::mx::ir::Attribute &that);
-
-  ::mlir::LLVM::DINullTypeAttr underlying_repr(void) const noexcept;
-
-  // Imported methods:
-};
-static_assert(sizeof(DINullTypeAttr) == sizeof(Attribute));
-
-class MX_EXPORT DISubprogramAttr final : public Attribute {
- public:
-  inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_DI_SUBPROGRAM;
-  }
-
-  static std::optional<DISubprogramAttr> from(const ::mx::ir::Attribute &that);
-
-  ::mlir::LLVM::DISubprogramAttr underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  //DICompileUnitAttr compile_unit(void) const;
-  //DIScopeAttr scope(void) const;
-  //StringAttr name(void) const;
-  //StringAttr linkage_name(void) const;
-  //DIFileAttr file(void) const;
-  //unsignedint line(void) const;
-  //unsignedint scope_line(void) const;
-  //DISubprogramFlags subprogram_flags(void) const;
-  //DISubroutineTypeAttr type(void) const;
-};
-static_assert(sizeof(DISubprogramAttr) == sizeof(Attribute));
 
 class MX_EXPORT DISubrangeAttr final : public Attribute {
  public:
@@ -393,20 +648,23 @@ class MX_EXPORT DISubroutineTypeAttr final : public Attribute {
 };
 static_assert(sizeof(DISubroutineTypeAttr) == sizeof(Attribute));
 
-class MX_EXPORT FastmathFlagsAttr final : public Attribute {
+class MX_EXPORT DILabelAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_FASTMATH_FLAGS;
+    return AttributeKind::LLVM_DI_LABEL;
   }
 
-  static std::optional<FastmathFlagsAttr> from(const ::mx::ir::Attribute &that);
+  static std::optional<DILabelAttr> from(const ::mx::ir::Attribute &that);
 
-  ::mlir::LLVM::FastmathFlagsAttr underlying_repr(void) const noexcept;
+  ::mlir::LLVM::DILabelAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::LLVM::FastmathFlags value(void) const;
+  //DIScopeAttr scope(void) const;
+  //StringAttr name(void) const;
+  //DIFileAttr file(void) const;
+  //unsignedint line(void) const;
 };
-static_assert(sizeof(FastmathFlagsAttr) == sizeof(Attribute));
+static_assert(sizeof(DILabelAttr) == sizeof(Attribute));
 
 class MX_EXPORT MemoryEffectsAttr final : public Attribute {
  public:
@@ -426,6 +684,69 @@ class MX_EXPORT MemoryEffectsAttr final : public Attribute {
 };
 static_assert(sizeof(MemoryEffectsAttr) == sizeof(Attribute));
 
+class MX_EXPORT AliasScopeDomainAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_ALIAS_SCOPE_DOMAIN;
+  }
+
+  static std::optional<AliasScopeDomainAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::AliasScopeDomainAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //DistinctAttr id(void) const;
+  //StringAttr description(void) const;
+};
+static_assert(sizeof(AliasScopeDomainAttr) == sizeof(Attribute));
+
+class MX_EXPORT AliasScopeAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_ALIAS_SCOPE;
+  }
+
+  static std::optional<AliasScopeAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::AliasScopeAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //DistinctAttr id(void) const;
+  //AliasScopeDomainAttr domain(void) const;
+  //StringAttr description(void) const;
+};
+static_assert(sizeof(AliasScopeAttr) == sizeof(Attribute));
+
+class MX_EXPORT AccessGroupAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_ACCESS_GROUP;
+  }
+
+  static std::optional<AccessGroupAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::AccessGroupAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //DistinctAttr id(void) const;
+};
+static_assert(sizeof(AccessGroupAttr) == sizeof(Attribute));
+
+class MX_EXPORT TBAARootAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::LLVM_TBAA_ROOT;
+  }
+
+  static std::optional<TBAARootAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::LLVM::TBAARootAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //StringAttr id(void) const;
+};
+static_assert(sizeof(TBAARootAttr) == sizeof(Attribute));
+
 class MX_EXPORT TBAAMemberAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
@@ -442,20 +763,21 @@ class MX_EXPORT TBAAMemberAttr final : public Attribute {
 };
 static_assert(sizeof(TBAAMemberAttr) == sizeof(Attribute));
 
-class MX_EXPORT TBAARootAttr final : public Attribute {
+class MX_EXPORT TBAATypeDescriptorAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_TBAA_ROOT;
+    return AttributeKind::LLVM_TBAA_TYPE_DESCRIPTOR;
   }
 
-  static std::optional<TBAARootAttr> from(const ::mx::ir::Attribute &that);
+  static std::optional<TBAATypeDescriptorAttr> from(const ::mx::ir::Attribute &that);
 
-  ::mlir::LLVM::TBAARootAttr underlying_repr(void) const noexcept;
+  ::mlir::LLVM::TBAATypeDescriptorAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //StringAttr id(void) const;
+  std::string_view id(void) const;
+  //::llvm::ArrayRef<TBAAMemberAttr> members(void) const;
 };
-static_assert(sizeof(TBAARootAttr) == sizeof(Attribute));
+static_assert(sizeof(TBAATypeDescriptorAttr) == sizeof(Attribute));
 
 class MX_EXPORT TBAATagAttr final : public Attribute {
  public:
@@ -475,223 +797,68 @@ class MX_EXPORT TBAATagAttr final : public Attribute {
 };
 static_assert(sizeof(TBAATagAttr) == sizeof(Attribute));
 
-class MX_EXPORT TBAATypeDescriptorAttr final : public Attribute {
+class MX_EXPORT VScaleRangeAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_TBAA_TYPE_DESCRIPTOR;
+    return AttributeKind::LLVM_V_SCALE_RANGE;
   }
 
-  static std::optional<TBAATypeDescriptorAttr> from(const ::mx::ir::Attribute &that);
+  static std::optional<VScaleRangeAttr> from(const ::mx::ir::Attribute &that);
 
-  ::mlir::LLVM::TBAATypeDescriptorAttr underlying_repr(void) const noexcept;
+  ::mlir::LLVM::VScaleRangeAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  std::string_view id(void) const;
-  //::llvm::ArrayRef<TBAAMemberAttr> members(void) const;
+  //IntegerAttr min_range(void) const;
+  //IntegerAttr max_range(void) const;
 };
-static_assert(sizeof(TBAATypeDescriptorAttr) == sizeof(Attribute));
+static_assert(sizeof(VScaleRangeAttr) == sizeof(Attribute));
 
-class MX_EXPORT LinkageAttr final : public Attribute {
+class MX_EXPORT TargetFeaturesAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_LINKAGE;
+    return AttributeKind::LLVM_TARGET_FEATURES;
   }
 
-  static std::optional<LinkageAttr> from(const ::mx::ir::Attribute &that);
+  static std::optional<TargetFeaturesAttr> from(const ::mx::ir::Attribute &that);
 
-  ::mlir::LLVM::LinkageAttr underlying_repr(void) const noexcept;
+  ::mlir::LLVM::TargetFeaturesAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //linkage::Linkage linkage(void) const;
+  bool null_or_empty(void) const;
+  std::string features_string(void) const;
+  //StringLiteral attribute_name(void) const;
+  //::llvm::ArrayRef<StringAttr> features(void) const;
 };
-static_assert(sizeof(LinkageAttr) == sizeof(Attribute));
+static_assert(sizeof(TargetFeaturesAttr) == sizeof(Attribute));
 
-class MX_EXPORT LoopAnnotationAttr final : public Attribute {
+class MX_EXPORT IntegerOverflowFlagsAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_LOOP_ANNOTATION;
+    return AttributeKind::LLVM_INTEGER_OVERFLOW_FLAGS;
   }
 
-  static std::optional<LoopAnnotationAttr> from(const ::mx::ir::Attribute &that);
+  static std::optional<IntegerOverflowFlagsAttr> from(const ::mx::ir::Attribute &that);
 
-  ::mlir::LLVM::LoopAnnotationAttr underlying_repr(void) const noexcept;
+  ::mlir::LLVM::IntegerOverflowFlagsAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //BoolAttr disable_nonforced(void) const;
-  //LoopVectorizeAttr vectorize(void) const;
-  //LoopInterleaveAttr interleave(void) const;
-  //LoopUnrollAttr unroll(void) const;
-  //LoopUnrollAndJamAttr unroll_and_jam(void) const;
-  //LoopLICMAttr licm(void) const;
-  //LoopDistributeAttr distribute(void) const;
-  //LoopPipelineAttr pipeline(void) const;
-  //LoopPeeledAttr peeled(void) const;
-  //LoopUnswitchAttr unswitch(void) const;
-  //BoolAttr must_progress(void) const;
-  //BoolAttr is_vectorized(void) const;
-  //::llvm::ArrayRef<AccessGroupAttr> parallel_accesses(void) const;
-  //FusedLoc start_loc(void) const;
-  //FusedLoc end_loc(void) const;
+  //::mlir::LLVM::IntegerOverflowFlags value(void) const;
 };
-static_assert(sizeof(LoopAnnotationAttr) == sizeof(Attribute));
+static_assert(sizeof(IntegerOverflowFlagsAttr) == sizeof(Attribute));
 
-class MX_EXPORT LoopDistributeAttr final : public Attribute {
+class MX_EXPORT FastmathFlagsAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_LOOP_DISTRIBUTE;
+    return AttributeKind::LLVM_FASTMATH_FLAGS;
   }
 
-  static std::optional<LoopDistributeAttr> from(const ::mx::ir::Attribute &that);
+  static std::optional<FastmathFlagsAttr> from(const ::mx::ir::Attribute &that);
 
-  ::mlir::LLVM::LoopDistributeAttr underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  //BoolAttr disable(void) const;
-  //LoopAnnotationAttr followup_coincident(void) const;
-  //LoopAnnotationAttr followup_sequential(void) const;
-  //LoopAnnotationAttr followup_fallback(void) const;
-  //LoopAnnotationAttr followup_all(void) const;
-};
-static_assert(sizeof(LoopDistributeAttr) == sizeof(Attribute));
-
-class MX_EXPORT LoopInterleaveAttr final : public Attribute {
- public:
-  inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_LOOP_INTERLEAVE;
-  }
-
-  static std::optional<LoopInterleaveAttr> from(const ::mx::ir::Attribute &that);
-
-  ::mlir::LLVM::LoopInterleaveAttr underlying_repr(void) const noexcept;
+  ::mlir::LLVM::FastmathFlagsAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //IntegerAttr count(void) const;
+  //::mlir::LLVM::FastmathFlags value(void) const;
 };
-static_assert(sizeof(LoopInterleaveAttr) == sizeof(Attribute));
-
-class MX_EXPORT LoopLICMAttr final : public Attribute {
- public:
-  inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_LOOP_LICM;
-  }
-
-  static std::optional<LoopLICMAttr> from(const ::mx::ir::Attribute &that);
-
-  ::mlir::LLVM::LoopLICMAttr underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  //BoolAttr disable(void) const;
-  //BoolAttr versioning_disable(void) const;
-};
-static_assert(sizeof(LoopLICMAttr) == sizeof(Attribute));
-
-class MX_EXPORT LoopPeeledAttr final : public Attribute {
- public:
-  inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_LOOP_PEELED;
-  }
-
-  static std::optional<LoopPeeledAttr> from(const ::mx::ir::Attribute &that);
-
-  ::mlir::LLVM::LoopPeeledAttr underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  //IntegerAttr count(void) const;
-};
-static_assert(sizeof(LoopPeeledAttr) == sizeof(Attribute));
-
-class MX_EXPORT LoopPipelineAttr final : public Attribute {
- public:
-  inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_LOOP_PIPELINE;
-  }
-
-  static std::optional<LoopPipelineAttr> from(const ::mx::ir::Attribute &that);
-
-  ::mlir::LLVM::LoopPipelineAttr underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  //BoolAttr disable(void) const;
-  //IntegerAttr initiationinterval(void) const;
-};
-static_assert(sizeof(LoopPipelineAttr) == sizeof(Attribute));
-
-class MX_EXPORT LoopUnrollAndJamAttr final : public Attribute {
- public:
-  inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_LOOP_UNROLL_AND_JAM;
-  }
-
-  static std::optional<LoopUnrollAndJamAttr> from(const ::mx::ir::Attribute &that);
-
-  ::mlir::LLVM::LoopUnrollAndJamAttr underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  //BoolAttr disable(void) const;
-  //IntegerAttr count(void) const;
-  //LoopAnnotationAttr followup_outer(void) const;
-  //LoopAnnotationAttr followup_inner(void) const;
-  //LoopAnnotationAttr followup_remainder_outer(void) const;
-  //LoopAnnotationAttr followup_remainder_inner(void) const;
-  //LoopAnnotationAttr followup_all(void) const;
-};
-static_assert(sizeof(LoopUnrollAndJamAttr) == sizeof(Attribute));
-
-class MX_EXPORT LoopUnrollAttr final : public Attribute {
- public:
-  inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_LOOP_UNROLL;
-  }
-
-  static std::optional<LoopUnrollAttr> from(const ::mx::ir::Attribute &that);
-
-  ::mlir::LLVM::LoopUnrollAttr underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  //BoolAttr disable(void) const;
-  //IntegerAttr count(void) const;
-  //BoolAttr runtime_disable(void) const;
-  //BoolAttr full(void) const;
-  //LoopAnnotationAttr followup_unrolled(void) const;
-  //LoopAnnotationAttr followup_remainder(void) const;
-  //LoopAnnotationAttr followup_all(void) const;
-};
-static_assert(sizeof(LoopUnrollAttr) == sizeof(Attribute));
-
-class MX_EXPORT LoopUnswitchAttr final : public Attribute {
- public:
-  inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_LOOP_UNSWITCH;
-  }
-
-  static std::optional<LoopUnswitchAttr> from(const ::mx::ir::Attribute &that);
-
-  ::mlir::LLVM::LoopUnswitchAttr underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  //BoolAttr partial_disable(void) const;
-};
-static_assert(sizeof(LoopUnswitchAttr) == sizeof(Attribute));
-
-class MX_EXPORT LoopVectorizeAttr final : public Attribute {
- public:
-  inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::LLVM_LOOP_VECTORIZE;
-  }
-
-  static std::optional<LoopVectorizeAttr> from(const ::mx::ir::Attribute &that);
-
-  ::mlir::LLVM::LoopVectorizeAttr underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  //BoolAttr disable(void) const;
-  //BoolAttr predicate_enable(void) const;
-  //BoolAttr scalable_enable(void) const;
-  //IntegerAttr width(void) const;
-  //LoopAnnotationAttr followup_vectorized(void) const;
-  //LoopAnnotationAttr followup_epilogue(void) const;
-  //LoopAnnotationAttr followup_all(void) const;
-};
-static_assert(sizeof(LoopVectorizeAttr) == sizeof(Attribute));
+static_assert(sizeof(FastmathFlagsAttr) == sizeof(Attribute));
 
 }  // namespace mx::ir::llvm

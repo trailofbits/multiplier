@@ -17,7 +17,7 @@ enum class CFGuardAttrSpelling : unsigned char {
   DECLSPEC_GUARD,
   GNU_GUARD,
   CXX11_CLANG_GUARD,
-  C2X_CLANG_GUARD,
+  C23_CLANG_GUARD,
   SPELLING_NOT_CALCULATED,
 };
 

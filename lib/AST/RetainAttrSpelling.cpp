@@ -16,7 +16,7 @@ const char *EnumeratorName(RetainAttrSpelling e) {
   switch (e) {
     case RetainAttrSpelling::GNU_RETAIN: return "GNU_RETAIN";
     case RetainAttrSpelling::CXX11_GNU_RETAIN: return "CXX11_GNU_RETAIN";
-    case RetainAttrSpelling::C2X_GNU_RETAIN: return "C2X_GNU_RETAIN";
+    case RetainAttrSpelling::C23_GNU_RETAIN: return "C23_GNU_RETAIN";
     case RetainAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

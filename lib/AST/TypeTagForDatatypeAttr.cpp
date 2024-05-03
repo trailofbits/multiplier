@@ -135,7 +135,7 @@ Type TypeTagForDatatypeAttr::matching_c_type(void) const {
 }
 
 Type TypeTagForDatatypeAttr::matching_c_type_token(void) const {
-  RawEntityId eid = impl->reader.getVal16();
+  RawEntityId eid = impl->reader.getVal20();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

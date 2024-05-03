@@ -36,6 +36,17 @@ bool BooleanAttr::value(void) const {
   return val;
 }
 
+std::optional<IntegerAttr> IntegerAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::CORE_INTEGER) {
+    return reinterpret_cast<const IntegerAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::core::IntegerAttr IntegerAttr::underlying_repr(void) const noexcept {
+  return ::vast::core::IntegerAttr(this->::mx::ir::Attribute::attr_);
+}
+
 std::optional<FloatAttr> FloatAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::CORE_FLOAT) {
     return reinterpret_cast<const FloatAttr &>(that);
@@ -47,15 +58,15 @@ std::optional<FloatAttr> FloatAttr::from(const ::mx::ir::Attribute &that) {
   return ::vast::core::FloatAttr(this->::mx::ir::Attribute::attr_);
 }
 
-std::optional<IntegerAttr> IntegerAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::CORE_INTEGER) {
-    return reinterpret_cast<const IntegerAttr &>(that);
+std::optional<VoidAttr> VoidAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::CORE_VOID) {
+    return reinterpret_cast<const VoidAttr &>(that);
   }
   return std::nullopt;
 }
 
-::vast::core::IntegerAttr IntegerAttr::underlying_repr(void) const noexcept {
-  return ::vast::core::IntegerAttr(this->::mx::ir::Attribute::attr_);
+::vast::core::VoidAttr VoidAttr::underlying_repr(void) const noexcept {
+  return ::vast::core::VoidAttr(this->::mx::ir::Attribute::attr_);
 }
 
 std::optional<SourceLanguageAttr> SourceLanguageAttr::from(const ::mx::ir::Attribute &that) {
@@ -69,35 +80,15 @@ std::optional<SourceLanguageAttr> SourceLanguageAttr::from(const ::mx::ir::Attri
   return ::vast::core::SourceLanguageAttr(this->::mx::ir::Attribute::attr_);
 }
 
-std::optional<StringLiteralAttr> StringLiteralAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::CORE_STRING_LITERAL) {
-    return reinterpret_cast<const StringLiteralAttr &>(that);
+std::optional<GlobalLinkageKindAttr> GlobalLinkageKindAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::CORE_GLOBAL_LINKAGE_KIND) {
+    return reinterpret_cast<const GlobalLinkageKindAttr &>(that);
   }
   return std::nullopt;
 }
 
-::vast::core::StringLiteralAttr StringLiteralAttr::underlying_repr(void) const noexcept {
-  return ::vast::core::StringLiteralAttr(this->::mx::ir::Attribute::attr_);
-}
-
-std::string_view StringLiteralAttr::value(void) const {
-  auto val = underlying_repr().getValue();
-  if (auto size = val.size()) {
-    return std::string_view(val.data(), size);
-  } else {
-    return {};
-  }
-}
-
-std::optional<VoidAttr> VoidAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::CORE_VOID) {
-    return reinterpret_cast<const VoidAttr &>(that);
-  }
-  return std::nullopt;
-}
-
-::vast::core::VoidAttr VoidAttr::underlying_repr(void) const noexcept {
-  return ::vast::core::VoidAttr(this->::mx::ir::Attribute::attr_);
+::vast::core::GlobalLinkageKindAttr GlobalLinkageKindAttr::underlying_repr(void) const noexcept {
+  return ::vast::core::GlobalLinkageKindAttr(this->::mx::ir::Attribute::attr_);
 }
 
 }  // namespace mx::ir::core

@@ -17,19 +17,19 @@ class AffineMapAttr;
 class ArrayAttr;
 class DenseArrayAttr;
 class DenseIntOrFPElementsAttr;
-class DenseResourceElementsAttr;
 class DenseStringElementsAttr;
+class DenseResourceElementsAttr;
 class DictionaryAttr;
 class FloatAttr;
 class IntegerAttr;
 class IntegerSetAttr;
 class OpaqueAttr;
 class SparseElementsAttr;
+class StridedLayoutAttr;
 class StringAttr;
 class SymbolRefAttr;
 class TypeAttr;
 class UnitAttr;
-class StridedLayoutAttr;
 class BoolAttr;
 class FlatSymbolRefAttr;
 class DenseIntElementsAttr;
@@ -145,6 +145,20 @@ class MX_EXPORT DenseIntOrFPElementsAttr final : public Attribute {
 };
 static_assert(sizeof(DenseIntOrFPElementsAttr) == sizeof(Attribute));
 
+class MX_EXPORT DenseStringElementsAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::BUILTIN_DENSE_STRING_ELEMENTS;
+  }
+
+  static std::optional<DenseStringElementsAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::DenseStringElementsAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(DenseStringElementsAttr) == sizeof(Attribute));
+
 class MX_EXPORT DenseResourceElementsAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
@@ -160,20 +174,6 @@ class MX_EXPORT DenseResourceElementsAttr final : public Attribute {
   //DenseResourceElementsHandle raw_handle(void) const;
 };
 static_assert(sizeof(DenseResourceElementsAttr) == sizeof(Attribute));
-
-class MX_EXPORT DenseStringElementsAttr final : public Attribute {
- public:
-  inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::BUILTIN_DENSE_STRING_ELEMENTS;
-  }
-
-  static std::optional<DenseStringElementsAttr> from(const ::mx::ir::Attribute &that);
-
-  ::mlir::DenseStringElementsAttr underlying_repr(void) const noexcept;
-
-  // Imported methods:
-};
-static_assert(sizeof(DenseStringElementsAttr) == sizeof(Attribute));
 
 class MX_EXPORT DictionaryAttr final : public Attribute {
  public:
@@ -277,12 +277,29 @@ class MX_EXPORT SparseElementsAttr final : public Attribute {
   //APFloat zero_ap_float(void) const;
   //APInt zero_ap_int(void) const;
   //Attribute zero_attr(void) const;
-  //std::vector<ptrdiff_t> flattened_sparse_indices(void) const;
+  //std::vector<long,allocator<long>> flattened_sparse_indices(void) const;
   //ShapedType type(void) const;
   //DenseIntElementsAttr indices(void) const;
   //DenseElementsAttr values(void) const;
 };
 static_assert(sizeof(SparseElementsAttr) == sizeof(Attribute));
+
+class MX_EXPORT StridedLayoutAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::BUILTIN_STRIDED_LAYOUT;
+  }
+
+  static std::optional<StridedLayoutAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::StridedLayoutAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  int64_t offset(void) const;
+  //::llvm::ArrayRef<longlong> strides(void) const;
+  //::mlir::AffineMap affine_map(void) const;
+};
+static_assert(sizeof(StridedLayoutAttr) == sizeof(Attribute));
 
 class MX_EXPORT StringAttr final : public Attribute {
  public:
@@ -300,8 +317,9 @@ class MX_EXPORT StringAttr final : public Attribute {
   std::string str(void) const;
   //constchar* data(void) const;
   //size_t size(void) const;
-  //llvm::StringRef::iterator begin(void) const;
-  //llvm::StringRef::iterator end(void) const;
+  bool empty(void) const;
+  //StringRef::iterator begin(void) const;
+  //StringRef::iterator end(void) const;
   std::string_view value(void) const;
   //::mlir::Type type(void) const;
 };
@@ -352,23 +370,6 @@ class MX_EXPORT UnitAttr final : public Attribute {
   // Imported methods:
 };
 static_assert(sizeof(UnitAttr) == sizeof(Attribute));
-
-class MX_EXPORT StridedLayoutAttr final : public Attribute {
- public:
-  inline static constexpr AttributeKind static_kind(void) {
-    return AttributeKind::BUILTIN_STRIDED_LAYOUT;
-  }
-
-  static std::optional<StridedLayoutAttr> from(const ::mx::ir::Attribute &that);
-
-  ::mlir::StridedLayoutAttr underlying_repr(void) const noexcept;
-
-  // Imported methods:
-  int64_t offset(void) const;
-  //::llvm::ArrayRef<int64_t> strides(void) const;
-  //::mlir::AffineMap affine_map(void) const;
-};
-static_assert(sizeof(StridedLayoutAttr) == sizeof(Attribute));
 
 class MX_EXPORT BoolAttr final : public Attribute {
  public:

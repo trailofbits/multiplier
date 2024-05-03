@@ -16,7 +16,7 @@ const char *EnumeratorName(ModeAttrSpelling e) {
   switch (e) {
     case ModeAttrSpelling::GNU_MODE: return "GNU_MODE";
     case ModeAttrSpelling::CXX11_GNU_MODE: return "CXX11_GNU_MODE";
-    case ModeAttrSpelling::C2X_GNU_MODE: return "C2X_GNU_MODE";
+    case ModeAttrSpelling::C23_GNU_MODE: return "C23_GNU_MODE";
     case ModeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1406]) || tp >= &(gTypes[1407])) {
+  if (tp < &(gTypes[1447]) || tp >= &(gTypes[1448])) {
     return std::nullopt;
   }
 
@@ -90,7 +90,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::llvm::PointerType::static_kind():
-      tp = &(gTypes[1406]);
+      tp = &(gTypes[1447]);
       break;
 
   }
@@ -124,16 +124,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
-  {
-    "is_opaque",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_opaque());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::PointerType::is_opaque"),
-    nullptr,
-  },
   {}  // Sentinel.
 };
 }  // namespace
@@ -185,7 +175,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1406]);
+  PyTypeObject * const tp = &(gTypes[1447]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -200,12 +190,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[1402].tp_hash;
-  tp->tp_richcompare = gTypes[1402].tp_richcompare;
+  tp->tp_hash = gTypes[1444].tp_hash;
+  tp->tp_richcompare = gTypes[1444].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[1402]);
+  tp->tp_base = &(gTypes[1444]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

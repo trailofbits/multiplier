@@ -16,7 +16,7 @@ const char *EnumeratorName(ConstAttrSpelling e) {
   switch (e) {
     case ConstAttrSpelling::GNU_CONST: return "GNU_CONST";
     case ConstAttrSpelling::CXX11_GNU_CONST: return "CXX11_GNU_CONST";
-    case ConstAttrSpelling::C2X_GNU_CONST: return "C2X_GNU_CONST";
+    case ConstAttrSpelling::C23_GNU_CONST: return "C23_GNU_CONST";
     case ConstAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

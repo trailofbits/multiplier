@@ -16,7 +16,7 @@ const char *EnumeratorName(NoMips16AttrSpelling e) {
   switch (e) {
     case NoMips16AttrSpelling::GNU_NOMIPS16: return "GNU_NOMIPS16";
     case NoMips16AttrSpelling::CXX11_GNU_NOMIPS16: return "CXX11_GNU_NOMIPS16";
-    case NoMips16AttrSpelling::C2X_GNU_NOMIPS16: return "C2X_GNU_NOMIPS16";
+    case NoMips16AttrSpelling::C23_GNU_NOMIPS16: return "C23_GNU_NOMIPS16";
     case NoMips16AttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

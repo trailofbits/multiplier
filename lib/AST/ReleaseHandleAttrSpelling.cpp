@@ -16,7 +16,7 @@ const char *EnumeratorName(ReleaseHandleAttrSpelling e) {
   switch (e) {
     case ReleaseHandleAttrSpelling::GNU_RELEASE_HANDLE: return "GNU_RELEASE_HANDLE";
     case ReleaseHandleAttrSpelling::CXX11_CLANG_RELEASE_HANDLE: return "CXX11_CLANG_RELEASE_HANDLE";
-    case ReleaseHandleAttrSpelling::C2X_CLANG_RELEASE_HANDLE: return "C2X_CLANG_RELEASE_HANDLE";
+    case ReleaseHandleAttrSpelling::C23_CLANG_RELEASE_HANDLE: return "C23_CLANG_RELEASE_HANDLE";
     case ReleaseHandleAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -16,7 +16,7 @@ namespace mx {
 enum class DiagnoseAsBuiltinAttrSpelling : unsigned char {
   GNU_DIAGNOSE_AS_BUILTIN,
   CXX11_CLANG_DIAGNOSE_AS_BUILTIN,
-  C2X_CLANG_DIAGNOSE_AS_BUILTIN,
+  C23_CLANG_DIAGNOSE_AS_BUILTIN,
   SPELLING_NOT_CALCULATED,
 };
 

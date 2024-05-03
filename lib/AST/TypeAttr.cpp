@@ -11,11 +11,17 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/AddressSpaceAttr.h>
 #include <multiplier/AST/AnnotateTypeAttr.h>
+#include <multiplier/AST/ArmInAttr.h>
+#include <multiplier/AST/ArmInOutAttr.h>
 #include <multiplier/AST/ArmMveStrictPolymorphismAttr.h>
+#include <multiplier/AST/ArmOutAttr.h>
+#include <multiplier/AST/ArmPreservesAttr.h>
 #include <multiplier/AST/ArmStreamingAttr.h>
+#include <multiplier/AST/ArmStreamingCompatibleAttr.h>
 #include <multiplier/AST/BTFTypeTagAttr.h>
 #include <multiplier/AST/CmseNSCallAttr.h>
 #include <multiplier/AST/HLSLGroupSharedAddressSpaceAttr.h>
+#include <multiplier/AST/HLSLParamModifierAttr.h>
 #include <multiplier/AST/NoDerefAttr.h>
 #include <multiplier/AST/ObjCGCAttr.h>
 #include <multiplier/AST/ObjCInertUnsafeUnretainedAttr.h>
@@ -55,11 +61,17 @@ static const AttrKind kTypeAttrDerivedKinds[] = {
     WebAssemblyFuncrefAttr::static_kind(),
     AddressSpaceAttr::static_kind(),
     AnnotateTypeAttr::static_kind(),
+    ArmInAttr::static_kind(),
+    ArmInOutAttr::static_kind(),
     ArmMveStrictPolymorphismAttr::static_kind(),
+    ArmOutAttr::static_kind(),
+    ArmPreservesAttr::static_kind(),
     ArmStreamingAttr::static_kind(),
+    ArmStreamingCompatibleAttr::static_kind(),
     BTFTypeTagAttr::static_kind(),
     CmseNSCallAttr::static_kind(),
     HLSLGroupSharedAddressSpaceAttr::static_kind(),
+    HLSLParamModifierAttr::static_kind(),
     NoDerefAttr::static_kind(),
     ObjCGCAttr::static_kind(),
     ObjCInertUnsafeUnretainedAttr::static_kind(),
@@ -122,11 +134,17 @@ std::optional<TypeAttr> TypeAttr::from_base(const Attr &parent) {
     case WebAssemblyFuncrefAttr::static_kind():
     case AddressSpaceAttr::static_kind():
     case AnnotateTypeAttr::static_kind():
+    case ArmInAttr::static_kind():
+    case ArmInOutAttr::static_kind():
     case ArmMveStrictPolymorphismAttr::static_kind():
+    case ArmOutAttr::static_kind():
+    case ArmPreservesAttr::static_kind():
     case ArmStreamingAttr::static_kind():
+    case ArmStreamingCompatibleAttr::static_kind():
     case BTFTypeTagAttr::static_kind():
     case CmseNSCallAttr::static_kind():
     case HLSLGroupSharedAddressSpaceAttr::static_kind():
+    case HLSLParamModifierAttr::static_kind():
     case NoDerefAttr::static_kind():
     case ObjCGCAttr::static_kind():
     case ObjCInertUnsafeUnretainedAttr::static_kind():

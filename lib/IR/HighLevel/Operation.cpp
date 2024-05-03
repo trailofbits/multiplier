@@ -300,24 +300,12 @@ std::optional<AsmOp> AsmOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::AsmOp(this->::mx::ir::Operation::op_);
 }
 
-gap::generator<::mx::ir::Operand> AsmOp::asm_outputs(void) const {
-  auto range = underlying_repr().getAsmOutputs();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
-  }
-}
-
-gap::generator<::mx::ir::Operand> AsmOp::asm_inputs(void) const {
-  auto range = underlying_repr().getAsmInputs();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
-  }
-}
-
-gap::generator<::mx::ir::Operand> AsmOp::labels(void) const {
-  auto range = underlying_repr().getLabels();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+std::string_view AsmOp::asm_template(void) const {
+  auto val = underlying_repr().getAsmTemplate();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
   }
 }
 
@@ -931,20 +919,6 @@ std::optional<CallOp> CallOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::hl::CallOp CallOp::underlying_repr(void) const noexcept {
   return ::vast::hl::CallOp(this->::mx::ir::Operation::op_);
-}
-
-gap::generator<::mx::ir::Operand> CallOp::arg_operands(void) const {
-  auto range = underlying_repr().getArgOperands();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
-  }
-}
-
-gap::generator<::mx::ir::Result> CallOp::results(void) const {
-  auto range = underlying_repr().getResults();
-  for (auto val : range) {
-    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
-  }
 }
 
 std::string_view CallOp::callee(void) const {
@@ -1898,19 +1872,6 @@ std::string_view FuncOp::sym_name(void) const {
   }
 }
 
-std::optional<std::string_view> FuncOp::sym_visibility(void) const {
-  auto opt_val = underlying_repr().getSymVisibility();
-  if (!opt_val) {
-    return std::nullopt;
-  }
-  auto &val = opt_val.value();
-  if (auto size = val.size()) {
-    return std::string_view(val.data(), size);
-  } else {
-    return {};
-  }
-}
-
 bool FuncOp::is_var_arg(void) const {
   auto val = underlying_repr().isVarArg();
   return val;
@@ -2285,20 +2246,6 @@ std::optional<IndirectCallOp> IndirectCallOp::producing(const ::mx::ir::Value &t
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-gap::generator<::mx::ir::Operand> IndirectCallOp::arg_operands(void) const {
-  auto range = underlying_repr().getArgOperands();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
-  }
-}
-
-gap::generator<::mx::ir::Result> IndirectCallOp::results(void) const {
-  auto range = underlying_repr().getResults();
-  for (auto val : range) {
-    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
-  }
-}
-
 std::optional<InitListExprOp> InitListExprOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_INITLIST) {
     return reinterpret_cast<const InitListExprOp &>(that);
@@ -2315,13 +2262,6 @@ std::optional<InitListExprOp> InitListExprOp::producing(const ::mx::ir::Value &t
 
 ::vast::hl::InitListExpr InitListExprOp::underlying_repr(void) const noexcept {
   return ::vast::hl::InitListExpr(this->::mx::ir::Operation::op_);
-}
-
-gap::generator<::mx::ir::Operand> InitListExprOp::elements(void) const {
-  auto range = underlying_repr().getElements();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
-  }
 }
 
 std::optional<LNotOp> LNotOp::from(const ::mx::ir::Operation &that) {
@@ -2961,13 +2901,6 @@ std::optional<ReturnOp> ReturnOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::ReturnOp(this->::mx::ir::Operation::op_);
 }
 
-gap::generator<::mx::ir::Operand> ReturnOp::result(void) const {
-  auto range = underlying_repr().getResult();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
-  }
-}
-
 std::optional<SizeOfExprOp> SizeOfExprOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_SIZEOF_EXPR) {
     return reinterpret_cast<const SizeOfExprOp &>(that);
@@ -3442,6 +3375,34 @@ std::optional<UnreachableOp> UnreachableOp::producing(const ::mx::ir::Value &tha
 
 ::vast::hl::UnreachableOp UnreachableOp::underlying_repr(void) const noexcept {
   return ::vast::hl::UnreachableOp(this->::mx::ir::Operation::op_);
+}
+
+std::optional<VAArgExprOp> VAArgExprOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_VA_ARG_EXPR) {
+    return reinterpret_cast<const VAArgExprOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<VAArgExprOp> VAArgExprOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::VAArgExpr VAArgExprOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::VAArgExpr(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value VAArgExprOp::arg_list(void) const {
+  auto val = underlying_repr().getArgList();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VAArgExprOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::hl

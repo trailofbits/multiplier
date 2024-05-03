@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <multiplier/AST/ConstantExprResultStorageKind.h>
+#include <multiplier/AST/ConstantResultStorageKind.h>
 #include <multiplier/AST/FullExpr.h>
 
 namespace mx {
@@ -67,7 +67,7 @@ class MX_EXPORT ConstantExpr : public FullExpr {
   static std::optional<ConstantExpr> from(const VariantEntity &e);
   static std::optional<ConstantExpr> from(const TokenContext &t);
 
-  ConstantExprResultStorageKind result_storage_kind(void) const;
+  ConstantResultStorageKind result_storage_kind(void) const;
   bool has_ap_value_result(void) const;
   bool is_immediate_invocation(void) const;
 };

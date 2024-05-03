@@ -16,7 +16,7 @@ const char *EnumeratorName(OpenCLGlobalDeviceAddressSpaceAttrSpelling e) {
   switch (e) {
     case OpenCLGlobalDeviceAddressSpaceAttrSpelling::GNU_OPENCL_GLOBAL_DEVICE: return "GNU_OPENCL_GLOBAL_DEVICE";
     case OpenCLGlobalDeviceAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_GLOBAL_DEVICE: return "CXX11_CLANG_OPENCL_GLOBAL_DEVICE";
-    case OpenCLGlobalDeviceAddressSpaceAttrSpelling::C2X_CLANG_OPENCL_GLOBAL_DEVICE: return "C2X_CLANG_OPENCL_GLOBAL_DEVICE";
+    case OpenCLGlobalDeviceAddressSpaceAttrSpelling::C23_CLANG_OPENCL_GLOBAL_DEVICE: return "C23_CLANG_OPENCL_GLOBAL_DEVICE";
     case OpenCLGlobalDeviceAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

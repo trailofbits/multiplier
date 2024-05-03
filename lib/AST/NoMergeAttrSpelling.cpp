@@ -16,7 +16,7 @@ const char *EnumeratorName(NoMergeAttrSpelling e) {
   switch (e) {
     case NoMergeAttrSpelling::GNU_NOMERGE: return "GNU_NOMERGE";
     case NoMergeAttrSpelling::CXX11_CLANG_NOMERGE: return "CXX11_CLANG_NOMERGE";
-    case NoMergeAttrSpelling::C2X_CLANG_NOMERGE: return "C2X_CLANG_NOMERGE";
+    case NoMergeAttrSpelling::C23_CLANG_NOMERGE: return "C23_CLANG_NOMERGE";
     case NoMergeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

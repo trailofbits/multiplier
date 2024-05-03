@@ -16,7 +16,7 @@ namespace mx {
 enum class ArtificialAttrSpelling : unsigned char {
   GNU_ARTIFICIAL,
   CXX11_GNU_ARTIFICIAL,
-  C2X_GNU_ARTIFICIAL,
+  C23_GNU_ARTIFICIAL,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -11,6 +11,6 @@
 namespace mx {
 
 // Size is defined in the auto-generated `Types.cpp` file.
-PyTypeObject gTypes[1446] = {};
+PyTypeObject gTypes[1488] = {};
 
 }  // namespace mx

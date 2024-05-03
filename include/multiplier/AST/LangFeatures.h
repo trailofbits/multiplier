@@ -18,7 +18,7 @@ enum class LangFeatures : unsigned char {
   C99,
   C11,
   C17,
-  C2X,
+  C23,
   C_PLUS_PLUS,
   C_PLUS_PLUS11,
   C_PLUS_PLUS14,

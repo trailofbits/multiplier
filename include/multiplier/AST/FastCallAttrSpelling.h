@@ -16,7 +16,7 @@ namespace mx {
 enum class FastCallAttrSpelling : unsigned char {
   GNU_FASTCALL,
   CXX11_GNU_FASTCALL,
-  C2X_GNU_FASTCALL,
+  C23_GNU_FASTCALL,
   KEYWORD_FASTCALL,
   SPELLING_NOT_CALCULATED,
 };

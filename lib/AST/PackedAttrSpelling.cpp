@@ -16,7 +16,7 @@ const char *EnumeratorName(PackedAttrSpelling e) {
   switch (e) {
     case PackedAttrSpelling::GNU_PACKED: return "GNU_PACKED";
     case PackedAttrSpelling::CXX11_GNU_PACKED: return "CXX11_GNU_PACKED";
-    case PackedAttrSpelling::C2X_GNU_PACKED: return "C2X_GNU_PACKED";
+    case PackedAttrSpelling::C23_GNU_PACKED: return "C23_GNU_PACKED";
     case PackedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

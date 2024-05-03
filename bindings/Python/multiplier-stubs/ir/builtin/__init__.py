@@ -99,16 +99,6 @@ class DenseIntOrFPElementsAttr(multiplier.ir.builtin.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.builtin.DenseIntOrFPElementsAttr]:
     ...
 
-class DenseResourceElementsAttr(multiplier.ir.builtin.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.builtin.DenseResourceElementsAttr]:
-    ...
-
 class DenseStringElementsAttr(multiplier.ir.builtin.Attribute):
 
   @staticmethod
@@ -117,6 +107,16 @@ class DenseStringElementsAttr(multiplier.ir.builtin.Attribute):
 
   @staticmethod
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.builtin.DenseStringElementsAttr]:
+    ...
+
+class DenseResourceElementsAttr(multiplier.ir.builtin.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.builtin.DenseResourceElementsAttr]:
     ...
 
 class DictionaryAttr(multiplier.ir.builtin.Attribute):
@@ -185,8 +185,20 @@ class SparseElementsAttr(multiplier.ir.builtin.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.builtin.SparseElementsAttr]:
     ...
 
+class StridedLayoutAttr(multiplier.ir.builtin.Attribute):
+  offset: int
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.builtin.StridedLayoutAttr]:
+    ...
+
 class StringAttr(multiplier.ir.builtin.Attribute):
   str: str
+  empty: bool
   value: str
 
   @staticmethod
@@ -225,17 +237,6 @@ class UnitAttr(multiplier.ir.builtin.Attribute):
 
   @staticmethod
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.builtin.UnitAttr]:
-    ...
-
-class StridedLayoutAttr(multiplier.ir.builtin.Attribute):
-  offset: int
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.builtin.StridedLayoutAttr]:
     ...
 
 class BoolAttr(multiplier.ir.builtin.Attribute):
@@ -277,8 +278,6 @@ class Operation(multiplier.ir.Operation):
 
 class ModuleOp(multiplier.ir.builtin.Operation):
   body_region: multiplier.ir.Region
-  sym_name: Optional[str]
-  sym_visibility: Optional[str]
   name: Optional[str]
   is_optional_symbol: bool
   default_dialect: str
@@ -296,8 +295,6 @@ class ModuleOp(multiplier.ir.builtin.Operation):
     ...
 
 class UnrealizedConversionCastOp(multiplier.ir.builtin.Operation):
-  inputs: Iterable[multiplier.ir.Operand]
-  outputs: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -342,16 +339,6 @@ class FloatType(multiplier.ir.builtin.Type):
   def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.FloatType]:
     ...
 
-class BFloat16Type(multiplier.ir.builtin.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.BFloat16Type]:
-    ...
-
 class ComplexType(multiplier.ir.builtin.Type):
 
   @staticmethod
@@ -360,36 +347,6 @@ class ComplexType(multiplier.ir.builtin.Type):
 
   @staticmethod
   def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.ComplexType]:
-    ...
-
-class Float8E4M3B11FNUZType(multiplier.ir.builtin.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.Float8E4M3B11FNUZType]:
-    ...
-
-class Float8E4M3FNType(multiplier.ir.builtin.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.Float8E4M3FNType]:
-    ...
-
-class Float8E4M3FNUZType(multiplier.ir.builtin.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.Float8E4M3FNUZType]:
     ...
 
 class Float8E5M2Type(multiplier.ir.builtin.Type):
@@ -402,6 +359,16 @@ class Float8E5M2Type(multiplier.ir.builtin.Type):
   def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.Float8E5M2Type]:
     ...
 
+class Float8E4M3FNType(multiplier.ir.builtin.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.Float8E4M3FNType]:
+    ...
+
 class Float8E5M2FNUZType(multiplier.ir.builtin.Type):
 
   @staticmethod
@@ -412,6 +379,36 @@ class Float8E5M2FNUZType(multiplier.ir.builtin.Type):
   def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.Float8E5M2FNUZType]:
     ...
 
+class Float8E4M3FNUZType(multiplier.ir.builtin.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.Float8E4M3FNUZType]:
+    ...
+
+class Float8E4M3B11FNUZType(multiplier.ir.builtin.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.Float8E4M3B11FNUZType]:
+    ...
+
+class BFloat16Type(multiplier.ir.builtin.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.BFloat16Type]:
+    ...
+
 class Float16Type(multiplier.ir.builtin.Type):
 
   @staticmethod
@@ -420,6 +417,16 @@ class Float16Type(multiplier.ir.builtin.Type):
 
   @staticmethod
   def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.Float16Type]:
+    ...
+
+class FloatTF32Type(multiplier.ir.builtin.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.FloatTF32Type]:
     ...
 
 class Float32Type(multiplier.ir.builtin.Type):
@@ -460,16 +467,6 @@ class Float128Type(multiplier.ir.builtin.Type):
 
   @staticmethod
   def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.Float128Type]:
-    ...
-
-class FloatTF32Type(multiplier.ir.builtin.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.builtin.FloatTF32Type]:
     ...
 
 class FunctionType(multiplier.ir.builtin.Type):

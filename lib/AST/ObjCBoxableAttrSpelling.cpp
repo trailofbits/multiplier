@@ -16,7 +16,7 @@ const char *EnumeratorName(ObjCBoxableAttrSpelling e) {
   switch (e) {
     case ObjCBoxableAttrSpelling::GNU_OBJC_BOXABLE: return "GNU_OBJC_BOXABLE";
     case ObjCBoxableAttrSpelling::CXX11_CLANG_OBJC_BOXABLE: return "CXX11_CLANG_OBJC_BOXABLE";
-    case ObjCBoxableAttrSpelling::C2X_CLANG_OBJC_BOXABLE: return "C2X_CLANG_OBJC_BOXABLE";
+    case ObjCBoxableAttrSpelling::C23_CLANG_OBJC_BOXABLE: return "C23_CLANG_OBJC_BOXABLE";
     case ObjCBoxableAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

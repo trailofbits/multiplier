@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <multiplier/AST/ImplicitParamDeclImplicitParamKind.h>
+#include <multiplier/AST/ImplicitParamKind.h>
 #include <multiplier/AST/VarDecl.h>
 
 namespace mx {
@@ -72,7 +72,7 @@ class MX_EXPORT ImplicitParamDecl : public VarDecl {
   static std::optional<ImplicitParamDecl> from(const VariantEntity &e);
   static std::optional<ImplicitParamDecl> from(const TokenContext &t);
 
-  ImplicitParamDeclImplicitParamKind parameter_kind(void) const;
+  ImplicitParamKind parameter_kind(void) const;
 };
 
 static_assert(sizeof(ImplicitParamDecl) == sizeof(VarDecl));

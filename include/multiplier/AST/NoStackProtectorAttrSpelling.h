@@ -16,7 +16,9 @@ namespace mx {
 enum class NoStackProtectorAttrSpelling : unsigned char {
   GNU_NO_STACK_PROTECTOR,
   CXX11_CLANG_NO_STACK_PROTECTOR,
-  C2X_CLANG_NO_STACK_PROTECTOR,
+  C23_CLANG_NO_STACK_PROTECTOR,
+  CXX11_GNU_NO_STACK_PROTECTOR,
+  C23_GNU_NO_STACK_PROTECTOR,
   DECLSPEC_SAFEBUFFERS,
   SPELLING_NOT_CALCULATED,
 };
@@ -26,7 +28,7 @@ inline static const char *EnumerationName(NoStackProtectorAttrSpelling) {
 }
 
 inline static constexpr unsigned NumEnumerators(NoStackProtectorAttrSpelling) {
-  return 5;
+  return 7;
 }
 
 MX_EXPORT const char *EnumeratorName(NoStackProtectorAttrSpelling);

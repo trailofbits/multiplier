@@ -129,7 +129,7 @@ SwiftNewTypeAttrNewtypeKind SwiftNewTypeAttr::newtype_kind(void) const {
 }
 
 SwiftNewTypeAttrSpelling SwiftNewTypeAttr::semantic_spelling(void) const {
-  return static_cast<SwiftNewTypeAttrSpelling>(impl->reader.getVal14());
+  return static_cast<SwiftNewTypeAttrSpelling>(impl->reader.getVal18());
 }
 
 #pragma GCC diagnostic pop

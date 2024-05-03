@@ -14,10 +14,12 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class ConceptDecl;
 class ConceptSpecializationExpr;
 class Decl;
 class Expr;
 class ImplicitConceptSpecializationDecl;
+class NamedDecl;
 class Stmt;
 class TemplateArgument;
 class Token;
@@ -66,10 +68,15 @@ class MX_EXPORT ConceptSpecializationExpr : public Expr {
   static std::optional<ConceptSpecializationExpr> from(const VariantEntity &e);
   static std::optional<ConceptSpecializationExpr> from(const TokenContext &t);
 
+  Token concept_name_token(void) const;
+  NamedDecl found_declaration(void) const;
+  ConceptDecl named_concept(void) const;
   ImplicitConceptSpecializationDecl specialization_declaration(void) const;
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
   unsigned num_template_arguments(void) const;
   gap::generator<TemplateArgument> template_arguments(void) const &;
+  Token template_keyword_token(void) const;
+  bool has_explicit_template_arguments(void) const;
 };
 
 static_assert(sizeof(ConceptSpecializationExpr) == sizeof(Expr));

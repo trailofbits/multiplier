@@ -17,8 +17,8 @@ const char *EnumeratorName(UnusedAttrSpelling e) {
     case UnusedAttrSpelling::CXX11_MAYBE_UNUSED: return "CXX11_MAYBE_UNUSED";
     case UnusedAttrSpelling::GNU_UNUSED: return "GNU_UNUSED";
     case UnusedAttrSpelling::CXX11_GNU_UNUSED: return "CXX11_GNU_UNUSED";
-    case UnusedAttrSpelling::C2X_GNU_UNUSED: return "C2X_GNU_UNUSED";
-    case UnusedAttrSpelling::C2X_MAYBE_UNUSED: return "C2X_MAYBE_UNUSED";
+    case UnusedAttrSpelling::C23_GNU_UNUSED: return "C23_GNU_UNUSED";
+    case UnusedAttrSpelling::C23_MAYBE_UNUSED: return "C23_MAYBE_UNUSED";
     case UnusedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

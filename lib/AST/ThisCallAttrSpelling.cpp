@@ -16,7 +16,7 @@ const char *EnumeratorName(ThisCallAttrSpelling e) {
   switch (e) {
     case ThisCallAttrSpelling::GNU_THISCALL: return "GNU_THISCALL";
     case ThisCallAttrSpelling::CXX11_GNU_THISCALL: return "CXX11_GNU_THISCALL";
-    case ThisCallAttrSpelling::C2X_GNU_THISCALL: return "C2X_GNU_THISCALL";
+    case ThisCallAttrSpelling::C23_GNU_THISCALL: return "C23_GNU_THISCALL";
     case ThisCallAttrSpelling::KEYWORD_THISCALL: return "KEYWORD_THISCALL";
     case ThisCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

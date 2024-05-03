@@ -16,7 +16,7 @@ const char *EnumeratorName(SwiftAsyncCallAttrSpelling e) {
   switch (e) {
     case SwiftAsyncCallAttrSpelling::GNU_SWIFTASYNCCALL: return "GNU_SWIFTASYNCCALL";
     case SwiftAsyncCallAttrSpelling::CXX11_CLANG_SWIFTASYNCCALL: return "CXX11_CLANG_SWIFTASYNCCALL";
-    case SwiftAsyncCallAttrSpelling::C2X_CLANG_SWIFTASYNCCALL: return "C2X_CLANG_SWIFTASYNCCALL";
+    case SwiftAsyncCallAttrSpelling::C23_CLANG_SWIFTASYNCCALL: return "C23_CLANG_SWIFTASYNCCALL";
     case SwiftAsyncCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -16,7 +16,7 @@ const char *EnumeratorName(NoMicroMipsAttrSpelling e) {
   switch (e) {
     case NoMicroMipsAttrSpelling::GNU_NOMICROMIPS: return "GNU_NOMICROMIPS";
     case NoMicroMipsAttrSpelling::CXX11_GNU_NOMICROMIPS: return "CXX11_GNU_NOMICROMIPS";
-    case NoMicroMipsAttrSpelling::C2X_GNU_NOMICROMIPS: return "C2X_GNU_NOMICROMIPS";
+    case NoMicroMipsAttrSpelling::C23_GNU_NOMICROMIPS: return "C23_GNU_NOMICROMIPS";
     case NoMicroMipsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

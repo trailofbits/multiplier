@@ -8,7 +8,7 @@
 
 #include <cassert>
 #include <cstdlib>
-#include <gap/core/generator.hpp>
+#include <gap/coro/generator.hpp>
 #include <iostream>
 #include <multiplier/Index.h>
 #include <string>

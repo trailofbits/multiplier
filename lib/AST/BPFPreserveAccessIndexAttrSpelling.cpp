@@ -16,7 +16,7 @@ const char *EnumeratorName(BPFPreserveAccessIndexAttrSpelling e) {
   switch (e) {
     case BPFPreserveAccessIndexAttrSpelling::GNU_PRESERVE_ACCESS_INDEX: return "GNU_PRESERVE_ACCESS_INDEX";
     case BPFPreserveAccessIndexAttrSpelling::CXX11_CLANG_PRESERVE_ACCESS_INDEX: return "CXX11_CLANG_PRESERVE_ACCESS_INDEX";
-    case BPFPreserveAccessIndexAttrSpelling::C2X_CLANG_PRESERVE_ACCESS_INDEX: return "C2X_CLANG_PRESERVE_ACCESS_INDEX";
+    case BPFPreserveAccessIndexAttrSpelling::C23_CLANG_PRESERVE_ACCESS_INDEX: return "C23_CLANG_PRESERVE_ACCESS_INDEX";
     case BPFPreserveAccessIndexAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

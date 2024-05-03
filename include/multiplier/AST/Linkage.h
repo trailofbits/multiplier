@@ -14,12 +14,13 @@
 
 namespace mx {
 enum class Linkage : unsigned char {
-  NO_LINKAGE,
-  INTERNAL_LINKAGE,
-  UNIQUE_EXTERNAL_LINKAGE,
-  VISIBLE_NO_LINKAGE,
-  MODULE_LINKAGE,
-  EXTERNAL_LINKAGE,
+  INVALID,
+  NONE,
+  INTERNAL,
+  UNIQUE_EXTERNAL,
+  VISIBLE_NONE,
+  MODULE,
+  EXTERNAL,
 };
 
 inline static const char *EnumerationName(Linkage) {
@@ -27,7 +28,7 @@ inline static const char *EnumerationName(Linkage) {
 }
 
 inline static constexpr unsigned NumEnumerators(Linkage) {
-  return 6;
+  return 7;
 }
 
 MX_EXPORT const char *EnumeratorName(Linkage);

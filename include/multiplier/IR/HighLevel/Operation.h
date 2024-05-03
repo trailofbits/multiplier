@@ -123,6 +123,7 @@ class TypeOfExprOp;
 class TypeOfTypeOp;
 class UnionDeclOp;
 class UnreachableOp;
+class VAArgExpr;
 }  // namespace vast::hl
 namespace mx::ir::hl {
 
@@ -232,7 +233,7 @@ class MX_EXPORT AddrLabelExprOp final : public Operation {
   ::vast::hl::AddrLabelExpr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::vast::hl::LabelType> label(void) const;
+  //::mlir::TypedValue<LabelType> label(void) const;
   ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(AddrLabelExprOp) == sizeof(Operation));
@@ -300,17 +301,17 @@ class MX_EXPORT AsmOp final : public Operation {
   ::vast::hl::AsmOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> asm_outputs(void) const;
-  gap::generator<::mx::ir::Operand> asm_inputs(void) const;
-  gap::generator<::mx::ir::Operand> labels(void) const;
-  //::mlir::Attribute asm_template(void) const;
+  //::mlir::Operation::operand_range asm_outputs(void) const;
+  //::mlir::Operation::operand_range asm_inputs(void) const;
+  //::mlir::Operation::operand_range labels(void) const;
+  std::string_view asm_template(void) const;
   bool is_volatile(void) const;
   bool has_goto(void) const;
-  //::std::optional<::mlir::ArrayAttr> output_names(void) const;
-  //::std::optional<::mlir::ArrayAttr> input_names(void) const;
-  //::std::optional<::mlir::ArrayAttr> output_constraints(void) const;
-  //::std::optional<::mlir::ArrayAttr> input_constraints(void) const;
-  //::std::optional<::mlir::ArrayAttr> clobbers(void) const;
+  //::std::optional<ArrayAttr> output_names(void) const;
+  //::std::optional<ArrayAttr> input_names(void) const;
+  //::std::optional<ArrayAttr> output_constraints(void) const;
+  //::std::optional<ArrayAttr> input_constraints(void) const;
+  //::std::optional<ArrayAttr> clobbers(void) const;
 };
 static_assert(sizeof(AsmOp) == sizeof(Operation));
 
@@ -650,8 +651,8 @@ class MX_EXPORT CallOp final : public Operation {
   ::vast::hl::CallOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> arg_operands(void) const;
-  gap::generator<::mx::ir::Result> results(void) const;
+  //::mlir::Operation::operand_range arg_operands(void) const;
+  //::mlir::Operation::result_range results(void) const;
   std::string_view callee(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
 };
@@ -921,7 +922,7 @@ class MX_EXPORT EnumDeclOp final : public Operation {
   // Imported methods:
   ::mx::ir::Region constants(void) const;
   std::string_view name(void) const;
-  //::std::optional<::mlir::Type> type(void) const;
+  //::std::optional<Type> type(void) const;
 };
 static_assert(sizeof(EnumDeclOp) == sizeof(Operation));
 
@@ -1009,7 +1010,8 @@ class MX_EXPORT FieldDeclOp final : public Operation {
   // Imported methods:
   std::string_view name(void) const;
   //::mlir::Type type(void) const;
-  //::std::optional<uint32_t> bits(void) const;
+  //::std::optional<unsignedint> bits(void) const;
+  //vast::AggregateTypeDefinitionInterface parent_aggregate(void) const;
 };
 static_assert(sizeof(FieldDeclOp) == sizeof(Operation));
 
@@ -1211,9 +1213,9 @@ class MX_EXPORT FuncOp final : public Operation {
   std::string_view sym_name(void) const;
   //::vast::core::FunctionType function_type(void) const;
   //::vast::core::GlobalLinkageKind linkage(void) const;
-  std::optional<std::string_view> sym_visibility(void) const;
-  //::std::optional<::mlir::ArrayAttr> arg_attrs(void) const;
-  //::std::optional<::mlir::ArrayAttr> res_attrs(void) const;
+  //::std::optional<StringRef> sym_visibility(void) const;
+  //::std::optional<ArrayAttr> arg_attrs(void) const;
+  //::std::optional<ArrayAttr> res_attrs(void) const;
   bool is_var_arg(void) const;
   //::mlir::Region* callable_region(void) const;
   //llvm::ArrayRef<Type> callable_results(void) const;
@@ -1237,7 +1239,7 @@ class MX_EXPORT GotoStmtOp final : public Operation {
   ::vast::hl::GotoStmt underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::vast::hl::LabelType> label(void) const;
+  //::mlir::TypedValue<LabelType> label(void) const;
 };
 static_assert(sizeof(GotoStmtOp) == sizeof(Operation));
 
@@ -1272,7 +1274,7 @@ class MX_EXPORT LabelDeclOp final : public Operation {
   ::vast::hl::LabelDeclOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::vast::hl::LabelType> result(void) const;
+  //::mlir::TypedValue<LabelType> result(void) const;
   std::string_view name(void) const;
 };
 static_assert(sizeof(LabelDeclOp) == sizeof(Operation));
@@ -1289,7 +1291,7 @@ class MX_EXPORT LabelStmtOp final : public Operation {
   ::vast::hl::LabelStmt underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::vast::hl::LabelType> label(void) const;
+  //::mlir::TypedValue<LabelType> label(void) const;
   ::mx::ir::Region body(void) const;
 };
 static_assert(sizeof(LabelStmtOp) == sizeof(Operation));
@@ -1322,7 +1324,7 @@ class MX_EXPORT SwitchOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Region cond_region(void) const;
-  //::mlir::MutableArrayRef<::mlir::Region> cases(void) const;
+  //::mlir::MutableArrayRef<Region> cases(void) const;
 };
 static_assert(sizeof(SwitchOp) == sizeof(Operation));
 
@@ -1375,8 +1377,8 @@ class MX_EXPORT VarDeclOp final : public Operation {
   ::mx::ir::Region initializer(void) const;
   ::mx::ir::Region allocation_size(void) const;
   std::string_view name(void) const;
-  //::std::optional<::vast::hl::StorageClass> storage_class(void) const;
-  //::std::optional<::vast::hl::TSClass> thread_storage_class(void) const;
+  //::std::optional<StorageClass> storage_class(void) const;
+  //::std::optional<TSClass> thread_storage_class(void) const;
   bool has_local_storage(void) const;
   bool is_local_var_decl(void) const;
   bool is_static_local(void) const;
@@ -1440,8 +1442,8 @@ class MX_EXPORT IndirectCallOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value callee(void) const;
-  gap::generator<::mx::ir::Operand> arg_operands(void) const;
-  gap::generator<::mx::ir::Result> results(void) const;
+  //::mlir::Operation::operand_range arg_operands(void) const;
+  //::mlir::Operation::result_range results(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
 };
 static_assert(sizeof(IndirectCallOp) == sizeof(Operation));
@@ -1458,7 +1460,7 @@ class MX_EXPORT InitListExprOp final : public Operation {
   ::vast::hl::InitListExpr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> elements(void) const;
+  //::mlir::Operation::operand_range elements(void) const;
 };
 static_assert(sizeof(InitListExprOp) == sizeof(Operation));
 
@@ -1826,7 +1828,7 @@ class MX_EXPORT ReturnOp final : public Operation {
   ::vast::hl::ReturnOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> result(void) const;
+  //::mlir::Operation::operand_range result(void) const;
 };
 static_assert(sizeof(ReturnOp) == sizeof(Operation));
 
@@ -1844,6 +1846,7 @@ class MX_EXPORT SizeOfExprOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value result(void) const;
   ::mx::ir::Region expr(void) const;
+  //std::size_t value(void) const;
 };
 static_assert(sizeof(SizeOfExprOp) == sizeof(Operation));
 
@@ -1861,6 +1864,7 @@ class MX_EXPORT SizeOfTypeOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value result(void) const;
   //::mlir::Type arg(void) const;
+  //std::size_t value(void) const;
 };
 static_assert(sizeof(SizeOfTypeOp) == sizeof(Operation));
 
@@ -1895,6 +1899,11 @@ class MX_EXPORT StructDeclOp final : public Operation {
   // Imported methods:
   ::mx::ir::Region fields(void) const;
   std::string_view name(void) const;
+  //gap::generator<Type> field_types(void) const;
+  //gap::generator<field_info_t> fields_info(void) const;
+  //gap::generator<AggregateTypeDefinitionInterface> nested_declarations(void) const;
+  //llvm::StringRef defined_name(void) const;
+  //mlir::Type defined_type(void) const;
 };
 static_assert(sizeof(StructDeclOp) == sizeof(Operation));
 
@@ -2033,6 +2042,7 @@ class MX_EXPORT TypeDeclOp final : public Operation {
 
   // Imported methods:
   std::string_view name(void) const;
+  //mlir_type defined_type(void) const;
 };
 static_assert(sizeof(TypeDeclOp) == sizeof(Operation));
 
@@ -2050,6 +2060,7 @@ class MX_EXPORT TypeDefOp final : public Operation {
   // Imported methods:
   std::string_view name(void) const;
   //::mlir::Type type(void) const;
+  //mlir_type defined_type(void) const;
 };
 static_assert(sizeof(TypeDefOp) == sizeof(Operation));
 
@@ -2101,6 +2112,11 @@ class MX_EXPORT UnionDeclOp final : public Operation {
   // Imported methods:
   ::mx::ir::Region fields(void) const;
   std::string_view name(void) const;
+  //gap::generator<Type> field_types(void) const;
+  //gap::generator<field_info_t> fields_info(void) const;
+  //gap::generator<AggregateTypeDefinitionInterface> nested_declarations(void) const;
+  //llvm::StringRef defined_name(void) const;
+  //mlir::Type defined_type(void) const;
 };
 static_assert(sizeof(UnionDeclOp) == sizeof(Operation));
 
@@ -2118,5 +2134,22 @@ class MX_EXPORT UnreachableOp final : public Operation {
   // Imported methods:
 };
 static_assert(sizeof(UnreachableOp) == sizeof(Operation));
+
+class MX_EXPORT VAArgExprOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::HL_VA_ARG_EXPR;
+  }
+
+  static std::optional<VAArgExprOp> from(const ::mx::ir::Operation &that);
+  static std::optional<VAArgExprOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::hl::VAArgExpr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Value arg_list(void) const;
+  ::mx::ir::Value result(void) const;
+};
+static_assert(sizeof(VAArgExprOp) == sizeof(Operation));
 
 }  // namespace mx::ir::hl

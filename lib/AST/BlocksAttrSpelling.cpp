@@ -16,7 +16,7 @@ const char *EnumeratorName(BlocksAttrSpelling e) {
   switch (e) {
     case BlocksAttrSpelling::GNU_BLOCKS: return "GNU_BLOCKS";
     case BlocksAttrSpelling::CXX11_CLANG_BLOCKS: return "CXX11_CLANG_BLOCKS";
-    case BlocksAttrSpelling::C2X_CLANG_BLOCKS: return "C2X_CLANG_BLOCKS";
+    case BlocksAttrSpelling::C23_CLANG_BLOCKS: return "C23_CLANG_BLOCKS";
     case BlocksAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

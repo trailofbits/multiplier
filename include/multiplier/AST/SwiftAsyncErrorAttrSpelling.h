@@ -16,7 +16,7 @@ namespace mx {
 enum class SwiftAsyncErrorAttrSpelling : unsigned char {
   GNU_SWIFT_ASYNC_ERROR,
   CXX11_CLANG_SWIFT_ASYNC_ERROR,
-  C2X_CLANG_SWIFT_ASYNC_ERROR,
+  C23_CLANG_SWIFT_ASYNC_ERROR,
   SPELLING_NOT_CALCULATED,
 };
 

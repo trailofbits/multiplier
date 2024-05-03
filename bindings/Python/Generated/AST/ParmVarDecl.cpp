@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[730]) || tp >= &(gTypes[731])) {
+  if (tp < &(gTypes[754]) || tp >= &(gTypes[755])) {
     return std::nullopt;
   }
 
@@ -90,7 +90,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ParmVarDecl::static_kind():
-      tp = &(gTypes[730]);
+      tp = &(gTypes[754]);
       break;
 
   }
@@ -175,6 +175,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "explicit_object_parameter_this_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->explicit_object_parameter_this_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ParmVarDecl::explicit_object_parameter_this_token"),
+    nullptr,
+  },
+  {
     "obj_c_decl_qualifier",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -252,6 +262,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ParmVarDecl::is_destroyed_in_callee"),
+    nullptr,
+  },
+  {
+    "is_explicit_object_parameter",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_explicit_object_parameter());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ParmVarDecl::is_explicit_object_parameter"),
     nullptr,
   },
   {
@@ -509,7 +529,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[730]);
+  PyTypeObject * const tp = &(gTypes[754]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -524,12 +544,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[729].tp_hash;
-  tp->tp_richcompare = gTypes[729].tp_richcompare;
+  tp->tp_hash = gTypes[753].tp_hash;
+  tp->tp_richcompare = gTypes[753].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[729]);
+  tp->tp_base = &(gTypes[753]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

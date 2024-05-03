@@ -52,34 +52,154 @@ class ComdatAttr(multiplier.ir.llvm.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.ComdatAttr]:
     ...
 
-class AccessGroupAttr(multiplier.ir.llvm.Attribute):
+class LinkageAttr(multiplier.ir.llvm.Attribute):
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.AccessGroupAttr]:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LinkageAttr]:
     ...
 
-class AliasScopeAttr(multiplier.ir.llvm.Attribute):
+class FramePointerKindAttr(multiplier.ir.llvm.Attribute):
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.AliasScopeAttr]:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.FramePointerKindAttr]:
     ...
 
-class AliasScopeDomainAttr(multiplier.ir.llvm.Attribute):
+class LoopVectorizeAttr(multiplier.ir.llvm.Attribute):
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.AliasScopeDomainAttr]:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopVectorizeAttr]:
+    ...
+
+class LoopInterleaveAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopInterleaveAttr]:
+    ...
+
+class LoopUnrollAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopUnrollAttr]:
+    ...
+
+class LoopUnrollAndJamAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopUnrollAndJamAttr]:
+    ...
+
+class LoopLICMAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopLICMAttr]:
+    ...
+
+class LoopDistributeAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopDistributeAttr]:
+    ...
+
+class LoopPipelineAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopPipelineAttr]:
+    ...
+
+class LoopPeeledAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopPeeledAttr]:
+    ...
+
+class LoopUnswitchAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopUnswitchAttr]:
+    ...
+
+class LoopAnnotationAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopAnnotationAttr]:
+    ...
+
+class DIExpressionElemAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DIExpressionElemAttr]:
+    ...
+
+class DIExpressionAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DIExpressionAttr]:
+    ...
+
+class DINullTypeAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DINullTypeAttr]:
     ...
 
 class DIBasicTypeAttr(multiplier.ir.llvm.Attribute):
@@ -140,14 +260,26 @@ class DIFileAttr(multiplier.ir.llvm.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DIFileAttr]:
     ...
 
-class DILabelAttr(multiplier.ir.llvm.Attribute):
+class DIGlobalVariableExpressionAttr(multiplier.ir.llvm.Attribute):
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DILabelAttr]:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DIGlobalVariableExpressionAttr]:
+    ...
+
+class DIGlobalVariableAttr(multiplier.ir.llvm.Attribute):
+  is_local_to_unit: bool
+  is_defined: bool
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DIGlobalVariableAttr]:
     ...
 
 class DILexicalBlockAttr(multiplier.ir.llvm.Attribute):
@@ -180,6 +312,27 @@ class DILocalVariableAttr(multiplier.ir.llvm.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DILocalVariableAttr]:
     ...
 
+class DISubprogramAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DISubprogramAttr]:
+    ...
+
+class DIModuleAttr(multiplier.ir.llvm.Attribute):
+  is_decl: bool
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DIModuleAttr]:
+    ...
+
 class DINamespaceAttr(multiplier.ir.llvm.Attribute):
   export_symbols: bool
 
@@ -189,26 +342,6 @@ class DINamespaceAttr(multiplier.ir.llvm.Attribute):
 
   @staticmethod
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DINamespaceAttr]:
-    ...
-
-class DINullTypeAttr(multiplier.ir.llvm.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DINullTypeAttr]:
-    ...
-
-class DISubprogramAttr(multiplier.ir.llvm.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DISubprogramAttr]:
     ...
 
 class DISubrangeAttr(multiplier.ir.llvm.Attribute):
@@ -231,14 +364,14 @@ class DISubroutineTypeAttr(multiplier.ir.llvm.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DISubroutineTypeAttr]:
     ...
 
-class FastmathFlagsAttr(multiplier.ir.llvm.Attribute):
+class DILabelAttr(multiplier.ir.llvm.Attribute):
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.FastmathFlagsAttr]:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.DILabelAttr]:
     ...
 
 class MemoryEffectsAttr(multiplier.ir.llvm.Attribute):
@@ -252,6 +385,46 @@ class MemoryEffectsAttr(multiplier.ir.llvm.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.MemoryEffectsAttr]:
     ...
 
+class AliasScopeDomainAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.AliasScopeDomainAttr]:
+    ...
+
+class AliasScopeAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.AliasScopeAttr]:
+    ...
+
+class AccessGroupAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.AccessGroupAttr]:
+    ...
+
+class TBAARootAttr(multiplier.ir.llvm.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.TBAARootAttr]:
+    ...
+
 class TBAAMemberAttr(multiplier.ir.llvm.Attribute):
   offset: int
 
@@ -263,14 +436,15 @@ class TBAAMemberAttr(multiplier.ir.llvm.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.TBAAMemberAttr]:
     ...
 
-class TBAARootAttr(multiplier.ir.llvm.Attribute):
+class TBAATypeDescriptorAttr(multiplier.ir.llvm.Attribute):
+  id: str
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.TBAARootAttr]:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.TBAATypeDescriptorAttr]:
     ...
 
 class TBAATagAttr(multiplier.ir.llvm.Attribute):
@@ -285,125 +459,46 @@ class TBAATagAttr(multiplier.ir.llvm.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.TBAATagAttr]:
     ...
 
-class TBAATypeDescriptorAttr(multiplier.ir.llvm.Attribute):
-  id: str
+class VScaleRangeAttr(multiplier.ir.llvm.Attribute):
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.TBAATypeDescriptorAttr]:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.VScaleRangeAttr]:
     ...
 
-class LinkageAttr(multiplier.ir.llvm.Attribute):
+class TargetFeaturesAttr(multiplier.ir.llvm.Attribute):
+  null_or_empty: bool
+  features_string: str
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LinkageAttr]:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.TargetFeaturesAttr]:
     ...
 
-class LoopAnnotationAttr(multiplier.ir.llvm.Attribute):
+class IntegerOverflowFlagsAttr(multiplier.ir.llvm.Attribute):
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopAnnotationAttr]:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.IntegerOverflowFlagsAttr]:
     ...
 
-class LoopDistributeAttr(multiplier.ir.llvm.Attribute):
+class FastmathFlagsAttr(multiplier.ir.llvm.Attribute):
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopDistributeAttr]:
-    ...
-
-class LoopInterleaveAttr(multiplier.ir.llvm.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopInterleaveAttr]:
-    ...
-
-class LoopLICMAttr(multiplier.ir.llvm.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopLICMAttr]:
-    ...
-
-class LoopPeeledAttr(multiplier.ir.llvm.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopPeeledAttr]:
-    ...
-
-class LoopPipelineAttr(multiplier.ir.llvm.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopPipelineAttr]:
-    ...
-
-class LoopUnrollAndJamAttr(multiplier.ir.llvm.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopUnrollAndJamAttr]:
-    ...
-
-class LoopUnrollAttr(multiplier.ir.llvm.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopUnrollAttr]:
-    ...
-
-class LoopUnswitchAttr(multiplier.ir.llvm.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopUnswitchAttr]:
-    ...
-
-class LoopVectorizeAttr(multiplier.ir.llvm.Attribute):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.AttributeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.LoopVectorizeAttr]:
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.llvm.FastmathFlagsAttr]:
     ...
 
 class Operation(multiplier.ir.Operation):
@@ -513,7 +608,6 @@ class AtomicCmpXchgOp(multiplier.ir.llvm.Operation):
   cmp: multiplier.ir.Value
   val: multiplier.ir.Value
   res: multiplier.ir.Value
-  syncscope: Optional[str]
   weak: bool
   volatile__: bool
 
@@ -532,7 +626,6 @@ class AtomicCmpXchgOp(multiplier.ir.llvm.Operation):
 class AtomicRMWOp(multiplier.ir.llvm.Operation):
   val: multiplier.ir.Value
   res: multiplier.ir.Value
-  syncscope: Optional[str]
   volatile__: bool
 
   @staticmethod
@@ -564,7 +657,6 @@ class BitcastOp(multiplier.ir.llvm.Operation):
     ...
 
 class BrOp(multiplier.ir.llvm.Operation):
-  dest_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -578,10 +670,24 @@ class BrOp(multiplier.ir.llvm.Operation):
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.BrOp]:
     ...
 
+class CallIntrinsicOp(multiplier.ir.llvm.Operation):
+  results: multiplier.ir.Value
+  intrin: str
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.llvm.CallIntrinsicOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.CallIntrinsicOp]:
+    ...
+
 class CallOp(multiplier.ir.llvm.Operation):
   result: multiplier.ir.Value
-  callee: Optional[str]
-  arg_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -627,8 +733,6 @@ class ComdatSelectorOp(multiplier.ir.llvm.Operation):
     ...
 
 class CondBrOp(multiplier.ir.llvm.Operation):
-  true_dest_operands: Iterable[multiplier.ir.Operand]
-  false_dest_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -872,7 +976,6 @@ class FSubOp(multiplier.ir.llvm.Operation):
     ...
 
 class FenceOp(multiplier.ir.llvm.Operation):
-  syncscope: Optional[str]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -904,7 +1007,6 @@ class FreezeOp(multiplier.ir.llvm.Operation):
 
 class GetElementPtrOp(multiplier.ir.llvm.Operation):
   base: multiplier.ir.Value
-  dynamic_indices: Iterable[multiplier.ir.Operand]
   res: multiplier.ir.Value
   inbounds: bool
 
@@ -955,7 +1057,6 @@ class GlobalOp(multiplier.ir.llvm.Operation):
   dso_local: bool
   thread_local__: bool
   addr_space: int
-  section: Optional[str]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -987,7 +1088,6 @@ class ICmpOp(multiplier.ir.llvm.Operation):
     ...
 
 class InlineAsmOp(multiplier.ir.llvm.Operation):
-  operands: Iterable[multiplier.ir.Operand]
   res: multiplier.ir.Value
   asm_string: str
   constraints: str
@@ -1057,11 +1157,6 @@ class IntToPtrOp(multiplier.ir.llvm.Operation):
     ...
 
 class InvokeOp(multiplier.ir.llvm.Operation):
-  callee_operands: Iterable[multiplier.ir.Operand]
-  normal_dest_operands: Iterable[multiplier.ir.Operand]
-  unwind_dest_operands: Iterable[multiplier.ir.Operand]
-  callee: Optional[str]
-  arg_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1079,9 +1174,6 @@ class FuncOp(multiplier.ir.llvm.Operation):
   body: multiplier.ir.Region
   sym_name: str
   dso_local: bool
-  personality: Optional[str]
-  garbage_collector: Optional[str]
-  section: Optional[str]
   is_var_arg: bool
 
   @staticmethod
@@ -1129,11 +1221,25 @@ class LandingpadOp(multiplier.ir.llvm.Operation):
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.LandingpadOp]:
     ...
 
+class LinkerOptionsOp(multiplier.ir.llvm.Operation):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.llvm.LinkerOptionsOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.LinkerOptionsOp]:
+    ...
+
 class LoadOp(multiplier.ir.llvm.Operation):
   res: multiplier.ir.Value
   volatile__: bool
   nontemporal: bool
-  syncscope: Optional[str]
+  invariant: bool
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1145,22 +1251,6 @@ class LoadOp(multiplier.ir.llvm.Operation):
 
   @staticmethod
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.LoadOp]:
-    ...
-
-class MetadataOp(multiplier.ir.llvm.Operation):
-  body: multiplier.ir.Region
-  sym_name: str
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.OperationKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.llvm.MetadataOp]:
-    ...
-
-  @staticmethod
-  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.MetadataOp]:
     ...
 
 class MulOp(multiplier.ir.llvm.Operation):
@@ -1180,18 +1270,19 @@ class MulOp(multiplier.ir.llvm.Operation):
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.MulOp]:
     ...
 
-class NullOp(multiplier.ir.llvm.Operation):
+class NoneTokenOp(multiplier.ir.llvm.Operation):
+  res: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
     ...
 
   @staticmethod
-  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.llvm.NullOp]:
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.llvm.NoneTokenOp]:
     ...
 
   @staticmethod
-  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.NullOp]:
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.NoneTokenOp]:
     ...
 
 class OrOp(multiplier.ir.llvm.Operation):
@@ -1394,7 +1485,6 @@ class StoreOp(multiplier.ir.llvm.Operation):
   value: multiplier.ir.Value
   volatile__: bool
   nontemporal: bool
-  syncscope: Optional[str]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1426,7 +1516,6 @@ class SubOp(multiplier.ir.llvm.Operation):
     ...
 
 class SwitchOp(multiplier.ir.llvm.Operation):
-  default_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1568,6 +1657,21 @@ class ZExtOp(multiplier.ir.llvm.Operation):
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.ZExtOp]:
     ...
 
+class ZeroOp(multiplier.ir.llvm.Operation):
+  res: multiplier.ir.Value
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.llvm.ZeroOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.ZeroOp]:
+    ...
+
 class AbsOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
   res: multiplier.ir.Value
@@ -1645,23 +1749,6 @@ class ByteSwapOp(multiplier.ir.llvm.Operation):
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.ByteSwapOp]:
     ...
 
-class CallIntrinsicOp(multiplier.ir.llvm.Operation):
-  args: Iterable[multiplier.ir.Operand]
-  results: Iterable[multiplier.ir.Result]
-  intrin: str
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.OperationKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.llvm.CallIntrinsicOp]:
-    ...
-
-  @staticmethod
-  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.CallIntrinsicOp]:
-    ...
-
 class CopySignOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
@@ -1696,7 +1783,6 @@ class CoroAlignOp(multiplier.ir.llvm.Operation):
 
 class CoroBeginOp(multiplier.ir.llvm.Operation):
   token: multiplier.ir.Value
-  mem: multiplier.ir.Value
   res: multiplier.ir.Value
 
   @staticmethod
@@ -1712,7 +1798,7 @@ class CoroBeginOp(multiplier.ir.llvm.Operation):
     ...
 
 class CoroEndOp(multiplier.ir.llvm.Operation):
-  handle: multiplier.ir.Value
+  retvals: multiplier.ir.Value
   res: multiplier.ir.Value
 
   @staticmethod
@@ -1729,7 +1815,6 @@ class CoroEndOp(multiplier.ir.llvm.Operation):
 
 class CoroFreeOp(multiplier.ir.llvm.Operation):
   id: multiplier.ir.Value
-  handle: multiplier.ir.Value
   res: multiplier.ir.Value
 
   @staticmethod
@@ -1745,9 +1830,6 @@ class CoroFreeOp(multiplier.ir.llvm.Operation):
     ...
 
 class CoroIdOp(multiplier.ir.llvm.Operation):
-  promise: multiplier.ir.Value
-  coroaddr: multiplier.ir.Value
-  fnaddrs: multiplier.ir.Value
   res: multiplier.ir.Value
 
   @staticmethod
@@ -1762,8 +1844,21 @@ class CoroIdOp(multiplier.ir.llvm.Operation):
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.CoroIdOp]:
     ...
 
+class CoroPromiseOp(multiplier.ir.llvm.Operation):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.llvm.CoroPromiseOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.CoroPromiseOp]:
+    ...
+
 class CoroResumeOp(multiplier.ir.llvm.Operation):
-  handle: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1778,7 +1873,6 @@ class CoroResumeOp(multiplier.ir.llvm.Operation):
     ...
 
 class CoroSaveOp(multiplier.ir.llvm.Operation):
-  handle: multiplier.ir.Value
   res: multiplier.ir.Value
 
   @staticmethod
@@ -1948,7 +2042,6 @@ class DebugTrapOp(multiplier.ir.llvm.Operation):
     ...
 
 class EhTypeidForOp(multiplier.ir.llvm.Operation):
-  type_info: multiplier.ir.Value
   res: multiplier.ir.Value
 
   @staticmethod
@@ -2176,6 +2269,36 @@ class GetActiveLaneMaskOp(multiplier.ir.llvm.Operation):
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.GetActiveLaneMaskOp]:
     ...
 
+class InvariantEndOp(multiplier.ir.llvm.Operation):
+  size: int
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.llvm.InvariantEndOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.InvariantEndOp]:
+    ...
+
+class InvariantStartOp(multiplier.ir.llvm.Operation):
+  size: int
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.llvm.InvariantStartOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.llvm.InvariantStartOp]:
+    ...
+
 class IsConstantOp(multiplier.ir.llvm.Operation):
   val: multiplier.ir.Value
 
@@ -2352,7 +2475,6 @@ class RoundAndCastToNearestLongOp(multiplier.ir.llvm.Operation):
 
 class MaskedLoadOp(multiplier.ir.llvm.Operation):
   mask: multiplier.ir.Value
-  pass_thru: Iterable[multiplier.ir.Operand]
   res: multiplier.ir.Value
   alignment: int
 
@@ -2908,7 +3030,6 @@ class SqrtOp(multiplier.ir.llvm.Operation):
     ...
 
 class StackRestoreOp(multiplier.ir.llvm.Operation):
-  ptr: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4014,8 +4135,6 @@ class VPZExtOp(multiplier.ir.llvm.Operation):
     ...
 
 class VaCopyOp(multiplier.ir.llvm.Operation):
-  dest_list: multiplier.ir.Value
-  src_list: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4030,7 +4149,6 @@ class VaCopyOp(multiplier.ir.llvm.Operation):
     ...
 
 class VaEndOp(multiplier.ir.llvm.Operation):
-  arg_list: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4045,7 +4163,6 @@ class VaEndOp(multiplier.ir.llvm.Operation):
     ...
 
 class VaStartOp(multiplier.ir.llvm.Operation):
-  arg_list: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4105,7 +4222,6 @@ class MaskedExpandLoadOp(multiplier.ir.llvm.Operation):
 class MaskedGatherOp(multiplier.ir.llvm.Operation):
   ptrs: multiplier.ir.Value
   mask: multiplier.ir.Value
-  pass_thru: Iterable[multiplier.ir.Operand]
   res: multiplier.ir.Value
   alignment: int
 
@@ -4159,8 +4275,8 @@ class VectorExtractOp(multiplier.ir.llvm.Operation):
     ...
 
 class VectorInsertOp(multiplier.ir.llvm.Operation):
-  srcvec: multiplier.ir.Value
   dstvec: multiplier.ir.Value
+  srcvec: multiplier.ir.Value
   res: multiplier.ir.Value
   pos: int
   src_vector_bit_width: int
@@ -4213,7 +4329,6 @@ class VectorReduceAndOp(multiplier.ir.llvm.Operation):
 class VectorReduceFAddOp(multiplier.ir.llvm.Operation):
   input: multiplier.ir.Value
   res: multiplier.ir.Value
-  reassoc: bool
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4294,7 +4409,6 @@ class VectorReduceFMinimumOp(multiplier.ir.llvm.Operation):
 class VectorReduceFMulOp(multiplier.ir.llvm.Operation):
   input: multiplier.ir.Value
   res: multiplier.ir.Value
-  reassoc: bool
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4451,16 +4565,6 @@ class ArrayType(multiplier.ir.llvm.Type):
   def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.llvm.ArrayType]:
     ...
 
-class FixedVectorType(multiplier.ir.llvm.Type):
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.TypeKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.llvm.FixedVectorType]:
-    ...
-
 class FunctionType(multiplier.ir.llvm.Type):
   is_var_arg: bool
   var_arg: bool
@@ -4474,7 +4578,6 @@ class FunctionType(multiplier.ir.llvm.Type):
     ...
 
 class PointerType(multiplier.ir.llvm.Type):
-  is_opaque: bool
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
@@ -4482,6 +4585,16 @@ class PointerType(multiplier.ir.llvm.Type):
 
   @staticmethod
   def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.llvm.PointerType]:
+    ...
+
+class FixedVectorType(multiplier.ir.llvm.Type):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.TypeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Type) -> Optional[multiplier.ir.llvm.FixedVectorType]:
     ...
 
 class ScalableVectorType(multiplier.ir.llvm.Type):

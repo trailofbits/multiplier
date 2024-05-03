@@ -191,8 +191,8 @@ std::optional<CharacterLiteral> CharacterLiteral::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-CharacterLiteralCharacterKind CharacterLiteral::literal_kind(void) const {
-  return static_cast<CharacterLiteralCharacterKind>(impl->reader.getVal90());
+CharacterLiteralKind CharacterLiteral::literal_kind(void) const {
+  return static_cast<CharacterLiteralKind>(impl->reader.getVal91());
 }
 
 Token CharacterLiteral::token(void) const {

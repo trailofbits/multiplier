@@ -16,7 +16,7 @@ namespace mx {
 enum class OverloadableAttrSpelling : unsigned char {
   GNU_OVERLOADABLE,
   CXX11_CLANG_OVERLOADABLE,
-  C2X_CLANG_OVERLOADABLE,
+  C23_CLANG_OVERLOADABLE,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -18,7 +18,6 @@ class Attr;
 class InheritableAttr;
 class NSErrorDomainAttr;
 class Token;
-class VarDecl;
 namespace ir {
 class Operation;
 class Value;
@@ -51,7 +50,6 @@ class MX_EXPORT NSErrorDomainAttr : public InheritableAttr {
   static std::optional<NSErrorDomainAttr> from(const VariantEntity &e);
   static std::optional<NSErrorDomainAttr> from(const TokenContext &t);
 
-  VarDecl error_domain(void) const;
 };
 
 static_assert(sizeof(NSErrorDomainAttr) == sizeof(InheritableAttr));

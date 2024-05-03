@@ -16,7 +16,7 @@ namespace mx {
 enum class WebAssemblyImportNameAttrSpelling : unsigned char {
   GNU_IMPORT_NAME,
   CXX11_CLANG_IMPORT_NAME,
-  C2X_CLANG_IMPORT_NAME,
+  C23_CLANG_IMPORT_NAME,
   SPELLING_NOT_CALCULATED,
 };
 

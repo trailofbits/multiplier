@@ -24,6 +24,7 @@ enum class MSVCMajorVersion : unsigned char {
   MSVC2019,
   MSVC20195,
   MSVC20198,
+  MSVC20223,
 };
 
 inline static const char *EnumerationName(MSVCMajorVersion) {
@@ -31,7 +32,7 @@ inline static const char *EnumerationName(MSVCMajorVersion) {
 }
 
 inline static constexpr unsigned NumEnumerators(MSVCMajorVersion) {
-  return 10;
+  return 11;
 }
 
 MX_EXPORT const char *EnumeratorName(MSVCMajorVersion);

@@ -16,7 +16,7 @@ namespace mx {
 enum class BlocksAttrSpelling : unsigned char {
   GNU_BLOCKS,
   CXX11_CLANG_BLOCKS,
-  C2X_CLANG_BLOCKS,
+  C23_CLANG_BLOCKS,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -16,10 +16,10 @@ const char *EnumeratorName(ErrorAttrSpelling e) {
   switch (e) {
     case ErrorAttrSpelling::GNU_ERROR: return "GNU_ERROR";
     case ErrorAttrSpelling::CXX11_GNU_ERROR: return "CXX11_GNU_ERROR";
-    case ErrorAttrSpelling::C2X_GNU_ERROR: return "C2X_GNU_ERROR";
+    case ErrorAttrSpelling::C23_GNU_ERROR: return "C23_GNU_ERROR";
     case ErrorAttrSpelling::GNU_WARNING: return "GNU_WARNING";
     case ErrorAttrSpelling::CXX11_GNU_WARNING: return "CXX11_GNU_WARNING";
-    case ErrorAttrSpelling::C2X_GNU_WARNING: return "C2X_GNU_WARNING";
+    case ErrorAttrSpelling::C23_GNU_WARNING: return "C23_GNU_WARNING";
     case ErrorAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

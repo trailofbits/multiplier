@@ -10,7 +10,7 @@
 
 #include <multiplier/AST/DeclObjCDeclQualifier.h>
 #include <multiplier/AST/NamedDecl.h>
-#include <multiplier/AST/ObjCMethodDeclImplementationControl.h>
+#include <multiplier/AST/ObjCImplementationControl.h>
 #include <multiplier/AST/ObjCMethodFamily.h>
 
 namespace mx {
@@ -79,7 +79,7 @@ class MX_EXPORT ObjCMethodDecl : public NamedDecl {
   ObjCInterfaceDecl class_interface(void) const;
   ImplicitParamDecl command_declaration(void) const;
   Token declarator_end_token(void) const;
-  ObjCMethodDeclImplementationControl implementation_control(void) const;
+  ObjCImplementationControl implementation_control(void) const;
   ObjCMethodFamily method_family(void) const;
   DeclObjCDeclQualifier obj_c_decl_qualifier(void) const;
   Type return_type(void) const;

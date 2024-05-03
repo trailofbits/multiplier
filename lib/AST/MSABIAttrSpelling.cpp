@@ -16,7 +16,7 @@ const char *EnumeratorName(MSABIAttrSpelling e) {
   switch (e) {
     case MSABIAttrSpelling::GNU_MS_ABI: return "GNU_MS_ABI";
     case MSABIAttrSpelling::CXX11_GNU_MS_ABI: return "CXX11_GNU_MS_ABI";
-    case MSABIAttrSpelling::C2X_GNU_MS_ABI: return "C2X_GNU_MS_ABI";
+    case MSABIAttrSpelling::C23_GNU_MS_ABI: return "C23_GNU_MS_ABI";
     case MSABIAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

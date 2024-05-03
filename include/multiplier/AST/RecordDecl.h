@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <multiplier/AST/RecordDeclArgPassingKind.h>
+#include <multiplier/AST/RecordArgPassingKind.h>
 #include <multiplier/AST/TagDecl.h>
 
 namespace mx {
@@ -75,7 +75,7 @@ class MX_EXPORT RecordDecl : public TagDecl {
   std::optional<FieldDecl> nth_field(unsigned n) const;
   unsigned num_fields(void) const;
   gap::generator<FieldDecl> fields(void) const &;
-  RecordDeclArgPassingKind argument_passing_restrictions(void) const;
+  RecordArgPassingKind argument_passing_restrictions(void) const;
   bool has_flexible_array_member(void) const;
   bool has_loaded_fields_from_external_storage(void) const;
   bool has_non_trivial_to_primitive_copy_c_union(void) const;

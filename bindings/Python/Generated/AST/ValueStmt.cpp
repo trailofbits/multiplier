@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[559]) || tp >= &(gTypes[694])) {
+  if (tp < &(gTypes[584]) || tp >= &(gTypes[719])) {
     return std::nullopt;
   }
 
@@ -90,507 +90,507 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::LabelStmt::static_kind():
-      tp = &(gTypes[560]);
-      break;
-
-    case mx::DesignatedInitUpdateExpr::static_kind():
-      tp = &(gTypes[562]);
-      break;
-
-    case mx::DesignatedInitExpr::static_kind():
-      tp = &(gTypes[563]);
-      break;
-
-    case mx::DependentScopeDeclRefExpr::static_kind():
-      tp = &(gTypes[564]);
-      break;
-
-    case mx::DependentCoawaitExpr::static_kind():
-      tp = &(gTypes[565]);
-      break;
-
-    case mx::DeclRefExpr::static_kind():
-      tp = &(gTypes[566]);
-      break;
-
-    case mx::CoawaitExpr::static_kind():
-      tp = &(gTypes[568]);
-      break;
-
-    case mx::CoyieldExpr::static_kind():
-      tp = &(gTypes[569]);
-      break;
-
-    case mx::ConvertVectorExpr::static_kind():
-      tp = &(gTypes[570]);
-      break;
-
-    case mx::ConceptSpecializationExpr::static_kind():
-      tp = &(gTypes[571]);
-      break;
-
-    case mx::CompoundLiteralExpr::static_kind():
-      tp = &(gTypes[572]);
-      break;
-
-    case mx::ChooseExpr::static_kind():
-      tp = &(gTypes[573]);
-      break;
-
-    case mx::CharacterLiteral::static_kind():
-      tp = &(gTypes[574]);
-      break;
-
-    case mx::ImplicitCastExpr::static_kind():
-      tp = &(gTypes[576]);
-      break;
-
-    case mx::CXXDynamicCastExpr::static_kind():
-      tp = &(gTypes[579]);
-      break;
-
-    case mx::CXXConstCastExpr::static_kind():
-      tp = &(gTypes[580]);
-      break;
-
-    case mx::CXXAddrspaceCastExpr::static_kind():
-      tp = &(gTypes[581]);
-      break;
-
-    case mx::CXXStaticCastExpr::static_kind():
-      tp = &(gTypes[582]);
-      break;
-
-    case mx::CXXReinterpretCastExpr::static_kind():
-      tp = &(gTypes[583]);
-      break;
-
-    case mx::CXXFunctionalCastExpr::static_kind():
-      tp = &(gTypes[584]);
-      break;
-
-    case mx::CStyleCastExpr::static_kind():
       tp = &(gTypes[585]);
       break;
 
-    case mx::BuiltinBitCastExpr::static_kind():
-      tp = &(gTypes[586]);
-      break;
-
-    case mx::ObjCBridgedCastExpr::static_kind():
+    case mx::DesignatedInitUpdateExpr::static_kind():
       tp = &(gTypes[587]);
       break;
 
-    case mx::CallExpr::static_kind():
+    case mx::DesignatedInitExpr::static_kind():
       tp = &(gTypes[588]);
       break;
 
-    case mx::CXXOperatorCallExpr::static_kind():
+    case mx::DependentScopeDeclRefExpr::static_kind():
       tp = &(gTypes[589]);
       break;
 
-    case mx::CXXMemberCallExpr::static_kind():
+    case mx::DependentCoawaitExpr::static_kind():
       tp = &(gTypes[590]);
       break;
 
-    case mx::CUDAKernelCallExpr::static_kind():
+    case mx::DeclRefExpr::static_kind():
       tp = &(gTypes[591]);
       break;
 
-    case mx::UserDefinedLiteral::static_kind():
-      tp = &(gTypes[592]);
-      break;
-
-    case mx::CXXUuidofExpr::static_kind():
+    case mx::CoawaitExpr::static_kind():
       tp = &(gTypes[593]);
       break;
 
-    case mx::CXXUnresolvedConstructExpr::static_kind():
+    case mx::CoyieldExpr::static_kind():
       tp = &(gTypes[594]);
       break;
 
-    case mx::CXXTypeidExpr::static_kind():
+    case mx::ConvertVectorExpr::static_kind():
       tp = &(gTypes[595]);
       break;
 
-    case mx::CXXThrowExpr::static_kind():
+    case mx::ConceptSpecializationExpr::static_kind():
       tp = &(gTypes[596]);
       break;
 
-    case mx::CXXThisExpr::static_kind():
+    case mx::CompoundLiteralExpr::static_kind():
       tp = &(gTypes[597]);
       break;
 
-    case mx::CXXStdInitializerListExpr::static_kind():
+    case mx::ChooseExpr::static_kind():
       tp = &(gTypes[598]);
       break;
 
-    case mx::CXXScalarValueInitExpr::static_kind():
+    case mx::CharacterLiteral::static_kind():
       tp = &(gTypes[599]);
       break;
 
-    case mx::CXXRewrittenBinaryOperator::static_kind():
-      tp = &(gTypes[600]);
-      break;
-
-    case mx::CXXPseudoDestructorExpr::static_kind():
+    case mx::ImplicitCastExpr::static_kind():
       tp = &(gTypes[601]);
       break;
 
-    case mx::CXXParenListInitExpr::static_kind():
-      tp = &(gTypes[602]);
-      break;
-
-    case mx::CXXNullPtrLiteralExpr::static_kind():
-      tp = &(gTypes[603]);
-      break;
-
-    case mx::CXXNoexceptExpr::static_kind():
+    case mx::CXXDynamicCastExpr::static_kind():
       tp = &(gTypes[604]);
       break;
 
-    case mx::CXXNewExpr::static_kind():
+    case mx::CXXConstCastExpr::static_kind():
       tp = &(gTypes[605]);
       break;
 
-    case mx::CXXInheritedCtorInitExpr::static_kind():
+    case mx::CXXAddrspaceCastExpr::static_kind():
       tp = &(gTypes[606]);
       break;
 
-    case mx::CXXFoldExpr::static_kind():
+    case mx::CXXStaticCastExpr::static_kind():
       tp = &(gTypes[607]);
       break;
 
-    case mx::CXXDependentScopeMemberExpr::static_kind():
+    case mx::CXXReinterpretCastExpr::static_kind():
       tp = &(gTypes[608]);
       break;
 
-    case mx::CXXDeleteExpr::static_kind():
+    case mx::CXXFunctionalCastExpr::static_kind():
       tp = &(gTypes[609]);
       break;
 
-    case mx::CXXDefaultInitExpr::static_kind():
+    case mx::CStyleCastExpr::static_kind():
       tp = &(gTypes[610]);
       break;
 
-    case mx::CXXDefaultArgExpr::static_kind():
+    case mx::BuiltinBitCastExpr::static_kind():
       tp = &(gTypes[611]);
       break;
 
-    case mx::CXXConstructExpr::static_kind():
+    case mx::ObjCBridgedCastExpr::static_kind():
       tp = &(gTypes[612]);
       break;
 
-    case mx::CXXTemporaryObjectExpr::static_kind():
+    case mx::CallExpr::static_kind():
       tp = &(gTypes[613]);
       break;
 
-    case mx::CXXBoolLiteralExpr::static_kind():
+    case mx::CXXOperatorCallExpr::static_kind():
       tp = &(gTypes[614]);
       break;
 
-    case mx::CXXBindTemporaryExpr::static_kind():
+    case mx::CXXMemberCallExpr::static_kind():
       tp = &(gTypes[615]);
       break;
 
-    case mx::BlockExpr::static_kind():
+    case mx::CUDAKernelCallExpr::static_kind():
       tp = &(gTypes[616]);
       break;
 
-    case mx::BinaryOperator::static_kind():
+    case mx::UserDefinedLiteral::static_kind():
       tp = &(gTypes[617]);
       break;
 
-    case mx::CompoundAssignOperator::static_kind():
+    case mx::CXXUuidofExpr::static_kind():
       tp = &(gTypes[618]);
       break;
 
-    case mx::AtomicExpr::static_kind():
+    case mx::CXXUnresolvedConstructExpr::static_kind():
       tp = &(gTypes[619]);
       break;
 
-    case mx::AsTypeExpr::static_kind():
+    case mx::CXXTypeidExpr::static_kind():
       tp = &(gTypes[620]);
       break;
 
-    case mx::ArrayTypeTraitExpr::static_kind():
+    case mx::CXXThrowExpr::static_kind():
       tp = &(gTypes[621]);
       break;
 
-    case mx::ArraySubscriptExpr::static_kind():
+    case mx::CXXThisExpr::static_kind():
       tp = &(gTypes[622]);
       break;
 
-    case mx::ArrayInitLoopExpr::static_kind():
+    case mx::CXXStdInitializerListExpr::static_kind():
       tp = &(gTypes[623]);
       break;
 
-    case mx::ArrayInitIndexExpr::static_kind():
+    case mx::CXXScalarValueInitExpr::static_kind():
       tp = &(gTypes[624]);
       break;
 
-    case mx::AddrLabelExpr::static_kind():
+    case mx::CXXRewrittenBinaryOperator::static_kind():
       tp = &(gTypes[625]);
       break;
 
-    case mx::ConditionalOperator::static_kind():
+    case mx::CXXPseudoDestructorExpr::static_kind():
+      tp = &(gTypes[626]);
+      break;
+
+    case mx::CXXParenListInitExpr::static_kind():
       tp = &(gTypes[627]);
       break;
 
-    case mx::BinaryConditionalOperator::static_kind():
+    case mx::CXXNullPtrLiteralExpr::static_kind():
       tp = &(gTypes[628]);
       break;
 
-    case mx::VAArgExpr::static_kind():
+    case mx::CXXNoexceptExpr::static_kind():
       tp = &(gTypes[629]);
       break;
 
-    case mx::UnaryOperator::static_kind():
+    case mx::CXXNewExpr::static_kind():
       tp = &(gTypes[630]);
       break;
 
-    case mx::UnaryExprOrTypeTraitExpr::static_kind():
+    case mx::CXXInheritedCtorInitExpr::static_kind():
       tp = &(gTypes[631]);
       break;
 
-    case mx::TypoExpr::static_kind():
+    case mx::CXXFoldExpr::static_kind():
       tp = &(gTypes[632]);
       break;
 
-    case mx::TypeTraitExpr::static_kind():
+    case mx::CXXDependentScopeMemberExpr::static_kind():
       tp = &(gTypes[633]);
       break;
 
-    case mx::SubstNonTypeTemplateParmPackExpr::static_kind():
+    case mx::CXXDeleteExpr::static_kind():
       tp = &(gTypes[634]);
       break;
 
-    case mx::SubstNonTypeTemplateParmExpr::static_kind():
+    case mx::CXXDefaultInitExpr::static_kind():
       tp = &(gTypes[635]);
       break;
 
-    case mx::StringLiteral::static_kind():
+    case mx::CXXDefaultArgExpr::static_kind():
       tp = &(gTypes[636]);
       break;
 
-    case mx::StmtExpr::static_kind():
+    case mx::CXXConstructExpr::static_kind():
       tp = &(gTypes[637]);
       break;
 
-    case mx::SourceLocExpr::static_kind():
+    case mx::CXXTemporaryObjectExpr::static_kind():
       tp = &(gTypes[638]);
       break;
 
-    case mx::SizeOfPackExpr::static_kind():
+    case mx::CXXBoolLiteralExpr::static_kind():
       tp = &(gTypes[639]);
       break;
 
-    case mx::ShuffleVectorExpr::static_kind():
+    case mx::CXXBindTemporaryExpr::static_kind():
       tp = &(gTypes[640]);
       break;
 
-    case mx::SYCLUniqueStableNameExpr::static_kind():
+    case mx::BlockExpr::static_kind():
       tp = &(gTypes[641]);
       break;
 
-    case mx::RequiresExpr::static_kind():
+    case mx::BinaryOperator::static_kind():
       tp = &(gTypes[642]);
       break;
 
-    case mx::RecoveryExpr::static_kind():
+    case mx::CompoundAssignOperator::static_kind():
       tp = &(gTypes[643]);
       break;
 
-    case mx::PseudoObjectExpr::static_kind():
+    case mx::AtomicExpr::static_kind():
       tp = &(gTypes[644]);
       break;
 
-    case mx::PredefinedExpr::static_kind():
+    case mx::AsTypeExpr::static_kind():
       tp = &(gTypes[645]);
       break;
 
-    case mx::ParenListExpr::static_kind():
+    case mx::ArrayTypeTraitExpr::static_kind():
       tp = &(gTypes[646]);
       break;
 
-    case mx::ParenExpr::static_kind():
+    case mx::ArraySubscriptExpr::static_kind():
       tp = &(gTypes[647]);
       break;
 
-    case mx::PackExpansionExpr::static_kind():
+    case mx::ArrayInitLoopExpr::static_kind():
       tp = &(gTypes[648]);
       break;
 
-    case mx::UnresolvedMemberExpr::static_kind():
+    case mx::ArrayInitIndexExpr::static_kind():
+      tp = &(gTypes[649]);
+      break;
+
+    case mx::AddrLabelExpr::static_kind():
       tp = &(gTypes[650]);
       break;
 
-    case mx::UnresolvedLookupExpr::static_kind():
-      tp = &(gTypes[651]);
-      break;
-
-    case mx::OpaqueValueExpr::static_kind():
+    case mx::ConditionalOperator::static_kind():
       tp = &(gTypes[652]);
       break;
 
-    case mx::OffsetOfExpr::static_kind():
+    case mx::BinaryConditionalOperator::static_kind():
       tp = &(gTypes[653]);
       break;
 
-    case mx::ObjCSubscriptRefExpr::static_kind():
+    case mx::VAArgExpr::static_kind():
       tp = &(gTypes[654]);
       break;
 
-    case mx::ObjCStringLiteral::static_kind():
+    case mx::UnaryOperator::static_kind():
       tp = &(gTypes[655]);
       break;
 
-    case mx::ObjCSelectorExpr::static_kind():
+    case mx::UnaryExprOrTypeTraitExpr::static_kind():
       tp = &(gTypes[656]);
       break;
 
-    case mx::ObjCProtocolExpr::static_kind():
+    case mx::TypoExpr::static_kind():
       tp = &(gTypes[657]);
       break;
 
-    case mx::ObjCPropertyRefExpr::static_kind():
+    case mx::TypeTraitExpr::static_kind():
       tp = &(gTypes[658]);
       break;
 
-    case mx::ObjCMessageExpr::static_kind():
+    case mx::SubstNonTypeTemplateParmPackExpr::static_kind():
       tp = &(gTypes[659]);
       break;
 
-    case mx::ObjCIvarRefExpr::static_kind():
+    case mx::SubstNonTypeTemplateParmExpr::static_kind():
       tp = &(gTypes[660]);
       break;
 
-    case mx::ObjCIsaExpr::static_kind():
+    case mx::StringLiteral::static_kind():
       tp = &(gTypes[661]);
       break;
 
-    case mx::ObjCIndirectCopyRestoreExpr::static_kind():
+    case mx::StmtExpr::static_kind():
       tp = &(gTypes[662]);
       break;
 
-    case mx::ObjCEncodeExpr::static_kind():
+    case mx::SourceLocExpr::static_kind():
       tp = &(gTypes[663]);
       break;
 
-    case mx::ObjCDictionaryLiteral::static_kind():
+    case mx::SizeOfPackExpr::static_kind():
       tp = &(gTypes[664]);
       break;
 
-    case mx::ObjCBoxedExpr::static_kind():
+    case mx::ShuffleVectorExpr::static_kind():
       tp = &(gTypes[665]);
       break;
 
-    case mx::ObjCBoolLiteralExpr::static_kind():
+    case mx::SYCLUniqueStableNameExpr::static_kind():
       tp = &(gTypes[666]);
       break;
 
-    case mx::ObjCAvailabilityCheckExpr::static_kind():
+    case mx::RequiresExpr::static_kind():
       tp = &(gTypes[667]);
       break;
 
-    case mx::ObjCArrayLiteral::static_kind():
+    case mx::RecoveryExpr::static_kind():
       tp = &(gTypes[668]);
       break;
 
-    case mx::OMPIteratorExpr::static_kind():
+    case mx::PseudoObjectExpr::static_kind():
       tp = &(gTypes[669]);
       break;
 
-    case mx::OMPArrayShapingExpr::static_kind():
+    case mx::PredefinedExpr::static_kind():
       tp = &(gTypes[670]);
       break;
 
-    case mx::OMPArraySectionExpr::static_kind():
+    case mx::ParenListExpr::static_kind():
       tp = &(gTypes[671]);
       break;
 
-    case mx::NoInitExpr::static_kind():
+    case mx::ParenExpr::static_kind():
       tp = &(gTypes[672]);
       break;
 
-    case mx::MemberExpr::static_kind():
+    case mx::PackExpansionExpr::static_kind():
       tp = &(gTypes[673]);
       break;
 
-    case mx::MatrixSubscriptExpr::static_kind():
-      tp = &(gTypes[674]);
-      break;
-
-    case mx::MaterializeTemporaryExpr::static_kind():
+    case mx::UnresolvedMemberExpr::static_kind():
       tp = &(gTypes[675]);
       break;
 
-    case mx::MSPropertySubscriptExpr::static_kind():
+    case mx::UnresolvedLookupExpr::static_kind():
       tp = &(gTypes[676]);
       break;
 
-    case mx::MSPropertyRefExpr::static_kind():
+    case mx::OpaqueValueExpr::static_kind():
       tp = &(gTypes[677]);
       break;
 
-    case mx::LambdaExpr::static_kind():
+    case mx::OffsetOfExpr::static_kind():
       tp = &(gTypes[678]);
       break;
 
-    case mx::IntegerLiteral::static_kind():
+    case mx::ObjCSubscriptRefExpr::static_kind():
       tp = &(gTypes[679]);
       break;
 
-    case mx::InitListExpr::static_kind():
+    case mx::ObjCStringLiteral::static_kind():
       tp = &(gTypes[680]);
       break;
 
-    case mx::ImplicitValueInitExpr::static_kind():
+    case mx::ObjCSelectorExpr::static_kind():
       tp = &(gTypes[681]);
       break;
 
-    case mx::ImaginaryLiteral::static_kind():
+    case mx::ObjCProtocolExpr::static_kind():
       tp = &(gTypes[682]);
       break;
 
-    case mx::GenericSelectionExpr::static_kind():
+    case mx::ObjCPropertyRefExpr::static_kind():
       tp = &(gTypes[683]);
       break;
 
-    case mx::GNUNullExpr::static_kind():
+    case mx::ObjCMessageExpr::static_kind():
       tp = &(gTypes[684]);
       break;
 
-    case mx::FunctionParmPackExpr::static_kind():
+    case mx::ObjCIvarRefExpr::static_kind():
       tp = &(gTypes[685]);
       break;
 
-    case mx::ExprWithCleanups::static_kind():
+    case mx::ObjCIsaExpr::static_kind():
+      tp = &(gTypes[686]);
+      break;
+
+    case mx::ObjCIndirectCopyRestoreExpr::static_kind():
       tp = &(gTypes[687]);
       break;
 
-    case mx::ConstantExpr::static_kind():
+    case mx::ObjCEncodeExpr::static_kind():
       tp = &(gTypes[688]);
       break;
 
-    case mx::FloatingLiteral::static_kind():
+    case mx::ObjCDictionaryLiteral::static_kind():
       tp = &(gTypes[689]);
       break;
 
-    case mx::FixedPointLiteral::static_kind():
+    case mx::ObjCBoxedExpr::static_kind():
       tp = &(gTypes[690]);
       break;
 
-    case mx::ExtVectorElementExpr::static_kind():
+    case mx::ObjCBoolLiteralExpr::static_kind():
       tp = &(gTypes[691]);
       break;
 
-    case mx::ExpressionTraitExpr::static_kind():
+    case mx::ObjCAvailabilityCheckExpr::static_kind():
       tp = &(gTypes[692]);
       break;
 
-    case mx::AttributedStmt::static_kind():
+    case mx::ObjCArrayLiteral::static_kind():
       tp = &(gTypes[693]);
+      break;
+
+    case mx::OMPIteratorExpr::static_kind():
+      tp = &(gTypes[694]);
+      break;
+
+    case mx::OMPArrayShapingExpr::static_kind():
+      tp = &(gTypes[695]);
+      break;
+
+    case mx::OMPArraySectionExpr::static_kind():
+      tp = &(gTypes[696]);
+      break;
+
+    case mx::NoInitExpr::static_kind():
+      tp = &(gTypes[697]);
+      break;
+
+    case mx::MemberExpr::static_kind():
+      tp = &(gTypes[698]);
+      break;
+
+    case mx::MatrixSubscriptExpr::static_kind():
+      tp = &(gTypes[699]);
+      break;
+
+    case mx::MaterializeTemporaryExpr::static_kind():
+      tp = &(gTypes[700]);
+      break;
+
+    case mx::MSPropertySubscriptExpr::static_kind():
+      tp = &(gTypes[701]);
+      break;
+
+    case mx::MSPropertyRefExpr::static_kind():
+      tp = &(gTypes[702]);
+      break;
+
+    case mx::LambdaExpr::static_kind():
+      tp = &(gTypes[703]);
+      break;
+
+    case mx::IntegerLiteral::static_kind():
+      tp = &(gTypes[704]);
+      break;
+
+    case mx::InitListExpr::static_kind():
+      tp = &(gTypes[705]);
+      break;
+
+    case mx::ImplicitValueInitExpr::static_kind():
+      tp = &(gTypes[706]);
+      break;
+
+    case mx::ImaginaryLiteral::static_kind():
+      tp = &(gTypes[707]);
+      break;
+
+    case mx::GenericSelectionExpr::static_kind():
+      tp = &(gTypes[708]);
+      break;
+
+    case mx::GNUNullExpr::static_kind():
+      tp = &(gTypes[709]);
+      break;
+
+    case mx::FunctionParmPackExpr::static_kind():
+      tp = &(gTypes[710]);
+      break;
+
+    case mx::ExprWithCleanups::static_kind():
+      tp = &(gTypes[712]);
+      break;
+
+    case mx::ConstantExpr::static_kind():
+      tp = &(gTypes[713]);
+      break;
+
+    case mx::FloatingLiteral::static_kind():
+      tp = &(gTypes[714]);
+      break;
+
+    case mx::FixedPointLiteral::static_kind():
+      tp = &(gTypes[715]);
+      break;
+
+    case mx::ExtVectorElementExpr::static_kind():
+      tp = &(gTypes[716]);
+      break;
+
+    case mx::ExpressionTraitExpr::static_kind():
+      tp = &(gTypes[717]);
+      break;
+
+    case mx::AttributedStmt::static_kind():
+      tp = &(gTypes[718]);
       break;
 
   }
@@ -852,7 +852,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[559]);
+  PyTypeObject * const tp = &(gTypes[584]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -867,12 +867,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[449].tp_hash;
-  tp->tp_richcompare = gTypes[449].tp_richcompare;
+  tp->tp_hash = gTypes[473].tp_hash;
+  tp->tp_richcompare = gTypes[473].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[449]);
+  tp->tp_base = &(gTypes[473]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

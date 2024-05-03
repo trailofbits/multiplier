@@ -16,7 +16,7 @@ namespace mx {
 enum class TypeTagForDatatypeAttrSpelling : unsigned char {
   GNU_TYPE_TAG_FOR_DATATYPE,
   CXX11_CLANG_TYPE_TAG_FOR_DATATYPE,
-  C2X_CLANG_TYPE_TAG_FOR_DATATYPE,
+  C23_CLANG_TYPE_TAG_FOR_DATATYPE,
   SPELLING_NOT_CALCULATED,
 };
 

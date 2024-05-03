@@ -16,7 +16,7 @@ const char *EnumeratorName(ArcWeakrefUnavailableAttrSpelling e) {
   switch (e) {
     case ArcWeakrefUnavailableAttrSpelling::GNU_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE: return "GNU_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE";
     case ArcWeakrefUnavailableAttrSpelling::CXX11_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE: return "CXX11_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE";
-    case ArcWeakrefUnavailableAttrSpelling::C2X_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE: return "C2X_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE";
+    case ArcWeakrefUnavailableAttrSpelling::C23_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE: return "C23_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE";
     case ArcWeakrefUnavailableAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

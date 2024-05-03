@@ -38,6 +38,8 @@
 #include <multiplier/AST/ArcWeakrefUnavailableAttr.h>
 #include <multiplier/AST/ArgumentWithTypeTagAttr.h>
 #include <multiplier/AST/ArmBuiltinAliasAttr.h>
+#include <multiplier/AST/ArmLocallyStreamingAttr.h>
+#include <multiplier/AST/ArmNewAttr.h>
 #include <multiplier/AST/ArtificialAttr.h>
 #include <multiplier/AST/AsmLabelAttr.h>
 #include <multiplier/AST/AssertCapabilityAttr.h>
@@ -48,6 +50,7 @@
 #include <multiplier/AST/AvailabilityAttr.h>
 #include <multiplier/AST/AvailableOnlyInDefaultEvalMethodAttr.h>
 #include <multiplier/AST/BPFPreserveAccessIndexAttr.h>
+#include <multiplier/AST/BPFPreserveStaticOffsetAttr.h>
 #include <multiplier/AST/BTFDeclTagAttr.h>
 #include <multiplier/AST/BlocksAttr.h>
 #include <multiplier/AST/BuiltinAttr.h>
@@ -79,6 +82,7 @@
 #include <multiplier/AST/CarriesDependencyAttr.h>
 #include <multiplier/AST/CleanupAttr.h>
 #include <multiplier/AST/CmseNSEntryAttr.h>
+#include <multiplier/AST/CodeModelAttr.h>
 #include <multiplier/AST/CodeSegAttr.h>
 #include <multiplier/AST/ColdAttr.h>
 #include <multiplier/AST/CommonAttr.h>
@@ -89,6 +93,12 @@
 #include <multiplier/AST/ConsumableAutoCastAttr.h>
 #include <multiplier/AST/ConsumableSetOnReadAttr.h>
 #include <multiplier/AST/ConvergentAttr.h>
+#include <multiplier/AST/CoroDisableLifetimeBoundAttr.h>
+#include <multiplier/AST/CoroLifetimeBoundAttr.h>
+#include <multiplier/AST/CoroOnlyDestroyWhenCompleteAttr.h>
+#include <multiplier/AST/CoroReturnTypeAttr.h>
+#include <multiplier/AST/CoroWrapperAttr.h>
+#include <multiplier/AST/CountedByAttr.h>
 #include <multiplier/AST/DLLExportAttr.h>
 #include <multiplier/AST/DLLExportStaticLocalAttr.h>
 #include <multiplier/AST/DLLImportAttr.h>
@@ -139,9 +149,11 @@
 #include <multiplier/AST/LockReturnedAttr.h>
 #include <multiplier/AST/LocksExcludedAttr.h>
 #include <multiplier/AST/M68kInterruptAttr.h>
+#include <multiplier/AST/M68kRTDAttr.h>
 #include <multiplier/AST/MIGServerRoutineAttr.h>
 #include <multiplier/AST/MSABIAttr.h>
 #include <multiplier/AST/MSAllocatorAttr.h>
+#include <multiplier/AST/MSConstexprAttr.h>
 #include <multiplier/AST/MSInheritanceAttr.h>
 #include <multiplier/AST/MSNoVTableAttr.h>
 #include <multiplier/AST/MSP430InterruptAttr.h>
@@ -234,6 +246,7 @@
 #include <multiplier/AST/PragmaClangRodataSectionAttr.h>
 #include <multiplier/AST/PragmaClangTextSectionAttr.h>
 #include <multiplier/AST/PreferredNameAttr.h>
+#include <multiplier/AST/PreferredTypeAttr.h>
 #include <multiplier/AST/PreserveAllAttr.h>
 #include <multiplier/AST/PreserveMostAttr.h>
 #include <multiplier/AST/PtGuardedByAttr.h>
@@ -266,6 +279,7 @@
 #include <multiplier/AST/StdCallAttr.h>
 #include <multiplier/AST/StrictFPAttr.h>
 #include <multiplier/AST/StrictGuardStackCheckAttr.h>
+#include <multiplier/AST/SuppressAttr.h>
 #include <multiplier/AST/SwiftAsyncAttr.h>
 #include <multiplier/AST/SwiftAsyncCallAttr.h>
 #include <multiplier/AST/SwiftAsyncContextAttr.h>
@@ -278,6 +292,8 @@
 #include <multiplier/AST/SwiftContextAttr.h>
 #include <multiplier/AST/SwiftErrorAttr.h>
 #include <multiplier/AST/SwiftErrorResultAttr.h>
+#include <multiplier/AST/SwiftImportAsNonGenericAttr.h>
+#include <multiplier/AST/SwiftImportPropertyAsAccessorsAttr.h>
 #include <multiplier/AST/SwiftIndirectResultAttr.h>
 #include <multiplier/AST/SwiftNameAttr.h>
 #include <multiplier/AST/SwiftNewTypeAttr.h>
@@ -340,9 +356,11 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     LockReturnedAttr::static_kind(),
     LocksExcludedAttr::static_kind(),
     M68kInterruptAttr::static_kind(),
+    M68kRTDAttr::static_kind(),
     MIGServerRoutineAttr::static_kind(),
     MSABIAttr::static_kind(),
     MSAllocatorAttr::static_kind(),
+    MSConstexprAttr::static_kind(),
     MSInheritanceAttr::static_kind(),
     MSNoVTableAttr::static_kind(),
     MSP430InterruptAttr::static_kind(),
@@ -429,6 +447,7 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     PragmaClangRodataSectionAttr::static_kind(),
     PragmaClangTextSectionAttr::static_kind(),
     PreferredNameAttr::static_kind(),
+    PreferredTypeAttr::static_kind(),
     PreserveAllAttr::static_kind(),
     PreserveMostAttr::static_kind(),
     PtGuardedByAttr::static_kind(),
@@ -469,6 +488,8 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     SwiftBridgedTypedefAttr::static_kind(),
     SwiftCallAttr::static_kind(),
     SwiftErrorAttr::static_kind(),
+    SwiftImportAsNonGenericAttr::static_kind(),
+    SwiftImportPropertyAsAccessorsAttr::static_kind(),
     SwiftNameAttr::static_kind(),
     SwiftNewTypeAttr::static_kind(),
     SwiftPrivateAttr::static_kind(),
@@ -535,6 +556,8 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     ArcWeakrefUnavailableAttr::static_kind(),
     ArgumentWithTypeTagAttr::static_kind(),
     ArmBuiltinAliasAttr::static_kind(),
+    ArmLocallyStreamingAttr::static_kind(),
+    ArmNewAttr::static_kind(),
     ArtificialAttr::static_kind(),
     AsmLabelAttr::static_kind(),
     AssertCapabilityAttr::static_kind(),
@@ -545,6 +568,7 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     AvailabilityAttr::static_kind(),
     AvailableOnlyInDefaultEvalMethodAttr::static_kind(),
     BPFPreserveAccessIndexAttr::static_kind(),
+    BPFPreserveStaticOffsetAttr::static_kind(),
     BTFDeclTagAttr::static_kind(),
     BlocksAttr::static_kind(),
     BuiltinAttr::static_kind(),
@@ -574,6 +598,7 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     CapturedRecordAttr::static_kind(),
     CleanupAttr::static_kind(),
     CmseNSEntryAttr::static_kind(),
+    CodeModelAttr::static_kind(),
     CodeSegAttr::static_kind(),
     ColdAttr::static_kind(),
     CommonAttr::static_kind(),
@@ -584,6 +609,12 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     ConsumableAutoCastAttr::static_kind(),
     ConsumableSetOnReadAttr::static_kind(),
     ConvergentAttr::static_kind(),
+    CoroDisableLifetimeBoundAttr::static_kind(),
+    CoroLifetimeBoundAttr::static_kind(),
+    CoroOnlyDestroyWhenCompleteAttr::static_kind(),
+    CoroReturnTypeAttr::static_kind(),
+    CoroWrapperAttr::static_kind(),
+    CountedByAttr::static_kind(),
     DLLExportAttr::static_kind(),
     DLLExportStaticLocalAttr::static_kind(),
     DLLImportAttr::static_kind(),
@@ -633,6 +664,7 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     CarriesDependencyAttr::static_kind(),
     NoInlineAttr::static_kind(),
     NoMergeAttr::static_kind(),
+    SuppressAttr::static_kind(),
     AlwaysInlineAttr::static_kind(),
     HLSLSV_DispatchThreadIDAttr::static_kind(),
     HLSLSV_GroupIndexAttr::static_kind(),
@@ -690,9 +722,11 @@ std::optional<InheritableAttr> InheritableAttr::from_base(const Attr &parent) {
     case LockReturnedAttr::static_kind():
     case LocksExcludedAttr::static_kind():
     case M68kInterruptAttr::static_kind():
+    case M68kRTDAttr::static_kind():
     case MIGServerRoutineAttr::static_kind():
     case MSABIAttr::static_kind():
     case MSAllocatorAttr::static_kind():
+    case MSConstexprAttr::static_kind():
     case MSInheritanceAttr::static_kind():
     case MSNoVTableAttr::static_kind():
     case MSP430InterruptAttr::static_kind():
@@ -779,6 +813,7 @@ std::optional<InheritableAttr> InheritableAttr::from_base(const Attr &parent) {
     case PragmaClangRodataSectionAttr::static_kind():
     case PragmaClangTextSectionAttr::static_kind():
     case PreferredNameAttr::static_kind():
+    case PreferredTypeAttr::static_kind():
     case PreserveAllAttr::static_kind():
     case PreserveMostAttr::static_kind():
     case PtGuardedByAttr::static_kind():
@@ -819,6 +854,8 @@ std::optional<InheritableAttr> InheritableAttr::from_base(const Attr &parent) {
     case SwiftBridgedTypedefAttr::static_kind():
     case SwiftCallAttr::static_kind():
     case SwiftErrorAttr::static_kind():
+    case SwiftImportAsNonGenericAttr::static_kind():
+    case SwiftImportPropertyAsAccessorsAttr::static_kind():
     case SwiftNameAttr::static_kind():
     case SwiftNewTypeAttr::static_kind():
     case SwiftPrivateAttr::static_kind():
@@ -885,6 +922,8 @@ std::optional<InheritableAttr> InheritableAttr::from_base(const Attr &parent) {
     case ArcWeakrefUnavailableAttr::static_kind():
     case ArgumentWithTypeTagAttr::static_kind():
     case ArmBuiltinAliasAttr::static_kind():
+    case ArmLocallyStreamingAttr::static_kind():
+    case ArmNewAttr::static_kind():
     case ArtificialAttr::static_kind():
     case AsmLabelAttr::static_kind():
     case AssertCapabilityAttr::static_kind():
@@ -895,6 +934,7 @@ std::optional<InheritableAttr> InheritableAttr::from_base(const Attr &parent) {
     case AvailabilityAttr::static_kind():
     case AvailableOnlyInDefaultEvalMethodAttr::static_kind():
     case BPFPreserveAccessIndexAttr::static_kind():
+    case BPFPreserveStaticOffsetAttr::static_kind():
     case BTFDeclTagAttr::static_kind():
     case BlocksAttr::static_kind():
     case BuiltinAttr::static_kind():
@@ -924,6 +964,7 @@ std::optional<InheritableAttr> InheritableAttr::from_base(const Attr &parent) {
     case CapturedRecordAttr::static_kind():
     case CleanupAttr::static_kind():
     case CmseNSEntryAttr::static_kind():
+    case CodeModelAttr::static_kind():
     case CodeSegAttr::static_kind():
     case ColdAttr::static_kind():
     case CommonAttr::static_kind():
@@ -934,6 +975,12 @@ std::optional<InheritableAttr> InheritableAttr::from_base(const Attr &parent) {
     case ConsumableAutoCastAttr::static_kind():
     case ConsumableSetOnReadAttr::static_kind():
     case ConvergentAttr::static_kind():
+    case CoroDisableLifetimeBoundAttr::static_kind():
+    case CoroLifetimeBoundAttr::static_kind():
+    case CoroOnlyDestroyWhenCompleteAttr::static_kind():
+    case CoroReturnTypeAttr::static_kind():
+    case CoroWrapperAttr::static_kind():
+    case CountedByAttr::static_kind():
     case DLLExportAttr::static_kind():
     case DLLExportStaticLocalAttr::static_kind():
     case DLLImportAttr::static_kind():
@@ -983,6 +1030,7 @@ std::optional<InheritableAttr> InheritableAttr::from_base(const Attr &parent) {
     case CarriesDependencyAttr::static_kind():
     case NoInlineAttr::static_kind():
     case NoMergeAttr::static_kind():
+    case SuppressAttr::static_kind():
     case AlwaysInlineAttr::static_kind():
     case HLSLSV_DispatchThreadIDAttr::static_kind():
     case HLSLSV_GroupIndexAttr::static_kind():

@@ -16,7 +16,7 @@ const char *EnumeratorName(DisableSanitizerInstrumentationAttrSpelling e) {
   switch (e) {
     case DisableSanitizerInstrumentationAttrSpelling::GNU_DISABLE_SANITIZER_INSTRUMENTATION: return "GNU_DISABLE_SANITIZER_INSTRUMENTATION";
     case DisableSanitizerInstrumentationAttrSpelling::CXX11_CLANG_DISABLE_SANITIZER_INSTRUMENTATION: return "CXX11_CLANG_DISABLE_SANITIZER_INSTRUMENTATION";
-    case DisableSanitizerInstrumentationAttrSpelling::C2X_CLANG_DISABLE_SANITIZER_INSTRUMENTATION: return "C2X_CLANG_DISABLE_SANITIZER_INSTRUMENTATION";
+    case DisableSanitizerInstrumentationAttrSpelling::C23_CLANG_DISABLE_SANITIZER_INSTRUMENTATION: return "C23_CLANG_DISABLE_SANITIZER_INSTRUMENTATION";
     case DisableSanitizerInstrumentationAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

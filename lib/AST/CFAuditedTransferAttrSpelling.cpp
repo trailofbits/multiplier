@@ -16,7 +16,7 @@ const char *EnumeratorName(CFAuditedTransferAttrSpelling e) {
   switch (e) {
     case CFAuditedTransferAttrSpelling::GNU_CF_AUDITED_TRANSFER: return "GNU_CF_AUDITED_TRANSFER";
     case CFAuditedTransferAttrSpelling::CXX11_CLANG_CF_AUDITED_TRANSFER: return "CXX11_CLANG_CF_AUDITED_TRANSFER";
-    case CFAuditedTransferAttrSpelling::C2X_CLANG_CF_AUDITED_TRANSFER: return "C2X_CLANG_CF_AUDITED_TRANSFER";
+    case CFAuditedTransferAttrSpelling::C23_CLANG_CF_AUDITED_TRANSFER: return "C23_CLANG_CF_AUDITED_TRANSFER";
     case CFAuditedTransferAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

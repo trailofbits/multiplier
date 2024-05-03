@@ -17,6 +17,7 @@ enum class OpenMPLinearClauseKind : unsigned char {
   VALUE,
   REFERENCE,
   UVAL,
+  STEP,
   UNKNOWN,
 };
 
@@ -25,7 +26,7 @@ inline static const char *EnumerationName(OpenMPLinearClauseKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(OpenMPLinearClauseKind) {
-  return 4;
+  return 5;
 }
 
 MX_EXPORT const char *EnumeratorName(OpenMPLinearClauseKind);

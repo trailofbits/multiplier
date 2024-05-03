@@ -74,6 +74,7 @@ class MX_EXPORT QualifiedType : public Type {
   bool is_referenceable(void) const;
   bool is_restrict_qualified(void) const;
   bool is_trivial_type(void) const;
+  bool is_trivially_copy_constructible_type(void) const;
   bool is_trivially_copyable_type(void) const;
   bool is_trivially_equality_comparable_type(void) const;
   bool is_trivially_relocatable_type(void) const;

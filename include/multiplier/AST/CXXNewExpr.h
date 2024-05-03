@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <multiplier/AST/CXXNewExprInitializationStyle.h>
+#include <multiplier/AST/CXXNewInitializationStyle.h>
 #include <multiplier/AST/Expr.h>
 
 namespace mx {
@@ -74,7 +74,7 @@ class MX_EXPORT CXXNewExpr : public Expr {
   std::optional<Expr> array_size(void) const;
   std::optional<CXXConstructExpr> construct_expression(void) const;
   TokenRange direct_initializer_range(void) const;
-  CXXNewExprInitializationStyle initialization_style(void) const;
+  CXXNewInitializationStyle initialization_style(void) const;
   std::optional<Expr> initializer(void) const;
   std::optional<FunctionDecl> operator_delete(void) const;
   std::optional<FunctionDecl> operator_new(void) const;

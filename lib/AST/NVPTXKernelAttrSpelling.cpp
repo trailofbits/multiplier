@@ -16,7 +16,7 @@ const char *EnumeratorName(NVPTXKernelAttrSpelling e) {
   switch (e) {
     case NVPTXKernelAttrSpelling::GNU_NVPTX_KERNEL: return "GNU_NVPTX_KERNEL";
     case NVPTXKernelAttrSpelling::CXX11_CLANG_NVPTX_KERNEL: return "CXX11_CLANG_NVPTX_KERNEL";
-    case NVPTXKernelAttrSpelling::C2X_CLANG_NVPTX_KERNEL: return "C2X_CLANG_NVPTX_KERNEL";
+    case NVPTXKernelAttrSpelling::C23_CLANG_NVPTX_KERNEL: return "C23_CLANG_NVPTX_KERNEL";
     case NVPTXKernelAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

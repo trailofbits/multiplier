@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[807]) || tp >= &(gTypes[836])) {
+  if (tp < &(gTypes[831]) || tp >= &(gTypes[860])) {
     return std::nullopt;
   }
 
@@ -90,103 +90,103 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::MacroSubstitution::static_kind():
-      tp = &(gTypes[808]);
-      break;
-
-    case mx::MacroConcatenate::static_kind():
-      tp = &(gTypes[809]);
-      break;
-
-    case mx::MacroStringify::static_kind():
-      tp = &(gTypes[810]);
-      break;
-
-    case mx::MacroExpansion::static_kind():
-      tp = &(gTypes[811]);
-      break;
-
-    case mx::MacroParameterSubstitution::static_kind():
-      tp = &(gTypes[812]);
-      break;
-
-    case mx::MacroVAOpt::static_kind():
-      tp = &(gTypes[813]);
-      break;
-
-    case mx::MacroVAOptArgument::static_kind():
-      tp = &(gTypes[814]);
-      break;
-
-    case mx::MacroArgument::static_kind():
-      tp = &(gTypes[815]);
-      break;
-
-    case mx::MacroParameter::static_kind():
-      tp = &(gTypes[816]);
-      break;
-
-    case mx::DefineMacroDirective::static_kind():
-      tp = &(gTypes[818]);
-      break;
-
-    case mx::PragmaMacroDirective::static_kind():
-      tp = &(gTypes[819]);
-      break;
-
-    case mx::UndefineMacroDirective::static_kind():
-      tp = &(gTypes[820]);
-      break;
-
-    case mx::OtherMacroDirective::static_kind():
-      tp = &(gTypes[821]);
-      break;
-
-    case mx::EndIfMacroDirective::static_kind():
-      tp = &(gTypes[823]);
-      break;
-
-    case mx::ElseMacroDirective::static_kind():
-      tp = &(gTypes[824]);
-      break;
-
-    case mx::ElseIfNotDefinedMacroDirective::static_kind():
-      tp = &(gTypes[825]);
-      break;
-
-    case mx::ElseIfDefinedMacroDirective::static_kind():
-      tp = &(gTypes[826]);
-      break;
-
-    case mx::ElseIfMacroDirective::static_kind():
-      tp = &(gTypes[827]);
-      break;
-
-    case mx::IfNotDefinedMacroDirective::static_kind():
-      tp = &(gTypes[828]);
-      break;
-
-    case mx::IfDefinedMacroDirective::static_kind():
-      tp = &(gTypes[829]);
-      break;
-
-    case mx::IfMacroDirective::static_kind():
-      tp = &(gTypes[830]);
-      break;
-
-    case mx::ImportMacroDirective::static_kind():
       tp = &(gTypes[832]);
       break;
 
-    case mx::IncludeMacrosMacroDirective::static_kind():
+    case mx::MacroConcatenate::static_kind():
       tp = &(gTypes[833]);
       break;
 
-    case mx::IncludeNextMacroDirective::static_kind():
+    case mx::MacroStringify::static_kind():
       tp = &(gTypes[834]);
       break;
 
-    case mx::IncludeMacroDirective::static_kind():
+    case mx::MacroExpansion::static_kind():
       tp = &(gTypes[835]);
+      break;
+
+    case mx::MacroParameterSubstitution::static_kind():
+      tp = &(gTypes[836]);
+      break;
+
+    case mx::MacroVAOpt::static_kind():
+      tp = &(gTypes[837]);
+      break;
+
+    case mx::MacroVAOptArgument::static_kind():
+      tp = &(gTypes[838]);
+      break;
+
+    case mx::MacroArgument::static_kind():
+      tp = &(gTypes[839]);
+      break;
+
+    case mx::MacroParameter::static_kind():
+      tp = &(gTypes[840]);
+      break;
+
+    case mx::DefineMacroDirective::static_kind():
+      tp = &(gTypes[842]);
+      break;
+
+    case mx::PragmaMacroDirective::static_kind():
+      tp = &(gTypes[843]);
+      break;
+
+    case mx::UndefineMacroDirective::static_kind():
+      tp = &(gTypes[844]);
+      break;
+
+    case mx::OtherMacroDirective::static_kind():
+      tp = &(gTypes[845]);
+      break;
+
+    case mx::EndIfMacroDirective::static_kind():
+      tp = &(gTypes[847]);
+      break;
+
+    case mx::ElseMacroDirective::static_kind():
+      tp = &(gTypes[848]);
+      break;
+
+    case mx::ElseIfNotDefinedMacroDirective::static_kind():
+      tp = &(gTypes[849]);
+      break;
+
+    case mx::ElseIfDefinedMacroDirective::static_kind():
+      tp = &(gTypes[850]);
+      break;
+
+    case mx::ElseIfMacroDirective::static_kind():
+      tp = &(gTypes[851]);
+      break;
+
+    case mx::IfNotDefinedMacroDirective::static_kind():
+      tp = &(gTypes[852]);
+      break;
+
+    case mx::IfDefinedMacroDirective::static_kind():
+      tp = &(gTypes[853]);
+      break;
+
+    case mx::IfMacroDirective::static_kind():
+      tp = &(gTypes[854]);
+      break;
+
+    case mx::ImportMacroDirective::static_kind():
+      tp = &(gTypes[856]);
+      break;
+
+    case mx::IncludeMacrosMacroDirective::static_kind():
+      tp = &(gTypes[857]);
+      break;
+
+    case mx::IncludeNextMacroDirective::static_kind():
+      tp = &(gTypes[858]);
+      break;
+
+    case mx::IncludeMacroDirective::static_kind():
+      tp = &(gTypes[859]);
       break;
 
   }
@@ -520,7 +520,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[807]);
+  PyTypeObject * const tp = &(gTypes[831]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

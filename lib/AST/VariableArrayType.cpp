@@ -110,15 +110,15 @@ TokenRange VariableArrayType::brackets_range(void) const {
 }
 
 Token VariableArrayType::l_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal60());
-}
-
-Token VariableArrayType::r_bracket_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
+Token VariableArrayType::r_bracket_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal62());
+}
+
 Expr VariableArrayType::size_expression(void) const {
-  RawEntityId eid = impl->reader.getVal63();
+  RawEntityId eid = impl->reader.getVal64();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

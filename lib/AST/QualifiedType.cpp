@@ -206,36 +206,40 @@ bool QualifiedType::is_trivial_type(void) const {
   return impl->reader.getVal50();
 }
 
-bool QualifiedType::is_trivially_copyable_type(void) const {
+bool QualifiedType::is_trivially_copy_constructible_type(void) const {
   return impl->reader.getVal51();
 }
 
-bool QualifiedType::is_trivially_equality_comparable_type(void) const {
+bool QualifiedType::is_trivially_copyable_type(void) const {
   return impl->reader.getVal52();
 }
 
-bool QualifiedType::is_trivially_relocatable_type(void) const {
+bool QualifiedType::is_trivially_equality_comparable_type(void) const {
   return impl->reader.getVal53();
 }
 
-bool QualifiedType::is_volatile_qualified(void) const {
+bool QualifiedType::is_trivially_relocatable_type(void) const {
   return impl->reader.getVal54();
 }
 
-bool QualifiedType::is_web_assembly_funcref_type(void) const {
+bool QualifiedType::is_volatile_qualified(void) const {
   return impl->reader.getVal55();
 }
 
-bool QualifiedType::is_web_assembly_reference_type(void) const {
+bool QualifiedType::is_web_assembly_funcref_type(void) const {
   return impl->reader.getVal56();
 }
 
-bool QualifiedType::may_be_dynamic_class(void) const {
+bool QualifiedType::is_web_assembly_reference_type(void) const {
   return impl->reader.getVal57();
 }
 
-bool QualifiedType::may_be_not_dynamic_class(void) const {
+bool QualifiedType::may_be_dynamic_class(void) const {
   return impl->reader.getVal58();
+}
+
+bool QualifiedType::may_be_not_dynamic_class(void) const {
+  return impl->reader.getVal59();
 }
 
 #pragma GCC diagnostic pop

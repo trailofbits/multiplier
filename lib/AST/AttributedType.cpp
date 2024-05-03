@@ -117,7 +117,7 @@ std::optional<Attr> AttributedType::attribute(void) const {
 }
 
 AttrKind AttributedType::attribute_kind(void) const {
-  return static_cast<AttrKind>(impl->reader.getVal68());
+  return static_cast<AttrKind>(impl->reader.getVal69());
 }
 
 Type AttributedType::equivalent_type(void) const {

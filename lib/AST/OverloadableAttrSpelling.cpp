@@ -16,7 +16,7 @@ const char *EnumeratorName(OverloadableAttrSpelling e) {
   switch (e) {
     case OverloadableAttrSpelling::GNU_OVERLOADABLE: return "GNU_OVERLOADABLE";
     case OverloadableAttrSpelling::CXX11_CLANG_OVERLOADABLE: return "CXX11_CLANG_OVERLOADABLE";
-    case OverloadableAttrSpelling::C2X_CLANG_OVERLOADABLE: return "C2X_CLANG_OVERLOADABLE";
+    case OverloadableAttrSpelling::C23_CLANG_OVERLOADABLE: return "C23_CLANG_OVERLOADABLE";
     case OverloadableAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

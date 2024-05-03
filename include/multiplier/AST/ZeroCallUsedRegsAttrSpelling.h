@@ -16,7 +16,7 @@ namespace mx {
 enum class ZeroCallUsedRegsAttrSpelling : unsigned char {
   GNU_ZERO_CALL_USED_REGS,
   CXX11_GNU_ZERO_CALL_USED_REGS,
-  C2X_GNU_ZERO_CALL_USED_REGS,
+  C23_GNU_ZERO_CALL_USED_REGS,
   SPELLING_NOT_CALCULATED,
 };
 

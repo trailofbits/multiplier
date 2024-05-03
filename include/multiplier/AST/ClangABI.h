@@ -23,6 +23,7 @@ enum class ClangABI : unsigned char {
   VER12,
   VER14,
   VER15,
+  VER17,
   LATEST,
 };
 
@@ -31,7 +32,7 @@ inline static const char *EnumerationName(ClangABI) {
 }
 
 inline static constexpr unsigned NumEnumerators(ClangABI) {
-  return 10;
+  return 11;
 }
 
 MX_EXPORT const char *EnumeratorName(ClangABI);

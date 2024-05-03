@@ -16,7 +16,7 @@ namespace mx {
 enum class NoReturnAttrSpelling : unsigned char {
   GNU_NORETURN,
   CXX11_GNU_NORETURN,
-  C2X_GNU_NORETURN,
+  C23_GNU_NORETURN,
   DECLSPEC_NORETURN,
   SPELLING_NOT_CALCULATED,
 };

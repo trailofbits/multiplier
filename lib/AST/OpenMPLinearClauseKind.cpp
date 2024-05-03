@@ -17,6 +17,7 @@ const char *EnumeratorName(OpenMPLinearClauseKind e) {
     case OpenMPLinearClauseKind::VALUE: return "VALUE";
     case OpenMPLinearClauseKind::REFERENCE: return "REFERENCE";
     case OpenMPLinearClauseKind::UVAL: return "UVAL";
+    case OpenMPLinearClauseKind::STEP: return "STEP";
     case OpenMPLinearClauseKind::UNKNOWN: return "UNKNOWN";
     default: return "<invalid>";
   }

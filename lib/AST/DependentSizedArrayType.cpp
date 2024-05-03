@@ -110,16 +110,16 @@ TokenRange DependentSizedArrayType::brackets_range(void) const {
 }
 
 Token DependentSizedArrayType::l_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal60());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
 Token DependentSizedArrayType::r_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal62());
 }
 
 std::optional<Expr> DependentSizedArrayType::size_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal63();
+    RawEntityId eid = impl->reader.getVal64();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

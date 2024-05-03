@@ -16,10 +16,10 @@ namespace mx {
 enum class MipsLongCallAttrSpelling : unsigned char {
   GNU_LONG_CALL,
   CXX11_GNU_LONG_CALL,
-  C2X_GNU_LONG_CALL,
+  C23_GNU_LONG_CALL,
   GNU_FAR,
   CXX11_GNU_FAR,
-  C2X_GNU_FAR,
+  C23_GNU_FAR,
   SPELLING_NOT_CALCULATED,
 };
 

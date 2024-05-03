@@ -33,7 +33,6 @@ class Operation(multiplier.ir.Operation):
     ...
 
 class CallArgsOp(multiplier.ir.abi.Operation):
-  results: Iterable[multiplier.ir.Result]
   body: multiplier.ir.Region
 
   @staticmethod
@@ -49,11 +48,9 @@ class CallArgsOp(multiplier.ir.abi.Operation):
     ...
 
 class CallExecutionOp(multiplier.ir.abi.Operation):
-  args: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
   body: multiplier.ir.Region
   callee: str
-  arg_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -68,10 +65,7 @@ class CallExecutionOp(multiplier.ir.abi.Operation):
     ...
 
 class CallOp(multiplier.ir.abi.Operation):
-  args: Iterable[multiplier.ir.Operand]
-  results: Iterable[multiplier.ir.Result]
   callee: str
-  arg_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -86,7 +80,6 @@ class CallOp(multiplier.ir.abi.Operation):
     ...
 
 class CallRetsOp(multiplier.ir.abi.Operation):
-  results: Iterable[multiplier.ir.Result]
   body: multiplier.ir.Region
 
   @staticmethod
@@ -102,8 +95,6 @@ class CallRetsOp(multiplier.ir.abi.Operation):
     ...
 
 class DirectOp(multiplier.ir.abi.Operation):
-  value: Iterable[multiplier.ir.Operand]
-  result: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -118,7 +109,6 @@ class DirectOp(multiplier.ir.abi.Operation):
     ...
 
 class EpilogueOp(multiplier.ir.abi.Operation):
-  results: Iterable[multiplier.ir.Result]
   body: multiplier.ir.Region
 
   @staticmethod
@@ -136,7 +126,6 @@ class EpilogueOp(multiplier.ir.abi.Operation):
 class FuncOp(multiplier.ir.abi.Operation):
   body: multiplier.ir.Region
   sym_name: str
-  sym_visibility: Optional[str]
   is_var_arg: bool
   is_declaration: bool
 
@@ -152,8 +141,23 @@ class FuncOp(multiplier.ir.abi.Operation):
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.abi.FuncOp]:
     ...
 
+class IndirectOp(multiplier.ir.abi.Operation):
+  value: multiplier.ir.Value
+  result: multiplier.ir.Value
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.abi.IndirectOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.abi.IndirectOp]:
+    ...
+
 class PrologueOp(multiplier.ir.abi.Operation):
-  results: Iterable[multiplier.ir.Result]
   body: multiplier.ir.Region
 
   @staticmethod
@@ -170,7 +174,6 @@ class PrologueOp(multiplier.ir.abi.Operation):
 
 class RetDirectOp(multiplier.ir.abi.Operation):
   value: multiplier.ir.Value
-  result: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -184,44 +187,7 @@ class RetDirectOp(multiplier.ir.abi.Operation):
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.abi.RetDirectOp]:
     ...
 
-class TodoOp(multiplier.ir.abi.Operation):
-  value: multiplier.ir.Value
-  result: Iterable[multiplier.ir.Result]
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.OperationKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.abi.TodoOp]:
-    ...
-
-  @staticmethod
-  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.abi.TodoOp]:
-    ...
-
-class WrapFuncOp(multiplier.ir.abi.Operation):
-  body: multiplier.ir.Region
-  sym_name: str
-  sym_visibility: Optional[str]
-  is_var_arg: bool
-  is_declaration: bool
-
-  @staticmethod
-  def static_kind() -> multiplier.ir.OperationKind:
-    ...
-
-  @staticmethod
-  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.abi.WrapFuncOp]:
-    ...
-
-  @staticmethod
-  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.abi.WrapFuncOp]:
-    ...
-
 class YieldOp(multiplier.ir.abi.Operation):
-  values: Iterable[multiplier.ir.Operand]
-  result: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

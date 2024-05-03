@@ -16,7 +16,7 @@ const char *EnumeratorName(NoProfileFunctionAttrSpelling e) {
   switch (e) {
     case NoProfileFunctionAttrSpelling::GNU_NO_PROFILE_INSTRUMENT_FUNCTION: return "GNU_NO_PROFILE_INSTRUMENT_FUNCTION";
     case NoProfileFunctionAttrSpelling::CXX11_GNU_NO_PROFILE_INSTRUMENT_FUNCTION: return "CXX11_GNU_NO_PROFILE_INSTRUMENT_FUNCTION";
-    case NoProfileFunctionAttrSpelling::C2X_GNU_NO_PROFILE_INSTRUMENT_FUNCTION: return "C2X_GNU_NO_PROFILE_INSTRUMENT_FUNCTION";
+    case NoProfileFunctionAttrSpelling::C23_GNU_NO_PROFILE_INSTRUMENT_FUNCTION: return "C23_GNU_NO_PROFILE_INSTRUMENT_FUNCTION";
     case NoProfileFunctionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -16,7 +16,7 @@ const char *EnumeratorName(NonNullAttrSpelling e) {
   switch (e) {
     case NonNullAttrSpelling::GNU_NONNULL: return "GNU_NONNULL";
     case NonNullAttrSpelling::CXX11_GNU_NONNULL: return "CXX11_GNU_NONNULL";
-    case NonNullAttrSpelling::C2X_GNU_NONNULL: return "C2X_GNU_NONNULL";
+    case NonNullAttrSpelling::C23_GNU_NONNULL: return "C23_GNU_NONNULL";
     case NonNullAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

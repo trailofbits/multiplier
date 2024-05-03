@@ -16,7 +16,7 @@ namespace mx {
 enum class ConstAttrSpelling : unsigned char {
   GNU_CONST,
   CXX11_GNU_CONST,
-  C2X_GNU_CONST,
+  C23_GNU_CONST,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -16,7 +16,7 @@ const char *EnumeratorName(ExcludeFromExplicitInstantiationAttrSpelling e) {
   switch (e) {
     case ExcludeFromExplicitInstantiationAttrSpelling::GNU_EXCLUDE_FROM_EXPLICIT_INSTANTIATION: return "GNU_EXCLUDE_FROM_EXPLICIT_INSTANTIATION";
     case ExcludeFromExplicitInstantiationAttrSpelling::CXX11_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION: return "CXX11_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION";
-    case ExcludeFromExplicitInstantiationAttrSpelling::C2X_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION: return "C2X_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION";
+    case ExcludeFromExplicitInstantiationAttrSpelling::C23_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION: return "C23_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION";
     case ExcludeFromExplicitInstantiationAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

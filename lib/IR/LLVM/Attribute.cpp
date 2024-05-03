@@ -40,37 +40,169 @@ std::optional<ComdatAttr> ComdatAttr::from(const ::mx::ir::Attribute &that) {
   return ::mlir::LLVM::ComdatAttr(this->::mx::ir::Attribute::attr_);
 }
 
-std::optional<AccessGroupAttr> AccessGroupAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_ACCESS_GROUP) {
-    return reinterpret_cast<const AccessGroupAttr &>(that);
+std::optional<LinkageAttr> LinkageAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_LINKAGE) {
+    return reinterpret_cast<const LinkageAttr &>(that);
   }
   return std::nullopt;
 }
 
-::mlir::LLVM::AccessGroupAttr AccessGroupAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::AccessGroupAttr(this->::mx::ir::Attribute::attr_);
+::mlir::LLVM::LinkageAttr LinkageAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::LinkageAttr(this->::mx::ir::Attribute::attr_);
 }
 
-std::optional<AliasScopeAttr> AliasScopeAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_ALIAS_SCOPE) {
-    return reinterpret_cast<const AliasScopeAttr &>(that);
+std::optional<FramePointerKindAttr> FramePointerKindAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_FRAME_POINTER_KIND) {
+    return reinterpret_cast<const FramePointerKindAttr &>(that);
   }
   return std::nullopt;
 }
 
-::mlir::LLVM::AliasScopeAttr AliasScopeAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::AliasScopeAttr(this->::mx::ir::Attribute::attr_);
+::mlir::LLVM::FramePointerKindAttr FramePointerKindAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::FramePointerKindAttr(this->::mx::ir::Attribute::attr_);
 }
 
-std::optional<AliasScopeDomainAttr> AliasScopeDomainAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_ALIAS_SCOPE_DOMAIN) {
-    return reinterpret_cast<const AliasScopeDomainAttr &>(that);
+std::optional<LoopVectorizeAttr> LoopVectorizeAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_LOOP_VECTORIZE) {
+    return reinterpret_cast<const LoopVectorizeAttr &>(that);
   }
   return std::nullopt;
 }
 
-::mlir::LLVM::AliasScopeDomainAttr AliasScopeDomainAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::AliasScopeDomainAttr(this->::mx::ir::Attribute::attr_);
+::mlir::LLVM::LoopVectorizeAttr LoopVectorizeAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::LoopVectorizeAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<LoopInterleaveAttr> LoopInterleaveAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_LOOP_INTERLEAVE) {
+    return reinterpret_cast<const LoopInterleaveAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::LoopInterleaveAttr LoopInterleaveAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::LoopInterleaveAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<LoopUnrollAttr> LoopUnrollAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_LOOP_UNROLL) {
+    return reinterpret_cast<const LoopUnrollAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::LoopUnrollAttr LoopUnrollAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::LoopUnrollAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<LoopUnrollAndJamAttr> LoopUnrollAndJamAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_LOOP_UNROLL_AND_JAM) {
+    return reinterpret_cast<const LoopUnrollAndJamAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::LoopUnrollAndJamAttr LoopUnrollAndJamAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::LoopUnrollAndJamAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<LoopLICMAttr> LoopLICMAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_LOOP_LICM) {
+    return reinterpret_cast<const LoopLICMAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::LoopLICMAttr LoopLICMAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::LoopLICMAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<LoopDistributeAttr> LoopDistributeAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_LOOP_DISTRIBUTE) {
+    return reinterpret_cast<const LoopDistributeAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::LoopDistributeAttr LoopDistributeAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::LoopDistributeAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<LoopPipelineAttr> LoopPipelineAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_LOOP_PIPELINE) {
+    return reinterpret_cast<const LoopPipelineAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::LoopPipelineAttr LoopPipelineAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::LoopPipelineAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<LoopPeeledAttr> LoopPeeledAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_LOOP_PEELED) {
+    return reinterpret_cast<const LoopPeeledAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::LoopPeeledAttr LoopPeeledAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::LoopPeeledAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<LoopUnswitchAttr> LoopUnswitchAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_LOOP_UNSWITCH) {
+    return reinterpret_cast<const LoopUnswitchAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::LoopUnswitchAttr LoopUnswitchAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::LoopUnswitchAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<LoopAnnotationAttr> LoopAnnotationAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_LOOP_ANNOTATION) {
+    return reinterpret_cast<const LoopAnnotationAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::LoopAnnotationAttr LoopAnnotationAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::LoopAnnotationAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<DIExpressionElemAttr> DIExpressionElemAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_DI_EXPRESSION_ELEM) {
+    return reinterpret_cast<const DIExpressionElemAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::DIExpressionElemAttr DIExpressionElemAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::DIExpressionElemAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<DIExpressionAttr> DIExpressionAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_DI_EXPRESSION) {
+    return reinterpret_cast<const DIExpressionAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::DIExpressionAttr DIExpressionAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::DIExpressionAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<DINullTypeAttr> DINullTypeAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_DI_NULL_TYPE) {
+    return reinterpret_cast<const DINullTypeAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::DINullTypeAttr DINullTypeAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::DINullTypeAttr(this->::mx::ir::Attribute::attr_);
 }
 
 std::optional<DIBasicTypeAttr> DIBasicTypeAttr::from(const ::mx::ir::Attribute &that) {
@@ -168,15 +300,36 @@ std::optional<DIFileAttr> DIFileAttr::from(const ::mx::ir::Attribute &that) {
   return ::mlir::LLVM::DIFileAttr(this->::mx::ir::Attribute::attr_);
 }
 
-std::optional<DILabelAttr> DILabelAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_DI_LABEL) {
-    return reinterpret_cast<const DILabelAttr &>(that);
+std::optional<DIGlobalVariableExpressionAttr> DIGlobalVariableExpressionAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_DI_GLOBAL_VARIABLE_EXPRESSION) {
+    return reinterpret_cast<const DIGlobalVariableExpressionAttr &>(that);
   }
   return std::nullopt;
 }
 
-::mlir::LLVM::DILabelAttr DILabelAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::DILabelAttr(this->::mx::ir::Attribute::attr_);
+::mlir::LLVM::DIGlobalVariableExpressionAttr DIGlobalVariableExpressionAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::DIGlobalVariableExpressionAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<DIGlobalVariableAttr> DIGlobalVariableAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_DI_GLOBAL_VARIABLE) {
+    return reinterpret_cast<const DIGlobalVariableAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::DIGlobalVariableAttr DIGlobalVariableAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::DIGlobalVariableAttr(this->::mx::ir::Attribute::attr_);
+}
+
+bool DIGlobalVariableAttr::is_local_to_unit(void) const {
+  auto val = underlying_repr().getIsLocalToUnit();
+  return val;
+}
+
+bool DIGlobalVariableAttr::is_defined(void) const {
+  auto val = underlying_repr().getIsDefined();
+  return val;
 }
 
 std::optional<DILexicalBlockAttr> DILexicalBlockAttr::from(const ::mx::ir::Attribute &that) {
@@ -212,6 +365,33 @@ std::optional<DILocalVariableAttr> DILocalVariableAttr::from(const ::mx::ir::Att
   return ::mlir::LLVM::DILocalVariableAttr(this->::mx::ir::Attribute::attr_);
 }
 
+std::optional<DISubprogramAttr> DISubprogramAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_DI_SUBPROGRAM) {
+    return reinterpret_cast<const DISubprogramAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::DISubprogramAttr DISubprogramAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::DISubprogramAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<DIModuleAttr> DIModuleAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_DI_MODULE) {
+    return reinterpret_cast<const DIModuleAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::DIModuleAttr DIModuleAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::DIModuleAttr(this->::mx::ir::Attribute::attr_);
+}
+
+bool DIModuleAttr::is_decl(void) const {
+  auto val = underlying_repr().getIsDecl();
+  return val;
+}
+
 std::optional<DINamespaceAttr> DINamespaceAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::LLVM_DI_NAMESPACE) {
     return reinterpret_cast<const DINamespaceAttr &>(that);
@@ -226,28 +406,6 @@ std::optional<DINamespaceAttr> DINamespaceAttr::from(const ::mx::ir::Attribute &
 bool DINamespaceAttr::export_symbols(void) const {
   auto val = underlying_repr().getExportSymbols();
   return val;
-}
-
-std::optional<DINullTypeAttr> DINullTypeAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_DI_NULL_TYPE) {
-    return reinterpret_cast<const DINullTypeAttr &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::LLVM::DINullTypeAttr DINullTypeAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::DINullTypeAttr(this->::mx::ir::Attribute::attr_);
-}
-
-std::optional<DISubprogramAttr> DISubprogramAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_DI_SUBPROGRAM) {
-    return reinterpret_cast<const DISubprogramAttr &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::LLVM::DISubprogramAttr DISubprogramAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::DISubprogramAttr(this->::mx::ir::Attribute::attr_);
 }
 
 std::optional<DISubrangeAttr> DISubrangeAttr::from(const ::mx::ir::Attribute &that) {
@@ -272,15 +430,15 @@ std::optional<DISubroutineTypeAttr> DISubroutineTypeAttr::from(const ::mx::ir::A
   return ::mlir::LLVM::DISubroutineTypeAttr(this->::mx::ir::Attribute::attr_);
 }
 
-std::optional<FastmathFlagsAttr> FastmathFlagsAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_FASTMATH_FLAGS) {
-    return reinterpret_cast<const FastmathFlagsAttr &>(that);
+std::optional<DILabelAttr> DILabelAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_DI_LABEL) {
+    return reinterpret_cast<const DILabelAttr &>(that);
   }
   return std::nullopt;
 }
 
-::mlir::LLVM::FastmathFlagsAttr FastmathFlagsAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::FastmathFlagsAttr(this->::mx::ir::Attribute::attr_);
+::mlir::LLVM::DILabelAttr DILabelAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::DILabelAttr(this->::mx::ir::Attribute::attr_);
 }
 
 std::optional<MemoryEffectsAttr> MemoryEffectsAttr::from(const ::mx::ir::Attribute &that) {
@@ -299,20 +457,37 @@ bool MemoryEffectsAttr::is_read_write(void) const {
   return val;
 }
 
-std::optional<TBAAMemberAttr> TBAAMemberAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_TBAA_MEMBER) {
-    return reinterpret_cast<const TBAAMemberAttr &>(that);
+std::optional<AliasScopeDomainAttr> AliasScopeDomainAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_ALIAS_SCOPE_DOMAIN) {
+    return reinterpret_cast<const AliasScopeDomainAttr &>(that);
   }
   return std::nullopt;
 }
 
-::mlir::LLVM::TBAAMemberAttr TBAAMemberAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::TBAAMemberAttr(this->::mx::ir::Attribute::attr_);
+::mlir::LLVM::AliasScopeDomainAttr AliasScopeDomainAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::AliasScopeDomainAttr(this->::mx::ir::Attribute::attr_);
 }
 
-int64_t TBAAMemberAttr::offset(void) const {
-  auto val = underlying_repr().getOffset();
-  return val;
+std::optional<AliasScopeAttr> AliasScopeAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_ALIAS_SCOPE) {
+    return reinterpret_cast<const AliasScopeAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::AliasScopeAttr AliasScopeAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::AliasScopeAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<AccessGroupAttr> AccessGroupAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_ACCESS_GROUP) {
+    return reinterpret_cast<const AccessGroupAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::LLVM::AccessGroupAttr AccessGroupAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::AccessGroupAttr(this->::mx::ir::Attribute::attr_);
 }
 
 std::optional<TBAARootAttr> TBAARootAttr::from(const ::mx::ir::Attribute &that) {
@@ -326,24 +501,19 @@ std::optional<TBAARootAttr> TBAARootAttr::from(const ::mx::ir::Attribute &that) 
   return ::mlir::LLVM::TBAARootAttr(this->::mx::ir::Attribute::attr_);
 }
 
-std::optional<TBAATagAttr> TBAATagAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_TBAA_TAG) {
-    return reinterpret_cast<const TBAATagAttr &>(that);
+std::optional<TBAAMemberAttr> TBAAMemberAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_TBAA_MEMBER) {
+    return reinterpret_cast<const TBAAMemberAttr &>(that);
   }
   return std::nullopt;
 }
 
-::mlir::LLVM::TBAATagAttr TBAATagAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::TBAATagAttr(this->::mx::ir::Attribute::attr_);
+::mlir::LLVM::TBAAMemberAttr TBAAMemberAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::TBAAMemberAttr(this->::mx::ir::Attribute::attr_);
 }
 
-int64_t TBAATagAttr::offset(void) const {
+int64_t TBAAMemberAttr::offset(void) const {
   auto val = underlying_repr().getOffset();
-  return val;
-}
-
-bool TBAATagAttr::constant(void) const {
-  auto val = underlying_repr().getConstant();
   return val;
 }
 
@@ -367,125 +537,79 @@ std::string_view TBAATypeDescriptorAttr::id(void) const {
   }
 }
 
-std::optional<LinkageAttr> LinkageAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_LINKAGE) {
-    return reinterpret_cast<const LinkageAttr &>(that);
+std::optional<TBAATagAttr> TBAATagAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_TBAA_TAG) {
+    return reinterpret_cast<const TBAATagAttr &>(that);
   }
   return std::nullopt;
 }
 
-::mlir::LLVM::LinkageAttr LinkageAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::LinkageAttr(this->::mx::ir::Attribute::attr_);
+::mlir::LLVM::TBAATagAttr TBAATagAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::TBAATagAttr(this->::mx::ir::Attribute::attr_);
 }
 
-std::optional<LoopAnnotationAttr> LoopAnnotationAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_LOOP_ANNOTATION) {
-    return reinterpret_cast<const LoopAnnotationAttr &>(that);
+int64_t TBAATagAttr::offset(void) const {
+  auto val = underlying_repr().getOffset();
+  return val;
+}
+
+bool TBAATagAttr::constant(void) const {
+  auto val = underlying_repr().getConstant();
+  return val;
+}
+
+std::optional<VScaleRangeAttr> VScaleRangeAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_V_SCALE_RANGE) {
+    return reinterpret_cast<const VScaleRangeAttr &>(that);
   }
   return std::nullopt;
 }
 
-::mlir::LLVM::LoopAnnotationAttr LoopAnnotationAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::LoopAnnotationAttr(this->::mx::ir::Attribute::attr_);
+::mlir::LLVM::VScaleRangeAttr VScaleRangeAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::VScaleRangeAttr(this->::mx::ir::Attribute::attr_);
 }
 
-std::optional<LoopDistributeAttr> LoopDistributeAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_LOOP_DISTRIBUTE) {
-    return reinterpret_cast<const LoopDistributeAttr &>(that);
+std::optional<TargetFeaturesAttr> TargetFeaturesAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_TARGET_FEATURES) {
+    return reinterpret_cast<const TargetFeaturesAttr &>(that);
   }
   return std::nullopt;
 }
 
-::mlir::LLVM::LoopDistributeAttr LoopDistributeAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::LoopDistributeAttr(this->::mx::ir::Attribute::attr_);
+::mlir::LLVM::TargetFeaturesAttr TargetFeaturesAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::TargetFeaturesAttr(this->::mx::ir::Attribute::attr_);
 }
 
-std::optional<LoopInterleaveAttr> LoopInterleaveAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_LOOP_INTERLEAVE) {
-    return reinterpret_cast<const LoopInterleaveAttr &>(that);
+bool TargetFeaturesAttr::null_or_empty(void) const {
+  auto val = underlying_repr().nullOrEmpty();
+  return val;
+}
+
+std::string TargetFeaturesAttr::features_string(void) const {
+  auto val = underlying_repr().getFeaturesString();
+  return val;
+}
+
+std::optional<IntegerOverflowFlagsAttr> IntegerOverflowFlagsAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_INTEGER_OVERFLOW_FLAGS) {
+    return reinterpret_cast<const IntegerOverflowFlagsAttr &>(that);
   }
   return std::nullopt;
 }
 
-::mlir::LLVM::LoopInterleaveAttr LoopInterleaveAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::LoopInterleaveAttr(this->::mx::ir::Attribute::attr_);
+::mlir::LLVM::IntegerOverflowFlagsAttr IntegerOverflowFlagsAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::IntegerOverflowFlagsAttr(this->::mx::ir::Attribute::attr_);
 }
 
-std::optional<LoopLICMAttr> LoopLICMAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_LOOP_LICM) {
-    return reinterpret_cast<const LoopLICMAttr &>(that);
+std::optional<FastmathFlagsAttr> FastmathFlagsAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::LLVM_FASTMATH_FLAGS) {
+    return reinterpret_cast<const FastmathFlagsAttr &>(that);
   }
   return std::nullopt;
 }
 
-::mlir::LLVM::LoopLICMAttr LoopLICMAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::LoopLICMAttr(this->::mx::ir::Attribute::attr_);
-}
-
-std::optional<LoopPeeledAttr> LoopPeeledAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_LOOP_PEELED) {
-    return reinterpret_cast<const LoopPeeledAttr &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::LLVM::LoopPeeledAttr LoopPeeledAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::LoopPeeledAttr(this->::mx::ir::Attribute::attr_);
-}
-
-std::optional<LoopPipelineAttr> LoopPipelineAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_LOOP_PIPELINE) {
-    return reinterpret_cast<const LoopPipelineAttr &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::LLVM::LoopPipelineAttr LoopPipelineAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::LoopPipelineAttr(this->::mx::ir::Attribute::attr_);
-}
-
-std::optional<LoopUnrollAndJamAttr> LoopUnrollAndJamAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_LOOP_UNROLL_AND_JAM) {
-    return reinterpret_cast<const LoopUnrollAndJamAttr &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::LLVM::LoopUnrollAndJamAttr LoopUnrollAndJamAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::LoopUnrollAndJamAttr(this->::mx::ir::Attribute::attr_);
-}
-
-std::optional<LoopUnrollAttr> LoopUnrollAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_LOOP_UNROLL) {
-    return reinterpret_cast<const LoopUnrollAttr &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::LLVM::LoopUnrollAttr LoopUnrollAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::LoopUnrollAttr(this->::mx::ir::Attribute::attr_);
-}
-
-std::optional<LoopUnswitchAttr> LoopUnswitchAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_LOOP_UNSWITCH) {
-    return reinterpret_cast<const LoopUnswitchAttr &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::LLVM::LoopUnswitchAttr LoopUnswitchAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::LoopUnswitchAttr(this->::mx::ir::Attribute::attr_);
-}
-
-std::optional<LoopVectorizeAttr> LoopVectorizeAttr::from(const ::mx::ir::Attribute &that) {
-  if (that.kind() == AttributeKind::LLVM_LOOP_VECTORIZE) {
-    return reinterpret_cast<const LoopVectorizeAttr &>(that);
-  }
-  return std::nullopt;
-}
-
-::mlir::LLVM::LoopVectorizeAttr LoopVectorizeAttr::underlying_repr(void) const noexcept {
-  return ::mlir::LLVM::LoopVectorizeAttr(this->::mx::ir::Attribute::attr_);
+::mlir::LLVM::FastmathFlagsAttr FastmathFlagsAttr::underlying_repr(void) const noexcept {
+  return ::mlir::LLVM::FastmathFlagsAttr(this->::mx::ir::Attribute::attr_);
 }
 
 }  // namespace mx::ir::llvm

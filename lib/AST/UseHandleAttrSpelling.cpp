@@ -16,7 +16,7 @@ const char *EnumeratorName(UseHandleAttrSpelling e) {
   switch (e) {
     case UseHandleAttrSpelling::GNU_USE_HANDLE: return "GNU_USE_HANDLE";
     case UseHandleAttrSpelling::CXX11_CLANG_USE_HANDLE: return "CXX11_CLANG_USE_HANDLE";
-    case UseHandleAttrSpelling::C2X_CLANG_USE_HANDLE: return "C2X_CLANG_USE_HANDLE";
+    case UseHandleAttrSpelling::C23_CLANG_USE_HANDLE: return "C23_CLANG_USE_HANDLE";
     case UseHandleAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

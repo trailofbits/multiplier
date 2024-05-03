@@ -77,6 +77,7 @@ class MX_EXPORT ParmVarDecl : public VarDecl {
 
   std::optional<Expr> default_argument(void) const;
   TokenRange default_argument_range(void) const;
+  Token explicit_object_parameter_this_token(void) const;
   DeclObjCDeclQualifier obj_c_decl_qualifier(void) const;
   Type original_type(void) const;
   std::optional<Expr> uninstantiated_default_argument(void) const;
@@ -85,6 +86,7 @@ class MX_EXPORT ParmVarDecl : public VarDecl {
   bool has_uninstantiated_default_argument(void) const;
   bool has_unparsed_default_argument(void) const;
   bool is_destroyed_in_callee(void) const;
+  bool is_explicit_object_parameter(void) const;
   bool is_knr_promoted(void) const;
   bool is_obj_c_method_parameter(void) const;
 };

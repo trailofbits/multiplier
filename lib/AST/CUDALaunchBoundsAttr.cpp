@@ -125,13 +125,18 @@ std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from(const TokenContex
   return std::nullopt;
 }
 
-Expr CUDALaunchBoundsAttr::max_threads(void) const {
+Expr CUDALaunchBoundsAttr::max_blocks(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
+Expr CUDALaunchBoundsAttr::max_threads(void) const {
+  RawEntityId eid = impl->reader.getVal20();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+}
+
 Expr CUDALaunchBoundsAttr::min_blocks(void) const {
-  RawEntityId eid = impl->reader.getVal16();
+  RawEntityId eid = impl->reader.getVal23();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

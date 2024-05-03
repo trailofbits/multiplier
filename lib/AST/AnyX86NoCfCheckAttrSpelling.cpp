@@ -16,7 +16,7 @@ const char *EnumeratorName(AnyX86NoCfCheckAttrSpelling e) {
   switch (e) {
     case AnyX86NoCfCheckAttrSpelling::GNU_NOCF_CHECK: return "GNU_NOCF_CHECK";
     case AnyX86NoCfCheckAttrSpelling::CXX11_GNU_NOCF_CHECK: return "CXX11_GNU_NOCF_CHECK";
-    case AnyX86NoCfCheckAttrSpelling::C2X_GNU_NOCF_CHECK: return "C2X_GNU_NOCF_CHECK";
+    case AnyX86NoCfCheckAttrSpelling::C23_GNU_NOCF_CHECK: return "C23_GNU_NOCF_CHECK";
     case AnyX86NoCfCheckAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

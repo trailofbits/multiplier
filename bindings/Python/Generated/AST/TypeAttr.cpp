@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[10]) || tp >= &(gTypes[38])) {
+  if (tp < &(gTypes[10]) || tp >= &(gTypes[44])) {
     return std::nullopt;
   }
 
@@ -145,56 +145,80 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       tp = &(gTypes[24]);
       break;
 
-    case mx::HLSLGroupSharedAddressSpaceAttr::static_kind():
+    case mx::HLSLParamModifierAttr::static_kind():
       tp = &(gTypes[25]);
       break;
 
-    case mx::CmseNSCallAttr::static_kind():
+    case mx::HLSLGroupSharedAddressSpaceAttr::static_kind():
       tp = &(gTypes[26]);
       break;
 
-    case mx::BTFTypeTagAttr::static_kind():
+    case mx::CmseNSCallAttr::static_kind():
       tp = &(gTypes[27]);
       break;
 
-    case mx::ArmStreamingAttr::static_kind():
+    case mx::BTFTypeTagAttr::static_kind():
       tp = &(gTypes[28]);
       break;
 
-    case mx::ArmMveStrictPolymorphismAttr::static_kind():
+    case mx::ArmStreamingCompatibleAttr::static_kind():
       tp = &(gTypes[29]);
       break;
 
-    case mx::AnnotateTypeAttr::static_kind():
+    case mx::ArmStreamingAttr::static_kind():
       tp = &(gTypes[30]);
       break;
 
-    case mx::AddressSpaceAttr::static_kind():
+    case mx::ArmPreservesAttr::static_kind():
       tp = &(gTypes[31]);
       break;
 
-    case mx::WebAssemblyFuncrefAttr::static_kind():
+    case mx::ArmOutAttr::static_kind():
       tp = &(gTypes[32]);
       break;
 
-    case mx::UPtrAttr::static_kind():
+    case mx::ArmMveStrictPolymorphismAttr::static_kind():
       tp = &(gTypes[33]);
       break;
 
-    case mx::TypeNullableResultAttr::static_kind():
+    case mx::ArmInOutAttr::static_kind():
       tp = &(gTypes[34]);
       break;
 
-    case mx::TypeNullableAttr::static_kind():
+    case mx::ArmInAttr::static_kind():
       tp = &(gTypes[35]);
       break;
 
-    case mx::TypeNullUnspecifiedAttr::static_kind():
+    case mx::AnnotateTypeAttr::static_kind():
       tp = &(gTypes[36]);
       break;
 
-    case mx::TypeNonNullAttr::static_kind():
+    case mx::AddressSpaceAttr::static_kind():
       tp = &(gTypes[37]);
+      break;
+
+    case mx::WebAssemblyFuncrefAttr::static_kind():
+      tp = &(gTypes[38]);
+      break;
+
+    case mx::UPtrAttr::static_kind():
+      tp = &(gTypes[39]);
+      break;
+
+    case mx::TypeNullableResultAttr::static_kind():
+      tp = &(gTypes[40]);
+      break;
+
+    case mx::TypeNullableAttr::static_kind():
+      tp = &(gTypes[41]);
+      break;
+
+    case mx::TypeNullUnspecifiedAttr::static_kind():
+      tp = &(gTypes[42]);
+      break;
+
+    case mx::TypeNonNullAttr::static_kind():
+      tp = &(gTypes[43]);
       break;
 
   }

@@ -16,7 +16,7 @@ namespace mx {
 enum class NoThrowAttrSpelling : unsigned char {
   GNU_NOTHROW,
   CXX11_GNU_NOTHROW,
-  C2X_GNU_NOTHROW,
+  C23_GNU_NOTHROW,
   DECLSPEC_NOTHROW,
   SPELLING_NOT_CALCULATED,
 };

@@ -263,7 +263,7 @@ bool ObjCPropertyRefExpr::is_object_receiver(void) const {
 }
 
 bool ObjCPropertyRefExpr::is_super_receiver(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal90();
 }
 
 #pragma GCC diagnostic pop

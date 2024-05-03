@@ -221,25 +221,25 @@ std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const TokenContext &t
 }
 
 Token UsingDirectiveDecl::identifier_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
-}
-
-Token UsingDirectiveDecl::namespace_key_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
+Token UsingDirectiveDecl::namespace_key_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
+}
+
 NamespaceDecl UsingDirectiveDecl::nominated_namespace(void) const {
-  RawEntityId eid = impl->reader.getVal57();
+  RawEntityId eid = impl->reader.getVal58();
   return NamespaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 NamedDecl UsingDirectiveDecl::nominated_namespace_as_written(void) const {
-  RawEntityId eid = impl->reader.getVal65();
+  RawEntityId eid = impl->reader.getVal66();
   return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token UsingDirectiveDecl::using_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal67());
 }
 
 #pragma GCC diagnostic pop

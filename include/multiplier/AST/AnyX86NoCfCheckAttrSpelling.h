@@ -16,7 +16,7 @@ namespace mx {
 enum class AnyX86NoCfCheckAttrSpelling : unsigned char {
   GNU_NOCF_CHECK,
   CXX11_GNU_NOCF_CHECK,
-  C2X_GNU_NOCF_CHECK,
+  C23_GNU_NOCF_CHECK,
   SPELLING_NOT_CALCULATED,
 };
 

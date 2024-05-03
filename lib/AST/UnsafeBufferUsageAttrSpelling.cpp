@@ -16,7 +16,7 @@ const char *EnumeratorName(UnsafeBufferUsageAttrSpelling e) {
   switch (e) {
     case UnsafeBufferUsageAttrSpelling::GNU_UNSAFE_BUFFER_USAGE: return "GNU_UNSAFE_BUFFER_USAGE";
     case UnsafeBufferUsageAttrSpelling::CXX11_CLANG_UNSAFE_BUFFER_USAGE: return "CXX11_CLANG_UNSAFE_BUFFER_USAGE";
-    case UnsafeBufferUsageAttrSpelling::C2X_CLANG_UNSAFE_BUFFER_USAGE: return "C2X_CLANG_UNSAFE_BUFFER_USAGE";
+    case UnsafeBufferUsageAttrSpelling::C23_CLANG_UNSAFE_BUFFER_USAGE: return "C23_CLANG_UNSAFE_BUFFER_USAGE";
     case UnsafeBufferUsageAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

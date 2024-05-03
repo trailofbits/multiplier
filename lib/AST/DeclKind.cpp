@@ -25,7 +25,6 @@ const char *EnumeratorName(DeclKind e) {
     case DeclKind::CXX_METHOD: return "CXX_METHOD";
     case DeclKind::CXX_RECORD: return "CXX_RECORD";
     case DeclKind::CAPTURED: return "CAPTURED";
-    case DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION: return "CLASS_SCOPE_FUNCTION_SPECIALIZATION";
     case DeclKind::CLASS_TEMPLATE: return "CLASS_TEMPLATE";
     case DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION: return "CLASS_TEMPLATE_PARTIAL_SPECIALIZATION";
     case DeclKind::CLASS_TEMPLATE_SPECIALIZATION: return "CLASS_TEMPLATE_SPECIALIZATION";
