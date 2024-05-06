@@ -193,13 +193,14 @@ class EntityProvider {
   // Generate references to `raw_id` as a tuple of `from_id`, `context_id`, and
   // `kind_id`. Internally, this will handle redeclarations.
   virtual gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
-  References(const Ptr &, RawEntityId eid, ReferenceDirection direction) & = 0;
+  References(const Ptr &, RawEntityId eid, ReferenceDirection direction,
+             bool get_redecls=true) & = 0;
 
   // Generate references to `raw_id` as a tuple of `from_id` and `context_id`.
   // Internally, this will handle redeclarations.
   virtual gap::generator<std::pair<RawEntityId, RawEntityId>>
   SpecificReferences(const Ptr &, RawEntityId eid, RawEntityId kind_id,
-                     ReferenceDirection direction) & = 0;
+                     ReferenceDirection direction, bool get_redecls=true) & = 0;
 
   // Find the entity ids matching the name
   virtual gap::generator<RawEntityId> FindSymbol(

@@ -222,7 +222,7 @@ std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const TokenContex
 gap::generator<Decl> RequiresExprBodyDecl::contained_declarations(void) const & {
   return BuiltinDeclReferences<Decl>(
       impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
-      EntityProvider::kReferenceFrom);
+      EntityProvider::kReferenceFrom, false  /* redecls */);
 }
 
 #pragma GCC diagnostic pop

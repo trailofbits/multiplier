@@ -222,7 +222,7 @@ std::optional<ExternCContextDecl> ExternCContextDecl::from(const TokenContext &t
 gap::generator<Decl> ExternCContextDecl::contained_declarations(void) const & {
   return BuiltinDeclReferences<Decl>(
       impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
-      EntityProvider::kReferenceFrom);
+      EntityProvider::kReferenceFrom, false  /* redecls */);
 }
 
 #pragma GCC diagnostic pop

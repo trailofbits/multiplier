@@ -231,7 +231,7 @@ Expr OMPDeclareMapperDecl::mapper_variable_reference(void) const {
 gap::generator<Decl> OMPDeclareMapperDecl::contained_declarations(void) const & {
   return BuiltinDeclReferences<Decl>(
       impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
-      EntityProvider::kReferenceFrom);
+      EntityProvider::kReferenceFrom, false  /* redecls */);
 }
 
 #pragma GCC diagnostic pop

@@ -36,12 +36,13 @@ gap::generator<Reference> References(EntityProviderPtr ep, RawEntityId raw_id);
 template <typename Derived>
 static gap::generator<Derived> BuiltinDeclReferences(
     EntityProvider::Ptr ep, RawEntityId id, BuiltinReferenceKind kind_id,
-    EntityProvider::ReferenceDirection direction) {
+    EntityProvider::ReferenceDirection direction, bool get_redecls=true) {
 
   const auto kKindId = static_cast<RawEntityId>(kind_id);
 
   for (auto [to_id, context_id] : ep->SpecificReferences(ep, id, kKindId,
-                                                         direction)) {
+                                                         direction,
+                                                         get_redecls)) {
 
     auto decl_id = EntityId(to_id).Extract<DeclId>();
     if (!decl_id) {

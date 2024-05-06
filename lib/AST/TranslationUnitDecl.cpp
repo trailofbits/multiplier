@@ -222,7 +222,7 @@ std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const TokenContext 
 gap::generator<Decl> TranslationUnitDecl::contained_declarations(void) const & {
   return BuiltinDeclReferences<Decl>(
       impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
-      EntityProvider::kReferenceFrom);
+      EntityProvider::kReferenceFrom, false  /* redecls */);
 }
 
 #pragma GCC diagnostic pop

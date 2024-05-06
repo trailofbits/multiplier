@@ -52,11 +52,11 @@ class InvalidEntityProvider final : public EntityProvider {
                     RawEntityId) final;
 
   gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
-  References(const Ptr &, RawEntityId eid, ReferenceDirection) & final;
+  References(const Ptr &, RawEntityId eid, ReferenceDirection, bool) & final;
 
   gap::generator<std::pair<RawEntityId, RawEntityId>>
   SpecificReferences(const Ptr &, RawEntityId eid, RawEntityId kind_id,
-                     ReferenceDirection direction) & final;
+                     ReferenceDirection direction, bool get_redecls) & final;
 
   gap::generator<RawEntityId> FindSymbol(const Ptr &, std::string name) & final;
 

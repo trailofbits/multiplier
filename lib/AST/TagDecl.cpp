@@ -355,7 +355,7 @@ gap::generator<TemplateParameterList> TagDecl::template_parameter_lists(void) co
 gap::generator<Decl> TagDecl::contained_declarations(void) const & {
   return BuiltinDeclReferences<Decl>(
       impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
-      EntityProvider::kReferenceFrom);
+      EntityProvider::kReferenceFrom, false  /* redecls */);
 }
 
 #pragma GCC diagnostic pop

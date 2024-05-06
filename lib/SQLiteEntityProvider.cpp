@@ -677,7 +677,7 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
 gap::generator<std::pair<RawEntityId, RawEntityId>>
 SQLiteEntityProvider::SpecificReferences(
     const Ptr &self, RawEntityId raw_id, RawEntityId kind_id,
-    EntityProvider::ReferenceDirection dir) & {
+    EntityProvider::ReferenceDirection dir, bool get_redecls) & {
 
   ImplPtr context = impl.Lock();
   sqlite::Statement &get_references = (dir == EntityProvider::kReferenceTo ?
@@ -690,17 +690,21 @@ SQLiteEntityProvider::SpecificReferences(
 
   // First, read the redeclarations for whatever this entity is.
   RawEntityIdList redecl_ids;
-  do {
-    for (RawEntityId raw_redecl_id : self->Redeclarations(self, raw_id)) {
-      redecl_ids.push_back(raw_redecl_id);
-    }
-  } while (false);
+  if (get_redecls) {
+    do {
+      for (RawEntityId raw_redecl_id : self->Redeclarations(self, raw_id)) {
+        redecl_ids.push_back(raw_redecl_id);
+      }
+    } while (false);
 
-  // Sanity check the redeclarations.
-  if (std::find(redecl_ids.begin(), redecl_ids.end(), raw_id) ==
-      redecl_ids.end()) {
-    assert(false);
-    co_return;
+    // Sanity check the redeclarations.
+    if (std::find(redecl_ids.begin(), redecl_ids.end(), raw_id) ==
+        redecl_ids.end()) {
+      assert(false);
+      co_return;
+    }
+  } else {
+    redecl_ids.push_back(raw_id);
   }
 
   // NOTE(pag): SQLite doesn't understand unsigned integers. When it sees our
@@ -777,7 +781,8 @@ SQLiteEntityProvider::SpecificReferences(
 // `kind_id`. Internally, this will handle redeclarations.
 gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
 SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id,
-                                 EntityProvider::ReferenceDirection dir) & {
+                                 EntityProvider::ReferenceDirection dir,
+                                 bool get_redecls) & {
 
   ImplPtr context = impl.Lock();
   sqlite::Statement &get_references = (dir == EntityProvider::kReferenceTo ?
@@ -790,17 +795,21 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id,
 
   // First, read the redeclarations for whatever this entity is.
   RawEntityIdList redecl_ids;
-  do {
-    for (RawEntityId raw_redecl_id : self->Redeclarations(self, raw_id)) {
-      redecl_ids.push_back(raw_redecl_id);
-    }
-  } while (false);
+  if (get_redecls) {
+    do {
+      for (RawEntityId raw_redecl_id : self->Redeclarations(self, raw_id)) {
+        redecl_ids.push_back(raw_redecl_id);
+      }
+    } while (false);
 
-  // Sanity check the redeclarations.
-  if (std::find(redecl_ids.begin(), redecl_ids.end(), raw_id) ==
-      redecl_ids.end()) {
-    assert(false);
-    co_return;
+    // Sanity check the redeclarations.
+    if (std::find(redecl_ids.begin(), redecl_ids.end(), raw_id) ==
+        redecl_ids.end()) {
+      assert(false);
+      co_return;
+    }
+  } else {
+    redecl_ids.push_back(raw_id);
   }
 
   // NOTE(pag): SQLite doesn't understand unsigned integers. When it sees our

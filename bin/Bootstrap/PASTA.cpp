@@ -3747,7 +3747,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "(void) const & {\n"
           << "  return BuiltinDeclReferences<Decl>(\n"
           << "      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,\n"
-          << "      EntityProvider::kReferenceFrom);\n"
+          << "      EntityProvider::kReferenceFrom, false  /* redecls */);\n"
           << "}\n\n";
     }
   }
