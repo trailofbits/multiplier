@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/CXXDeductionGuideDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/CXXConstructorDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/DeclaratorDecl.h>

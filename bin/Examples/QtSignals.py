@@ -252,7 +252,7 @@ def find_qobject_connect(index: mx.Index, seen: Set[int]) -> Iterable[mx.ast.CXX
 
         # Go through all declarations in the class body. We want to see methods and function templates, as most
         # definitions of `connect` are actually method templates.
-        for decl in ent.declarations_in_context:
+        for decl in ent.contained_declarations:
             if not isinstance(decl, mx.ast.NamedDecl) or decl.name != "connect":
                 continue
 

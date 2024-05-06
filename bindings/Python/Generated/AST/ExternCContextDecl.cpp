@@ -154,6 +154,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ExternCContextDecl::redeclarations"),
     nullptr,
   },
+  {
+    "contained_declarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::contained_declarations);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExternCContextDecl::contained_declarations"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

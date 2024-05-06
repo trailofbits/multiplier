@@ -643,6 +643,7 @@ bool IsOutOfLine(const pasta::Decl &decl) {
 // if `decl` isn't a declaration context.
 bool ShouldInternalizeDeclContextIntoFragment(const pasta::Decl &decl) {
   switch (decl.Kind()) {
+    case pasta::DeclKind::kExport:
     case pasta::DeclKind::kExternCContext:
     case pasta::DeclKind::kLinkageSpec:
     case pasta::DeclKind::kNamespace:

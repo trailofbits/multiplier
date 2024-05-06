@@ -183,7 +183,10 @@ class EntityProvider {
       const Ptr &, RawEntityId eid) & = 0;
 
   enum ReferenceDirection {
+    // Constrain the `to_entity_id` to be within a redeclaration ID set.
     kReferenceTo,
+
+    // Constraint the `from_entity_id` to be within a redeclaration ID set.
     kReferenceFrom
   };
 
@@ -191,6 +194,12 @@ class EntityProvider {
   // `kind_id`. Internally, this will handle redeclarations.
   virtual gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
   References(const Ptr &, RawEntityId eid, ReferenceDirection direction) & = 0;
+
+  // Generate references to `raw_id` as a tuple of `from_id` and `context_id`.
+  // Internally, this will handle redeclarations.
+  virtual gap::generator<std::pair<RawEntityId, RawEntityId>>
+  SpecificReferences(const Ptr &, RawEntityId eid, RawEntityId kind_id,
+                     ReferenceDirection direction) & = 0;
 
   // Find the entity ids matching the name
   virtual gap::generator<RawEntityId> FindSymbol(

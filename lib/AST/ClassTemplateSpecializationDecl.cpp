@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/ClassTemplateSpecializationDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/CXXRecordDecl.h>
 #include <multiplier/AST/ClassTemplateDecl.h>
 #include <multiplier/AST/Decl.h>

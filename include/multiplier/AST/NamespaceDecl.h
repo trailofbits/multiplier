@@ -14,6 +14,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class Reference;
 class Decl;
 class NamedDecl;
 class NamespaceDecl;
@@ -72,6 +73,7 @@ class MX_EXPORT NamespaceDecl : public NamedDecl {
   bool is_inline(void) const;
   bool is_nested(void) const;
   bool is_original_namespace(void) const;
+  gap::generator<Decl> contained_declarations(void) const &;
 };
 
 static_assert(sizeof(NamespaceDecl) == sizeof(NamedDecl));

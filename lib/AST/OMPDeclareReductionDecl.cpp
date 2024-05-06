@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/OMPDeclareReductionDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Expr.h>
 #include <multiplier/AST/NamedDecl.h>
@@ -255,14 +256,10 @@ OMPDeclareReductionInitKind OMPDeclareReductionDecl::initializer_kind(void) cons
   return static_cast<OMPDeclareReductionInitKind>(impl->reader.getVal81());
 }
 
-gap::generator<Decl> OMPDeclareReductionDecl::declarations_in_context(void) const & {
-  EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal51();
-  for (auto v : list) {
-    if (auto eptr = ep->DeclFor(ep, v)) {
-      co_yield std::move(eptr);
-    }
-  }
+gap::generator<Decl> OMPDeclareReductionDecl::contained_declarations(void) const & {
+  return BuiltinDeclReferences<Decl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
+      EntityProvider::kReferenceFrom);
 }
 
 #pragma GCC diagnostic pop

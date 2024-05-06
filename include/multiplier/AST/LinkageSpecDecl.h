@@ -15,6 +15,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class Reference;
 class Decl;
 class LinkageSpecDecl;
 class Stmt;
@@ -68,6 +69,7 @@ class MX_EXPORT LinkageSpecDecl : public Decl {
   LinkageSpecLanguageIDs language(void) const;
   Token r_brace_token(void) const;
   bool has_braces(void) const;
+  gap::generator<Decl> contained_declarations(void) const &;
 };
 
 static_assert(sizeof(LinkageSpecDecl) == sizeof(Decl));

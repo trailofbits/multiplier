@@ -15,6 +15,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class Reference;
 class Decl;
 class Expr;
 class NamedDecl;
@@ -76,7 +77,7 @@ class MX_EXPORT OMPDeclareReductionDecl : public ValueDecl {
   Expr initializer_private(void) const;
   Expr initializer(void) const;
   OMPDeclareReductionInitKind initializer_kind(void) const;
-  gap::generator<Decl> declarations_in_context(void) const &;
+  gap::generator<Decl> contained_declarations(void) const &;
 };
 
 static_assert(sizeof(OMPDeclareReductionDecl) == sizeof(ValueDecl));

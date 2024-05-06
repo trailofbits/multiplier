@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/LinkageSpecDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
@@ -232,6 +233,12 @@ Token LinkageSpecDecl::r_brace_token(void) const {
 
 bool LinkageSpecDecl::has_braces(void) const {
   return impl->reader.getVal50();
+}
+
+gap::generator<Decl> LinkageSpecDecl::contained_declarations(void) const & {
+  return BuiltinDeclReferences<Decl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
+      EntityProvider::kReferenceFrom);
 }
 
 #pragma GCC diagnostic pop

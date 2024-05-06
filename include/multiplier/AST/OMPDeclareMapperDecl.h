@@ -14,6 +14,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class Reference;
 class Decl;
 class Expr;
 class NamedDecl;
@@ -71,7 +72,7 @@ class MX_EXPORT OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   static std::optional<OMPDeclareMapperDecl> from(const TokenContext &t);
 
   Expr mapper_variable_reference(void) const;
-  gap::generator<Decl> declarations_in_context(void) const &;
+  gap::generator<Decl> contained_declarations(void) const &;
 };
 
 static_assert(sizeof(OMPDeclareMapperDecl) == sizeof(OMPDeclarativeDirectiveValueDecl));

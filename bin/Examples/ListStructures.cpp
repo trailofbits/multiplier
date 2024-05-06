@@ -38,7 +38,7 @@ static void PrintStructures(mx::Index index) {
 
     std::cout << '\n';
 
-    for (const mx::Decl &decl : tag.declarations_in_context()) {
+    for (const mx::Decl &decl : tag.contained_declarations()) {
       if (auto field = mx::NamedDecl::from(decl)) {
         std::cout << "\t\t" << field->id() << '\t' << field->name();
         if (FLAGS_show_locations && file) {

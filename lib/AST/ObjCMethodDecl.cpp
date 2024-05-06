@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/ObjCMethodDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/ImplicitParamDecl.h>
 #include <multiplier/AST/NamedDecl.h>
@@ -414,14 +415,10 @@ gap::generator<Token> ObjCMethodDecl::selector_tokens(void) const & {
   co_return;
 }
 
-gap::generator<Decl> ObjCMethodDecl::declarations_in_context(void) const & {
-  EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal62();
-  for (auto v : list) {
-    if (auto eptr = ep->DeclFor(ep, v)) {
-      co_yield std::move(eptr);
-    }
-  }
+gap::generator<Decl> ObjCMethodDecl::contained_declarations(void) const & {
+  return BuiltinDeclReferences<Decl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
+      EntityProvider::kReferenceFrom);
 }
 
 #pragma GCC diagnostic pop

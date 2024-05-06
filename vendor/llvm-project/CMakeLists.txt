@@ -84,7 +84,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DLLVM_INCLUDE_TOOLS:BOOL=ON
                         -DLLVM_INSTALL_UTILS:BOOL=ON
                         -DLLVM_ENABLE_ZSTD:BOOL=ON
-                        "zstd_DIR=${zstd_DIR}"
+                        "-Dzstd_DIR=${zstd_DIR}"
                         "${src_dir}/llvm"
                WORKING_DIRECTORY "${build_dir}")
 

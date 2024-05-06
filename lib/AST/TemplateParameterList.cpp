@@ -7,7 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/TemplateParameterList.h>
-#include <multiplier/Reference.h>
+#include "../Reference.h"
 #include <multiplier/AST/Expr.h>
 #include <multiplier/Frontend/File.h>
 #include <multiplier/AST/NamedDecl.h>

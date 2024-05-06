@@ -57574,7 +57574,7 @@ class CapturedDecl(multiplier.ast.Decl):
   is_nothrow: bool
   num_parameters: int
   parameters: Iterable[multiplier.ast.ImplicitParamDecl]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -57685,7 +57685,7 @@ class BlockDecl(multiplier.ast.Decl):
   parameters: Iterable[multiplier.ast.ParmVarDecl]
   num_parameter_declarations: int
   parameter_declarations: Iterable[multiplier.ast.ParmVarDecl]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -58252,7 +58252,7 @@ class TranslationUnitDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.TranslationUnitDecl
   definition: Optional[multiplier.ast.TranslationUnitDecl]
   redeclarations: Iterable[multiplier.ast.TranslationUnitDecl]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -58535,7 +58535,7 @@ class RequiresExprBodyDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.RequiresExprBodyDecl
   definition: Optional[multiplier.ast.RequiresExprBodyDecl]
   redeclarations: Iterable[multiplier.ast.RequiresExprBodyDecl]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -59875,7 +59875,7 @@ class OMPDeclareReductionDecl(multiplier.ast.ValueDecl):
   initializer_private: multiplier.ast.Expr
   initializer: multiplier.ast.Expr
   initializer_kind: multiplier.ast.OMPDeclareReductionInitKind
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -61359,7 +61359,7 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
   parameters: Iterable[multiplier.ast.ParmVarDecl]
   uses_seh_try: bool
   body: Optional[multiplier.ast.Stmt]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
   callers: Iterable[multiplier.ast.Stmt]
 
   @overload
@@ -62437,7 +62437,7 @@ class OMPDeclareMapperDecl(multiplier.ast.OMPDeclarativeDirectiveValueDecl):
   definition: Optional[multiplier.ast.OMPDeclareMapperDecl]
   redeclarations: Iterable[multiplier.ast.OMPDeclareMapperDecl]
   mapper_variable_reference: multiplier.ast.Expr
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -63219,7 +63219,7 @@ class TagDecl(multiplier.ast.TypeDecl):
   may_have_out_of_date_definition: bool
   num_template_parameter_lists: int
   template_parameter_lists: Iterable[multiplier.ast.TemplateParameterList]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -65419,7 +65419,7 @@ class ObjCMethodDecl(multiplier.ast.NamedDecl):
   parameters: Iterable[multiplier.ast.ParmVarDecl]
   num_selector_tokens: int
   selector_tokens: Iterable[multiplier.frontend.Token]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -65532,7 +65532,7 @@ class ObjCContainerDecl(multiplier.ast.NamedDecl):
   methods: Iterable[multiplier.ast.ObjCMethodDecl]
   num_properties: int
   properties: Iterable[multiplier.ast.ObjCPropertyDecl]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -66402,6 +66402,7 @@ class NamespaceDecl(multiplier.ast.NamedDecl):
   is_inline: bool
   is_nested: bool
   is_original_namespace: bool
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -66595,6 +66596,7 @@ class LinkageSpecDecl(multiplier.ast.Decl):
   language: multiplier.ast.LinkageSpecLanguageIDs
   r_brace_token: multiplier.frontend.Token
   has_braces: bool
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -67273,6 +67275,7 @@ class ExternCContextDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.ExternCContextDecl
   definition: Optional[multiplier.ast.ExternCContextDecl]
   redeclarations: Iterable[multiplier.ast.ExternCContextDecl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -67368,7 +67371,7 @@ class ExportDecl(multiplier.ast.Decl):
   export_token: multiplier.frontend.Token
   r_brace_token: multiplier.frontend.Token
   has_braces: bool
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod

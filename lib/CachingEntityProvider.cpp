@@ -188,6 +188,13 @@ CachingEntityProvider::References(
   return next->References(self, eid, direction);
 }
 
+gap::generator<std::pair<RawEntityId, RawEntityId>>
+CachingEntityProvider::SpecificReferences(
+    const Ptr &self, RawEntityId eid, RawEntityId kind_id,
+    EntityProvider::ReferenceDirection direction) & {
+  return next->SpecificReferences(self, eid, kind_id, direction);
+}
+
 gap::generator<RawEntityId> CachingEntityProvider::FindSymbol(
     const Ptr &self, std::string name) & {
   return next->FindSymbol(self, std::move(name));

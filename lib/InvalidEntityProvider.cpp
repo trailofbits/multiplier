@@ -76,6 +76,13 @@ InvalidEntityProvider::References(const Ptr &, RawEntityId,
   co_return;
 }
 
+gap::generator<std::pair<RawEntityId, RawEntityId>>
+InvalidEntityProvider::SpecificReferences(
+    const Ptr &, RawEntityId, RawEntityId,
+    EntityProvider::ReferenceDirection) & {
+  co_return;
+}
+
 gap::generator<RawEntityId> InvalidEntityProvider::FindSymbol(
     const Ptr &, std::string) & {
   co_return;

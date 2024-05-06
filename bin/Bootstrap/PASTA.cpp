@@ -112,13 +112,6 @@ static const std::unordered_set<std::string> gUnserializableTypes{
   "TranslationUnitDecl",
 };
 
-// These are replicated into fragments.
-static const std::unordered_set<std::string> gSpecialDeclContexts{
-  "NamespaceDecl",
-  "ExternCContextDecl",
-  "LinkageSpecDecl",
-};
-
 static const std::unordered_set<std::string> gFragmentEntityTypes{
 #define FRAG_ENT_TYPE(type_name, lower_name) #type_name ,
   FOR_EACH_ENTITY_CATEGORY(FRAG_ENT_TYPE)
@@ -254,6 +247,17 @@ static const std::unordered_set<std::string> kDeclContextTypes{
   "RequiresExprBodyDecl",
   "TagDecl",
   "TranslationUnitDecl",
+};
+
+// These are replicated into fragments.
+//
+// NOTE(pag): Make sure to keep up-to-date with `bin/Index/Util.cpp` function
+//            `ShouldInternalizeDeclContextIntoFragment`.
+static const std::unordered_set<std::string> gSpecialDeclContexts{
+  "NamespaceDecl",
+  "ExternCContextDecl",
+  "LinkageSpecDecl",
+  "ExportDecl",
 };
 
 static const std::unordered_set<std::string> gConcreteClassNames{
@@ -711,9 +715,8 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "Access"},
   {"Expr","IsKnownToHaveBooleanValue"},
 
-  {"NamespaceDecl","AlreadyLoadedDeclarations"},
-  {"LinkageSpecDecl","AlreadyLoadedDeclarations"},
-  {"ExternCContextDecl","AlreadyLoadedDeclarations"},
+  {"Decl","AlreadyLoadedDeclarations"},
+  {"Decl","DeclarationsInContext"},
 
   {"EnumDecl", "ODRHash"},
   {"CXXRecordDecl", "ODRHash"},
@@ -3698,49 +3701,37 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   // If this is a `DeclContext`, then try to add the `DeclarationsInContext`
   // method.
-  if (kDeclContextTypes.count(class_name) &&
-      !gSpecialDeclContexts.count(class_name)) {
-    static const std::string method_name = "DeclarationsInContext";
-    static const std::string snake_name = "declarations_in_context";
+  if (kDeclContextTypes.count(class_name)) {
+    needs_reference = true;
+
+    static const std::string snake_name = "contained_declarations";
     static const std::string api_name = SnakeCaseToAPICase(snake_name);
     if (seen_methods->emplace(api_name).second) {
 
       const auto i = storage.AddMethod("List(UInt64)");
       auto [getter_name, setter_name, init_name] = NamesFor(i);
 
-//      static const std::string camel_name = "declarationsInContext";
-
-      serialize_inc_os
-          << "  MX_VISIT_DECL_CONTEXT(" << class_name << ", " << api_name
-          << ", " << i << ", MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, "
-          << nth_entity_reader << ")\n";
+      // NOTE(pag): This method is implemented in terms of a dynamic lookup of
+      //            but we still have this here so that `BuildPendingFragment`
+      //            goes and discovers more stuff to serialize.
+      if (!gSpecialDeclContexts.count(class_name)) {
+        serialize_inc_os
+            << "  MX_VISIT_DECL_CONTEXT(" << class_name << ", " << api_name
+            << ", " << i << ", MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, "
+            << nth_entity_reader << ")\n";
+      }
 
       class_os
-          << "  gap::generator<Decl> " << api_name << "(void) const &;\n";
+          << "  gap::generator<Decl> contained_declarations(void) const &;\n";
 
       lib_cpp_os
           << "gap::generator<Decl> "
           << class_name << "::" << api_name
           << "(void) const & {\n"
-          << "  EntityProviderPtr ep = impl->ep;\n"
-          << "  auto list = impl->reader." << getter_name << "();\n"
-          << "  for (auto v : list) {\n"
-          << "    if (auto eptr = ep->DeclFor(ep, v)) {\n"
-          << "      co_yield std::move(eptr);\n"
-          << "    }\n"
-          << "  }\n"
+          << "  return BuiltinDeclReferences<Decl>(\n"
+          << "      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,\n"
+          << "      EntityProvider::kReferenceFrom);\n"
           << "}\n\n";
-
-      serialize_cpp_os
-          << "  pasta::DeclContext dc" << i << "(e);\n"
-          << "  auto v" << i << " = DeclarationsInDeclContext(dc" << i << ");\n"
-          << "  auto sv" << i << " = b." << init_name << "(static_cast<unsigned>(v"
-          << i << ".size()));\n"
-          << "  auto i" << i << " = 0u;\n"
-          << "  for (const pasta::Decl &e" << i << " : v" << i << ") {\n"
-          << "    sv" << i << ".set(i" << i << ", es.EntityId(e" << i << "));\n"
-          << "    ++i" << i << ";\n"
-          << "  }\n";
     }
   }
 
@@ -4180,7 +4171,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
         << "#include <multiplier/" << dir_name << '/' << name << ".h>\n";
 
     if (needs_reference) {
-      fs << "#include <multiplier/Reference.h>\n";
+      fs << "#include \"../Reference.h\"\n";
     }
 
     auto needs_fragment = is_root;

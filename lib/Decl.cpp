@@ -44,6 +44,7 @@ SpecificEntityId<DeclId> Decl::id(void) const {
   return eid;
 }
 
+// Get the definition of a declaration.
 std::optional<Decl> Decl::definition(void) const {
   const EntityProviderPtr &ep = impl->ep;
 
@@ -105,6 +106,9 @@ std::optional<Decl> Decl::definition(void) const {
   return std::nullopt;
 }
 
+// Get the canonical declaration. This is the declaration with the minimum-
+// valued ID, where all definition IDs are less than all declaration IDs, and
+// so preference is given to definition IDs.
 Decl Decl::canonical_declaration(void) const {
   const EntityProviderPtr &ep = impl->ep;
 
@@ -193,12 +197,9 @@ gap::generator<Stmt> FunctionDecl::callers(void) const & {
   auto ep = impl->ep;
   auto is_constructor = kind() == DeclKind::CXX_CONSTRUCTOR;
 
-  for (auto [from_id, context_id, kind_id] :
-        ep->References(ep, id().Pack(), EntityProvider::kReferenceTo)) {
-
-    if (kCallerKindId != kind_id) {
-      continue;
-    }
+  for (auto [from_id, context_id] : ep->SpecificReferences(
+                                        ep, id().Pack(), kCallerKindId,
+                                        EntityProvider::kReferenceTo)) {
 
     // The `context_id` should point to a `CallExpr`.
     if (auto context_stmt_id = EntityId(context_id).Extract<StmtId>()) {
@@ -257,63 +258,15 @@ gap::generator<Stmt> FunctionDecl::callers(void) const & {
 }
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::base_classes(void) const & {
-  static constexpr auto kExtendsKindId =
-      static_cast<RawEntityId>(BuiltinReferenceKind::EXTENDS);
-
-  auto ep = impl->ep;
-  for (auto [to_id, context_id, kind_id] :
-        ep->References(ep, id().Pack(), EntityProvider::kReferenceFrom)) {
-
-    if (kExtendsKindId != kind_id) {
-      continue;
-    }
-
-    auto decl_id = EntityId(to_id).Extract<DeclId>();
-    if (!decl_id) {
-      continue;
-    }
-
-    auto eptr = ep->DeclFor(ep, to_id);
-    if (!eptr) {
-      assert(false);
-      continue;
-    }
-
-    Decl cls_ref(std::move(eptr));
-    if (auto record = CXXRecordDecl::from(cls_ref)) {
-      co_yield std::move(record.value());
-    }
-  }
+  return BuiltinDeclReferences<CXXRecordDecl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::EXTENDS,
+      EntityProvider::kReferenceFrom);
 }
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::derived_classes(void) const & {
-  static constexpr auto kExtendsKindId =
-      static_cast<RawEntityId>(BuiltinReferenceKind::EXTENDS);
-
-  auto ep = impl->ep;
-  for (auto [from_id, context_id, kind_id] :
-        ep->References(ep, id().Pack(), EntityProvider::kReferenceTo)) {
-
-    if (kExtendsKindId != kind_id) {
-      continue;
-    }
-
-    auto decl_id = EntityId(from_id).Extract<DeclId>();
-    if (!decl_id) {
-      continue;
-    }
-
-    auto eptr = ep->DeclFor(ep, from_id);
-    if (!eptr) {
-      assert(false);
-      continue;
-    }
-
-    Decl cls_ref(std::move(eptr));
-    if (auto record = CXXRecordDecl::from(cls_ref)) {
-      co_yield std::move(record.value());
-    }
-  }
+  return BuiltinDeclReferences<CXXRecordDecl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::EXTENDS,
+      EntityProvider::kReferenceTo);
 }
 
 gap::generator<CXXMethodDecl> CXXRecordDecl::methods(void) const & {
@@ -323,42 +276,9 @@ gap::generator<CXXMethodDecl> CXXRecordDecl::methods(void) const & {
 
 gap::generator<CXXMethodDecl>
 CXXMethodDecl::overridden_by_methods(void) const & {
-  static constexpr auto kOverridesKindId =
-      static_cast<RawEntityId>(BuiltinReferenceKind::OVERRIDES);
-
-  auto ep = impl->ep;
-  for (auto [from_id, context_id, kind_id] :
-        ep->References(ep, id().Pack(), EntityProvider::kReferenceTo)) {
-
-    if (kOverridesKindId != kind_id) {
-      continue;
-    }
-
-    auto decl_id = EntityId(from_id).Extract<DeclId>();
-    if (!decl_id) {
-      continue;
-    }
-
-    switch (decl_id->kind) {
-      case mx::DeclKind::CXX_CONVERSION:
-      case mx::DeclKind::CXX_CONSTRUCTOR:
-      case mx::DeclKind::CXX_DEDUCTION_GUIDE:
-      case mx::DeclKind::CXX_DESTRUCTOR:
-      case mx::DeclKind::CXX_METHOD:
-        break;
-      default:
-        continue;
-    }
-
-    auto eptr = ep->DeclFor(ep, from_id);
-    if (!eptr) {
-      assert(false);
-      continue;
-    }
-
-    Decl method_ref(std::move(eptr));
-    co_yield std::move(reinterpret_cast<CXXMethodDecl &>(method_ref));
-  }
+  return BuiltinDeclReferences<CXXMethodDecl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::OVERRIDES,
+      EntityProvider::kReferenceTo);
 }
 
 gap::generator<CXXMethodDecl>
@@ -372,12 +292,9 @@ CXXMethodDecl::transitive_overridden_by_methods(void) const & {
 
   auto ep = impl->ep;
   for (auto i = 0u; i < found_ids.size(); ++i) {
-    for (auto [from_id, context_id, kind_id] :
-        ep->References(ep, found_ids[i], EntityProvider::kReferenceTo)) {
-
-      if (kOverridesKindId != kind_id) {
-        continue;
-      }
+    for (auto [from_id, context_id] : ep->SpecificReferences(
+                                          ep, found_ids[i], kOverridesKindId,
+                                          EntityProvider::kReferenceTo)) {
 
       auto decl_id = EntityId(from_id).Extract<DeclId>();
       if (!decl_id) {
@@ -414,9 +331,6 @@ CXXMethodDecl::transitive_overridden_by_methods(void) const & {
 }
 
 gap::generator<Decl> Decl::specializations(void) const & {
-    static constexpr auto kSpecializesKindId =
-      static_cast<RawEntityId>(BuiltinReferenceKind::SPECIALIZES);
-
   // If `this` is a pattern, then go and get the entity ID for the template.
   auto self_id = id().Pack();
   switch (kind()) {
@@ -453,28 +367,9 @@ gap::generator<Decl> Decl::specializations(void) const & {
       break;
   }
 
-  // Emit the specializations.
-  auto ep = impl->ep;
-  for (auto [from_id, context_id, kind_id] :
-        ep->References(ep, self_id, EntityProvider::kReferenceTo)) {
-
-    if (kSpecializesKindId != kind_id) {
-      continue;
-    }
-
-    auto decl_id = EntityId(from_id).Extract<DeclId>();
-    if (!decl_id) {
-      continue;
-    }
-
-    auto eptr = ep->DeclFor(ep, from_id);
-    if (!eptr) {
-      assert(false);
-      continue;
-    }
-
-    co_yield Decl(std::move(eptr));
-  }
+  return BuiltinDeclReferences<Decl>(
+      impl->ep, self_id, BuiltinReferenceKind::SPECIALIZES,
+      EntityProvider::kReferenceTo);
 }
 
 }  // namespace mx

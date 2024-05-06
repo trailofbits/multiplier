@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/BlockDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/CompoundStmt.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/ParmVarDecl.h>
@@ -340,14 +341,10 @@ gap::generator<ParmVarDecl> BlockDecl::parameter_declarations(void) const & {
   co_return;
 }
 
-gap::generator<Decl> BlockDecl::declarations_in_context(void) const & {
-  EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal62();
-  for (auto v : list) {
-    if (auto eptr = ep->DeclFor(ep, v)) {
-      co_yield std::move(eptr);
-    }
-  }
+gap::generator<Decl> BlockDecl::contained_declarations(void) const & {
+  return BuiltinDeclReferences<Decl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
+      EntityProvider::kReferenceFrom);
 }
 
 #pragma GCC diagnostic pop

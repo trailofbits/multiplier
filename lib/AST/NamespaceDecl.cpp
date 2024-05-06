@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/NamespaceDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/Stmt.h>
@@ -255,6 +256,12 @@ bool NamespaceDecl::is_nested(void) const {
 
 bool NamespaceDecl::is_original_namespace(void) const {
   return impl->reader.getVal78();
+}
+
+gap::generator<Decl> NamespaceDecl::contained_declarations(void) const & {
+  return BuiltinDeclReferences<Decl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
+      EntityProvider::kReferenceFrom);
 }
 
 #pragma GCC diagnostic pop

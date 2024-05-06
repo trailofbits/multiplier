@@ -18,6 +18,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class Reference;
 class CXXBaseSpecifier;
 class CXXConstructorDecl;
 class CXXDestructorDecl;

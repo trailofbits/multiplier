@@ -9001,14 +9001,6 @@ void SerializeCapturedDecl(const PendingFragment &pf, const EntityMapper &es, mx
       ++i51;
     }
   } while (false);
-  pasta::DeclContext dc52(e);
-  auto v52 = DeclarationsInDeclContext(dc52);
-  auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
-  auto i52 = 0u;
-  for (const pasta::Decl &e52 : v52) {
-    sv52.set(i52, es.EntityId(e52));
-    ++i52;
-  }
 }
 
 void SerializeBlockDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::BlockDecl &e, const TokenTree *) {
@@ -9053,14 +9045,6 @@ void SerializeBlockDecl(const PendingFragment &pf, const EntityMapper &es, mx::a
       ++i52;
     }
   } while (false);
-  pasta::DeclContext dc62(e);
-  auto v62 = DeclarationsInDeclContext(dc62);
-  auto sv62 = b.initVal62(static_cast<unsigned>(v62.size()));
-  auto i62 = 0u;
-  for (const pasta::Decl &e62 : v62) {
-    sv62.set(i62, es.EntityId(e62));
-    ++i62;
-  }
 }
 
 void SerializeAccessSpecDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::AccessSpecDecl &e, const TokenTree *) {
@@ -9130,14 +9114,6 @@ void SerializeTranslationUnitDecl(const PendingFragment &pf, const EntityMapper 
   (void) es;
   (void) b;
   (void) e;
-  pasta::DeclContext dc51(e);
-  auto v51 = DeclarationsInDeclContext(dc51);
-  auto sv51 = b.initVal51(static_cast<unsigned>(v51.size()));
-  auto i51 = 0u;
-  for (const pasta::Decl &e51 : v51) {
-    sv51.set(i51, es.EntityId(e51));
-    ++i51;
-  }
 }
 
 void SerializeTopLevelStmtDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TopLevelStmtDecl &e, const TokenTree *) {
@@ -9175,14 +9151,6 @@ void SerializeRequiresExprBodyDecl(const PendingFragment &pf, const EntityMapper
   (void) b;
   (void) e;
   SerializeDecl(pf, es, b, e, nullptr);
-  pasta::DeclContext dc51(e);
-  auto v51 = DeclarationsInDeclContext(dc51);
-  auto sv51 = b.initVal51(static_cast<unsigned>(v51.size()));
-  auto i51 = 0u;
-  for (const pasta::Decl &e51 : v51) {
-    sv51.set(i51, es.EntityId(e51));
-    ++i51;
-  }
 }
 
 void SerializePragmaDetectMismatchDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::PragmaDetectMismatchDecl &e, const TokenTree *) {
@@ -9397,14 +9365,6 @@ void SerializeOMPDeclareReductionDecl(const PendingFragment &pf, const EntityMap
   b.setVal79(es.EntityId(e.InitializerPrivate()));
   b.setVal80(es.EntityId(e.Initializer()));
   b.setVal81(static_cast<unsigned char>(mx::FromPasta(e.InitializerKind())));
-  pasta::DeclContext dc51(e);
-  auto v51 = DeclarationsInDeclContext(dc51);
-  auto sv51 = b.initVal51(static_cast<unsigned>(v51.size()));
-  auto i51 = 0u;
-  for (const pasta::Decl &e51 : v51) {
-    sv51.set(i51, es.EntityId(e51));
-    ++i51;
-  }
 }
 
 void SerializeMSGuidDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::MSGuidDecl &e, const TokenTree *) {
@@ -9913,14 +9873,6 @@ void SerializeFunctionDecl(const PendingFragment &pf, const EntityMapper &es, mx
   } else {
     b.setVal163(mx::kInvalidEntityId);
   }
-  pasta::DeclContext dc62(e);
-  auto v62 = DeclarationsInDeclContext(dc62);
-  auto sv62 = b.initVal62(static_cast<unsigned>(v62.size()));
-  auto i62 = 0u;
-  for (const pasta::Decl &e62 : v62) {
-    sv62.set(i62, es.EntityId(e62));
-    ++i62;
-  }
 }
 
 void SerializeCXXMethodDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXMethodDecl &e, const TokenTree *) {
@@ -10146,14 +10098,6 @@ void SerializeOMPDeclareMapperDecl(const PendingFragment &pf, const EntityMapper
   (void) e;
   SerializeOMPDeclarativeDirectiveValueDecl(pf, es, b, e, nullptr);
   b.setVal58(es.EntityId(e.MapperVariableReference()));
-  pasta::DeclContext dc51(e);
-  auto v51 = DeclarationsInDeclContext(dc51);
-  auto sv51 = b.initVal51(static_cast<unsigned>(v51.size()));
-  auto i51 = 0u;
-  for (const pasta::Decl &e51 : v51) {
-    sv51.set(i51, es.EntityId(e51));
-    ++i51;
-  }
 }
 
 void SerializeUsingShadowDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UsingShadowDecl &e, const TokenTree *) {
@@ -10328,14 +10272,6 @@ void SerializeTagDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast
       ++i51;
     }
   } while (false);
-  pasta::DeclContext dc52(e);
-  auto v52 = DeclarationsInDeclContext(dc52);
-  auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
-  auto i52 = 0u;
-  for (const pasta::Decl &e52 : v52) {
-    sv52.set(i52, es.EntityId(e52));
-    ++i52;
-  }
 }
 
 void SerializeRecordDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::RecordDecl &e, const TokenTree *) {
@@ -11628,14 +11564,6 @@ void SerializeObjCMethodDecl(const PendingFragment &pf, const EntityMapper &es, 
       ++i52;
     }
   } while (false);
-  pasta::DeclContext dc62(e);
-  auto v62 = DeclarationsInDeclContext(dc62);
-  auto sv62 = b.initVal62(static_cast<unsigned>(v62.size()));
-  auto i62 = 0u;
-  for (const pasta::Decl &e62 : v62) {
-    sv62.set(i62, es.EntityId(e62));
-    ++i62;
-  }
 }
 
 void SerializeObjCContainerDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCContainerDecl &e, const TokenTree *) {
@@ -11703,14 +11631,6 @@ void SerializeObjCContainerDecl(const PendingFragment &pf, const EntityMapper &e
       ++i187;
     }
   } while (false);
-  pasta::DeclContext dc188(e);
-  auto v188 = DeclarationsInDeclContext(dc188);
-  auto sv188 = b.initVal188(static_cast<unsigned>(v188.size()));
-  auto i188 = 0u;
-  for (const pasta::Decl &e188 : v188) {
-    sv188.set(i188, es.EntityId(e188));
-    ++i188;
-  }
 }
 
 void SerializeObjCCategoryDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCCategoryDecl &e, const TokenTree *) {
@@ -12169,14 +12089,6 @@ void SerializeExportDecl(const PendingFragment &pf, const EntityMapper &es, mx::
   auto et56 = es.EntityId(e.RBraceToken());
   b.setVal56(et56);
   b.setVal50(e.HasBraces());
-  pasta::DeclContext dc51(e);
-  auto v51 = DeclarationsInDeclContext(dc51);
-  auto sv51 = b.initVal51(static_cast<unsigned>(v51.size()));
-  auto i51 = 0u;
-  for (const pasta::Decl &e51 : v51) {
-    sv51.set(i51, es.EntityId(e51));
-    ++i51;
-  }
 }
 
 void SerializeEmptyDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::EmptyDecl &e, const TokenTree *) {

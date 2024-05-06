@@ -14,6 +14,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class Reference;
 class Decl;
 class Stmt;
 class Token;
@@ -63,7 +64,7 @@ class MX_EXPORT TranslationUnitDecl : public Decl {
   static std::optional<TranslationUnitDecl> from(const VariantEntity &e);
   static std::optional<TranslationUnitDecl> from(const TokenContext &t);
 
-  gap::generator<Decl> declarations_in_context(void) const &;
+  gap::generator<Decl> contained_declarations(void) const &;
 };
 
 static_assert(sizeof(TranslationUnitDecl) == sizeof(Decl));

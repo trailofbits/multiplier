@@ -40,7 +40,7 @@ static void PrintFunctionNames(mx::Index index) {
     std::cout << '\n';
 
     if (FLAGS_list_variables) {
-      for (const mx::Decl &var : func.declarations_in_context()) {
+      for (const mx::Decl &var : func.contained_declarations()) {
         std::cout
             << "\t\t" << var.id() << '\t' << mx::EnumeratorName(var.kind());
 

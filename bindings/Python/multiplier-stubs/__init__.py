@@ -80,6 +80,7 @@ class BuiltinReferenceKind(IntEnum):
   EXTENDS = 13
   OVERRIDES = 14
   SPECIALIZES = 15
+  CONTAINS = 16
 
 class IndexStatus(IntEnum):
   UNINITIALIZED = 0

@@ -17,6 +17,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class Reference;
 class Decl;
 class ImplicitParamDecl;
 class NamedDecl;
@@ -109,7 +110,7 @@ class MX_EXPORT ObjCMethodDecl : public NamedDecl {
   std::optional<Token> nth_selector_token(unsigned n) const;
   unsigned num_selector_tokens(void) const;
   gap::generator<Token> selector_tokens(void) const &;
-  gap::generator<Decl> declarations_in_context(void) const &;
+  gap::generator<Decl> contained_declarations(void) const &;
 };
 
 static_assert(sizeof(ObjCMethodDecl) == sizeof(NamedDecl));

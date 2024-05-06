@@ -7,7 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/Attr.h>
-#include <multiplier/Reference.h>
+#include "../Reference.h"
 #include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Token.h>
 

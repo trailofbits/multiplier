@@ -22,6 +22,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class Reference;
 class Decl;
 class DeclaratorDecl;
 class FunctionDecl;
@@ -164,7 +165,7 @@ class MX_EXPORT FunctionDecl : public DeclaratorDecl {
   gap::generator<ParmVarDecl> parameters(void) const &;
   bool uses_seh_try(void) const;
   std::optional<Stmt> body(void) const;
-  gap::generator<Decl> declarations_in_context(void) const &;
+  gap::generator<Decl> contained_declarations(void) const &;
   // Callers of a `FunctionDecl` can be `CallExpr`, `CxxNewExpr`,
   // `CxxConstructExpr`, etc. Even `CastExpr` can sometimes be a call
   // if it needs to invoke a function call to perform the conversion.

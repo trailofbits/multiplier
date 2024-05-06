@@ -7,7 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/Frontend/Macro.h>
-#include <multiplier/Reference.h>
+#include "../Reference.h"
 #include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Token.h>
 
