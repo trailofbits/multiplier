@@ -125,39 +125,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-<<<<<<< HEAD
-=======
-    "offsets",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::offsets);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::memref::SubViewOp::offsets"),
-    nullptr,
-  },
-  {
-    "sizes",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::sizes);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::memref::SubViewOp::sizes"),
-    nullptr,
-  },
-  {
-    "strides",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::strides);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::memref::SubViewOp::strides"),
-    nullptr,
-  },
-  {
->>>>>>> 7ebaf5fc (Improve issues related to provenance. Attempt to fix some speculative generator lifetime issues in the python bindings.)
     "view_source",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -167,19 +134,6 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::memref::SubViewOp::view_source"),
     nullptr,
   },
-<<<<<<< HEAD
-=======
-  {
-    "dynamic_sizes",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::dynamic_sizes);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::memref::SubViewOp::dynamic_sizes"),
-    nullptr,
-  },
->>>>>>> 7ebaf5fc (Improve issues related to provenance. Attempt to fix some speculative generator lifetime issues in the python bindings.)
   {}  // Sentinel.
 };
 }  // namespace

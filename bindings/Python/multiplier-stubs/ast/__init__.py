@@ -63536,7 +63536,6 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   may_be_abstract: Optional[bool]
   may_be_dynamic_class: Optional[bool]
   may_be_non_dynamic_class: Optional[bool]
-  methods: Optional[Sequence[multiplier.ast.CXXMethodDecl]]
   needs_implicit_copy_assignment: Optional[bool]
   needs_implicit_copy_constructor: Optional[bool]
   needs_implicit_default_constructor: Optional[bool]
@@ -63558,6 +63557,7 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   has_own_virtual_base_table_pointer: Optional[bool]
   derived_classes: Iterable[multiplier.ast.CXXRecordDecl]
   base_classes: Iterable[multiplier.ast.CXXRecordDecl]
+  methods: Iterable[multiplier.ast.CXXMethodDecl]
 
   @overload
   @staticmethod

@@ -5,7 +5,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <cassert>
-#include <gap/core/generator.hpp>
+#include <gap/coro/generator.hpp>
 #include <list>
 #include <multiplier/Entity.h>
 #include <optional>

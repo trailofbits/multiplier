@@ -1203,16 +1203,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "methods",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->methods());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRecordDecl::methods"),
-    nullptr,
-  },
-  {
     "needs_implicit_copy_assignment",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -1420,6 +1410,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::base_classes"),
+    nullptr,
+  },
+  {
+    "methods",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::methods);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRecordDecl::methods"),
     nullptr,
   },
   {}  // Sentinel.

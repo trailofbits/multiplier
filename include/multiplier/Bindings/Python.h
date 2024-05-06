@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <gap/core/generator.hpp>
+#include <gap/coro/generator.hpp>
 #include <optional>
 #include <span>
 #include <string>

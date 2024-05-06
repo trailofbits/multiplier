@@ -128,37 +128,10 @@ static PyGetSetDef gProperties[] = {
     "asm_template",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-<<<<<<< HEAD
           return ::mx::to_python(T_cast(self)->asm_template());
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::hl::AsmOp::asm_template"),
-=======
-          return ::mx::generator_to_python(*T_cast(self), &T::asm_outputs);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::AsmOp::asm_outputs"),
-    nullptr,
-  },
-  {
-    "asm_inputs",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::asm_inputs);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::AsmOp::asm_inputs"),
-    nullptr,
-  },
-  {
-    "labels",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::labels);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::AsmOp::labels"),
->>>>>>> 7ebaf5fc (Improve issues related to provenance. Attempt to fix some speculative generator lifetime issues in the python bindings.)
     nullptr,
   },
   {

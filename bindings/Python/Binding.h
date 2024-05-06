@@ -8,7 +8,7 @@
 
 #include <cstdint>
 #include <filesystem>
-#include <gap/core/generator.hpp>
+#include <gap/coro/generator.hpp>
 #include <map>
 #include <new>
 #include <set>

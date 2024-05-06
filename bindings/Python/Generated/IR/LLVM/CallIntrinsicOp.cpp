@@ -125,23 +125,10 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-<<<<<<< HEAD
-=======
-    "args",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::args);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::CallIntrinsicOp::args"),
-    nullptr,
-  },
-  {
->>>>>>> 7ebaf5fc (Improve issues related to provenance. Attempt to fix some speculative generator lifetime issues in the python bindings.)
     "results",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::results);
+          return ::mx::to_python(T_cast(self)->results());
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::llvm::CallIntrinsicOp::results"),

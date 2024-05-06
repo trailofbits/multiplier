@@ -125,29 +125,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-<<<<<<< HEAD
-=======
-    "args",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::args);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::abi::CallOp::args"),
-    nullptr,
-  },
-  {
-    "results",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::results);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::abi::CallOp::results"),
-    nullptr,
-  },
-  {
->>>>>>> 7ebaf5fc (Improve issues related to provenance. Attempt to fix some speculative generator lifetime issues in the python bindings.)
     "callee",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -157,19 +134,6 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::abi::CallOp::callee"),
     nullptr,
   },
-<<<<<<< HEAD
-=======
-  {
-    "arg_operands",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::arg_operands);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::abi::CallOp::arg_operands"),
-    nullptr,
-  },
->>>>>>> 7ebaf5fc (Improve issues related to provenance. Attempt to fix some speculative generator lifetime issues in the python bindings.)
   {}  // Sentinel.
 };
 }  // namespace

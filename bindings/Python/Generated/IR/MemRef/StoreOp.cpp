@@ -135,19 +135,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-<<<<<<< HEAD
-=======
-    "indices",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::indices);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::memref::StoreOp::indices"),
-    nullptr,
-  },
-  {
->>>>>>> 7ebaf5fc (Improve issues related to provenance. Attempt to fix some speculative generator lifetime issues in the python bindings.)
     "nontemporal",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

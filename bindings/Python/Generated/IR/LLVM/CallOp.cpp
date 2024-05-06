@@ -134,29 +134,6 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::llvm::CallOp::result"),
     nullptr,
   },
-<<<<<<< HEAD
-=======
-  {
-    "callee",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->callee());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::CallOp::callee"),
-    nullptr,
-  },
-  {
-    "arg_operands",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::arg_operands);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::CallOp::arg_operands"),
-    nullptr,
-  },
->>>>>>> 7ebaf5fc (Improve issues related to provenance. Attempt to fix some speculative generator lifetime issues in the python bindings.)
   {}  // Sentinel.
 };
 }  // namespace

@@ -724,7 +724,6 @@ bool IsSpecialization(const pasta::Decl &decl) {
 
     case pasta::DeclKind::kVarTemplateSpecialization:
     case pasta::DeclKind::kClassTemplateSpecialization:
-    case pasta::DeclKind::kClassScopeFunctionSpecialization:
     case pasta::DeclKind::kImplicitConceptSpecialization:
       return true;
 

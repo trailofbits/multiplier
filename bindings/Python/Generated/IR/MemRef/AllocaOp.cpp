@@ -124,29 +124,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
-<<<<<<< HEAD
-=======
-  {
-    "dynamic_sizes",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::dynamic_sizes);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::memref::AllocaOp::dynamic_sizes"),
-    nullptr,
-  },
-  {
-    "symbol_operands",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::generator_to_python(*T_cast(self), &T::symbol_operands);
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::memref::AllocaOp::symbol_operands"),
-    nullptr,
-  },
->>>>>>> 7ebaf5fc (Improve issues related to provenance. Attempt to fix some speculative generator lifetime issues in the python bindings.)
   {}  // Sentinel.
 };
 }  // namespace

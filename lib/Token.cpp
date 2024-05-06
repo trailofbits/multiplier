@@ -732,15 +732,7 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
     return baseline_category;
   }
 
-  const Decl &decl = std::get<Decl>(ent);
-
-  if (id.kind == DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION) {
-    if (auto spec = ClassScopeFunctionSpecializationDecl::from(decl)) {
-      return Rebase(spec->specialization().category());
-    }
-  }
-
-  return Rebase(decl.category());
+  return Rebase(std::get<Decl>(ent).category());
 }
 
 static TokenCategory ClassifyStmt(StmtId id, TokenKind kind,
