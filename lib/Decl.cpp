@@ -316,6 +316,11 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::derived_classes(void) const & {
   }
 }
 
+gap::generator<CXXMethodDecl> CXXRecordDecl::methods(void) const & {
+  // TODO(pag): Implement this.
+  co_return;
+}
+
 gap::generator<CXXMethodDecl>
 CXXMethodDecl::overridden_by_methods(void) const & {
   static constexpr auto kOverridesKindId =

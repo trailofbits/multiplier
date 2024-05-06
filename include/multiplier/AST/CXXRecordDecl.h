@@ -189,7 +189,6 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   std::optional<bool> may_be_abstract(void) const;
   std::optional<bool> may_be_dynamic_class(void) const;
   std::optional<bool> may_be_non_dynamic_class(void) const;
-  std::optional<std::vector<CXXMethodDecl>> methods(void) const;
   std::optional<bool> needs_implicit_copy_assignment(void) const;
   std::optional<bool> needs_implicit_copy_constructor(void) const;
   std::optional<bool> needs_implicit_default_constructor(void) const;
@@ -212,6 +211,7 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   // List of base and derived classes.
   gap::generator<CXXRecordDecl> derived_classes(void) const &;
   gap::generator<CXXRecordDecl> base_classes(void) const &;
+  gap::generator<CXXMethodDecl> methods(void) const &;
 };
 
 static_assert(sizeof(CXXRecordDecl) == sizeof(RecordDecl));

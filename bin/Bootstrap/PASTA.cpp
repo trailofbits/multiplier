@@ -721,6 +721,10 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"CXXRecordDecl", "VisibleConversionFunctions"},
   {"FunctionDecl", "WillHaveBody"},
 
+  // These will be discovered dynamically. This is because methods on class
+  // template specializations might not actually have bodies.
+  {"CXXRecordDecl", "Methods"},
+
   // These will apply to functions, enums, classes, etc.
   {"Decl", "TypeAsWritten"},
   {"Decl", "PointOfInstantiation"},
@@ -3598,7 +3602,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         serialize_inc_os
             << "  MX_VISIT_ENTITY(" << class_name << ", " << api_name
-            << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
+            << ", " << i << ", " << meth_or_func << ", " << method_name << ", "
             << record_name << ", " << nth_entity_reader << ")\n";
 
         lib_cpp_os
@@ -3746,7 +3750,8 @@ MethodListPtr CodeGenerator::RunOnClass(
     class_os
         << "  // List of base and derived classes.\n"
         << "  gap::generator<CXXRecordDecl> derived_classes(void) const &;\n"
-        << "  gap::generator<CXXRecordDecl> base_classes(void) const &;\n";
+        << "  gap::generator<CXXRecordDecl> base_classes(void) const &;\n"
+        << "  gap::generator<CXXMethodDecl> methods(void) const &;\n";
   }
 
   if (class_name == "CXXMethodDecl") {

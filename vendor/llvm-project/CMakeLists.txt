@@ -74,7 +74,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DLLVM_ENABLE_DIA_SDK:BOOL=OFF
                         -DLLVM_ENABLE_EH:BOOL=ON
                         -DLLVM_ENABLE_RTTI:BOOL=ON
-                        "-DLLVM_ENABLE_ASSERTIONS:BOOL=$<CONFIG:Release>"
+                        "-DLLVM_ENABLE_ASSERTIONS:BOOL=$<CONFIG:Debug>"
                         -DLLVM_ENABLE_EXPENSIVE_CHECKS:BOOL=OFF
                         -DLLVM_ENABLE_FFI:BOOL=OFF
                         -DLLVM_ENABLE_WARNINGS:BOOL=ON
