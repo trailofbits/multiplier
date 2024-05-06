@@ -1011,6 +1011,7 @@ static mx::RawEntityId VisitTemplateArgument(
     case pasta::TemplateArgumentKind::kIntegral:
     case pasta::TemplateArgumentKind::kExpression:
     case pasta::TemplateArgumentKind::kPack:
+    case pasta::TemplateArgumentKind::kStructuralValue:
       break;
   }
   return mx::kInvalidEntityId;

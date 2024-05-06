@@ -124,6 +124,7 @@ const char *EnumeratorName(BuiltinReferenceKind kind) {
     case BuiltinReferenceKind::EXTENDS: return "EXTENDS";
     case BuiltinReferenceKind::OVERRIDES: return "OVERRIDES";
     case BuiltinReferenceKind::SPECIALIZES: return "SPECIALIZES";
+    case BuiltinReferenceKind::CONTAINS: return "CONTAINS";
   }
 }
 
