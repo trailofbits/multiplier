@@ -221,15 +221,15 @@ std::optional<UsingDecl> UsingDecl::from(const TokenContext &t) {
 }
 
 Token UsingDecl::using_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 bool UsingDecl::has_typename(void) const {
-  return impl->reader.getVal75();
+  return impl->reader.getVal64();
 }
 
 bool UsingDecl::is_access_declaration(void) const {
-  return impl->reader.getVal76();
+  return impl->reader.getVal65();
 }
 
 #pragma GCC diagnostic pop

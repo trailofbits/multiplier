@@ -223,7 +223,7 @@ std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const TokenContext &t) 
 }
 
 ImplicitParamKind ImplicitParamDecl::parameter_kind(void) const {
-  return static_cast<ImplicitParamKind>(impl->reader.getVal130());
+  return static_cast<ImplicitParamKind>(impl->reader.getVal119());
 }
 
 #pragma GCC diagnostic pop

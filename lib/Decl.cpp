@@ -270,8 +270,9 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::derived_classes(void) const & {
 }
 
 gap::generator<CXXMethodDecl> CXXRecordDecl::methods(void) const & {
-  // TODO(pag): Implement this.
-  co_return;
+  return BuiltinDeclReferences<CXXMethodDecl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
+      EntityProvider::kReferenceFrom);
 }
 
 gap::generator<CXXMethodDecl>

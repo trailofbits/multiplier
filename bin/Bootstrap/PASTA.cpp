@@ -332,7 +332,15 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "NextDeclarationInContext"},
   {"Decl", "HasDefiningAttribute"},  // Already have `Decl::DefiningAttribute`.
 
-  {"Decl", "Redeclarations"},  // Implement it ourselves.
+  // We have more derived versions of these
+  {"Decl", "DescribedTemplate"},
+  {"Decl", "DescribedTemplateParameters"},
+
+  // Implement it ourselves.
+  {"Decl", "Redeclarations"},
+  {"Decl", "ParentFunctionOrMethod"},
+
+  // These make no sense on a whole-program scope
   {"Decl", "MostRecentDeclaration"},
   {"NamedDecl", "MostRecentDeclaration"},
   {"VarTemplateDecl", "MostRecentDeclaration"},
@@ -702,6 +710,15 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "IsCanonicalDeclaration"},
   {"Decl", "IsFirstDeclaration"},
   {"Decl", "IdentifierNamespace"},
+  {"Decl", "IsInLocalScopeForInstantiation"},
+  {"Decl", "ShouldSkipCheckingODR"},
+  {"Decl", "HasAttributes"},
+  {"Decl", "HasBody"},
+  {"Decl", "HasOwningModule"},
+  {"Decl", "HasTagIdentifierNamespace"},
+  {"Decl", "IsDefinedOutsideFunctionOrMethod"},
+  {"Decl", "IsDiscardedInGlobalModuleFragment"},
+  {"Decl", "IsFunctionPointerType"},
 
   {"MemberPointerType", "MostRecentCXXRecordDeclaration"},
   {"Expr", "Dependence"},

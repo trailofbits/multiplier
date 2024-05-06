@@ -222,7 +222,7 @@ std::optional<NamespaceDecl> NamespaceDecl::from(const TokenContext &t) {
 
 std::optional<NamespaceDecl> NamespaceDecl::anonymous_namespace(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal56();
+    RawEntityId eid = impl->reader.getVal45();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -234,28 +234,28 @@ std::optional<NamespaceDecl> NamespaceDecl::anonymous_namespace(void) const {
 }
 
 NamespaceDecl NamespaceDecl::original_namespace(void) const {
-  RawEntityId eid = impl->reader.getVal57();
+  RawEntityId eid = impl->reader.getVal46();
   return NamespaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token NamespaceDecl::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
 }
 
 bool NamespaceDecl::is_anonymous_namespace(void) const {
-  return impl->reader.getVal75();
+  return impl->reader.getVal64();
 }
 
 bool NamespaceDecl::is_inline(void) const {
-  return impl->reader.getVal76();
+  return impl->reader.getVal65();
 }
 
 bool NamespaceDecl::is_nested(void) const {
-  return impl->reader.getVal77();
+  return impl->reader.getVal66();
 }
 
 bool NamespaceDecl::is_original_namespace(void) const {
-  return impl->reader.getVal78();
+  return impl->reader.getVal67();
 }
 
 gap::generator<Decl> NamespaceDecl::contained_declarations(void) const & {

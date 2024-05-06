@@ -57419,27 +57419,18 @@ class Decl(multiplier.Entity):
   attributes: Iterable[multiplier.ast.Attr]
   availability: multiplier.ast.AvailabilityResult
   defining_attribute: Optional[multiplier.ast.Attr]
-  described_template: Optional[multiplier.ast.TemplateDecl]
-  described_template_parameters: Optional[multiplier.ast.TemplateParameterList]
   external_source_symbol_attribute: Optional[multiplier.ast.ExternalSourceSymbolAttr]
   friend_object_kind: multiplier.ast.DeclFriendObjectKind
   max_alignment: Optional[int]
   module_ownership_kind: multiplier.ast.DeclModuleOwnershipKind
   non_closure_context: Optional[multiplier.ast.Decl]
-  has_attributes: bool
-  has_owning_module: bool
-  has_tag_identifier_namespace: bool
-  is_defined_outside_function_or_method: bool
   is_deprecated: bool
-  is_discarded_in_global_module_fragment: bool
   is_file_context_declaration: bool
   is_function_or_function_template: bool
-  is_function_pointer_type: bool
   is_implicit: bool
   is_in_anonymous_namespace: bool
   is_in_another_module_unit: bool
   is_in_export_declaration_context: bool
-  is_in_local_scope_for_instantiation: Optional[bool]
   is_in_std_namespace: bool
   is_invisible_outside_the_owning_module: bool
   is_local_extern_declaration: bool
@@ -57454,7 +57445,6 @@ class Decl(multiplier.Entity):
   is_unavailable: bool
   is_unconditionally_visible: bool
   is_weak_imported: bool
-  should_skip_checking_odr: bool
   kind: multiplier.ast.DeclKind
   category: multiplier.ast.DeclCategory
   token: multiplier.frontend.Token

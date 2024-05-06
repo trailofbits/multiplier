@@ -50,6 +50,33 @@ static void TrackRedeclarations(
   }
 }
 
+// Fill in the `CONTAINS` relation.
+void LinkLexicalDeclContext(
+    mx::DatabaseWriter &database, const EntityMapper &em,
+    const pasta::Decl &decl, mx::RawEntityId child_eid) {
+  std::optional<pasta::DeclContext> dc =
+      IsLambda(decl) ? decl.DeclarationContext() :
+      decl.LexicalDeclarationContext();
+
+  if (!dc) {
+    return;
+  }
+
+  auto parent_eid = em.EntityId(pasta::Decl::From(dc.value()));
+  if (parent_eid == mx::kInvalidEntityId) {
+    return;
+  }
+
+  if (parent_eid == child_eid) {
+    assert(false);
+    return;
+  }
+
+  mx::ReferenceRecord record{parent_eid, child_eid, parent_eid,
+                             mx::BuiltinReferenceKind::CONTAINS};
+  database.AddAsync(record);
+}
+
 }  // namespace
 
 // Store information persistently to enable linking of declarations across
@@ -61,7 +88,7 @@ void LinkEntitiesAcrossFragments(
   const EntityMapper &em = pf.em;
 
   std::string dummy_mangled_name;
-  for (pasta::Decl decl : Entities(pf.decls_to_serialize)) {
+  for (const pasta::Decl &decl : Entities(pf.decls_to_serialize)) {
     mx::RawEntityId eid = em.EntityId(decl);
     if (eid == mx::kInvalidEntityId) {
       assert(false);
@@ -74,6 +101,11 @@ void LinkEntitiesAcrossFragments(
           database, pf.fragment_index, em,
           (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
           decl, func->Redeclarations());
+
+      // Don't mark a function template pattern as being part of a class.
+      if (!func->DescribedFunctionTemplate()) {
+        LinkLexicalDeclContext(database, em, decl, eid);
+      }
 
     } else if (auto var = pasta::VarDecl::From(decl)) {
       switch (var->Category()) {
@@ -91,16 +123,39 @@ void LinkEntitiesAcrossFragments(
           break;
       }
 
+      // Don't mark a variable template pattern as being part of a class.
+      if (!var->DescribedVariableTemplate()) {
+        LinkLexicalDeclContext(database, em, decl, eid);
+      }
+
+    } else if (auto cls = pasta::CXXRecordDecl::From(decl)) {
+      TrackRedeclarations(database, pf.fragment_index, em, dummy_mangled_name,
+                          decl, cls->Redeclarations());
+
+      // Don't mark a class template pattern as being part of a class.
+      if (!cls->DescribedClassTemplate()) {
+        LinkLexicalDeclContext(database, em, decl, eid);
+      }
+
     } else if (auto tag = pasta::TagDecl::From(decl)) {
       TrackRedeclarations(database, pf.fragment_index, em, dummy_mangled_name,
                           decl, tag->Redeclarations());
+
+      LinkLexicalDeclContext(database, em, decl, eid);
 
     } else if (auto tpl = pasta::RedeclarableTemplateDecl::From(decl)) {
       TrackRedeclarations(database, pf.fragment_index, em, dummy_mangled_name,
                           decl, tpl->Redeclarations());
 
+      LinkLexicalDeclContext(database, em, decl, eid);
+
+    } else if (auto tad = pasta::TypeAliasDecl::From(decl)) {
+      if (!tad->DescribedAliasTemplate()) {
+        LinkLexicalDeclContext(database, em, decl, eid);
+      }
+
     } else {
-      continue;
+      LinkLexicalDeclContext(database, em, decl, eid);
     }
   }
 }

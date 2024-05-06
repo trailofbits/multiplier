@@ -357,9 +357,22 @@ static std::string HashNestedFragment(
 
   TypePrintingPolicy pp;
 
-  // Type, e.g. of a function/method. This allows us to ignore the body, which
+  // When hashing functions, don't include their return types. The return type
+  // of a method in a class template specialization may be `auto` or similar,
+  // (e.g. `decltype(auto)`), and only resolved if/when the method is used. If
+  // the method isn't used, then the body won't be substituted, and thus the
+  // return type won't be substituted. This largely corresponds to the name
+  // mangling rules of C++: they don't encode the return type.
+  if (auto fd = pasta::FunctionDecl::From(decl)) {
+    unsigned p = 0u;
+    for (const auto &param : fd->Parameters()) {
+      ss << " P" << (p++);
+      AccumulateTokenData(ss, pasta::PrintedTokenRange::Create(param.Type(), pp));
+    }
+
+  // Type, e.g. of a var, enum, etc. This allows us to ignore the body, which
   // may not have been substituted.
-  if (auto vd = pasta::ValueDecl::From(decl)) {
+  } else if (auto vd = pasta::ValueDecl::From(decl)) {
     AccumulateTokenData(ss, pasta::PrintedTokenRange::Create(vd->Type(), pp));
 
   } else if (auto td = pasta::TypeDecl::From(decl)) {

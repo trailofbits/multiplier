@@ -585,26 +585,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "described_template",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->described_template());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Decl::described_template"),
-    nullptr,
-  },
-  {
-    "described_template_parameters",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->described_template_parameters());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Decl::described_template_parameters"),
-    nullptr,
-  },
-  {
     "external_source_symbol_attribute",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -655,46 +635,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "has_attributes",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_attributes());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Decl::has_attributes"),
-    nullptr,
-  },
-  {
-    "has_owning_module",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_owning_module());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Decl::has_owning_module"),
-    nullptr,
-  },
-  {
-    "has_tag_identifier_namespace",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_tag_identifier_namespace());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Decl::has_tag_identifier_namespace"),
-    nullptr,
-  },
-  {
-    "is_defined_outside_function_or_method",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_defined_outside_function_or_method());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Decl::is_defined_outside_function_or_method"),
-    nullptr,
-  },
-  {
     "is_deprecated",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -702,16 +642,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Decl::is_deprecated"),
-    nullptr,
-  },
-  {
-    "is_discarded_in_global_module_fragment",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_discarded_in_global_module_fragment());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Decl::is_discarded_in_global_module_fragment"),
     nullptr,
   },
   {
@@ -732,16 +662,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Decl::is_function_or_function_template"),
-    nullptr,
-  },
-  {
-    "is_function_pointer_type",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_function_pointer_type());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Decl::is_function_pointer_type"),
     nullptr,
   },
   {
@@ -782,16 +702,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Decl::is_in_export_declaration_context"),
-    nullptr,
-  },
-  {
-    "is_in_local_scope_for_instantiation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_in_local_scope_for_instantiation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Decl::is_in_local_scope_for_instantiation"),
     nullptr,
   },
   {
@@ -932,16 +842,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Decl::is_weak_imported"),
-    nullptr,
-  },
-  {
-    "should_skip_checking_odr",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->should_skip_checking_odr());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Decl::should_skip_checking_odr"),
     nullptr,
   },
   {

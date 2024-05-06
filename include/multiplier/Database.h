@@ -282,7 +282,8 @@ struct ReferenceRecord {
                  (12, "EXPANSION_OF"),
                  (13, "EXTENDS"),
                  (14, "OVERRIDES"),
-                 (15, "SPECIALIZES")
+                 (15, "SPECIALIZES"),
+                 (16, "CONTAINS")
           )"};
 
   static constexpr const char *kExitStatements[] = {nullptr};

@@ -275,16 +275,16 @@ std::optional<DeclaratorDecl> DeclaratorDecl::from(const TokenContext &t) {
 }
 
 Token DeclaratorDecl::first_inner_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
 }
 
 Token DeclaratorDecl::first_outer_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
 }
 
 std::optional<Expr> DeclaratorDecl::trailing_requires_clause(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal67();
+    RawEntityId eid = impl->reader.getVal56();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -296,19 +296,19 @@ std::optional<Expr> DeclaratorDecl::trailing_requires_clause(void) const {
 }
 
 Token DeclaratorDecl::type_spec_end_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal68());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
 }
 
 Token DeclaratorDecl::type_spec_start_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal79());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal68());
 }
 
 unsigned DeclaratorDecl::num_template_parameter_lists(void) const {
-  return impl->reader.getVal51().size();
+  return impl->reader.getVal40().size();
 }
 
 std::optional<TemplateParameterList> DeclaratorDecl::nth_template_parameter_list(unsigned n) const {
-  auto list = impl->reader.getVal51();
+  auto list = impl->reader.getVal40();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -322,12 +322,12 @@ std::optional<TemplateParameterList> DeclaratorDecl::nth_template_parameter_list
 }
 
 gap::generator<TemplateParameterList> DeclaratorDecl::template_parameter_lists(void) const & {
-  auto list = impl->reader.getVal51();
+  auto list = impl->reader.getVal40();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d51 = ep->TemplateParameterListFor(ep, v)) {
-      co_yield TemplateParameterList(std::move(d51));
+    if (auto d40 = ep->TemplateParameterListFor(ep, v)) {
+      co_yield TemplateParameterList(std::move(d40));
     }
   }
   co_return;
