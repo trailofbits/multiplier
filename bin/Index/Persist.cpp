@@ -410,7 +410,7 @@ struct TokenTreeSerializationSchedule {
 
         CHECK_EQ(id.offset, tokens.size())
             << "Mismatched parsed token ID offset"
-            << PrefixedLocation(pf.top_level_decls.front(), " at or near ")
+            << PrefixedLocation(pf.top_level_decls, " at or near ")
             << " on main job file " << main_job_file
             << " (thread " << std::hex << std::this_thread::get_id()
             << std::dec << ")";
@@ -427,7 +427,11 @@ struct TokenTreeSerializationSchedule {
 
       raw_id = mx::EntityId(id).Pack();
       CHECK_NE(raw_id, mx::kInvalidEntityId)
-          << "Likely MacroTokenId offset overflow: " << id.offset;
+          << "Likely MacroTokenId offset overflow (offset " << id.offset
+          << ')' << PrefixedLocation(pf.top_level_decls, " at or near ")
+          << " on main job file " << main_job_file
+          << " (thread " << std::hex << std::this_thread::get_id()
+          << std::dec << ")";
 
       if (raw_pt) {
         em.token_tree_ids.emplace(raw_pt, raw_id);

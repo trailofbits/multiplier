@@ -2370,6 +2370,28 @@ static unsigned MacroRangeSize(const std::vector<pasta::Macro> &macros) {
   return any ? (max - min + 1u) : 0u;
 }
 
+// Locate top-level macro expansion uses inside of a given declaration range.
+// This is to help us when we need to estimate the size of a fragment.
+static void LocateExpansionsInRange(
+    const pasta::TokenRange &tokens, std::vector<pasta::Macro> &macros_out) {
+  const void *last_raw_root = nullptr;
+  for (auto &tok : tokens) {
+    auto mtok = tok.MacroLocation();
+    if (!mtok) {
+      continue;
+    }
+
+    auto root = RootMacroFrom(mtok.value());
+    const void *raw_root = RawEntity(root);
+    if (raw_root != last_raw_root) {
+      last_raw_root = raw_root;
+      if (root.Kind() == pasta::MacroKind::kExpansion) {
+        macros_out.emplace_back(std::move(root));
+      }
+    }
+  }
+}
+
 static PendingFragmentPtr CreatePendingFragment(
     IdStore &id_store, EntityMapper &em, NameMangler &nm,
     const pasta::TokenRange *original_tokens,
@@ -2394,8 +2416,17 @@ static PendingFragmentPtr CreatePendingFragment(
     num_tokens = original_tokens->Size();
   }
 
-  num_tokens = std::max(num_tokens, parsed_tokens.Size()) +
-               MacroRangeSize(macros);
+  num_tokens = std::max(num_tokens, parsed_tokens.Size());
+
+  auto macros_were_empty = macros.empty();
+  if (macros_were_empty && original_tokens && !parsed_are_printed) {
+    LocateExpansionsInRange(*original_tokens, macros);
+  }
+
+  num_tokens += MacroRangeSize(macros);
+  if (macros_were_empty) {
+    macros.clear();
+  }
 
   mx::RawEntityId context_eid = mx::kInvalidEntityId;
   if (parent_entity) {
@@ -2476,7 +2507,10 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
   // We've hoisted the decls embedded in declarators out into their own
   // independent fragments.
   if (decls_to_print.empty()) {
-    CHECK_EQ(decls.size(), 1u);
+    CHECK_GE(decls.size(), 1u)
+        << "Missing declarations for printing/alignment on main job file "
+        << main_job_file;
+
     decls_to_print = decls;
   }
 
@@ -2491,14 +2525,6 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
       << PrefixedLocation(decls_to_print.front(), " at or near ")
       << " where we're doing token alignment on "
       << decls_to_print.size() << " printed declarations";
-
-  if (decls_to_print.size() > 100u) {
-    Dump(decls_to_print[0]);
-    Dump(decls_to_print[1]);
-    CHECK(false);
-  }
-
-  CHECK_LT(decls_to_print.size(), 1000u);  // Likely a serious problem.
 
   for (auto i = 1u; i < decls_to_print.size(); ++i) {
     auto decl_tokens = pasta::PrintedTokenRange::Create(decls_to_print[i]);

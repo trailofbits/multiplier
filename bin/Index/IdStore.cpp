@@ -51,7 +51,7 @@ static std::mutex gKeyShards[kNumKeyShards];
 static std::mutex gOpenDbsLock;
 static std::unordered_map<std::string, std::weak_ptr<IdStoreImpl>> gOpenDbs;
 
-static rocksdb::Options DBOptions(void) {
+inline static rocksdb::Options DBOptions(void) {
   rocksdb::Options options;
   options.create_if_missing = true;
   options.compression = rocksdb::kZSTD;
@@ -63,12 +63,12 @@ static rocksdb::Options DBOptions(void) {
   return options;
 }
 
-static std::unique_lock<std::mutex> KeyShardGuard(std::string_view key) {
+inline static std::unique_lock<std::mutex> KeyShardGuard(std::string_view key) {
   return std::unique_lock<std::mutex>(gKeyShards[Hash32(key) % kNumKeyShards]);
 }
 
 // Convert an entity ID into big endian.
-static mx::RawEntityId Canonicalize(mx::RawEntityId id) {
+inline static mx::RawEntityId Canonicalize(mx::RawEntityId id) {
   if MX_CONSTEXPR_ENDIAN (MX_LITTLE_ENDIAN) {
     return __builtin_bswap64(id);
   }
@@ -302,8 +302,8 @@ class IdStoreImpl {
             mx::kMaxSmallTypeId)),
         next_big_type_index(configs.emplace_back(
             "META::NEXT_BIG_TYPE_INDEX", "BTI", 1, mx::kMaxBigTypeId)) {
-          EnterNextIndices();
-        }
+    EnterNextIndices();
+  }
 
   // Set `val` to `key`.
   void UnlockedSet(const std::string &key, mx::RawEntityId val);

@@ -870,6 +870,17 @@ bool BulkInserterState::InsertAsync(
   return true;
 }
 
+size_t BulkInserterState::SizeOfRecord(
+    const ReplacementFragmentRecord &record) {
+  return sizeof(record) + record.data.size();
+}
+
+bool BulkInserterState::InsertAsync(
+    const ReplacementFragmentRecord &record, sqlite::Statement &insert) {
+  insert.BindValuesWithoutCopying(record.id, record.data);
+  return true;
+}
+
 size_t BulkInserterState::SizeOfRecord(const RedeclarationRecord &record) {
   return sizeof(record);
 }

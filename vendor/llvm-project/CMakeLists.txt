@@ -40,6 +40,12 @@ endif()
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${build_dir}")
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(LLVM_ENABLE_ASSERTIONS ON)
+else()
+  set(LLVM_ENABLE_ASSERTIONS OFF)
+endif()
+
 # (b) Nested CMake run. May need more -D... options than shown here.
 execute_process(COMMAND ${CMAKE_COMMAND}
                         -G "${CMAKE_GENERATOR}"
@@ -74,7 +80,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DLLVM_ENABLE_DIA_SDK:BOOL=OFF
                         -DLLVM_ENABLE_EH:BOOL=ON
                         -DLLVM_ENABLE_RTTI:BOOL=ON
-                        "-DLLVM_ENABLE_ASSERTIONS:BOOL=$<CONFIG:Debug>"
+                        "-DLLVM_ENABLE_ASSERTIONS:BOOL=${LLVM_ENABLE_ASSERTIONS}"
                         -DLLVM_ENABLE_EXPENSIVE_CHECKS:BOOL=OFF
                         -DLLVM_ENABLE_FFI:BOOL=OFF
                         -DLLVM_ENABLE_WARNINGS:BOOL=ON

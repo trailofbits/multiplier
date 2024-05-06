@@ -34,7 +34,8 @@ class DatabaseWriterImpl;
     m(MangledNameRecord) \
     m(ReferenceRecord) \
     m(NamedEntityRecord) \
-    m(DictionaryRecord)
+    m(DictionaryRecord) \
+    m(ReplacementFragmentRecord)
 
 #define MX_FOR_EACH_ENTITY_RECORD_TYPE(m) \
     m(FileRecord) \
@@ -365,13 +366,40 @@ struct FragmentRecord {
             fragment_id INTEGER PRIMARY KEY,
             data BLOB NOT NULL
           ) WITHOUT ROWID)",
-
        nullptr};
 
-  static constexpr const char *kExitStatements[] = {nullptr};
+  static constexpr const char *kExitStatements[] =
+      {nullptr};
 
   static constexpr const char *kInsertStatement =
       "INSERT OR IGNORE INTO fragment (fragment_id, data) VALUES (?1, ?2)";
+
+  RawEntityId id;
+  std::string data;
+};
+
+// A replacement fragment exists to take the place of a pre-existing fragment,
+// e.g. if we see a method on a class template specialization in one TU, and it
+// is not used, and therefore has no substituted body, then we want this to be
+// replaced by "the same" fragment in another TU, but where that method is used,
+// and whose body is subject to substitution.
+struct ReplacementFragmentRecord {
+  static constexpr const char *kTableName = "replacement_fragment";
+
+  static constexpr const char *kInitStatements[] =
+      {R"(CREATE TABLE IF NOT EXISTS replacement_fragment (
+            fragment_id INTEGER PRIMARY KEY,
+            data BLOB NOT NULL
+          ) WITHOUT ROWID)",
+
+       nullptr};
+
+  static constexpr const char *kExitStatements[] =
+      {R"()",
+      };
+
+  static constexpr const char *kInsertStatement =
+      "INSERT OR IGNORE INTO replacement_fragment (fragment_id, data) VALUES (?1, ?2)";
 
   RawEntityId id;
   std::string data;

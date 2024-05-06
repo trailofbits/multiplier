@@ -219,6 +219,15 @@ std::string PrefixedLocation(const pasta::Decl &decl, const char *prefix) {
   return "";
 }
 
+// Return the location of a declaration with a leading `prefix`, or nothing.
+std::string PrefixedLocation(const std::vector<pasta::Decl> &decls,
+                             const char *prefix) {
+  if (!decls.empty()) {
+    return PrefixedLocation(decls.front(), prefix);
+  }
+  return "";
+}
+
 // Returns `true` if `data` contains only whitespace or is empty.
 bool IsWhitespaceOrEmpty(std::string_view data) {
   for (auto ch : data) {
