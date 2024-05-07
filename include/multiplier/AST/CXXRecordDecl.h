@@ -184,7 +184,7 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   std::optional<bool> is_standard_layout(void) const;
   std::optional<bool> is_structural(void) const;
   std::optional<bool> is_trivial(void) const;
-  bool is_trivially_copy_constructible(void) const;
+  std::optional<bool> is_trivially_copy_constructible(void) const;
   std::optional<bool> is_trivially_copyable(void) const;
   std::optional<bool> lambda_is_default_constructible_and_assignable(void) const;
   std::optional<bool> may_be_abstract(void) const;

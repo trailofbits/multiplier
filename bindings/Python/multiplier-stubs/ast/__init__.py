@@ -63520,7 +63520,7 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   is_standard_layout: Optional[bool]
   is_structural: Optional[bool]
   is_trivial: Optional[bool]
-  is_trivially_copy_constructible: bool
+  is_trivially_copy_constructible: Optional[bool]
   is_trivially_copyable: Optional[bool]
   lambda_is_default_constructible_and_assignable: Optional[bool]
   may_be_abstract: Optional[bool]
