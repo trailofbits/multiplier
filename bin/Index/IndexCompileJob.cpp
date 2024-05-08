@@ -2444,7 +2444,8 @@ static PendingFragmentPtr CreatePendingFragment(
       context_eid,
       HashFragment(em, nm, parent_entity, decls, macros, original_tokens,
                    parsed_tokens),
-      num_tokens  /* for fragment id packing format */);
+      num_tokens  /* for fragment id packing format */,
+      IsReplaceableFragment(decls));
 
   PendingFragmentPtr pf(new PendingFragment(
       fid,
@@ -3230,6 +3231,7 @@ static void PersistParsedFragments(
       });
 
   auto num_new = 0u;
+  auto num_replaced = 0u;
   for (PendingFragmentPtr &pf : pending_fragments) {
 
     // Record the bounds of nested fragments. These will represent "holes" in
@@ -3247,10 +3249,16 @@ static void PersistParsedFragments(
       }
     }
 
-    if (pf->is_new) {
-      ++num_new;
-    } else {
-      pf.reset();  // We don't need it anymore.
+    switch (pf->id_status) {
+      case IdStatus::kNew:
+        ++num_new;
+        break;
+      case IdStatus::kExisting:
+        pf.reset();  // We don't need it anymore.
+        break;
+      case IdStatus::kExistingButReplaced:
+        ++num_replaced;
+        break; 
     }
   }
 
@@ -3266,7 +3274,7 @@ static void PersistParsedFragments(
   DLOG(INFO)
       << "Main source file " << main_source_file
       << " has " << num_new << " / " << pending_fragments.size()
-      << " unique fragments";
+      << " unique fragments, " << num_replaced << " of which are replacements";
 
   fragment_ids.reserve(num_new);
 
@@ -3340,10 +3348,10 @@ static void MaybePersistParsedFile(
         << ": " << maybe_data.TakeError().message();
   }
 
-  auto [file_id, is_new_file_id] = context.id_store.GetOrCreateFileIdForHash(
+  auto [file_id, id_status] = context.id_store.GetOrCreateFileIdForHash(
       HashFile(maybe_data.TakeValue()));
 
-  if (is_new_file_id) {
+  if (id_status == IdStatus::kNew) {
     context.PersistFile(file_id, file);
   }
 
@@ -3415,10 +3423,10 @@ void IndexCompileJobAction::Run(void) {
   PersistParsedFiles(context, ast, em);
 
   // Detect if this is a new compilation.
-  auto [tu_id, is_new_tu_id] = context.id_store.GetOrCreateCompilationId(
+  auto [tu_id, id_status] = context.id_store.GetOrCreateCompilationId(
       em.EntityId(main_file), HashCompilation(ast, em));
 
-  if (!is_new_tu_id) {
+  if (id_status != IdStatus::kNew) {
     DLOG(INFO)
         << "Skipping redundant AST for main source file " << main_file_path;
     return;

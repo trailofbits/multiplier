@@ -13,10 +13,12 @@
 #include <string>
 #include <utility>
 
+#include "Util.h"
+
 namespace indexer {
 
 template <typename T>
-using MaybeNewId = std::pair<T, bool>;
+using MaybeNewId = std::pair<T, IdStatus>;
 
 class IdStoreImpl;
 
@@ -40,7 +42,8 @@ class IdStore {
   // NOTE(pag): `context_id` is either a file token ID, identifying where this
   //            fragment is located, or it is the parent fragment id.
   MaybeNewId<mx::PackedFragmentId> GetOrCreateFragmentIdForHash(
-      mx::RawEntityId context_id, std::string hash, size_t num_tokens);
+      mx::RawEntityId context_id, std::string hash, size_t num_tokens,
+      bool is_replaceable);
 
   // Get, or create and return, a type ID for the specific type details.
   MaybeNewId<mx::PackedTypeId> GetOrCreateTypeIdForHash(

@@ -112,6 +112,7 @@ static std::optional<mx::PackedFragmentId> IdentifyAsNestedFragmentToken(
     // ones nested inside of that will be discovered (via this mechanism) as
     // nested fragments of that fragment.
     mx::EntityOffset max_interval_size = 0u;
+
     pf.em.nested_fragment_bounds.visit_overlapping(
         pt->Index(),
         [&] (const FragmentBounds &bounds) {
@@ -137,6 +138,10 @@ static std::optional<mx::PackedFragmentId> IdentifyAsNestedFragmentToken(
   return mx::FragmentId(frag_index);
 }
 
+static bool IsNonLineBreakingWhitespaceOrEmpty(std::string_view td) {
+  return IsWhitespaceOrEmpty(td) && !std::count(td.begin(), td.end(), '\n');
+}
+
 // Search for gaps between two tokens identified in the same nested fragment,
 // and then fill them.
 static void IdentifyNestedFragmentTokens(
@@ -148,11 +153,21 @@ static void IdentifyNestedFragmentTokens(
 
   std::optional<std::pair<mx::EntityOffset, mx::PackedFragmentId>> prev;
 
+  // NOTE(pag): `ExpandRange` in `IndexCompileJob.cpp` tries to put the leading
+  //            indentation of a fragment with the fragment itself. This is so
+  //            that things "look right" when previewed independently. Here, we
+  //            want to make sure we capture that too.
+  std::optional<pasta::PrintedToken> previous_indent;
+
   for (auto tok : pf.parsed_tokens) {
     auto fid = IdentifyAsNestedFragmentToken(
         pf, tok, might_have_nested_fragments);
 
     if (!fid) {
+      previous_indent.reset();
+      if (IsNonLineBreakingWhitespaceOrEmpty(tok.Data())) {
+        previous_indent.emplace(std::move(tok));
+      }
       continue;
     }
 
@@ -165,6 +180,13 @@ static void IdentifyNestedFragmentTokens(
     }
 
     pf.token_to_nested_fragment.emplace(RawEntity(tok), fid.value());
+
+    // Mark leading indents as being part of this fragment.
+    if (previous_indent) {
+      pf.token_to_nested_fragment.emplace(RawEntity(previous_indent.value()),
+                                          fid.value());
+      previous_indent.reset(); 
+    }
 
     prev.reset();
     prev.emplace(ti, fid.value());

@@ -945,9 +945,17 @@ void GlobalIndexingState::PersistFragment(
   LinkExternalReferencesInFragment(ast, database, pf);
   LinkEntityNamesToFragment(database, pf);
 
-  // Add the fragment to the database.
-  database.AddAsync(
-      mx::FragmentRecord{pf.fragment_id.Pack(), GetSerializedData(message)});
+  // Add the fragment to the database. In the IDStore, we can detect whether
+  // or not we have an opportunity to replace a fragment, but we have no way
+
+  if (pf.id_status == IdStatus::kExistingButReplaced) {
+    database.AddAsync(
+        mx::ReplacementFragmentRecord{pf.fragment_id.Pack(),
+                                      GetSerializedData(message)});
+  } else {
+    database.AddAsync(
+        mx::FragmentRecord{pf.fragment_id.Pack(), GetSerializedData(message)});
+  }
 }
 
 // Persist the compilation.

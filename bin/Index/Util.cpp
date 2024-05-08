@@ -502,6 +502,65 @@ static bool ParamIsDefinition(clang::ParmVarDecl *decl) {
 
 }  // namespace
 
+// Does this look like a replaceable fragment? This happens when there's a
+// method with an uninstantiated/unsubstitued body, or return type that isn't
+// yet deduced.
+bool IsReplaceableFragment(const std::vector<pasta::Decl> &decls) {
+  if (decls.size() != 1u) {
+    return false;
+  }
+
+  const pasta::Decl &decl = decls.front();
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kFunction:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod:
+      break;
+    default:
+      return false;
+  }
+
+  if (decl.IsImplicit()) {
+    return false;
+  }
+
+  const auto &func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
+  
+  // We don't expect to be looking at the pattern definition itself. We should
+  // really never hit this condition, because the top-level decl in `decls`
+  // should instead be the `FunctionTemplateDecl`.
+  if (func.DescribedFunctionTemplate()) {
+    assert(false);
+    return false;
+  }
+
+  // If we have a method with an unresolved/undeduced/etc return type then we
+  // really hope that something better is going to come along.
+  auto rt = func.ReturnType().UnqualifiedDesugaredType();
+  if (rt.ContainsErrors() || rt.IsPlaceholderType() || rt.IsUnresolvedType() ||
+      rt.IsUndeducedAutoType() || rt.IsUndeducedType()) {
+    return true;
+  }
+
+  // NOTE(pag): Clang usually performs body substitution when a method is
+  //            referenced, but not always. What we're looking for is that a
+  //            method doesn't have a body, but that it is patterned on
+  //            something that *does* have a body.
+  if (func.DoesThisDeclarationHaveABody()) {
+    return false;
+  }
+
+  auto pattern_decl = TemplateInstantiationPattern(func);
+  if (!pattern_decl) {
+    return true;
+  }
+
+  return pattern_decl->DoesThisDeclarationHaveABody();
+}
+
 // Returns `true` if `decl` is a definition.
 bool IsDefinition(const pasta::Decl &decl_) {
   auto decl = const_cast<clang::Decl *>(decl_.RawDecl()->RemappedDecl);
@@ -1048,6 +1107,11 @@ bool IsImplicitMethod(const pasta::Decl &decl) {
   }
 }
 
+// Get the unqualified, non-parameterized name of a declaration.
+std::string Name(const pasta::NamedDecl &decl) {
+  return decl.Name();  // TODO(pag).
+}
+
 // Returns `true` if a macro is visible across fragments, and should have an
 // entity id stored in the global mapper.
 bool IsVisibleAcrossFragments(const pasta::Macro &macro) {
@@ -1087,20 +1151,6 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
   }
 
   switch (decl.Kind()) {
-
-    // // Function templates whose bodies are not fully instantiated.
-    // case pasta::DeclKind::kFunction: {
-    //   if (IsSpecialization(decl)) {
-    //     auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
-    //     if (auto pattern_decl = TemplateInstantiationPattern(func)) {
-    //       return pattern_decl->DoesThisDeclarationHaveABody() &&
-    //              !func.DoesThisDeclarationHaveABody() &&
-    //              !func.IsReferenced();
-    //     }
-    //   }
-    //   break;
-    // }
-
     case pasta::DeclKind::kUsingDirective:
       return decl.IsImplicit();
 

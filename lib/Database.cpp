@@ -65,6 +65,7 @@ using QueueItem = std::variant<
 #define MX_RECORD_VARIANT_ENTRY(name) , name
     MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_RECORD_VARIANT_ENTRY)
     MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_RECORD_VARIANT_ENTRY)
+    MX_RECORD_VARIANT_ENTRY(ReplacementFragmentRecord)
 #undef MX_RECORD_VARIANT_ENTRY
 #endif
     >;
@@ -129,6 +130,7 @@ class BulkInserterState {
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DECLARE_INSERT_STMT)
   MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DECLARE_INSERT_STMT)
+  MX_DECLARE_INSERT_STMT(ReplacementFragmentRecord)
 #undef MX_DECLARE_INSERT_STMT
 
   BulkInserterState(std::filesystem::path db_path)
@@ -140,6 +142,7 @@ class BulkInserterState {
         record::kInsertStatement))
     MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DEFINE_STMT)
     MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DEFINE_STMT)
+    MX_DEFINE_STMT(ReplacementFragmentRecord)
 #undef MX_DEFINE_STMT
 #endif
       {
@@ -258,6 +261,7 @@ struct DictionaryCompressor {
   std::string training_data;
   std::vector<size_t> data_sizes;
   std::vector<RawEntityId> entity_ids;
+  std::vector<bool> replacement_flags;
 
   DictionaryCompressor(void);
   ~DictionaryCompressor(void);
@@ -286,11 +290,11 @@ struct DictionaryCompressor {
 
   void CompressAndAdd(DatabaseWriterImpl &impl, DictionaryContext &context,
                       RawEntityId id, const void *data,
-                      size_t data_size, ZSTD_CDict *d);
+                      size_t data_size, bool is_replacement, ZSTD_CDict *d);
 
   void CompressAndAdd(DatabaseWriterImpl &impl, RawEntityId id,
-                      const void *data,
-                      size_t data_size, ZSTD_CDict *d, ZSTD_CCtx *context);
+                      const void *data, size_t data_size, bool is_replacement,
+                      ZSTD_CDict *d, ZSTD_CCtx *context);
 };
 
 class DatabaseWriterImpl {
@@ -346,6 +350,7 @@ class DatabaseWriterImpl {
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DECLARE_INSERT_STMT)
   MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DECLARE_INSERT_STMT)
   MX_DECLARE_INSERT_STMT(FragmentIndexRecord)
+  MX_DECLARE_INSERT_STMT(ReplacementFragmentRecord)
 #undef MX_DECLARE_INSERT_STMT
 };
 
@@ -372,7 +377,7 @@ void DictionaryCompressor::InitWithoutDictionary(void) {
 
 void DictionaryCompressor::CompressAndAdd(
     DatabaseWriterImpl &impl, RawEntityId id, const void *data,
-    size_t data_size, ZSTD_CDict *d, ZSTD_CCtx *context) {
+    size_t data_size, bool is_replacement, ZSTD_CDict *d, ZSTD_CCtx *context) {
 
   const size_t maybe_compressed_data_size = ZSTD_compressBound(data_size);
   std::string compressed_data;
@@ -386,6 +391,11 @@ void DictionaryCompressor::CompressAndAdd(
 
   assert(!ZSTD_isError(compressed_data_size));
   compressed_data.resize(compressed_data_size);
+
+  if (is_replacement) {
+    impl.DoAddAsync(ReplacementFragmentRecord{id, std::move(compressed_data)});
+    return;
+  }
 
   // Swap the uncompressed data with the compressed data, and add it to the
   // bulk insertion queue.
@@ -407,9 +417,10 @@ void DictionaryCompressor::CompressAndAdd(
 
 void DictionaryCompressor::CompressAndAdd(
     DatabaseWriterImpl &impl, DictionaryContext &context, RawEntityId id,
-    const void *data, size_t data_size, ZSTD_CDict *d) {
+    const void *data, size_t data_size, bool is_replacement, ZSTD_CDict *d) {
   auto context_and_index = context.AcquireContext();
-  CompressAndAdd(impl, id, data, data_size, d, context_and_index.first);
+  CompressAndAdd(impl, id, data, data_size, is_replacement, d,
+                 context_and_index.first);
   context.ReleaseContext(context_and_index);
 }
 
@@ -418,8 +429,9 @@ template <typename EntityRecord>
 void DictionaryCompressor::CompressAndAdd(
     DatabaseWriterImpl &impl, DictionaryContext &context, EntityRecord record,
     ZSTD_CDict *d) {
-  CompressAndAdd(impl, context, record.id, record.data.data(),
-                 record.data.size(), d);
+  CompressAndAdd(
+      impl, context, record.id, record.data.data(), record.data.size(),
+      std::is_same_v<EntityRecord, ReplacementFragmentRecord>, d);
 }
 
 // Add `record`, either as a pending item for training a dictionary, or passed
@@ -451,6 +463,8 @@ void DictionaryCompressor::Add(DatabaseWriterImpl &impl,
   training_data.append(record.data);
   data_sizes.push_back(record.data.size());
   entity_ids.push_back(record.id);
+  replacement_flags.push_back(
+      std::is_same_v<ReplacementFragmentRecord, EntityRecord>);
 
   // If we haven't yet collected enough training data then stop here.
   if (training_data.size() < kMinTrainingSetSize) {
@@ -537,8 +551,9 @@ void DictionaryCompressor::Build(DatabaseWriterImpl &impl,
   for (auto i = 0u; i < num_records; ++i) {
     auto record_id = entity_ids[i];
     auto record_data_size = data_sizes[i];
+    auto is_replacement = replacement_flags[i];
     CompressAndAdd(impl, record_id, record_data, record_data_size,
-                   compression_dict, context_and_index.first);
+                   is_replacement, compression_dict, context_and_index.first);
     record_data = &(record_data[record_data_size]);
   }
 
@@ -547,6 +562,7 @@ void DictionaryCompressor::Build(DatabaseWriterImpl &impl,
   // Force free the training resources.
   std::vector<RawEntityId>().swap(entity_ids);
   std::vector<size_t>().swap(data_sizes);
+  std::vector<bool>().swap(replacement_flags);
   std::string().swap(training_data);
 }
 
@@ -881,6 +897,13 @@ bool BulkInserterState::InsertAsync(
   return true;
 }
 
+void DatabaseWriter::AddAsync(ReplacementFragmentRecord record) {
+  static constexpr auto kEntityCategory =
+      static_cast<unsigned>(EntityCategory::FRAGMENT);
+  impl->entity_dictionaries[kEntityCategory].Add(
+      *impl, impl->dictionary_context, std::move(record));
+}
+
 size_t BulkInserterState::SizeOfRecord(const RedeclarationRecord &record) {
   return sizeof(record);
 }
@@ -972,6 +995,7 @@ void DatabaseWriterImpl::InitRecords(void) {
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_EXEC_INITS)
   MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_EXEC_INITS)
+  MX_EXEC_INITS(ReplacementFragmentRecord)
 #undef MX_EXEC_INITS
 #endif
 }
@@ -987,6 +1011,7 @@ void DatabaseWriterImpl::ExitRecords(void) {
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_EXEC_TEARDOWNS)
   MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_EXEC_TEARDOWNS)
+  MX_EXEC_TEARDOWNS(ReplacementFragmentRecord)
 #undef MX_EXEC_TEARDOWNS
 #endif
 }
@@ -1004,6 +1029,7 @@ void DatabaseWriterImpl::ExitRecords(void) {
     }
 
 MX_DEFINE_ADD_RECORD(FragmentIndexRecord)
+MX_DEFINE_ADD_RECORD(ReplacementFragmentRecord)
 MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DEFINE_ADD_RECORD)
 MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DEFINE_ADD_RECORD)
 

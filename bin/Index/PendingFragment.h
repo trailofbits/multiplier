@@ -34,6 +34,8 @@
 
 namespace indexer {
 
+enum class IdStatus : int;
+
 class EntityMapper;
 class TypeMapper;
 
@@ -72,7 +74,7 @@ using FragmentIdMap = std::unordered_map<const void *, mx::PackedFragmentId>;
 // represents a single logical thing.
 class PendingFragment {
  public:
-  inline PendingFragment(mx::PackedFragmentId fragment_id_, bool is_new_,
+  inline PendingFragment(mx::PackedFragmentId fragment_id_, IdStatus id_status_,
                          mx::PackedCompilationId tu_id_,
                          mx::EntityOffset first_parsed_token_index_,
                          mx::EntityOffset last_parsed_token_index_,
@@ -89,7 +91,7 @@ class PendingFragment {
         file_location(std::move(file_location_)),
         first_parsed_token_index(first_parsed_token_index_),
         last_parsed_token_index(last_parsed_token_index_),
-        is_new(is_new_),
+        id_status(id_status_),
         parsed_tokens_are_printed(parsed_tokens_are_printed_) {
     if (original_tokens_) {
       original_tokens = *original_tokens_;
@@ -176,7 +178,7 @@ class PendingFragment {
   // of a type, only to have that pending fragment "thrown away" later (due to
   // it being redundant), yet have other fragments in the TU point to type IDs
   // that logically belong to this type.
-  const bool is_new;
+  const IdStatus id_status;
 
   // Are the parsed tokens actually printed tokens? This happens when we need
   // to render out the specialized version of templates.

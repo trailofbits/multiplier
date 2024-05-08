@@ -92,7 +92,7 @@ inline constexpr unsigned NumEnumerators(IndexStatus) {
 MX_EXPORT const char *EnumeratorName(IndexStatus);
 
 // Access to the indexed code.
-class MX_EXPORT Index {
+class MX_EXPORT Index final {
  private:
   friend class Reference;
   friend class ReferenceKind;
@@ -256,7 +256,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_REFERENCE_AS,
 #endif  // __CDT_PARSER__
 
 // User-definable token. See `TokenRange::create`.
-class MX_EXPORT UserToken {
+class MX_EXPORT UserToken final {
  public:
 
   // The kind of this token.
@@ -298,6 +298,18 @@ class MX_EXPORT UserToken {
     related_entity.swap(that.related_entity);
     return *this;
   }
+};
+
+// User configuration for rendering qualified names.
+class MX_EXPORT QualifiedNameRenderOptions final {
+ public:
+  bool render_anonymous_structs{true};
+  bool render_anonymous_unions{true};
+  bool render_anonymous_enums{true};
+  bool render_anonymous_namespaces{true};
+  bool render_inline_namespaces{true};
+  bool render_template_parameters{true};
+  bool render_template_arguments{true};
 };
 
 }  // namespace mx

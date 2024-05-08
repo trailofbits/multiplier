@@ -332,10 +332,16 @@ static std::string HashTopLevelFragment(
 }
 
 static std::string HashNestedFragment(
-    const EntityMapper &em, const NameMangler &, const pasta::Decl &decl) {
+    const EntityMapper &em, const NameMangler &, const pasta::Decl &decl,
+    mx::RawEntityId parent_eid) {
 
   std::stringstream ss;
-  ss << "K" << int(decl.Kind()) << " S" << decl.Tokens().size();
+  ss << "P" << parent_eid << " K" << int(decl.Kind())
+     << " S" << decl.Tokens().size();
+
+  if (decl.IsImplicit()) {
+    ss << " I";
+  }
 
   // Relative position w.r.t. parent declaration context.
   if (auto first_tok = decl.Tokens().Front()) {
@@ -364,6 +370,13 @@ static std::string HashNestedFragment(
   // return type won't be substituted. This largely corresponds to the name
   // mangling rules of C++: they don't encode the return type.
   if (auto fd = pasta::FunctionDecl::From(decl)) {
+
+    // The pattern should have been indexed already.
+    auto pattern_decl = TemplateInstantiationPattern(fd.value());
+    if (pattern_decl) {
+      ss << " T" << em.EntityId(pattern_decl.value());
+    }
+
     unsigned p = 0u;
     for (const auto &param : fd->Parameters()) {
       ss << " P" << (p++);
@@ -455,8 +468,9 @@ std::string HashFragment(
     const pasta::TokenRange *frag_tok_range,
     const pasta::PrintedTokenRange &decl_tok_range) {
 
-  if (parent_entity && decls.size() == 1u) {
-    return HashNestedFragment(em, nm, decls.front());
+  auto parent_eid = em.EntityId(parent_entity);
+  if (parent_eid != mx::kInvalidEntityId && decls.size() == 1u) {
+    return HashNestedFragment(em, nm, decls.front(), parent_eid);
   }
 
   return HashTopLevelFragment(em, decls, macros, frag_tok_range, decl_tok_range);

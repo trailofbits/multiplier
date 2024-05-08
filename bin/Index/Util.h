@@ -51,6 +51,12 @@ enum class TokenKind : unsigned short;
 }  // namespace mx
 namespace indexer {
 
+enum class IdStatus : int {
+  kNew,
+  kExisting,
+  kExistingButReplaced
+};
+
 using Entity = std::variant<std::monostate, pasta::Decl, pasta::Macro>;
 using EntityLocation = std::pair<uint32_t, uint32_t>;
 struct EntityIdMap final : public std::unordered_map<const void *, mx::EntityId> {};
@@ -120,6 +126,11 @@ mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity);
 mx::TokenKind TokenKindFromPasta(pasta::TokenKind kind, std::string_view data);
 
 pasta::DerivedToken DerivedLocation(const pasta::DerivedToken &tok);
+
+// Does this look like a replaceable fragment? This happens when there's a
+// method with an uninstantiated/unsubstitued body, or return type that isn't
+// yet deduced.
+bool IsReplaceableFragment(const std::vector<pasta::Decl> &decls);
 
 // Returns `true` if `decl` is a definition.
 bool IsDefinition(const pasta::Decl &decl);
@@ -203,6 +214,9 @@ bool IsLambda(const pasta::Decl &decl);
 // etc. These superficially look like builtins, but we don't want to treat them
 // as such.
 bool IsImplicitMethod(const pasta::Decl &decl);
+
+// Get the unqualified, non-parameterized name of a declaration.
+std::string Name(const pasta::NamedDecl &decl);
 
 // List the indexable declarations in this declcontext.
 std::vector<pasta::Decl> DeclarationsInDeclContext(const pasta::DeclContext &dc);

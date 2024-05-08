@@ -33,6 +33,7 @@ class TypePrintingPolicy final : public pasta::PrintingPolicy {
   bool ShouldPrintConstantExpressionsInTypes(void) const final;
   bool ShouldPrintOriginalTypeOfAdjustedType(void) const final;
   bool ShouldPrintOriginalTypeOfDecayedType(void) const final;
+  bool ShouldPrintDeducedTypes(void) const final;
 };
 
 // The type mapper manages type deduplicating and compression. Clang, as well

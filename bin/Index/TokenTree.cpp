@@ -740,7 +740,7 @@ void Rebuilder::AllocateTokens(const pasta::PrintedTokenRange &range) {
       depth[i] += 10;
     }
 
-#if 0
+#if 1
     auto data = info.printed_tok->Data();
     if (data[0] == '\n') {
       data = {};

@@ -34,8 +34,7 @@ class DatabaseWriterImpl;
     m(MangledNameRecord) \
     m(ReferenceRecord) \
     m(NamedEntityRecord) \
-    m(DictionaryRecord) \
-    m(ReplacementFragmentRecord)
+    m(DictionaryRecord)
 
 #define MX_FOR_EACH_ENTITY_RECORD_TYPE(m) \
     m(FileRecord) \
@@ -395,8 +394,11 @@ struct ReplacementFragmentRecord {
        nullptr};
 
   static constexpr const char *kExitStatements[] =
-      {R"()",
-      };
+      {R"(INSERT OR REPLACE INTO fragment (fragment_id, data)
+          SELECT fragment_id, data FROM replacement_fragment)",
+
+       R"(DELETE FROM replacement_fragment)",
+       nullptr};
 
   static constexpr const char *kInsertStatement =
       "INSERT OR IGNORE INTO replacement_fragment (fragment_id, data) VALUES (?1, ?2)";
@@ -530,6 +532,7 @@ class DatabaseWriter final {
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DECLARE_ADD_RECORD)
   MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DECLARE_ADD_RECORD)
+  MX_DECLARE_ADD_RECORD(ReplacementFragmentRecord)
 #undef MX_DECLARE_ADD_RECORD
 
   template <typename T1, typename T2, typename... Ts>

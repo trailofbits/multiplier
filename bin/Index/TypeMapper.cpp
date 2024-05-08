@@ -232,6 +232,10 @@ bool TypePrintingPolicy::ShouldPrintOriginalTypeOfDecayedType(void) const {
   return false;
 }
 
+bool TypePrintingPolicy::ShouldPrintDeducedTypes(void) const {
+  return true;
+}
+
 clang::QualType TypeMapper::Compress(clang::ASTContext &context,
                                      const clang::QualType &type) {
   uint32_t qualifiers = 0u;
@@ -428,7 +432,7 @@ bool TypeMapper::AddEntityId(PendingFragment &pf, pasta::Type *entity_) {
   entity = ast.Adopt(raw_type, raw_qualifiers);
 
   auto token_range = pasta::PrintedTokenRange::Create(entity, pp);
-  auto [type_id, is_new_type_id] = id_store.GetOrCreateTypeIdForHash(
+  auto [type_id, id_status] = id_store.GetOrCreateTypeIdForHash(
       mx::FromPasta(entity.Kind()),
       raw_qualifiers,
       HashType(pf, entity, token_range),
@@ -438,7 +442,7 @@ bool TypeMapper::AddEntityId(PendingFragment &pf, pasta::Type *entity_) {
   type_ids.emplace(orig_type_key, tid);
   type_ids.emplace(dedup_type_key, tid);
 
-  return is_new_type_id;
+  return id_status == IdStatus::kNew;
 }
 
 mx::PackedTypeId TypeMapper::TypeId(const pasta::Type &type) const {
