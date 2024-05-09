@@ -49,7 +49,6 @@ class MX_EXPORT AttributedType : public Type {
   static std::optional<AttributedType> from(const VariantEntity &e);
   static std::optional<AttributedType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   std::optional<Attr> attribute(void) const;
   AttrKind attribute_kind(void) const;
   Type equivalent_type(void) const;

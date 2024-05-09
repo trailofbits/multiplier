@@ -46,7 +46,6 @@ class MX_EXPORT PackExpansionType : public Type {
   static std::optional<PackExpansionType> from(const VariantEntity &e);
   static std::optional<PackExpansionType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Type pattern(void) const;
   bool is_sugared(void) const;
 };

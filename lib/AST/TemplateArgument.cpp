@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/TemplateArgument.h>
 #include "../Reference.h"
+#include <multiplier/AST/Expr.h>
 #include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/Type.h>
@@ -146,21 +147,47 @@ std::optional<Type> TemplateArgument::null_pointer_type(void) const {
   return std::nullopt;
 }
 
-std::optional<std::vector<TemplateArgument>> TemplateArgument::pack_elements(void) const {
-  if (!impl->reader.getVal13()) {
+std::optional<Expr> TemplateArgument::expression(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal12();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
+}
+
+unsigned TemplateArgument::num_pack_arguments(void) const {
+  return impl->reader.getVal13().size();
+}
+
+std::optional<TemplateArgument> TemplateArgument::nth_pack_argument(unsigned n) const {
+  auto list = impl->reader.getVal13();
+  if (n >= list.size()) {
     return std::nullopt;
   }
-  auto list = impl->reader.getVal12();
-  std::vector<TemplateArgument> vec;
-  vec.reserve(list.size());
+  const EntityProviderPtr &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TemplateArgumentFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return TemplateArgument(std::move(e));
+}
+
+gap::generator<TemplateArgument> TemplateArgument::pack_arguments(void) const & {
+  auto list = impl->reader.getVal13();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d12 = ep->TemplateArgumentFor(ep, v)) {
-      vec.emplace_back(std::move(d12));
+    if (auto d13 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d13));
     }
   }
-  return vec;
+  co_return;
 }
 
 #pragma GCC diagnostic pop

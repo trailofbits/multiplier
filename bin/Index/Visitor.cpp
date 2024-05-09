@@ -184,6 +184,10 @@ bool EntityVisitor::EnterFunctionDecl(const pasta::FunctionDecl &decl) {
     return false;
   }
 
+  for (const pasta::TemplateArgument &arg : decl.TemplateArguments()) {
+    Accept(arg);
+  }
+
   Accept(decl.Type());
   VisitDeclContext(decl);
   for (const pasta::ParmVarDecl &param : decl.Parameters()) {

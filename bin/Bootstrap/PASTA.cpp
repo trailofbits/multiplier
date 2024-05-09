@@ -771,6 +771,8 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"FunctionDecl", "IsThisDeclarationInstantiatedFromAFriendDefinition"},
   {"VarDecl", "InstantiatedFromStaticDataMember"},
 
+  {"TemplateArgument", "PackElements"}
+
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
 };
@@ -3226,6 +3228,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   auto methods = cls->record.Methods();
   assert(methods);
+
   for (pasta::CXXMethodDecl method : *methods) {
     if (dont_serialize) {
       continue;
@@ -3728,6 +3731,19 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       serialize_cpp_os
           << "  b." << setter_name << "(e." << method_name << "());\n";
+    }
+  }
+
+  // Allow the blacklist to recursively when a method name isn't actually in
+  // a base class, but is in many derived classes, and we just want to wipe
+  // out all of those derived class methods.
+  for (const auto &[reject_class_name, reject_method_name] : kMethodBlackList) {
+    if (reject_class_name == "Type" && reject_method_name == "PointeeType") {
+      continue;
+    } else if (reject_class_name == class_name) {
+      std::string snake_name = CapitalCaseToSnakeCase(reject_method_name);
+      std::string api_name = SnakeCaseToAPICase(snake_name);
+      (void) seen_methods->emplace(api_name);
     }
   }
 

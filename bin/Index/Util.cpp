@@ -1111,6 +1111,12 @@ bool IsImplicitMethod(const pasta::Decl &decl) {
 std::string Name(const pasta::NamedDecl &decl) {
   auto raw_decl = reinterpret_cast<const clang::NamedDecl *>(decl.RawDecl());
 
+  if (auto cls = dyn_cast<clang::CXXRecordDecl>(raw_decl)) {
+    if (cls->isLambda()) {
+      return {};
+    }
+  }
+
   std::string name;
   llvm::raw_string_ostream os(name);
   clang::PrintingPolicy pp(raw_decl->getASTContext().getLangOpts());

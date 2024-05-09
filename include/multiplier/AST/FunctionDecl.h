@@ -16,7 +16,6 @@
 #include <multiplier/AST/MultiVersionKind.h>
 #include <multiplier/AST/OverloadedOperatorKind.h>
 #include <multiplier/AST/StorageClass.h>
-#include <multiplier/AST/TemplateSpecializationKind.h>
 
 namespace mx {
 class EntityProvider;
@@ -30,6 +29,7 @@ class FunctionTemplateDecl;
 class NamedDecl;
 class ParmVarDecl;
 class Stmt;
+class TemplateArgument;
 class Token;
 class TokenRange;
 class Type;
@@ -99,13 +99,8 @@ class MX_EXPORT FunctionDecl : public DeclaratorDecl {
   MultiVersionKind multi_version_kind(void) const;
   OverloadedOperatorKind overloaded_operator(void) const;
   TokenRange parameters_tokens(void) const;
-  Token point_of_instantiation(void) const;
-  std::optional<FunctionTemplateDecl> primary_template(void) const;
   Type return_type(void) const;
   StorageClass storage_class(void) const;
-  std::optional<FunctionDecl> template_instantiation_pattern(void) const;
-  TemplateSpecializationKind template_specialization_kind(void) const;
-  TemplateSpecializationKind template_specialization_kind_for_instantiation(void) const;
   FunctionDeclTemplatedKind templated_kind(void) const;
   bool has_cxx_explicit_function_object_parameter(void) const;
   bool has_implicit_return_zero(void) const;
@@ -165,6 +160,9 @@ class MX_EXPORT FunctionDecl : public DeclaratorDecl {
   gap::generator<ParmVarDecl> parameters(void) const &;
   bool uses_seh_try(void) const;
   std::optional<Stmt> body(void) const;
+  std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
+  unsigned num_template_arguments(void) const;
+  gap::generator<TemplateArgument> template_arguments(void) const &;
   gap::generator<Decl> contained_declarations(void) const &;
   // Callers of a `FunctionDecl` can be `CallExpr`, `CxxNewExpr`,
   // `CxxConstructExpr`, etc. Even `CastExpr` can sometimes be a call

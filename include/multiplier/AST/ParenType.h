@@ -46,7 +46,6 @@ class MX_EXPORT ParenType : public Type {
   static std::optional<ParenType> from(const VariantEntity &e);
   static std::optional<ParenType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Type inner_type(void) const;
   bool is_sugared(void) const;
 };

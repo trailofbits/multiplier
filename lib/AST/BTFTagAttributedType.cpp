@@ -98,23 +98,18 @@ std::optional<BTFTagAttributedType> BTFTagAttributedType::from(const TokenContex
   return std::nullopt;
 }
 
-Type BTFTagAttributedType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal19();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
 BTFTypeTagAttr BTFTagAttributedType::attribute(void) const {
-  RawEntityId eid = impl->reader.getVal20();
+  RawEntityId eid = impl->reader.getVal19();
   return BTFTypeTagAttr::from_base(impl->ep->AttrFor(impl->ep, eid)).value();
 }
 
 Type BTFTagAttributedType::wrapped_type(void) const {
-  RawEntityId eid = impl->reader.getVal26();
+  RawEntityId eid = impl->reader.getVal25();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool BTFTagAttributedType::is_sugared(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal20();
 }
 
 #pragma GCC diagnostic pop

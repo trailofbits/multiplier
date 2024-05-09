@@ -345,26 +345,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "point_of_instantiation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->point_of_instantiation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionDecl::point_of_instantiation"),
-    nullptr,
-  },
-  {
-    "primary_template",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->primary_template());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionDecl::primary_template"),
-    nullptr,
-  },
-  {
     "return_type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -382,36 +362,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::FunctionDecl::storage_class"),
-    nullptr,
-  },
-  {
-    "template_instantiation_pattern",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_instantiation_pattern());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionDecl::template_instantiation_pattern"),
-    nullptr,
-  },
-  {
-    "template_specialization_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_specialization_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionDecl::template_specialization_kind"),
-    nullptr,
-  },
-  {
-    "template_specialization_kind_for_instantiation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_specialization_kind_for_instantiation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionDecl::template_specialization_kind_for_instantiation"),
     nullptr,
   },
   {
@@ -995,6 +945,26 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "num_template_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_template_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionDecl::num_template_arguments"),
+    nullptr,
+  },
+  {
+    "template_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::template_arguments);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionDecl::template_arguments"),
+    nullptr,
+  },
+  {
     "contained_declarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -1263,6 +1233,28 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::FunctionDecl::nth_parameter"),
+  },
+  {
+    "nth_template_argument",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          T *obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<uint32_t>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nth_template_argument(std::move(arg_0.value())));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nth_template_argument'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::FunctionDecl::nth_template_argument"),
   },
   {}  // Sentinel.
 };

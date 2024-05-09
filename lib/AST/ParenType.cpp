@@ -97,18 +97,13 @@ std::optional<ParenType> ParenType::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-Type ParenType::desugar(void) const {
+Type ParenType::inner_type(void) const {
   RawEntityId eid = impl->reader.getVal19();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
-Type ParenType::inner_type(void) const {
-  RawEntityId eid = impl->reader.getVal20();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
 bool ParenType::is_sugared(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal20();
 }
 
 #pragma GCC diagnostic pop

@@ -48,7 +48,6 @@ class MX_EXPORT RecordType : public TagType {
   static std::optional<RecordType> from(const VariantEntity &e);
   static std::optional<RecordType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   bool has_const_fields(void) const;
   bool is_sugared(void) const;
 };

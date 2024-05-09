@@ -48,7 +48,6 @@ class MX_EXPORT SubstTemplateTypeParmType : public Type {
   static std::optional<SubstTemplateTypeParmType> from(const VariantEntity &e);
   static std::optional<SubstTemplateTypeParmType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Decl associated_declaration(void) const;
   std::optional<uint32_t> pack_index(void) const;
   TemplateTypeParmDecl replaced_parameter(void) const;

@@ -47,7 +47,6 @@ class MX_EXPORT UsingType : public Type {
   static std::optional<UsingType> from(const VariantEntity &e);
   static std::optional<UsingType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   UsingShadowDecl found_declaration(void) const;
   Type underlying_type(void) const;
   bool is_sugared(void) const;

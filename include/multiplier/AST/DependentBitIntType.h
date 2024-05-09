@@ -47,7 +47,6 @@ class MX_EXPORT DependentBitIntType : public Type {
   static std::optional<DependentBitIntType> from(const VariantEntity &e);
   static std::optional<DependentBitIntType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Expr num_bits_expression(void) const;
   bool is_signed(void) const;
   bool is_sugared(void) const;

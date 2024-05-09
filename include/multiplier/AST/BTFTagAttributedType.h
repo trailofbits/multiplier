@@ -47,7 +47,6 @@ class MX_EXPORT BTFTagAttributedType : public Type {
   static std::optional<BTFTagAttributedType> from(const VariantEntity &e);
   static std::optional<BTFTagAttributedType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   BTFTypeTagAttr attribute(void) const;
   Type wrapped_type(void) const;
   bool is_sugared(void) const;

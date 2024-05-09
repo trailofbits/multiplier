@@ -12,7 +12,6 @@
 #include <multiplier/AST/MSInheritanceModel.h>
 #include <multiplier/AST/MSVtorDispMode.h>
 #include <multiplier/AST/RecordDecl.h>
-#include <multiplier/AST/TemplateSpecializationKind.h>
 
 namespace mx {
 class EntityProvider;
@@ -105,8 +104,6 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   std::optional<CXXMethodDecl> lambda_static_invoker(void) const;
   std::optional<MSInheritanceModel> ms_inheritance_model(void) const;
   MSVtorDispMode ms_vtor_disp_mode(void) const;
-  std::optional<CXXRecordDecl> template_instantiation_pattern(void) const;
-  TemplateSpecializationKind template_specialization_kind(void) const;
   std::optional<bool> has_any_dependent_bases(void) const;
   std::optional<bool> has_constexpr_default_constructor(void) const;
   std::optional<bool> has_constexpr_destructor(void) const;

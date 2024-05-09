@@ -48,7 +48,6 @@ class MX_EXPORT EnumType : public TagType {
   static std::optional<EnumType> from(const VariantEntity &e);
   static std::optional<EnumType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   bool is_sugared(void) const;
 };
 

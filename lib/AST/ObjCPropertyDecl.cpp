@@ -253,7 +253,7 @@ ObjCPropertyQueryKind ObjCPropertyDecl::query_kind(void) const {
 }
 
 ObjCPropertyDeclSetterKind ObjCPropertyDecl::setter_kind(void) const {
-  return static_cast<ObjCPropertyDeclSetterKind>(impl->reader.getVal75());
+  return static_cast<ObjCPropertyDeclSetterKind>(impl->reader.getVal74());
 }
 
 ObjCMethodDecl ObjCPropertyDecl::setter_method_declaration(void) const {
@@ -287,15 +287,15 @@ bool ObjCPropertyDecl::is_instance_property(void) const {
 }
 
 bool ObjCPropertyDecl::is_optional(void) const {
-  return impl->reader.getVal82();
+  return impl->reader.getVal78();
 }
 
 bool ObjCPropertyDecl::is_read_only(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal79();
 }
 
 bool ObjCPropertyDecl::is_retaining(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal80();
 }
 
 #pragma GCC diagnostic pop

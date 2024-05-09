@@ -49,7 +49,6 @@ class MX_EXPORT ElaboratedType : public TypeWithKeyword {
   static std::optional<ElaboratedType> from(const VariantEntity &e);
   static std::optional<ElaboratedType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Type named_type(void) const;
   std::optional<TagDecl> owned_tag_declaration(void) const;
   bool is_sugared(void) const;

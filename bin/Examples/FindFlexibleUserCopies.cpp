@@ -108,7 +108,7 @@ static std::optional<mx::RecordType> CopiedRecord(
   }
 
   return mx::RecordType::from(
-      ptr_type->desugar().unqualified_type().canonical_type());
+      ptr_type->pointee_type().unqualified_type().canonical_type());
 }
 
 static void WithCopyToUser(mx::FunctionDecl copy_from_user) {

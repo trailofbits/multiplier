@@ -48,7 +48,6 @@ class MX_EXPORT IncompleteArrayType : public ArrayType {
   static std::optional<IncompleteArrayType> from(const VariantEntity &e);
   static std::optional<IncompleteArrayType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   bool is_sugared(void) const;
 };
 

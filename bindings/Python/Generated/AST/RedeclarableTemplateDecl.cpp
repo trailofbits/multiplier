@@ -167,16 +167,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "instantiated_from_member_template",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instantiated_from_member_template());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RedeclarableTemplateDecl::instantiated_from_member_template"),
-    nullptr,
-  },
-  {
     "is_member_specialization",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

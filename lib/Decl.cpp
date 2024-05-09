@@ -7,12 +7,16 @@
 #include "Decl.h"
 
 #include <multiplier/AST/ClassTemplateDecl.h>
+#include <multiplier/AST/ClassTemplatePartialSpecializationDecl.h>
 #include <multiplier/AST/CXXMethodDecl.h>
 #include <multiplier/AST/CXXRecordDecl.h>
 #include <multiplier/AST/FunctionTemplateDecl.h>
+#include <multiplier/AST/ImplicitConceptSpecializationDecl.h>
 #include <multiplier/AST/NamespaceDecl.h>
-#include <multiplier/AST/VarTemplateDecl.h>
+#include <multiplier/AST/TemplateArgument.h>
 #include <multiplier/AST/VarDecl.h>
+#include <multiplier/AST/VarTemplateDecl.h>
+#include <multiplier/AST/VarTemplatePartialSpecializationDecl.h>
 #include <multiplier/Index.h>
 
 #include "Fragment.h"
@@ -376,6 +380,25 @@ gap::generator<Decl> Decl::specializations(void) const & {
 
 namespace {
 
+static void AddSimpleToken(CustomTokenReader &tr, std::string_view data,
+                           TokenKind kind, TokenCategory category) {
+
+  tr.data.insert(tr.data.end(), data.begin(), data.end());
+  tr.data_offset.push_back(static_cast<EntityOffset>(tr.data.size()));
+  tr.derived_token_ids.push_back(kInvalidEntityId);
+  tr.parsed_token_ids.push_back(kInvalidEntityId);
+  tr.containing_macro_ids.push_back(kInvalidEntityId);
+  tr.token_ids.push_back(kInvalidEntityId);
+  tr.token_kinds.push_back(kind);
+  tr.token_categories.push_back(category);
+  tr.file_token_ids.push_back(kInvalidEntityId);
+  tr.related_entities.emplace_back(NotAnEntity{});
+}
+
+static void RenderQualifiedNameInto(
+    CustomTokenReader &tr, const NamedDecl &nd,
+    const QualifiedNameRenderOptions &options);
+
 static void RenderTemplateParametersInto(
     CustomTokenReader &tr, const TemplateParameterList &params,
     const QualifiedNameRenderOptions &options) {
@@ -385,11 +408,102 @@ static void RenderTemplateParametersInto(
   (void) options;
 }
 
-static void RenderQualifiedNameInto(
+static void RenderTemplateArgumentInto(
+    CustomTokenReader &tr, const TemplateArgument &arg,
+    const QualifiedNameRenderOptions &options) {
+
+  bool needs_comma = tr.token_kinds.back() != TokenKind::L_ANGLE;
+  auto maybe_add_comma = [&] (void) {
+    if (needs_comma) {
+      AddSimpleToken(tr, ",", TokenKind::COMMA, TokenCategory::PUNCTUATION);
+      AddSimpleToken(tr, " ", TokenKind::WHITESPACE, TokenCategory::WHITESPACE);
+      needs_comma = false;
+    }
+  };
+
+  switch (arg.kind()) {
+    case TemplateArgumentKind::EMPTY:
+      return;
+    case TemplateArgumentKind::TYPE:
+      if (auto ty = arg.type()) {
+        for (auto tok : ty->tokens()) {
+          maybe_add_comma();
+          tr.Append(std::move(tok));
+        }
+      }
+      break;
+    case TemplateArgumentKind::DECLARATION:
+      if (auto vd = arg.declaration()) {
+        if (auto nvd = NamedDecl::from(vd.value())) {
+          maybe_add_comma();
+          RenderQualifiedNameInto(tr, nvd.value(), options);
+        } else {
+          auto max = 16;
+          for (auto tok : vd->tokens()) {
+            maybe_add_comma();
+            tr.Append(std::move(tok));
+            if (!--max) {
+              AddSimpleToken(tr, "...", TokenKind::ELLIPSIS,
+                             TokenCategory::PUNCTUATION);
+              break;
+            }
+          }
+        }
+      }
+      break;
+    case TemplateArgumentKind::NULL_POINTER:
+      maybe_add_comma();
+      AddSimpleToken(tr, "nullptr", TokenKind::KEYWORD_NULLPTR,
+                     TokenCategory::KEYWORD);
+      break;
+
+    case TemplateArgumentKind::INTEGRAL:
+      maybe_add_comma();
+      AddSimpleToken(tr, "?", TokenKind::UNKNOWN, TokenCategory::ERROR);
+      break;
+
+    case TemplateArgumentKind::EXPRESSION:
+      if (auto expr = arg.expression()) {
+        for (auto tok : expr->tokens()) {
+          maybe_add_comma();
+          tr.Append(std::move(tok));
+        }
+      }
+      break;
+
+    case TemplateArgumentKind::PACK:
+      for (const auto &sub_arg : arg.pack_arguments()) {
+        RenderTemplateArgumentInto(tr, sub_arg, options);
+      }
+      break;
+
+    // TODO(pag): Handle these.
+    case TemplateArgumentKind::TEMPLATE:
+    case TemplateArgumentKind::TEMPLATE_EXPANSION:
+    case TemplateArgumentKind::STRUCTURAL_VALUE:
+      maybe_add_comma();
+      AddSimpleToken(tr, "?", TokenKind::UNKNOWN, TokenCategory::ERROR);
+      break;
+  }
+}
+
+static void RenderTemplateArgumentsInto(
+    CustomTokenReader &tr, gap::generator<TemplateArgument> args,
+    const QualifiedNameRenderOptions &options) {
+  AddSimpleToken(tr, "<", TokenKind::L_ANGLE, TokenCategory::PUNCTUATION);
+
+  for (const auto &arg : args) {
+    RenderTemplateArgumentInto(tr, arg, options);
+  }
+
+  AddSimpleToken(tr, ">", TokenKind::R_ANGLE, TokenCategory::PUNCTUATION);
+}
+
+void RenderQualifiedNameInto(
     CustomTokenReader &tr, const NamedDecl &nd,
     const QualifiedNameRenderOptions &options) {
-  if (auto pd = NamedDecl::from(nd.parent_declaration())) {
 
+  if (auto pd = NamedDecl::from(nd.parent_declaration())) {
     RenderQualifiedNameInto(tr, pd.value(), options);
 
     // The parent is a template declaration; we don't need to print `nd` because
@@ -423,6 +537,14 @@ static void RenderQualifiedNameInto(
         break;
       default:
         break;
+    }
+  }
+
+  if (kind == DeclKind::CXX_RECORD) {
+    const auto &record = reinterpret_cast<const CXXRecordDecl &>(nd);
+    if (record.is_lambda()) {
+      name = "(lambda)";
+      should_print = true;
     }
   }
 
@@ -482,18 +604,8 @@ static void RenderQualifiedNameInto(
   // Add in a leading `::` to separate from parent declaration names.
   if (!tr.token_kinds.empty() &&
       tr.token_kinds.back() != TokenKind::COLON_COLON) {
-
-    tr.data.push_back(':');
-    tr.data.push_back(':');
-    tr.data_offset.push_back(static_cast<EntityOffset>(tr.data.size()));
-    tr.derived_token_ids.push_back(kInvalidEntityId);
-    tr.parsed_token_ids.push_back(kInvalidEntityId);
-    tr.containing_macro_ids.push_back(kInvalidEntityId);
-    tr.token_ids.push_back(kInvalidEntityId);
-    tr.token_kinds.push_back(TokenKind::COLON_COLON);
-    tr.token_categories.push_back(TokenCategory::PUNCTUATION);
-    tr.file_token_ids.push_back(kInvalidEntityId);
-    tr.related_entities.emplace_back(NotAnEntity{});
+    AddSimpleToken(tr, "::", TokenKind::COLON_COLON,
+                   TokenCategory::PUNCTUATION);
   }
 
   // Add in the declaration.
@@ -520,12 +632,51 @@ static void RenderQualifiedNameInto(
             reinterpret_cast<const TemplateDecl &>(nd).template_parameters(),
             options);
         break;
+      case DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
+      case DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
       default:
         break;
     }
   }
 
   if (options.render_template_arguments) {
+    switch (kind) {
+      case DeclKind::FUNCTION:
+      case DeclKind::CXX_CONSTRUCTOR:
+      case DeclKind::CXX_CONVERSION:
+      case DeclKind::CXX_DEDUCTION_GUIDE:
+      case DeclKind::CXX_DESTRUCTOR:
+      case DeclKind::CXX_METHOD: {
+        const auto &func = reinterpret_cast<const FunctionDecl &>(nd);
+        switch (func.templated_kind()) {
+          case FunctionDeclTemplatedKind::FUNCTION_TEMPLATE_SPECIALIZATION:
+          case FunctionDeclTemplatedKind::DEPENDENT_FUNCTION_TEMPLATE_SPECIALIZATION:
+            RenderTemplateArgumentsInto(tr, func.template_arguments(), options);
+            break;
+          default:
+            break;
+        }
+        break;
+      }
+      case DeclKind::CLASS_TEMPLATE_SPECIALIZATION: {
+        const auto &cls = reinterpret_cast<const ClassTemplateSpecializationDecl &>(nd);
+        RenderTemplateArgumentsInto(tr, cls.template_arguments(), options);
+        break;
+      }
+      case DeclKind::VAR_TEMPLATE_SPECIALIZATION: {
+        const auto &var = reinterpret_cast<const VarTemplateSpecializationDecl &>(nd);
+        RenderTemplateArgumentsInto(tr, var.template_arguments(), options);
+        break;
+      }
+      case DeclKind::IMPLICIT_CONCEPT_SPECIALIZATION: {
+        const auto &cpt = reinterpret_cast<const ImplicitConceptSpecializationDecl &>(nd);
+        RenderTemplateArgumentsInto(tr, cpt.template_arguments(), options);
+        break;
+      }
+      default:
+        break;
+    }
+
     // TODO(pag): Implement this.
   }
 }

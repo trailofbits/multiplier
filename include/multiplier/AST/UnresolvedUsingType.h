@@ -47,7 +47,6 @@ class MX_EXPORT UnresolvedUsingType : public Type {
   static std::optional<UnresolvedUsingType> from(const VariantEntity &e);
   static std::optional<UnresolvedUsingType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   UnresolvedUsingTypenameDecl declaration(void) const;
   bool is_sugared(void) const;
 };

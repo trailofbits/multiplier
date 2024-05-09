@@ -47,7 +47,6 @@ class MX_EXPORT UnaryTransformType : public Type {
   static std::optional<UnaryTransformType> from(const VariantEntity &e);
   static std::optional<UnaryTransformType> from(const TokenContext &t);
 
-  std::optional<Type> desugar(void) const;
   std::optional<Type> base_type(void) const;
   UnaryTransformTypeUTTKind utt_kind(void) const;
   std::optional<Type> underlying_type(void) const;

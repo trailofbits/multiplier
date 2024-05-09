@@ -46,7 +46,6 @@ class MX_EXPORT AdjustedType : public Type {
   static std::optional<AdjustedType> from(const VariantEntity &e);
   static std::optional<AdjustedType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Type resolved_type(void) const;
   Type original_type(void) const;
   bool is_sugared(void) const;

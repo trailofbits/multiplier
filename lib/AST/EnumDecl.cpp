@@ -287,49 +287,32 @@ std::optional<Type> EnumDecl::promotion_type(void) const {
   return std::nullopt;
 }
 
-std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal72();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return EnumDecl::from_base(std::move(eptr));
-    }
-  }
-  return std::nullopt;
-}
-
-TemplateSpecializationKind EnumDecl::template_specialization_kind(void) const {
-  return static_cast<TemplateSpecializationKind>(impl->reader.getVal73());
-}
-
 bool EnumDecl::is_closed(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal88();
 }
 
 bool EnumDecl::is_closed_flag(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal89();
 }
 
 bool EnumDecl::is_closed_non_flag(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal90();
 }
 
 bool EnumDecl::is_complete(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal91();
 }
 
 bool EnumDecl::is_fixed(void) const {
-  return impl->reader.getVal96();
+  return impl->reader.getVal92();
 }
 
 bool EnumDecl::is_scoped(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal93();
 }
 
 bool EnumDecl::is_scoped_using_class_tag(void) const {
-  return impl->reader.getVal98();
+  return impl->reader.getVal94();
 }
 
 #pragma GCC diagnostic pop

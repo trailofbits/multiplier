@@ -63,7 +63,6 @@ class MX_EXPORT RedeclarableTemplateDecl : public TemplateDecl {
   static std::optional<RedeclarableTemplateDecl> from(const VariantEntity &e);
   static std::optional<RedeclarableTemplateDecl> from(const TokenContext &t);
 
-  std::optional<RedeclarableTemplateDecl> instantiated_from_member_template(void) const;
   bool is_member_specialization(void) const;
 };
 

@@ -135,16 +135,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::desugar"),
-    nullptr,
-  },
-  {
     "ellipsis_token",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

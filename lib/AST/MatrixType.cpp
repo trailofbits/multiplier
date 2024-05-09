@@ -101,18 +101,13 @@ std::optional<MatrixType> MatrixType::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-Type MatrixType::desugar(void) const {
+Type MatrixType::element_type(void) const {
   RawEntityId eid = impl->reader.getVal19();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
-Type MatrixType::element_type(void) const {
-  RawEntityId eid = impl->reader.getVal20();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
 bool MatrixType::is_sugared(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal20();
 }
 
 #pragma GCC diagnostic pop

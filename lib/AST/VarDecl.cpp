@@ -301,45 +301,20 @@ LanguageLinkage VarDecl::language_linkage(void) const {
   return static_cast<LanguageLinkage>(impl->reader.getVal73());
 }
 
-Token VarDecl::point_of_instantiation(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal74());
-}
-
 StorageClass VarDecl::storage_class(void) const {
-  return static_cast<StorageClass>(impl->reader.getVal75());
+  return static_cast<StorageClass>(impl->reader.getVal74());
 }
 
 StorageDuration VarDecl::storage_duration(void) const {
-  return static_cast<StorageDuration>(impl->reader.getVal76());
+  return static_cast<StorageDuration>(impl->reader.getVal75());
 }
 
 VarDeclTLSKind VarDecl::tls_kind(void) const {
-  return static_cast<VarDeclTLSKind>(impl->reader.getVal77());
+  return static_cast<VarDeclTLSKind>(impl->reader.getVal76());
 }
 
 ThreadStorageClassSpecifier VarDecl::tsc_spec(void) const {
-  return static_cast<ThreadStorageClassSpecifier>(impl->reader.getVal78());
-}
-
-std::optional<VarDecl> VarDecl::template_instantiation_pattern(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal79();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from_base(std::move(eptr));
-    }
-  }
-  return std::nullopt;
-}
-
-TemplateSpecializationKind VarDecl::template_specialization_kind(void) const {
-  return static_cast<TemplateSpecializationKind>(impl->reader.getVal80());
-}
-
-TemplateSpecializationKind VarDecl::template_specialization_kind_for_instantiation(void) const {
-  return static_cast<TemplateSpecializationKind>(impl->reader.getVal81());
+  return static_cast<ThreadStorageClassSpecifier>(impl->reader.getVal77());
 }
 
 bool VarDecl::has_constant_initialization(void) const {
@@ -351,132 +326,132 @@ bool VarDecl::has_dependent_alignment(void) const {
 }
 
 bool VarDecl::has_external_storage(void) const {
-  return impl->reader.getVal82();
+  return impl->reader.getVal78();
 }
 
 std::optional<bool> VarDecl::has_flexible_array_initializer(void) const {
-  if (!impl->reader.getVal84()) {
+  if (!impl->reader.getVal80()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal83());
+    return static_cast<bool>(impl->reader.getVal79());
   }
   return std::nullopt;
 }
 
 bool VarDecl::has_global_storage(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal81();
 }
 
 bool VarDecl::has_initializer(void) const {
-  return impl->reader.getVal86();
+  return impl->reader.getVal82();
 }
 
 bool VarDecl::has_local_storage(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal83();
 }
 
 bool VarDecl::is_arc_pseudo_strong(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal84();
 }
 
 bool VarDecl::is_cxx_for_range_declaration(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal85();
 }
 
 bool VarDecl::is_constexpr(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal86();
 }
 
 bool VarDecl::is_direct_initializer(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal87();
 }
 
 bool VarDecl::is_escaping_byref(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal88();
 }
 
 bool VarDecl::is_exception_variable(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal89();
 }
 
 bool VarDecl::is_extern_c(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal90();
 }
 
 bool VarDecl::is_file_variable_declaration(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal91();
 }
 
 bool VarDecl::is_function_or_method_variable_declaration(void) const {
-  return impl->reader.getVal96();
+  return impl->reader.getVal92();
 }
 
 bool VarDecl::is_in_extern_c_context(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal93();
 }
 
 bool VarDecl::is_in_extern_cxx_context(void) const {
-  return impl->reader.getVal98();
+  return impl->reader.getVal94();
 }
 
 bool VarDecl::is_inline(void) const {
-  return impl->reader.getVal99();
+  return impl->reader.getVal95();
 }
 
 bool VarDecl::is_inline_specified(void) const {
-  return impl->reader.getVal100();
+  return impl->reader.getVal96();
 }
 
 bool VarDecl::is_known_to_be_defined(void) const {
-  return impl->reader.getVal101();
+  return impl->reader.getVal97();
 }
 
 bool VarDecl::is_local_variable_declaration(void) const {
-  return impl->reader.getVal102();
+  return impl->reader.getVal98();
 }
 
 bool VarDecl::is_local_variable_declaration_or_parm(void) const {
-  return impl->reader.getVal103();
+  return impl->reader.getVal99();
 }
 
 bool VarDecl::is_nrvo_variable(void) const {
-  return impl->reader.getVal104();
+  return impl->reader.getVal100();
 }
 
 bool VarDecl::is_no_destroy(void) const {
-  return impl->reader.getVal105();
+  return impl->reader.getVal101();
 }
 
 bool VarDecl::is_non_escaping_byref(void) const {
-  return impl->reader.getVal106();
+  return impl->reader.getVal102();
 }
 
 bool VarDecl::is_obj_c_for_declaration(void) const {
-  return impl->reader.getVal107();
+  return impl->reader.getVal103();
 }
 
 bool VarDecl::is_previous_declaration_in_same_block_scope(void) const {
-  return impl->reader.getVal108();
+  return impl->reader.getVal104();
 }
 
 bool VarDecl::is_static_data_member(void) const {
-  return impl->reader.getVal109();
+  return impl->reader.getVal105();
 }
 
 bool VarDecl::is_static_local(void) const {
-  return impl->reader.getVal110();
+  return impl->reader.getVal106();
 }
 
 bool VarDecl::is_this_declaration_a_demoted_definition(void) const {
-  return impl->reader.getVal111();
+  return impl->reader.getVal107();
 }
 
 bool VarDecl::is_usable_in_constant_expressions(void) const {
-  return impl->reader.getVal112();
+  return impl->reader.getVal108();
 }
 
 bool VarDecl::might_be_usable_in_constant_expressions(void) const {
-  return impl->reader.getVal113();
+  return impl->reader.getVal109();
 }
 
 #pragma GCC diagnostic pop

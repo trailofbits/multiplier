@@ -48,7 +48,6 @@ class MX_EXPORT TypeOfExprType : public Type {
   static std::optional<TypeOfExprType> from(const VariantEntity &e);
   static std::optional<TypeOfExprType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   TypeOfKind type_kind(void) const;
   Expr underlying_expression(void) const;
   bool is_sugared(void) const;

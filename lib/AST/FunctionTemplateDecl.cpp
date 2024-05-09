@@ -226,7 +226,7 @@ bool FunctionTemplateDecl::is_abbreviated(void) const {
 }
 
 bool FunctionTemplateDecl::is_this_declaration_a_definition(void) const {
-  return impl->reader.getVal82();
+  return impl->reader.getVal78();
 }
 
 #pragma GCC diagnostic pop

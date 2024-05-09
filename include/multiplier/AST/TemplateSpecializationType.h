@@ -47,7 +47,6 @@ class MX_EXPORT TemplateSpecializationType : public Type {
   static std::optional<TemplateSpecializationType> from(const VariantEntity &e);
   static std::optional<TemplateSpecializationType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   std::optional<Type> aliased_type(void) const;
   bool is_current_instantiation(void) const;
   bool is_sugared(void) const;

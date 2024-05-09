@@ -67,7 +67,7 @@ static PyTypeObject gTypeDef = {
       return -1;
     }
 
-    // Initialize the cache.
+    // Initialize the token.
     auto obj = reinterpret_cast<O *>(self);
     obj->data = new (obj->backing_storage) T;
 

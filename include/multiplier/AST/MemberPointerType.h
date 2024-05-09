@@ -46,7 +46,6 @@ class MX_EXPORT MemberPointerType : public Type {
   static std::optional<MemberPointerType> from(const VariantEntity &e);
   static std::optional<MemberPointerType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Type class_(void) const;
   Type pointee_type(void) const;
   bool is_member_data_pointer(void) const;

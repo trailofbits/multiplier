@@ -5687,7 +5687,9 @@ class TemplateArgument(multiplier.Entity):
   type: Optional[multiplier.ast.Type]
   parameter_type_for_declaration: Optional[multiplier.ast.Type]
   null_pointer_type: Optional[multiplier.ast.Type]
-  pack_elements: Optional[Sequence[multiplier.ast.TemplateArgument]]
+  expression: Optional[multiplier.ast.Expr]
+  num_pack_arguments: int
+  pack_arguments: Iterable[multiplier.ast.TemplateArgument]
 
   @staticmethod
   def static_category() -> multiplier.EntityCategory:
@@ -5716,6 +5718,9 @@ class TemplateArgument(multiplier.Entity):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TemplateArgument]:
+    ...
+
+  def nth_pack_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
     ...
 
 class Attr(multiplier.Entity):
@@ -30650,7 +30655,6 @@ class Type(multiplier.Entity):
     ...
 
 class TemplateTypeParmType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   declaration: Optional[multiplier.ast.TemplateTypeParmDecl]
   is_parameter_pack: bool
   is_sugared: bool
@@ -30704,7 +30708,6 @@ class TemplateTypeParmType(multiplier.ast.Type):
     ...
 
 class TemplateSpecializationType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   aliased_type: Optional[multiplier.ast.Type]
   is_current_instantiation: bool
   is_sugared: bool
@@ -30812,7 +30815,6 @@ class TagType(multiplier.ast.Type):
     ...
 
 class RecordType(multiplier.ast.TagType):
-  desugar: multiplier.ast.Type
   has_const_fields: bool
   is_sugared: bool
 
@@ -30865,7 +30867,6 @@ class RecordType(multiplier.ast.TagType):
     ...
 
 class EnumType(multiplier.ast.TagType):
-  desugar: multiplier.ast.Type
   is_sugared: bool
 
   @staticmethod
@@ -30917,7 +30918,6 @@ class EnumType(multiplier.ast.TagType):
     ...
 
 class SubstTemplateTypeParmType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   associated_declaration: multiplier.ast.Decl
   pack_index: Optional[int]
   replaced_parameter: multiplier.ast.TemplateTypeParmDecl
@@ -30973,7 +30973,6 @@ class SubstTemplateTypeParmType(multiplier.ast.Type):
     ...
 
 class SubstTemplateTypeParmPackType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   associated_declaration: multiplier.ast.Decl
   final: bool
   replaced_parameter: multiplier.ast.TemplateTypeParmDecl
@@ -31078,7 +31077,6 @@ class ReferenceType(multiplier.ast.Type):
     ...
 
 class RValueReferenceType(multiplier.ast.ReferenceType):
-  desugar: multiplier.ast.Type
   is_sugared: bool
 
   @staticmethod
@@ -31130,7 +31128,6 @@ class RValueReferenceType(multiplier.ast.ReferenceType):
     ...
 
 class LValueReferenceType(multiplier.ast.ReferenceType):
-  desugar: multiplier.ast.Type
   is_sugared: bool
 
   @staticmethod
@@ -31268,7 +31265,6 @@ class QualifiedType(multiplier.ast.Type):
     ...
 
 class PointerType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   pointee_type: multiplier.ast.Type
   is_sugared: bool
 
@@ -31321,7 +31317,6 @@ class PointerType(multiplier.ast.Type):
     ...
 
 class PipeType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   element_type: multiplier.ast.Type
   is_read_only: bool
   is_sugared: bool
@@ -31375,7 +31370,6 @@ class PipeType(multiplier.ast.Type):
     ...
 
 class ParenType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   inner_type: multiplier.ast.Type
   is_sugared: bool
 
@@ -31428,7 +31422,6 @@ class ParenType(multiplier.ast.Type):
     ...
 
 class PackExpansionType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   pattern: multiplier.ast.Type
   is_sugared: bool
 
@@ -31481,7 +31474,6 @@ class PackExpansionType(multiplier.ast.Type):
     ...
 
 class ObjCTypeParamType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   declaration: multiplier.ast.ObjCTypeParamDecl
   is_sugared: bool
 
@@ -31534,7 +31526,6 @@ class ObjCTypeParamType(multiplier.ast.Type):
     ...
 
 class ObjCObjectType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   base_type: multiplier.ast.Type
   interface: multiplier.ast.ObjCInterfaceDecl
   super_class_type: Optional[multiplier.ast.Type]
@@ -31660,7 +31651,6 @@ class ObjCInterfaceType(multiplier.ast.ObjCObjectType):
     ...
 
 class ObjCObjectPointerType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   interface_declaration: multiplier.ast.ObjCInterfaceDecl
   interface_type: multiplier.ast.ObjCInterfaceType
   object_type: multiplier.ast.ObjCObjectType
@@ -31740,7 +31730,6 @@ class ObjCObjectPointerType(multiplier.ast.Type):
     ...
 
 class MemberPointerType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   class_: multiplier.ast.Type
   pointee_type: multiplier.ast.Type
   is_member_data_pointer: bool
@@ -31796,7 +31785,6 @@ class MemberPointerType(multiplier.ast.Type):
     ...
 
 class MatrixType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   element_type: multiplier.ast.Type
   is_sugared: bool
 
@@ -31948,7 +31936,6 @@ class ConstantMatrixType(multiplier.ast.MatrixType):
     ...
 
 class MacroQualifiedType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   modified_type: multiplier.ast.Type
   underlying_type: multiplier.ast.Type
   is_sugared: bool
@@ -32002,7 +31989,6 @@ class MacroQualifiedType(multiplier.ast.Type):
     ...
 
 class InjectedClassNameType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   declaration: multiplier.ast.CXXRecordDecl
   injected_specialization_type: multiplier.ast.Type
   injected_tst: multiplier.ast.TemplateSpecializationType
@@ -32113,7 +32099,6 @@ class FunctionType(multiplier.ast.Type):
 
 class FunctionProtoType(multiplier.ast.FunctionType):
   can_throw: Optional[multiplier.ast.CanThrowResult]
-  desugar: multiplier.ast.Type
   ellipsis_token: multiplier.frontend.Token
   exception_spec_declaration: Optional[multiplier.ast.FunctionDecl]
   exception_spec_template: Optional[multiplier.ast.FunctionDecl]
@@ -32191,7 +32176,6 @@ class FunctionProtoType(multiplier.ast.FunctionType):
     ...
 
 class FunctionNoProtoType(multiplier.ast.FunctionType):
-  desugar: multiplier.ast.Type
   is_sugared: bool
 
   @staticmethod
@@ -32243,7 +32227,6 @@ class FunctionNoProtoType(multiplier.ast.FunctionType):
     ...
 
 class DependentVectorType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   attribute_token: multiplier.frontend.Token
   element_type: multiplier.ast.Type
   size_expression: multiplier.ast.Expr
@@ -32299,7 +32282,6 @@ class DependentVectorType(multiplier.ast.Type):
     ...
 
 class DependentSizedExtVectorType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   attribute_token: multiplier.frontend.Token
   element_type: multiplier.ast.Type
   size_expression: multiplier.ast.Expr
@@ -32354,7 +32336,6 @@ class DependentSizedExtVectorType(multiplier.ast.Type):
     ...
 
 class DependentBitIntType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   num_bits_expression: multiplier.ast.Expr
   is_signed: bool
   is_sugared: bool
@@ -32409,7 +32390,6 @@ class DependentBitIntType(multiplier.ast.Type):
     ...
 
 class DependentAddressSpaceType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   address_space_expression: multiplier.ast.Expr
   attribute_token: multiplier.frontend.Token
   pointee_type: multiplier.ast.Type
@@ -32464,7 +32444,6 @@ class DependentAddressSpaceType(multiplier.ast.Type):
     ...
 
 class DeducedType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   resolved_type: Optional[multiplier.ast.Type]
   is_deduced: bool
   is_sugared: bool
@@ -32624,7 +32603,6 @@ class AutoType(multiplier.ast.DeducedType):
     ...
 
 class DecltypeType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   underlying_expression: multiplier.ast.Expr
   underlying_type: multiplier.ast.Type
   is_sugared: bool
@@ -32678,7 +32656,6 @@ class DecltypeType(multiplier.ast.Type):
     ...
 
 class ComplexType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   element_type: multiplier.ast.Type
   is_sugared: bool
 
@@ -32731,7 +32708,6 @@ class ComplexType(multiplier.ast.Type):
     ...
 
 class BuiltinType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   builtin_kind: multiplier.ast.BuiltinTypeKind
   is_floating_point: bool
   is_integer: bool
@@ -32790,7 +32766,6 @@ class BuiltinType(multiplier.ast.Type):
     ...
 
 class BlockPointerType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   pointee_type: multiplier.ast.Type
   is_sugared: bool
 
@@ -32843,7 +32818,6 @@ class BlockPointerType(multiplier.ast.Type):
     ...
 
 class BitIntType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   is_signed: bool
   is_sugared: bool
   is_unsigned: bool
@@ -32897,7 +32871,6 @@ class BitIntType(multiplier.ast.Type):
     ...
 
 class BTFTagAttributedType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   attribute: multiplier.ast.BTFTypeTagAttr
   wrapped_type: multiplier.ast.Type
   is_sugared: bool
@@ -32951,7 +32924,6 @@ class BTFTagAttributedType(multiplier.ast.Type):
     ...
 
 class AttributedType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   attribute: Optional[multiplier.ast.Attr]
   attribute_kind: multiplier.ast.AttrKind
   equivalent_type: multiplier.ast.Type
@@ -33013,7 +32985,6 @@ class AttributedType(multiplier.ast.Type):
     ...
 
 class AtomicType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   value_type: multiplier.ast.Type
   is_sugared: bool
 
@@ -33114,7 +33085,6 @@ class ArrayType(multiplier.ast.Type):
     ...
 
 class VariableArrayType(multiplier.ast.ArrayType):
-  desugar: multiplier.ast.Type
   brackets_range: multiplier.frontend.TokenRange
   l_bracket_token: multiplier.frontend.Token
   r_bracket_token: multiplier.frontend.Token
@@ -33170,7 +33140,6 @@ class VariableArrayType(multiplier.ast.ArrayType):
     ...
 
 class IncompleteArrayType(multiplier.ast.ArrayType):
-  desugar: multiplier.ast.Type
   is_sugared: bool
 
   @staticmethod
@@ -33222,7 +33191,6 @@ class IncompleteArrayType(multiplier.ast.ArrayType):
     ...
 
 class DependentSizedArrayType(multiplier.ast.ArrayType):
-  desugar: multiplier.ast.Type
   brackets_range: multiplier.frontend.TokenRange
   l_bracket_token: multiplier.frontend.Token
   r_bracket_token: multiplier.frontend.Token
@@ -33278,7 +33246,6 @@ class DependentSizedArrayType(multiplier.ast.ArrayType):
     ...
 
 class ConstantArrayType(multiplier.ast.ArrayType):
-  desugar: multiplier.ast.Type
   size_expression: Optional[multiplier.ast.Expr]
   is_sugared: bool
 
@@ -33331,7 +33298,6 @@ class ConstantArrayType(multiplier.ast.ArrayType):
     ...
 
 class AdjustedType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   resolved_type: multiplier.ast.Type
   original_type: multiplier.ast.Type
   is_sugared: bool
@@ -33483,7 +33449,6 @@ class TypeWithKeyword(multiplier.ast.Type):
     ...
 
 class ElaboratedType(multiplier.ast.TypeWithKeyword):
-  desugar: multiplier.ast.Type
   named_type: multiplier.ast.Type
   owned_tag_declaration: Optional[multiplier.ast.TagDecl]
   is_sugared: bool
@@ -33537,7 +33502,6 @@ class ElaboratedType(multiplier.ast.TypeWithKeyword):
     ...
 
 class DependentTemplateSpecializationType(multiplier.ast.TypeWithKeyword):
-  desugar: multiplier.ast.Type
   is_sugared: bool
   num_template_arguments: int
   template_arguments: Iterable[multiplier.ast.TemplateArgument]
@@ -33594,7 +33558,6 @@ class DependentTemplateSpecializationType(multiplier.ast.TypeWithKeyword):
     ...
 
 class DependentNameType(multiplier.ast.TypeWithKeyword):
-  desugar: multiplier.ast.Type
   is_sugared: bool
 
   @staticmethod
@@ -33646,7 +33609,6 @@ class DependentNameType(multiplier.ast.TypeWithKeyword):
     ...
 
 class VectorType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   element_type: multiplier.ast.Type
   vector_kind: multiplier.ast.VectorKind
   is_sugared: bool
@@ -33750,7 +33712,6 @@ class ExtVectorType(multiplier.ast.VectorType):
     ...
 
 class UsingType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   found_declaration: multiplier.ast.UsingShadowDecl
   underlying_type: multiplier.ast.Type
   is_sugared: bool
@@ -33805,7 +33766,6 @@ class UsingType(multiplier.ast.Type):
     ...
 
 class UnresolvedUsingType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   declaration: multiplier.ast.UnresolvedUsingTypenameDecl
   is_sugared: bool
 
@@ -33858,7 +33818,6 @@ class UnresolvedUsingType(multiplier.ast.Type):
     ...
 
 class UnaryTransformType(multiplier.ast.Type):
-  desugar: Optional[multiplier.ast.Type]
   base_type: Optional[multiplier.ast.Type]
   utt_kind: multiplier.ast.UnaryTransformTypeUTTKind
   underlying_type: Optional[multiplier.ast.Type]
@@ -33913,7 +33872,6 @@ class UnaryTransformType(multiplier.ast.Type):
     ...
 
 class TypedefType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   declaration: multiplier.ast.TypedefNameDecl
   is_sugared: bool
   type_matches_declaration: bool
@@ -33967,7 +33925,6 @@ class TypedefType(multiplier.ast.Type):
     ...
 
 class TypeOfType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   type_kind: multiplier.ast.TypeOfKind
   unmodified_type: multiplier.ast.Type
   is_sugared: bool
@@ -34021,7 +33978,6 @@ class TypeOfType(multiplier.ast.Type):
     ...
 
 class TypeOfExprType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   type_kind: multiplier.ast.TypeOfKind
   underlying_expression: multiplier.ast.Expr
   is_sugared: bool
@@ -60344,14 +60300,10 @@ class VarDecl(multiplier.ast.DeclaratorDecl):
   initializer_style: multiplier.ast.VarDeclInitializationStyle
   initializing_declaration: Optional[multiplier.ast.VarDecl]
   language_linkage: multiplier.ast.LanguageLinkage
-  point_of_instantiation: multiplier.frontend.Token
   storage_class: multiplier.ast.StorageClass
   storage_duration: multiplier.ast.StorageDuration
   tls_kind: multiplier.ast.VarDeclTLSKind
   tsc_spec: multiplier.ast.ThreadStorageClassSpecifier
-  template_instantiation_pattern: Optional[multiplier.ast.VarDecl]
-  template_specialization_kind: multiplier.ast.TemplateSpecializationKind
-  template_specialization_kind_for_instantiation: multiplier.ast.TemplateSpecializationKind
   has_constant_initialization: bool
   has_dependent_alignment: bool
   has_external_storage: bool
@@ -60870,10 +60822,7 @@ class VarTemplateSpecializationDecl(multiplier.ast.VarDecl):
   specialized_template: multiplier.ast.VarTemplateDecl
   num_template_arguments: int
   template_arguments: Iterable[multiplier.ast.TemplateArgument]
-  num_template_instantiation_arguments: int
-  template_instantiation_arguments: Iterable[multiplier.ast.TemplateArgument]
   template_keyword_token: multiplier.frontend.Token
-  type_as_written: Optional[multiplier.ast.Type]
   is_class_scope_explicit_specialization: bool
   is_explicit_instantiation_or_specialization: bool
   is_explicit_specialization: bool
@@ -60968,14 +60917,10 @@ class VarTemplateSpecializationDecl(multiplier.ast.VarDecl):
   def nth_template_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
     ...
 
-  def nth_template_instantiation_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
-    ...
-
 class VarTemplatePartialSpecializationDecl(multiplier.ast.VarTemplateSpecializationDecl):
   canonical_declaration: multiplier.ast.VarTemplatePartialSpecializationDecl
   definition: Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]
   redeclarations: Iterable[multiplier.ast.VarTemplatePartialSpecializationDecl]
-  instantiated_from_member: Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]
   template_parameters: multiplier.ast.TemplateParameterList
   has_associated_constraints: bool
 
@@ -61286,13 +61231,8 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
   multi_version_kind: multiplier.ast.MultiVersionKind
   overloaded_operator: multiplier.ast.OverloadedOperatorKind
   parameters_tokens: multiplier.frontend.TokenRange
-  point_of_instantiation: multiplier.frontend.Token
-  primary_template: Optional[multiplier.ast.FunctionTemplateDecl]
   return_type: multiplier.ast.Type
   storage_class: multiplier.ast.StorageClass
-  template_instantiation_pattern: Optional[multiplier.ast.FunctionDecl]
-  template_specialization_kind: multiplier.ast.TemplateSpecializationKind
-  template_specialization_kind_for_instantiation: multiplier.ast.TemplateSpecializationKind
   templated_kind: multiplier.ast.FunctionDeclTemplatedKind
   has_cxx_explicit_function_object_parameter: bool
   has_implicit_return_zero: bool
@@ -61351,6 +61291,8 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
   parameters: Iterable[multiplier.ast.ParmVarDecl]
   uses_seh_try: bool
   body: Optional[multiplier.ast.Stmt]
+  num_template_arguments: int
+  template_arguments: Iterable[multiplier.ast.TemplateArgument]
   contained_declarations: Iterable[multiplier.ast.Decl]
   callers: Iterable[multiplier.ast.Stmt]
 
@@ -61442,6 +61384,9 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
     ...
 
   def nth_parameter(self, n: int) -> Optional[multiplier.ast.ParmVarDecl]:
+    ...
+
+  def nth_template_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
     ...
 
 class CXXMethodDecl(multiplier.ast.FunctionDecl):
@@ -63443,8 +63388,6 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   lambda_static_invoker: Optional[multiplier.ast.CXXMethodDecl]
   ms_inheritance_model: Optional[multiplier.ast.MSInheritanceModel]
   ms_vtor_disp_mode: multiplier.ast.MSVtorDispMode
-  template_instantiation_pattern: Optional[multiplier.ast.CXXRecordDecl]
-  template_specialization_kind: multiplier.ast.TemplateSpecializationKind
   has_any_dependent_bases: Optional[bool]
   has_constexpr_default_constructor: Optional[bool]
   has_constexpr_destructor: Optional[bool]
@@ -63646,15 +63589,11 @@ class ClassTemplateSpecializationDecl(multiplier.ast.CXXRecordDecl):
   definition: Optional[multiplier.ast.ClassTemplateSpecializationDecl]
   redeclarations: Iterable[multiplier.ast.ClassTemplateSpecializationDecl]
   extern_token: multiplier.frontend.Token
-  point_of_instantiation: multiplier.frontend.Token
   specialization_kind: multiplier.ast.TemplateSpecializationKind
   specialized_template: multiplier.ast.ClassTemplateDecl
   num_template_arguments: int
   template_arguments: Iterable[multiplier.ast.TemplateArgument]
-  num_template_instantiation_arguments: int
-  template_instantiation_arguments: Iterable[multiplier.ast.TemplateArgument]
   template_keyword_token: multiplier.frontend.Token
-  type_as_written: Optional[multiplier.ast.Type]
   is_class_scope_explicit_specialization: bool
   is_explicit_instantiation_or_specialization: bool
   is_explicit_specialization: bool
@@ -63749,16 +63688,11 @@ class ClassTemplateSpecializationDecl(multiplier.ast.CXXRecordDecl):
   def nth_template_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
     ...
 
-  def nth_template_instantiation_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
-    ...
-
 class ClassTemplatePartialSpecializationDecl(multiplier.ast.ClassTemplateSpecializationDecl):
   canonical_declaration: multiplier.ast.ClassTemplatePartialSpecializationDecl
   definition: Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]
   redeclarations: Iterable[multiplier.ast.ClassTemplatePartialSpecializationDecl]
   injected_specialization_type: multiplier.ast.Type
-  instantiated_from_member: Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]
-  instantiated_from_member_template: Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]
   template_parameters: multiplier.ast.TemplateParameterList
   has_associated_constraints: bool
 
@@ -63858,8 +63792,6 @@ class EnumDecl(multiplier.ast.TagDecl):
   integer_type: Optional[multiplier.ast.Type]
   integer_type_range: multiplier.frontend.TokenRange
   promotion_type: Optional[multiplier.ast.Type]
-  template_instantiation_pattern: Optional[multiplier.ast.EnumDecl]
-  template_specialization_kind: multiplier.ast.TemplateSpecializationKind
   is_closed: bool
   is_closed_flag: bool
   is_closed_non_flag: bool
@@ -64523,7 +64455,6 @@ class RedeclarableTemplateDecl(multiplier.ast.TemplateDecl):
   canonical_declaration: multiplier.ast.RedeclarableTemplateDecl
   definition: Optional[multiplier.ast.RedeclarableTemplateDecl]
   redeclarations: Iterable[multiplier.ast.RedeclarableTemplateDecl]
-  instantiated_from_member_template: Optional[multiplier.ast.RedeclarableTemplateDecl]
   is_member_specialization: bool
 
   @overload

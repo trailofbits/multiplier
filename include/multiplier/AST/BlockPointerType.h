@@ -46,7 +46,6 @@ class MX_EXPORT BlockPointerType : public Type {
   static std::optional<BlockPointerType> from(const VariantEntity &e);
   static std::optional<BlockPointerType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Type pointee_type(void) const;
   bool is_sugared(void) const;
 };

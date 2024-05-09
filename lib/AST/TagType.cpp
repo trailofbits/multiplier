@@ -108,7 +108,7 @@ TagDecl TagType::declaration(void) const {
 }
 
 bool TagType::is_being_defined(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal20();
 }
 
 #pragma GCC diagnostic pop

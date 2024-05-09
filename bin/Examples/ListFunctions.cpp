@@ -17,6 +17,8 @@ DEFINE_bool(list_variables, false, "Should we list the variables inside of funct
 DEFINE_bool(show_locations, false, "Show the file locations of the functions?");
 
 static void PrintFunctionNames(mx::Index index) {
+  mx::QualifiedNameRenderOptions opts;
+
   for (mx::FunctionDecl func : mx::FunctionDecl::in(index)) {
     auto file = mx::File::containing(func);
     auto fragment = mx::Fragment::containing(func);
@@ -25,7 +27,7 @@ static void PrintFunctionNames(mx::Index index) {
         << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
         << fragment.id() << '\t'
         << func.id() << '\t'
-        << func.name()
+        << func.qualified_name(opts).data()
         << (func.is_definition() ? "\tdef" : "\tdecl");
 
     if (FLAGS_show_locations && file) {

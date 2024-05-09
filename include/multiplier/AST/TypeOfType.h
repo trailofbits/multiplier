@@ -47,7 +47,6 @@ class MX_EXPORT TypeOfType : public Type {
   static std::optional<TypeOfType> from(const VariantEntity &e);
   static std::optional<TypeOfType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   TypeOfKind type_kind(void) const;
   Type unmodified_type(void) const;
   bool is_sugared(void) const;

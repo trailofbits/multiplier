@@ -50,7 +50,6 @@ class MX_EXPORT VariableArrayType : public ArrayType {
   static std::optional<VariableArrayType> from(const VariantEntity &e);
   static std::optional<VariableArrayType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   TokenRange brackets_range(void) const;
   Token l_bracket_token(void) const;
   Token r_bracket_token(void) const;

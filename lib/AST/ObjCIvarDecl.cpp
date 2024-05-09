@@ -228,21 +228,21 @@ ObjCIvarDeclAccessControl ObjCIvarDecl::access_control(void) const {
 }
 
 ObjCIvarDeclAccessControl ObjCIvarDecl::canonical_access_control(void) const {
-  return static_cast<ObjCIvarDeclAccessControl>(impl->reader.getVal75());
+  return static_cast<ObjCIvarDeclAccessControl>(impl->reader.getVal74());
 }
 
 ObjCInterfaceDecl ObjCIvarDecl::containing_interface(void) const {
-  RawEntityId eid = impl->reader.getVal74();
+  RawEntityId eid = impl->reader.getVal110();
   return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ObjCIvarDecl ObjCIvarDecl::next_instance_variable(void) const {
-  RawEntityId eid = impl->reader.getVal79();
+  RawEntityId eid = impl->reader.getVal111();
   return ObjCIvarDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool ObjCIvarDecl::synthesize(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal87();
 }
 
 #pragma GCC diagnostic pop

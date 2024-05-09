@@ -49,7 +49,6 @@ class MX_EXPORT DependentTemplateSpecializationType : public TypeWithKeyword {
   static std::optional<DependentTemplateSpecializationType> from(const VariantEntity &e);
   static std::optional<DependentTemplateSpecializationType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   bool is_sugared(void) const;
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
   unsigned num_template_arguments(void) const;

@@ -50,7 +50,6 @@ class MX_EXPORT ObjCObjectPointerType : public Type {
   static std::optional<ObjCObjectPointerType> from(const VariantEntity &e);
   static std::optional<ObjCObjectPointerType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   ObjCInterfaceDecl interface_declaration(void) const;
   ObjCInterfaceType interface_type(void) const;
   ObjCObjectType object_type(void) const;

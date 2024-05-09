@@ -258,7 +258,7 @@ ObjCMethodFamily ObjCMethodDecl::method_family(void) const {
 }
 
 DeclObjCDeclQualifier ObjCMethodDecl::obj_c_decl_qualifier(void) const {
-  return static_cast<DeclObjCDeclQualifier>(impl->reader.getVal75());
+  return static_cast<DeclObjCDeclQualifier>(impl->reader.getVal74());
 }
 
 Type ObjCMethodDecl::return_type(void) const {
@@ -292,59 +292,59 @@ bool ObjCMethodDecl::has_related_result_type(void) const {
 }
 
 bool ObjCMethodDecl::has_skipped_body(void) const {
-  return impl->reader.getVal82();
+  return impl->reader.getVal78();
 }
 
 bool ObjCMethodDecl::is_class_method(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal79();
 }
 
 bool ObjCMethodDecl::is_defined(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal80();
 }
 
 bool ObjCMethodDecl::is_designated_initializer_for_the_interface(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal81();
 }
 
 bool ObjCMethodDecl::is_direct_method(void) const {
-  return impl->reader.getVal86();
+  return impl->reader.getVal82();
 }
 
 bool ObjCMethodDecl::is_instance_method(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal83();
 }
 
 bool ObjCMethodDecl::is_optional(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal84();
 }
 
 bool ObjCMethodDecl::is_overriding(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal85();
 }
 
 bool ObjCMethodDecl::is_property_accessor(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal86();
 }
 
 bool ObjCMethodDecl::is_redeclaration(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal87();
 }
 
 bool ObjCMethodDecl::is_synthesized_accessor_stub(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal88();
 }
 
 bool ObjCMethodDecl::is_this_declaration_a_definition(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal89();
 }
 
 bool ObjCMethodDecl::is_this_declaration_a_designated_initializer(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal90();
 }
 
 bool ObjCMethodDecl::is_variadic(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal91();
 }
 
 unsigned ObjCMethodDecl::num_parameters(void) const {
