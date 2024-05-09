@@ -2354,13 +2354,24 @@ static unsigned MacroRangeSize(const std::vector<pasta::Macro> &macros) {
   auto any = false;
 
   for (const auto &macro : macros) {
-    if (auto bt = macro.BeginToken()) {
+    if (auto bt = macro.BeginToken()) {  // Begin of usage.
       auto index = bt->Index();
       min = std::min(min, index);
       max = std::max(max, index);
       any = true;
     }
 
+    if (auto et = macro.EndToken()) {  // End of usage.
+      auto index = et->Index();
+      min = std::min(min, index);
+      max = std::max(max, index);
+      any = true;
+    }
+
+    // NOTE(pag): Don't have a good way of getting the last macro token of
+    //            the last expansion. This gives us a proxy for that, by trying
+    //            to see what the last expansion token derived from a macro
+    //            was, and then taking that macro's index.
     auto range = pasta::Macro::CompleteExpansionRange(macro);
     for (auto size = range.Size(); size--; ) {
       if (auto et = range[size].MacroLocation()) {
@@ -2378,24 +2389,28 @@ static unsigned MacroRangeSize(const std::vector<pasta::Macro> &macros) {
 
 // Locate top-level macro expansion uses inside of a given declaration range.
 // This is to help us when we need to estimate the size of a fragment.
-static void LocateExpansionsInRange(
-    const pasta::TokenRange &tokens, std::vector<pasta::Macro> &macros_out) {
+static std::vector<pasta::Macro>
+LocateExpansionsInRange(const pasta::TokenRange &tokens) {
+  std::vector<pasta::Macro> macros_out;
   const void *last_raw_root = nullptr;
-  for (auto &tok : tokens) {
-    auto mtok = tok.MacroLocation();
-    if (!mtok) {
-      continue;
-    }
-
-    auto root = RootMacroFrom(mtok.value());
+  auto track_root = [&] (const pasta::Macro &macro) {
+    auto root = RootMacroFrom(macro);
     const void *raw_root = RawEntity(root);
     if (raw_root != last_raw_root) {
       last_raw_root = raw_root;
-      if (root.Kind() == pasta::MacroKind::kExpansion) {
-        macros_out.emplace_back(std::move(root));
-      }
+      macros_out.emplace_back(std::move(root));
+    }
+  };
+
+  for (auto &tok : tokens) {
+    if (auto macro = pasta::Macro::FromMarkerToken(tok)) {
+      track_root(macro.value());
+
+    } else if (auto mtok = tok.MacroLocation()) {
+      track_root(mtok.value());
     }
   }
+  return macros_out;
 }
 
 static PendingFragmentPtr CreatePendingFragment(
@@ -2424,14 +2439,10 @@ static PendingFragmentPtr CreatePendingFragment(
 
   num_tokens = std::max(num_tokens, parsed_tokens.Size());
 
-  auto macros_were_empty = macros.empty();
-  if (macros_were_empty && original_tokens && !parsed_are_printed) {
-    LocateExpansionsInRange(*original_tokens, macros);
-  }
-
-  num_tokens += MacroRangeSize(macros);
-  if (macros_were_empty) {
-    macros.clear();
+  if (original_tokens) {
+    num_tokens += MacroRangeSize(LocateExpansionsInRange(*original_tokens));
+  } else {
+    num_tokens += MacroRangeSize(macros);
   }
 
   mx::RawEntityId context_eid = mx::kInvalidEntityId;
