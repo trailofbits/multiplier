@@ -248,11 +248,11 @@ Type TypedefNameDecl::underlying_type(void) const {
 }
 
 bool TypedefNameDecl::is_moded(void) const {
-  return impl->reader.getVal64();
+  return impl->reader.getVal63();
 }
 
 bool TypedefNameDecl::is_transparent_tag(void) const {
-  return impl->reader.getVal65();
+  return impl->reader.getVal64();
 }
 
 #pragma GCC diagnostic pop

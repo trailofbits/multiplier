@@ -227,7 +227,7 @@ std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const TokenContext &t
 
 std::optional<CXXConstructorDecl> CXXConstructorDecl::target_constructor(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal168();
+    RawEntityId eid = impl->reader.getVal167();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -239,11 +239,11 @@ std::optional<CXXConstructorDecl> CXXConstructorDecl::target_constructor(void) c
 }
 
 unsigned CXXConstructorDecl::num_initializers(void) const {
-  return impl->reader.getVal172().size();
+  return impl->reader.getVal171().size();
 }
 
 std::optional<CXXCtorInitializer> CXXConstructorDecl::nth_initializer(unsigned n) const {
-  auto list = impl->reader.getVal172();
+  auto list = impl->reader.getVal171();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -257,35 +257,35 @@ std::optional<CXXCtorInitializer> CXXConstructorDecl::nth_initializer(unsigned n
 }
 
 gap::generator<CXXCtorInitializer> CXXConstructorDecl::initializers(void) const & {
-  auto list = impl->reader.getVal172();
+  auto list = impl->reader.getVal171();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d172 = ep->CXXCtorInitializerFor(ep, v)) {
-      co_yield CXXCtorInitializer(std::move(d172));
+    if (auto d171 = ep->CXXCtorInitializerFor(ep, v)) {
+      co_yield CXXCtorInitializer(std::move(d171));
     }
   }
   co_return;
 }
 
 bool CXXConstructorDecl::is_default_constructor(void) const {
-  return impl->reader.getVal170();
+  return impl->reader.getVal169();
 }
 
 bool CXXConstructorDecl::is_delegating_constructor(void) const {
-  return impl->reader.getVal171();
+  return impl->reader.getVal170();
 }
 
 bool CXXConstructorDecl::is_explicit(void) const {
-  return impl->reader.getVal173();
+  return impl->reader.getVal172();
 }
 
 bool CXXConstructorDecl::is_inheriting_constructor(void) const {
-  return impl->reader.getVal174();
+  return impl->reader.getVal173();
 }
 
 bool CXXConstructorDecl::is_specialization_copying_object(void) const {
-  return impl->reader.getVal175();
+  return impl->reader.getVal174();
 }
 
 #pragma GCC diagnostic pop

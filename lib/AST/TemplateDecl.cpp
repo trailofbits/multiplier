@@ -258,11 +258,11 @@ std::optional<NamedDecl> TemplateDecl::templated_declaration(void) const {
 }
 
 bool TemplateDecl::has_associated_constraints(void) const {
-  return impl->reader.getVal64();
+  return impl->reader.getVal63();
 }
 
 bool TemplateDecl::is_type_alias(void) const {
-  return impl->reader.getVal65();
+  return impl->reader.getVal64();
 }
 
 #pragma GCC diagnostic pop

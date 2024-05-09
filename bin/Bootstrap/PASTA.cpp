@@ -359,6 +359,9 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"EnumDecl", "PreviousDeclaration"},
   {"RecordDecl", "PreviousDeclaration"},
   {"RecordDecl", "FirstNamedDataMember"},
+  {"NamespaceDecl", "OriginalNamespace"},
+  {"NamespaceDecl", "IsOriginalNamespace"},
+  {"NamespaceDecl", "AnonymousNamespace"},
 
   // We hoist forward declarations embedded in declarators out into their own
   // freestanding fragments that aren't associated with files, and so the return
@@ -744,6 +747,9 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   // These will be discovered dynamically. This is because methods on class
   // template specializations might not actually have bodies.
   {"CXXRecordDecl", "Methods"},
+
+  // We provide a custom and configurable way of computing this.
+  {"NamedDecl", "QualifiedNameAsString"},
 
   // These will apply to functions, enums, classes, etc.
   {"Decl", "TypeAsWritten"},
@@ -3473,10 +3479,14 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         const auto i = storage.AddMethod("Text");
         auto [getter_name, setter_name, init_name] = NamesFor(i);
+        auto meth_or_func = "MX_APPLY_METHOD";
+        if (class_name == "NamedDecl" && method_name == "Name") {
+          meth_or_func = "MX_APPLY_FUNC";
+        }
 
         serialize_inc_os
             << "  MX_VISIT_TEXT(" << class_name << ", " << api_name
-            << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
+            << ", " << i << ", " << meth_or_func << ", " << method_name << ", "
             << record_name << ", " << nth_entity_reader << ")\n";
 
         class_os
@@ -3490,8 +3500,13 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  return std::string_view(data.cStr(), data.size());\n"
             << "}\n\n";
 
-        serialize_cpp_os
-            << "  b." << setter_name << "(e." << method_name << "());\n";
+        if (!strcmp(meth_or_func, "MX_APPLY_METHOD")) {
+          serialize_cpp_os
+              << "  b." << setter_name << "(e." << method_name << "());\n";
+        } else {
+          serialize_cpp_os
+              << "  b." << setter_name << "(" << method_name << "(e));\n";
+        }
 
       // Handle `std::string_view`. Cap'n Proto requires that `:Text` fields
       // are `NUL`-terminated, so we convert the string view into a
@@ -3616,7 +3631,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         // Work around this method returning only the pattern info for definitions.
         auto meth_or_func = "MX_APPLY_METHOD";
-        if (class_name == "FunctionDecl" && api_name == "TemplateInstantiationPattern") {
+        if ((class_name == "FunctionDecl" && api_name == "TemplateInstantiationPattern")) {
           meth_or_func = "MX_APPLY_FUNC";
         }
 
@@ -3753,8 +3768,18 @@ MethodListPtr CodeGenerator::RunOnClass(
   }
 
   // Additional special methods for specific derived classes go here
+  if (class_name == "NamedDecl") {
+    forward_decls.insert("QualifiedNameRenderOptions");
+    seen_methods->emplace("qualified_name");
+    class_os
+        << "  // Compute a qualified name for this declaration.\n"
+        << "  TokenRange qualified_name(const QualifiedNameRenderOptions &options) const;\n";
+  }
 
   if (class_name == "CXXRecordDecl") {
+    seen_methods->emplace("derived_classes");
+    seen_methods->emplace("base_classes");
+    seen_methods->emplace("methods");
     class_os
         << "  // List of base and derived classes.\n"
         << "  gap::generator<CXXRecordDecl> derived_classes(void) const &;\n"
@@ -3763,6 +3788,8 @@ MethodListPtr CodeGenerator::RunOnClass(
   }
 
   if (class_name == "CXXMethodDecl") {
+    seen_methods->emplace("overridden_by_methods");
+    seen_methods->emplace("transitive_overridden_by_methods");
     class_os
         << "  // List of methods that can override this method.\n"
         << "  gap::generator<CXXMethodDecl> overridden_by_methods(void) const &;\n"
@@ -3771,6 +3798,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   // `FunctionDecl::callers`.
   if (class_name == "FunctionDecl") {
+    seen_methods->emplace("callers");
     class_os
         << "  // Callers of a `FunctionDecl` can be `CallExpr`, `CxxNewExpr`,\n"
         << "  // `CxxConstructExpr`, etc. Even `CastExpr` can sometimes be a call\n"
@@ -3782,6 +3810,8 @@ MethodListPtr CodeGenerator::RunOnClass(
   if (class_name == "CallExpr") {
     forward_decls.insert("Type");
     forward_decls.insert("CastExpr");
+    seen_methods->emplace("casted_return_type");
+    seen_methods->emplace("casted_return_value");
     class_os
         << "  std::optional<Type> casted_return_type(void) const;\n"
         << "  std::optional<CastExpr> casted_return_value(void) const;\n";
@@ -4193,6 +4223,9 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
     auto needs_fragment = is_root;
     for (const std::string &other_name : forward_decls) {
+      if (other_name == "QualifiedNameRenderOptions") {
+        continue;
+      }
       if (other_name == "TokenRange") {
         needs_fragment = true;
       } else if (name != other_name && !other_name.ends_with("Impl")) {

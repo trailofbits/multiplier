@@ -228,13 +228,13 @@ std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecia
 }
 
 Type ClassTemplatePartialSpecializationDecl::injected_specialization_type(void) const {
-  RawEntityId eid = impl->reader.getVal345();
+  RawEntityId eid = impl->reader.getVal344();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal346();
+    RawEntityId eid = impl->reader.getVal345();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -247,7 +247,7 @@ std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecia
 
 std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::instantiated_from_member_template(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal347();
+    RawEntityId eid = impl->reader.getVal346();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -259,12 +259,12 @@ std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecia
 }
 
 TemplateParameterList ClassTemplatePartialSpecializationDecl::template_parameters(void) const {
-  RawEntityId eid = impl->reader.getVal348();
+  RawEntityId eid = impl->reader.getVal347();
   return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
 bool ClassTemplatePartialSpecializationDecl::has_associated_constraints(void) const {
-  return impl->reader.getVal349();
+  return impl->reader.getVal348();
 }
 
 #pragma GCC diagnostic pop

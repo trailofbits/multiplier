@@ -35,6 +35,7 @@ class FileToken;
 class FunctionDecl;
 class Macro;
 class MacroToken;
+class NamedDecl;
 class PrintedToken;
 class PrintedTokenRange;
 class Stmt;

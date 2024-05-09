@@ -226,7 +226,7 @@ Token ObjCTypeParamDecl::colon_token(void) const {
 }
 
 ObjCTypeParamVariance ObjCTypeParamDecl::variance(void) const {
-  return static_cast<ObjCTypeParamVariance>(impl->reader.getVal70());
+  return static_cast<ObjCTypeParamVariance>(impl->reader.getVal69());
 }
 
 Token ObjCTypeParamDecl::variance_token(void) const {
@@ -234,7 +234,7 @@ Token ObjCTypeParamDecl::variance_token(void) const {
 }
 
 bool ObjCTypeParamDecl::has_explicit_bound(void) const {
-  return impl->reader.getVal66();
+  return impl->reader.getVal65();
 }
 
 #pragma GCC diagnostic pop

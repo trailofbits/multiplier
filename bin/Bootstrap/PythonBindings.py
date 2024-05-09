@@ -168,6 +168,7 @@ namespace mx {
 
 class FileLocationCache;
 class ProxyTokenTreeVisitor;
+class QualifiedNameRenderOptions;
 class UserToken;
 
 namespace {
@@ -254,6 +255,13 @@ MODULE_CPP_SUFFIX = """
   // Doesn't have any methods, so no schema is made for it. We manually inject
   // this so that we can handle `Token::location`.
   if (!mx::PythonBinding<mx::FileLocationCache>::load(frontendm)) {
+    Py_DECREF(m);
+    return nullptr;
+  }
+
+  // Doesn't have any methods, so no schema is made fo rit. We manually inject
+  // this so that we can handle `NamedDecl::qualified_name`.
+  if (!mx::PythonBinding<mx::QualifiedNameRenderOptions>::load(astm)) {
     Py_DECREF(m);
     return nullptr;
   }
@@ -939,6 +947,22 @@ template MX_EXPORT SharedPyObject *to_python<{0}>({0}) noexcept;
 
 BINDING_CPP_FOOTER = """}  // namespace mx
 """
+
+
+class QualifiedNameRenderOptionsSchema(Schema):
+  def __init__(self, *args):
+    super().__init__()
+
+  def __str__(self) -> str:
+    return f"QualifiedNameRenderOptions"
+
+  @property
+  def python_value_name(self):
+    return "multiplier.ast.QualifiedNameRenderOptions"
+
+  @property
+  def cxx_value_name(self):
+    return "QualifiedNameRenderOptions"
 
 
 class UserTokenSchema(Schema):
@@ -1787,6 +1811,7 @@ def run_on_ast(ast: AST, ns_name: str):
   lifter: SchemaLifter = SchemaLifter()
   lifter.add_lifter("mx::FileLocationCache", FileLocationCacheSchema)
   lifter.add_lifter("mx::TokenTreeVisitor", TokenTreeVisitorSchema)
+  lifter.add_lifter("mx::QualifiedNameRenderOptions", QualifiedNameRenderOptionsSchema)
   lifter.add_lifter("mx::UserToken", UserTokenSchema)
   lifter.add_lifter("mx::VariantEntity", VariantEntitySchema)
   lifter.add_lifter("mx::EntityId", EntityIdSchema)

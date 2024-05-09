@@ -244,7 +244,7 @@ std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::instantiated_f
 }
 
 bool RedeclarableTemplateDecl::is_member_specialization(void) const {
-  return impl->reader.getVal66();
+  return impl->reader.getVal65();
 }
 
 #pragma GCC diagnostic pop

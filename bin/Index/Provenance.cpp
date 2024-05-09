@@ -927,6 +927,10 @@ static std::string_view NameWithoutTilde(const std::string &name,
 // have token data, and will accept an in-name-only match.
 bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
                       const pasta::Decl &decl, std::string_view token_data) {
+  if (token_data == "Bar") {
+    (void) decl.Token();
+  }
+
   auto is_cxx_destructor = decl.Kind() == pasta::DeclKind::kCXXDestructor;
 
   if (auto func = pasta::FunctionDecl::From(decl)) {

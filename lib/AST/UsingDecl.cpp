@@ -225,11 +225,11 @@ Token UsingDecl::using_token(void) const {
 }
 
 bool UsingDecl::has_typename(void) const {
-  return impl->reader.getVal64();
+  return impl->reader.getVal63();
 }
 
 bool UsingDecl::is_access_declaration(void) const {
-  return impl->reader.getVal65();
+  return impl->reader.getVal64();
 }
 
 #pragma GCC diagnostic pop

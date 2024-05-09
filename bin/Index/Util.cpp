@@ -1109,7 +1109,26 @@ bool IsImplicitMethod(const pasta::Decl &decl) {
 
 // Get the unqualified, non-parameterized name of a declaration.
 std::string Name(const pasta::NamedDecl &decl) {
-  return decl.Name();  // TODO(pag).
+  auto raw_decl = reinterpret_cast<const clang::NamedDecl *>(decl.RawDecl());
+
+  std::string name;
+  llvm::raw_string_ostream os(name);
+  clang::PrintingPolicy pp(raw_decl->getASTContext().getLangOpts());
+  pp.FullyQualifiedName = false;
+  pp.SuppressTemplateArgsInCXXConstructors = true;
+  pp.SuppressDefaultTemplateArgs = true;
+  pp.TerseOutput = true;
+  pp.IncludeNewlines = false;
+  pp.EntireContentsOfLargeArray = false;
+  pp.SuppressUnwrittenScope = true;
+  pp.IncludeTagDefinition = false;
+  pp.AnonymousTagLocations = false;
+  pp.CleanUglifiedParameters = false;
+  raw_decl->printName(os, pp);
+  if (name.starts_with('(') || name.starts_with("using ")) {
+    return {};
+  }
+  return name;
 }
 
 // Returns `true` if a macro is visible across fragments, and should have an

@@ -423,11 +423,6 @@ std::optional<ObjCStringFormatFamily> NamedDecl::obj_cf_string_formatting_family
   return std::nullopt;
 }
 
-std::string_view NamedDecl::qualified_name_as_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal53();
-  return std::string_view(data.cStr(), data.size());
-}
-
 NamedDecl NamedDecl::underlying_declaration(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();

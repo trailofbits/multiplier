@@ -221,7 +221,7 @@ std::optional<LabelDecl> LabelDecl::from(const TokenContext &t) {
 }
 
 std::string_view LabelDecl::ms_assembly_label(void) const {
-  capnp::Text::Reader data = impl->reader.getVal63();
+  capnp::Text::Reader data = impl->reader.getVal53();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -231,15 +231,15 @@ LabelStmt LabelDecl::statement(void) const {
 }
 
 bool LabelDecl::is_gnu_local(void) const {
-  return impl->reader.getVal64();
+  return impl->reader.getVal63();
 }
 
 bool LabelDecl::is_ms_assembly_label(void) const {
-  return impl->reader.getVal65();
+  return impl->reader.getVal64();
 }
 
 bool LabelDecl::is_resolved_ms_assembly_label(void) const {
-  return impl->reader.getVal66();
+  return impl->reader.getVal65();
 }
 
 #pragma GCC diagnostic pop

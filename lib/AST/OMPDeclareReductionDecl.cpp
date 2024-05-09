@@ -243,17 +243,17 @@ Expr OMPDeclareReductionDecl::initializer_original(void) const {
 }
 
 Expr OMPDeclareReductionDecl::initializer_private(void) const {
-  RawEntityId eid = impl->reader.getVal68();
+  RawEntityId eid = impl->reader.getVal67();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr OMPDeclareReductionDecl::initializer(void) const {
-  RawEntityId eid = impl->reader.getVal69();
+  RawEntityId eid = impl->reader.getVal68();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 OMPDeclareReductionInitKind OMPDeclareReductionDecl::initializer_kind(void) const {
-  return static_cast<OMPDeclareReductionInitKind>(impl->reader.getVal70());
+  return static_cast<OMPDeclareReductionInitKind>(impl->reader.getVal69());
 }
 
 gap::generator<Decl> OMPDeclareReductionDecl::contained_declarations(void) const & {

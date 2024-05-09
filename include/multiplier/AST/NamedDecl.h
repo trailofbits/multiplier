@@ -19,6 +19,7 @@ class Fragment;
 class Index;
 class Decl;
 class NamedDecl;
+class QualifiedNameRenderOptions;
 class Stmt;
 class Token;
 namespace ir {
@@ -65,7 +66,6 @@ class MX_EXPORT NamedDecl : public Decl {
   Linkage formal_linkage(void) const;
   std::string_view name(void) const;
   std::optional<ObjCStringFormatFamily> obj_cf_string_formatting_family(void) const;
-  std::string_view qualified_name_as_string(void) const;
   NamedDecl underlying_declaration(void) const;
   std::optional<Visibility> visibility(void) const;
   bool has_external_formal_linkage(void) const;
@@ -76,6 +76,8 @@ class MX_EXPORT NamedDecl : public Decl {
   bool is_externally_declarable(void) const;
   bool is_externally_visible(void) const;
   bool is_linkage_valid(void) const;
+  // Compute a qualified name for this declaration.
+  TokenRange qualified_name(const QualifiedNameRenderOptions &options) const;
 };
 
 static_assert(sizeof(NamedDecl) == sizeof(Decl));

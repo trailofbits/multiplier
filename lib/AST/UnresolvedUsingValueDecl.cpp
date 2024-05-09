@@ -229,11 +229,11 @@ Token UnresolvedUsingValueDecl::using_token(void) const {
 }
 
 bool UnresolvedUsingValueDecl::is_access_declaration(void) const {
-  return impl->reader.getVal66();
+  return impl->reader.getVal65();
 }
 
 bool UnresolvedUsingValueDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal67();
+  return impl->reader.getVal66();
 }
 
 #pragma GCC diagnostic pop

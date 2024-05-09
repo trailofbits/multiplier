@@ -10,6 +10,7 @@
 #include <multiplier/AST/CXXMethodDecl.h>
 #include <multiplier/AST/CXXRecordDecl.h>
 #include <multiplier/AST/FunctionTemplateDecl.h>
+#include <multiplier/AST/NamespaceDecl.h>
 #include <multiplier/AST/VarTemplateDecl.h>
 #include <multiplier/AST/VarDecl.h>
 #include <multiplier/Index.h>
@@ -371,6 +372,172 @@ gap::generator<Decl> Decl::specializations(void) const & {
   return BuiltinDeclReferences<Decl>(
       impl->ep, self_id, BuiltinReferenceKind::SPECIALIZES,
       EntityProvider::kReferenceTo);
+}
+
+namespace {
+
+static void RenderTemplateParametersInto(
+    CustomTokenReader &tr, const TemplateParameterList &params,
+    const QualifiedNameRenderOptions &options) {
+  // TODO(pag): Implement this.
+  (void) tr;
+  (void) params;
+  (void) options;
+}
+
+static void RenderQualifiedNameInto(
+    CustomTokenReader &tr, const NamedDecl &nd,
+    const QualifiedNameRenderOptions &options) {
+  if (auto pd = NamedDecl::from(nd.parent_declaration())) {
+
+    RenderQualifiedNameInto(tr, pd.value(), options);
+
+    // The parent is a template declaration; we don't need to print `nd` because
+    // `pd` has the same name.
+    if (auto td = TemplateDecl::from(pd.value())) {
+      if (auto pattern = td->templated_declaration()) {
+        if (pattern->id() == nd.id()) {
+          return;
+        }
+      }
+    }
+  }
+
+  auto kind = nd.kind();
+  auto category = ConvertDeclCategoryToTokenCategory(nd.category());
+
+  // Add in the name.
+  auto name = nd.name();
+  bool should_print = true;
+
+  // Scan for alternative names in redeclarations.
+  if (options.find_name_in_redeclaration && name.empty()) {
+    switch (category) {
+      case TokenCategory::PARAMETER_VARIABLE:
+        for (auto redecl : nd.redeclarations()) {
+          name = redecl.name();
+          if (name.empty()) {
+            break;
+          }
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  if (name.empty()) {
+    switch (category) {
+      case TokenCategory::ENUM:
+        name = "(anonymous enum)";
+        should_print = options.render_anonymous_enums;
+        break;
+      case TokenCategory::CLASS:
+        name = "(anonymous class)";
+        should_print = options.render_anonymous_classes;
+        break;
+
+      case TokenCategory::STRUCT:
+        name = "(anonymous struct)";
+        should_print = options.render_anonymous_structs;
+        break;
+
+      case TokenCategory::UNION:
+        name = "(anonymous union)";
+        should_print = options.render_anonymous_unions;
+        break;
+
+      case TokenCategory::INSTANCE_MEMBER:
+        name = "(anonymous field)";
+        should_print = options.render_anonymous_fields;
+        break;
+
+      case TokenCategory::PARAMETER_VARIABLE:
+        name = "(anonymous parameter)";
+        should_print = options.render_anonymous_parameters;
+        break;
+
+      case TokenCategory::NAMESPACE:
+        name = "(anonymous namespace)";
+        should_print = options.render_anonymous_namespaces;
+        break;
+
+      default:
+        should_print = false;
+        break;
+    }
+  }
+
+  if (should_print && kind == DeclKind::NAMESPACE) {
+    const auto &ns = reinterpret_cast<const NamespaceDecl &>(nd);
+    if (ns.is_inline()) {
+      should_print = options.render_inline_namespaces;
+    }
+  }
+
+  if (!should_print || name.empty()) {
+    return;
+  }
+
+  // Add in a leading `::` to separate from parent declaration names.
+  if (!tr.token_kinds.empty() &&
+      tr.token_kinds.back() != TokenKind::COLON_COLON) {
+
+    tr.data.push_back(':');
+    tr.data.push_back(':');
+    tr.data_offset.push_back(static_cast<EntityOffset>(tr.data.size()));
+    tr.derived_token_ids.push_back(kInvalidEntityId);
+    tr.parsed_token_ids.push_back(kInvalidEntityId);
+    tr.containing_macro_ids.push_back(kInvalidEntityId);
+    tr.token_ids.push_back(kInvalidEntityId);
+    tr.token_kinds.push_back(TokenKind::COLON_COLON);
+    tr.token_categories.push_back(TokenCategory::PUNCTUATION);
+    tr.file_token_ids.push_back(kInvalidEntityId);
+    tr.related_entities.emplace_back(NotAnEntity{});
+  }
+
+  // Add in the declaration.
+  tr.data.insert(tr.data.end(), name.begin(), name.end());
+  tr.data_offset.push_back(static_cast<EntityOffset>(tr.data.size()));
+  tr.derived_token_ids.push_back(kInvalidEntityId);
+  tr.parsed_token_ids.push_back(kInvalidEntityId);
+  tr.containing_macro_ids.push_back(kInvalidEntityId);
+  tr.token_ids.push_back(kInvalidEntityId);
+  tr.token_kinds.push_back(TokenKind::IDENTIFIER);
+  tr.token_categories.push_back(category);
+  tr.file_token_ids.push_back(kInvalidEntityId);
+  tr.related_entities.emplace_back(nd);
+
+  if (options.render_template_parameters) {
+    switch (kind) {
+      case DeclKind::CLASS_TEMPLATE:
+      case DeclKind::VAR_TEMPLATE:
+      case DeclKind::FRIEND_TEMPLATE:
+      case DeclKind::CONCEPT:
+      case DeclKind::FUNCTION_TEMPLATE:
+        RenderTemplateParametersInto(
+            tr,
+            reinterpret_cast<const TemplateDecl &>(nd).template_parameters(),
+            options);
+        break;
+      default:
+        break;
+    }
+  }
+
+  if (options.render_template_arguments) {
+    // TODO(pag): Implement this.
+  }
+}
+
+}  // namespace
+
+TokenRange NamedDecl::qualified_name(
+    const QualifiedNameRenderOptions &options) const {
+  auto tr = std::make_shared<CustomTokenReader>(FragmentImpl::Ptr{});
+  RenderQualifiedNameInto(*tr, *this, options);
+  auto num_tokens = static_cast<unsigned>(tr->token_ids.size());
+  return TokenRange(std::move(tr), 0u, num_tokens);
 }
 
 }  // namespace mx

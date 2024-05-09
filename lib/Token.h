@@ -22,6 +22,8 @@ class FileImpl;
 using TokenContextReaderPtr = std::shared_ptr<const TokenContextReader>;
 using TokenReaderPtr = std::shared_ptr<const TokenReader>;
 
+TokenCategory ConvertDeclCategoryToTokenCategory(DeclCategory category);
+
 class TokenReader {
  public:
   using Ptr = TokenReaderPtr;

@@ -232,7 +232,7 @@ Token HLSLBufferDecl::r_brace_token(void) const {
 }
 
 bool HLSLBufferDecl::is_c_buffer(void) const {
-  return impl->reader.getVal64();
+  return impl->reader.getVal63();
 }
 
 #pragma GCC diagnostic pop

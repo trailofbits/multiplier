@@ -229,15 +229,15 @@ std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from
 }
 
 Token VarTemplateSpecializationDecl::extern_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal115());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal114());
 }
 
 TemplateSpecializationKind VarTemplateSpecializationDecl::specialization_kind(void) const {
-  return static_cast<TemplateSpecializationKind>(impl->reader.getVal119());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal118());
 }
 
 VarTemplateDecl VarTemplateSpecializationDecl::specialized_template(void) const {
-  RawEntityId eid = impl->reader.getVal116();
+  RawEntityId eid = impl->reader.getVal115();
   return VarTemplateDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
@@ -302,12 +302,12 @@ gap::generator<TemplateArgument> VarTemplateSpecializationDecl::template_instant
 }
 
 Token VarTemplateSpecializationDecl::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal117());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal116());
 }
 
 std::optional<Type> VarTemplateSpecializationDecl::type_as_written(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal118();
+    RawEntityId eid = impl->reader.getVal117();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -319,15 +319,15 @@ std::optional<Type> VarTemplateSpecializationDecl::type_as_written(void) const {
 }
 
 bool VarTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const {
-  return impl->reader.getVal122();
+  return impl->reader.getVal121();
 }
 
 bool VarTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
-  return impl->reader.getVal123();
+  return impl->reader.getVal122();
 }
 
 bool VarTemplateSpecializationDecl::is_explicit_specialization(void) const {
-  return impl->reader.getVal124();
+  return impl->reader.getVal123();
 }
 
 #pragma GCC diagnostic pop

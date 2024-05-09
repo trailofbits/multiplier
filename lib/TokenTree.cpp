@@ -78,7 +78,15 @@ class SaveRestoreLastSequence final {
 
 // Return the leftmost use tokens of a macro.
 static Token LeftCornerOfExpansion(const Macro &exp) {
-  return exp.first_fully_substituted_token();
+  if (auto sub = MacroSubstitution::from(exp)) {
+    return sub->first_fully_substituted_token();
+  }
+
+  auto expansion_tokens = exp.generate_expansion_tokens();
+  for (Token tok : expansion_tokens) {
+    return tok;
+  }
+  return Token();
 }
 
 // Return the leftmost use tokens of a macro.

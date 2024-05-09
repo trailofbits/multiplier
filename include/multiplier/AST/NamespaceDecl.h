@@ -66,13 +66,10 @@ class MX_EXPORT NamespaceDecl : public NamedDecl {
   static std::optional<NamespaceDecl> from(const VariantEntity &e);
   static std::optional<NamespaceDecl> from(const TokenContext &t);
 
-  std::optional<NamespaceDecl> anonymous_namespace(void) const;
-  NamespaceDecl original_namespace(void) const;
   Token r_brace_token(void) const;
   bool is_anonymous_namespace(void) const;
   bool is_inline(void) const;
   bool is_nested(void) const;
-  bool is_original_namespace(void) const;
   gap::generator<Decl> contained_declarations(void) const &;
 };
 

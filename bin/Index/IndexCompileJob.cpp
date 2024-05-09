@@ -505,6 +505,12 @@ class TLDFinder final : public pasta::DeclVisitor {
     VisitDeeperDeclContext(decl, decl);
   }
 
+  void VisitTopLevelStmtDecl(const pasta::TopLevelStmtDecl &decl) final {
+    if (seen.emplace(RawEntity(decl)).second) {
+      AddDeclAlways(decl);
+    }
+  }
+
   // void VisitVarTemplatePartialSpecializationDecl(
   //     const pasta::VarTemplatePartialSpecializationDecl &) final {
   //   // Do nothing.

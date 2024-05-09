@@ -28,6 +28,7 @@ class Fragment;
 class Index;
 class MacroSubstitution;
 class MacroVAOpt;
+class NamedDecl;
 class Reference;
 class RegexQuery;
 class RegexQueryMatch;
@@ -260,6 +261,7 @@ class MX_EXPORT TokenRange {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Macro;
+  friend class NamedDecl;
   friend class RegexQuery;
   friend class RegexQueryMatch;
   friend class RegexQueryMatchImpl;

@@ -222,7 +222,7 @@ std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const TokenContex
 }
 
 bool TemplateTypeParmDecl::default_argument_was_inherited(void) const {
-  return impl->reader.getVal64();
+  return impl->reader.getVal63();
 }
 
 std::optional<Type> TemplateTypeParmDecl::default_argument(void) const {
@@ -256,23 +256,23 @@ Token TemplateTypeParmDecl::default_argument_token(void) const {
 }
 
 bool TemplateTypeParmDecl::has_default_argument(void) const {
-  return impl->reader.getVal65();
+  return impl->reader.getVal64();
 }
 
 bool TemplateTypeParmDecl::has_type_constraint(void) const {
-  return impl->reader.getVal66();
+  return impl->reader.getVal65();
 }
 
 bool TemplateTypeParmDecl::is_expanded_parameter_pack(void) const {
-  return impl->reader.getVal67();
+  return impl->reader.getVal66();
 }
 
 bool TemplateTypeParmDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal82();
 }
 
 bool TemplateTypeParmDecl::was_declared_with_typename(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal83();
 }
 
 #pragma GCC diagnostic pop

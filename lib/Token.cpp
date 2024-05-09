@@ -584,17 +584,6 @@ static TokenCategory ClassifyMacro(TokenKind kind, MacroId id,
   return baseline_category;
 }
 
-static inline TokenCategory Rebase(DeclCategory category) {
-  if (category == DeclCategory::UNKNOWN) {
-    assert(false);
-    return TokenCategory::UNKNOWN;
-
-  } else {
-    return static_cast<TokenCategory>(
-        int(category) + int(TokenCategory::COMMENT));
-  }
-}
-
 static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
                                   DeclId id, TokenCategory baseline_category) {
   switch (id.kind) {
@@ -732,7 +721,7 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
     return baseline_category;
   }
 
-  return Rebase(std::get<Decl>(ent).category());
+  return ConvertDeclCategoryToTokenCategory(std::get<Decl>(ent).category());
 }
 
 static TokenCategory ClassifyStmt(StmtId id, TokenKind kind,
@@ -829,6 +818,17 @@ static TokenCategory ClassifyFile(TokenKind kind,
 }
 
 }  // namespace
+
+TokenCategory ConvertDeclCategoryToTokenCategory(DeclCategory category) {
+  if (category == DeclCategory::UNKNOWN) {
+    assert(false);
+    return TokenCategory::UNKNOWN;
+
+  } else {
+    return static_cast<TokenCategory>(
+        int(category) + int(TokenCategory::COMMENT));
+  }
+}
 
 TokenReader::~TokenReader(void) noexcept {}
 

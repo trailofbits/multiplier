@@ -155,26 +155,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "anonymous_namespace",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->anonymous_namespace());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamespaceDecl::anonymous_namespace"),
-    nullptr,
-  },
-  {
-    "original_namespace",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->original_namespace());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamespaceDecl::original_namespace"),
-    nullptr,
-  },
-  {
     "r_brace_token",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -212,16 +192,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::NamespaceDecl::is_nested"),
-    nullptr,
-  },
-  {
-    "is_original_namespace",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_original_namespace());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamespaceDecl::is_original_namespace"),
     nullptr,
   },
   {

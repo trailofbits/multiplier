@@ -58910,7 +58910,6 @@ class NamedDecl(multiplier.ast.Decl):
   formal_linkage: multiplier.ast.Linkage
   name: str
   obj_cf_string_formatting_family: Optional[multiplier.ast.ObjCStringFormatFamily]
-  qualified_name_as_string: str
   underlying_declaration: multiplier.ast.NamedDecl
   visibility: Optional[multiplier.ast.Visibility]
   has_external_formal_linkage: bool
@@ -59003,6 +59002,9 @@ class NamedDecl(multiplier.ast.Decl):
 
   @staticmethod
   def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.NamedDecl]:
+    ...
+
+  def qualified_name(self, options: multiplier.ast.QualifiedNameRenderOptions) -> multiplier.frontend.TokenRange:
     ...
 
 class LabelDecl(multiplier.ast.NamedDecl):
@@ -66385,13 +66387,10 @@ class NamespaceDecl(multiplier.ast.NamedDecl):
   canonical_declaration: multiplier.ast.NamespaceDecl
   definition: Optional[multiplier.ast.NamespaceDecl]
   redeclarations: Iterable[multiplier.ast.NamespaceDecl]
-  anonymous_namespace: Optional[multiplier.ast.NamespaceDecl]
-  original_namespace: multiplier.ast.NamespaceDecl
   r_brace_token: multiplier.frontend.Token
   is_anonymous_namespace: bool
   is_inline: bool
   is_nested: bool
-  is_original_namespace: bool
   contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
