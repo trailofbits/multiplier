@@ -288,6 +288,9 @@ pasta::Macro RootMacroFrom(const pasta::Macro &node);
 gap::generator<std::pair<pasta::Decl, pasta::Decl>>
 OriginalDeclsInDeclContext(pasta::DeclContext dc);
 
+// Get the raw canonical entity, without remapping.
+const void *RawOriginalCanonicalDecl(const pasta::Decl &decl);
+
 uint32_t Hash32(std::string_view data);
 uint64_t Hash64(std::string_view data);
 

@@ -51,8 +51,8 @@ struct SeenEntityTracker {
 
 SeenEntityList seen;
 
-static void PrintCallHierarchy(mx::Decl entity, unsigned depth);
-static void PrintCallHierarchy(mx::Stmt entity, unsigned depth);
+static void PrintReferenceHierarchy(mx::Decl entity, unsigned depth);
+static void PrintReferenceHierarchy(mx::Stmt entity, unsigned depth);
 
 static void Indent(std::ostream &os, unsigned depth) {
   for (auto i = 0u; i < depth; ++i) {
@@ -60,7 +60,7 @@ static void Indent(std::ostream &os, unsigned depth) {
   }
 }
 
-void PrintCallHierarchy(mx::Decl entity, unsigned depth) {
+void PrintReferenceHierarchy(mx::Decl entity, unsigned depth) {
   SeenEntityTracker enter_entity(seen, entity);
   if (!enter_entity) {
     return;
@@ -98,20 +98,20 @@ void PrintCallHierarchy(mx::Decl entity, unsigned depth) {
   if (enter_entity.IsCycle()) {
     return;
   } else if (decl != decls.end()) {
-    PrintCallHierarchy(*decl, depth + 1u);
+    PrintReferenceHierarchy(*decl, depth + 1u);
   } else {
     for (mx::Reference ref : mx::Reference::to(entity)) {
       if (auto ref_stmt = ref.as_statement()) {
-        PrintCallHierarchy(*ref_stmt, depth + 1u);
+        PrintReferenceHierarchy(*ref_stmt, depth + 1u);
 
       } else if (auto ref_decl = ref.as_declaration()) {
-        PrintCallHierarchy(*ref_decl, depth + 1u);
+        PrintReferenceHierarchy(*ref_decl, depth + 1u);
       }
     }
   }
 }
 
-void PrintCallHierarchy(mx::Stmt entity, unsigned depth) {
+void PrintReferenceHierarchy(mx::Stmt entity, unsigned depth) {
   SeenEntityTracker enter_entity(seen, entity);
   if (!enter_entity) {
     return;
@@ -119,7 +119,7 @@ void PrintCallHierarchy(mx::Stmt entity, unsigned depth) {
   auto decls = mx::Decl::containing(entity);
   auto decl = decls.begin();
   if (decl != decls.end()) {
-    PrintCallHierarchy(*decl, depth);
+    PrintReferenceHierarchy(*decl, depth);
   }
 }
 
@@ -138,11 +138,11 @@ int main(int argc, char *argv[]) {
   auto maybe_entity = index.entity(FLAGS_entity_id);
   if (std::holds_alternative<mx::Decl>(maybe_entity)) {
     mx::Decl decl = std::get<mx::Decl>(maybe_entity);
-    PrintCallHierarchy(std::move(decl), 0u);
+    PrintReferenceHierarchy(std::move(decl), 0u);
 
   } else if (std::holds_alternative<mx::Stmt>(maybe_entity)) {
     mx::Stmt stmt = std::get<mx::Stmt>(maybe_entity);
-    PrintCallHierarchy(std::move(stmt), 0u);
+    PrintReferenceHierarchy(std::move(stmt), 0u);
 
   } else if (std::holds_alternative<mx::Token>(maybe_entity)) {
     mx::Token token = std::get<mx::Token>(maybe_entity);
@@ -151,10 +151,10 @@ int main(int argc, char *argv[]) {
     auto stmt = stmts.begin();
     auto decl = decls.begin();
     if (stmt != stmts.end()) {
-      PrintCallHierarchy(*stmt, 0u);
+      PrintReferenceHierarchy(*stmt, 0u);
 
     } else if (decl != decls.end()) {
-      PrintCallHierarchy(*decl, 0u);
+      PrintReferenceHierarchy(*decl, 0u);
     }
 
   // TODO(pag): Macros?

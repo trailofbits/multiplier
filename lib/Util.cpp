@@ -4,7 +4,11 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <cassert>
+
+#include <multiplier/AST/DeclCategory.h>
 #include <multiplier/AST/StmtKind.h>
+#include <multiplier/Frontend/TokenCategory.h>
 
 namespace mx {
 
@@ -29,6 +33,18 @@ bool IsNonValueStatement(StmtKind kind) {
       return true;
     default:
       return false;
+  }
+}
+
+// Converts a declaration category into token category.
+TokenCategory ConvertDeclCategoryToTokenCategory(DeclCategory category) {
+  if (category == DeclCategory::UNKNOWN) {
+    assert(false);
+    return TokenCategory::UNKNOWN;
+
+  } else {
+    return static_cast<TokenCategory>(
+        int(category) + int(TokenCategory::COMMENT));
   }
 }
 

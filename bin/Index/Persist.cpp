@@ -27,6 +27,7 @@
 #include <pasta/Util/ArgumentVector.h>
 #include <pasta/Util/File.h>
 #include <sstream>
+#include <thread>
 #include <utility>
 #include <unordered_set>
 

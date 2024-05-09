@@ -21,6 +21,7 @@
 #include <pasta/Util/ArgumentVector.h>
 #include <pasta/Util/File.h>
 #include <set>
+#include <thread>
 #include <tuple>
 #include <unordered_set>
 #include <vector>
@@ -145,7 +146,7 @@ static std::optional<pasta::Decl> FindSpecializationParent(
   if (auto pattern = TemplateInstantiationPattern(decl)) {
     if (auto tpl = pattern->DescribedFunctionTemplate()) {
       return FindParentRedecl(tpl.value(), decl.Token());
-    
+
     // This is probably a friend declaration inside of a class template.
     } else if (pattern->Token() == decl.Token()) {
       return std::move(pattern.value());
@@ -176,6 +177,9 @@ class TLDFinder final : public pasta::DeclVisitor {
   // Tracks declarations for which we've seen the specializations. This is
   // to prevent us from double-adding specializations.
   std::unordered_set<const void *> seen;
+
+  // Tracks which templates have been visited.
+  std::unordered_set<const void *> seen_templates;
 
   std::unordered_set<const void *> deferred_seen;
 
@@ -282,24 +286,80 @@ class TLDFinder final : public pasta::DeclVisitor {
     --depth;
   }
 
-  void VisitDeclContext(const pasta::Decl &dc_decl,
-                        const pasta::DeclContext &dc,
-                        bool track_parent = true) {
-    std::optional<PrevValueTracker<const void *>> save_restore;
+  // Only visit the non-remapped decls in a decl context.
+  void VisitOriginalDeclsInDeclContext(const pasta::Decl &dc_decl,
+                                       const pasta::DeclContext &dc,
+                                       bool track_parent) {
 
     // NOTE(pag): If this isn't a C++ class/struct, so we don't need/want to
     //            maintain trigger fragment nesting.
+    std::optional<PrevValueTracker<const void *>> save_restore;
     if (track_parent && dc_decl.Kind() != pasta::DeclKind::kRecord) {
       save_restore.emplace(parent_decl, RawEntity(dc_decl));
     }
 
     auto decls = OriginalDeclsInDeclContext(dc);
-    for (const auto &[orig, remapped] : decls) {
-      Accept(remapped);
+    for (const auto &[decl, remapped] : decls) {
+      if (decl == remapped || decl == dc_decl) {
+        continue;
+      }
 
-      if (parent_decl && !em.IsTopLevel(remapped)) {
-        actual_parent.emplace(RawEntity(orig), parent_decl);
-        actual_parent.emplace(RawEntity(remapped), parent_decl);
+      switch (decl.Kind()) {
+        case pasta::DeclKind::kFunctionTemplate: {
+          const auto &func = reinterpret_cast<const pasta::FunctionTemplateDecl &>(
+              decl);
+          VisitSpecializations(func);
+          break;
+        }
+        case pasta::DeclKind::kVarTemplate: {
+          const auto &var = reinterpret_cast<const pasta::VarTemplateDecl &>(
+              decl);
+          VisitSpecializations(var);
+          break;
+        }
+        case pasta::DeclKind::kClassTemplate: {
+          const auto &cls = reinterpret_cast<const pasta::ClassTemplateDecl &>(
+              decl);
+          VisitSpecializations(cls);
+          auto pattern = cls.TemplatedDeclaration();
+          seen.insert(RawEntity(pattern));
+          ++depth;
+          VisitOriginalDeclsInDeclContext(pattern, pattern, true);
+          --depth;
+          break;
+        }
+        default:
+          break;
+      }
+
+      if (parent_decl && !em.IsTopLevel(decl)) {
+        actual_parent.emplace(RawEntity(decl), parent_decl);
+      }
+    }
+  }
+
+  void VisitDeclContext(const pasta::Decl &dc_decl,
+                        const pasta::DeclContext &dc,
+                        bool track_parent = true) {
+    VisitOriginalDeclsInDeclContext(dc_decl, dc, track_parent);
+
+    // NOTE(pag): If this isn't a C++ class/struct, so we don't need/want to
+    //            maintain trigger fragment nesting.
+    std::optional<PrevValueTracker<const void *>> save_restore;
+    if (track_parent && dc_decl.Kind() != pasta::DeclKind::kRecord) {
+      save_restore.emplace(parent_decl, RawEntity(dc_decl));
+    }
+
+    auto decls = OriginalDeclsInDeclContext(dc);
+    for (const auto &decl : dc.AlreadyLoadedDeclarations()) {
+      if (decl == dc_decl) {
+        continue;
+      }
+
+      Accept(decl);
+
+      if (parent_decl && !em.IsTopLevel(decl)) {
+        actual_parent.emplace(RawEntity(decl), parent_decl);
       }
     }
   }
@@ -327,7 +387,7 @@ class TLDFinder final : public pasta::DeclVisitor {
       auto prev_pending_child_decls = std::move(pending_child_decls);
       pending_child_decls.clear();
       for (const auto &[parent, child] : prev_pending_child_decls) {
-        
+
         // Figure out the "real" parent. We might have calculated the parent
         // of a lambda as a method, but the real parent of the method is
         // (sometimes) its containing class.
@@ -516,6 +576,32 @@ class TLDFinder final : public pasta::DeclVisitor {
   //   // Do nothing.
   // }
 
+  void VisitSpecializations(const pasta::ClassTemplateDecl &decl) {
+    if (!seen_templates.emplace(RawOriginalCanonicalDecl(decl)).second) {
+      return;
+    }
+
+    auto specs = ExpandSpecializations(decl.Specializations());
+    for (pasta::ClassTemplateSpecializationDecl &spec : specs) {
+
+      // Specializations of partial specializations are collected into the
+      // template itself, but lexically "belong" to the partial specialization
+      // itself.
+      auto pattern = spec.SpecializedTemplateOrPartial();
+
+      if (std::holds_alternative<pasta::ClassTemplatePartialSpecializationDecl>(pattern)) {
+        const auto &partial = std::get<pasta::ClassTemplatePartialSpecializationDecl>(pattern);
+        ScheduleAccept(FindParentRedecl(partial, spec.Token()),
+                       std::move(spec));
+
+      } else if (std::holds_alternative<pasta::ClassTemplateDecl>(pattern)) {
+        const auto &tpl = std::get<pasta::ClassTemplateDecl>(pattern);
+        ScheduleAccept(FindParentRedecl(tpl, spec.Token()),
+                       std::move(spec));
+      }
+    }
+  }
+
   void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &decl) final {
     auto raw_decl = RawEntity(decl);
 
@@ -537,30 +623,32 @@ class TLDFinder final : public pasta::DeclVisitor {
     auto pattern = decl.TemplatedDeclaration();
     seen.insert(RawEntity(pattern));
     AddDeclAlways(decl);
+    VisitSpecializations(decl);
+    VisitDeeperDeclContext(decl, pattern);
+  }
 
-    if (decl.CanonicalDeclaration() == decl) {
-      auto specs = ExpandSpecializations(decl.Specializations());
-      for (pasta::ClassTemplateSpecializationDecl &spec : specs) {
-
-        // Specializations of partial specializations are collected into the
-        // template itself, but lexically "belong" to the partial specialization
-        // itself.
-        auto pattern = spec.SpecializedTemplateOrPartial();
-
-        if (std::holds_alternative<pasta::ClassTemplatePartialSpecializationDecl>(pattern)) {
-          const auto &partial = std::get<pasta::ClassTemplatePartialSpecializationDecl>(pattern);
-          ScheduleAccept(FindParentRedecl(partial, spec.Token()),
-                         std::move(spec));
-        
-        } else if (std::holds_alternative<pasta::ClassTemplateDecl>(pattern)) {
-          const auto &tpl = std::get<pasta::ClassTemplateDecl>(pattern);
-          ScheduleAccept(FindParentRedecl(tpl, spec.Token()),
-                         std::move(spec));
-        }
-      }
+  void VisitSpecializations(const pasta::VarTemplateDecl &decl) {
+    if (!seen_templates.emplace(RawOriginalCanonicalDecl(decl)).second) {
+      return;
     }
 
-    VisitDeeperDeclContext(decl, pattern);
+    auto specs = ExpandSpecializations(decl.Specializations());
+    for (pasta::VarTemplateSpecializationDecl &spec : specs) {
+
+      // Specializations of partial specializations are collected into the
+      // template itself, but lexically "belong" to the partial specialization
+      // itself.
+      auto pattern = spec.SpecializedTemplateOrPartial();
+      if (std::holds_alternative<pasta::VarTemplatePartialSpecializationDecl>(pattern)) {
+        const auto &partial = std::get<pasta::VarTemplatePartialSpecializationDecl>(pattern);
+        ScheduleAccept(FindParentRedecl(partial, spec.Token()),
+                       std::move(spec));
+
+      } else if (std::holds_alternative<pasta::VarTemplateDecl>(pattern)) {
+        const auto &tpl = std::get<pasta::VarTemplateDecl>(pattern);
+        ScheduleAccept(FindParentRedecl(tpl, spec.Token()), std::move(spec));
+      }
+    }
   }
 
   void VisitVarTemplateDecl(const pasta::VarTemplateDecl &decl) final {
@@ -570,26 +658,7 @@ class TLDFinder final : public pasta::DeclVisitor {
     }
 
     AddDeclAlways(decl);
-
-    if (decl.CanonicalDeclaration() == decl) {
-      auto specs = ExpandSpecializations(decl.Specializations());
-      for (pasta::VarTemplateSpecializationDecl &spec : specs) {
-
-        // Specializations of partial specializations are collected into the
-        // template itself, but lexically "belong" to the partial specialization
-        // itself.
-        auto pattern = spec.SpecializedTemplateOrPartial();
-        if (std::holds_alternative<pasta::VarTemplatePartialSpecializationDecl>(pattern)) {
-          const auto &partial = std::get<pasta::VarTemplatePartialSpecializationDecl>(pattern);
-          ScheduleAccept(FindParentRedecl(partial, spec.Token()),
-                         std::move(spec));
-        
-        } else if (std::holds_alternative<pasta::VarTemplateDecl>(pattern)) {
-          const auto &tpl = std::get<pasta::VarTemplateDecl>(pattern);
-          ScheduleAccept(FindParentRedecl(tpl, spec.Token()), std::move(spec));
-        }
-      }
-    }
+    VisitSpecializations(decl);
   }
 
   void VisitVarTemplatePartialSpecializationDecl(
@@ -632,6 +701,35 @@ class TLDFinder final : public pasta::DeclVisitor {
     VisitDeclaratorDecl(decl);
   }
 
+  void VisitSpecializations(const pasta::FunctionTemplateDecl &decl) {
+    if (!seen_templates.emplace(RawOriginalCanonicalDecl(decl)).second) {
+      return;
+    }
+
+    // Deduction guides.
+    auto should_hide = ShouldHideFromIndexer(decl.TemplatedDeclaration());
+    auto specs = ExpandSpecializations(decl.Specializations());
+
+    for (pasta::FunctionDecl &spec : specs) {
+      if (should_hide) {
+        seen.emplace(RawEntity(spec));
+        continue;
+      }
+
+      auto tpl = spec.PrimaryTemplate();
+      if (!tpl) {
+        assert(false);
+        continue;
+      }
+
+      // Specializations of partial specializations are collected into the
+      // template itself, but lexically "belong" to the partial specialization
+      // itself.
+      auto parent = FindParentRedecl(tpl.value(), spec.Token());
+      ScheduleAccept(parent, std::move(spec));
+    }
+  }
+
   void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) final {
     auto raw_decl = RawEntity(decl);
     if (!seen.emplace(raw_decl).second) {
@@ -644,28 +742,7 @@ class TLDFinder final : public pasta::DeclVisitor {
       AddDeclAlways(decl);
     }
 
-    if (decl.CanonicalDeclaration() == decl) {
-      auto specs = ExpandSpecializations(decl.Specializations());
-
-      for (pasta::FunctionDecl &spec : specs) {
-        if (should_hide) {
-          seen.emplace(RawEntity(spec));
-          continue;
-        }
-
-        auto tpl = spec.PrimaryTemplate();
-        if (!tpl) {
-          assert(false);
-          continue;
-        }
-
-        // Specializations of partial specializations are collected into the
-        // template itself, but lexically "belong" to the partial specialization
-        // itself.
-        auto parent = FindParentRedecl(tpl.value(), spec.Token());
-        ScheduleAccept(parent, std::move(spec));
-      }
-    }
+    VisitSpecializations(decl);
   }
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
@@ -1304,7 +1381,7 @@ static std::pair<mx::EntityOffset, mx::EntityOffset> ExpandDeclRange(
   while (3u <= begin_tok_index &&
          range[begin_tok_index - 3u].Role() == pasta::TokenRole::kBeginOfMacroExpansionMarker &&
          range[begin_tok_index - 2u].Role() == pasta::TokenRole::kEndOfMacroExpansionMarker) {
-    
+
     auto pt = range[begin_tok_index - 1u];
     auto td = pt.Data();
     if (pt.Kind() == pasta::TokenKind::kUnknown &&
@@ -1556,7 +1633,7 @@ bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
     case pasta::DeclKind::kFunctionTemplate:
       return IsProbablyABuiltinDecl(
           reinterpret_cast<const pasta::FunctionTemplateDecl &>(decl).TemplatedDeclaration());
-  
+
     default:
       break;
   }
@@ -1782,7 +1859,7 @@ static void FindTLMs(
     }
 
     add_macro(std::move(md));
-    
+
     // If it's an include-like directive, then we want to be able to associate
     // begin- and end-of-file markers with this directive. Here we'll find
     // the relevant begin-of-file markers.
@@ -1977,7 +2054,7 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
 //     auto btk = tokens[end_index + 1u].Kind();
 //     return btk == pasta::TokenKind::kComment ||
 //            btk == pasta::TokenKind::kUnknown;
-  
+
 //   // Two tokens in-between.
 //   } else if ((end_index + 3u) == next_begin_index) {
 //     auto btk = tokens[end_index + 1u].Kind();
@@ -2028,7 +2105,7 @@ static std::vector<EntityGroupRange> PartitionEntities(
         !ShouldGoInFloatingFragment(std::get<pasta::Macro>(ent))) {
       return false;
     }
-    
+
     auto next_begin = entity_ranges[i].begin_index;
     auto next_end = entity_ranges[i].end_index;
     auto next_order = entity_ranges[i].order;
@@ -2105,7 +2182,6 @@ static std::vector<EntityGroupRange> PartitionEntities(
       //     !ShouldGoInFloatingFragment(std::get<pasta::Macro>(prev_entity)) &&
       //     MergeLeadingMacroWithNextEntity(tokens, prev_begin_index,
       //                                     prev_end_index, next_begin)) {
-      
 
       // If we have a macro that is Nth in the list, and it will end up in a
       // floating fragment anyway, then separate it out. This also ends up
@@ -2119,7 +2195,7 @@ static std::vector<EntityGroupRange> PartitionEntities(
       } else if (next_begin > end_index) {
         // LOG(ERROR) << "Breaking at i=" << i << " next_begin=" << next_begin << " > end_index=" << end_index;
         break;
-      
+
       // This declaration has no specific location, nor does the last one, so
       // don't put them into the same entity range. If we do put them together,
       // then we will end up pretty-printing them all together at the same time
@@ -2171,7 +2247,6 @@ static std::vector<EntityGroupRange> PartitionEntities(
       //   LOG(ERROR) << "Floating end_index=" << end_index << " max_end_index=" << max_end_index; 
       // }
 
-      
       // prev_begin_index = next_begin;
       // prev_end_index = next_end;
 
@@ -2322,7 +2397,7 @@ static std::optional<FileLocationOfFragment> FindFileLocationOfFragment(
   if (id_it == entity_ids.end()) {
     return std::nullopt;
   }
-  
+
   mx::VariantId vid = mx::EntityId(id_it->second).Unpack();
   if (!std::holds_alternative<mx::FileId>(vid)) {
     return std::nullopt;
@@ -3245,7 +3320,7 @@ static void PersistParsedFragments(
     if (pf->first_parsed_token_index < pf->last_parsed_token_index &&
         pf->raw_parent_entity &&
         pf->num_top_level_declarations == 1u) {
-      
+
       const auto &tld = pf->top_level_decls.front();
       if (IsTemplateOrPattern(tld) ||
           IsLambda(tld) ||

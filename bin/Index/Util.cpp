@@ -1462,4 +1462,9 @@ OriginalDeclsInDeclContext(pasta::DeclContext dc) {
   }
 }
 
+// Get the raw canonical entity, without remapping.
+const void *RawOriginalCanonicalDecl(const pasta::Decl &decl) {
+  return decl.RawDecl()->getCanonicalDecl();
+}
+
 }  // namespace indexer

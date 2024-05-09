@@ -503,15 +503,17 @@ void RenderQualifiedNameInto(
     CustomTokenReader &tr, const NamedDecl &nd,
     const QualifiedNameRenderOptions &options) {
 
-  if (auto pd = NamedDecl::from(nd.parent_declaration())) {
-    RenderQualifiedNameInto(tr, pd.value(), options);
+  if (options.fully_qualified) {
+    if (auto pd = NamedDecl::from(nd.parent_declaration())) {
+      RenderQualifiedNameInto(tr, pd.value(), options);
 
-    // The parent is a template declaration; we don't need to print `nd` because
-    // `pd` has the same name.
-    if (auto td = TemplateDecl::from(pd.value())) {
-      if (auto pattern = td->templated_declaration()) {
-        if (pattern->id() == nd.id()) {
-          return;
+      // The parent is a template declaration; we don't need to print `nd`
+      // because `pd` has the same name.
+      if (auto td = TemplateDecl::from(pd.value())) {
+        if (auto pattern = td->templated_declaration()) {
+          if (pattern->id() == nd.id()) {
+            return;
+          }
         }
       }
     }
@@ -554,6 +556,7 @@ void RenderQualifiedNameInto(
         name = "(anonymous enum)";
         should_print = options.render_anonymous_enums;
         break;
+
       case TokenCategory::CLASS:
         name = "(anonymous class)";
         should_print = options.render_anonymous_classes;

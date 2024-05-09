@@ -33,6 +33,24 @@ TokenKind ReadTypeTokens::NthTokenKind(EntityOffset to) const {
   return static_cast<TokenKind>(type->frag_reader.getTokenKinds()[to]);
 }
 
+// Return teh category of the Nth token.
+TokenCategory ReadTypeTokens::NthTokenCategory(EntityOffset to) const {
+  auto category = this->TokenReader::NthTokenCategory(to);
+  if (category != TokenCategory::IDENTIFIER) {
+    return category;
+  }
+
+  // Namespaces are always internalized into their respective fragments, and
+  // so type serialization never has a related entity ID available for them,
+  // because types aren't serialized into fragments.
+  if (NthTokenKind(to) == TokenKind::IDENTIFIER &&
+      NthTokenKind(to + 1u) == TokenKind::COLON_COLON) {
+    return TokenCategory::NAMESPACE;
+  }
+
+  return category;
+}
+
 // Return the data of the Nth token.
 std::string_view ReadTypeTokens::NthTokenData(EntityOffset to) const {
   if (to >= type->num_type_tokens) {

@@ -51,6 +51,7 @@ static PyTypeObject gTypeDef = {
     obj->data = new (obj->backing_storage) T;
 
  #define FOR_EACH_OPTIONS(m) \
+    m(fully_qualified) \
     m(render_anonymous_classes) \
     m(render_anonymous_structs) \
     m(render_anonymous_fields) \

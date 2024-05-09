@@ -304,6 +304,9 @@ class MX_EXPORT UserToken final {
 class MX_EXPORT QualifiedNameRenderOptions final {
  public:
 
+  // Should the name be fully qualified, i.e. with all parent classes/namespaces?
+  bool fully_qualified{true};
+
   // If the class is unnamed, then should we render out `(anonumous class)`?
   bool render_anonymous_classes{true};
 

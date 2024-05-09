@@ -27,6 +27,7 @@
 #include "Fragment.h"
 #include "Reference.h"
 #include "Type.h"
+#include "Util.h"
 
 namespace mx {
 namespace {
@@ -818,17 +819,6 @@ static TokenCategory ClassifyFile(TokenKind kind,
 }
 
 }  // namespace
-
-TokenCategory ConvertDeclCategoryToTokenCategory(DeclCategory category) {
-  if (category == DeclCategory::UNKNOWN) {
-    assert(false);
-    return TokenCategory::UNKNOWN;
-
-  } else {
-    return static_cast<TokenCategory>(
-        int(category) + int(TokenCategory::COMMENT));
-  }
-}
 
 TokenReader::~TokenReader(void) noexcept {}
 
