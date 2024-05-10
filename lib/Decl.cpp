@@ -490,6 +490,7 @@ static void RenderTemplateArgumentInto(
 static void RenderTemplateArgumentsInto(
     CustomTokenReader &tr, gap::generator<TemplateArgument> args,
     const QualifiedNameRenderOptions &options) {
+
   AddSimpleToken(tr, "<", TokenKind::L_ANGLE, TokenCategory::PUNCTUATION);
 
   for (const auto &arg : args) {

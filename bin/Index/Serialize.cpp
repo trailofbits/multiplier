@@ -8892,10 +8892,7 @@ void SerializeDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::D
   b.setVal32(e.IsWeakImported());
   b.setVal33(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
   b.setVal34(static_cast<unsigned char>(mx::FromPasta(e.Category())));
-  auto et35 = es.EntityId(e.Token());
-  if (!et35) {
-    et35 = pf.DeclTokenEntityId(e);
-  }
+  auto et35 = pf.DeclTokenEntityId(e);
   b.setVal35(et35);
   auto p36 = es.EntityIds(e.Tokens());
   b.setVal36(p36.first);

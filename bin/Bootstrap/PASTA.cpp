@@ -3340,16 +3340,15 @@ MethodListPtr CodeGenerator::RunOnClass(
             << getter_name << "());\n"
             << "}\n\n";
 
-        serialize_cpp_os
-            << "  auto et" << i << " = es.EntityId(e." << method_name << "());\n";
-
         // For builtin declarations, we sometimes need to go looking for the
         // token, because it never existed in any parsed representation.
         if (class_name == "Decl" && method_name == "Token") {
           serialize_cpp_os
-              << "  if (!et" << i << ") {\n"
-              << "    et" << i << " = pf.DeclTokenEntityId(e);\n"
-              << "  }\n";
+              << "  auto et" << i << " = pf.DeclTokenEntityId(e);\n";
+        } else {
+          serialize_cpp_os
+              << "  auto et" << i << " = es.EntityId(e." << method_name << "());\n";
+
         }
 
         serialize_cpp_os

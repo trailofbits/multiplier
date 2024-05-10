@@ -411,7 +411,6 @@ bool TypeMapper::AddEntityId(PendingFragment &pf, pasta::Type *entity_) {
     pf.TryAdd(ast.Adopt(stmt));
   }
 
-
   TypeKey dedup_type_key(raw_type, raw_qualifiers);
   assert(dedup_type_key.first != nullptr);
 
@@ -432,10 +431,11 @@ bool TypeMapper::AddEntityId(PendingFragment &pf, pasta::Type *entity_) {
   entity = ast.Adopt(raw_type, raw_qualifiers);
 
   auto token_range = pasta::PrintedTokenRange::Create(entity, pp);
+  auto hash = HashType(pf, entity, token_range);
   auto [type_id, id_status] = id_store.GetOrCreateTypeIdForHash(
       mx::FromPasta(entity.Kind()),
       raw_qualifiers,
-      HashType(pf, entity, token_range),
+      hash,
       token_range.size());
 
   auto tid = type_id.Unpack();

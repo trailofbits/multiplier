@@ -927,10 +927,6 @@ static std::string_view NameWithoutTilde(const std::string &name,
 // have token data, and will accept an in-name-only match.
 bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
                       const pasta::Decl &decl, std::string_view token_data) {
-  if (token_data == "Bar") {
-    (void) decl.Token();
-  }
-
   auto is_cxx_destructor = decl.Kind() == pasta::DeclKind::kCXXDestructor;
 
   if (auto func = pasta::FunctionDecl::From(decl)) {
@@ -1035,7 +1031,6 @@ mx::RawEntityId RelatedEntityIdToPrintedToken(
   if (parsed_tok) {
     tk = parsed_tok->Kind();
     self = RawEntity(parsed_tok.value());
-    token_data = parsed_tok->Data();
   }
 
   const void *related_entity = nullptr;
@@ -1243,6 +1238,10 @@ mx::RawEntityId PendingFragment::DeclTokenEntityId(
 
   auto decl_id = em.EntityId(decl);
 
+  if (IsLambda(decl)) {
+    return mx::kInvalidEntityId;
+  }
+
   // If we have a name for this entity, then try to find it.
   if (auto nd = pasta::NamedDecl::From(decl)) {
     auto dt = decl.Token();
@@ -1257,10 +1256,12 @@ mx::RawEntityId PendingFragment::DeclTokenEntityId(
 
   // Otherwise, scan.
   for (pasta::PrintedToken tok : parsed_tokens) {
-    auto dt = tok.DerivedLocation();
-    auto rel_id = RelatedEntityIdToPrintedToken(em, tok, dt);
-    if (decl_id == rel_id) {
-      return em.EntityId(tok);
+    if (tok.Kind() == pasta::TokenKind::kIdentifier) {
+      auto dt = tok.DerivedLocation();
+      auto rel_id = RelatedEntityIdToPrintedToken(em, tok, dt);
+      if (decl_id == rel_id) {
+        return em.EntityId(tok);
+      }
     }
   }
 
@@ -1373,7 +1374,6 @@ void TokenProvenanceCalculator::Clear(void) {
   expansion_toks.clear();
   multiple_children.clear();
   ordered_tokens.clear();
-  parsed_tokens.clear();
   fragment_index = mx::kInvalidEntityId;
 }
 
@@ -1755,6 +1755,9 @@ bool TokenProvenanceCalculator::Push(void) {
         continue;
       }
 
+      assert(derived_tok->related_entity_id == mx::kInvalidEntityId ||
+             rel_id != mx::kInvalidEntityId);
+
       derived_tok->parsed_token_id = parsed_id;
       derived_tok->related_entity_id = rel_id;
       changed = true;
@@ -1785,12 +1788,10 @@ bool TokenProvenanceCalculator::FinalPush(void) {
     }
 
     for (TokenInfo *derived_tok : tok->Children(*this)) {
-      if (derived_tok->related_entity_id != mx::kInvalidEntityId) {
-        continue;
+      if (derived_tok->related_entity_id == mx::kInvalidEntityId) {
+        derived_tok->related_entity_id = rel_id;
+        changed = true;
       }
-
-      derived_tok->related_entity_id = rel_id;
-      changed = true;
     }
   }
 
@@ -1869,12 +1870,7 @@ void TokenProvenanceCalculator::Run(
     mx::RawEntityId rel_id = mx::kInvalidEntityId;
     if (cl) {
       parsed_id = em.EntityId(cl.value());
-      if (auto it = parsed_tokens.find(RawEntity(cl.value()));
-          it != parsed_tokens.end()) {
-        rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), it->second);
-      } else {
-        rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), pl);
-      }
+      rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), pl);
     }
 
     if (pl && parsed_id == mx::kInvalidEntityId) {
@@ -2133,12 +2129,6 @@ void TokenProvenanceCalculator::Run(
 void TokenProvenanceCalculator::Init(
     const pasta::PrintedTokenRange &printed_toks) {
   Clear();
-
-  for (pasta::PrintedToken tok : printed_toks) {
-    if (std::optional<pasta::Token> parsed_tok = tok.DerivedLocation()) {
-      parsed_tokens.emplace(RawEntity(tok), std::move(parsed_tok.value()));
-    }
-  }
 }
 
 #ifndef NDEBUG

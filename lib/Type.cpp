@@ -43,8 +43,7 @@ TokenCategory ReadTypeTokens::NthTokenCategory(EntityOffset to) const {
   // Namespaces are always internalized into their respective fragments, and
   // so type serialization never has a related entity ID available for them,
   // because types aren't serialized into fragments.
-  if (NthTokenKind(to) == TokenKind::IDENTIFIER &&
-      NthTokenKind(to + 1u) == TokenKind::COLON_COLON) {
+  if (NthTokenKind(to + 1u) == TokenKind::COLON_COLON) {
     return TokenCategory::NAMESPACE;
   }
 

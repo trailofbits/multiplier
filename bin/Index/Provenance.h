@@ -101,7 +101,6 @@ class TokenProvenanceCalculator {
   mx::RawEntityId fragment_index{mx::kInvalidEntityId};
   std::deque<TokenInfo> infos;
   std::unordered_map<const void *, TokenInfo *> info_map;
-  std::unordered_map<const void *, pasta::Token> parsed_tokens;
   std::unordered_map<const TokenInfo *, std::vector<TokenInfo *>>
       multiple_children;
   std::vector<TokenInfo *> ordered_tokens;
