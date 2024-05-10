@@ -169,6 +169,14 @@ bool IsSpecialization(const pasta::Decl &decl);
 // specialization, then we'll also want to do the same thing.
 bool IsSpecializationOrInSpecialization(const pasta::Decl &decl);
 
+// Is this decl a specialization of a template? If so, then we will want
+// to render the printed tokens of the specialization into the fragment, rather
+// than the parsed tokens.
+bool IsOrIsInSpecializationOrTemplate(const pasta::Decl &decl);
+
+// Return `true` if `decl` is a method.
+bool IsMethod(const pasta::Decl &decl);
+
 // Is this decl a template or template pattern?
 bool IsTemplateOrPattern(const pasta::Decl &decl);
 

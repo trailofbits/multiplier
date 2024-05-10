@@ -945,6 +945,46 @@ bool IsSpecializationOrInSpecialization(const pasta::Decl &decl) {
   }
 }
 
+// Is this decl a specialization of a template? If so, then we will want
+// to render the printed tokens of the specialization into the fragment, rather
+// than the parsed tokens.
+bool IsOrIsInSpecializationOrTemplate(const pasta::Decl &decl) {
+  if (IsSpecialization(decl) || IsTemplateOrPattern(decl)) {
+    return true;
+  }
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kFunction:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod:
+      if (auto dc = decl.DeclarationContext()) {
+        if (auto dc_decl = pasta::Decl::From(dc.value())) {
+          return IsOrIsInSpecializationOrTemplate(dc_decl.value());
+        }
+      }
+      return false;
+
+    default:
+      return false;
+  }
+}
+
+// Return `true` if `decl` is a method.
+bool IsMethod(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod:
+      return true;
+    default:
+      return false;
+  }
+}
+
 // Is this decl a template or template pattern?
 bool IsTemplateOrPattern(const pasta::Decl &decl) {
   switch (decl.Kind()) {

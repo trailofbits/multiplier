@@ -251,10 +251,6 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
       return mx::kInvalidEntityId;
     }
 
-    if (!is_identifier) {
-      return mx::kInvalidEntityId;
-    }
-
     pasta::ValueDecl md = me->MemberDeclaration();
 
     // With a `CxxMemberCallExpr` to an overloaded operator, we might see the
@@ -265,6 +261,10 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
       if (AcceptOOK(ook, token_kind)) {
         return em.EntityId(md);
       }
+    }
+
+    if (!is_identifier) {
+      return mx::kInvalidEntityId;
     }
 
     if (check_token(me->MemberToken())) {

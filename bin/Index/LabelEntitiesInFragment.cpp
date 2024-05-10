@@ -17,6 +17,8 @@
 
 #include "LabelEntitiesInFragment.h"
 
+#include <iostream>
+
 namespace indexer {
 namespace {
 
@@ -57,6 +59,17 @@ static std::optional<mx::PackedFragmentId> IdentifyAsNestedFragmentToken(
         D( std::cerr << "\tparent frag index is " << parent_frag_index << '\n'; )
       }
     }
+
+    // std::cerr << tok.Index() << ' ' << tok.Data();
+    // for (const pasta::TokenContext &ctx : TokenContexts(tok)) {
+    //   std::cerr << " -> " << ctx.KindName();
+    //   if (auto decl = pasta::Decl::From(ctx)) {
+    //     std::cerr << ':' << decl->KindName();
+    //   } else if (auto type = pasta::Type::From(ctx)) {
+    //     std::cerr << ':' << type->KindName();
+    //   }
+    // }
+    // std::cerr << '\n';
 
     for (const pasta::TokenContext &ctx : TokenContexts(tok)) {
       auto kind = ctx.Kind();

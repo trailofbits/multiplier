@@ -753,7 +753,6 @@ class TLDFinder final : public pasta::DeclVisitor {
 
     if (ShouldHideFromIndexer(decl)) {
       actual_parent.emplace(raw_decl, parent_decl);
-      // LOG(ERROR) << "Hiding " << raw_decl;
       return;
     }
 
@@ -835,27 +834,20 @@ class TLDFinder final : public pasta::DeclVisitor {
       assert(false);
     }
 
-    // All methods end up being nested or top-level fragmnets. The above cases
-    // try to figure out if we need to sometimes force-nest things. If we make
-    // it here and we're still dealing with a method then add it as top-level.
-    //
-    // Methods (static or member) inside of class template specializations are
-    // always nested fragments. This is because their bodies may not be fully
-    // instantiated, and so we don't want them screwing up the fragment
-    // deduplication.
-    if (IsMethodLexicallyInClass(decl)) {
-      // LOG(ERROR) << "IsMethodLexicallyInSpecialization " << raw_decl;
-      seen.emplace(RawEntity(decl));
-      AddDeclAlways(decl);
-      return;
+    // Methods (static or member) transitively inside of class template
+    // specializations are always nested fragments. This is because their
+    // bodies may not be fully instantiated, and so we don't want them screwing
+    // up the fragment deduplication.
+    if (IsMethod(decl)) {
+      if (IsOrIsInSpecializationOrTemplate(decl) || IsLambda(decl)) {
+        seen.emplace(RawEntity(decl));
+        AddDeclAlways(decl);
+        return;
+      }
     }
 
     VisitDeclaratorDecl(decl);
   }
-
-  // void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final {
-  //   VisitRecordDecl(decl);
-  // }
 
   void VisitRecordDecl(const pasta::RecordDecl &decl) final {
     auto raw_decl = RawEntity(decl);
@@ -904,17 +896,6 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
-    // // We should have already found this method via the top-level
-    // // `CXXRecordDecl`. If it's a generic lambda then this method is the
-    // // specialization of the `operator()` so don't want to skip it.
-    // if (IsLambda(decl) && !IsSpecialization(decl)) {
-    //   LOG(ERROR) << "method in lambda " << RawEntity(decl)
-    //              << " IsSpecialization(parent)=" << IsSpecialization(decl.Parent());
-    //   CHECK_NOTNULL(parent_decl);
-    //   CHECK_GT(depth, 0u);
-    //   return;
-    // }
-
     VisitFunctionDecl(decl);
   }
 
@@ -923,7 +904,7 @@ class TLDFinder final : public pasta::DeclVisitor {
   void VisitTypeAliasTemplateDecl(
       const pasta::TypeAliasTemplateDecl &decl) final {
     if (seen.emplace(RawEntity(decl)).second) {
-      AddDecl(decl);
+      AddDeclAlways(decl);
     }
   }
 
@@ -962,15 +943,11 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 
   void VisitStaticAssertDecl(const pasta::StaticAssertDecl &decl) final {
-    if (seen.emplace(RawEntity(decl)).second) {
-      VisitDecl(decl);
-    }
+    VisitDecl(decl);
   }
 
   void VisitEmptyDecl(const pasta::EmptyDecl &decl) final {
-    if (seen.emplace(RawEntity(decl)).second) {
-      VisitDecl(decl);
-    }
+    VisitDecl(decl);
   }
 
   void VisitDecl(const pasta::Decl &decl) final {
@@ -1985,92 +1962,8 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
 
   std::sort(entity_ranges.begin(), entity_ranges.end());
 
-  // std::sort(
-  //     entity_ranges.begin(), entity_ranges.end(),
-  //     [] (const EntityRange &a, const EntityRange &b) {
-  //       return b.end_index > a.end_index;
-  //     });
-
-  // std::stable_sort(
-  //     entity_ranges.begin(), entity_ranges.end(),
-  //     [] (const EntityRange &a, const EntityRange &b) {
-  //       return a.begin_index < b.begin_index;
-  //     });
-
   return entity_ranges;
 }
-
-// // Should we merge a leading macro with the next entity? We have to deal with
-// // one corner case, observed in cURL:
-// //
-// //    CURL_EXTERN CURLcode curl_easy_pause(...);
-// //
-// // Here, depending on the configuration, the macro `CURL_EXTERN` either
-// // expands to a `__declspec` or attribute, and is thus part of the
-// // function declaration, or it expands to nothing, and so looks disjoint
-// // from the function declaration. We want to make it logically part of
-// // the declaration, fusing the two.
-// //
-// // XREF: Issue 412 (https://github.com/trailofbits/multiplier/issues/412).
-// static bool MergeLeadingMacroWithNextEntity(
-//     const pasta::TokenRange &tokens, mx::EntityOffset begin_index,
-//     mx::EntityOffset end_index, mx::EntityOffset next_begin_index) {
-
-//   // Make sure there are no parsed tokens inside of the leading macro expansion.
-//   // If there were then we should have discovered them as leading keywords (e.g.
-//   // storage specifiers) or attributes.
-//   for (auto i = begin_index; i <= end_index; ++i) {
-//     auto tok = tokens[i];
-//     switch (tok.Role()) {
-//       case pasta::TokenRole::kFinalMacroExpansionToken:
-//       case pasta::TokenRole::kMacroDirectiveMarker:
-//       case pasta::TokenRole::kBeginOfFileMarker:
-//       case pasta::TokenRole::kEndOfFileMarker:
-//         return false;
-//       case pasta::TokenRole::kFileToken:
-//         if (IsParsedTokenExcludingWhitespaceAndComments(tok)) {
-//           return false;
-//         }
-//         continue;
-//       case pasta::TokenRole::kBeginOfMacroExpansionMarker:
-//       case pasta::TokenRole::kEndOfMacroExpansionMarker:
-//       case pasta::TokenRole::kInvalid:
-//         continue;
-//       case pasta::TokenRole::kInitialMacroUseToken:
-//       case pasta::TokenRole::kIntermediateMacroExpansionToken:
-//         assert(false);
-//         continue;
-//     }
-//   }
-
-//   // Nothing between.
-//   if ((end_index + 1u) == next_begin_index) {
-//     return true;
-//   }
-
-//   // One token in-between.
-//   if ((end_index + 2u) == next_begin_index) {
-
-//     auto btk = tokens[end_index + 1u].Kind();
-//     return btk == pasta::TokenKind::kComment ||
-//            btk == pasta::TokenKind::kUnknown;
-
-//   // Two tokens in-between.
-//   } else if ((end_index + 3u) == next_begin_index) {
-//     auto btk = tokens[end_index + 1u].Kind();
-//     if (btk != pasta::TokenKind::kComment &&
-//         btk != pasta::TokenKind::kUnknown) {
-//       return false;
-//     }
-
-//     btk = tokens[end_index + 2u].Kind();
-//     return btk == pasta::TokenKind::kComment ||
-//            btk == pasta::TokenKind::kUnknown;
-
-//   } else {
-//     return false;
-//   }
-// }
 
 // Try to accumulate the nearby top-level declarations whose token ranges
 // overlap with `decl` into `decls_for_chunk`. For example, this process
@@ -2117,11 +2010,6 @@ static std::vector<EntityGroupRange> PartitionEntities(
     return true;
   };
 
-  // for (size_t i = 0u, max_i = entity_ranges.size(); i < max_i; ++i) {
-  //   LOG(ERROR) << i << ' ' << entity_ranges[i].begin_index
-  //              << ' ' << entity_ranges[i].end_index; 
-  // }
-
   for (size_t i = 0u, max_i = entity_ranges.size(); i < max_i; ) {
     EntityGroup entities_for_group;
     // Entity prev_entity;
@@ -2130,18 +2018,11 @@ static std::vector<EntityGroupRange> PartitionEntities(
     auto order = entity_ranges[i].order;
     auto begin_index = entity_ranges[i].begin_index;
     auto end_index = entity_ranges[i].end_index;
-    // auto prev_begin_index = begin_index;
-    // auto prev_end_index = end_index;
-    // auto num_decls = 0u;
-    // std::optional<const void *> decl_parent;
 
     CHECK_LE(begin_index, end_index);
 
     if (try_add_floating_macro(i)) {
       ++i;
-
-      // LOG(ERROR) << "Floating end_index=" << end_index << " max_end_index=" << max_end_index; 
-      // max_end_index = std::max(end_index, max_end_index);
       continue;
     }
 
@@ -2156,33 +2037,6 @@ static std::vector<EntityGroupRange> PartitionEntities(
       auto next_begin = entity_ranges[i].begin_index;
       auto next_end = entity_ranges[i].end_index;
 
-      // auto next_parent = entity_ranges[i].parent;
-
-      // LOG(ERROR) << next_begin << ' ' << next_end << ' ' << next_parent;
-
-      // if (prev_i < i && try_add_floating_macro(i)) {
-      //   ++i;
-      //   begin_index = std::min(begin_index, next_begin);
-      //   end_index = std::max(end_index, next_end);
-      //   max_end_index = std::max(end_index, max_end_index);
-      //   continue;
-      //   EntityGroup sub_group;
-      //   sub_group.emplace_back(std::move(entity_ranges[i]));
-      //   entity_group_ranges.emplace_back(
-      //       std::move(sub_group), next_begin, next_end, order);
-      //   ++i;
-      //   end_index = std::max(end_index, next_end);
-      //   continue;
-
-      // // XREF: Issue 412 (https://github.com/trailofbits/multiplier/issues/412).
-      // //       We can have leading empty macros in cURL and the Linux kernel,
-      // //       depending on the configuration, that logically should belong to
-      // //       the entity. It's possible we have a sequence of such macros.
-      // if (std::holds_alternative<pasta::Macro>(prev_entity) &&
-      //     !ShouldGoInFloatingFragment(std::get<pasta::Macro>(prev_entity)) &&
-      //     MergeLeadingMacroWithNextEntity(tokens, prev_begin_index,
-      //                                     prev_end_index, next_begin)) {
-
       // If we have a macro that is Nth in the list, and it will end up in a
       // floating fragment anyway, then separate it out. This also ends up
       // being a good way to avoid shoving all the macros defined in preambles
@@ -2193,7 +2047,6 @@ static std::vector<EntityGroupRange> PartitionEntities(
 
       // Doesn't close over.
       } else if (next_begin > end_index) {
-        // LOG(ERROR) << "Breaking at i=" << i << " next_begin=" << next_begin << " > end_index=" << end_index;
         break;
 
       // This declaration has no specific location, nor does the last one, so
@@ -2202,61 +2055,18 @@ static std::vector<EntityGroupRange> PartitionEntities(
       // and trying to do token alignment on that, and that will have terrible
       // computational complexity.
       } else if (prev_i < i && !next_begin) {
-        // LOG(ERROR) << "Breaking at prev_i=" << i << " < i=" << i << " and !next_begin";
         break;
       }
-
-      // // If two decls have the same parent then that is fine, but if they don't
-      // // then split them into different ranges.
-      // if (std::holds_alternative<pasta::Decl>(next_entity)) {
-      //   if (decl_parent.has_value()) {
-
-      //     // If this declaration has an unrelated parent to the last one then
-      //     // they can't be placed into the same entity range.
-      //     if (next_parent != decl_parent.value()) {
-      //       break;
-      //     }
-      //   } else {
-      //     decl_parent.emplace(entity_ranges[i].parent);
-      //   }
-
-      //   // LOG(ERROR)
-      //   //     << RawEntity(std::get<pasta::Decl>(next_entity))
-      //   //     << ' ' << entity_ranges[i].parent
-      //   //     << ' ' << next_begin << ' ' << next_end << ' '
-      //   //     << next_order;
-
-      //   ++num_decls;
-      // }
 
       // Make sure we definitely enclose over the next decl.
       order = std::min(order, next_order);
       begin_index = std::min(begin_index, next_begin);
       end_index = std::max(end_index, next_end);
       max_end_index = std::max(end_index, max_end_index);
-      // prev_entity = std::move(next_entity);
-
-      // LOG(ERROR) << "Normal end_index=" << end_index << " max_end_index=" << max_end_index; 
-
       entities_for_group.emplace_back(std::move(entity_ranges[i]));
-
-      // if (!try_add_floating_macro(i)) {
-      //   LOG(ERROR) << "Normal end_index=" << end_index << " max_end_index=" << max_end_index; 
-      //   entities_for_group.emplace_back(std::move(entity_ranges[i]));
-      // } else {
-      //   LOG(ERROR) << "Floating end_index=" << end_index << " max_end_index=" << max_end_index; 
-      // }
-
-      // prev_begin_index = next_begin;
-      // prev_end_index = next_end;
 
       ++i;
     }
-
-    // LOG_IF(WARNING, num_decls && entities_for_group.size() > 10)
-    //     << "Possible performance issue: entity group has "
-    //     << entities_for_group.size() << " entities, " << num_decls
-    //     << " of which are decls";
 
     CHECK(!entities_for_group.empty());
     entity_group_ranges.emplace_back(
@@ -2887,6 +2697,7 @@ static void CreateFloatingDirectiveFragment(
   pending_fragments.emplace_back(std::move(pf));
 }
 
+// Perform a topological sort of the top-level entities.
 static void SortByParentage(EntityGroup &entities) {
   auto num_entities = entities.size();
   if (num_entities <= 1u) {
@@ -2929,104 +2740,6 @@ static void SortByParentage(EntityGroup &entities) {
           return er.parent == raw_parent;
         });
   }
-
-  // figure out topological sort
-  // maybe: sort by size of token ranges, then do an selection sort, by taking
-  // the biggest thing from the sorted list, then finding all children, and
-  // recursing that way.
-
-  // // fix sorting.. maybe do a size-based sort, followed by a parentage check?
-  // //
-  // // note: only really need to do parent checking when the locations match
-
-  // std::sort(
-  //     entities.begin(), entities.end(),
-  //     [] (const EntityRange &a, const EntityRange &b) {
-  //       if (&a == &b) {
-  //         return false;
-  //       } else if (!a.parent && b.parent) {
-  //         return true;
-  //       } else if (a.parent && !b.parent) {
-  //         return false;
-  //       } else if (a.parent == b.parent) {
-  //         return a.order < b.order;
-  //       }
-
-  //       if (a.begin_index < b.begin_index) {
-  //         return true;
-  //       } else if (a.begin_index > b.begin_index) {
-  //         return false;
-  //       }
-
-  //       const auto &a_decl = std::get<pasta::Decl>(a.entity);
-  //       const auto &b_decl = std::get<pasta::Decl>(b.entity);
-
-  //       // We can have a function template with a parent, and a function
-  //       // specializing that template (i.e. the function's parent is the
-  //       // template). These two will occupy the same space, and so this should
-  //       // be the only case where both have parents, have the same locations,
-  //       // and have the same token range sizes, and thus 
-
-  //       if (a.parent == RawEntity(b_decl)) {
-  //         return false;
-  //       } else if (b.parent == RawEntity(a_decl)) {
-  //         return true;
-  //       }
-
-  //       // Here we actually want to compare the tokens and not the indexes
-  //       // recorded in the `EntityRange`s, because those have already been
-  //       // adjusted by things like `ExpandRange`.
-
-  //       auto a_tokens = a_decl.Tokens();
-  //       auto b_tokens = b_decl.Tokens();
-
-  //       // Containment implies parentage.
-  //       auto a_size = a_tokens.size();
-  //       auto b_size = b_tokens.size();
-  //       if (a_size > b_size) {
-  //         return true;
-  //       } else if (a_size < b_size) {
-  //         return false;
-  //       }
-
-  //       auto a_front = a_tokens.Front();
-  //       auto b_front = b_tokens.Front();
-  //       if (!a_front || !b_front) {
-  //         return a.order < b.order;
-  //       }
-
-  //       auto a_loc = a_front->Index();
-  //       auto b_loc = b_front->Index();
-  //       if (a_loc < b_loc) {
-  //         return true;
-  //       } else if (a_loc > b_loc) {
-  //         return false;
-  //       }
-
-  //       return a.order < b.order;
-  //     });
-
-  // for (auto &er : entities) {
-  //   CHECK(!std::holds_alternative<pasta::Macro>(er.entity));
-
-  //   auto raw_decl = RawEntity(std::get<pasta::Decl>(er.entity));
-  // }
-
-  // if (num_entities == 1u) {
-  //   return;
-  // } else if (num_entities == 2u) {
-  //   std::sort(
-  //       entities.begin(), entities.end(),
-  //       [] (const EntityRange &a, const EntityRange &b) {
-  //         if (a.parent == b.parent) {
-  //           return a.begin_index < b.begin_index;
-  //         } else if (!a.parent && b.parent) {
-  //           return true;
-  //         } else if (a.parent && !b.parent) {
-  //           return false;
-  //         }
-  //       });
-  // }
 }
 
 static void CreatePendingFragments(
@@ -3252,20 +2965,6 @@ static std::vector<PendingFragmentPtr> CreatePendingFragments(
       << " has at least " << decl_group_ranges.size() << " possible fragments";
 
   pasta::TokenRange tok_range = ast.Tokens();
-
-  // // Sort the the order of appearance in the parsed token list, then break
-  // // ties using the order that we visited things in in the TLD finder.
-  // std::sort(
-  //     decl_group_ranges.begin(), decl_group_ranges.end(),
-  //     [] (const EntityGroupRange &a, const EntityGroupRange &b) {
-  //       if (a.begin_index < b.begin_index) {
-  //         return true;
-  //       } else if (a.begin_index > b.begin_index) {
-  //         return false;
-  //       } else {
-  //         return a.order < b.order;
-  //       }
-  //     });
 
   // Visit decl range groups in their natural order, so that we're more likely
   // to associate tokens/expressions indirectly reachable through types with
