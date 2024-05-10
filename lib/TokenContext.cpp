@@ -138,10 +138,6 @@ std::optional<TokenContext> Token::context(void) const {
     ret.parent_offset = parent_index >> 1u;
   }
 
-  if (auto alias_index = tc->getAliasIndex()) {
-    ret.alias_offset = alias_index >> 1u;
-  }
-
   return ret;
 }
 
@@ -163,25 +159,6 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DEFINE_GETTER
 
-// Return the aliased context.
-std::optional<TokenContext> TokenContext::aliasee(void) const {
-  if (!reader || !alias_offset.has_value()) {
-    return std::nullopt;
-  }
-
-  auto tc = reader->TokenContexts(alias_offset.value());
-  if (!tc.has_value()) {
-    assert(false);
-    return std::nullopt;
-  }
-
-  TokenContext ret(reader, referenced_entity_id, alias_offset.value());
-  assert(referenced_entity_id == tc->getEntityId());
-  assert(!tc->getAliasIndex());
-  assert(ret.offset != offset);
-  return ret;
-}
-
 // Return the parent context.
 std::optional<TokenContext> TokenContext::parent(void) const {
   if (!reader || !parent_offset.has_value()) {
@@ -201,10 +178,6 @@ std::optional<TokenContext> TokenContext::parent(void) const {
 
   if (auto parent_index = tc->getParentIndex()) {
     ret.parent_offset = parent_index >> 1u;
-  }
-
-  if (auto alias_index = tc->getAliasIndex()) {
-    ret.alias_offset = alias_index >> 1u;
   }
 
   return ret;

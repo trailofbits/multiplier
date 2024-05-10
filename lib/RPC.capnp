@@ -46,13 +46,9 @@ struct TokenContext @0xb9ff75e040124cb3 {
   # value is present.
   parentIndex @0 :UInt32;
   
-  # Index of the aliased token context (shifted left by 1). Low bit is 1 if this
-  # value is present. The `entityId` at the indexed context should match.
-  aliasIndex @1 :UInt32;
-  
   # Entity ID. This should generally be in the same fragment, but sometimes
   # isn't.
-  entityId @2 :UInt64;
+  entityId @1 :UInt64;
 }
 
 struct File @0x987f05f6a48636d5 {

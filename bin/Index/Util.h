@@ -278,9 +278,6 @@ std::ostream &StdErr(void);
 // This is a helpful function to be called from a debugger.
 std::string DiagnosePrintedTokens(const pasta::PrintedTokenRange &);
 
-// Returns `c` if `c` isn't an alias, otherwise `c.Aliasee().value()`.
-pasta::TokenContext UnaliasedContext(const pasta::TokenContext &c);
-
 // Return the root macro containing `node`.
 pasta::Macro RootMacroFrom(const pasta::Macro &node);
 

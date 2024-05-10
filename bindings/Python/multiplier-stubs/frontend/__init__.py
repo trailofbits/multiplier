@@ -639,7 +639,6 @@ class TokenCategory(IntEnum):
 class TokenContext(object):
   entity_id: int
   has_parent: bool
-  is_alias: bool
   index_in_fragment: int
   as_declaration: Optional[multiplier.ast.Decl]
   as_statement: Optional[multiplier.ast.Stmt]
@@ -651,7 +650,6 @@ class TokenContext(object):
   as_cxx_base_specifier: Optional[multiplier.ast.CXXBaseSpecifier]
   as_designator: Optional[multiplier.ast.Designator]
   as_cxx_ctor_initializer: Optional[multiplier.ast.CXXCtorInitializer]
-  aliasee: Optional[multiplier.frontend.TokenContext]
   parent: Optional[multiplier.frontend.TokenContext]
 
 class Compilation(multiplier.Entity):

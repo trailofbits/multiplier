@@ -95,9 +95,6 @@ int main(int argc, char *argv[]) {
       bgcolor = " bgcolor=\"cadetblue1\"";
       kind_name = mx::EnumeratorName(type_->kind());
 
-    } else if (context.is_alias()) {
-      bgcolor = " bgcolor=\"deepskyblue3\"";
-
     } else {
       assert(false);
     }
@@ -116,13 +113,6 @@ int main(int argc, char *argv[]) {
       os
           << "c" << context.index_in_fragment() << " -> c" << parent_context->index_in_fragment() << ";\n";
     }
-
-    if (auto alias_context = context.aliasee()) {
-      os
-          << "c" << context.index_in_fragment() << " -> c" << alias_context->index_in_fragment()
-          << " [style=dashed];\n";
-    }
-
   }
 
   i = 0u;

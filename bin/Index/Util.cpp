@@ -1307,14 +1307,6 @@ gap::generator<pasta::TokenContext> TokenContexts(pasta::PrintedToken tok) {
   }
 }
 
-// Returns `c` if `c` isn't an alias, otherwise `c.Aliasee().value()`.
-pasta::TokenContext UnaliasedContext(const pasta::TokenContext &c) {
-  if (auto alias = c.Aliasee()) {
-    return alias.value();
-  }
-  return c;
-}
-
 const void *RawEntity(const pasta::Token &entity) {
   return entity.RawToken();
 }

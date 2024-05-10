@@ -24,9 +24,7 @@ namespace {
 
 struct PendingTokenContext {
   mx::RawEntityId entity_id{mx::kInvalidEntityId};
-  bool is_alias{false};
   unsigned offset{0};
-  unsigned alias_offset{0};
 };
 
 using DeclContextSet = std::unordered_set<pasta::TokenContext>;
@@ -70,7 +68,6 @@ class TokenContextSaver {
 
   unsigned CollectContextsFromTokens(void);
   unsigned ConvertContextsToPendingContexts(void);
-  void ResolveAliases(void);
 
   template <typename ContextListBuilder, typename OffsetListBuilder>
   void Persist(ContextListBuilder tcb_list, OffsetListBuilder tco_list);
@@ -90,9 +87,8 @@ unsigned TokenContextSaver::CollectContextsFromTokens(void) {
     ++num_tokens;
 
     for (pasta::TokenContext context : TokenContexts(tok)) {
-      auto unaliased_context = UnaliasedContext(context);
 #define ADD_ENTITY_TO_CONTEXT(type_name, lower_name) \
-      if (auto lower_name ## _ = pasta::type_name::From(unaliased_context)) { \
+      if (auto lower_name ## _ = pasta::type_name::From(context)) { \
         const mx::RawEntityId eid = em.EntityId(*lower_name ## _); \
         if (eid != mx::kInvalidEntityId) { \
           contexts[eid].insert(context); \
@@ -136,62 +132,10 @@ unsigned TokenContextSaver::ConvertContextsToPendingContexts(void) {
 
       PendingTokenContext &info = pending_contexts[remapped_context];
       info = tpl;  // Copy the template.
-
-      // Adjust the kind to be an aliasee.
-      if (remapped_context.Aliasee()) {
-        info.is_alias = true;
-      }
-
       info.offset = num_contexts++;
     }
   }
   return num_contexts;
-}
-
-// Now resolve the aliasee targets, if any. Token contexts and their aliases
-// will end up in the same entity-specific lists. This is because the entity
-// in which the context resides will tell us its type.
-void TokenContextSaver::ResolveAliases(void) {
-  for (const auto &entry : contexts) {
-    for (const pasta::TokenContext &orig_context : entry.second) {
-
-      auto remap_it = remapped_contexts.find(orig_context);
-      if (remap_it == remapped_contexts.end()) {
-        continue;
-      }
-
-      const pasta::TokenContext &context = remap_it->second;
-      if (context != orig_context) {
-        continue;
-      }
-
-      auto pc_it = pending_contexts.find(context);
-      if (pc_it == pending_contexts.end()) {
-        continue;  // E.g. translation unit contexts.
-      }
-
-      PendingTokenContext &info = pc_it->second;
-      CHECK_NE(info.entity_id, mx::kInvalidEntityId);
-
-      auto orig_alias_context = context.Aliasee();
-      if (!info.is_alias) {
-        DCHECK(!orig_alias_context.has_value());
-        continue;
-      }
-
-      CHECK(orig_alias_context.has_value());
-
-      remap_it = remapped_contexts.find(orig_alias_context.value());
-      CHECK(remap_it != remapped_contexts.end());
-
-      const pasta::TokenContext &alias_context = remap_it->second;
-      PendingTokenContext &alias_info = pending_contexts[alias_context];
-      CHECK_EQ(info.entity_id, alias_info.entity_id);
-      CHECK_NE(info.offset, alias_info.offset);
-      CHECK_LT(alias_info.offset, num_contexts);
-      info.alias_offset = alias_info.offset;
-    }
-  }
 }
 
 // Persist the token contexts. The token contexts are a kind of inverted tree,
@@ -209,9 +153,7 @@ void TokenContextSaver::ResolveAliases(void) {
 // represents the code containing that token. You can, in theory, follow a
 // linked list from a token all the way up to the root of an AST. We want to
 // serialize these because they allow us to make queries in our API, e.g. "give
-// me the SwitchStmt containing this token." Token contexts aren't pure linked
-// lists, though; there are special "alias" nodes that tend to link you further
-// down the lists, and so that takes some special handling.
+// me the SwitchStmt containing this token."
 template <typename ContextListBuilder, typename OffsetListBuilder>
 void TokenContextSaver::Persist(ContextListBuilder tcb_list,
                                 OffsetListBuilder tco_list) {
@@ -270,13 +212,6 @@ void TokenContextSaver::Persist(ContextListBuilder tcb_list,
       tcb.emplace(tcb_list[info.offset]);
       tcb->setEntityId(info.entity_id);
       tcb->setParentIndex(0u);
-
-      if (info.is_alias) {
-        CHECK_LT(info.alias_offset, num_contexts);
-        tcb->setAliasIndex((info.alias_offset << 1u) | 1u);
-      } else {
-        tcb->setAliasIndex(0u);
-      }
     }
 
     ++num_tokens;
@@ -300,7 +235,6 @@ void PersistTokenContexts(const PendingFragment &pf,
   auto num_tokens = tcs.CollectContextsFromTokens();
   CHECK_EQ(pf.num_parsed_tokens, num_tokens);
   auto num_contexts = tcs.ConvertContextsToPendingContexts();
-  tcs.ResolveAliases();
   tcs.Persist(fb.initParsedTokenContexts(num_contexts),
               fb.initParsedTokenContextOffsets(num_tokens));
 }
@@ -315,7 +249,6 @@ void PersistTokenContexts(
   TokenContextSaver tcs(em, parsed_tokens, 0u);
   auto num_tokens = tcs.CollectContextsFromTokens();
   auto num_contexts = tcs.ConvertContextsToPendingContexts();
-  tcs.ResolveAliases();
   tcs.Persist(fb.initTypeTokenContexts(num_contexts),
               fb.initTypeTokenContextOffsets(num_tokens));
 }
