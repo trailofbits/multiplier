@@ -13,8 +13,8 @@
 #include <multiplier/AST/FunctionTemplateDecl.h>
 #include <multiplier/AST/ImplicitConceptSpecializationDecl.h>
 #include <multiplier/AST/NamespaceDecl.h>
+#include <multiplier/AST/ParmVarDecl.h>
 #include <multiplier/AST/TemplateArgument.h>
-#include <multiplier/AST/VarDecl.h>
 #include <multiplier/AST/VarTemplateDecl.h>
 #include <multiplier/AST/VarTemplatePartialSpecializationDecl.h>
 #include <multiplier/Index.h>
@@ -500,6 +500,49 @@ static void RenderTemplateArgumentsInto(
   AddSimpleToken(tr, ">", TokenKind::R_ANGLE, TokenCategory::PUNCTUATION);
 }
 
+static void RenderParametersInto(
+    CustomTokenReader &tr, const NamedDecl &nd,
+    const QualifiedNameRenderOptions &options) {
+  switch (nd.kind()) {
+    case DeclKind::FUNCTION:
+    case DeclKind::CXX_CONSTRUCTOR:
+    case DeclKind::CXX_CONVERSION:
+    case DeclKind::CXX_DEDUCTION_GUIDE:
+    case DeclKind::CXX_DESTRUCTOR:
+    case DeclKind::CXX_METHOD:
+      break;
+    default:
+      return;
+  }
+
+  bool needs_comma = false;
+  auto maybe_add_comma = [&] (void) {
+    if (needs_comma) {
+      AddSimpleToken(tr, ",", TokenKind::COMMA, TokenCategory::PUNCTUATION);
+      AddSimpleToken(tr, " ", TokenKind::WHITESPACE, TokenCategory::WHITESPACE);
+      needs_comma = true;
+    }
+  };
+
+  const auto &fd = reinterpret_cast<const FunctionDecl &>(nd);
+  AddSimpleToken(tr, "(", TokenKind::L_PARENTHESIS, TokenCategory::PUNCTUATION);
+
+  auto params = fd.parameters();
+  for (const auto &pd : params) {
+    maybe_add_comma();
+    for (auto tok : pd.type().tokens()) {
+      tr.Append(std::move(tok));
+    }
+  }
+
+  if (fd.is_variadic()) {
+    maybe_add_comma();
+    AddSimpleToken(tr, "...", TokenKind::ELLIPSIS, TokenCategory::PUNCTUATION);
+  }
+
+  AddSimpleToken(tr, ")", TokenKind::R_PARENTHESIS, TokenCategory::PUNCTUATION);
+}
+
 void RenderQualifiedNameInto(
     CustomTokenReader &tr, const NamedDecl &nd,
     const QualifiedNameRenderOptions &options) {
@@ -507,6 +550,10 @@ void RenderQualifiedNameInto(
   if (options.fully_qualified) {
     if (auto pd = NamedDecl::from(nd.parent_declaration())) {
       RenderQualifiedNameInto(tr, pd.value(), options);
+
+      if (options.include_function_parameter_types) {
+        RenderParametersInto(tr, nd, options);
+      }
 
       // The parent is a template declaration; we don't need to print `nd`
       // because `pd` has the same name.
@@ -682,6 +729,10 @@ void RenderQualifiedNameInto(
     }
 
     // TODO(pag): Implement this.
+  }
+
+  if (options.include_function_parameter_types) {
+    RenderParametersInto(tr, nd, options);
   }
 }
 

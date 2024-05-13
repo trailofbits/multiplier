@@ -1325,6 +1325,74 @@ static mx::EntityOffset ExpandToEndOfNextDirective(
   return end_index;
 }
 
+// Expand to leading empty macro, followed by whitespace containing no more
+// than one new line.
+static mx::EntityOffset ExpandToLeadingEmptyMacro(
+    const pasta::TokenRange &range, mx::EntityOffset begin_tok_index) {
+  while (3u <= begin_tok_index &&
+         range[begin_tok_index - 3u].Role() == pasta::TokenRole::kBeginOfMacroExpansionMarker &&
+         range[begin_tok_index - 2u].Role() == pasta::TokenRole::kEndOfMacroExpansionMarker) {
+
+    auto pt = range[begin_tok_index - 1u];
+    auto td = pt.Data();
+    if (pt.Kind() == pasta::TokenKind::kUnknown &&
+        pt.Role() == pasta::TokenRole::kFileToken &&
+        IsWhitespaceOrEmpty(td) &&
+        std::count(td.begin(), td.end(), '\n') <= 1u) {
+      begin_tok_index -= 3u;
+    } else {
+      break;
+    }
+  }
+  return begin_tok_index;
+}
+
+// Expand to leading comment followed by whitespace containing no more than
+// one new line.
+static mx::EntityOffset ExpandToLeadingComment(
+    const pasta::TokenRange &range, mx::EntityOffset begin_tok_index) {
+  while (2u <= begin_tok_index &&
+       range[begin_tok_index - 2u].Kind() == pasta::TokenKind::kComment) {
+    auto pt = range[begin_tok_index - 1u];
+    auto td = pt.Data();
+    if (pt.Kind() == pasta::TokenKind::kUnknown &&
+        pt.Role() == pasta::TokenRole::kFileToken &&
+        IsWhitespaceOrEmpty(td) &&
+        std::count(td.begin(), td.end(), '\n') <= 1u) {
+      begin_tok_index -= 2u;
+    } else {
+      break;
+    }
+  }
+
+  return begin_tok_index;
+}
+
+// Expand to leading indentation.
+static mx::EntityOffset ExpandToLeadingIndentation(
+    const pasta::TokenRange &range, mx::EntityOffset begin_tok_index) {
+  if (begin_tok_index) {
+    auto prev_tok = range[begin_tok_index - 1u];
+    auto prev_tok_data = prev_tok.Data();
+    if (prev_tok.Kind() == pasta::TokenKind::kUnknown &&
+        (prev_tok_data.ends_with(' ') || prev_tok_data.ends_with('\t'))) {
+      begin_tok_index -= 1u;
+    }
+  }
+  return begin_tok_index;
+}
+
+// Expand to trailing semicolon.
+static mx::EntityOffset ExpandToTrailingSemicolon(
+    const pasta::TokenRange &range, mx::EntityOffset end_tok_index) {
+  if (auto tok = range.At(end_tok_index + 1u)) {
+    if (tok->Kind() == pasta::TokenKind::kSemi) {
+      return end_tok_index + 1u;
+    }
+  }
+  return end_tok_index;
+}
+
 // Expand the range for a declaration. This doesn't widen to the complete
 // expansion range, and instead focuses on trailing semicolons, leading
 // indentation, empty macros, and comments.
@@ -1342,60 +1410,10 @@ static std::pair<mx::EntityOffset, mx::EntityOffset> ExpandDeclRange(
     return {begin_tok_index, end_tok_index};
   }
 
-  const auto max_tok_index = range.Size();
-
-  // Expand to trailing semicolon.
-  if ((end_tok_index + 1u) < max_tok_index) {
-    pasta::Token last_tok = range[end_tok_index + 1u];
-    if (last_tok.Kind() == pasta::TokenKind::kSemi &&
-        last_tok.Role() == pasta::TokenRole::kFileToken) {
-      ++end_tok_index;
-    }
-  }
-
-  // Expand to leading empty macro, followed by whitespace containing no more
-  // than one new line.
-  while (3u <= begin_tok_index &&
-         range[begin_tok_index - 3u].Role() == pasta::TokenRole::kBeginOfMacroExpansionMarker &&
-         range[begin_tok_index - 2u].Role() == pasta::TokenRole::kEndOfMacroExpansionMarker) {
-
-    auto pt = range[begin_tok_index - 1u];
-    auto td = pt.Data();
-    if (pt.Kind() == pasta::TokenKind::kUnknown &&
-        pt.Role() == pasta::TokenRole::kFileToken &&
-        IsWhitespaceOrEmpty(td) &&
-        std::count(td.begin(), td.end(), '\n') <= 1u) {
-      begin_tok_index -= 3u;
-    } else {
-      break;
-    }
-  }
-
-  // Expand to leading comment followed by whitespace containing no more than
-  // one new line.
-  while (2u <= begin_tok_index &&
-         range[begin_tok_index - 2u].Kind() == pasta::TokenKind::kComment) {
-    auto pt = range[begin_tok_index - 1u];
-    auto td = pt.Data();
-    if (pt.Kind() == pasta::TokenKind::kUnknown &&
-        pt.Role() == pasta::TokenRole::kFileToken &&
-        IsWhitespaceOrEmpty(td) &&
-        std::count(td.begin(), td.end(), '\n') <= 1u) {
-      begin_tok_index -= 2u;
-    } else {
-      break;
-    }
-  }
-
-  // Expand to leading indentation.
-  if (begin_tok_index) {
-    auto prev_tok = range[begin_tok_index - 1u];
-    auto prev_tok_data = prev_tok.Data();
-    if (prev_tok.Kind() == pasta::TokenKind::kUnknown &&
-        (prev_tok_data.ends_with(' ') || prev_tok_data.ends_with('\t'))) {
-      begin_tok_index -= 1u;
-    }
-  }
+  end_tok_index = ExpandToTrailingSemicolon(range, end_tok_index);
+  begin_tok_index = ExpandToLeadingEmptyMacro(range, begin_tok_index);
+  begin_tok_index = ExpandToLeadingComment(range, begin_tok_index);
+  begin_tok_index = ExpandToLeadingIndentation(range, begin_tok_index);
 
   return {begin_tok_index, end_tok_index};
 }

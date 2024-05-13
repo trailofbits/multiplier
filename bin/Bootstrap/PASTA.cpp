@@ -370,6 +370,7 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
 
   // These are redundant.
   {"FunctionDecl", "ParameterDeclarations"},
+  {"DeclRefExpr", "FoundDeclaration"},
 
   // These can crash?
   {"Expr", "BestDynamicClassType"},
@@ -377,6 +378,8 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
 
   // These are odd.
   {"CXXRecordDecl", "IsParsingBaseSpecifiers"},
+  {"DeclRefExpr", "HasTemplateKeywordAndArgumentsInfo"},
+  {"DeclRefExpr", "HasTemplateKeyword"},
 
   // These have assertions related to FIXME comments, and so we don't want them.
   {"CXXRecordDecl", "MostRecentNonInjectedDeclaration"},

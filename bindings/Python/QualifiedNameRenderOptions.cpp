@@ -62,7 +62,8 @@ static PyTypeObject gTypeDef = {
     m(render_inline_namespaces) \
     m(render_template_parameters) \
     m(render_template_arguments) \
-    m(find_name_in_redeclaration)
+    m(find_name_in_redeclaration) \
+    m(include_function_parameter_types)
 
   #define GET_SET_OPTION(opt) \
       { \

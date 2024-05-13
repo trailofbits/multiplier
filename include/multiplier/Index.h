@@ -346,6 +346,9 @@ class MX_EXPORT QualifiedNameRenderOptions final {
   // in a given place, but have a name elsewhere. This option tells us to try
   // to go and look for an alternative name in a redeclaration.
   bool find_name_in_redeclaration{true};
+
+  // Should function parameter types be included?
+  bool include_function_parameter_types{false};
 };
 
 }  // namespace mx
