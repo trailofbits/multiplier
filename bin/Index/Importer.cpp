@@ -296,6 +296,7 @@ BuildCommandAction::GetCompilerInfo(void) {
         arg.starts_with("-mfunction-return=") ||
         arg.starts_with("-fsanitize=") ||
         arg.starts_with("-fcoverage-compilation-dir=") ||
+        arg.starts_with("-fcrash-diagnostics-dir=") ||
         arg == "-pic-is-pie" ||
         arg == "-mindirect-branch-cs-prefix" ||
         arg == "-Wno-cast-function-type-strict" ||
@@ -511,11 +512,17 @@ static const std::string_view kOptNoStdInc("-nostdinc");
 static const std::string_view kOptNoStdIncxx("-nostdinc++");
 static const std::string_view kOptNoBuiltinInc("-nobuiltininc");
 static const std::string_view kOptNoStdSystemInc("-nostdsysteminc");
+static const std::string_view kXClang("-Xclang");
+static const std::string_view kMLLVM("-mllvm");
 
 static bool IsOptNeedingFixing(std::string_view arg) {
   return arg == kOptNoStdInc || arg == kOptNoStdIncxx ||
          arg == kOptNoBuiltinInc || arg == kOptNoStdSystemInc ||
          arg.starts_with("-fsanitize=");
+}
+
+static bool IsOpt1NeedingFixing(std::string_view arg) {
+  return arg.starts_with(kXClang) || arg.starts_with(kMLLVM);
 }
 
 // The way we do system include directory inference with the compiler means
@@ -528,7 +535,7 @@ static bool IsOptNeedingFixing(std::string_view arg) {
 // to use them.
 static bool NeedsFixing(const pasta::ArgumentVector &argv) {
   for (auto arg : argv) {
-    if (IsOptNeedingFixing(arg)) {
+    if (IsOptNeedingFixing(arg) || IsOpt1NeedingFixing(arg)) {
       return true;
     }
   }
@@ -540,9 +547,15 @@ static bool NeedsFixing(const pasta::ArgumentVector &argv) {
 // themselves derived from `orig_command` and thus should be trusted.
 static std::optional<pasta::CompileCommand> FixedCommand(
     const pasta::CompileCommand &orig_command) {
+
   std::vector<std::string> args;
+  auto skip = false;
   for (auto arg : orig_command.Arguments()) {
-    if (!IsOptNeedingFixing(arg)) {
+    if (skip) {
+      skip = false;
+    } else if (IsOpt1NeedingFixing(arg)) {
+      skip = true;
+    } else if (!IsOptNeedingFixing(arg)) {
       args.emplace_back(arg);
     }
   }
