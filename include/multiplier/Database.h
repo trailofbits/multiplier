@@ -185,7 +185,7 @@ struct MangledNameRecord {
   static constexpr const char *kExitStatements[] = {nullptr};
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT INTO mangled_name (entity_id, data)
+      R"(INSERT OR REPLACE INTO mangled_name (entity_id, data)
          VALUES (?1, ?2))";
 
   // A `DeclId` or a `MacroId`.

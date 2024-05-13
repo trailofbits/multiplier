@@ -299,6 +299,7 @@ struct DictionaryCompressor {
 
 class DatabaseWriterImpl {
  public:
+  // Path to the open database file.
   const std::filesystem::path db_path;
 
   // Maximum size in bytes of the writer queue.
