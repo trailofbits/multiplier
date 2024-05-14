@@ -258,6 +258,7 @@ class TLDFinder final : public pasta::DeclVisitor {
     if (child.IsImplicit()) {
       return;
     }
+
     auto raw_parent = RawEntity(parent);
     auto raw_child = RawEntity(child);
     CHECK_NE(raw_parent, raw_child);
@@ -952,7 +953,15 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 
   void VisitEmptyDecl(const pasta::EmptyDecl &decl) final {
-    VisitDecl(decl);
+    if (depth || parent_decl) {
+      VisitDecl(decl);
+    }
+  }
+
+  void VisitUsingDirectiveDecl(const pasta::UsingDirectiveDecl &decl) final {
+    if (depth || parent_decl) {
+      VisitDecl(decl);
+    }
   }
 
   void VisitDecl(const pasta::Decl &decl) final {

@@ -209,6 +209,14 @@ std::string PrefixedLocation(const pasta::Decl &decl, const char *prefix) {
       }
     }
   }
+  if (!ft) {
+    if (auto mt = decl.Token().MacroLocation()) {
+      auto root = RootMacroFrom(mt.value());
+      if (auto lhs = root.BeginToken()) {
+        ft = lhs->FileLocation();
+      }
+    }
+  }
   if (ft) {
     auto file = pasta::File::Containing(*ft);
     std::stringstream ss;

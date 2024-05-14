@@ -203,5 +203,10 @@
     "file": "ArgumentPack.cpp",
     "command": "/usr/bin/c++ -std=c++20 ArgumentPack.cpp",
     "directory": ""
+},
+{
+    "file": "AbslInlineData.cpp",
+    "command": "/usr/bin/c++ -std=c++20 AbslInlineData.cpp",
+    "directory": ""
 }
 ]
