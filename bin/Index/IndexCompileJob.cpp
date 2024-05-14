@@ -2368,16 +2368,20 @@ static PendingFragmentPtr CreatePendingFragment(
     context_eid = em.ParentFragmentId(parent_entity, decls);
   }
 
-  if (context_eid == mx::kInvalidEntityId && floc) {
-    context_eid = floc->first_file_token_id.Pack();
+  mx::RawEntityId loc_eid = mx::kInvalidEntityId;
+  if (floc) {
+    loc_eid = floc->first_file_token_id.Pack();
+    if (context_eid == mx::kInvalidEntityId) {
+      context_eid = loc_eid;
+    }
   }
 
   // Compute the fragment ID, and in doing so, figure out if this is actually
   // a new fragment.
   auto [fid, is_new_fragment_id] = id_store.GetOrCreateFragmentIdForHash(
       context_eid,
-      HashFragment(em, nm, parent_entity, decls, macros, original_tokens,
-                   parsed_tokens),
+      HashFragment(em, nm, loc_eid, parent_entity, decls, macros,
+                   original_tokens, parsed_tokens),
       num_tokens  /* for fragment id packing format */,
       IsReplaceableFragment(decls));
 

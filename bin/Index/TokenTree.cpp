@@ -2436,6 +2436,10 @@ bool TokenTreeNodeIterator::operator!=(TokenTreeNodeIteratorEnd) const {
 // Dump.
 void TokenTreeNodeRange::Dump(std::ostream &os) const {
   Substitution *root = nullptr;
+  if (!begin_.node.impl) {
+    return;
+  }
+
   for (const SubstitutionNode &node : *(begin_.node.impl)) {
     if (!std::holds_alternative<Substitution *>(node)) {
       continue;

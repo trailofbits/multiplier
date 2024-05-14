@@ -213,6 +213,7 @@ struct TokenTreeSerializationSchedule {
   PendingFragment &pf;
   EntityMapper &em;
   std::string_view main_job_file;
+  TokenTreeNodeRange all_nodes;
 
   std::vector<TokenTreeNode> tokens;
   std::vector<TokenTreeNode> macro_tokens;
@@ -409,6 +410,22 @@ struct TokenTreeSerializationSchedule {
       if (std::holds_alternative<mx::ParsedTokenId>(vid)) {
         id.offset = std::get<mx::ParsedTokenId>(vid).offset;
 
+        // Nifty for debugging these kinds of issues.
+        if (id.offset != tokens.size()) {
+
+          all_nodes.Dump(StdErr());
+          if (!pf.top_level_decls.empty()) {
+            Dump(pf.top_level_decls.front());
+          }
+
+          if (gt) {
+            LOG(ERROR) << "GI=" << gt->Index() << " DATA=" << gt->Data();
+          }
+          if (pt) {
+            LOG(ERROR) << "PI=" << pt->Index() << " DATA=" << pt->Data();
+          }
+        }
+
         CHECK_EQ(id.offset, tokens.size())
             << "Mismatched parsed token ID offset"
             << PrefixedLocation(pf.top_level_decls, " at or near ")
@@ -476,10 +493,12 @@ struct TokenTreeSerializationSchedule {
 
   TokenTreeSerializationSchedule(
       PendingFragment &pf_,
-      std::string_view main_job_file_)
+      std::string_view main_job_file_,
+      const TokenTreeNodeRange &all_nodes_)
       : pf(pf_),
         em(pf_.em),
-        main_job_file(main_job_file_) {}
+        main_job_file(main_job_file_),
+        all_nodes(all_nodes_) {}
 };
 
 // Persist just the parsed tokens in the absence of a token tree.
@@ -560,7 +579,7 @@ static void PersistTokenTree(
 
   const EntityMapper &em = pf.em;
 
-  TokenTreeSerializationSchedule sched(pf, main_job_file);
+  TokenTreeSerializationSchedule sched(pf, main_job_file, nodes);
   sched.Schedule(nodes);
 
   provenance.Run(pf.fragment_index, sched.tokens);
@@ -692,9 +711,11 @@ static void PersistTokenTree(
     mx::VariantId macro_vid = macro_eid.Unpack();
     if (std::holds_alternative<mx::MacroId>(macro_vid)) {
       mx::MacroId mid = std::get<mx::MacroId>(macro_vid);
+
       if (mid.fragment_id != pf.fragment_index) {
         nodes.Dump(StdErr());
       }
+
       CHECK_EQ(mid.fragment_id, pf.fragment_index);
       mti2mi.set(i, macro_eid.Pack());
     } else {

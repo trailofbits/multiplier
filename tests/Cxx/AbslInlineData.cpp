@@ -8,6 +8,7 @@ typedef signed char int8_t;
 
 extern "C" int memcmp(const void *, const void *, size_t);
 extern "C" void *memcpy(void *, const void *, size_t);
+extern "C" void __assert_rtn(const char *);
 
 namespace absl {
 static constexpr bool is_constant_evaluated(void) {
@@ -35,9 +36,13 @@ struct string_view {
 struct CordzInfo {};
 
 #define ABSL_CORD_INTERNAL_NO_SANITIZE
-#define ABSL_INTERNAL_CORD_HAVE_SANITIZER
-#define ABSL_ASSERT(...)
-#define assert(...)
+//#define ABSL_INTERNAL_CORD_HAVE_SANITIZER
+
+#define assert(...) __assert_rtn(__func__)
+#define ABSL_PREDICT_TRUE(cond) __builtin_expect((cond), true)
+#define ABSL_ASSERT(cond) \
+  (ABSL_PREDICT_TRUE(cond) ? static_cast<void>(0) : []{ assert(false); }())
+
 
 inline static constexpr cordz_info_t LittleEndianByte(int) {
     return 1;

@@ -39,6 +39,9 @@
 namespace mx {
 namespace {
 
+// Helps speed up debugging by making things happen faster.
+static constexpr bool MX_DISABLE_ADD_ASYNC = false;
+
 // Number of INSERT statements to try to add in a single transaction.
 static constexpr size_t kMaxTransactionSize = 10000000u;
 
@@ -119,10 +122,12 @@ class BulkInserterState {
 #define MX_DECLARE_INSERT_STMT(record) \
     sqlite::Statement INSERT_INTO_ ## record; \
     void DoInsertAsync(const record &r) { \
-      if (InsertAsync(r, INSERT_INTO_ ## record)) { \
-        INSERT_INTO_ ## record.Execute(); \
-      } else { \
-        INSERT_INTO_ ## record.Reset(); \
+      if constexpr (!MX_DISABLE_ADD_ASYNC) { \
+        if (InsertAsync(r, INSERT_INTO_ ## record)) { \
+          INSERT_INTO_ ## record.Execute(); \
+        } else { \
+          INSERT_INTO_ ## record.Reset(); \
+        } \
       } \
     } \
     bool InsertAsync(const record &, sqlite::Statement &); \
@@ -441,6 +446,10 @@ template <typename EntityRecord>
 void DictionaryCompressor::Add(DatabaseWriterImpl &impl,
                                DictionaryContext &context,
                                EntityRecord record) {
+
+  if constexpr (MX_DISABLE_ADD_ASYNC) {
+    return;
+  }
 
   // If we already have a dictionary, then use it.
   if (ZSTD_CDict *d = dict.load(std::memory_order_acquire)) {
@@ -1019,13 +1028,15 @@ void DatabaseWriterImpl::ExitRecords(void) {
 
 #define MX_DEFINE_ADD_RECORD(name) \
     void DatabaseWriterImpl::DoAddAsync(name record) { \
-      auto record_size = BulkInserterState::SizeOfRecord(record); \
-      auto queue_size = pending_bytes.fetch_add(record_size) + record_size; \
-      num_total_rows.fetch_add(1u); \
-      insertion_queue.enqueue(std::move(record)); \
-      if (queue_size > max_queue_size_in_bytes) { \
-        insertion_queue.enqueue(PushbackSignal{}); \
-        pushback_signal.wait(10000000 /* 10s */); \
+      if constexpr (!MX_DISABLE_ADD_ASYNC) { \
+        auto record_size = BulkInserterState::SizeOfRecord(record); \
+        auto queue_size = pending_bytes.fetch_add(record_size) + record_size; \
+        num_total_rows.fetch_add(1u); \
+        insertion_queue.enqueue(std::move(record)); \
+        if (queue_size > max_queue_size_in_bytes) { \
+          insertion_queue.enqueue(PushbackSignal{}); \
+          pushback_signal.wait(10000000 /* 10s */); \
+        } \
       } \
     }
 
@@ -1038,7 +1049,9 @@ MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DEFINE_ADD_RECORD)
 
 #define MX_DEFINE_ADD_RECORD(name) \
     void DatabaseWriter::AddAsync(name record) { \
-      impl->DoAddAsync(std::move(record)); \
+      if constexpr (!MX_DISABLE_ADD_ASYNC) { \
+        impl->DoAddAsync(std::move(record)); \
+      } \
     }
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DEFINE_ADD_RECORD)
@@ -1047,10 +1060,12 @@ MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DEFINE_ADD_RECORD)
 
 #define MX_DEFINE_ADD_ENTITY_RECORD(name) \
     void DatabaseWriter::AddAsync(name record) { \
-      auto category = CategoryFromEntityId(record.id); \
-      assert(mx::EntityCategory::NOT_AN_ENTITY != category); \
-      impl->entity_dictionaries[static_cast<unsigned>(category)].Add( \
-          *impl, impl->dictionary_context, std::move(record)); \
+      if constexpr (!MX_DISABLE_ADD_ASYNC) { \
+        auto category = CategoryFromEntityId(record.id); \
+        assert(mx::EntityCategory::NOT_AN_ENTITY != category); \
+        impl->entity_dictionaries[static_cast<unsigned>(category)].Add( \
+            *impl, impl->dictionary_context, std::move(record)); \
+      } \
     }
 
 MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DEFINE_ADD_ENTITY_RECORD)
@@ -1060,7 +1075,9 @@ MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DEFINE_ADD_ENTITY_RECORD)
 // `entity_id` contains the specific type and kind of entity.
 void DatabaseWriter::AsyncIndexFragmentSpecificEntity(
     mx::RawEntityId entity_id) {
-  impl->DoAddAsync(FragmentIndexRecord{entity_id});
+  if constexpr (!MX_DISABLE_ADD_ASYNC) {
+    impl->DoAddAsync(FragmentIndexRecord{entity_id});
+  }
 }
 
 } // namespace mx

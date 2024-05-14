@@ -331,12 +331,44 @@ static std::string HashTopLevelFragment(
   return ss.str();
 }
 
+static void OffsetFromDeclContext(
+    std::ostream &ss, const EntityMapper &em, const pasta::DeclContext &dc,
+    const pasta::Token &first_tok) {
+
+  auto dc_decl = pasta::Decl::From(dc);
+  if (dc_decl->Kind() == pasta::DeclKind::kTranslationUnit) {
+    return;
+  }
+
+  auto dc_eid = em.EntityId(dc_decl);
+  if (dc_eid != mx::kInvalidEntityId) {
+    ss << " ^" << dc_eid;
+  }
+
+  auto dc_decl_loc = dc_decl->Tokens().Front();
+  if (!dc_decl_loc) {
+    return;
+  }
+
+  auto first = dc_decl_loc->Index();
+  auto second = first_tok.Index();
+  if (first < second) {
+    ss << " -" << (second - first);
+  }
+}
+
 static std::string HashNestedFragment(
     const EntityMapper &em, const NameMangler &, const pasta::Decl &decl,
-    mx::RawEntityId parent_eid) {
+    mx::RawEntityId location_eid, mx::RawEntityId parent_eid) {
 
   std::stringstream ss;
-  ss << "P" << parent_eid << " K" << int(decl.Kind())
+  ss << "P" << parent_eid;
+
+  if (location_eid != mx::kInvalidEntityId) {
+    ss << " L" << location_eid;
+  }
+
+  ss << " K" << int(decl.Kind())
      << " S" << decl.Tokens().size();
 
   if (decl.IsImplicit()) {
@@ -344,15 +376,17 @@ static std::string HashNestedFragment(
   }
 
   // Relative position w.r.t. parent declaration context.
+  //
+  // NOTE(pag): Our Clang patches set the lambda lexical decl context to the
+  //            translation unit.
   if (auto first_tok = decl.Tokens().Front()) {
-    if (auto dc = decl.DeclarationContext()) {
-      auto dc_decl = pasta::Decl::From(dc.value());
-      if (auto dc_decl_loc = dc_decl->Tokens().Front()) {
-        auto first = dc_decl_loc->Index();
-        auto second = first_tok->Index();
-        if (first < second) {
-          ss << " O" << (second - first);
-        }
+    if (IsLambda(decl)) {
+      if (auto sdc = decl.DeclarationContext()) {
+        OffsetFromDeclContext(ss, em, sdc.value(), first_tok.value());
+      }
+    } else {
+      if (auto ldc = decl.LexicalDeclarationContext()) {
+        OffsetFromDeclContext(ss, em, ldc.value(), first_tok.value());
       }
     }
   }
@@ -462,7 +496,8 @@ std::string HashCompilation(const pasta::AST &ast, const EntityMapper &em) {
 //
 // TODO(pag): Integrate template parameter lists for specializations?
 std::string HashFragment(
-    const EntityMapper &em, const NameMangler &nm, const void *parent_entity,
+    const EntityMapper &em, const NameMangler &nm,
+    mx::RawEntityId location_eid, const void *parent_entity,
     const std::vector<pasta::Decl> &decls,
     const std::vector<pasta::Macro> &macros,
     const pasta::TokenRange *frag_tok_range,
@@ -470,7 +505,7 @@ std::string HashFragment(
 
   auto parent_eid = em.EntityId(parent_entity);
   if (parent_eid != mx::kInvalidEntityId && decls.size() == 1u) {
-    return HashNestedFragment(em, nm, decls.front(), parent_eid);
+    return HashNestedFragment(em, nm, decls.front(), location_eid, parent_eid);
   }
 
   return HashTopLevelFragment(em, decls, macros, frag_tok_range, decl_tok_range);
