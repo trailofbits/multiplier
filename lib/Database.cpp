@@ -40,7 +40,7 @@ namespace mx {
 namespace {
 
 // Helps speed up debugging by making things happen faster.
-static constexpr bool MX_DISABLE_ADD_ASYNC = false;
+static constexpr bool kDisableAddAsync = false;
 
 // Number of INSERT statements to try to add in a single transaction.
 static constexpr size_t kMaxTransactionSize = 10000000u;
@@ -122,7 +122,7 @@ class BulkInserterState {
 #define MX_DECLARE_INSERT_STMT(record) \
     sqlite::Statement INSERT_INTO_ ## record; \
     void DoInsertAsync(const record &r) { \
-      if constexpr (!MX_DISABLE_ADD_ASYNC) { \
+      if constexpr (!kDisableAddAsync) { \
         if (InsertAsync(r, INSERT_INTO_ ## record)) { \
           INSERT_INTO_ ## record.Execute(); \
         } else { \
@@ -447,7 +447,7 @@ void DictionaryCompressor::Add(DatabaseWriterImpl &impl,
                                DictionaryContext &context,
                                EntityRecord record) {
 
-  if constexpr (MX_DISABLE_ADD_ASYNC) {
+  if constexpr (kDisableAddAsync) {
     return;
   }
 
@@ -1028,7 +1028,7 @@ void DatabaseWriterImpl::ExitRecords(void) {
 
 #define MX_DEFINE_ADD_RECORD(name) \
     void DatabaseWriterImpl::DoAddAsync(name record) { \
-      if constexpr (!MX_DISABLE_ADD_ASYNC) { \
+      if constexpr (!kDisableAddAsync) { \
         auto record_size = BulkInserterState::SizeOfRecord(record); \
         auto queue_size = pending_bytes.fetch_add(record_size) + record_size; \
         num_total_rows.fetch_add(1u); \
@@ -1049,7 +1049,7 @@ MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DEFINE_ADD_RECORD)
 
 #define MX_DEFINE_ADD_RECORD(name) \
     void DatabaseWriter::AddAsync(name record) { \
-      if constexpr (!MX_DISABLE_ADD_ASYNC) { \
+      if constexpr (!kDisableAddAsync) { \
         impl->DoAddAsync(std::move(record)); \
       } \
     }
@@ -1060,7 +1060,7 @@ MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DEFINE_ADD_RECORD)
 
 #define MX_DEFINE_ADD_ENTITY_RECORD(name) \
     void DatabaseWriter::AddAsync(name record) { \
-      if constexpr (!MX_DISABLE_ADD_ASYNC) { \
+      if constexpr (!kDisableAddAsync) { \
         auto category = CategoryFromEntityId(record.id); \
         assert(mx::EntityCategory::NOT_AN_ENTITY != category); \
         impl->entity_dictionaries[static_cast<unsigned>(category)].Add( \
@@ -1075,7 +1075,7 @@ MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DEFINE_ADD_ENTITY_RECORD)
 // `entity_id` contains the specific type and kind of entity.
 void DatabaseWriter::AsyncIndexFragmentSpecificEntity(
     mx::RawEntityId entity_id) {
-  if constexpr (!MX_DISABLE_ADD_ASYNC) {
+  if constexpr (!kDisableAddAsync) {
     impl->DoAddAsync(FragmentIndexRecord{entity_id});
   }
 }
