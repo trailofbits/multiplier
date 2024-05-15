@@ -107,7 +107,7 @@ union PackedEntityId {
   struct {
     uint64_t offset:kBigFragmentIdNumBits;
 
-    // 35 bits for fragment id, i.e. 34 billion IDs.
+    // 32 bits for fragment id, i.e. 4 billion IDs.
     uint64_t fragment_id:(62u - (kSubKindNumBits + kBigFragmentIdNumBits));
 
     // For declarations, `sub_kind` also encodes if something is a definition,
@@ -124,12 +124,12 @@ union PackedEntityId {
   } __attribute__((packed)) small_entity;
 
   struct {
-    // 35 bits for the offset, as we expect a lot of things in these fragments.
+    // 32 bits for the offset, as we expect a lot of things in these fragments.
     //
     // NOTE(pag): Could eventually drop the bit count here, e.g. to 30.
     uint64_t offset:(62u - (kSubKindNumBits + kBigFragmentIdNumBits));
 
-    // 16 bits for fragment id, i.e. we expect less than 2^16 really really
+    // 18 bits for fragment id, i.e. we expect less than 2^16 really really
     // big fragments. For those fragments, we have more "stuff" in them, so
     // we have many more bits available for the `offset`.
     uint64_t fragment_id:kBigFragmentIdNumBits;
