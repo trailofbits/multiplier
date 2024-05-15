@@ -2453,11 +2453,6 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
     decls_to_print = decls;
   }
 
-  // Print the root declarations one after the other, and then try to apply the
-  // alignment algorithm.
-  pasta::PrintedTokenRange printed_tokens =
-      pasta::PrintedTokenRange::Create(decls_to_print.front());
-
   LOG_IF(ERROR, decls_to_print.size() > 100u)
       << "Likely performance problem on main job file "
       << main_job_file << " with " << decls_to_print.front().KindName()
@@ -2465,13 +2460,10 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
       << " where we're doing token alignment on "
       << decls_to_print.size() << " printed declarations";
 
-  for (auto i = 1u; i < decls_to_print.size(); ++i) {
-    auto decl_tokens = pasta::PrintedTokenRange::Create(decls_to_print[i]);
-    auto concat = pasta::PrintedTokenRange::Concatenate(
-        printed_tokens, decl_tokens);
-    CHECK(concat.has_value());
-    printed_tokens = std::move(concat.value());
-  }
+  // Print the root declarations one after the other, and then try to apply the
+  // alignment algorithm.
+  auto printed_tokens = pasta::PrintedTokenRange::Create(
+      pasta::AST::From(decls_to_print.front()), decls_to_print);
 
   // If the alignment algorithm succeeds, then we will have token contexts
   // for each of the parsed tokens.
