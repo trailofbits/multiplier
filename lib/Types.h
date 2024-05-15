@@ -26,7 +26,7 @@ static constexpr RawEntityId kMinEntityIdIncrement = 1ull;
 static constexpr unsigned kBigFragmentIdNumBits = 20u;
 static constexpr RawEntityId kMaxBigFragmentId = 1ull << kBigFragmentIdNumBits;
 
-static constexpr uint64_t kNumTokensInBigFragment = 8500u;
+static constexpr uint64_t kNumTokensInBigFragment = 16000u;
 
 static constexpr unsigned kFileIdNumBits = 20u;
 static constexpr RawEntityId kMaxFileId = 1ull << kFileIdNumBits;
