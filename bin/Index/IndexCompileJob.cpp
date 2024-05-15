@@ -123,6 +123,79 @@ struct EntityGroupRange {
         order(order_) {}
 };
 
+struct FragmentCollector {
+  GlobalIndexingState &context;
+  const pasta::AST ast;
+  const pasta::Compiler compiler;
+  const pasta::CompileJob job;
+  const pasta::TokenRange tok_range;
+  const mx::EntityOffset tok_range_size;
+  const mx::PackedCompilationId tu_id;
+  const pasta::PrintedTokenRange empty_printed_tokens;
+  const std::string main_file_path;
+
+  EntityMapper &em;
+  NameMangler nm;
+  IdStore &id_store;
+
+  EntityOffsetToDirectiveMap dir_index_to_next_dir;
+  EntityOffsetMap eof_index_to_include;
+  EntityOffsetMap bof_to_eof;
+  EntityOffsetMap eof_to_include;
+
+  // Filled up.
+  std::vector<PendingFragmentPtr> pending_fragments;
+
+  FragmentCollector(GlobalIndexingState &context_,
+                    const pasta::AST &ast_,
+                    const pasta::Compiler &compiler_,
+                    const pasta::CompileJob &job_,
+                    mx::PackedCompilationId tu_id_,
+                    EntityMapper &em_)
+      : context(context_),
+        ast(ast_),
+        compiler(compiler_),
+        job(job_),
+        tok_range(ast.Tokens()),
+        tok_range_size(tok_range.Size()),
+        tu_id(tu_id_),
+        empty_printed_tokens(pasta::PrintedTokenRange::CreateEmpty(ast)),
+        main_file_path(ast.MainFile().Path().generic_string()),
+        em(em_),
+        nm(ast, tu_id),
+        id_store(context.id_store) {}
+
+  void FillBOFToEOF(void);
+  void FillNextPrevConditionalMacros(void);
+  std::vector<OrderedDecl> FindTLDs(void);
+  std::vector<EntityRange> FindTLMs(void);
+  std::vector<EntityRange> SortEntities(void);
+  std::vector<EntityGroupRange> PartitionEntities(void);
+  void FillPendingFragments(EntityGroupRange group_range);
+  void PartitionEntitiesAndFillPendingFragments(void);
+  void PersistParsedFragments(void);
+
+  void CreateFloatingDirectiveFragment(const pasta::Macro &macro);
+
+  void CreateFloatingDeclFragment(
+      std::optional<FileLocationOfFragment> floc,
+      mx::EntityOffset begin_index,
+      mx::EntityOffset end_index,
+      const pasta::Decl &decl);
+
+  template <typename CreateParsedTokens>
+  PendingFragmentPtr CreatePendingFragment(
+      const pasta::TokenRange *original_tokens,
+      CreateParsedTokens create_parsed_tokens,
+      std::optional<FileLocationOfFragment> floc,
+      mx::EntityOffset begin_index,
+      mx::EntityOffset end_index,
+      std::vector<pasta::Decl> decls,
+      std::vector<pasta::Macro> macros,
+      const void *parent_entity,
+      bool parsed_are_printed);
+};
+
 static bool IsProbablyABuiltinDecl(const pasta::Decl &decl);
 
 // Find a redeclaration of `tpl` that has the same location as `loc`.
@@ -1100,12 +1173,9 @@ FindDirectivesInMacro(pasta::Macro mn) {
 // can extend its bounds, possibly as far as the `#endif`.
 //
 // XREF(pag): https://github.com/trailofbits/multiplier/issues/457
-static EntityOffsetToDirectiveMap
-FindNextPrevConditionalMacros(const pasta::AST &ast,
-                              std::string_view main_file_path) {
+void FragmentCollector::FillNextPrevConditionalMacros(void) {
 
   std::vector<pasta::MacroDirective> prev;
-  EntityOffsetToDirectiveMap next;
 
   auto add_to_prev = [&] (const pasta::MacroDirective &macro, const char *what) {
     CHECK(!prev.empty())
@@ -1114,8 +1184,8 @@ FindNextPrevConditionalMacros(const pasta::AST &ast,
 
     auto prev_index = ParsedIndexOfMacroDirective(prev.back());
     auto index = ParsedIndexOfMacroDirective(macro);
-    next.emplace(prev_index, macro);
-    next.emplace(~index, prev.back());
+    dir_index_to_next_dir.emplace(prev_index, macro);
+    dir_index_to_next_dir.emplace(~index, prev.back());
   };
 
   for (pasta::Macro macro : ast.Macros()) {
@@ -1133,12 +1203,10 @@ FindNextPrevConditionalMacros(const pasta::AST &ast,
       }
     }
   }
-  return next;
 }
 
 // Find all top-level declarations.
-static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast,
-                                         EntityMapper &em) {
+std::vector<OrderedDecl> FragmentCollector::FindTLDs(void) {
   std::vector<OrderedDecl> tlds;
   TLDFinder tld_finder(tlds, em);
   tld_finder.VisitTranslationUnitDecl(ast.TranslationUnit());
@@ -1819,10 +1887,10 @@ static void AddDeclToEntityRangeList(
 // and so we'd like to treat those separately (as floating fragments). Then we
 // can get the root expansions from looking at just the uses of `#define`
 // directives.
-static void FindTLMs(
-    const pasta::AST &ast, const pasta::TokenRange &tokens,
-    const EntityOffsetMap &bof_to_eof, EntityOffsetMap &eof_to_include,
-    std::vector<EntityRange> &entity_ranges) {
+std::vector<EntityRange> FragmentCollector::FindTLMs(void) {
+
+  std::vector<EntityRange> entity_ranges;
+  entity_ranges.reserve(8192u);
 
   auto add_macro = [&entity_ranges] (pasta::MacroDirective node) {
     auto tok_index = node.ParsedLocation().Index();  // Marker location.
@@ -1831,8 +1899,7 @@ static void FindTLMs(
         static_cast<unsigned>(entity_ranges.size()));
   };
 
-  const mx::EntityOffset num_tokens = tokens.Size();
-  for (pasta::Token tok : tokens) {
+  for (pasta::Token tok : tok_range) {
 
     // All macro directives have a corresponding marker token.
     if (tok.Role() != pasta::TokenRole::kMacroDirectiveMarker) {
@@ -1885,8 +1952,8 @@ static void FindTLMs(
     auto bom_index = ild_index;
     auto eom_index = ild_index;
     auto found = false;
-    for (; eom_index < (num_tokens - 1); ++eom_index) {
-      auto tok = tokens[eom_index];
+    for (; eom_index < (tok_range_size - 1); ++eom_index) {
+      auto tok = tok_range[eom_index];
       if (tok.Role() == pasta::TokenRole::kEndOfMacroExpansionMarker) {
         bom_index = tok.BalancedLocation()->Index();
         assert(bom_index != eom_index);
@@ -1912,7 +1979,7 @@ static void FindTLMs(
     // x-macro pattern. We don't anticipate include guards/pragmas preventing
     // redundant inclusion in those cases.
     auto bof_index = eom_index + 1u;
-    if (tokens[bof_index].Role() != pasta::TokenRole::kBeginOfFileMarker) {
+    if (tok_range[bof_index].Role() != pasta::TokenRole::kBeginOfFileMarker) {
       continue;
     }
 
@@ -1926,36 +1993,26 @@ static void FindTLMs(
     // use this to help expand decl/fragment ranges.
     eof_to_include.emplace(it->second, bom_index);
   }
+
+  return entity_ranges;
 }
 
-// Sort the top-level declarations so that syntactically overlapping
-// declarations are in the correct order, and are side-by-side in the output
-// vector.
-static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
-                                             std::string_view main_file_path,
-                                             EntityMapper &em) {
 
-  pasta::TokenRange tokens = ast.Tokens();
-  std::vector<EntityRange> entity_ranges;
-  entity_ranges.reserve(8192u);
-
-  EntityOffsetMap eof_index_to_include;
-  EntityOffsetMap bof_to_eof;
-
-  // Find end-of-file indices. Sometimes we need to expand declaration ranges
-  // out to include an end of file if they include the beginning of the file.
-  // This helps keep later `TokenTree` stuff balanced, and relates to Issue
-  // #258.
+// Find end-of-file indices. Sometimes we need to expand declaration ranges
+// out to include an end of file if they include the beginning of the file.
+// This helps keep later `TokenTree` stuff balanced, and relates to Issue
+// #258.
+void FragmentCollector::FillBOFToEOF(void) {
   std::vector<mx::EntityOffset> open_indexes;
   open_indexes.reserve(64u);
-  for (const pasta::Token &tok : tokens) {
+  for (const pasta::Token &tok : tok_range) {
     switch (tok.Role()) {
       case pasta::TokenRole::kBeginOfFileMarker:
         open_indexes.push_back(tok.Index());
         break;
       case pasta::TokenRole::kEndOfFileMarker:
         if (open_indexes.empty()) {  // Unbalanced EOF marker.
-          assert((tok.Index() + 1u) == tokens.Size());
+          assert((tok.Index() + 1u) == tok_range_size);
         } else {
           bof_to_eof.emplace(open_indexes.back(), tok.Index());
           open_indexes.pop_back();
@@ -1970,14 +2027,17 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
         break;
     }
   }
+}
 
-  FindTLMs(ast, tokens, bof_to_eof, eof_index_to_include, entity_ranges);
+// Sort the top-level declarations so that syntactically overlapping
+// declarations are in the correct order, and are side-by-side in the output
+// vector.
+std::vector<EntityRange> FragmentCollector::SortEntities(void) {
 
-  auto dir_index_to_next_dir = FindNextPrevConditionalMacros(
-      ast, main_file_path);
+  std::vector<EntityRange> entity_ranges = FindTLMs();
 
-  for (OrderedDecl &ordered_entry : FindTLDs(ast, em)) {
-    AddDeclToEntityRangeList(tokens, eof_index_to_include, bof_to_eof,
+  for (OrderedDecl &ordered_entry : FindTLDs()) {
+    AddDeclToEntityRangeList(tok_range, eof_index_to_include, bof_to_eof,
                              dir_index_to_next_dir, main_file_path, 
                              std::move(ordered_entry.decl),
                              ordered_entry.parent, entity_ranges);
@@ -2008,17 +2068,11 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
 // as well as for template specializations.
 //
 // TODO(pag): Handle top-level statements, e.g. `asm`, `static_assert`, etc.
-static std::vector<EntityGroupRange> PartitionEntities(
-    GlobalIndexingState &context, const pasta::AST &ast,
-    EntityMapper &em) {
-
-  pasta::TokenRange tokens = ast.Tokens();
-  std::string main_file_path = ast.MainFile().Path().generic_string();
+std::vector<EntityGroupRange> FragmentCollector::PartitionEntities(void) {
 
   ProgressBarWork partitioning_progress_tracker(context.partitioning_progress);
 
-  std::vector<EntityRange> entity_ranges = SortEntities(
-      ast, main_file_path, em);
+  std::vector<EntityRange> entity_ranges = SortEntities();
   std::vector<EntityGroupRange> entity_group_ranges;
   entity_group_ranges.reserve(entity_ranges.size());
 
@@ -2330,12 +2384,11 @@ LocateExpansionsInRange(const pasta::TokenRange &tokens) {
   return macros_out;
 }
 
-static PendingFragmentPtr CreatePendingFragment(
-    IdStore &id_store, EntityMapper &em, NameMangler &nm,
+template <typename CreateParsedTokens>
+PendingFragmentPtr FragmentCollector::CreatePendingFragment(
     const pasta::TokenRange *original_tokens,
-    pasta::PrintedTokenRange parsed_tokens,
+    CreateParsedTokens create_parsed_tokens,
     std::optional<FileLocationOfFragment> floc,
-    mx::PackedCompilationId tu_id,
     mx::EntityOffset begin_index,
     mx::EntityOffset end_index,
     std::vector<pasta::Decl> decls,
@@ -2349,12 +2402,8 @@ static PendingFragmentPtr CreatePendingFragment(
   // fragment ID encoding scheme (i.e. has lots of stuff, but we can't encode
   // as many of them), or the small one (i.e. doesn't have as much stuff, and
   // we can encode substantially more of them).
-  mx::EntityOffset num_tokens = 0u;
-  if (original_tokens) {
-    num_tokens = original_tokens->Size();
-  }
-
-  num_tokens = std::max(num_tokens, parsed_tokens.Size());
+  mx::EntityOffset num_tokens =
+      original_tokens ? original_tokens->Size() : 64u;
 
   if (original_tokens) {
     num_tokens += MacroRangeSize(LocateExpansionsInRange(*original_tokens));
@@ -2380,10 +2429,13 @@ static PendingFragmentPtr CreatePendingFragment(
   // a new fragment.
   auto [fid, is_new_fragment_id] = id_store.GetOrCreateFragmentIdForHash(
       context_eid,
-      HashFragment(em, nm, loc_eid, parent_entity, decls, macros,
-                   original_tokens, parsed_tokens),
+      HashFragment(em, loc_eid, parent_entity, decls, macros, original_tokens),
       num_tokens  /* for fragment id packing format */,
       IsReplaceableFragment(decls));
+
+  auto parsed_tokens = is_new_fragment_id != IdStatus::kExisting ?
+                       create_parsed_tokens(parsed_are_printed) :
+                       empty_printed_tokens;
 
   PendingFragmentPtr pf(new PendingFragment(
       fid,
@@ -2423,8 +2475,10 @@ static PendingFragmentPtr CreatePendingFragment(
 // represent the parsed tokens.
 static pasta::PrintedTokenRange CreateParsedTokenRange(
     pasta::PrintedTokenRange parsed_tokens,
-    const std::vector<pasta::Decl> &decls, const pasta::PrintingPolicy &pp,
-    std::string_view main_job_file, const void *parent_entity,
+    const std::vector<pasta::Decl> &decls,
+    const pasta::PrintingPolicy &pp,
+    std::string_view main_file_path,
+    const void *parent_entity,
     bool &parsed_are_printed) {
 
   CHECK(!decls.empty());
@@ -2448,14 +2502,14 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
   if (decls_to_print.empty()) {
     CHECK_GE(decls.size(), 1u)
         << "Missing declarations for printing/alignment on main job file "
-        << main_job_file;
+        << main_file_path;
 
     decls_to_print = decls;
   }
 
   LOG_IF(ERROR, decls_to_print.size() > 100u)
       << "Likely performance problem on main job file "
-      << main_job_file << " with " << decls_to_print.front().KindName()
+      << main_file_path << " with " << decls_to_print.front().KindName()
       << PrefixedLocation(decls_to_print.front(), " at or near ")
       << " where we're doing token alignment on "
       << decls_to_print.size() << " printed declarations";
@@ -2493,7 +2547,7 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
 
   // Report the error and try to recover.
   LOG(WARNING)
-      << "Unable to align tokens in main job file " << main_job_file
+      << "Unable to align tokens in main job file " << main_file_path
       << PrefixedLocation(decls.front(), " at or near ") << ": "
       << err.value();
 
@@ -2502,42 +2556,10 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
 
   LOG_IF(ERROR, err.has_value())
       << "Unable to align tokens in recovery mode in main job file "
-      << main_job_file << PrefixedLocation(decls.front(), " at or near ")
+      << main_file_path << PrefixedLocation(decls.front(), " at or near ")
       << ": " << err.value();
 
   return parsed_tokens;
-}
-
-// NOTE(pag): Left here for niftiness of debugging issues, e.g. where some
-//            top-level decl doesn't have all of its tokens properly
-//            identified. Usually this would be a bug in PASTA's
-//            `lib/AST/Bounds.cpp` file, but having a restriction here also
-//            helps the end-to-end debugging process.
-//
-// NOTE(pag): Likely, an `assert(false)` in `TrackRedeclarations` in
-//            `LinkEntitiesAcrossFragments.cpp` needs to be commented out
-//            when using this debugging technique.
-static bool DebugIndexOnlyThisFragment(const EntityGroup &entities) {
-  // bool found = false;
-  // for (const auto &er : entities) {
-  //   if (!std::holds_alternative<pasta::Decl>(er.entity)) {
-  //     continue;
-  //   }
-
-  //   auto nd = pasta::FunctionDecl::From(std::get<pasta::Decl>(er.entity));
-  //   if (!nd) {
-  //     continue;
-  //   }
-
-  //   if (nd->Name() == "qt_metatype_id") {
-  //     found = true;
-  //     break;
-  //   }
-  // }
-
-  // return found;
-  (void) entities;
-  return true;
 }
 
 // Create a freestanding fragment. This is generally for builtin types, e.g.
@@ -2546,26 +2568,11 @@ static bool DebugIndexOnlyThisFragment(const EntityGroup &entities) {
 // forward declarations to prevent Issue #396.
 //
 // XREF(pag): https://github.com/trailofbits/multiplier/issues/396
-static void CreateFloatingDeclFragment(
-    IdStore &id_store,
-    EntityMapper &em,
-    NameMangler &nm,
+void FragmentCollector::CreateFloatingDeclFragment(
     std::optional<FileLocationOfFragment> floc,
-    mx::PackedCompilationId tu_id,
     mx::EntityOffset begin_index,
     mx::EntityOffset end_index,
-    const pasta::Decl &decl,
-    std::vector<PendingFragmentPtr> &pending_fragments,
-    std::string_view main_file_path) {
-
-  // NOTE(pag): For builtin declaration, this will be empty.
-  const pasta::PrintingPolicy pp;
-
-  pasta::PrintedTokenRange parsed_tokens =
-      pasta::PrintedTokenRange::Adopt(decl.Tokens());
-
-  pasta::PrintedTokenRange printed_tokens =
-      pasta::PrintedTokenRange::Create(decl, pp);
+    const pasta::Decl &decl) {
 
   // If this is a builtin declaration, then we want the fragment hash to be
   // generic across the whole program, not specific to this file. For example,
@@ -2576,31 +2583,6 @@ static void CreateFloatingDeclFragment(
     floc.reset();
   }
 
-  // Align against the parsed tokens, if we can.
-  //
-  // NOTE(pag): Alignment mutates both `parsed_tokens` and `printed_tokens`
-  //            in place, making `printed_tokens` have source locations from
-  //            `parsed_tokens`, and `parsed_tokens` have contexts from
-  //            `printed_tokens`.
-  if (parsed_tokens) {
-    (void) pasta::PrintedTokenRange::Align(parsed_tokens, printed_tokens);
-    if (IsSpecializationOrInSpecialization(decl)) {
-      parsed_tokens = pasta::PrintedTokenRange::AdoptWhitespace(
-          printed_tokens, parsed_tokens);
-    }
-
-  } else {
-
-    // If the decl is implicit, the parsed_tokens can be empty and it will
-    // fallback to the error path. Example: CXXDeductionGuide in some cases
-    // will not have parsed token and it will fallback here.
-    LOG_IF(ERROR, !(is_builtin || decl.IsImplicit()))
-        << "Could not find tokens of " << decl.KindName()
-        << " declaration: " << DeclToString(decl)
-        << PrefixedLocation(decl, " at or near ")
-        << " on main job file " << main_file_path;
-  }
-
   std::vector<pasta::Decl> decls;
   decls.push_back(decl);
 
@@ -2608,13 +2590,46 @@ static void CreateFloatingDeclFragment(
   //            guarantee that the parsed tokens aren't the result of
   //            macro expansions.
   auto pf = CreatePendingFragment(
-      id_store,
-      em,
-      nm,
       nullptr  /* original_tokens */,
-      std::move(printed_tokens)  /* parsed_tokens */,
+      [&] (bool) {
+
+        // NOTE(pag): For builtin declaration, this will be empty.
+        const pasta::PrintingPolicy pp;
+
+        pasta::PrintedTokenRange parsed_tokens =
+            pasta::PrintedTokenRange::Adopt(decl.Tokens());
+
+        pasta::PrintedTokenRange printed_tokens =
+            pasta::PrintedTokenRange::Create(decl, pp);
+
+        // Align against the parsed tokens, if we can.
+        //
+        // NOTE(pag): Alignment mutates both `parsed_tokens` and
+        //            `printed_tokens` in place, making `printed_tokens` have
+        //            source locations from `parsed_tokens`, and `parsed_tokens`
+        //            have contexts from `printed_tokens`.
+        if (parsed_tokens) {
+          (void) pasta::PrintedTokenRange::Align(parsed_tokens, printed_tokens);
+          if (IsSpecializationOrInSpecialization(decl)) {
+            parsed_tokens = pasta::PrintedTokenRange::AdoptWhitespace(
+                printed_tokens, parsed_tokens);
+          }
+
+        } else {
+
+          // If the decl is implicit, the parsed_tokens can be empty and it will
+          // fallback to the error path. Example: CXXDeductionGuide in some
+          // cases will not have parsed token and it will fallback here.
+          LOG_IF(ERROR, !(is_builtin || decl.IsImplicit()))
+              << "Could not find tokens of " << decl.KindName()
+              << " declaration: " << DeclToString(decl)
+              << PrefixedLocation(decl, " at or near ")
+              << " on main job file " << main_file_path;
+        }
+
+        return printed_tokens;
+      },
       std::move(floc),
-      tu_id,
       begin_index,
       end_index,
       std::move(decls),
@@ -2679,13 +2694,8 @@ static bool CanUseFullDirectiveRange(const pasta::TokenRange &full_range) {
 }
 
 // Create a floating fragment for the top-level directives.
-static void CreateFloatingDirectiveFragment(
-    IdStore &id_store,
-    EntityMapper &em,
-    NameMangler &nm,
-    mx::PackedCompilationId tu_id,
-    const pasta::Macro &macro,
-    std::vector<PendingFragmentPtr> &pending_fragments) {
+void FragmentCollector::CreateFloatingDirectiveFragment(
+    const pasta::Macro &macro) {
 
   auto dir = pasta::MacroDirective::From(macro);
   CHECK(dir.has_value());
@@ -2716,14 +2726,11 @@ static void CreateFloatingDirectiveFragment(
   macros.push_back(macro);
 
   auto pf = CreatePendingFragment(
-      id_store,
-      em,
-      nm,
       &directive_range  /* original_tokens */,
-      pasta::PrintedTokenRange::CreateEmpty(
-          pasta::AST::From(macro))  /* parsed_tokens */,
+      [this] (bool) {
+        return empty_printed_tokens;
+      },
       std::move(floc),
-      tu_id,
       begin_index,
       end_index,
       {}  /* empty decls */,
@@ -2781,16 +2788,9 @@ static void SortByParentage(EntityGroup &entities) {
   }
 }
 
-static void CreatePendingFragments(
-    IdStore &id_store, EntityMapper &em, NameMangler &nm,
-    const pasta::TokenRange &tok_range, mx::PackedCompilationId tu_id,
-    EntityGroupRange group_range, std::string_view main_file_path,
-    std::vector<PendingFragmentPtr> &pending_fragments) {
+void FragmentCollector::FillPendingFragments(EntityGroupRange group_range) {
 
   EntityGroup &entities = group_range.group;
-  if (!DebugIndexOnlyThisFragment(entities)) {
-    return;
-  }
 
   SortByParentage(entities);
 
@@ -2837,9 +2837,7 @@ static void CreatePendingFragments(
                  (IsInjectedForwardDeclaration(decl) ||
                   !floc || decl.IsImplicit())) {
         CHECK(!er.parent);
-        CreateFloatingDeclFragment(
-            id_store, em, nm, floc, tu_id, begin_index, end_index,
-            decl, pending_fragments, main_file_path);
+        CreateFloatingDeclFragment(floc, begin_index, end_index, decl);
 
       // These are generally template instantiations.
       } else if (er.parent) {
@@ -2862,8 +2860,7 @@ static void CreatePendingFragments(
       // entity mapper. We process these first, as they can end up being used
       // lexically inside of other top-level entities.
       if (ShouldGoInFloatingFragment(macro)) {
-        CreateFloatingDirectiveFragment(
-            id_store, em, nm, tu_id, macro, pending_fragments);
+        CreateFloatingDirectiveFragment(macro);
 
       } else {
         top_level_macros.emplace_back(macro);
@@ -2878,19 +2875,15 @@ static void CreatePendingFragments(
 
   pasta::PrintingPolicy pp;
 
-  auto root_decls_copy = root_decls;
-  auto top_level_macros_copy = top_level_macros;
-
   // Top-level expansion or `#include`. 
   if (root_decls.empty() && !top_level_macros.empty()) {
+
     auto pf = CreatePendingFragment(
-        id_store,
-        em,
-        nm,
         &frag_tok_range  /* original_tokens */,
-        pasta::PrintedTokenRange::Adopt(frag_tok_range)  /* parsed_tokens */,
+        [&] (bool &) {
+          return pasta::PrintedTokenRange::Adopt(frag_tok_range);
+        }  /* make_parsed_tokens */,
         floc  /* copied */,
-        tu_id,
         begin_index,
         end_index,
         std::move(root_decls),
@@ -2902,28 +2895,26 @@ static void CreatePendingFragments(
 
   // Top-level declarations, possibly with macro expansions.
   } else if (!root_decls.empty()) {
-    bool parsed_are_printed = false;
-    pasta::PrintedTokenRange aligned_tokens =
-        CreateParsedTokenRange(
-            pasta::PrintedTokenRange::Adopt(frag_tok_range),
-            root_decls, pp, main_file_path, nullptr, parsed_are_printed);
-
-    CHECK(!aligned_tokens.empty() || !top_level_macros.empty());
 
     auto pf = CreatePendingFragment(
-        id_store,
-        em,
-        nm,
         &frag_tok_range  /* original_tokens */,
-        std::move(aligned_tokens)  /* parsed_tokens */,
+        [&] (bool &parsed_tokens_are_printed) {
+          auto aligned_tokens = CreateParsedTokenRange(
+                pasta::PrintedTokenRange::Adopt(frag_tok_range),
+                root_decls, pp, main_file_path, nullptr,
+                parsed_tokens_are_printed);
+
+          CHECK(!aligned_tokens.empty() || !top_level_macros.empty());
+
+          return aligned_tokens;
+        },
         floc  /* copied */,
-        tu_id,
         begin_index,
         end_index,
-        std::move(root_decls),
+        root_decls  /* copied */,
         top_level_macros  /* copied */,
         nullptr  /* parent entity */,
-        parsed_are_printed);
+        false  /* parsed_are_printed */);
 
     pending_fragments.emplace_back(std::move(pf));
   }
@@ -2953,27 +2944,24 @@ static void CreatePendingFragments(
 
     CHECK(sub_tok_range.has_value());
 
-    bool parsed_are_printed = false;
-    pasta::PrintedTokenRange aligned_tokens = CreateParsedTokenRange(
-        pasta::PrintedTokenRange::Adopt(sub_tok_range.value()),
-        decls, pp, main_file_path, er.parent, parsed_are_printed);
-
-    CHECK(!aligned_tokens.empty());
-
     auto pf = CreatePendingFragment(
-        id_store,
-        em,
-        nm,
         &(sub_tok_range.value())  /* original_tokens */,
-        std::move(aligned_tokens)  /* parsed_tokens */,
+        [&] (bool &parsed_tokens_are_printed) -> pasta::PrintedTokenRange {
+          auto aligned_tokens = CreateParsedTokenRange(
+              pasta::PrintedTokenRange::Adopt(sub_tok_range.value()),
+              decls, pp, main_file_path, er.parent,
+              parsed_tokens_are_printed);
+
+          CHECK(!aligned_tokens.empty());
+          return aligned_tokens;
+        },
         floc  /* copied */,
-        tu_id,
         begin_index,
         end_index,
-        std::move(decls),
+        decls  /* copied */,
         top_level_macros  /* copied */,
         er.parent,
-        parsed_are_printed);
+        false  /* parsed_are_printed */);
 
     pending_fragments.emplace_back(std::move(pf));
   }
@@ -2990,17 +2978,14 @@ static void CreatePendingFragments(
 // process the fragments in order. A downside of this overall effect is that
 // it precludes sub-translation unit-granularity indexing (e.g. by having
 // other indexer threads do work stealing on the pending fragments).
-static std::vector<PendingFragmentPtr> CreatePendingFragments(
-    GlobalIndexingState &context, EntityMapper &em, NameMangler &nm,
-    const pasta::AST &ast, mx::PackedCompilationId tu_id,
-    std::vector<EntityGroupRange> decl_group_ranges) {
+void FragmentCollector::PartitionEntitiesAndFillPendingFragments(void) {
 
-  std::vector<PendingFragmentPtr> pending_fragments;
+  auto decl_group_ranges = PartitionEntities();
+
   pending_fragments.reserve(decl_group_ranges.size());
 
-  std::string main_job_file = ast.MainFile().Path().generic_string();
   DLOG(INFO)
-      << "Main source file " << main_job_file
+      << "Main source file " << main_file_path
       << " has at least " << decl_group_ranges.size() << " possible fragments";
 
   pasta::TokenRange tok_range = ast.Tokens();
@@ -3010,44 +2995,37 @@ static std::vector<PendingFragmentPtr> CreatePendingFragments(
   // the fragments logically containing those tokens/expressions.
   for (EntityGroupRange &entities_in_fragment : decl_group_ranges) {
     try {
-      CreatePendingFragments(context.id_store, em, nm, tok_range, tu_id,
-                             std::move(entities_in_fragment), main_job_file,
-                             pending_fragments);
+      FillPendingFragments(std::move(entities_in_fragment));
     } catch (...) {
       LOG(ERROR)
-          << "Caught exception in main job file " << main_job_file
+          << "Caught exception in main job file " << main_file_path
           << " when trying to create pending fragment";
     }
   }
-
-  return pending_fragments;
 }
 
 // Serialize the parsed fragments that were identified as new and/or "won"
 // the race to assign a fragment ID in this thread of execution.
-static void PersistParsedFragments(
-    GlobalIndexingState &context,
-    const pasta::Compiler &compiler,
-    const pasta::CompileJob &job,
-    const pasta::AST &ast,
-    EntityMapper &em,
-    NameMangler &nm,
-    mx::PackedCompilationId tu_id,
-    std::vector<PendingFragmentPtr> pending_fragments) {
+void FragmentCollector::PersistParsedFragments(void) {
 
   TokenProvenanceCalculator provenance(em);
 
-  std::string main_source_file = ast.MainFile().Path().generic_string();
-  std::vector<mx::PackedFragmentId> fragment_ids;
-  std::vector<FragmentBounds> nested_fragment_bounds;
+  // Map begin-of-file to end-of-file markers.
+  FillBOFToEOF();
+
+  FillNextPrevConditionalMacros();
 
   // Process floating fragments (macro directives) and freestanding fragments
   // (declarator-embedded `struct` forward declarations) first.
+  PartitionEntitiesAndFillPendingFragments();
+
   std::stable_sort(
       pending_fragments.begin(), pending_fragments.end(),
       [] (const PendingFragmentPtr &a, const PendingFragmentPtr &b) {
         return a->is_floating && !b->is_floating;
       });
+
+  std::vector<FragmentBounds> nested_fragment_bounds;
 
   auto num_new = 0u;
   auto num_replaced = 0u;
@@ -3091,10 +3069,11 @@ static void PersistParsedFragments(
   CHECK(em.token_tree_ids.empty());
 
   DLOG(INFO)
-      << "Main source file " << main_source_file
+      << "Main source file " << main_file_path
       << " has " << num_new << " / " << pending_fragments.size()
       << " unique fragments, " << num_replaced << " of which are replacements";
 
+  std::vector<mx::PackedFragmentId> fragment_ids;
   fragment_ids.reserve(num_new);
 
   for (PendingFragmentPtr &pf : pending_fragments) {
@@ -3117,11 +3096,11 @@ static void PersistParsedFragments(
         LOG(ERROR)
             << "Persisting fragment"
             << PrefixedLocation(leader_decl, " at or near ")
-            << " on main job file " << main_source_file
+            << " on main job file " << main_file_path
             << " triggered exception";
       } else {
         LOG(ERROR)
-            << "Persisting fragment on main job file " << main_source_file
+            << "Persisting fragment on main job file " << main_file_path
             << " triggered exception";
       }
       continue;
@@ -3138,7 +3117,7 @@ static void PersistParsedFragments(
       LOG(WARNING)
           << "Fragment with ID " << pf->fragment_id.Pack()
           << PrefixedLocation(leader_decl, " at or near ")
-          << " on main job file " << main_source_file
+          << " on main job file " << main_file_path
           << " took " << static_cast<uint64_t>(elapsed_time_s)
           << " seconds to persist";
     }
@@ -3251,13 +3230,8 @@ void IndexCompileJobAction::Run(void) {
     return;
   }
 
-  NameMangler nm(ast, tu_id);
-
-  PersistParsedFragments(
-      context, compiler, job, ast, em, nm, tu_id,
-      CreatePendingFragments(
-          context, em, nm, ast, tu_id,
-          PartitionEntities(context, ast, em)));
+  FragmentCollector fb(context, ast, compiler, job, tu_id, em);
+  fb.PersistParsedFragments();
 }
 
 }  // namespace indexer

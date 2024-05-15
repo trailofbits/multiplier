@@ -41,93 +41,8 @@
 namespace indexer {
 namespace {
 
-class HashVisitor final : public pasta::DeclVisitor {
- public:
-  virtual ~HashVisitor(void) = default;
-
-  explicit HashVisitor(std::stringstream &ss_)
-      : ss(ss_) {}
-
-  void VisitDeclContext(const pasta::Decl &dc_decl) {
-    auto dc = pasta::DeclContext::From(dc_decl);
-    if (!dc) {
-      return;
-    }
-
-    for (const pasta::Decl &decl : dc->AlreadyLoadedDeclarations()) {
-      if (dc_decl != decl) {
-        Accept(decl);
-      }
-    }
-  }
-
-  void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final {
-    VisitDeclContext(decl);
-  }
-
-  void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final {
-    VisitDeclContext(decl);
-  }
-
-  void VisitExternCContextDecl(const pasta::ExternCContextDecl &decl) final {
-    VisitDeclContext(decl);
-  }
-
-  void VisitLinkageSpecDecl(const pasta::LinkageSpecDecl &decl) final {
-    VisitDeclContext(decl);
-  }
-
-  // XREF(pag): Issue #318. Only integrate the ODR hash when we have a
-  //            definition.
-  template <typename T>
-  void VisitODRHashable(const T &entity) {
-    if (IsDefinition(entity)) {
-      if (auto hash = entity.ODRHash()) {
-        ss << " o" << hash.value();
-      }
-    }
-  }
-
-  void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
-    VisitODRHashable(decl);
-  }
-
-  void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &decl) {
-    Accept(decl.TemplatedDeclaration());
-  }
-
-  void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) {
-    Accept(decl.TemplatedDeclaration());
-  }
-
-  void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final {
-    VisitODRHashable(decl);
-    if (IsDefinition(decl)) {
-      VisitDeclContext(decl);
-    }
-  }
-
-  void VisitEnumDecl(const pasta::EnumDecl &decl) final {
-    VisitODRHashable(decl);
-  }
-
-  void VisitDecl(const pasta::Decl &) final {}
-
-  void VisitClassTemplatePartialSpecializationDecl(
-      const pasta::ClassTemplatePartialSpecializationDecl &decl) {
-    VisitCXXRecordDecl(decl);
-  }
-
-  void VisitClassTemplateSpecializationDecl(
-      const pasta::ClassTemplateSpecializationDecl &) {}
-
- private:
-  std::stringstream &ss;
-};
-
-static void AccumulateTokenData(std::stringstream &ss,
-                                mx::TokenKind kind, pasta::TokenRole role,
-                                std::string_view data) {
+static void AccumulateTokenData(std::ostream &ss, mx::TokenKind kind,
+                                pasta::TokenRole role, std::string_view data) {
   if (data.empty()) {
     return;
   }
@@ -177,7 +92,7 @@ static void AccumulateTokenData(std::stringstream &ss,
 }
 
 static void AccumulateTokenData(
-    std::stringstream &ss, const pasta::PrintedTokenRange &tokens) {
+    std::ostream &ss, const pasta::PrintedTokenRange &tokens) {
 
   for (pasta::PrintedToken token : tokens) {
     AccumulateTokenData(ss, mx::FromPasta(token.Kind()),
@@ -209,12 +124,187 @@ static void AccumulateTokenData(
   }
 }
 
+static void OffsetFromDeclContext(
+    std::ostream &ss, const EntityMapper &em, const pasta::DeclContext &dc,
+    const pasta::Token &first_tok) {
+
+  auto dc_decl = pasta::Decl::From(dc);
+  if (dc_decl->Kind() == pasta::DeclKind::kTranslationUnit) {
+    return;
+  }
+
+  auto dc_eid = em.EntityId(dc_decl);
+  if (dc_eid != mx::kInvalidEntityId) {
+    ss << " ^" << dc_eid;
+  }
+
+  auto dc_decl_loc = dc_decl->Tokens().Front();
+  if (!dc_decl_loc) {
+    return;
+  }
+
+  auto first = dc_decl_loc->Index();
+  auto second = first_tok.Index();
+  if (first < second) {
+    ss << " -" << (second - first);
+  }
+}
+
+// Relative position w.r.t. parent declaration context.
+static void OffsetFromDeclContext(std::ostream &ss, const EntityMapper &em,
+                                  const pasta::Decl &decl) {
+
+  if (auto first_tok = decl.Tokens().Front()) {
+
+    // NOTE(pag): Our Clang patches set the lambda lexical decl context to the
+    //            translation unit.
+    if (IsLambda(decl)) {
+      if (auto sdc = decl.DeclarationContext()) {
+        OffsetFromDeclContext(ss, em, sdc.value(), first_tok.value());
+      }
+    } else {
+      if (auto ldc = decl.LexicalDeclarationContext()) {
+        OffsetFromDeclContext(ss, em, ldc.value(), first_tok.value());
+      }
+    }
+  }
+}
+
+class HashVisitor final : public pasta::DeclVisitor {
+ private:
+  std::ostream &ss;
+  const EntityMapper &em;
+  const bool nested;
+
+ public:
+  virtual ~HashVisitor(void) = default;
+
+  explicit HashVisitor(std::ostream &ss_, const EntityMapper &em_, bool nested_)
+      : ss(ss_),
+        em(em_),
+        nested(nested_) {}
+
+  void VisitDeclContext(const pasta::Decl &dc_decl) {
+    if (nested) {
+      return;
+    }
+
+    auto dc = pasta::DeclContext::From(dc_decl);
+    if (!dc) {
+      return;
+    }
+
+    for (const pasta::Decl &decl : dc->AlreadyLoadedDeclarations()) {
+      if (dc_decl != decl) {
+        Accept(decl);
+      }
+    }
+  }
+
+  void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final {
+    VisitDeclContext(decl);
+  }
+
+  void VisitNamespaceDecl(const pasta::NamespaceDecl &decl) final {
+    VisitDeclContext(decl);
+  }
+
+  void VisitExternCContextDecl(const pasta::ExternCContextDecl &decl) final {
+    VisitDeclContext(decl);
+  }
+
+  void VisitLinkageSpecDecl(const pasta::LinkageSpecDecl &decl) final {
+    VisitDeclContext(decl);
+  }
+
+  // XREF(pag): Issue #318. Only integrate the ODR hash when we have a
+  //            definition.
+  template <typename T>
+  void VisitODRHashable(const T &entity) {
+    if (!nested && IsDefinition(entity)) {
+      if (auto hash = entity.ODRHash()) {
+        ss << " o" << hash.value();
+      }
+    }
+  }
+
+  void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
+    VisitODRHashable(decl);
+    VisitNamedDecl(decl);
+  }
+
+  void VisitFriendTemplateDecl(const pasta::FriendTemplateDecl &decl) {
+    ss << " FTD";
+    Accept(decl.FriendDeclaration());
+  }
+
+  void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &decl) {
+    ss << " CTD";
+    Accept(decl.TemplatedDeclaration());
+  }
+
+  void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) {
+    ss << " FTD";
+    Accept(decl.TemplatedDeclaration());
+  }
+
+  void VisitVarTemplateDecl(const pasta::VarTemplateDecl &decl) {
+    ss << " VTD";
+    Accept(decl.TemplatedDeclaration());
+  }
+
+  void VisitTypeAliasTemplateDecl(const pasta::TypeAliasTemplateDecl &decl) {
+    ss << " TATD";
+    Accept(decl.TemplatedDeclaration());
+  }
+
+  void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final {
+    VisitODRHashable(decl);
+    VisitNamedDecl(decl);
+    if (!nested && IsDefinition(decl)) {
+      VisitDeclContext(decl);
+    }
+  }
+
+  void VisitEnumDecl(const pasta::EnumDecl &decl) final {
+    VisitODRHashable(decl);
+    VisitNamedDecl(decl);
+  }
+
+  void VisitVarTemplatePartialSpecializationDecl(
+      const pasta::VarTemplatePartialSpecializationDecl &decl) {
+    VisitVarDecl(decl);
+  }
+
+  void VisitVarTemplateSpecializationDecl(
+      const pasta::VarTemplateSpecializationDecl &decl) {
+    if (nested) {
+      VisitVarDecl(decl);
+    }
+  }
+
+  void VisitClassTemplatePartialSpecializationDecl(
+      const pasta::ClassTemplatePartialSpecializationDecl &decl) {
+    VisitCXXRecordDecl(decl);
+  }
+
+  void VisitClassTemplateSpecializationDecl(
+      const pasta::ClassTemplateSpecializationDecl &decl) {
+    if (nested) {
+      VisitCXXRecordDecl(decl);
+    }
+  }
+
+  void VisitNamedDecl(const pasta::NamedDecl &decl) final;
+  void VisitDecl(const pasta::Decl &decl) final;
+};
+
 class TemplateArgumentVisitor final : public EntityVisitor {
  public:
-  std::stringstream &ss;
+  std::ostream &ss;
   unsigned i{0u};
 
-  inline TemplateArgumentVisitor(std::stringstream &ss_)
+  inline TemplateArgumentVisitor(std::ostream &ss_)
       : ss(ss_) {}
 
   virtual ~TemplateArgumentVisitor(void) = default;
@@ -248,126 +338,12 @@ class TemplateArgumentVisitor final : public EntityVisitor {
   }
 };
 
-static std::string HashTopLevelFragment(
-    const EntityMapper &em,
-    const std::vector<pasta::Decl> &decls,
-    const std::vector<pasta::Macro> &macros,
-    const pasta::TokenRange *frag_tok_range,
-    const pasta::PrintedTokenRange &decl_tok_range) {
-
-  std::stringstream ss;
-
-  uint64_t end_index = 0u;
-
-  // Original tokens visible to the parser.
-  if (frag_tok_range && *frag_tok_range) {
-    for (pasta::Token token : *frag_tok_range) {
-      end_index = token.Index();
-      AccumulateTokenData(ss, mx::FromPasta(token.Kind()), token.Role(),
-                          token.Data());
-    }
-  }
-
-  // Pretty-printed tokens. These include token contexts. These may or may
-  // not correspond to original tokens.
-  if (decl_tok_range) {
-    AccumulateTokenData(ss, decl_tok_range);
-  }
-
-  HashVisitor visitor(ss);
-
-  // Mix in ODR hashes, decl kinds, and offsets of the decls. We need to mix
-  // in decl kinds and offsets because not all decls have ODR hashes, and so
-  // these extra bits of data add variability to help distinguish between things
-  // that might only manifest as nested fragments.
-  for (const pasta::Decl &decl : decls) {
-    ss << " D" << int(decl.Kind());
-
-    pasta::Token decl_token = decl.Token();
-    if (frag_tok_range && frag_tok_range->Contains(decl_token)) {
-      ss << " o" << (end_index - decl_token.Index());
-    }
-
-    visitor.Accept(decl);
-  }
-
-  // Mix in macro info. Note that macro uses are not integrated from the token
-  // values themselves, as those aren't represented in PASTA's parsed token
-  // list, so we integrate the top-level macro IDs manually.
-  //
-  // TODO(pag): Should really have a `MacroVisitor` in pasta, then separately
-  //            visit and hash each top-level macro entity. The saving factor
-  //            for now is probably that the above token hashing operates on
-  //            the parsed and intermediate tokens, which is a good enough
-  //            proxy.
-  for (const pasta::Macro &macro : macros) {
-
-    ss << " M" << int(macro.Kind());
-    if (macro.Kind() == pasta::MacroKind::kExpansion) {
-      const auto &exp = reinterpret_cast<const pasta::MacroExpansion &>(macro);
-      if (auto def = exp.Definition()) {
-        auto def_id = em.EntityId(def.value());
-        if (def_id != mx::kInvalidEntityId) {
-          ss << " E" << def_id;
-          continue;
-        }
-      }
-    }
-
-    // NOTE(pag): We don't need to use the location of anything here because
-    //            `GetOrCreateFragmentIdForHash` integrates a file token ID
-    //            at a higher level.
-    //
-    // // Bound to the top-level macro use location in the file.
-    // if (auto bt = macro.BeginToken()) {
-    //   auto dl = bt->DerivedLocation();
-    //   assert(!std::holds_alternative<pasta::MacroToken>(dl));
-    //   if (std::holds_alternative<pasta::FileToken>(dl)) {
-    //     ss << " @" << em.EntityId(std::get<pasta::FileToken>(dl));
-    //   }
-    // }
-  }
-
-  return ss.str();
+void HashVisitor::VisitNamedDecl(const pasta::NamedDecl &decl) {
+  ss << " N" << decl.Name();
+  VisitDecl(decl);
 }
 
-static void OffsetFromDeclContext(
-    std::ostream &ss, const EntityMapper &em, const pasta::DeclContext &dc,
-    const pasta::Token &first_tok) {
-
-  auto dc_decl = pasta::Decl::From(dc);
-  if (dc_decl->Kind() == pasta::DeclKind::kTranslationUnit) {
-    return;
-  }
-
-  auto dc_eid = em.EntityId(dc_decl);
-  if (dc_eid != mx::kInvalidEntityId) {
-    ss << " ^" << dc_eid;
-  }
-
-  auto dc_decl_loc = dc_decl->Tokens().Front();
-  if (!dc_decl_loc) {
-    return;
-  }
-
-  auto first = dc_decl_loc->Index();
-  auto second = first_tok.Index();
-  if (first < second) {
-    ss << " -" << (second - first);
-  }
-}
-
-static std::string HashNestedFragment(
-    const EntityMapper &em, const NameMangler &, const pasta::Decl &decl,
-    mx::RawEntityId location_eid, mx::RawEntityId parent_eid) {
-
-  std::stringstream ss;
-  ss << "P" << parent_eid;
-
-  if (location_eid != mx::kInvalidEntityId) {
-    ss << " L" << location_eid;
-  }
-
+void HashVisitor::VisitDecl(const pasta::Decl &decl) {
   ss << " K" << int(decl.Kind())
      << " S" << decl.Tokens().size();
 
@@ -375,25 +351,7 @@ static std::string HashNestedFragment(
     ss << " I";
   }
 
-  // Relative position w.r.t. parent declaration context.
-  //
-  // NOTE(pag): Our Clang patches set the lambda lexical decl context to the
-  //            translation unit.
-  if (auto first_tok = decl.Tokens().Front()) {
-    if (IsLambda(decl)) {
-      if (auto sdc = decl.DeclarationContext()) {
-        OffsetFromDeclContext(ss, em, sdc.value(), first_tok.value());
-      }
-    } else {
-      if (auto ldc = decl.LexicalDeclarationContext()) {
-        OffsetFromDeclContext(ss, em, ldc.value(), first_tok.value());
-      }
-    }
-  }
-
-  if (auto nd = pasta::NamedDecl::From(decl)) {
-    ss << " N" << nd->Name();
-  }
+  OffsetFromDeclContext(ss, em, decl);
 
   TypePrintingPolicy pp;
 
@@ -431,10 +389,82 @@ static std::string HashNestedFragment(
   // Visit the template arguments.
   TemplateArgumentVisitor tav(ss);
   tav.Accept(decl);
+}
+
+static std::string HashNestedFragment(
+    const EntityMapper &em, const pasta::Decl &decl,
+    mx::RawEntityId location_eid, mx::RawEntityId parent_eid) {
+
+  std::stringstream ss;
+  ss << "P" << parent_eid;
+
+  if (location_eid != mx::kInvalidEntityId) {
+    ss << " L" << location_eid;
+  }
+
+  HashVisitor visitor(ss, em, true);
+  visitor.Accept(decl);
 
   // std::cerr << "\n-----------------\n";
   // std::cerr << ss.str() << '\n';
   // Dump(decl);
+
+  return ss.str();
+}
+
+static std::string HashTopLevelFragment(
+    const EntityMapper &em,
+    const std::vector<pasta::Decl> &decls,
+    const std::vector<pasta::Macro> &macros,
+    const pasta::TokenRange *frag_tok_range,
+    mx::RawEntityId location_eid) {
+
+  std::stringstream ss;
+
+  if (location_eid != mx::kInvalidEntityId) {
+    ss << "L" << location_eid;
+  }
+
+  // Original tokens visible to the parser.
+  if (frag_tok_range && *frag_tok_range) {
+    for (pasta::Token token : *frag_tok_range) {
+      AccumulateTokenData(ss, mx::FromPasta(token.Kind()), token.Role(),
+                          token.Data());
+    }
+  }
+
+  HashVisitor visitor(ss, em, false);
+
+  // Mix in ODR hashes, decl kinds, and offsets of the decls. We need to mix
+  // in decl kinds and offsets because not all decls have ODR hashes, and so
+  // these extra bits of data add variability to help distinguish between things
+  // that might only manifest as nested fragments.
+  for (const pasta::Decl &decl : decls) {
+    visitor.Accept(decl);
+  }
+
+  // Mix in macro info. Note that macro uses are not integrated from the token
+  // values themselves, as those aren't represented in PASTA's parsed token
+  // list, so we integrate the top-level macro IDs manually.
+  //
+  // TODO(pag): Should really have a `MacroVisitor` in pasta, then separately
+  //            visit and hash each top-level macro entity. The saving factor
+  //            for now is probably that the above token hashing operates on
+  //            the parsed and intermediate tokens, which is a good enough
+  //            proxy.
+  for (const pasta::Macro &macro : macros) {
+    ss << " M" << int(macro.Kind());
+    if (macro.Kind() == pasta::MacroKind::kExpansion) {
+      const auto &exp = reinterpret_cast<const pasta::MacroExpansion &>(macro);
+      if (auto def = exp.Definition()) {
+        auto def_id = em.EntityId(def.value());
+        if (def_id != mx::kInvalidEntityId) {
+          ss << " E" << def_id;
+          continue;
+        }
+      }
+    }
+  }
 
   return ss.str();
 }
@@ -496,19 +526,19 @@ std::string HashCompilation(const pasta::AST &ast, const EntityMapper &em) {
 //
 // TODO(pag): Integrate template parameter lists for specializations?
 std::string HashFragment(
-    const EntityMapper &em, const NameMangler &nm,
-    mx::RawEntityId location_eid, const void *parent_entity,
+    const EntityMapper &em,
+    mx::RawEntityId location_eid,
+    const void *parent_entity,
     const std::vector<pasta::Decl> &decls,
     const std::vector<pasta::Macro> &macros,
-    const pasta::TokenRange *frag_tok_range,
-    const pasta::PrintedTokenRange &decl_tok_range) {
+    const pasta::TokenRange *frag_tok_range) {
 
   auto parent_eid = em.EntityId(parent_entity);
   if (parent_eid != mx::kInvalidEntityId && decls.size() == 1u) {
-    return HashNestedFragment(em, nm, decls.front(), location_eid, parent_eid);
+    return HashNestedFragment(em, decls.front(), location_eid, parent_eid);
   }
 
-  return HashTopLevelFragment(em, decls, macros, frag_tok_range, decl_tok_range);
+  return HashTopLevelFragment(em, decls, macros, frag_tok_range, location_eid);
 }
 
 }  // namespace indexer
