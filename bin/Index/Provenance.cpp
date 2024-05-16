@@ -1235,37 +1235,22 @@ mx::RawEntityId RelatedEntityIdToPrintedToken(
 // declaration token to render the entity name.
 mx::RawEntityId PendingFragment::DeclTokenEntityId(
     const pasta::Decl &decl) const {
-
-  auto decl_id = em.EntityId(decl);
-
-  if (IsLambda(decl)) {
-    return mx::kInvalidEntityId;
-  }
-
-  // If we have a name for this entity, then try to find it.
-  if (auto nd = pasta::NamedDecl::From(decl)) {
-    auto dt = decl.Token();
-    if (!dt.Data().empty() && dt.Data() == nd->Name()) {
-      auto loc_tok_id = em.EntityId(dt);
-      auto pl = mx::EntityId(loc_tok_id).Extract<mx::ParsedTokenId>();
-      if (pl && pl->fragment_id == fragment_index) {
-        return loc_tok_id;
+  if (!IsLambda(decl)) {
+    if (auto eid = em.EntityId(decl.Token()); eid != mx::kInvalidEntityId) {
+      return eid;
+    } else if (auto vd = pasta::DeclaratorDecl::From(decl)) {
+      if (auto eid = em.EntityId(vd->FirstInnerToken());
+          eid != mx::kInvalidEntityId) {
+        return eid;
+      }
+    } else if (auto td = pasta::TagDecl::From(decl)) {
+      if (auto eid = em.EntityId(td->FirstInnerToken());
+          eid != mx::kInvalidEntityId) {
+        return eid;
       }
     }
   }
-
-  // Otherwise, scan.
-  for (pasta::PrintedToken tok : parsed_tokens) {
-    if (tok.Kind() == pasta::TokenKind::kIdentifier) {
-      auto dt = tok.DerivedLocation();
-      auto rel_id = RelatedEntityIdToPrintedToken(em, tok, dt);
-      if (decl_id == rel_id) {
-        return em.EntityId(tok);
-      }
-    }
-  }
-
-  return mx::kInvalidEntityId;
+  return em.EntityId(parsed_tokens.At(0u));
 }
 
 unsigned TokenProvenanceCalculator::TokenInfo::Depth(

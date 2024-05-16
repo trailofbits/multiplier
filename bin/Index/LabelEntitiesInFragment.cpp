@@ -366,10 +366,9 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
     return false;
   }
 
-  auto raw_entity = RawEntity(entity);
-
   // Figure out if this token is in a sub-range of tokens belonging to a
   // nested fragment.
+  auto raw_entity = RawEntity(entity);
   if (fragment.token_to_nested_fragment.count(raw_entity)) {
     return false;
   }
@@ -381,11 +380,6 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
 
   CHECK(em.token_tree_ids.emplace(raw_entity, id).second);
 
-  std::optional<pasta::Token> pt = entity.DerivedLocation();
-  if (!pt) {
-    return true;
-  }
-
   // NOTE(pag): We may see the same token come up multiple times, especially
   //            if this is purely printed tokens, rather than parsed tokens
   //            aligned with printed tokens. A good example is that the
@@ -393,7 +387,9 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
   //            each attribute in its own `__attribute__` block, whereas in
   //            the pasrsed source code, multiple attributes may belong to the
   //            same syntactical block.
-  em.token_tree_ids.emplace(RawEntity(pt.value()), id);
+  if (auto pt = entity.DerivedLocation()) {
+    em.token_tree_ids.emplace(RawEntity(pt.value()), id);
+  }
 
   return true;
 }

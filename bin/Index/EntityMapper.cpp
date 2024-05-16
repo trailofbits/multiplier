@@ -171,38 +171,16 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
     return mx::kInvalidEntityId;
   }
 
-  // NOTE(pag): May be part of a directive, which may be referenced by other
-  //            fragments, so we use `EntityId`, which falls back on
-  //            `PerFragmentEntityId`.
-  auto eid = EntityId(RawEntity(entity));
+  auto eid = PerFragmentEntityId(RawEntity(entity));
   if (eid != mx::kInvalidEntityId) {
     return eid;
   }
 
-  // We shouldn't get parsed tokens here, though when serializing types or
-  // freestanding fragments, i.e. where we've pulled out a forward declaration
-  // embedded in a declarator, then we might get here. Generally, this suggests
-  // a bug in PASTA, where we've used `PrintedTokenRange::Create(decl)`, and
-  // then there is some method, e.g. `decl.Location()` that should correspond
-  // to one of the `PrintedToken::DerivedLocation()`s return values, but
-  // doesn't. This means that PASTA's internal pretty printers aren't
-  // sufficiently marking locations/provenenance info. A good way to diagnose
-  // this is to check if `PendingFragment::drop_token_provenance` is `true`, and
-  // if so, then go and print out each printed token and whether its derived
-  // location has a value (where we create the fragment). What you'll see is
-  // that `entity.Data()` here likely matches some printed token data over there
-  // that has no corresponding derived (parsed) token.
-  if (IsParsedToken(entity)) {
-
-    // NOTE(pag): Is it technically common to observe these types of issues
-    //            when serializing things like namespaces, which are semi-
-    //            internalized into fragments.
-    if (auto ft = entity.FileLocation()) {
-      return EntityId(ft.value());
-    }
-
-    // assert(false);
-    return mx::kInvalidEntityId;
+  // NOTE(pag): Is it technically common to observe these types of issues
+  //            when serializing things like namespaces, which are semi-
+  //            internalized into fragments.
+  if (auto ft = entity.FileLocation()) {
+    return EntityId(ft.value());
   }
 
   return mx::kInvalidEntityId;
