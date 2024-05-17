@@ -188,7 +188,8 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
                                  const void *raw_token,
                                  std::string_view token_data,
                                  pasta::TokenKind token_kind,
-                                 bool is_identifier) {
+                                 bool is_identifier,
+                                 int depth) {
 
   auto check_token = [=] (const pasta::Token &et) {
     if (raw_token) {
@@ -273,7 +274,7 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
 
     // Failing this, try to match on `base` in `base->member` or `base.member`.
     return VisitStmt(em, me->Base(), raw_token, token_data, token_kind,
-                     is_identifier);
+                     is_identifier, depth);
 
   // Something like `__c11_atomic_load(...)` of an `_Atomic`-qualified variable.
   } else if (auto atomic = pasta::AtomicExpr::From(stmt)) {
@@ -281,8 +282,8 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
       if (token_data == atomic->BuiltinToken().Data()) {
         return raw_stmt;
       }
-    } else if (token_kind == pasta::TokenKind::kRParenthesis ||
-               token_kind == pasta::TokenKind::kLParenthesis) {
+    } else if (!depth && (token_kind == pasta::TokenKind::kRParenthesis ||
+                          token_kind == pasta::TokenKind::kLParenthesis)) {
       auto r_paren = atomic->RParenToken();
       if (r_paren.Kind() == pasta::TokenKind::kRParenthesis) {
         if (check_token(r_paren)) {
@@ -359,7 +360,11 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
     if (token_kind != pasta::TokenKind::kLParenthesis &&
         token_kind != pasta::TokenKind::kRParenthesis) {
       return VisitStmt(em, call->Callee(), raw_token, token_data, token_kind,
-                       is_identifier);
+                       is_identifier, depth);
+    }
+
+    if (depth) {
+      return mx::kInvalidEntityId;
     }
 
     // Try to match the `)` in `func()`.
@@ -390,19 +395,25 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
     if (is_identifier) {
       return VisitType(em, fce->TypeAsWritten(), token_data, 0u);
 
-    } else if (token_kind == pasta::TokenKind::kLParenthesis) {
-      if (check_token(fce->LParenToken())) {
-        return raw_stmt;
-      }
-    } else if (token_kind == pasta::TokenKind::kRParenthesis) {
-      if (check_token(fce->RParenToken())) {
-        return raw_stmt;
+    } else if (!depth) {
+      if (token_kind == pasta::TokenKind::kLParenthesis) {
+        if (check_token(fce->LParenToken())) {
+          return raw_stmt;
+        }
+      } else if (token_kind == pasta::TokenKind::kRParenthesis) {
+        if (check_token(fce->RParenToken())) {
+          return raw_stmt;
+        }
       }
     }
 
   } else if (auto ece = pasta::ExplicitCastExpr::From(stmt)) {
     if (token_kind != pasta::TokenKind::kLParenthesis &&
         token_kind != pasta::TokenKind::kRParenthesis) {
+      return mx::kInvalidEntityId;
+    }
+
+    if (!depth) {
       return mx::kInvalidEntityId;
     }
 
@@ -423,24 +434,28 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
 
   // Parentheses.
   } else if (auto paren = pasta::ParenExpr::From(stmt)) {
-    if (token_kind == pasta::TokenKind::kLParenthesis) {
-      if (check_token(paren->BeginToken())) {
-        return raw_stmt;
-      }
-    } else if (token_kind == pasta::TokenKind::kRParenthesis) {
-      if (check_token(paren->EndToken())) {
-        return raw_stmt;
+    if (!depth) {
+      if (token_kind == pasta::TokenKind::kLParenthesis) {
+        if (check_token(paren->BeginToken())) {
+          return raw_stmt;
+        }
+      } else if (token_kind == pasta::TokenKind::kRParenthesis) {
+        if (check_token(paren->EndToken())) {
+          return raw_stmt;
+        }
       }
     }
 
   } else if (auto sexpr = pasta::StmtExpr::From(stmt)) {
-    if (token_kind == pasta::TokenKind::kLParenthesis) {
-      if (check_token(sexpr->LParenToken())) {
-        return raw_stmt;
-      }
-    } else if (token_kind == pasta::TokenKind::kRParenthesis) {
-      if (check_token(sexpr->RParenToken())) {
-        return raw_stmt;
+    if (!depth) {
+      if (token_kind == pasta::TokenKind::kLParenthesis) {
+        if (check_token(sexpr->LParenToken())) {
+          return raw_stmt;
+        }
+      } else if (token_kind == pasta::TokenKind::kRParenthesis) {
+        if (check_token(sexpr->RParenToken())) {
+          return raw_stmt;
+        }
       }
     }
 
@@ -448,14 +463,16 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
 
   // Braces.
   } else if (auto comp = pasta::CompoundStmt::From(stmt)) {
-    if (token_kind == pasta::TokenKind::kLBrace) {
-      if (check_token(comp->LeftBraceToken())) {
-        return raw_stmt;
-      }
+    if (!depth) {
+      if (token_kind == pasta::TokenKind::kLBrace) {
+        if (check_token(comp->LeftBraceToken())) {
+          return raw_stmt;
+        }
 
-    } else if (token_kind == pasta::TokenKind::kRBrace) {
-      if (check_token(comp->RightBraceToken())) {
-        return raw_stmt;
+      } else if (token_kind == pasta::TokenKind::kRBrace) {
+        if (check_token(comp->RightBraceToken())) {
+          return raw_stmt;
+        }
       }
     }
 
@@ -464,13 +481,13 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
 
   // Binary operator.
   } else if (auto binary = pasta::BinaryOperator::From(stmt)) {
-    if (check_token(binary->OperatorToken())) {
+    if (!depth && check_token(binary->OperatorToken())) {
       return raw_stmt;
     }
 
   // Unary operator.
   } else if (auto unary = pasta::UnaryOperator::From(stmt)) {
-    if (check_token(unary->OperatorToken())) {
+    if (!depth && check_token(unary->OperatorToken())) {
       return raw_stmt;
     }
   }
@@ -1144,7 +1161,7 @@ mx::RawEntityId RelatedEntityIdToPrintedToken(
             }
           } else {
             auto eid = VisitStmt(em, stmt.value(), self, token_data, tk,
-                                 is_identifier);
+                                 is_identifier, depth);
             if (eid != mx::kInvalidEntityId) {
               return eid;
             }
