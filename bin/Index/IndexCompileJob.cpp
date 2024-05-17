@@ -2047,36 +2047,9 @@ std::vector<EntityRange> FragmentCollector::SortEntities(void) {
   std::vector<EntityRange> entity_ranges = FindTLMs();
 
   for (OrderedDecl &ordered_entry : FindTLDs()) {
-    pasta::Decl decl = std::move(ordered_entry.decl);
-
-    // This suggests either:
-    //
-    //    1) Something giant is being indexed. This can happen for good reasons,
-    //       e.g. a file embedded as a byte array (e.g. Qt resource files,
-    //       cryptographic lookup tables, etc.), or heavy use of the X-Macro
-    //       pattern (e.g. V8's Maglev code generator), etc.
-    //
-    //    2) A bug in PASTA related to computing the bounds of something, and
-    //       drastically over-estimating it, causing a possible knock-on effect
-    //       of one or more such (in)correctly bounded overlapping and being
-    //       grouped into the same set of top-level decls.
-    //
-    // Both cases are potentially worth investigating. For example, in the
-    // embedded file example (e.g. Qt resource files), those really ought to be
-    // excluded from indexing as they provide little value from a human auditing
-    // perspective, and just slow the indexing process. If it turns out not to
-    // be a "normal bad" case, then it might be a bug, and that should be fixed.
-    LOG_ERROR_OR_WARNING_IF(decl.Tokens().Size() >= mx::kNumTokensInBigFragment)
-        << "Likely performance problem"
-        << PrefixedLocation(decl, " at or near ")
-        << " on main job file " << main_file_path
-        << " with " << decl.KindName() << " with " << decl.Tokens().Size()
-        << " parsed tokens";
-
-
     AddDeclToEntityRangeList(tok_range, eof_index_to_include, bof_to_eof,
                              dir_index_to_next_dir, main_file_path, 
-                             std::move(decl), ordered_entry.parent,
+                             std::move(ordered_entry.decl), ordered_entry.parent,
                              entity_ranges);
   }
 
@@ -2532,6 +2505,30 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
     } else {
       decls_to_print.emplace_back(decl);
     }
+
+    // This suggests either:
+    //
+    //    1) Something giant is being indexed. This can happen for good reasons,
+    //       e.g. a file embedded as a byte array (e.g. Qt resource files,
+    //       cryptographic lookup tables, etc.), or heavy use of the X-Macro
+    //       pattern (e.g. V8's Maglev code generator), etc.
+    //
+    //    2) A bug in PASTA related to computing the bounds of something, and
+    //       drastically over-estimating it, causing a possible knock-on effect
+    //       of one or more such (in)correctly bounded overlapping and being
+    //       grouped into the same set of top-level decls.
+    //
+    // Both cases are potentially worth investigating. For example, in the
+    // embedded file example (e.g. Qt resource files), those really ought to be
+    // excluded from indexing as they provide little value from a human auditing
+    // perspective, and just slow the indexing process. If it turns out not to
+    // be a "normal bad" case, then it might be a bug, and that should be fixed.
+    LOG_ERROR_OR_WARNING_IF(decl.Tokens().Size() >= mx::kNumTokensInBigFragment)
+        << "Likely performance problem"
+        << PrefixedLocation(decl, " at or near ")
+        << " on main job file " << main_file_path
+        << " with " << decl.KindName() << " with " << decl.Tokens().Size()
+        << " parsed tokens";
   }
 
   // We've hoisted the decls embedded in declarators out into their own
