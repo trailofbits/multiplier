@@ -208,5 +208,10 @@
     "file": "AbslInlineData.cpp",
     "command": "/usr/bin/c++ -std=c++20 AbslInlineData.cpp",
     "directory": ""
+},
+{
+    "file": "LambdaInConstructorInClassInFunction.cpp",
+    "command": "/usr/bin/c++ -std=c++20 LambdaInConstructorInClassInFunction.cpp",
+    "directory": ""
 }
 ]

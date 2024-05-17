@@ -533,6 +533,23 @@ class TLDFinder final : public pasta::DeclVisitor {
             ScheduleAccept(meth.Parent(), meth);
           }
           continue;
+
+        // Lambda in a method in a plain old class. The method isn't a top-
+        // level declaration, so ascend until we hit something top-level.
+        } else if (pasta::CXXMethodDecl::From(parent)) {
+          while (!em.IsTopLevel(parent) && !IsLambda(parent)) {
+            auto parent_dc = parent.LexicalDeclarationContext();
+            if (!parent_dc) {
+              break;
+            }
+
+            auto parent_decl = pasta::Decl::From(parent_dc.value());
+            if (!parent_decl) {
+              break;
+            }
+
+            parent = std::move(parent_decl.value());
+          }
         }
 
       } else if (auto parent_class = pasta::CXXRecordDecl::From(parent)) {
@@ -544,9 +561,11 @@ class TLDFinder final : public pasta::DeclVisitor {
           if (seen.emplace(RawEntity(parent)).second) {
             CHECK(!em.IsTopLevel(parent));
             AddDeclAlways(parent);
+
           } else {
             em.MarkAsTopLevel(parent);
           }
+
           continue;
         }
       }
