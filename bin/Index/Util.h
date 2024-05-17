@@ -216,6 +216,30 @@ bool IsInjectedForwardDeclaration(const pasta::Decl &decl);
 // Should a declaration be hidden from the indexer?
 bool ShouldHideFromIndexer(const pasta::Decl &decl);
 
+inline static bool ShouldHideFromIndexer(const pasta::Stmt &) {
+  return false;
+}
+
+inline static bool ShouldHideFromIndexer(const pasta::TemplateArgument &) {
+  return false;
+}
+
+inline static bool ShouldHideFromIndexer(const pasta::TemplateParameterList &) {
+  return false;
+}
+
+inline static bool ShouldHideFromIndexer(const pasta::CXXBaseSpecifier &) {
+  return false;
+}
+
+inline static bool ShouldHideFromIndexer(const pasta::Designator &) {
+  return false;
+}
+
+inline static bool ShouldHideFromIndexer(const pasta::CXXCtorInitializer &) {
+  return false;
+}
+
 // Does `decl` look like a lambda?
 bool IsLambda(const pasta::Decl &decl);
 
@@ -233,11 +257,6 @@ std::vector<pasta::Decl> DeclarationsInDeclContext(const pasta::DeclContext &dc)
 // Get the instantiation pattern.
 std::optional<pasta::FunctionDecl> TemplateInstantiationPattern(
     const pasta::FunctionDecl &decl);
-
-template <typename T>
-inline static bool ShouldHideFromIndexer(const T &) {
-  return false;
-}
 
 // Return an opaque pointer to the underlying representation of a given entity.
 // This uniquely identifies the entity.

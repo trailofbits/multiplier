@@ -37,6 +37,8 @@
 #include "TypeMapper.h"
 #include "Util.h"
 
+#include "../../lib/Types.h"
+
 namespace indexer {
 namespace {
 
@@ -270,6 +272,7 @@ class TLDFinder final : public pasta::DeclVisitor {
   unsigned depth{0u};
 
   void AddDeclAlways(const pasta::Decl &decl) {
+    DCHECK(!ShouldHideFromIndexer(decl));
     DCHECK(seen.count(RawEntity(decl)));
 
     if (parent_decl) {
@@ -387,7 +390,7 @@ class TLDFinder final : public pasta::DeclVisitor {
         case pasta::DeclKind::kFunctionTemplate: {
           const auto &func = reinterpret_cast<const pasta::FunctionTemplateDecl &>(
               decl);
-          VisitSpecializations(func);
+          VisitSpecializations(func, ShouldHideFromIndexer(func));
           break;
         }
         case pasta::DeclKind::kVarTemplate: {
@@ -780,13 +783,13 @@ class TLDFinder final : public pasta::DeclVisitor {
     VisitDeclaratorDecl(decl);
   }
 
-  void VisitSpecializations(const pasta::FunctionTemplateDecl &decl) {
+  void VisitSpecializations(const pasta::FunctionTemplateDecl &decl,
+                            bool should_hide) {
     if (!seen_templates.emplace(RawOriginalCanonicalDecl(decl)).second) {
       return;
     }
 
     // Deduction guides.
-    auto should_hide = ShouldHideFromIndexer(decl.TemplatedDeclaration());
     auto specs = ExpandSpecializations(decl.Specializations());
 
     for (pasta::FunctionDecl &spec : specs) {
@@ -815,13 +818,14 @@ class TLDFinder final : public pasta::DeclVisitor {
       return;
     }
 
-    auto pattern = decl.TemplatedDeclaration();
-    auto should_hide = ShouldHideFromIndexer(pattern);  // Deduction guides.
-    if (!should_hide) {
-      AddDeclAlways(decl);
-    }
+    // NOTE(pag): Hide deduction guides.
+    if (ShouldHideFromIndexer(decl)) {
+      VisitSpecializations(decl, true);
 
-    VisitSpecializations(decl);
+    } else {
+      AddDeclAlways(decl);
+      VisitSpecializations(decl, false);
+    }
   }
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
@@ -2037,10 +2041,19 @@ std::vector<EntityRange> FragmentCollector::SortEntities(void) {
   std::vector<EntityRange> entity_ranges = FindTLMs();
 
   for (OrderedDecl &ordered_entry : FindTLDs()) {
+    pasta::Decl decl = std::move(ordered_entry.decl);
+
+    DLOG_IF(ERROR, decl.Tokens().Size() >= mx::kNumTokensInBigFragment)
+        << "Likely performance problem"
+        << PrefixedLocation(decl, " at or near ")
+        << " on main job file " << main_file_path
+        << " with " << decl.KindName() << " with " << decl.Tokens().Size()
+        << " parsed tokens";
+
     AddDeclToEntityRangeList(tok_range, eof_index_to_include, bof_to_eof,
                              dir_index_to_next_dir, main_file_path, 
-                             std::move(ordered_entry.decl),
-                             ordered_entry.parent, entity_ranges);
+                             std::move(decl), ordered_entry.parent,
+                             entity_ranges);
   }
 
   // It's possible that we have two-or-more things that appear to be top-level
@@ -3229,6 +3242,9 @@ void IndexCompileJobAction::Run(void) {
         << "Skipping redundant AST for main source file " << main_file_path;
     return;
   }
+
+  LOG(ERROR)
+      << "Running compile job: " << job.Arguments().Join();
 
   FragmentCollector fb(context, ast, compiler, job, tu_id, em);
   fb.PersistParsedFragments();
