@@ -39,6 +39,12 @@
 
 #include "../../lib/Types.h"
 
+#ifndef NDEBUG
+# define LOG_ERROR_OR_WARNING_IF(...) DLOG_IF(ERROR, __VA_ARGS__)
+#else
+# define LOG_ERROR_OR_WARNING_IF(...) LOG_IF(WARNING, __VA_ARGS__)
+#endif
+
 namespace indexer {
 namespace {
 
@@ -2043,12 +2049,30 @@ std::vector<EntityRange> FragmentCollector::SortEntities(void) {
   for (OrderedDecl &ordered_entry : FindTLDs()) {
     pasta::Decl decl = std::move(ordered_entry.decl);
 
-    DLOG_IF(ERROR, decl.Tokens().Size() >= mx::kNumTokensInBigFragment)
+    // This suggests either:
+    //
+    //    1) Something giant is being indexed. This can happen for good reasons,
+    //       e.g. a file embedded as a byte array (e.g. Qt resource files,
+    //       cryptographic lookup tables, etc.), or heavy use of the X-Macro
+    //       pattern (e.g. V8's Maglev code generator), etc.
+    //
+    //    2) A bug in PASTA related to computing the bounds of something, and
+    //       drastically over-estimating it, causing a possible knock-on effect
+    //       of one or more such (in)correctly bounded overlapping and being
+    //       grouped into the same set of top-level decls.
+    //
+    // Both cases are potentially worth investigating. For example, in the
+    // embedded file example (e.g. Qt resource files), those really ought to be
+    // excluded from indexing as they provide little value from a human auditing
+    // perspective, and just slow the indexing process. If it turns out not to
+    // be a "normal bad" case, then it might be a bug, and that should be fixed.
+    LOG_ERROR_OR_WARNING_IF(decl.Tokens().Size() >= mx::kNumTokensInBigFragment)
         << "Likely performance problem"
         << PrefixedLocation(decl, " at or near ")
         << " on main job file " << main_file_path
         << " with " << decl.KindName() << " with " << decl.Tokens().Size()
         << " parsed tokens";
+
 
     AddDeclToEntityRangeList(tok_range, eof_index_to_include, bof_to_eof,
                              dir_index_to_next_dir, main_file_path, 
@@ -2520,7 +2544,7 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
     decls_to_print = decls;
   }
 
-  LOG_IF(ERROR, decls_to_print.size() > 100u)
+  LOG_ERROR_OR_WARNING_IF(decls_to_print.size() > 100u)
       << "Likely performance problem on main job file "
       << main_file_path << " with " << decls_to_print.front().KindName()
       << PrefixedLocation(decls_to_print.front(), " at or near ")
