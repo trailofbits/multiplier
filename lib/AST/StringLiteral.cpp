@@ -215,7 +215,7 @@ std::string_view StringLiteral::bytes(void) const {
 }
 
 StringLiteralKind StringLiteral::literal_kind(void) const {
-  return static_cast<StringLiteralKind>(impl->reader.getVal91());
+  return static_cast<StringLiteralKind>(impl->reader.getVal89());
 }
 
 std::optional<std::string_view> StringLiteral::string(void) const {
@@ -229,15 +229,15 @@ std::optional<std::string_view> StringLiteral::string(void) const {
 }
 
 bool StringLiteral::is_ordinary(void) const {
-  return impl->reader.getVal89();
-}
-
-bool StringLiteral::is_pascal(void) const {
   return impl->reader.getVal90();
 }
 
-bool StringLiteral::is_utf16(void) const {
+bool StringLiteral::is_pascal(void) const {
   return impl->reader.getVal92();
+}
+
+bool StringLiteral::is_utf16(void) const {
+  return impl->reader.getVal93();
 }
 
 bool StringLiteral::is_utf32(void) const {

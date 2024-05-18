@@ -201,9 +201,17 @@ Token CXXPseudoDestructorExpr::colon_colon_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
-Type CXXPseudoDestructorExpr::destroyed_type(void) const {
-  RawEntityId eid = impl->reader.getVal39();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
+std::optional<Type> CXXPseudoDestructorExpr::destroyed_type(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal39();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 Token CXXPseudoDestructorExpr::destroyed_type_token(void) const {

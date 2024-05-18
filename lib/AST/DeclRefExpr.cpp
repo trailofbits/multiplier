@@ -9,7 +9,6 @@
 #include <multiplier/AST/DeclRefExpr.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Expr.h>
-#include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueDecl.h>
@@ -198,21 +197,16 @@ ValueDecl DeclRefExpr::declaration(void) const {
   return ValueDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
-NamedDecl DeclRefExpr::found_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal38();
-  return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
-}
-
 Token DeclRefExpr::l_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token DeclRefExpr::r_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token DeclRefExpr::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 bool DeclRefExpr::had_multiple_candidates(void) const {
@@ -227,28 +221,20 @@ bool DeclRefExpr::has_qualifier(void) const {
   return impl->reader.getVal86();
 }
 
-bool DeclRefExpr::has_template_keyword_and_arguments_info(void) const {
+bool DeclRefExpr::is_captured_by_copy_in_lambda_with_explicit_object_parameter(void) const {
   return impl->reader.getVal87();
 }
 
-bool DeclRefExpr::has_template_keyword(void) const {
+bool DeclRefExpr::is_immediate_escalating(void) const {
   return impl->reader.getVal88();
 }
 
-bool DeclRefExpr::is_captured_by_copy_in_lambda_with_explicit_object_parameter(void) const {
-  return impl->reader.getVal89();
-}
-
-bool DeclRefExpr::is_immediate_escalating(void) const {
-  return impl->reader.getVal90();
-}
-
 NonOdrUseReason DeclRefExpr::is_non_odr_use(void) const {
-  return static_cast<NonOdrUseReason>(impl->reader.getVal91());
+  return static_cast<NonOdrUseReason>(impl->reader.getVal89());
 }
 
 bool DeclRefExpr::refers_to_enclosing_variable_or_capture(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal90();
 }
 
 #pragma GCC diagnostic pop

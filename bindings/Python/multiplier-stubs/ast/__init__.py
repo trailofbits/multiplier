@@ -44956,15 +44956,12 @@ class DependentCoawaitExpr(multiplier.ast.Expr):
 
 class DeclRefExpr(multiplier.ast.Expr):
   declaration: multiplier.ast.ValueDecl
-  found_declaration: multiplier.ast.NamedDecl
   l_angle_token: multiplier.frontend.Token
   r_angle_token: multiplier.frontend.Token
   template_keyword_token: multiplier.frontend.Token
   had_multiple_candidates: bool
   has_explicit_template_arguments: bool
   has_qualifier: bool
-  has_template_keyword_and_arguments_info: bool
-  has_template_keyword: bool
   is_captured_by_copy_in_lambda_with_explicit_object_parameter: bool
   is_immediate_escalating: bool
   is_non_odr_use: multiplier.ast.NonOdrUseReason
@@ -48198,7 +48195,7 @@ class CXXRewrittenBinaryOperator(multiplier.ast.Expr):
 class CXXPseudoDestructorExpr(multiplier.ast.Expr):
   base: multiplier.ast.Expr
   colon_colon_token: multiplier.frontend.Token
-  destroyed_type: multiplier.ast.Type
+  destroyed_type: Optional[multiplier.ast.Type]
   destroyed_type_token: multiplier.frontend.Token
   operator_token: multiplier.frontend.Token
   tilde_token: multiplier.frontend.Token

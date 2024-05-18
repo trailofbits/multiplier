@@ -18,7 +18,6 @@ class Index;
 class Decl;
 class DeclRefExpr;
 class Expr;
-class NamedDecl;
 class Stmt;
 class Token;
 class ValueDecl;
@@ -68,15 +67,12 @@ class MX_EXPORT DeclRefExpr : public Expr {
   static std::optional<DeclRefExpr> from(const TokenContext &t);
 
   ValueDecl declaration(void) const;
-  NamedDecl found_declaration(void) const;
   Token l_angle_token(void) const;
   Token r_angle_token(void) const;
   Token template_keyword_token(void) const;
   bool had_multiple_candidates(void) const;
   bool has_explicit_template_arguments(void) const;
   bool has_qualifier(void) const;
-  bool has_template_keyword_and_arguments_info(void) const;
-  bool has_template_keyword(void) const;
   bool is_captured_by_copy_in_lambda_with_explicit_object_parameter(void) const;
   bool is_immediate_escalating(void) const;
   NonOdrUseReason is_non_odr_use(void) const;

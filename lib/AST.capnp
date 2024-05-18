@@ -382,8 +382,8 @@ struct Stmt @0x91127d30fade9a32{
   val7 @17 :UInt8;
   val56 @18 :UInt8;
   val69 @19 :UInt8;
-  val91 @20 :UInt8;
-  val93 @21 :UInt8;
+  val89 @20 :UInt8;
+  val91 @21 :UInt8;
   val60 @22 :Text;
   val65 @23 :Text;
   val12 @24 :Bool;
@@ -413,9 +413,9 @@ struct Stmt @0x91127d30fade9a32{
   val86 @48 :Bool;
   val87 @49 :Bool;
   val88 @50 :Bool;
-  val89 @51 :Bool;
-  val90 @52 :Bool;
-  val92 @53 :Bool;
+  val90 @51 :Bool;
+  val92 @52 :Bool;
+  val93 @53 :Bool;
   val94 @54 :Bool;
   val95 @55 :Bool;
   val96 @56 :Bool;

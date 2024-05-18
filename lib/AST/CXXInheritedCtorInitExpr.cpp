@@ -197,7 +197,7 @@ bool CXXInheritedCtorInitExpr::constructs_virtual_base(void) const {
 }
 
 CXXConstructionKind CXXInheritedCtorInitExpr::construction_kind(void) const {
-  return static_cast<CXXConstructionKind>(impl->reader.getVal91());
+  return static_cast<CXXConstructionKind>(impl->reader.getVal89());
 }
 
 CXXConstructorDecl CXXInheritedCtorInitExpr::constructor(void) const {

@@ -305,18 +305,18 @@ bool InitListExpr::is_semantic_form(void) const {
 }
 
 bool InitListExpr::is_string_literal_initializer(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal90();
 }
 
 bool InitListExpr::is_syntactic_form(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal92();
 }
 
 std::optional<bool> InitListExpr::is_transparent(void) const {
   if (!impl->reader.getVal94()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal92());
+    return static_cast<bool>(impl->reader.getVal93());
   }
   return std::nullopt;
 }

@@ -67,7 +67,7 @@ class MX_EXPORT CXXPseudoDestructorExpr : public Expr {
 
   Expr base(void) const;
   Token colon_colon_token(void) const;
-  Type destroyed_type(void) const;
+  std::optional<Type> destroyed_type(void) const;
   Token destroyed_type_token(void) const;
   Token operator_token(void) const;
   Token tilde_token(void) const;

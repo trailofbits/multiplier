@@ -239,7 +239,7 @@ gap::generator<Expr> CallExpr::arguments(void) const & {
 }
 
 CallExprADLCallKind CallExpr::adl_call_kind(void) const {
-  return static_cast<CallExprADLCallKind>(impl->reader.getVal91());
+  return static_cast<CallExprADLCallKind>(impl->reader.getVal89());
 }
 
 Type CallExpr::call_return_type(void) const {
@@ -303,7 +303,7 @@ bool CallExpr::is_unevaluated_builtin_call(void) const {
 }
 
 bool CallExpr::uses_adl(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal90();
 }
 
 #pragma GCC diagnostic pop

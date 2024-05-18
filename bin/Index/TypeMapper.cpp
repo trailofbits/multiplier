@@ -73,7 +73,7 @@ clang::Type *BasicTypeDeduplication(
     EntityList<const clang::Stmt *> *list) {
 
   if (!type) {
-    return nullptr;
+    return const_cast<clang::Type *>(ctx.UnresolvedTy.getTypePtr());
   }
 
   // Early exit: we're not interested in finding nested statements, so replace
