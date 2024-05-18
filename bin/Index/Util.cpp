@@ -123,6 +123,23 @@ bool IsParsedTokenExcludingWhitespaceAndComments(const pasta::Token &tok) {
 
 namespace {
 
+static bool TryFixupMissedInjectedClassName(const clang::Decl *decl_) {
+  auto decl = const_cast<clang::Decl *>(decl_);
+  if (decl->RemappedDecl != decl ||
+      decl->getKind() != clang::Decl::Kind::CXXRecord) {
+    return false;
+  }
+
+  auto record = reinterpret_cast<clang::CXXRecordDecl *>(decl);
+  if (!record->isInjectedClassName()) {
+    return false;
+  }
+
+  record->RemappedDecl = clang::Decl::castFromDeclContext(
+      record->getDeclContext());
+  return true;
+}
+
 // Compute the last token of a macro.
 static std::optional<pasta::MacroToken> EndTokenOfRange(pasta::MacroRange range,
                                                         const void *parent) {
@@ -1219,7 +1236,8 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
   // is kind of an "empty shell" for another declaration, then we want to
   // hide this declaration and forward to the other one.
   auto raw_decl = decl.RawDecl();
-  if (raw_decl->RemappedDecl != raw_decl) {
+  if (raw_decl->RemappedDecl != raw_decl ||
+      TryFixupMissedInjectedClassName(raw_decl)) {
     return true;
   }
 
@@ -1238,15 +1256,47 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
 std::vector<pasta::Decl> DeclarationsInDeclContext(
     const pasta::DeclContext &dc) {
 
+  std::vector<pasta::Decl> decls_list;
+  auto decls_gen = GenerateDeclarationsInDeclContext(dc);
+  for (auto &decl : decls_gen) {
+    decls_list.emplace_back(std::move(decl));
+  }
+
+  return decls_list;
+}
+
+// Generate the indexable declarations in this declcontext.
+gap::generator<pasta::Decl> GenerateDeclarationsInDeclContext(
+    pasta::DeclContext dc) {
+
   auto dc_decl = pasta::Decl::From(dc);
-  auto decls = dc.AlreadyLoadedDeclarations();
-  auto it = std::remove_if(decls.begin(), decls.end(),
-                           [&] (const pasta::Decl &d) {
-                             return ShouldHideFromIndexer(d) ||
-                                    d == dc_decl;
-                           });
-  decls.erase(it, decls.end());
-  return decls;
+  if (!dc_decl) {
+    co_return;
+  }
+
+  auto ast = pasta::AST::From(dc_decl.value());
+  auto raw_dc_decl = dc_decl->RawDecl();
+  auto decls = dc.RawDeclContext()->noload_decls();
+
+  for (auto decl : decls) {
+    if (!decl || decl->isInvalidDecl() || decl == raw_dc_decl) {
+      continue;
+    }
+
+    if (auto record = clang::dyn_cast<clang::RecordDecl>(decl)) {
+      if (record->isInjectedClassName()) {
+        assert(record->RemappedDecl != record);
+        continue;
+      }
+    }
+
+    auto adopted = ast.Adopt(decl);
+    if (adopted == dc_decl.value() || ShouldHideFromIndexer(adopted)) {
+      continue;
+    }
+
+    co_yield std::move(adopted);
+  }
 }
 
 // Return the root macro containing `node`.
@@ -1491,8 +1541,13 @@ OriginalDeclsInDeclContext(pasta::DeclContext dc) {
 
   decltype(auto) val = raw_dc->noload_decls();
   for (auto raw_decl : val) {
-    if (!raw_decl || raw_decl->isInvalidDecl() || raw_decl == raw_dc_decl ||
-        raw_decl->RemappedDecl == raw_dc_decl) {
+    if (!raw_decl || raw_decl->isInvalidDecl() || raw_decl == raw_dc_decl) {
+      continue;
+    }
+
+    (void) TryFixupMissedInjectedClassName(raw_decl);
+
+    if (raw_decl->RemappedDecl == raw_dc_decl) {
       continue;
     }
 

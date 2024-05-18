@@ -98,7 +98,6 @@ unsigned TokenContextSaver::CollectContextsFromTokens(void) {
 
       FOR_EACH_ENTITY_CATEGORY(ADD_ENTITY_TO_CONTEXT)
 #undef ADD_ENTITY_TO_CONTEXT
-  
     }
   }
   return num_tokens;

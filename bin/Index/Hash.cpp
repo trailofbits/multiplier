@@ -194,10 +194,9 @@ class HashVisitor final : public pasta::DeclVisitor {
       return;
     }
 
-    for (const pasta::Decl &decl : dc->AlreadyLoadedDeclarations()) {
-      if (dc_decl != decl) {
-        Accept(decl);
-      }
+    auto decls = GenerateDeclarationsInDeclContext(dc.value());
+    for (const pasta::Decl &decl : decls) {
+      Accept(decl);
     }
   }
 

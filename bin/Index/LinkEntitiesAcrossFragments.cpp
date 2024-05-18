@@ -62,7 +62,12 @@ void LinkLexicalDeclContext(
     return;
   }
 
-  auto parent_eid = em.EntityId(pasta::Decl::From(dc.value()));
+  auto dc_decl = pasta::Decl::From(dc.value());
+  if (!dc_decl) {
+    return;
+  }
+
+  auto parent_eid = em.EntityId(dc_decl);
   if (parent_eid == mx::kInvalidEntityId) {
     return;
   }
@@ -71,6 +76,8 @@ void LinkLexicalDeclContext(
     assert(false);
     return;
   }
+
+  assert(decl.CanonicalDeclaration() != dc_decl->CanonicalDeclaration());
 
   mx::ReferenceRecord record{parent_eid, child_eid, parent_eid,
                              mx::BuiltinReferenceKind::CONTAINS};

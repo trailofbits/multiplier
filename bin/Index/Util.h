@@ -15,6 +15,7 @@
 #include <multiplier/Iterator.h>
 #include <multiplier/Types.h>
 #include <optional>
+#include <pasta/AST/Decl.h>  // For DeclContext.
 #include <pasta/Util/File.h>
 #include <string>
 #include <string_view>
@@ -253,6 +254,9 @@ std::string Name(const pasta::NamedDecl &decl);
 
 // List the indexable declarations in this declcontext.
 std::vector<pasta::Decl> DeclarationsInDeclContext(const pasta::DeclContext &dc);
+
+gap::generator<pasta::Decl> GenerateDeclarationsInDeclContext(
+    pasta::DeclContext dc);
 
 // Get the instantiation pattern.
 std::optional<pasta::FunctionDecl> TemplateInstantiationPattern(

@@ -209,7 +209,6 @@ class BuildCommandAction final : public Action {
   std::shared_ptr<pasta::FileSystem> fs;
   const Command &command;
   GlobalIndexingState &ctx;
-  const bool cxx_support;
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc);
 
@@ -221,13 +220,11 @@ class BuildCommandAction final : public Action {
   virtual ~BuildCommandAction(void) = default;
 
   inline BuildCommandAction(pasta::FileManager &fm_, const Command &command_,
-                            GlobalIndexingState &ctx_,
-                            bool cxx_support_)
+                            GlobalIndexingState &ctx_)
       : fm(fm_),
         fs(fm.FileSystem()),
         command(command_),
-        ctx(ctx_),
-        cxx_support(cxx_support_) {}
+        ctx(ctx_) {}
 
   void Run(void) final;
 };
@@ -247,7 +244,7 @@ BuildCommandAction::GetCompilerInfo(void) {
     std::string_view arg(arg_);
 
     // Try to detect C++ code.
-    if (!specifies_language && cxx_support) {
+    if (!specifies_language) {
       if (arg.find("++") != std::string_view::npos) {
         inferred_lang = "c++";
 
@@ -488,7 +485,7 @@ bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) const {
     }
 
     if (arg == "c" || arg == "c-header" ||
-        (cxx_support && (arg == "c++" || arg == "c++-header"))) {
+        arg == "c++" || arg == "c++-header") {
 
     } else {
       LOG(ERROR) << "Skipping compile job due to unsupported language "
@@ -883,7 +880,7 @@ namespace {
 static std::mutex gImportLock;
 }  // namespace
 
-void Importer::Import(const ExecutorOptions &options, bool cxx_support) {
+void Importer::Import(const ExecutorOptions &options) {
   Executor per_path_exe(options);
 
   for (auto &[cwd, commands] : d->commands) {
@@ -904,8 +901,7 @@ void Importer::Import(const ExecutorOptions &options, bool cxx_support) {
     }
 
     for (const Command &cmd : commands) {
-      per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, cmd, d->ctx,
-                                                     cxx_support);
+      per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, cmd, d->ctx);
     }
 
     per_path_exe.Start();

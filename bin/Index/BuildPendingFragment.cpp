@@ -558,7 +558,13 @@ void BuildPendingFragment(const pasta::AST &ast, PendingFragment &pf) {
       // such a fragment, then exclude it from here.
       auto eid = mx::EntityId(em.EntityId(context.Data())).Unpack();
       if (std::holds_alternative<mx::InvalidId>(eid)) {
-        // Do nothing.
+
+        // We want to be able to syntax highlight namespaces.
+        if (auto decl = pasta::Decl::From(context)) {
+          if (ShouldInternalizeDeclContextIntoFragment(decl.value())) {
+            builder.MaybeVisitNext(decl.value());
+          }
+        }
 
       } else if (std::holds_alternative<mx::DeclId>(eid) &&
                  std::get<mx::DeclId>(eid).fragment_id != pf.fragment_index) {

@@ -438,12 +438,8 @@ class TLDFinder final : public pasta::DeclVisitor {
       save_restore.emplace(parent_decl, RawEntity(dc_decl));
     }
 
-    auto decls = OriginalDeclsInDeclContext(dc);
-    for (const auto &decl : dc.AlreadyLoadedDeclarations()) {
-      if (decl == dc_decl) {
-        continue;
-      }
-
+    auto decls = GenerateDeclarationsInDeclContext(dc);
+    for (const auto &decl : decls) {
       Accept(decl);
 
       if (parent_decl && !em.IsTopLevel(decl)) {

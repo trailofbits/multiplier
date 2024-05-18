@@ -18,10 +18,9 @@ void EntityVisitor::VisitDeclContext(const pasta::Decl &dc_decl) {
     return;
   }
 
-  for (const pasta::Decl &decl : dc->AlreadyLoadedDeclarations()) {
-    if (decl != dc_decl) {
-      Accept(decl);
-    }
+  auto decls = GenerateDeclarationsInDeclContext(dc.value());
+  for (const pasta::Decl &decl : decls) {
+    Accept(decl);
   }
 }
 
@@ -416,11 +415,8 @@ bool EntityVisitor::EnterRecordDecl(const pasta::RecordDecl &decl) {
   if (EnterTagDecl(decl)) {
     if (decl.IsThisDeclarationADefinition()) {
       pasta::DeclContext dc(decl);
-      for (const auto &nested_decl : dc.AlreadyLoadedDeclarations()) {
-        if (nested_decl == decl) {
-          continue;
-        }
-
+      auto decls = GenerateDeclarationsInDeclContext(dc);
+      for (const auto &nested_decl : decls) {
         if (!nested_decl.IsOutOfLine()) {
           Accept(nested_decl);
         }
@@ -434,7 +430,6 @@ bool EntityVisitor::EnterRecordDecl(const pasta::RecordDecl &decl) {
 
 bool EntityVisitor::EnterCXXRecordDecl(const pasta::CXXRecordDecl &decl) {
   if (EnterRecordDecl(decl)) {
-    
     if (auto bases = decl.Bases()) {
       for (pasta::CXXBaseSpecifier spec : *bases) {
         Accept(spec);
