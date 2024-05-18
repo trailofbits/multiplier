@@ -3287,8 +3287,8 @@ void IndexCompileJobAction::Run(void) {
     return;
   }
 
-  LOG(ERROR)
-      << "Running compile job: " << job.Arguments().Join();
+  // LOG(ERROR)
+  //     << "Running compile job: " << job.Arguments().Join();
 
   FragmentCollector fb(context, ast, compiler, job, tu_id, em);
   fb.PersistParsedFragments();
