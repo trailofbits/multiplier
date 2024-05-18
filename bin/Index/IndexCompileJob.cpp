@@ -550,6 +550,10 @@ class TLDFinder final : public pasta::DeclVisitor {
 
             parent = std::move(parent_decl.value());
           }
+          
+          if (em.IsTopLevel(parent)) {
+            continue;
+          }
         }
 
       } else if (auto parent_class = pasta::CXXRecordDecl::From(parent)) {
