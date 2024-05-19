@@ -1283,12 +1283,8 @@ gap::generator<pasta::Decl> GenerateDeclarationsInDeclContext(
       continue;
     }
 
-    if (ShouldHideFromIndexer(decl)) {
-      continue;
-    }
-
     auto adopted = ast.Adopt(decl);
-    if (adopted == dc_decl.value()) {
+    if (adopted == dc_decl.value() || ShouldHideFromIndexer(adopted)) {
       continue;
     }
 
