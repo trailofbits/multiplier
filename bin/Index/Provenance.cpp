@@ -242,6 +242,12 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
       }
     }
 
+  // `this`.
+  } else if (auto this_ = pasta::CXXThisExpr::From(stmt)) {
+    if (token_kind == pasta::TokenKind::kKeywordThis || token_data == "this") {
+      return raw_stmt;
+    }
+
   // Try to match on `member` in `base->member` or `base.member`.
   } else if (auto me = pasta::MemberExpr::From(stmt)) {
     if (token_kind == pasta::TokenKind::kPeriod ||
@@ -431,65 +437,58 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
         return raw_stmt;
       }
     }
-
-  // Parentheses.
-  } else if (auto paren = pasta::ParenExpr::From(stmt)) {
-    if (!depth) {
-      if (token_kind == pasta::TokenKind::kLParenthesis) {
-        if (check_token(paren->BeginToken())) {
-          return raw_stmt;
-        }
-      } else if (token_kind == pasta::TokenKind::kRParenthesis) {
-        if (check_token(paren->EndToken())) {
-          return raw_stmt;
-        }
-      }
-    }
-
-  } else if (auto sexpr = pasta::StmtExpr::From(stmt)) {
-    if (!depth) {
-      if (token_kind == pasta::TokenKind::kLParenthesis) {
-        if (check_token(sexpr->LParenToken())) {
-          return raw_stmt;
-        }
-      } else if (token_kind == pasta::TokenKind::kRParenthesis) {
-        if (check_token(sexpr->RParenToken())) {
-          return raw_stmt;
-        }
-      }
-    }
+  }
 
   // TODO(pag): CoroutineBodyStmt.
-
-  // Braces.
-  } else if (auto comp = pasta::CompoundStmt::From(stmt)) {
-    if (!depth) {
-      if (token_kind == pasta::TokenKind::kLBrace) {
-        if (check_token(comp->LeftBraceToken())) {
-          return raw_stmt;
-        }
-
-      } else if (token_kind == pasta::TokenKind::kRBrace) {
-        if (check_token(comp->RightBraceToken())) {
-          return raw_stmt;
-        }
-      }
-    }
 
   // // Declaration statement, which might have an assignment.
   // } else if (auto dstmt = pasta::DeclStmt::From(stmt)) {
 
-  // Binary operator.
-  } else if (auto binary = pasta::BinaryOperator::From(stmt)) {
-    if (!depth && check_token(binary->OperatorToken())) {
-      return raw_stmt;
-    }
+  if (depth) {
+    return mx::kInvalidEntityId;
+  }
 
-  // Unary operator.
-  } else if (auto unary = pasta::UnaryOperator::From(stmt)) {
-    if (!depth && check_token(unary->OperatorToken())) {
-      return raw_stmt;
-    }
+  switch (stmt.Kind()) {
+
+    // Binary operator.
+    case pasta::StmtKind::kBinaryOperator:
+      if (check_token(reinterpret_cast<const pasta::BinaryOperator &>(stmt).OperatorToken())) {
+        return raw_stmt;
+      }
+      break;
+
+    // Unary operator.
+    case pasta::StmtKind::kUnaryOperator:
+      if (check_token(reinterpret_cast<const pasta::UnaryOperator &>(stmt).OperatorToken())) {
+        return raw_stmt;
+      }
+      break;
+    case pasta::StmtKind::kSwitchStmt:
+      if (token_kind == pasta::TokenKind::kLBrace ||
+          token_kind == pasta::TokenKind::kRBrace) {
+        return raw_stmt;
+      }
+      [[fallthrough]];
+    case pasta::StmtKind::kStmtExpr:
+    case pasta::StmtKind::kParenExpr:
+    case pasta::StmtKind::kIfStmt:
+    case pasta::StmtKind::kWhileStmt:
+    case pasta::StmtKind::kDoStmt:
+    case pasta::StmtKind::kForStmt:
+    case pasta::StmtKind::kCXXCatchStmt:
+      if (token_kind == pasta::TokenKind::kLParenthesis ||
+          token_kind == pasta::TokenKind::kLParenthesis) {
+        return raw_stmt;
+      }
+      break;
+    case pasta::StmtKind::kCompoundStmt:
+      if (token_kind == pasta::TokenKind::kLBrace ||
+          token_kind == pasta::TokenKind::kRBrace) {
+        return raw_stmt;
+      }
+      break;
+    default:
+      break;
   }
 
   return mx::kInvalidEntityId;
