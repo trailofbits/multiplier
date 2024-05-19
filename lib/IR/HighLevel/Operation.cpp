@@ -254,11 +254,6 @@ std::optional<AlignOfExprOp> AlignOfExprOp::producing(const ::mx::ir::Value &tha
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region AlignOfExprOp::expr(void) const {
-  auto &val = underlying_repr().getExpr();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<AlignOfTypeOp> AlignOfTypeOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_ALIGNOF_TYPE) {
     return reinterpret_cast<const AlignOfTypeOp &>(that);
@@ -540,16 +535,6 @@ std::optional<BinLAndOp> BinLAndOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region BinLAndOp::lhs(void) const {
-  auto &val = underlying_repr().getLhs();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region BinLAndOp::rhs(void) const {
-  auto &val = underlying_repr().getRhs();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<BinLOrOp> BinLOrOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_BIN_LOR) {
     return reinterpret_cast<const BinLOrOp &>(that);
@@ -571,16 +556,6 @@ std::optional<BinLOrOp> BinLOrOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value BinLOrOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-::mx::ir::Region BinLOrOp::lhs(void) const {
-  auto &val = underlying_repr().getLhs();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region BinLOrOp::rhs(void) const {
-  auto &val = underlying_repr().getRhs();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<BinLShrAssignOp> BinLShrAssignOp::from(const ::mx::ir::Operation &that) {
@@ -948,16 +923,6 @@ std::optional<ClassDeclOp> ClassDeclOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::ClassDeclOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region ClassDeclOp::bases(void) const {
-  auto &val = underlying_repr().getBases();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region ClassDeclOp::fields(void) const {
-  auto &val = underlying_repr().getFields();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::string_view ClassDeclOp::name(void) const {
   auto val = underlying_repr().getName();
   if (auto size = val.size()) {
@@ -1062,16 +1027,6 @@ std::optional<CxxStructDeclOp> CxxStructDeclOp::producing(const ::mx::ir::Value 
 
 ::vast::hl::CxxStructDeclOp CxxStructDeclOp::underlying_repr(void) const noexcept {
   return ::vast::hl::CxxStructDeclOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region CxxStructDeclOp::bases(void) const {
-  auto &val = underlying_repr().getBases();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region CxxStructDeclOp::fields(void) const {
-  auto &val = underlying_repr().getFields();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::string_view CxxStructDeclOp::name(void) const {
@@ -1355,11 +1310,6 @@ std::optional<EnumConstantOp> EnumConstantOp::producing(const ::mx::ir::Value &t
   return ::vast::hl::EnumConstantOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region EnumConstantOp::init(void) const {
-  auto &val = underlying_repr().getInit();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::string_view EnumConstantOp::name(void) const {
   auto val = underlying_repr().getName();
   if (auto size = val.size()) {
@@ -1387,11 +1337,6 @@ std::optional<EnumDeclOp> EnumDeclOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::EnumDeclOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region EnumDeclOp::constants(void) const {
-  auto &val = underlying_repr().getConstants();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::string_view EnumDeclOp::name(void) const {
   auto val = underlying_repr().getName();
   if (auto size = val.size()) {
@@ -1399,6 +1344,11 @@ std::string_view EnumDeclOp::name(void) const {
   } else {
     return {};
   }
+}
+
+bool EnumDeclOp::is_complete(void) const {
+  auto val = underlying_repr().isComplete();
+  return val;
 }
 
 std::optional<EnumRefOp> EnumRefOp::from(const ::mx::ir::Operation &that) {
@@ -1454,11 +1404,6 @@ std::optional<ExprOp> ExprOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value ExprOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-::mx::ir::Region ExprOp::subexpr(void) const {
-  auto &val = underlying_repr().getSubexpr();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<ExtensionOp> ExtensionOp::from(const ::mx::ir::Operation &that) {
@@ -1649,16 +1594,6 @@ std::optional<CaseOp> CaseOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::CaseOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region CaseOp::lhs(void) const {
-  auto &val = underlying_repr().getLhs();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region CaseOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<CondOp> CondOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_COND) {
     return reinterpret_cast<const CondOp &>(that);
@@ -1680,21 +1615,6 @@ std::optional<CondOp> CondOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value CondOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-::mx::ir::Region CondOp::cond_region(void) const {
-  auto &val = underlying_repr().getCondRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region CondOp::then_region(void) const {
-  auto &val = underlying_repr().getThenRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region CondOp::else_region(void) const {
-  auto &val = underlying_repr().getElseRegion();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<CondYieldOp> CondYieldOp::from(const ::mx::ir::Operation &that) {
@@ -1756,11 +1676,6 @@ std::optional<DefaultOp> DefaultOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::DefaultOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region DefaultOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<DoOp> DoOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_DO) {
     return reinterpret_cast<const DoOp &>(that);
@@ -1777,16 +1692,6 @@ std::optional<DoOp> DoOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::hl::DoOp DoOp::underlying_repr(void) const noexcept {
   return ::vast::hl::DoOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region DoOp::body_region(void) const {
-  auto &val = underlying_repr().getBodyRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region DoOp::cond_region(void) const {
-  auto &val = underlying_repr().getCondRegion();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<EmptyDeclOp> EmptyDeclOp::from(const ::mx::ir::Operation &that) {
@@ -1825,21 +1730,6 @@ std::optional<ForOp> ForOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::ForOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region ForOp::cond_region(void) const {
-  auto &val = underlying_repr().getCondRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region ForOp::incr_region(void) const {
-  auto &val = underlying_repr().getIncrRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region ForOp::body_region(void) const {
-  auto &val = underlying_repr().getBodyRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<FuncOp> FuncOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_FUNC) {
     return reinterpret_cast<const FuncOp &>(that);
@@ -1856,11 +1746,6 @@ std::optional<FuncOp> FuncOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::hl::FuncOp FuncOp::underlying_repr(void) const noexcept {
   return ::vast::hl::FuncOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region FuncOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::string_view FuncOp::sym_name(void) const {
@@ -1918,21 +1803,6 @@ std::optional<IfOp> IfOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::IfOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region IfOp::cond_region(void) const {
-  auto &val = underlying_repr().getCondRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region IfOp::then_region(void) const {
-  auto &val = underlying_repr().getThenRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region IfOp::else_region(void) const {
-  auto &val = underlying_repr().getElseRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
 bool IfOp::has_else(void) const {
   auto val = underlying_repr().hasElse();
   return val;
@@ -1983,11 +1853,6 @@ std::optional<LabelStmtOp> LabelStmtOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::LabelStmt(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region LabelStmtOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<SkipStmtOp> SkipStmtOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_SKIP) {
     return reinterpret_cast<const SkipStmtOp &>(that);
@@ -2022,11 +1887,6 @@ std::optional<SwitchOp> SwitchOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::hl::SwitchOp SwitchOp::underlying_repr(void) const noexcept {
   return ::vast::hl::SwitchOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region SwitchOp::cond_region(void) const {
-  auto &val = underlying_repr().getCondRegion();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<TypeYieldOp> TypeYieldOp::from(const ::mx::ir::Operation &that) {
@@ -2096,16 +1956,6 @@ std::optional<VarDeclOp> VarDeclOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value VarDeclOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-::mx::ir::Region VarDeclOp::initializer(void) const {
-  auto &val = underlying_repr().getInitializer();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region VarDeclOp::allocation_size(void) const {
-  auto &val = underlying_repr().getAllocationSize();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::string_view VarDeclOp::name(void) const {
@@ -2183,16 +2033,6 @@ std::optional<WhileOp> WhileOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::hl::WhileOp WhileOp::underlying_repr(void) const noexcept {
   return ::vast::hl::WhileOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region WhileOp::cond_region(void) const {
-  auto &val = underlying_repr().getCondRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region WhileOp::body_region(void) const {
-  auto &val = underlying_repr().getBodyRegion();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<ImplicitCastOp> ImplicitCastOp::from(const ::mx::ir::Operation &that) {
@@ -2924,11 +2764,6 @@ std::optional<SizeOfExprOp> SizeOfExprOp::producing(const ::mx::ir::Value &that)
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region SizeOfExprOp::expr(void) const {
-  auto &val = underlying_repr().getExpr();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<SizeOfTypeOp> SizeOfTypeOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_SIZEOF_TYPE) {
     return reinterpret_cast<const SizeOfTypeOp &>(that);
@@ -2975,11 +2810,6 @@ std::optional<StmtExprOp> StmtExprOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region StmtExprOp::substmt(void) const {
-  auto &val = underlying_repr().getSubstmt();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<StructDeclOp> StructDeclOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_STRUCT) {
     return reinterpret_cast<const StructDeclOp &>(that);
@@ -2998,11 +2828,6 @@ std::optional<StructDeclOp> StructDeclOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::StructDeclOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region StructDeclOp::fields(void) const {
-  auto &val = underlying_repr().getFields();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::string_view StructDeclOp::name(void) const {
   auto val = underlying_repr().getName();
   if (auto size = val.size()) {
@@ -3010,6 +2835,11 @@ std::string_view StructDeclOp::name(void) const {
   } else {
     return {};
   }
+}
+
+bool StructDeclOp::is_complete_definition(void) const {
+  auto val = underlying_repr().isCompleteDefinition();
+  return val;
 }
 
 std::optional<SubFAssignOp> SubFAssignOp::from(const ::mx::ir::Operation &that) {
@@ -3218,11 +3048,6 @@ std::optional<TranslationUnitOp> TranslationUnitOp::producing(const ::mx::ir::Va
   return ::vast::hl::TranslationUnitOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region TranslationUnitOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<TypeDeclOp> TypeDeclOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_TYPE) {
     return reinterpret_cast<const TypeDeclOp &>(that);
@@ -3295,11 +3120,6 @@ std::optional<TypeOfExprOp> TypeOfExprOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::TypeOfExprOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region TypeOfExprOp::expr(void) const {
-  auto &val = underlying_repr().getExpr();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::string_view TypeOfExprOp::name(void) const {
   auto val = underlying_repr().getName();
   if (auto size = val.size()) {
@@ -3307,24 +3127,6 @@ std::string_view TypeOfExprOp::name(void) const {
   } else {
     return {};
   }
-}
-
-std::optional<TypeOfTypeOp> TypeOfTypeOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_TYPEOF_TYPE) {
-    return reinterpret_cast<const TypeOfTypeOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<TypeOfTypeOp> TypeOfTypeOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::TypeOfTypeOp TypeOfTypeOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::TypeOfTypeOp(this->::mx::ir::Operation::op_);
 }
 
 std::optional<UnionDeclOp> UnionDeclOp::from(const ::mx::ir::Operation &that) {
@@ -3345,11 +3147,6 @@ std::optional<UnionDeclOp> UnionDeclOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::UnionDeclOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region UnionDeclOp::fields(void) const {
-  auto &val = underlying_repr().getFields();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::string_view UnionDeclOp::name(void) const {
   auto val = underlying_repr().getName();
   if (auto size = val.size()) {
@@ -3357,6 +3154,11 @@ std::string_view UnionDeclOp::name(void) const {
   } else {
     return {};
   }
+}
+
+bool UnionDeclOp::is_complete_definition(void) const {
+  auto val = underlying_repr().isCompleteDefinition();
+  return val;
 }
 
 std::optional<UnreachableOp> UnreachableOp::from(const ::mx::ir::Operation &that) {

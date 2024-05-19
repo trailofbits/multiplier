@@ -37,8 +37,8 @@ class MX_EXPORT ArrayType final : public Type {
 
   // Imported methods:
   //Type element_type(void) const;
-  //unsignedint num_elements(void) const;
-  //::std::optional<DenseMap<Attribute,Type,DenseMapInfo<Attribute,void>,DenseMapPair<Attribute,Type>>> subelement_index_map(void) const;
+  unsigned int num_elements(void) const;
+  //::std::optional<DenseMap<Attribute, Type, DenseMapInfo<Attribute, void>, DenseMapPair<Attribute, Type>>> subelement_index_map(void) const;
 };
 static_assert(sizeof(ArrayType) == sizeof(Type));
 
@@ -54,7 +54,7 @@ class MX_EXPORT FunctionType final : public Type {
   // Imported methods:
   bool is_var_arg(void) const;
   //ArrayRef<Type> return_types(void) const;
-  //unsignedint num_params(void) const;
+  unsigned int num_params(void) const;
   //Type return_type(void) const;
   //::llvm::ArrayRef<Type> params(void) const;
   bool var_arg(void) const;
@@ -71,7 +71,7 @@ class MX_EXPORT PointerType final : public Type {
   ::mlir::LLVM::LLVMPointerType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //unsignedint address_space(void) const;
+  unsigned int address_space(void) const;
 };
 static_assert(sizeof(PointerType) == sizeof(Type));
 
@@ -86,7 +86,7 @@ class MX_EXPORT FixedVectorType final : public Type {
 
   // Imported methods:
   //Type element_type(void) const;
-  //unsignedint num_elements(void) const;
+  unsigned int num_elements(void) const;
 };
 static_assert(sizeof(FixedVectorType) == sizeof(Type));
 
@@ -101,7 +101,7 @@ class MX_EXPORT ScalableVectorType final : public Type {
 
   // Imported methods:
   //Type element_type(void) const;
-  //unsignedint min_num_elements(void) const;
+  unsigned int min_num_elements(void) const;
 };
 static_assert(sizeof(ScalableVectorType) == sizeof(Type));
 
@@ -118,7 +118,7 @@ class MX_EXPORT TargetExtType final : public Type {
   bool supports_mem_ops(void) const;
   std::string_view ext_type_name(void) const;
   //::llvm::ArrayRef<Type> type_params(void) const;
-  //::llvm::ArrayRef<unsignedint> int_params(void) const;
+  //::llvm::ArrayRef<unsigned int> int_params(void) const;
 };
 static_assert(sizeof(TargetExtType) == sizeof(Type));
 

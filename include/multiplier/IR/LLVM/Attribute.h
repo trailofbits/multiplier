@@ -324,8 +324,8 @@ class MX_EXPORT DIExpressionElemAttr final : public Attribute {
   ::mlir::LLVM::DIExpressionElemAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //unsignedint opcode(void) const;
-  //::llvm::ArrayRef<unsignedlonglong> arguments(void) const;
+  unsigned int opcode(void) const;
+  //::llvm::ArrayRef<unsigned long long> arguments(void) const;
 };
 static_assert(sizeof(DIExpressionElemAttr) == sizeof(Attribute));
 
@@ -369,10 +369,10 @@ class MX_EXPORT DIBasicTypeAttr final : public Attribute {
   ::mlir::LLVM::DIBasicTypeAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //unsignedint tag(void) const;
+  unsigned int tag(void) const;
   //StringAttr name(void) const;
   uint64_t size_in_bits(void) const;
-  //unsignedint encoding(void) const;
+  unsigned int encoding(void) const;
 };
 static_assert(sizeof(DIBasicTypeAttr) == sizeof(Attribute));
 
@@ -388,7 +388,7 @@ class MX_EXPORT DICompileUnitAttr final : public Attribute {
 
   // Imported methods:
   //DistinctAttr id(void) const;
-  //unsignedint source_language(void) const;
+  unsigned int source_language(void) const;
   //DIFileAttr file(void) const;
   //StringAttr producer(void) const;
   bool is_optimized(void) const;
@@ -407,7 +407,7 @@ class MX_EXPORT DICompositeTypeAttr final : public Attribute {
   ::mlir::LLVM::DICompositeTypeAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //unsignedint tag(void) const;
+  unsigned int tag(void) const;
   //StringAttr name(void) const;
   //DIFileAttr file(void) const;
   uint32_t line(void) const;
@@ -431,7 +431,7 @@ class MX_EXPORT DIDerivedTypeAttr final : public Attribute {
   ::mlir::LLVM::DIDerivedTypeAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //unsignedint tag(void) const;
+  unsigned int tag(void) const;
   //StringAttr name(void) const;
   //DITypeAttr base_type(void) const;
   uint64_t size_in_bits(void) const;
@@ -487,11 +487,11 @@ class MX_EXPORT DIGlobalVariableAttr final : public Attribute {
   //StringAttr name(void) const;
   //StringAttr linkage_name(void) const;
   //DIFileAttr file(void) const;
-  //unsignedint line(void) const;
+  unsigned int line(void) const;
   //DITypeAttr type(void) const;
   bool is_local_to_unit(void) const;
   bool is_defined(void) const;
-  //unsignedint align_in_bits(void) const;
+  unsigned int align_in_bits(void) const;
 };
 static_assert(sizeof(DIGlobalVariableAttr) == sizeof(Attribute));
 
@@ -508,8 +508,8 @@ class MX_EXPORT DILexicalBlockAttr final : public Attribute {
   // Imported methods:
   //DIScopeAttr scope(void) const;
   //DIFileAttr file(void) const;
-  //unsignedint line(void) const;
-  //unsignedint column(void) const;
+  unsigned int line(void) const;
+  unsigned int column(void) const;
 };
 static_assert(sizeof(DILexicalBlockAttr) == sizeof(Attribute));
 
@@ -526,7 +526,7 @@ class MX_EXPORT DILexicalBlockFileAttr final : public Attribute {
   // Imported methods:
   //DIScopeAttr scope(void) const;
   //DIFileAttr file(void) const;
-  //unsignedint discriminator(void) const;
+  unsigned int discriminator(void) const;
 };
 static_assert(sizeof(DILexicalBlockFileAttr) == sizeof(Attribute));
 
@@ -544,9 +544,9 @@ class MX_EXPORT DILocalVariableAttr final : public Attribute {
   //DIScopeAttr scope(void) const;
   //StringAttr name(void) const;
   //DIFileAttr file(void) const;
-  //unsignedint line(void) const;
-  //unsignedint arg(void) const;
-  //unsignedint align_in_bits(void) const;
+  unsigned int line(void) const;
+  unsigned int arg(void) const;
+  unsigned int align_in_bits(void) const;
   //DITypeAttr type(void) const;
 };
 static_assert(sizeof(DILocalVariableAttr) == sizeof(Attribute));
@@ -568,8 +568,8 @@ class MX_EXPORT DISubprogramAttr final : public Attribute {
   //StringAttr name(void) const;
   //StringAttr linkage_name(void) const;
   //DIFileAttr file(void) const;
-  //unsignedint line(void) const;
-  //unsignedint scope_line(void) const;
+  unsigned int line(void) const;
+  unsigned int scope_line(void) const;
   //DISubprogramFlags subprogram_flags(void) const;
   //DISubroutineTypeAttr type(void) const;
 };
@@ -592,7 +592,7 @@ class MX_EXPORT DIModuleAttr final : public Attribute {
   //StringAttr config_macros(void) const;
   //StringAttr include_path(void) const;
   //StringAttr apinotes(void) const;
-  //unsignedint line(void) const;
+  unsigned int line(void) const;
   bool is_decl(void) const;
 };
 static_assert(sizeof(DIModuleAttr) == sizeof(Attribute));
@@ -643,7 +643,7 @@ class MX_EXPORT DISubroutineTypeAttr final : public Attribute {
   ::mlir::LLVM::DISubroutineTypeAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //unsignedint calling_convention(void) const;
+  unsigned int calling_convention(void) const;
   //::llvm::ArrayRef<DITypeAttr> types(void) const;
 };
 static_assert(sizeof(DISubroutineTypeAttr) == sizeof(Attribute));
@@ -662,7 +662,7 @@ class MX_EXPORT DILabelAttr final : public Attribute {
   //DIScopeAttr scope(void) const;
   //StringAttr name(void) const;
   //DIFileAttr file(void) const;
-  //unsignedint line(void) const;
+  unsigned int line(void) const;
 };
 static_assert(sizeof(DILabelAttr) == sizeof(Attribute));
 

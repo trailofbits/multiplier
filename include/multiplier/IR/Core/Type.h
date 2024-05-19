@@ -32,8 +32,8 @@ class MX_EXPORT FunctionType final : public Type {
 
   // Imported methods:
   bool is_var_arg(void) const;
-  //unsignedint num_inputs(void) const;
-  //unsignedint num_results(void) const;
+  unsigned int num_inputs(void) const;
+  unsigned int num_results(void) const;
   //::llvm::ArrayRef<Type> inputs(void) const;
   //::llvm::ArrayRef<Type> results(void) const;
   bool var_arg(void) const;

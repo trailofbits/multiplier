@@ -58,8 +58,8 @@ class MX_EXPORT ShapedType final : public Type {
   // Imported methods:
   //::mlir::Type element_type(void) const;
   bool has_rank(void) const;
-  //::llvm::ArrayRef<longlong> shape(void) const;
-  //unsignedint element_type_bit_width(void) const;
+  //::llvm::ArrayRef<long long> shape(void) const;
+  unsigned int element_type_bit_width(void) const;
   int64_t rank(void) const;
   int64_t num_elements(void) const;
   bool has_static_shape(void) const;
@@ -77,9 +77,9 @@ class MX_EXPORT FloatType final : public Type {
   ::mlir::FloatType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //unsignedint width(void) const;
-  //unsignedint fp_mantissa_width(void) const;
-  //constllvm::fltSemantics& float_semantics(void) const;
+  unsigned int width(void) const;
+  unsigned int fp_mantissa_width(void) const;
+  //const llvm::fltSemantics & float_semantics(void) const;
 };
 static_assert(sizeof(FloatType) == sizeof(Type));
 
@@ -263,8 +263,8 @@ class MX_EXPORT FunctionType final : public Type {
   ::mlir::FunctionType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //unsignedint num_inputs(void) const;
-  //unsignedint num_results(void) const;
+  unsigned int num_inputs(void) const;
+  unsigned int num_results(void) const;
   //ArrayRef<Type> inputs(void) const;
   //ArrayRef<Type> results(void) const;
 };
@@ -296,7 +296,7 @@ class MX_EXPORT IntegerType final : public Type {
   bool is_signless(void) const;
   bool is_signed(void) const;
   bool is_unsigned(void) const;
-  //unsignedint width(void) const;
+  unsigned int width(void) const;
   //SignednessSemantics signedness(void) const;
 };
 static_assert(sizeof(IntegerType) == sizeof(Type));
@@ -311,8 +311,8 @@ class MX_EXPORT MemRefType final : public Type {
   ::mlir::MemRefType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //unsignedint memory_space_as_int(void) const;
-  //::llvm::ArrayRef<longlong> shape(void) const;
+  unsigned int memory_space_as_int(void) const;
+  //::llvm::ArrayRef<long long> shape(void) const;
   //Type element_type(void) const;
   //MemRefLayoutAttrInterface layout(void) const;
   //Attribute memory_space(void) const;
@@ -357,7 +357,7 @@ class MX_EXPORT RankedTensorType final : public Type {
   ::mlir::RankedTensorType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::llvm::ArrayRef<longlong> shape(void) const;
+  //::llvm::ArrayRef<long long> shape(void) const;
   //Type element_type(void) const;
   //Attribute encoding(void) const;
 };
@@ -390,8 +390,8 @@ class MX_EXPORT UnrankedMemRefType final : public Type {
   ::mlir::UnrankedMemRefType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //ArrayRef<longlong> shape(void) const;
-  //unsignedint memory_space_as_int(void) const;
+  //ArrayRef<long long> shape(void) const;
+  unsigned int memory_space_as_int(void) const;
   //Type element_type(void) const;
   //Attribute memory_space(void) const;
 };
@@ -407,7 +407,7 @@ class MX_EXPORT UnrankedTensorType final : public Type {
   ::mlir::UnrankedTensorType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //ArrayRef<longlong> shape(void) const;
+  //ArrayRef<long long> shape(void) const;
   //Type element_type(void) const;
 };
 static_assert(sizeof(UnrankedTensorType) == sizeof(Type));
@@ -425,7 +425,7 @@ class MX_EXPORT VectorType final : public Type {
   bool is_scalable(void) const;
   bool all_dims_scalable(void) const;
   bool has_rank(void) const;
-  //::llvm::ArrayRef<longlong> shape(void) const;
+  //::llvm::ArrayRef<long long> shape(void) const;
   //Type element_type(void) const;
   //::llvm::ArrayRef<bool> scalable_dims(void) const;
 };

@@ -200,6 +200,11 @@ std::optional<BuiltinAttr> BuiltinAttr::from(const ::mx::ir::Attribute &that) {
   return ::vast::hl::BuiltinAttr(this->::mx::ir::Attribute::attr_);
 }
 
+unsigned int BuiltinAttr::id(void) const {
+  auto val = underlying_repr().getID();
+  return val;
+}
+
 std::optional<AllocAlignAttr> AllocAlignAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::HL_ALLOC_ALIGN) {
     return reinterpret_cast<const AllocAlignAttr &>(that);

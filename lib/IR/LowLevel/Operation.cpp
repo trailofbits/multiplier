@@ -242,11 +242,6 @@ std::optional<InlineScopeOp> InlineScopeOp::producing(const ::mx::ir::Value &tha
   return ::vast::ll::InlineScope(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region InlineScopeOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<LoadOp> LoadOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LL_LOAD) {
     return reinterpret_cast<const LoadOp &>(that);
@@ -286,11 +281,6 @@ std::optional<FuncOp> FuncOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::ll::FuncOp FuncOp::underlying_repr(void) const noexcept {
   return ::vast::ll::FuncOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region FuncOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::string_view FuncOp::sym_name(void) const {
@@ -388,11 +378,6 @@ std::optional<ScopeOp> ScopeOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::ll::Scope ScopeOp::underlying_repr(void) const noexcept {
   return ::vast::ll::Scope(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region ScopeOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<ScopeRecurseOp> ScopeRecurseOp::from(const ::mx::ir::Operation &that) {

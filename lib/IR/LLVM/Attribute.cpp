@@ -183,6 +183,11 @@ std::optional<DIExpressionElemAttr> DIExpressionElemAttr::from(const ::mx::ir::A
   return ::mlir::LLVM::DIExpressionElemAttr(this->::mx::ir::Attribute::attr_);
 }
 
+unsigned int DIExpressionElemAttr::opcode(void) const {
+  auto val = underlying_repr().getOpcode();
+  return val;
+}
+
 std::optional<DIExpressionAttr> DIExpressionAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::LLVM_DI_EXPRESSION) {
     return reinterpret_cast<const DIExpressionAttr &>(that);
@@ -216,8 +221,18 @@ std::optional<DIBasicTypeAttr> DIBasicTypeAttr::from(const ::mx::ir::Attribute &
   return ::mlir::LLVM::DIBasicTypeAttr(this->::mx::ir::Attribute::attr_);
 }
 
+unsigned int DIBasicTypeAttr::tag(void) const {
+  auto val = underlying_repr().getTag();
+  return val;
+}
+
 uint64_t DIBasicTypeAttr::size_in_bits(void) const {
   auto val = underlying_repr().getSizeInBits();
+  return val;
+}
+
+unsigned int DIBasicTypeAttr::encoding(void) const {
+  auto val = underlying_repr().getEncoding();
   return val;
 }
 
@@ -230,6 +245,11 @@ std::optional<DICompileUnitAttr> DICompileUnitAttr::from(const ::mx::ir::Attribu
 
 ::mlir::LLVM::DICompileUnitAttr DICompileUnitAttr::underlying_repr(void) const noexcept {
   return ::mlir::LLVM::DICompileUnitAttr(this->::mx::ir::Attribute::attr_);
+}
+
+unsigned int DICompileUnitAttr::source_language(void) const {
+  auto val = underlying_repr().getSourceLanguage();
+  return val;
 }
 
 bool DICompileUnitAttr::is_optimized(void) const {
@@ -246,6 +266,11 @@ std::optional<DICompositeTypeAttr> DICompositeTypeAttr::from(const ::mx::ir::Att
 
 ::mlir::LLVM::DICompositeTypeAttr DICompositeTypeAttr::underlying_repr(void) const noexcept {
   return ::mlir::LLVM::DICompositeTypeAttr(this->::mx::ir::Attribute::attr_);
+}
+
+unsigned int DICompositeTypeAttr::tag(void) const {
+  auto val = underlying_repr().getTag();
+  return val;
 }
 
 uint32_t DICompositeTypeAttr::line(void) const {
@@ -272,6 +297,11 @@ std::optional<DIDerivedTypeAttr> DIDerivedTypeAttr::from(const ::mx::ir::Attribu
 
 ::mlir::LLVM::DIDerivedTypeAttr DIDerivedTypeAttr::underlying_repr(void) const noexcept {
   return ::mlir::LLVM::DIDerivedTypeAttr(this->::mx::ir::Attribute::attr_);
+}
+
+unsigned int DIDerivedTypeAttr::tag(void) const {
+  auto val = underlying_repr().getTag();
+  return val;
 }
 
 uint64_t DIDerivedTypeAttr::size_in_bits(void) const {
@@ -322,6 +352,11 @@ std::optional<DIGlobalVariableAttr> DIGlobalVariableAttr::from(const ::mx::ir::A
   return ::mlir::LLVM::DIGlobalVariableAttr(this->::mx::ir::Attribute::attr_);
 }
 
+unsigned int DIGlobalVariableAttr::line(void) const {
+  auto val = underlying_repr().getLine();
+  return val;
+}
+
 bool DIGlobalVariableAttr::is_local_to_unit(void) const {
   auto val = underlying_repr().getIsLocalToUnit();
   return val;
@@ -329,6 +364,11 @@ bool DIGlobalVariableAttr::is_local_to_unit(void) const {
 
 bool DIGlobalVariableAttr::is_defined(void) const {
   auto val = underlying_repr().getIsDefined();
+  return val;
+}
+
+unsigned int DIGlobalVariableAttr::align_in_bits(void) const {
+  auto val = underlying_repr().getAlignInBits();
   return val;
 }
 
@@ -343,6 +383,16 @@ std::optional<DILexicalBlockAttr> DILexicalBlockAttr::from(const ::mx::ir::Attri
   return ::mlir::LLVM::DILexicalBlockAttr(this->::mx::ir::Attribute::attr_);
 }
 
+unsigned int DILexicalBlockAttr::line(void) const {
+  auto val = underlying_repr().getLine();
+  return val;
+}
+
+unsigned int DILexicalBlockAttr::column(void) const {
+  auto val = underlying_repr().getColumn();
+  return val;
+}
+
 std::optional<DILexicalBlockFileAttr> DILexicalBlockFileAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::LLVM_DI_LEXICAL_BLOCK_FILE) {
     return reinterpret_cast<const DILexicalBlockFileAttr &>(that);
@@ -352,6 +402,11 @@ std::optional<DILexicalBlockFileAttr> DILexicalBlockFileAttr::from(const ::mx::i
 
 ::mlir::LLVM::DILexicalBlockFileAttr DILexicalBlockFileAttr::underlying_repr(void) const noexcept {
   return ::mlir::LLVM::DILexicalBlockFileAttr(this->::mx::ir::Attribute::attr_);
+}
+
+unsigned int DILexicalBlockFileAttr::discriminator(void) const {
+  auto val = underlying_repr().getDiscriminator();
+  return val;
 }
 
 std::optional<DILocalVariableAttr> DILocalVariableAttr::from(const ::mx::ir::Attribute &that) {
@@ -365,6 +420,21 @@ std::optional<DILocalVariableAttr> DILocalVariableAttr::from(const ::mx::ir::Att
   return ::mlir::LLVM::DILocalVariableAttr(this->::mx::ir::Attribute::attr_);
 }
 
+unsigned int DILocalVariableAttr::line(void) const {
+  auto val = underlying_repr().getLine();
+  return val;
+}
+
+unsigned int DILocalVariableAttr::arg(void) const {
+  auto val = underlying_repr().getArg();
+  return val;
+}
+
+unsigned int DILocalVariableAttr::align_in_bits(void) const {
+  auto val = underlying_repr().getAlignInBits();
+  return val;
+}
+
 std::optional<DISubprogramAttr> DISubprogramAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::LLVM_DI_SUBPROGRAM) {
     return reinterpret_cast<const DISubprogramAttr &>(that);
@@ -376,6 +446,16 @@ std::optional<DISubprogramAttr> DISubprogramAttr::from(const ::mx::ir::Attribute
   return ::mlir::LLVM::DISubprogramAttr(this->::mx::ir::Attribute::attr_);
 }
 
+unsigned int DISubprogramAttr::line(void) const {
+  auto val = underlying_repr().getLine();
+  return val;
+}
+
+unsigned int DISubprogramAttr::scope_line(void) const {
+  auto val = underlying_repr().getScopeLine();
+  return val;
+}
+
 std::optional<DIModuleAttr> DIModuleAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::LLVM_DI_MODULE) {
     return reinterpret_cast<const DIModuleAttr &>(that);
@@ -385,6 +465,11 @@ std::optional<DIModuleAttr> DIModuleAttr::from(const ::mx::ir::Attribute &that) 
 
 ::mlir::LLVM::DIModuleAttr DIModuleAttr::underlying_repr(void) const noexcept {
   return ::mlir::LLVM::DIModuleAttr(this->::mx::ir::Attribute::attr_);
+}
+
+unsigned int DIModuleAttr::line(void) const {
+  auto val = underlying_repr().getLine();
+  return val;
 }
 
 bool DIModuleAttr::is_decl(void) const {
@@ -430,6 +515,11 @@ std::optional<DISubroutineTypeAttr> DISubroutineTypeAttr::from(const ::mx::ir::A
   return ::mlir::LLVM::DISubroutineTypeAttr(this->::mx::ir::Attribute::attr_);
 }
 
+unsigned int DISubroutineTypeAttr::calling_convention(void) const {
+  auto val = underlying_repr().getCallingConvention();
+  return val;
+}
+
 std::optional<DILabelAttr> DILabelAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::LLVM_DI_LABEL) {
     return reinterpret_cast<const DILabelAttr &>(that);
@@ -439,6 +529,11 @@ std::optional<DILabelAttr> DILabelAttr::from(const ::mx::ir::Attribute &that) {
 
 ::mlir::LLVM::DILabelAttr DILabelAttr::underlying_repr(void) const noexcept {
   return ::mlir::LLVM::DILabelAttr(this->::mx::ir::Attribute::attr_);
+}
+
+unsigned int DILabelAttr::line(void) const {
+  auto val = underlying_repr().getLine();
+  return val;
 }
 
 std::optional<MemoryEffectsAttr> MemoryEffectsAttr::from(const ::mx::ir::Attribute &that) {
