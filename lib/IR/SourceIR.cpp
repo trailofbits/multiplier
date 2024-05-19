@@ -52,7 +52,6 @@
 #include <vast/Dialect/Meta/MetaTypes.hpp>
 #include <vast/Dialect/Unsupported/UnsupportedOps.hpp>
 #include <vast/Dialect/Unsupported/UnsupportedTypes.hpp>
-#include <vast/CodeGen/CodeGenContext.hpp>
 #include <vast/CodeGen/CodeGenBuilder.hpp>
 
 #include "../Compilation.h"

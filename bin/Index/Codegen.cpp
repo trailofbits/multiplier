@@ -25,11 +25,11 @@ VAST_UNRELAX_WARNINGS
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
 
-#include <vast/Util/Common.hpp>
-#include <vast/CodeGen/CodeGenContext.hpp>
+#include <vast/CodeGen/CodeGenBuilder.hpp>
 #include <vast/CodeGen/CodeGenVisitor.hpp>
-#include <vast/CodeGen/CodeGen.hpp>
 #include <vast/Dialect/Dialects.hpp>
+#include <vast/Frontend/Options.hpp>
+#include <vast/Util/Common.hpp>
 
 #include "CodegenMetaGenerator.h"
 #include "Context.h"
@@ -42,11 +42,11 @@ namespace indexer {
 namespace {
 
 template <typename Derived>
-struct TypeCompressingGenVisitor : vast::cg::type_visitor_with_dl< Derived > {
+struct TypeCompressingGenVisitor : vast::cg::type_visitor_base< Derived > {
  public:
 
   // The base class is logically our "next" class in the proxy pattern.
-  using Base = vast::cg::type_visitor_with_dl< Derived >;
+  using Base = vast::cg::type_visitor_base< Derived >;
 
   // Apply the `TypeMapper`s type compression, which eagerly desugars things
   // like `AutoType`, `ElaboratedType`, etc. (but isn't as aggressive when
@@ -78,51 +78,31 @@ struct TypeCompressingGenVisitor : vast::cg::type_visitor_with_dl< Derived > {
   }
 };
 
-template< typename Derived >
-struct MXDefaultCodeGenVisitor
-    : vast::cg::decl_visitor_with_attrs< Derived >
-    , vast::cg::default_stmt_visitor< Derived >
-    , TypeCompressingGenVisitor< Derived >
-    , vast::cg::default_attr_visitor< Derived >
-{
-    using DeclVisitor = vast::cg::decl_visitor_with_attrs< Derived >;
-    using StmtVisitor = vast::cg::default_stmt_visitor< Derived >;
-    using TypeVisitor = TypeCompressingGenVisitor< Derived >;
-    using AttrVisitor = vast::cg::default_attr_visitor< Derived >;
+// template< typename Derived >
+// struct MXDefaultCodeGenVisitor
+//     : vast::cg::decl_visitor_with_attrs< Derived >
+//     , vast::cg::default_stmt_visitor< Derived >
+//     , TypeCompressingGenVisitor< Derived >
+//     , vast::cg::default_attr_visitor< Derived >
+// {
+//     using DeclVisitor = vast::cg::decl_visitor_with_attrs< Derived >;
+//     using StmtVisitor = vast::cg::default_stmt_visitor< Derived >;
+//     using TypeVisitor = TypeCompressingGenVisitor< Derived >;
+//     using AttrVisitor = vast::cg::default_attr_visitor< Derived >;
 
-    using DeclVisitor::Visit;
-    using StmtVisitor::Visit;
-    using TypeVisitor::Visit;
-    using AttrVisitor::Visit;
-};
+//     using DeclVisitor::Visit;
+//     using StmtVisitor::Visit;
+//     using TypeVisitor::Visit;
+//     using AttrVisitor::Visit;
+// };
 
-template< typename Derived >
-using MXVisitorConfig = vast::cg::fallback_visitor<
-    Derived,
-    MXDefaultCodeGenVisitor,
-    vast::cg::unsup_visitor,
-    vast::cg::unreach_visitor
->;
-
-static vast::cg::source_language GetSourceLanguage(
-    const vast::cc::language_options &opts) {
-  using ClangStd = clang::LangStandard;
-
-  if (opts.CPlusPlus || opts.CPlusPlus11 || opts.CPlusPlus14 ||
-      opts.CPlusPlus17 || opts.CPlusPlus20 || opts.CPlusPlus23 ||
-      opts.CPlusPlus26) {
-    return vast::cg::source_language::CXX;
-  }
-
-  if (opts.C99 || opts.C11 || opts.C17 || opts.C23 ||
-      opts.LangStd == ClangStd::lang_c89) {
-    return vast::cg::source_language::C;
-  }
-
-  // TODO: support remaining source languages.
-  vast::vast_error() << "VAST does not yet support the given source language";
-  return vast::cg::source_language::C;
-}
+// template< typename Derived >
+// using MXVisitorConfig = vast::cg::fallback_visitor<
+//     Derived,
+//     MXDefaultCodeGenVisitor,
+//     vast::cg::unsup_visitor,
+//     vast::cg::unreach_visitor
+// >;
 
 }  // namespace
 
@@ -168,7 +148,7 @@ std::string CodeGenerator::GenerateSourceIR(
   auto &opts = actx.getLangOpts();
 
   vast::mcontext_t mctx(impl->registry);
-  vast::cg::codegen_context cgctx(mctx, actx, GetSourceLanguage(opts));
+  vast::cg::codegen_context cgctx(mctx, actx, vast::cc::get_source_language(opts));
   MetaGenerator meta(ast, mctx, em);
   vast::cg::codegen_instance<MXVisitorConfig> codegen(cgctx, meta);
   llvm::raw_string_ostream os(ret);

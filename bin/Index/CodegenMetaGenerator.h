@@ -9,10 +9,9 @@
 #include <cassert>
 
 #include <vast/Util/Common.hpp>
-#include <vast/CodeGen/CodeGen.hpp>
-#include <vast/CodeGen/CodeGenContext.hpp>
-#include <vast/CodeGen/CodeGenVisitor.hpp>
 #include <vast/CodeGen/CodeGenBuilder.hpp>
+#include <vast/CodeGen/CodeGenVisitor.hpp>
+#include <vast/CodeGen/CodeGenMeta.hpp>
 #include <vast/Dialect/Meta/MetaTypes.hpp>
 
 #include <pasta/AST/AST.h>
