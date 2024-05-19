@@ -1283,15 +1283,12 @@ gap::generator<pasta::Decl> GenerateDeclarationsInDeclContext(
       continue;
     }
 
-    if (auto record = clang::dyn_cast<clang::RecordDecl>(decl)) {
-      if (record->isInjectedClassName()) {
-        assert(record->RemappedDecl != record);
-        continue;
-      }
+    if (ShouldHideFromIndexer(decl)) {
+      continue;
     }
 
     auto adopted = ast.Adopt(decl);
-    if (adopted == dc_decl.value() || ShouldHideFromIndexer(adopted)) {
+    if (adopted == dc_decl.value()) {
       continue;
     }
 
@@ -1545,9 +1542,8 @@ OriginalDeclsInDeclContext(pasta::DeclContext dc) {
       continue;
     }
 
-    (void) TryFixupMissedInjectedClassName(raw_decl);
-
-    if (raw_decl->RemappedDecl == raw_dc_decl) {
+    if (TryFixupMissedInjectedClassName(raw_decl) ||
+        raw_decl->RemappedDecl == raw_dc_decl) {
       continue;
     }
 

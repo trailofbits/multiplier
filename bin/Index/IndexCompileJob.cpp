@@ -255,6 +255,9 @@ class TLDFinder final : public pasta::DeclVisitor {
   // a class.
   const void *parent_decl{nullptr};
 
+  // Main job file.
+  const std::string_view main_file_path;
+
   // Tracks declarations for which we've seen the specializations. This is
   // to prevent us from double-adding specializations.
   std::unordered_set<const void *> seen;
@@ -362,9 +365,11 @@ class TLDFinder final : public pasta::DeclVisitor {
  public:
   virtual ~TLDFinder(void) = default;
 
-  explicit TLDFinder(std::vector<OrderedDecl> &tlds_, EntityMapper &em_)
+  explicit TLDFinder(std::vector<OrderedDecl> &tlds_, EntityMapper &em_,
+                     std::string_view main_file_path_)
       : tlds(tlds_),
-        em(em_) {}
+        em(em_),
+        main_file_path(main_file_path_) {}
 
   void VisitDeeperDeclContext(const pasta::Decl &dc_decl,
                               const pasta::DeclContext &dc,
@@ -491,7 +496,12 @@ class TLDFinder final : public pasta::DeclVisitor {
         auto raw_child = RawEntity(child);
         seen.erase(raw_child);
         Accept(child);
-        CHECK(seen.count(raw_child));
+        CHECK(seen.count(raw_child))
+            << "Revisiting " << child.KindName()
+            << PrefixedLocation(child, " at or near ")<< " in main job file "
+            << main_file_path << " (parent is lambda="
+            << IsLambda(parent) << "; child is lambda=" << IsLambda(child) 
+            << " didn't work quite right";
         made_progress = true;
       }
 
@@ -500,7 +510,9 @@ class TLDFinder final : public pasta::DeclVisitor {
       // scenes. It's a rather tricky situation where our parent is a method
       // that has been specialized from something that has been remapped.
       if (!made_progress) {
-        CHECK(FixupRemapped());
+        CHECK(FixupRemapped())
+            << "Failed to fixup remaining remapped declarations in main job file "
+            << main_file_path;
       }
     }
 
@@ -1237,7 +1249,7 @@ void FragmentCollector::FillNextPrevConditionalMacros(void) {
 // Find all top-level declarations.
 std::vector<OrderedDecl> FragmentCollector::FindTLDs(void) {
   std::vector<OrderedDecl> tlds;
-  TLDFinder tld_finder(tlds, em);
+  TLDFinder tld_finder(tlds, em, main_file_path);
   tld_finder.VisitTranslationUnitDecl(ast.TranslationUnit());
 
   auto decl_eq = +[] (const OrderedDecl &a, const OrderedDecl &b) {

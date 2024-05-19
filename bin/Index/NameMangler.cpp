@@ -73,6 +73,7 @@ class NameManglerImpl {
   llvm::raw_string_ostream mangled_name_os;
   std::unique_ptr<clang::MangleContext> mangle_context;
   bool is_precise{false};
+  bool fail{false};
 
   explicit NameManglerImpl(clang::ASTContext &ast_context_,
                            mx::PackedCompilationId tu_id_);
@@ -111,6 +112,7 @@ const std::string &NameManglerImpl::GetMangledNameRec(
   // The clang name-magling fails for deduction guide. if the decl is
   // CXXDeductionGuideDecl then return empty.
   if (decl->getDeclKind() == clang::Decl::Kind::CXXDeductionGuide) {
+    is_precise = false;
     return mangled_name;
   }
 
@@ -118,6 +120,26 @@ const std::string &NameManglerImpl::GetMangledNameRec(
     const auto alias_name = alias_attr->getAliasee();
     mangled_name.assign(alias_name.data(), alias_name.size());
     if (!mangled_name.empty()) {
+      return mangled_name;
+    }
+  }
+
+  // If the return type is dependent or undeduced then ignore.
+  auto rt = decl->getReturnType();
+  if (rt->isDependentType() ||
+      rt->isUndeducedType() ||
+      rt->isUndeducedAutoType()) {
+    is_precise = false;
+    return mangled_name;
+  }
+
+  // If the parameter types are undeduced then ignore.
+  for (auto param : decl->parameters()) {
+    auto pt = param->getType();
+    if (pt->isDependentType() ||
+        pt->isUndeducedType() ||
+        pt->isUndeducedAutoType()) {
+      is_precise = false;
       return mangled_name;
     }
   }
@@ -196,6 +218,16 @@ const std::string &NameManglerImpl::GetMangledNameRec(
 
 const std::string &NameManglerImpl::GetMangledNameRec(
     const clang::FieldDecl *decl) {
+  
+  // If the type is dependent or undeduced then ignore.
+  auto rt = decl->getType();
+  if (rt->isDependentType() ||
+      rt->isUndeducedType() ||
+      rt->isUndeducedAutoType()) {
+    is_precise = false;
+    return mangled_name;
+  }
+
   if (!GetMangledNameImpl(decl->getParent()).empty()) {
     const auto name = decl->getName();
     if (name.empty()) {
@@ -244,7 +276,9 @@ const std::string &NameManglerImpl::GetMangledNameRec(
 
 const std::string &NameManglerImpl::GetMangledNameRec(
     const clang::ParmVarDecl *decl) {
+
   if (decl->getParentFunctionOrMethod() == nullptr) {
+    is_precise = false;
     return mangled_name;
   }
 
@@ -280,6 +314,14 @@ const std::string &NameManglerImpl::GetMangledNameRec(
 
 const std::string &NameManglerImpl::GetMangledNameRec(
     const clang::VarDecl *decl) {
+
+  auto pt = decl->getType();
+  if (pt->isDependentType() ||
+      pt->isUndeducedType() ||
+      pt->isUndeducedAutoType()) {
+    is_precise = false;
+    return mangled_name;
+  }
 
   if (auto param_decl = clang::dyn_cast<clang::ParmVarDecl>(decl)) {
     return GetMangledNameRec(param_decl);
