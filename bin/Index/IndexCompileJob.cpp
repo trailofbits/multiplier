@@ -340,7 +340,7 @@ class TLDFinder final : public pasta::DeclVisitor {
   void ScheduleAccept(const pasta::Decl &parent, pasta::Decl child) {
     // If child is implicit, we don't need to visit them. Don't add
     // them to the pending_child_decls.
-    if (child.IsImplicit()) {
+    if (child.IsImplicit() || ShouldHideFromIndexer(child)) {
       return;
     }
 
