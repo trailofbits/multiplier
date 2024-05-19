@@ -500,8 +500,10 @@ class TLDFinder final : public pasta::DeclVisitor {
             << "Revisiting " << child.KindName()
             << PrefixedLocation(child, " at or near ")<< " in main job file "
             << main_file_path << " (parent is lambda="
-            << IsLambda(parent) << "; child is lambda=" << IsLambda(child) 
-            << " didn't work quite right";
+            << IsLambda(parent) << "; child is lambda=" << IsLambda(child)
+            << "; deferred_seen=" << deferred_seen.count(raw_child)
+            << "; is_specialization=" << IsSpecialization(child)
+            << ") didn't work quite right";
         made_progress = true;
       }
 
@@ -894,11 +896,12 @@ class TLDFinder final : public pasta::DeclVisitor {
 
     // This is a function is a method
     if (IsSpecialization(decl)) {
+
       // Sometimes functions don't show up in the relevant specialization
       // lists. Another possibility is that we're a specialization of B, but
       // B has been remapped to A, and so we'll never see B or its list of
       // specializations.
-      if (IsSpecialization(decl) && !deferred_seen.count(raw_decl)) {
+      if (!deferred_seen.count(raw_decl)) {
         if (auto parent = FindSpecializationParent(decl)) {
           ScheduleAccept(parent, decl);
           return;
