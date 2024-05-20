@@ -26,6 +26,7 @@
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/SourceMgr.h>
 
+#include <mlir/Bytecode/BytecodeReader.h>
 #include <mlir/Dialect/SCF/IR/SCF.h>
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <mlir/Dialect/MemRef/IR/MemRef.h>
@@ -212,8 +213,9 @@ SourceIRImpl::SourceIRImpl(PackedCompilationId compilation_id_,
 
   mlir::MLIRContext &context = ir::kMLIR.Context();
   context.enterMultiThreadedExecution();
-  mod = mlir::parseSourceFile<mlir::ModuleOp>(sm, &context);
 
+  // NOTE(pag): This should check if it is bytecode internally.
+  mod = mlir::parseSourceFile<mlir::ModuleOp>(sm, &context);
   if (!mod) {
     context.exitMultiThreadedExecution();
     return;

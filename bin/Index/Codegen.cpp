@@ -408,6 +408,10 @@ std::string CodeGenerator::GenerateSourceIR(
   };
 
   vast::mcontext_t mlir_context(impl->registry);
+  mlir::registerAllDialects(mlir_context);
+  vast::registerAllDialects(mlir_context);
+  mlir_context.loadAllAvailableDialects();
+
   vast::cg::codegen_builder builder(&mlir_context);
 
   auto path = ast.MainFile().Path().generic_string();
@@ -415,12 +419,12 @@ std::string CodeGenerator::GenerateSourceIR(
   vast::owning_module_ref mlir_module(vast::vast_module::create(loc));
   mlir_module->setSymName(path);
 
+  builder.module = mlir_module.get();
+  builder.set_insertion_point_to_start(&(mlir_module->getBodyRegion()));
+
   vast::cg::set_target_triple(
       mlir_module, ast_context.getTargetInfo().getTriple().str());
   vast::cg::set_source_language(mlir_module, options.lang);
-
-  builder.module = mlir_module.get();
-  builder.set_insertion_point_to_start(&(mlir_module->getBodyRegion()));
 
   vast::cg::symbol_tables symbols;
   vast::cg::module_scope scope(symbols);
