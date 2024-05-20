@@ -56,7 +56,7 @@ static clang::Type *BasicTypeDeduplication(
     EntityList<const clang::Stmt *> *list = nullptr);
 
 static clang::Type *BasicTypeDeduplication(
-    clang::ASTContext &ctx,clang::QualType type, uint32_t &up_quals,
+    clang::ASTContext &ctx, clang::QualType type, uint32_t &up_quals,
     EntityList<const clang::Stmt *> *list = nullptr) {
 
   clang::Type *tp = const_cast<clang::Type *>(type.getTypePtrOrNull());

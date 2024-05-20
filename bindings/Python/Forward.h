@@ -2069,7 +2069,6 @@ class TranslationUnitOp;
 class TypeDeclOp;
 class TypeDefOp;
 class TypeOfExprOp;
-class TypeOfTypeOp;
 class UnionDeclOp;
 class UnreachableOp;
 class VAArgExprOp;

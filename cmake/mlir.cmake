@@ -24,6 +24,9 @@ else()
     MLIRSupport
     MLIRTransforms
     MLIRTransformUtils
+    MLIRBytecodeReader
+    MLIRBytecodeWriter
+    MLIRBytecodeOpInterface
 
     ${MLIR_DIALECT_LIBS}
     ${MLIR_CONVERSION_LIBS}

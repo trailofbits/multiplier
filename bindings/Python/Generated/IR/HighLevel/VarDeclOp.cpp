@@ -135,26 +135,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "initializer",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializer());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::VarDeclOp::initializer"),
-    nullptr,
-  },
-  {
-    "allocation_size",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->allocation_size());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::VarDeclOp::allocation_size"),
-    nullptr,
-  },
-  {
     "name",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

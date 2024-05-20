@@ -37,6 +37,16 @@ bool FunctionType::is_var_arg(void) const {
   return val;
 }
 
+unsigned int FunctionType::num_inputs(void) const {
+  auto val = underlying_repr().getNumInputs();
+  return val;
+}
+
+unsigned int FunctionType::num_results(void) const {
+  auto val = underlying_repr().getNumResults();
+  return val;
+}
+
 bool FunctionType::var_arg(void) const {
   auto val = underlying_repr().getVarArg();
   return val;

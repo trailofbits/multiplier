@@ -427,7 +427,6 @@
    _hl("hl.type", OperationKind::HL_TYPE, vast::hl::TypeDeclOp) \
    _hl("hl.typedef", OperationKind::HL_TYPEDEF, vast::hl::TypeDefOp) \
    _hl("hl.typeof.expr", OperationKind::HL_TYPEOF_EXPR, vast::hl::TypeOfExprOp) \
-   _hl("hl.typeof.type", OperationKind::HL_TYPEOF_TYPE, vast::hl::TypeOfTypeOp) \
    _hl("hl.union", OperationKind::HL_UNION, vast::hl::UnionDeclOp) \
    _hl("hl.unreachable", OperationKind::HL_UNREACHABLE, vast::hl::UnreachableOp) \
    _hl("hl.va_arg_expr", OperationKind::HL_VA_ARG_EXPR, vast::hl::VAArgExpr) \
@@ -440,5 +439,5 @@
    _unsup("unsup.decl", OperationKind::UNSUP_DECL, vast::unsup::UnsupportedDecl) \
    _unsup("unsup.stmt", OperationKind::UNSUP_STMT, vast::unsup::UnsupportedStmt)
 
-#define MX_IR_NUM_MLIR_OPS 432
+#define MX_IR_NUM_MLIR_OPS 431
 

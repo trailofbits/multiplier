@@ -268,7 +268,7 @@ class MX_EXPORT BuiltinAttr final : public Attribute {
   ::vast::hl::BuiltinAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //unsignedint id(void) const;
+  unsigned int id(void) const;
 };
 static_assert(sizeof(BuiltinAttr) == sizeof(Attribute));
 

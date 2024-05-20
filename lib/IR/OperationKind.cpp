@@ -433,7 +433,6 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_TYPE: return "HL_TYPE";
     case ir::OperationKind::HL_TYPEDEF: return "HL_TYPEDEF";
     case ir::OperationKind::HL_TYPEOF_EXPR: return "HL_TYPEOF_EXPR";
-    case ir::OperationKind::HL_TYPEOF_TYPE: return "HL_TYPEOF_TYPE";
     case ir::OperationKind::HL_UNION: return "HL_UNION";
     case ir::OperationKind::HL_UNREACHABLE: return "HL_UNREACHABLE";
     case ir::OperationKind::HL_VA_ARG_EXPR: return "HL_VA_ARG_EXPR";
@@ -912,7 +911,6 @@ bool IsHighLevelOperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::HL_TYPE:
     case mx::ir::OperationKind::HL_TYPEDEF:
     case mx::ir::OperationKind::HL_TYPEOF_EXPR:
-    case mx::ir::OperationKind::HL_TYPEOF_TYPE:
     case mx::ir::OperationKind::HL_UNION:
     case mx::ir::OperationKind::HL_UNREACHABLE:
     case mx::ir::OperationKind::HL_VA_ARG_EXPR:

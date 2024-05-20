@@ -103,10 +103,8 @@ void LinkEntitiesAcrossFragments(
     }
 
     if (auto func = pasta::FunctionDecl::From(decl)) {
-      const auto &mangled_name = mangler.Mangle(decl);
       TrackRedeclarations(
-          database, pf.fragment_index, em,
-          (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
+          database, pf.fragment_index, em, mangler.Mangle(decl),
           decl, func->Redeclarations());
 
       // Don't mark a function template pattern as being part of a class.
@@ -119,10 +117,8 @@ void LinkEntitiesAcrossFragments(
         case pasta::DeclCategory::kGlobalVariable:
         case pasta::DeclCategory::kParameterVariable:
         case pasta::DeclCategory::kClassMember: {
-          const auto &mangled_name = mangler.Mangle(decl);
           TrackRedeclarations(
-              database, pf.fragment_index, em,
-              (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
+              database, pf.fragment_index, em, mangler.Mangle(decl),
               decl, var->Redeclarations());
           break;
         }

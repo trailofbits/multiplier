@@ -386,7 +386,7 @@ class MX_EXPORT ArrayType final : public Type {
   ::vast::hl::ArrayType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //std::tuple<vector<optional<unsignedlonglong>,allocator<optional<unsignedlonglong>>>,Type> dim__and__type(void) const;
+  //std::tuple<vector<optional<unsigned long long>, allocator<optional<unsigned long long>>>, Type> dim__and__type(void) const;
   //dimensions_t dimensions(void) const;
   //SizeParam size(void) const;
   //Type element_type(void) const;

@@ -142,7 +142,8 @@ class GlobalIndexingState {
   // Persist the compilation.
   void PersistCompilation(const pasta::Compiler &compiler,
                           const pasta::CompileJob &job, const pasta::AST &ast,
-                          const EntityMapper &em, mx::PackedCompilationId tu_id,
+                          const EntityMapper &em, const NameMangler &nm,
+                          mx::PackedCompilationId tu_id,
                           std::vector<mx::PackedFragmentId> fragment_ids);
 };
 

@@ -277,7 +277,6 @@ class Operation(multiplier.ir.Operation):
     ...
 
 class ModuleOp(multiplier.ir.builtin.Operation):
-  body_region: multiplier.ir.Region
   name: Optional[str]
   is_optional_symbol: bool
   default_dialect: str
@@ -316,6 +315,7 @@ class Type(multiplier.ir.Type):
 
 class ShapedType(multiplier.ir.builtin.Type):
   has_rank: bool
+  element_type_bit_width: int
   rank: int
   num_elements: int
   has_static_shape: bool
@@ -330,6 +330,8 @@ class ShapedType(multiplier.ir.builtin.Type):
     ...
 
 class FloatType(multiplier.ir.builtin.Type):
+  width: int
+  fp_mantissa_width: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
@@ -470,6 +472,8 @@ class Float128Type(multiplier.ir.builtin.Type):
     ...
 
 class FunctionType(multiplier.ir.builtin.Type):
+  num_inputs: int
+  num_results: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
@@ -493,6 +497,7 @@ class IntegerType(multiplier.ir.builtin.Type):
   is_signless: bool
   is_signed: bool
   is_unsigned: bool
+  width: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
@@ -503,6 +508,7 @@ class IntegerType(multiplier.ir.builtin.Type):
     ...
 
 class MemRefType(multiplier.ir.builtin.Type):
+  memory_space_as_int: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
@@ -554,6 +560,7 @@ class TupleType(multiplier.ir.builtin.Type):
     ...
 
 class UnrankedMemRefType(multiplier.ir.builtin.Type):
+  memory_space_as_int: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:

@@ -10,10 +10,14 @@
 #include <string>
 
 #include <multiplier/Types.h>
+#include <pasta/AST/Decl.h>
 
+namespace clang {
+class Decl;
+class NamedDecl;
+}  // namespace clang
 namespace pasta {
 class AST;
-class Decl;
 }  // namespace pasta
 namespace indexer {
 
@@ -31,12 +35,12 @@ class NameMangler {
 
   // Returns the mangled name of `decl`.
   //
-  // NOTE(pag): The same string reference is returned upon each call.
-  const std::string &Mangle(const pasta::Decl &decl) const;
+  // NOTE(pag): The same string reference may be returned across calls.
+  const std::string &Mangle(const clang::Decl *decl) const;
 
-  // This is not a very good API, but basically says that the mangled name
-  // can probably be trusted.
-  bool MangledNameIsPrecise(void) const;
+  inline const std::string &Mangle(const pasta::Decl &decl) const {
+    return Mangle(decl.RawDecl());
+  }
 };
 
 }  // namespace indexer

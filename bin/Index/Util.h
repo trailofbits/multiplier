@@ -108,7 +108,14 @@ std::string PrefixedName(const pasta::Decl &decl, const char *prefix=" ");
 std::string PrefixedLocation(const pasta::Decl &decl, const char *prefix=" ");
 
 // Return the location of a declaration with a leading `prefix`, or nothing.
-std::string PrefixedLocation(const std::vector<pasta::Decl> &, const char *prefix=" ");
+std::string PrefixedLocation(const std::vector<pasta::Decl> &,
+                             const char *prefix=" ");
+
+// Return the location of a statement with a leading `prefix`, or nothing.
+std::string PrefixedLocation(const pasta::Stmt &stmt, const char *prefix=" ");
+
+// Return the location of an attribute with a leading `prefix`, or nothing.
+std::string PrefixedLocation(const pasta::Attr &stmt, const char *prefix=" ");
 
 // Returns `true` if `data` contains only whitespace or is empty.
 bool IsWhitespaceOrEmpty(std::string_view data);

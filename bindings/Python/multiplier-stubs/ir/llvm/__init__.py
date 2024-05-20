@@ -173,6 +173,7 @@ class LoopAnnotationAttr(multiplier.ir.llvm.Attribute):
     ...
 
 class DIExpressionElemAttr(multiplier.ir.llvm.Attribute):
+  opcode: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -203,7 +204,9 @@ class DINullTypeAttr(multiplier.ir.llvm.Attribute):
     ...
 
 class DIBasicTypeAttr(multiplier.ir.llvm.Attribute):
+  tag: int
   size_in_bits: int
+  encoding: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -214,6 +217,7 @@ class DIBasicTypeAttr(multiplier.ir.llvm.Attribute):
     ...
 
 class DICompileUnitAttr(multiplier.ir.llvm.Attribute):
+  source_language: int
   is_optimized: bool
 
   @staticmethod
@@ -225,6 +229,7 @@ class DICompileUnitAttr(multiplier.ir.llvm.Attribute):
     ...
 
 class DICompositeTypeAttr(multiplier.ir.llvm.Attribute):
+  tag: int
   line: int
   size_in_bits: int
   align_in_bits: int
@@ -238,6 +243,7 @@ class DICompositeTypeAttr(multiplier.ir.llvm.Attribute):
     ...
 
 class DIDerivedTypeAttr(multiplier.ir.llvm.Attribute):
+  tag: int
   size_in_bits: int
   align_in_bits: int
   offset_in_bits: int
@@ -271,8 +277,10 @@ class DIGlobalVariableExpressionAttr(multiplier.ir.llvm.Attribute):
     ...
 
 class DIGlobalVariableAttr(multiplier.ir.llvm.Attribute):
+  line: int
   is_local_to_unit: bool
   is_defined: bool
+  align_in_bits: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -283,6 +291,8 @@ class DIGlobalVariableAttr(multiplier.ir.llvm.Attribute):
     ...
 
 class DILexicalBlockAttr(multiplier.ir.llvm.Attribute):
+  line: int
+  column: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -293,6 +303,7 @@ class DILexicalBlockAttr(multiplier.ir.llvm.Attribute):
     ...
 
 class DILexicalBlockFileAttr(multiplier.ir.llvm.Attribute):
+  discriminator: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -303,6 +314,9 @@ class DILexicalBlockFileAttr(multiplier.ir.llvm.Attribute):
     ...
 
 class DILocalVariableAttr(multiplier.ir.llvm.Attribute):
+  line: int
+  arg: int
+  align_in_bits: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -313,6 +327,8 @@ class DILocalVariableAttr(multiplier.ir.llvm.Attribute):
     ...
 
 class DISubprogramAttr(multiplier.ir.llvm.Attribute):
+  line: int
+  scope_line: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -323,6 +339,7 @@ class DISubprogramAttr(multiplier.ir.llvm.Attribute):
     ...
 
 class DIModuleAttr(multiplier.ir.llvm.Attribute):
+  line: int
   is_decl: bool
 
   @staticmethod
@@ -355,6 +372,7 @@ class DISubrangeAttr(multiplier.ir.llvm.Attribute):
     ...
 
 class DISubroutineTypeAttr(multiplier.ir.llvm.Attribute):
+  calling_convention: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -365,6 +383,7 @@ class DISubroutineTypeAttr(multiplier.ir.llvm.Attribute):
     ...
 
 class DILabelAttr(multiplier.ir.llvm.Attribute):
+  line: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -702,7 +721,6 @@ class CallOp(multiplier.ir.llvm.Operation):
     ...
 
 class ComdatOp(multiplier.ir.llvm.Operation):
-  body: multiplier.ir.Region
   sym_name: str
 
   @staticmethod
@@ -1051,7 +1069,6 @@ class GlobalDtorsOp(multiplier.ir.llvm.Operation):
     ...
 
 class GlobalOp(multiplier.ir.llvm.Operation):
-  initializer: multiplier.ir.Region
   constant: bool
   sym_name: str
   dso_local: bool
@@ -1171,7 +1188,6 @@ class InvokeOp(multiplier.ir.llvm.Operation):
     ...
 
 class FuncOp(multiplier.ir.llvm.Operation):
-  body: multiplier.ir.Region
   sym_name: str
   dso_local: bool
   is_var_arg: bool
@@ -4556,6 +4572,7 @@ class Type(multiplier.ir.Type):
     ...
 
 class ArrayType(multiplier.ir.llvm.Type):
+  num_elements: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
@@ -4567,6 +4584,7 @@ class ArrayType(multiplier.ir.llvm.Type):
 
 class FunctionType(multiplier.ir.llvm.Type):
   is_var_arg: bool
+  num_params: int
   var_arg: bool
 
   @staticmethod
@@ -4578,6 +4596,7 @@ class FunctionType(multiplier.ir.llvm.Type):
     ...
 
 class PointerType(multiplier.ir.llvm.Type):
+  address_space: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
@@ -4588,6 +4607,7 @@ class PointerType(multiplier.ir.llvm.Type):
     ...
 
 class FixedVectorType(multiplier.ir.llvm.Type):
+  num_elements: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:
@@ -4598,6 +4618,7 @@ class FixedVectorType(multiplier.ir.llvm.Type):
     ...
 
 class ScalableVectorType(multiplier.ir.llvm.Type):
+  min_num_elements: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:

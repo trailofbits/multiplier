@@ -125,6 +125,56 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
+    "src_mem_ref_rank",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->src_mem_ref_rank());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::DMAStartOp::src_mem_ref_rank"),
+    nullptr,
+  },
+  {
+    "dst_mem_ref_rank",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->dst_mem_ref_rank());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::DMAStartOp::dst_mem_ref_rank"),
+    nullptr,
+  },
+  {
+    "src_memory_space",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->src_memory_space());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::DMAStartOp::src_memory_space"),
+    nullptr,
+  },
+  {
+    "dst_memory_space",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->dst_memory_space());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::DMAStartOp::dst_memory_space"),
+    nullptr,
+  },
+  {
+    "tag_mem_ref_rank",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->tag_mem_ref_rank());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::DMAStartOp::tag_mem_ref_rank"),
+    nullptr,
+  },
+  {
     "is_dest_memory_space_faster",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -142,6 +192,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::memref::DMAStartOp::is_src_memory_space_faster"),
+    nullptr,
+  },
+  {
+    "faster_mem_pos",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->faster_mem_pos());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::DMAStartOp::faster_mem_pos"),
     nullptr,
   },
   {

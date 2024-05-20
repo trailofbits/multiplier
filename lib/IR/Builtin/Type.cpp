@@ -36,6 +36,11 @@ bool ShapedType::has_rank(void) const {
   return val;
 }
 
+unsigned int ShapedType::element_type_bit_width(void) const {
+  auto val = underlying_repr().getElementTypeBitWidth();
+  return val;
+}
+
 int64_t ShapedType::rank(void) const {
   auto val = underlying_repr().getRank();
   return val;
@@ -65,6 +70,16 @@ std::optional<FloatType> FloatType::from(const ::mx::ir::Type &that) {
 
 ::mlir::FloatType FloatType::underlying_repr(void) const noexcept {
   return ::mlir::FloatType(this->::mx::ir::Type::type_);
+}
+
+unsigned int FloatType::width(void) const {
+  auto val = underlying_repr().getWidth();
+  return val;
+}
+
+unsigned int FloatType::fp_mantissa_width(void) const {
+  auto val = underlying_repr().getFPMantissaWidth();
+  return val;
 }
 
 std::optional<ComplexType> ComplexType::from(const ::mx::ir::Type &that) {
@@ -221,6 +236,16 @@ std::optional<FunctionType> FunctionType::from(const ::mx::ir::Type &that) {
   return ::mlir::FunctionType(this->::mx::ir::Type::type_);
 }
 
+unsigned int FunctionType::num_inputs(void) const {
+  auto val = underlying_repr().getNumInputs();
+  return val;
+}
+
+unsigned int FunctionType::num_results(void) const {
+  auto val = underlying_repr().getNumResults();
+  return val;
+}
+
 std::optional<IndexType> IndexType::from(const ::mx::ir::Type &that) {
   if (that.kind() == TypeKind::BUILTIN_INDEX) {
     return reinterpret_cast<const IndexType &>(that);
@@ -258,6 +283,11 @@ bool IntegerType::is_unsigned(void) const {
   return val;
 }
 
+unsigned int IntegerType::width(void) const {
+  auto val = underlying_repr().getWidth();
+  return val;
+}
+
 std::optional<MemRefType> MemRefType::from(const ::mx::ir::Type &that) {
   if (that.kind() == TypeKind::BUILTIN_MEM_REF) {
     return reinterpret_cast<const MemRefType &>(that);
@@ -267,6 +297,11 @@ std::optional<MemRefType> MemRefType::from(const ::mx::ir::Type &that) {
 
 ::mlir::MemRefType MemRefType::underlying_repr(void) const noexcept {
   return ::mlir::MemRefType(this->::mx::ir::Type::type_);
+}
+
+unsigned int MemRefType::memory_space_as_int(void) const {
+  auto val = underlying_repr().getMemorySpaceAsInt();
+  return val;
 }
 
 std::optional<NoneType> NoneType::from(const ::mx::ir::Type &that) {
@@ -331,6 +366,11 @@ std::optional<UnrankedMemRefType> UnrankedMemRefType::from(const ::mx::ir::Type 
 
 ::mlir::UnrankedMemRefType UnrankedMemRefType::underlying_repr(void) const noexcept {
   return ::mlir::UnrankedMemRefType(this->::mx::ir::Type::type_);
+}
+
+unsigned int UnrankedMemRefType::memory_space_as_int(void) const {
+  auto val = underlying_repr().getMemorySpaceAsInt();
+  return val;
 }
 
 std::optional<UnrankedTensorType> UnrankedTensorType::from(const ::mx::ir::Type &that) {

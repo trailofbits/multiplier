@@ -46,11 +46,6 @@ std::optional<UnsupportedDeclOp> UnsupportedDeclOp::producing(const ::mx::ir::Va
   return ::vast::unsup::UnsupportedDecl(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region UnsupportedDeclOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::string_view UnsupportedDeclOp::name(void) const {
   auto val = underlying_repr().getName();
   if (auto size = val.size()) {

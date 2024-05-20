@@ -435,7 +435,6 @@ enum class OperationKind : unsigned {
   HL_TYPE,  // hl.type
   HL_TYPEDEF,  // hl.typedef
   HL_TYPEOF_EXPR,  // hl.typeof.expr
-  HL_TYPEOF_TYPE,  // hl.typeof.type
   HL_UNION,  // hl.union
   HL_UNREACHABLE,  // hl.unreachable
   HL_VA_ARG_EXPR,  // hl.va_arg_expr
@@ -456,7 +455,7 @@ inline static const char *EnumerationName(ir::OperationKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::OperationKind) {
-  return 433;
+  return 432;
 }
 
 MX_EXPORT const char *EnumeratorName(ir::OperationKind);

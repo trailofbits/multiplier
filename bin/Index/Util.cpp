@@ -253,6 +253,44 @@ std::string PrefixedLocation(const std::vector<pasta::Decl> &decls,
   return "";
 }
 
+// Return the location of a statement with a leading `prefix`, or nothing.
+std::string PrefixedLocation(const pasta::Stmt &stmt, const char *prefix) {
+  std::optional<pasta::FileToken> ft;
+  for (auto tok : stmt.Tokens()) {
+    ft = tok.FileLocation();
+    if (ft) {
+      break;
+    }
+  }
+  if (ft) {
+    auto file = pasta::File::Containing(*ft);
+    std::stringstream ss;
+    ss << prefix << file.Path().lexically_normal().generic_string()
+       << ':' << ft->Line() << ':' << ft->Column();
+    return ss.str();
+  }
+  return "";
+}
+
+// Return the location of an attribute with a leading `prefix`, or nothing.
+std::string PrefixedLocation(const pasta::Attr &attr, const char *prefix) {
+  std::optional<pasta::FileToken> ft;
+  for (auto tok : attr.Tokens()) {
+    ft = tok.FileLocation();
+    if (ft) {
+      break;
+    }
+  }
+  if (ft) {
+    auto file = pasta::File::Containing(*ft);
+    std::stringstream ss;
+    ss << prefix << file.Path().lexically_normal().generic_string()
+       << ':' << ft->Line() << ':' << ft->Column();
+    return ss.str();
+  }
+  return "";
+}
+
 // Returns `true` if `data` contains only whitespace or is empty.
 bool IsWhitespaceOrEmpty(std::string_view data) {
   for (auto ch : data) {

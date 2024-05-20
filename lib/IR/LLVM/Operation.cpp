@@ -398,11 +398,6 @@ std::optional<ComdatOp> ComdatOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::ComdatOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region ComdatOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::string_view ComdatOp::sym_name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
@@ -1007,11 +1002,6 @@ std::optional<GlobalOp> GlobalOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::GlobalOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region GlobalOp::initializer(void) const {
-  auto &val = underlying_repr().getInitializer();
-  return ::mx::ir::Region(module_, val);
-}
-
 bool GlobalOp::constant(void) const {
   auto val = underlying_repr().getConstant();
   return val;
@@ -1253,11 +1243,6 @@ std::optional<FuncOp> FuncOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::LLVMFuncOp FuncOp::underlying_repr(void) const noexcept {
   return ::mlir::LLVM::LLVMFuncOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region FuncOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::string_view FuncOp::sym_name(void) const {

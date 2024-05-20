@@ -277,7 +277,7 @@ class MX_EXPORT SparseElementsAttr final : public Attribute {
   //APFloat zero_ap_float(void) const;
   //APInt zero_ap_int(void) const;
   //Attribute zero_attr(void) const;
-  //std::vector<long,allocator<long>> flattened_sparse_indices(void) const;
+  //std::vector<long, allocator<long>> flattened_sparse_indices(void) const;
   //ShapedType type(void) const;
   //DenseIntElementsAttr indices(void) const;
   //DenseElementsAttr values(void) const;
@@ -296,7 +296,7 @@ class MX_EXPORT StridedLayoutAttr final : public Attribute {
 
   // Imported methods:
   int64_t offset(void) const;
-  //::llvm::ArrayRef<longlong> strides(void) const;
+  //::llvm::ArrayRef<long long> strides(void) const;
   //::mlir::AffineMap affine_map(void) const;
 };
 static_assert(sizeof(StridedLayoutAttr) == sizeof(Attribute));
@@ -312,10 +312,10 @@ class MX_EXPORT StringAttr final : public Attribute {
   ::mlir::StringAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //Dialect* referenced_dialect(void) const;
+  //Dialect * referenced_dialect(void) const;
   //StringRef strref(void) const;
   std::string str(void) const;
-  //constchar* data(void) const;
+  //const char * data(void) const;
   //size_t size(void) const;
   bool empty(void) const;
   //StringRef::iterator begin(void) const;
