@@ -983,7 +983,7 @@ void GlobalIndexingState::PersistFragment(
 // Persist the compilation.
 void GlobalIndexingState::PersistCompilation(
     const pasta::Compiler &compiler, const pasta::CompileJob &job,
-    const pasta::AST &ast, const EntityMapper &em,
+    const pasta::AST &ast, const EntityMapper &em, const NameMangler &nm,
     mx::PackedCompilationId tu_id,
     std::vector<mx::PackedFragmentId> fragment_ids) {
 
@@ -1066,7 +1066,7 @@ void GlobalIndexingState::PersistCompilation(
     sourceir_progress->AddWork(1u);
   }
 
-  if (std::string mlir = codegen.GenerateSourceIR(ast, em);
+  if (std::string mlir = codegen.GenerateSourceIR(ast, em, nm);
       !mlir.empty()) {
     cb.setMlir(mlir);
     if (sourceir_progress) {

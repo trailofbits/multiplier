@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1290]) || tp >= &(gTypes[1404])) {
+  if (tp < &(gTypes[1290]) || tp >= &(gTypes[1403])) {
     return std::nullopt;
   }
 
@@ -525,20 +525,16 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       tp = &(gTypes[1399]);
       break;
 
-    case mx::ir::hl::TypeOfTypeOp::static_kind():
+    case mx::ir::hl::UnionDeclOp::static_kind():
       tp = &(gTypes[1400]);
       break;
 
-    case mx::ir::hl::UnionDeclOp::static_kind():
+    case mx::ir::hl::UnreachableOp::static_kind():
       tp = &(gTypes[1401]);
       break;
 
-    case mx::ir::hl::UnreachableOp::static_kind():
-      tp = &(gTypes[1402]);
-      break;
-
     case mx::ir::hl::VAArgExprOp::static_kind():
-      tp = &(gTypes[1403]);
+      tp = &(gTypes[1402]);
       break;
 
   }

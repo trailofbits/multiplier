@@ -498,7 +498,7 @@ class TLDFinder final : public pasta::DeclVisitor {
         Accept(child);
         CHECK(seen.count(raw_child))
             << "Revisiting " << child.KindName()
-            << PrefixedLocation(child, " at or near ")<< " in main job file "
+            << PrefixedLocation(child, " at or near ") << " in main job file "
             << main_file_path << " (parent is lambda="
             << IsLambda(parent) << "; child is lambda=" << IsLambda(child)
             << "; deferred_seen=" << deferred_seen.count(raw_child)
@@ -3193,7 +3193,7 @@ void FragmentCollector::PersistParsedFragments(void) {
     pf.reset();  // Don't need it anymore.
   }
 
-  context.PersistCompilation(compiler, job, ast, em, tu_id,
+  context.PersistCompilation(compiler, job, ast, em, nm, tu_id,
                              std::move(fragment_ids));
 }
 

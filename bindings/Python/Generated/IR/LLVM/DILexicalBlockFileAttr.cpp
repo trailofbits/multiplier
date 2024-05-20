@@ -124,6 +124,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "discriminator",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->discriminator());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::DILexicalBlockFileAttr::discriminator"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

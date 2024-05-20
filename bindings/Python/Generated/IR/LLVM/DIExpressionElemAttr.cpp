@@ -124,6 +124,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "opcode",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->opcode());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::DIExpressionElemAttr::opcode"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

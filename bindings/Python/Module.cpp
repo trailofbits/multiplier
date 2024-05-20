@@ -2267,7 +2267,6 @@ static LoaderFunc * const gHighLevelLoaders[] = {
   PythonBinding<mx::ir::hl::TypeDeclOp>::load,
   PythonBinding<mx::ir::hl::TypeDefOp>::load,
   PythonBinding<mx::ir::hl::TypeOfExprOp>::load,
-  PythonBinding<mx::ir::hl::TypeOfTypeOp>::load,
   PythonBinding<mx::ir::hl::UnionDeclOp>::load,
   PythonBinding<mx::ir::hl::UnreachableOp>::load,
   PythonBinding<mx::ir::hl::VAArgExprOp>::load,

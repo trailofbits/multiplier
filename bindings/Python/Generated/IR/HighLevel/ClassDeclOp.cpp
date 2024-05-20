@@ -125,26 +125,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "bases",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->bases());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::ClassDeclOp::bases"),
-    nullptr,
-  },
-  {
-    "fields",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->fields());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::ClassDeclOp::fields"),
-    nullptr,
-  },
-  {
     "name",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

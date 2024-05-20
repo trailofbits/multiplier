@@ -124,6 +124,26 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "line",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->line());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::DISubprogramAttr::line"),
+    nullptr,
+  },
+  {
+    "scope_line",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->scope_line());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::DISubprogramAttr::scope_line"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

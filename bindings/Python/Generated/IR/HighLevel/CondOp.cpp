@@ -134,36 +134,6 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::hl::CondOp::result"),
     nullptr,
   },
-  {
-    "cond_region",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->cond_region());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::CondOp::cond_region"),
-    nullptr,
-  },
-  {
-    "then_region",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->then_region());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::CondOp::then_region"),
-    nullptr,
-  },
-  {
-    "else_region",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->else_region());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::CondOp::else_region"),
-    nullptr,
-  },
   {}  // Sentinel.
 };
 }  // namespace
