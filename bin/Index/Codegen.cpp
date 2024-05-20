@@ -438,8 +438,10 @@ std::string CodeGenerator::GenerateSourceIR(
   vast::cg::module_generator generator(builder, visitor, options);
 
   try {
-    generator.emit(const_cast<clang::TranslationUnitDecl *>(
-        ast.TranslationUnit().RawDecl()));
+    auto decls = GenerateDeclarationsInDeclContext(ast.TranslationUnit());
+    for (const auto &decl : decls) {
+      generator.emit(const_cast<clang::Decl *>(decl.RawDecl()));
+    }
     generator.finalize();
     vast::cg::emit_data_layout(mlir_context, mlir_module, codegen.dl_blueprint);
 
