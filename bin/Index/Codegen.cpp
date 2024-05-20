@@ -19,6 +19,7 @@ VAST_RELAX_WARNINGS
 #include <mlir/IR/MLIRContext.h>
 #include <mlir/IR/OperationSupport.h>
 #include <mlir/InitAllDialects.h>
+#include <mlir/IR/Verifier.h>
 VAST_UNRELAX_WARNINGS
 
 #include <exception>
@@ -32,6 +33,7 @@ VAST_UNRELAX_WARNINGS
 #include <vast/CodeGen/CodeGenMeta.hpp>
 #include <vast/CodeGen/CodeGenOptions.hpp>
 #include <vast/CodeGen/CodeGenVisitor.hpp>
+#include <vast/CodeGen/DataLayout.hpp>
 #include <vast/CodeGen/DefaultVisitor.hpp>
 #include <vast/CodeGen/FallBackVisitor.hpp>
 #include <vast/CodeGen/ScopeContext.hpp>
@@ -57,9 +59,6 @@ namespace {
 class MetaGenerator final : public vast::cg::meta_generator {
  private:
 
-  // Pasta AST context
-  const pasta::AST &ast;
-
   // Entity mapper; The entity id gets embedded as meta data
   const EntityMapper &em;
 
@@ -71,10 +70,8 @@ class MetaGenerator final : public vast::cg::meta_generator {
  public:
   virtual ~MetaGenerator(void) = default;
 
-  MetaGenerator(const pasta::AST &ast, mlir::MLIRContext &mctx_,
-                const EntityMapper &em)
-      : ast(ast),
-        em(em),
+  MetaGenerator(mlir::MLIRContext &mctx_, const EntityMapper &em)
+      : em(em),
         mctx(&mctx_),
         unknown_location(mlir::UnknownLoc::get(mctx)) {}
 
@@ -428,10 +425,10 @@ std::string CodeGenerator::GenerateSourceIR(
   vast::cg::symbol_tables symbols;
   vast::cg::module_scope scope(symbols);
 
-  MetaGenerator meta_generator(ast, mlir_context, em);
+  MetaGenerator meta_generator(mlir_context, em);
   SymbolGenerator symbol_generator(nm);
-  CodeGenVisitor codegen(mlir_context, ast_context, mlir_context, meta_generator,
-                         builder, symbol_generator, options);
+  CodeGenVisitor codegen(ast, ast_context, mlir_context, builder,
+                         meta_generator, symbol_generator, options);
 
   vast::cg::scoped_visitor_view visitor(codegen, scope);
   vast::cg::module_generator generator(builder, visitor, options);
