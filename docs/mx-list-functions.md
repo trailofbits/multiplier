@@ -1,7 +1,6 @@
 # `mx-list-functions`
 
-This tool is one of the easiest to understand, and it has some immediate value.
-Its purpose is to list out functions in the indexed codebase.
+This tool lists all functions in the indexed codebase.
 
 ```shell
 % mx-list-functions --db /tmp/test.db 
