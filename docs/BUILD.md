@@ -87,7 +87,8 @@ You should use at least Python 3.12 because of its support for subinterpreters.
 ## Step 3: Download and build Multiplier
 
 **Note:** Multiplier will download and build most/all of its dependencies during
-CMake's configuration stage, unless you specify otherwise.
+CMake's configuration stage, unless you specify otherwise. Thus, you *do not*
+need to recursively initialize/clone its submodules.
 
 ```shell
 cd "${WORKSPACE_DIR}/src"

@@ -3,9 +3,9 @@
 ## Basic usage
 
 Once installed, a build of a codebase can be indexed by the `mx-index` binary.
-Indexing produces a SQLite database, whose path is specified using the `--db`
-command-line option. If you omit `--db` then the index is stored in
-`./mx-index.db`.
+Indexing produces a [SQLite](https://sqlite.org/) database, whose path is
+specified using the `--db` command-line option. If you omit `--db` then the
+index is stored in `./mx-index.db`.
 
 Indexing is computationally expensive, and could take up to 30x for C code and
 300x for C++ code the time to build / compile the target codebase. Because of
@@ -173,7 +173,7 @@ save a `compile_commands.json` file in the build directory.
 Install [`scan-build`](https://github.com/rizsotto/scan-build) and then prefix
 your build command, such as `make`, with `intercept-build`, for example: `intercept-build make`. This will save a `compile_commands.json` file in the current directory.
 
-### Importing builds from target binaries
+## Importing builds from target binaries
 Install a [branch](https://github.com/trailofbits/blight/tree/kumarak/embed_compile_command) of [Blight](https://github.com/trailofbits/blight), ideally into a Python virtual environment (to isolate it from your globally installed Python packages), as follows:
 
 ```shell

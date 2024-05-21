@@ -11,10 +11,11 @@ persistent forms of AST nodes found in Clang, and the methods available on these
 entities mirror those that can be called on those objects in-memory in Clang.
 With Multiplier's API, you can get everywhere from anywhere.
 
-* [Getting and building the code](docs/BUILD.md)
 * About
   * [How do other indexers work](docs/other-indexers.md), and why the normal way of indexing code is insufficient for C/C++ 
-  * [What analysis challenges Multiplier solves](docs/why-multiplier.md)
+  * [Why Multiplier?](docs/why-multiplier.md) What analysis challenges does Multiplier solve?
+* Usage
+  * [Getting and building the code](docs/BUILD.md)
   * [Installing a pre-built release](docs/INSTALLING.md)
   * [How to index a codebase](docs/INDEXING.md)
 * Included tools
