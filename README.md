@@ -1,15 +1,18 @@
 # Multiplier: Find more bugs faster
 
-Multiplier provides precise, and comprehensive code understanding capabilities
-by storing a compressed representation of build artifacts, called entities, in
-an index database. Entities in Multiplier's index include files, tokens, macro
-expansions, abstract syntax tree (AST) nodes, and compilations (represented with
-MLIR). Each entity is uniquely identified by a 64 bit integer, and is available
-through scripting in C++ or Python as a fully formed object with methods. For
-example, the AST entities (declarations, statements, types, templates, etc.) are
-persistent forms of AST nodes found in Clang, and the methods available on these
-entities mirror those that can be called on those objects in-memory in Clang.
-With Multiplier's API, you can get everywhere from anywhere.
+Multiplier provides precise and comprehensive code understanding capabilities.
+It does so by persisting build artifacts into a database, and then making them
+persistently accessible using a C++ or Python API.
+
+Multiplier emphasizes the ability to unique identify *all* entities in a build
+process, including individual tokens, AST nodes, and intermediate
+representations. With Multiplier, an analyst can identify code patterns of
+interest over one of the representations, and then accurately relay results back
+to humans in a readable form, or to follow-on scripts via entity IDs.
+
+Multiplier's APIs are extensive, and often provide as-good or better-than
+compiler-level quality information, but linked at a whole-program level. We like
+to say that with its APIs, *you can get everywhere from anywhere*.
 
 * About
   * [How do other indexers work](docs/other-indexers.md), and why the normal way of indexing code is insufficient for C/C++ 
@@ -19,11 +22,11 @@ With Multiplier's API, you can get everywhere from anywhere.
   * [Installing a pre-built release](docs/INSTALLING.md)
   * [How to index a codebase](docs/INDEXING.md)
 * Included tools
-  * [Finds function calls that are inside of the argument list of macros](docs/mx-find-calls-in-macro-expansions.md)
+  * [Find function calls inside macro argument lists](docs/mx-find-calls-in-macro-expansions.md)
   * [Find possible divergent representations](docs/mx-find-divergent-candidates.md)
   * [Find uses of `copy_to_user` in the Linux kernel that overwrite flexible array members](docs/mx-find-flexible-user-copies.md)
   * [Find data structures containing self-referential pointers, such as linked lists and trees](docs/mx-find-linked-structures.md)
-  * [Generic finder for "sketchy" casts flowing to function arguments and to return sites](docs/mx-find-sketchy-casts.md)
+  * [Find "sketchy" casts flowing to function arguments and to return sites](docs/mx-find-sketchy-casts.md)
   * [Extract an entity, e.g. a function, and all of its dependencies into a file](docs/mx-harness.md)
   * [Highlight a specific entity within its surrounding code](docs/mx-highlight-entity.md)
   * [Print a call graph](docs/mx-print-call-graph.md)
