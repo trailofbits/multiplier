@@ -1,4 +1,4 @@
-# _Multiplier_ finds more bugs faster
+# __Multiplier__ finds more bugs faster
 
 Multiplier provides precise and comprehensive code understanding capabilities.
 It does so by persisting build artifacts into a database, and then making them
